@@ -1,0 +1,45 @@
+#!/bin/bash
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+# This script should create VPS private area
+# For usage info see vz-create_prvt(5) man page.
+#
+# Parameters are passed in environment variables.
+# Required parameters:
+#   VE_PRVT		- path to root of VPS private areas
+#   PRIVATE_TEMPLATE	- path to private template used as a source for copying
+
+. /usr/lib/vzctl/scripts/vps-functions
+
+vzcheckvar VE_PRVT PRIVATE_TEMPLATE
+
+function create_prvt()
+{
+	if test ! -d ${VE_PRVT}; then
+		vzerror "Destination dir doesn't exists: ${VE_PRVT}" $VZ_FS_NEW_VE_PRVT 
+	fi
+
+	if test ! -f $PRIVATE_TEMPLATE; then
+		vzerror "Tarball does not exist: ${PRIVATE_TEMPLATE}" $VZ_FS_NEW_VE_PRVT
+	fi
+	TMP=`df -P ${VE_PRVT}`
+	AVAIL=`echo "${TMP}" | awk 'END{print $4}'`
+	NEEDED=`gzip -l  ${PRIVATE_TEMPLATE} | awk 'END{print int($2/1024)}'`
+	if test ${AVAIL} -lt ${NEEDED}; then
+		vzerror "Insufficient disk space in ${VE_PRVT} available: ${AVAIL} needed: ${NEEDED} <${TMP}>" ${VZ_FS_NO_DISK_SPACE}
+	fi
+	tar -C ${VE_PRVT} ${TAR_OPT} -xzf ${PRIVATE_TEMPLATE}
+	if [ $? -ne 0 ]; then
+		vzerror "Error in tar xzf $PRIVATE_TEMPLATE ${exclude}" $VZ_FS_NEW_VE_PRVT
+	fi
+}
+
+create_prvt
+exit 0

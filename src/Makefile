@@ -1,0 +1,178 @@
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+
+     INSTALL = install
+      PREFIX = /usr
+     SBINDIR = $(PREFIX)/sbin
+      LIBDIR = $(PREFIX)/lib/vzctl
+    CACHEDIR = /vz/template/cache
+   GLBCONFIG = /etc/sysconfig/vz
+  VPSCONFDIR = /etc/sysconfig/vz-scripts
+ DISTCONFDIR = $(VPSCONFDIR)/dists
+NETSCRIPTDIR = /etc/sysconfig/network-scripts
+    CRONDDIR = /etc/cron.d
+    INITDDIR = /etc/init.d
+   VZLOCKDIR = /vz/lock
+     LOGRDIR = /etc/logrotate.d
+     LIB_VER = 0.0.1
+
+export LD_LIBRARY_PATH=.
+CC = gcc
+CFLAGS = -Wall -g2 
+VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
+INC = -I ../include -I$(VZKERNEL_HEADERS)
+
+OBJ_libvzctl = lib/env.o lib/ub.o lib/net.o lib/logger.o lib/exec.o lib/cap.o \
+	lib/cpu.o lib/res.o lib/util.o lib/dist.o lib/list.o lib/script.o \
+	lib/dev.o lib/config.o lib/lock.o lib/quota.o lib/modules.o \
+	lib/iptables.o lib/fs.o lib/create.o
+OBJ_simfs=lib/fs_simfs.o
+OBJ_vzctl = vzctl.o vzctl-actions.o modules.o enter.o
+OBJ_vzlist = vzlist.o
+OBJ_arp = arpsend.o
+OBJ_split = vzsplit.o
+OBJ_memcheck = vzmemcheck.o validate.o
+OBJ_cfgvalidate = vzcfgvalidate.o validate.o
+OBJ_cacl = vzcalc.o
+OBJ = $(OBJ_libvzctl) $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_split)
+LIB_vzctl = libvzctl.so.$(LIB_VER)
+LIB_simfs = libvzctl-simfs.so.$(LIB_VER)
+LIB_fs = libvzctl-fs.so
+
+LD_FLAGS = -L. -Wl,-rpath=$(LIBDIR)/lib -ldl
+LIBSCRIPTS = vps-create vps-postcreate vps-net_add vps-net_del vps-stop \
+     vps-functions
+
+PROGS = vzctl vzlist arpsend vzsplit vzcfgvalidate vzmemcheck vzcalc
+LIBS = $(LIB_vzctl) $(LIB_simfs)
+
+INITSCRIPTS = vz
+CRONSCRIPTS = vpsreboot vpsnetclean
+SCRIPTS = vpsreboot vpsnetclean
+NETSCRIPTS = ifcfg-venet0 ifdown-venet ifup-venet
+VECONFIG = ve-light.conf-sample ve-vps.basic.conf-sample 
+default: all
+
+all: $(PROGS) $(LIBS)
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $(INC) $< -o $@
+
+$(LIB_simfs) : $(OBJ_simfs)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_simfs) -shared -o $@; \
+	ln -sf $(LIB_simfs) $(LIB_fs)
+
+libvzctl.a: $(OBJ_libvzctl)
+	ar scq $@ $+
+	ranlib $@
+
+$(LIB_vzctl) : $(LIB_simfs) $(OBJ_libvzctl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_libvzctl) $(LD_FLAGS) $(LIB_fs) -shared -o $@
+
+vzctl-static: $(OBJ_vzctl) libvzctl.a
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(OBJ_simfs) libvzctl.a -rdynamic -ldl -lutil -o $@
+
+vzctl: $(LIB_vzctl) $(OBJ_vzctl) 
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) -lutil -o $@
+
+vzlist: $(OBJ_vzlist) 
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_vzctl) -o $@
+
+arpsend: $(OBJ_arp)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
+
+vzsplit: $(OBJ_split)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
+
+vzmemcheck: $(OBJ_memcheck)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(LD_FLAGS) $(LIB_vzctl) $^ -o $@
+
+vzcfgvalidate: $(OBJ_cfgvalidate)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_vzctl) -o $@
+
+vzcalc: $(OBJ_cacl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_vzctl) -o $@
+
+inst-sbin :$(PROGS)
+	for file in $(PROGS); do \
+		$(INSTALL) $$file $(DESTDIR)$(SBINDIR)/$$file; \
+	done
+inst-lib: $(LIB_vzctl)
+	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/lib
+	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/scripts
+	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/lib/$(LIB_vzctl)
+	$(INSTALL) $(LIB_simfs) $(DESTDIR)$(LIBDIR)/lib/$(LIB_simfs)
+	cp -a $(LIB_fs) $(DESTDIR)$(LIBDIR)/lib/$(LIB_fs)
+	for file in $(LIBSCRIPTS); do 					\
+		$(INSTALL) ../etc/$$file $(DESTDIR)$(LIBDIR)/scripts/$$file; \
+	done
+inst-scripts:
+	for file in $(SCRIPTS); do \
+		$(INSTALL) ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
+	done
+inst-netscripts:
+	for file in $(NETSCRIPTS); do \
+		$(INSTALL) ../etc/$$file $(DESTDIR)$(NETSCRIPTDIR)/$$file; \
+	done
+inst-configs:
+	$(INSTALL) -m 644 ../etc/vz $(DESTDIR)$(GLBCONFIG)
+ifeq ($(ARCH),ia64)
+	for file in $(VECONFIG); do \
+		$(INSTALL) ../etc/$$file.ia64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
+	done
+else
+	for file in $(VECONFIG); do \
+		$(INSTALL) ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
+	done
+endif
+inst-initd:
+	for file in $(INITSCRIPTS); do \
+		$(INSTALL) ../etc/init.d/$$file $(DESTDIR)$(INITDDIR)/$$file; \
+	done
+
+inst-cron:
+	for file in $(CRONSCRIPTS); do \
+		$(INSTALL) ../etc/cron.d/$$file $(DESTDIR)$(CRONDDIR)/$$file; \
+	done
+
+inst-dirs:
+	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -d $(DESTDIR)$(VPSCONFDIR)
+	$(INSTALL) -d $(DESTDIR)$(DISTCONFDIR)
+	$(INSTALL) -d $(DESTDIR)$(NETSCRIPTDIR)
+	$(INSTALL) -d $(DESTDIR)$(VPSCONFDIR)
+	$(INSTALL) -d $(DESTDIR)$(CRONDDIR)
+	$(INSTALL) -d $(DESTDIR)$(INITDDIR)
+	$(INSTALL) -d $(DESTDIR)$(VZLOCKDIR)
+	$(INSTALL) -d $(DESTDIR)$(LOGRDIR)
+	$(INSTALL) -d $(DESTDIR)$(CACHEDIR)
+	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl
+
+install-lib: inst-lib
+
+install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
+	inst-netscripts inst-configs inst-initd inst-cron
+clean:
+	rm -f $(PROGS) $(OBJ_libvzctl) $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_arp) \
+	$(OBJ_split) $(OBJ_memcheck) $(OBJ_cfgvalidate) $(LIB_vzctl) \
+	$(OBJ_calc) .depend
+
+.depend:: $(OBJ:.o=.c)
+	$(CC) -M $(FLAGS) $(DEPFLAGS) $(INC) $(OBJ:.o=.c) >.depend
+
+depend:: .depend
+
+include .depend
+
+
+.PHONY: clean depend install inst-dirs inst-config \
+	inst-initd install-cron all default inst-config inst-lib
+
+

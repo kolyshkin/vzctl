@@ -1,0 +1,24 @@
+.\" $Id: vzmemcheck.8,v 1.1.12.5 2005/09/26 14:58:18 igor Exp $
+.TH vzmemcheck 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.SH NAME
+vzmemcheck \- utility to display information of node memory parameters.
+.SH SYNOPSIS
+vzmemcheck [\fB-v\fR] [\fB-A\fR]
+.SH OPTIONS
+.IP \fB-v\fR 4
+Display information for each VPS.
+.IP \fB-A\fR 4
+Display absolute values (in megabytes). 
+.SH DESCRIPTION
+This utility shows node memory parameters:
+\fBlow memory utilization\fR, \fBlow memory commitment\fR, \fBRAM utilization\fR
+,\fBmem+swap utilization\fR, \fBmem+swap commitment\fR,
+\fBallocmem utilization\fR, \fBallocmem commitment\fR, \fBallocmem limit\fR.
+.P
+With \fB-A\fR option it show absolute values (in megabytes).
+Without \fB-v\fR option, it will be 1 more line: header line(s),
+the numerator and the denominator of the corresponding fraction.
+.SH DIAGNOSTICS
+Normally, exit status is 0. On error, exit status is 1.
+.SH LICENSE
+Copyright (C) 2000-2005, SWsoft. Licensed under QPL.

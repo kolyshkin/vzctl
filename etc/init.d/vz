@@ -1,0 +1,384 @@
+#!/bin/sh
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+# OpenVZ startup script
+#
+# chkconfig: 2345 96 88
+# description: OpenVZ startup script.
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# This line is needed to cheat /etc/init.d/rc who expects action word
+
+[ -f  /etc/sysconfig/vz  ] || exit 0
+. /etc/sysconfig/vz
+[ "${VIRTUOZZO}" = "no" ] && exit 0
+
+VZCTL=/usr/sbin/vzctl
+VZQUOTA=/usr/sbin/vzquota
+LOCKFILE=/var/lock/subsys/vz_lock
+LICVIEW=/usr/sbin/vzlicview
+PROC_VZVEINFO=/proc/vz/veinfo
+
+[ -x ${VZCTL} ] || exit 0
+
+VZDEV=venet0
+PRELOAD_MODULES="af_packet"
+MODULES="vzmon vzdquota vzdev"
+NET_MODULES="vznetdev vznet"
+if [ "${VZWDOG}" = "yes" ]; then
+	MODULES="${MODULES} vzwdog"
+fi
+CONFIG_DIR=/etc/sysconfig/vz-scripts
+
+VEINFO=""
+RETVAL=0
+PARALLEL=4
+cd /
+
+check_is_root()
+{
+        ID=`id -u`
+        if [ ! $ID -eq 0 ]; then 
+                echo "You need to be root to run this command."
+                exit 1
+        fi
+}
+
+get_veinfo()
+{
+	if [ -f /proc/vz/veinfo ]; then
+		VEINFO=/proc/vz/veinfo
+	elif [ -f /proc/veinfo ]; then
+		VEINFO=/proc/veinfo
+	else
+		return 1
+	fi
+	return 0
+}
+
+status()
+{
+	local base=${0##*/}
+	if get_veinfo; then
+		echo $"OpenVZ is running..."
+		return 0
+	else
+		echo $"OpenVZ is stopped."
+		return 3
+	fi
+}
+
+runcmd()
+{
+   echo -n $"$1 "
+   shift
+   if [ "$BOOTUP" = "color" ]; then
+      $* && echo_success || echo_failure
+   else
+      $*
+   fi
+   echo
+}
+
+function setup_net()
+{
+	local mod
+
+	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
+		return 0
+	fi
+	for mod in ${NET_MODULES}; do
+        	modprobe ${mod} 2>/dev/null
+	done
+	action $"Bringing up interface $VZDEV: " \
+		ip link set $VZDEV up
+	ip addr add 0.0.0.0/0 dev $VZDEV
+	action $"Configuring interface $VZDEV: " \
+		sysctl -w net.ipv4.conf.$VZDEV.send_redirects=0
+}
+
+function ve_start()
+{
+	local veid
+	local velist
+	local msg
+	local need_restart
+
+	need_restart=""
+	cd ${CONFIG_DIR} || return
+	velist=`grep -l '^ONBOOT=yes\|^ONBOOT=\"yes\"' [0-9]*.conf 2>/dev/null | \
+		sed -e 's/.conf//g' | sort -n`
+	cd - >/dev/null
+	echo "0" > /proc/sys/net/ipv4/route/src_check
+	for veid in $velist; do
+		echo -n  $"Starting VPS ${veid}: "
+		if [ "x${VZFASTBOOT}" = "xyes" -a "x${DISK_QUOTA}" = "xyes" ]; 
+		then
+			$VZQUOTA stat ${veid} >/dev/null 2>&1
+			if [ $? -eq 6 ]; then
+				if $VZQUOTA show ${veid} 2>&1 | grep "vzquota : (warning) Quota is running" >/dev/null 2>&1; then
+					$VZQUOTA on ${veid} --nocheck >/dev/null 2>&1
+					need_restart="${need_restart} ${veid}"
+				fi
+			fi
+		fi
+		msg=`$VZCTL start ${veid} 2>&1`
+		if [ $? -eq 0 ]; then
+			success
+		else
+			failure "$msg"
+		fi
+		echo
+	done
+	for veid in ${need_restart}; do
+		echo -n  $"Stopping VPS ${veid}: "
+		$VZCTL stop ${veid} 2>&1 >/dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			success
+		else
+			failure "$msg"
+		fi
+		echo
+		echo -n  $"Starting VPS ${veid}: "
+		msg=`$VZCTL start ${veid} 2>&1`
+		if [ $? -eq 0 ]; then
+			success
+		else
+			failure "$msg"
+		fi
+		echo
+	done
+}
+
+function ve_stop()
+{
+	local veid
+	local velist
+	local msg
+	local m
+	local mounts
+	local fail
+	local iter
+	local quota
+	local pids
+
+	if get_veinfo; then
+		for ((i = 0; i <= 2; i++)); do
+			iter=0;
+			pids=
+			velist=`awk  '{print $1;}' < ${VEINFO} | grep -v "^0$"`
+			for veid in $velist; do
+				echo "Shutting down VPS $veid"
+				# Set fairsched parameters to maximum so
+				# VPS will stop fast
+				$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
+				$VZCTL --skiplock stop $veid >/dev/null 2>&1 &
+				pids="$pids $!"
+				let iter++
+				sleep 1
+				if [ ${iter} -gt ${PARALLEL} ]; then
+					for pid in ${pids}; do
+						wait ${pid}
+					done
+					pids=
+					iter=0
+				fi
+			done
+			for pid in $pids; do
+				wait $pid
+			done
+		done
+	fi
+	iter=0
+	fail=1
+	while test $iter -lt 5 -a $fail -ne 0; do
+		fail=0
+		mounts=`awk '{if ($3=="simfs") print $2}' /proc/mounts`
+		for m in $mounts; do
+			echo -n $"Unmounting VPS area "
+			echo -n $m
+			msg=`umount $m 2>&1`
+			if [ $? -eq 0 ]; then
+				success
+			else
+				failure "$msg"
+				fail=$((fail+1))
+				fuser -k -m ${m} > /dev/null 2>&1
+			fi
+			echo
+		done
+		iter=$((iter+1))
+	done
+	# turn quota off
+	quota=`awk -F: '/^[0-9]+:/{print $1}' /proc/vz/vzquota 2>/dev/null`
+	for m in ${quota}; do
+		echo -n $"Turn quota off for VPS "
+		echo -n $m
+		msg=`vzquota off ${m} 2>&1`
+		if [ $? -eq 0 ]; then
+			success
+		else
+			failure "$msg"
+		fi
+		echo
+	done
+}
+
+function lockfile()
+{
+        local TEMPFILE="${1}.$$"
+        local LOCKFILE="${1}"
+
+        echo $$ > ${TEMPFILE} 2> /dev/null || {
+		echo "Can't write to ${TEMPFILE}"
+        }
+    	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
+            	rm -f ${TEMPFILE};
+            	return 0;
+    	}
+	kill -0 `cat $LOCKFILE` >/dev/null 2>&1 && {
+		return 1;
+    	}
+    	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
+            	rm -f ${TEMPFILE};
+            	return 0;
+    	}
+	rm -f ${LOCKFILE}
+        echo $$ > ${LOCKFILE}
+	return 0
+}
+
+function start()
+{
+	local veid
+	local velist
+	local msg
+
+	if ! lockfile $LOCKFILE; then
+		echo -n "OpenVZ is locked"
+		failure
+		echo
+		return 1
+	fi
+	if [ -f /var/lock/subsys/vz ]; then
+		echo -n "OpenVZ already running"
+		failure
+		echo	
+		return 1
+	fi
+	if [ ! -e /dev/vzctl ]; then
+		/bin/mknod /dev/vzctl c 126 0 > /dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -ne 0 ]; then
+			failure $"creating vzctl device"
+			echo
+			return $RETVAL
+		fi
+	fi
+	echo -n  $"Starting OpenVZ: "
+	for MOD in $PRELOAD_MODULES; do
+		/sbin/modprobe -r $MOD >/dev/null 2>&1
+		/sbin/modprobe $MOD >/dev/null 2>&1
+	done
+	for MOD in $MODULES; do
+		/sbin/modprobe $MOD >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -ne 0 ]; then
+			failure $"Loading module ${MOD}"
+			echo
+			return $RETVAL
+		fi
+	done
+	success $"loading OpenVZ modules"
+	echo
+	setup_net
+	if test -z "${VE0CPUUNITS}"; then
+		echo "Warning: VE0CPUUNITS is not set in /etc/sysconfig/vz; using value of 1000"
+		VE0CPUUNITS=1000
+	fi
+	msg=`${VZCTL} set 0 --cpuunits ${VE0CPUUNITS} 2>&1`
+	if [ $? -ne 0 ]; then
+		failure $"vzctl set 0 --cpuunits ${VE0CPUUNITS} failed: $msg"
+	fi
+	ve_start
+	
+	rm -f $LOCKFILE
+	touch /var/lock/subsys/vz
+}
+
+function stop()
+{
+	if ! lockfile $LOCKFILE; then
+		echo -n "OpenVZ is locked"
+		failure
+		echo
+		RETVAL=1
+		return 1
+	fi
+
+	ve_stop
+	echo -n  $"Stopping OpenVZ: "
+	ip link set ${VZDEV} down 2>/dev/null
+	for MOD in $MODULES; do
+		/sbin/modprobe -r $MOD > /dev/null 2>&1
+	done
+	for MOD in $PRELOAD_MODULES ${IPT_MODULES2} ${NET_MODULES}; do
+		/sbin/modprobe -r $MOD > /dev/null 2>&1
+	done
+	success
+	echo
+	rm -f $LOCKFILE
+	rm -f /var/lock/subsys/vz
+}
+
+function load_modules()
+{
+	local modules=$1
+	local mod
+
+	for mod in ${modules}; do
+		if /sbin/lsmod | grep -qw ${mod}; then
+			continue
+		fi
+		/sbin/modprobe $mod >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -ne 0 ]; then
+			failure $"Loading module ${mod}"
+			echo
+			return $RETVAL
+		fi
+	done
+}
+
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	stop
+	start
+	;;
+  status)
+  	status
+	RETVAL=$?
+	;;
+  *)
+  	echo "Usage: $0 {start|stop|status|restart}"
+	exit 1
+esac
+
+exit $RETVAL
+

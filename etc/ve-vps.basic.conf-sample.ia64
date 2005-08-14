@@ -1,0 +1,46 @@
+# This is an example configuration file for ia64 so-called "vps.basic" VPS.
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ONBOOT="no"
+
+# UBC parameters (in form of barrier:limit)
+# Primary parameters
+AVNUMPROC="40:40"
+NUMPROC="65:65"
+NUMTCPSOCK="80:80"
+NUMOTHERSOCK="80:80"
+VMGUARPAGES="3072:9223372036854775807"
+# Secondary parameters
+KMEMSIZE="12288000:13107200"
+TCPSNDBUF="319488:524288"
+TCPRCVBUF="319488:524288"
+OTHERSOCKBUF="122880:327680"
+DGRAMRCVBUF="65536:65536"
+OOMGUARPAGES="3072:9223372036854775807"
+# Auxiliary parameters
+LOCKEDPAGES="32:32"
+SHMPAGES="2048:2048"
+PRIVVMPAGES="11264:12288"
+NUMFILE="1280:1280"
+NUMFLOCK="100:110"
+NUMPTY="16:16"
+NUMSIGINFO="256:256"
+DCACHESIZE="1048576:1097728"
+
+PHYSPAGES="0:9223372036854775807"
+NUMIPTENT="128:128"
+
+# Disk quota parameters (in form of softlimit:hardlimit)
+DISKSPACE="1048576:1153434"
+DISKINODES="200000:220000"
+QUOTATIME="0"
+
+# CPU fair sheduler parameter
+CPUUNITS="1000"

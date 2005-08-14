@@ -1,0 +1,45 @@
+#!/bin/bash
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+# This script setup routing for given VPS.
+#
+# Parameters are passed in environment variables.
+# Required parameters:
+#   VEID          - VPS id
+# Optional parameters:
+#   IP_ADDR       - IP address(es) to add
+#                   (several addresses should be divided by space)
+#   VE_STATE      - state of VPS; could be one of:
+#                     starting | stopping | running | stopped
+. /usr/lib/vzctl/scripts/vps-functions
+
+vzcheckvar VEID
+
+######## Common stuff - route, ARP, iptables ###########
+# Set routing, iptables, ARP...
+vzgetnetdev
+
+vzarpipdetect "$IP_ADDR"
+for IP in $IP_ADDR; do
+	vzaddrouting $IP
+	vzarp add $IP
+done
+vzarpipset "$IP_ADDR"
+# Save ip address information
+mkdir -p ${VE_STATE_DIR} >/dev/null 2>&1
+if [ "${VE_STATE}" == "starting" ]; then
+  echo -n  "${IP_ADDR} " > ${VE_STATE_DIR}/${VEID}
+elif [ "${VE_STATE}" == "running" ]; then
+  echo -n "${IP_ADDR} " >> ${VE_STATE_DIR}/${VEID}
+fi
+
+exit 0
+# end of script
+

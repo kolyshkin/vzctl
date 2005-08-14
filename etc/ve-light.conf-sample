@@ -1,0 +1,46 @@
+# This is an example configuration file for so-called "light" VPS.
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ONBOOT="no"
+
+# UBC parameters (in form of barrier:limit)
+# Primary parameters
+AVNUMPROC="15:15"
+NUMPROC="40:40"
+NUMTCPSOCK="40:40"
+NUMOTHERSOCK="40:40"
+VMGUARPAGES="1725:2147483647"
+# Secondary parameters
+KMEMSIZE="1740800:1847296"
+TCPSNDBUF="159744:262144"
+TCPRCVBUF="159744:262144"
+OTHERSOCKBUF="61440:163840"
+DGRAMRCVBUF="32768:32768"
+OOMGUARPAGES="1725:2147483647"
+# Auxiliary parameters
+LOCKEDPAGES="4:4"
+SHMPAGES="1152:1152"
+PRIVVMPAGES="7680:8448"
+NUMFILE="512:512"
+NUMFLOCK="50:60"
+NUMPTY="4:4"
+NUMSIGINFO="256:256"
+DCACHESIZE="196608:202752"
+
+PHYSPAGES="0:2147483647"
+NUMIPTENT="16:16"
+
+# Disk quota parameters (in form of softlimit:hardlimit)
+DISKSPACE="512000:512000"
+DISKINODES="80000:88000"
+QUOTATIME="0"
+
+# CPU fair sheduler parameter
+CPUUNITS="250"

@@ -1,0 +1,2 @@
+DEVICE=venet0
+ONBOOT=yes

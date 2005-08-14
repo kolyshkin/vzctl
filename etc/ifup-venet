@@ -1,0 +1,48 @@
+#!/bin/bash
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+CONFIG=${1}
+if ! . "$CONFIG"; then
+	echo "can't source interface config $CONFIG" >&2
+	exit 1
+fi
+
+# VZNET device
+vznet=$DEVICE
+
+# configure VZNET
+modvenet="vznetdev vznet"
+
+. /etc/init.d/functions
+. /usr/lib/vzctl/scripts/vps-functions
+. /etc/sysconfig/vz
+
+veinfo="/proc/vz/veinfo"
+
+# configure interface
+
+for mod in ${modvenet}; do
+	modprobe ${mod} 2>/dev/null
+done
+ip link set $vznet up
+action $"Bringing up interface $vznet: " \
+		ip addr add 0.0.0.0/0 dev $vznet
+action $"Configuring interface $vznet: " \
+	sysctl -w net.ipv4.conf.$vznet.send_redirects=0
+
+if [ -r $veinfo ]; then
+	vzgetnetdev
+
+	for veip in `awk '($1 > 0) { for(i=4;i<=NF;i++) { print $i; } }' < $veinfo`; do
+		vzarp add $veip
+		vzaddrouting $veip
+	done
+fi
+

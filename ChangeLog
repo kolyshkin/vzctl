@@ -1,0 +1,49 @@
+vzctl (2.7.0)
+
+    2.7.0-22: Wed Sep 21 2005 <igor@sw.ru>
+	vzctl:
+	* increased privvmpages to '49152:53575' for vps.basic sample config
+	* changed Open Virtuozzo -> OpenVZ
+	* fixed terminal screwup on enter action
+    2.7.0-21: Tue Aug 16 2005 <igor@sw.ru>
+	vzctl:
+	* rewriten enter action (use pipes for communication)
+	* fixes to use new vzkernel headers provisioning scheme
+	* moved VPS create functionality to library 
+	* added runscript action
+	* fixed error mesage if UBC parameters applayed on stopped VPS
+	* added VPS states STATE_STOPPED, STATE_STOPPING
+	vzlist:
+	* Skip processing VPS if no private area exists
+    2.7.0-20: Wed Aug 10 2005 <igor@sw.ru>
+	vzctl:
+	* internal modifications in list.h
+	* manpage fixes
+    2.7.0-19: Mon Aug  8 2005 <igor@sw.ru>
+	vzctl:
+	* minor spelling fixes
+	* added 'quotaon -aug' to 2level quota action script
+    2.7.0-18: Sat Aug  6 2005 <igor@sw.ru>
+	vzctl:
+	* added aquota.{user|group} creation in case 
+	    /proc/vz/vzaquota/cur/aquota.{user|group}} exists
+	* fixed libvzctl-fs.so installation
+    2.7.0-17: Fri Aug  5 2005 <igor@sw.ru>
+	* added callback support in vps_start
+	* enable vpsreboot cron script
+    2.7.0-16: Tue Aug  2 2005 <igor@sw.ru>
+	vzctl:
+	* fixed 2level quota setup under gentoo, slackware
+	* give access for /dev/simfs on quotaugidlimit setup
+	* added libvzctl-simfs
+	initscripts:
+	* added venet0 interface setup on 'vz start'
+    2.7.0-15: Wed Jul 27 2005 <igor@sw.ru>
+	vzctl:
+	* fixed arp update in case of >1 ip addresses
+	* changed DEF_OSTEMPLATE redhat-9 -> fedora-core-4
+	* fixed VPS network setup under gentoo
+	* fixed 'exec VPSID -' action
+	* fixed compilation under 2.6.8-22stab028
+	initscripts:
+	* create /dev/vzctl on Virtuozzo start

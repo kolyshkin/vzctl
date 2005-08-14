@@ -1,0 +1,34 @@
+.\" $Id: vzcalc.8,v 1.5.10.4 2005/09/26 14:58:18 igor Exp $
+.TH vzcalc 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.SH NAME
+vzcalc \- utility to calculate VPS resource usage.
+.SH SYNOPSIS
+vzcalc [\fB-v\fR] <\fBvpsid\fR>
+.SH OPTIONS
+.IP \fB-v\fR 4
+Display additional information.
+.SH DESCRIPTION
+This utility display what part of Hardware Node resources the Virtual
+Private Server is using. If VPS is running the current usage is
+displayed. High utilization values (>100%) means that the system is overloaded
+(or VPS have invalid configuration).
+.IP \fBCurrent\fR 4
+shows the amount of resources consumed by VPS at given time.
+.IP \fBPromised\fR 4
+shows how much resources are "promised" to the given VPS.
+.IP \fBMax\ \fR 4 
+shows how much resources are "promised" to the given VPS.
+.P
+If \fB-v\fR option specified the additional information displayed.
+.IP \fBLow\ Mem\fR 4
+the part of memory residing at lower addresses and directly accessed by kernel.
+.IP \fBTotal\ Ram\fR 4
+whole RAM
+.IP \fBMem+Swap\fR 4
+amount of memory available for applications in the union of RAM and swap space.
+.IP \fBAlloc\ Mem\fR 4
+standard memory allocations made by applications in VPS. This is a more "virtual" system resource than  RAM or RAM and swap.
+.SH DIAGNOSTICS
+Normally, exit status is 0. On error, exit status is 1.
+.SH LICENSE
+Copyright (C) 2000-2005, SWsoft. Licensed under QPL.

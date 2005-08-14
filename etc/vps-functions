@@ -1,0 +1,173 @@
+#!/bin/bash
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+# Common stuff for vzctl helper scripts
+# get the name of the script
+SELFNAME=`basename $0`
+
+# Set the sane umask
+umask 022
+
+# Error codes
+VZ_INVALID_PARAMETER_SYNTAX=20
+VZ_FS_NO_DISK_SPACE=46
+VZ_FS_BAD_TMPL=47
+VZ_FS_NEW_VE_PRVT=48
+VZ_CHANGEPASS=74
+VZ_CANT_ADDIP=34
+VZ_IP_INUSE=78
+
+# iptables parameters
+VE_STATE_DIR="/var/vz/veip/"
+CONF_DIR="/etc/sysconfig/vz-scripts/"
+
+ARPSEND_CMD="arpsend -c 1 -w 1"
+IP_CMD=/sbin/ip
+
+# Prints error message and exits
+# Parameters:
+#   $1 - error message
+#   $2 - exit code
+# Example of usage:
+#   vzerror "Fatal error" 1
+function vzerror()
+{
+	# print errors to stdout too
+	ERR=$?
+	echo "$SELFNAME ERROR: $1"
+	exit $2
+}
+
+# Prints warning message
+# Parameters:
+#   $* - error message
+# Example of usage:
+#   vzwarning Invalid user
+function vzwarning()
+{
+	echo "$SELFNAME WARNING: $*"
+}
+
+# Prints debug message
+# Parameters:
+#   $* - debug message
+# Example of usage:
+#   vzdebug Trying to start ls
+function vzdebug()
+{
+	echo "$SELFNAME: $*"
+}
+
+# Checks if environment variable exists,
+# and exits with exit code 1 if not
+# Parameters:
+#   $* - option names
+# Example:
+#   vzcheckvar VEID IP_ADDR
+function vzcheckvar()
+{
+	for VAR in $*; do
+		if eval test "\"x\$$VAR\"" = "x"; then
+			vzerror "Missing parameter: $VAR" $VZ_INVALID_PARAMETER_SYNTAX
+		fi
+	done
+}
+
+# This function fills $NETDEVICES with all network interfaces
+# You should always call it before calling vzarp
+function vzgetnetdev()
+{
+# Get a list of interfaces, excluding ones with LOOPBACK NOARP or SLAVE flags
+	NETDEVICES=`${IP_CMD} link list | egrep -v -E "LOOPBACK|NOARP|SLAVE" | \
+	awk "/^[0-9].*:/&&/UP/ {print substr(\\$2, 0, length(\\$2)-1)}"`
+}
+
+# Adds/deletes public ARP records for given IP for all interfaces
+# Parameters:
+#   $1		- should be either "add" or "del"
+#   $2          - IP address
+#   $NETDEVICES - Network devices used to take MAC addresses from
+function vzarp()
+{
+	local DEV
+
+	[ -z "${NETDEVICES}" ] && vzwarning "Device list is empty"
+	for DEV in $NETDEVICES; do
+		${IP_CMD} neigh $1 proxy $2 dev $DEV > /dev/null 2>&1
+	done
+}
+
+# Send ARP request to detect that somebody already have this IP 
+function vzarpipdetect()
+{
+	local DEV
+	local ip
+	local cmd
+
+	[ -z "${1}" ] && return
+
+	for ip in ${1}; do
+		cmd="$cmd -e $ip"
+	done
+
+	for DEV in $NETDEVICES; do
+		${ARPSEND_CMD} -D ${cmd} $DEV || vzwarning "${ARPSEND_CMD} -D ${cmd} $DEV FAILED"
+	done	
+}
+
+# Send ARP request to update neighbour ARP caches
+function vzarpipset()
+{
+	local DEV
+	local ip
+	local dev
+
+	[ -z "${1}" ] && return
+
+	for dev in $NETDEVICES; do
+		for ip in ${1}; do
+			opt="-i ${ip} -e ${ip}"
+			${ARPSEND_CMD} -U ${opt} ${dev} || vzwarning "${ARPSEND_CMD} -U ${opt} ${dev} FAILED"
+		done
+	done	
+}
+
+# Sets VE0 source routing for given IP
+# Parameters:
+#   $1 - IP address
+function vzaddrouting()
+{
+	local src_addr
+	local device=
+	if ! ${IP_CMD} route list $1 | grep "$1 dev venet0" > /dev/null 2>&1;
+	then
+		if [ -n "${VE_ROUTE_SRC_DEV}" ]; then
+			device="dev ${VE_ROUTE_SRC_DEV}"
+		fi
+		src_addr=`ip route list table local ${device} | grep '^local'|\
+			cut -d' ' -f2 | grep -v '^127\.' | head -1`
+		if [ -z "${src_addr}" ]; then
+			vzerror "Unable to get source ip [${device}]" $VZ_CANT_ADDIP
+		fi
+		${IP_CMD} route add $1 dev venet0 src ${src_addr} || \
+			vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 src ${src_addr}" $VZ_CANT_ADDIP
+	fi
+}
+
+# Deletes VE0 source routing for given IP
+# Parameters:
+#   $1 - IP address
+function vzdelrouting()
+{
+if ${IP_CMD} route list $1 | grep  "$1 dev venet0" >/dev/null 2>&1; then
+	${IP_CMD} route del $1 dev venet0 || \
+		vzwarning "Unable to del route ${IP_CMD} route del $1 dev venet0"
+fi
+}

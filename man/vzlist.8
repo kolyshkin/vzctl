@@ -1,0 +1,174 @@
+.\" $Id: vzlist.8,v 1.4.10.7 2005/09/26 14:58:18 igor Exp $
+.TH vzlist 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.SH NAME
+vzlist \- VPS listing utility.
+.SH SYNOPSIS
+vzlist [\fB-a\fR] [\fB-o\fR \fIname\fR[,\fIname\fR...]]
+ [\fB-s\fR [-]\fIname\fR] [\fB-h\fR \fIhostname_pattern\fR]
+ [\fB-H\fR] [\fB-S\fR] [\fIvpsid\fR [\fIvpsid\fR ..] | \fB-1\fR]
+.PP
+vzlist \fB-L\fR
+.SH DESCRIPTION
+This utility is used for listing VPS. By default only running VPSes are listed.
+If \fIvpsid\fR is/are specified, only specified VPSes are displayed.
+VPS id of \fB-1\fR is used to output VPS IDs only, one per line.
+.SH OPTIONS
+.IP "\fB--all\fR, \fB-a\fR"
+list of all VPSes.
+.IP "\fB--sort\fR, \fB-s\fR"
+specify sorting order, the '-' before parameter means sort in reverse order
+.IP "\fB--hostname\fR, \fB-h\fR "
+display only VPSes whose hostname matches the \fIhostname_pattern\fR.
+The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR. 
+Note that wildcard characters should be properly escaped
+to avoid expansion by shell.
+.IP "\fB--no-header\fR, \fB-H\fR"
+suppress displaying header
+.IP "\fB--stopped -S\fR"
+display only stopped VPSs
+.IP "\fB--list -L\fR"
+list all format specifiers
+
+.SS STANDARD FORMAT SPECIFIERS
+These may be used to control both output format and sorting.
+.TS
+allbox center;
+lB lB
+lI l.
+Suffix	Description
+_
+ .m	maxheld
+ .b	barrier
+ .l	limit
+ .f	failcnt
+ .s	softlimit
+ .h	hardlimit
+.TE
+.P
+For example:
+.br
+\f(CW	vzlist -o vpsid,kmemsize,kmemsize.l -s kmemsize\fR
+.TS
+allbox center;
+lB lB
+lI l.
+Fixme1	FixmeToo
+_
+vpsid	VPSID
+hostname	HOSTNAME
+ip	IP_ADDR
+status	STATUS
+kmemsize	KMEMSIZE
+kmemsize.m	KMEMSIZE.M
+kmemsize.b	KMEMSIZE.B
+kmemsize.l	KMEMSIZE.L
+kmemsize.f	KMEMSIZE.F
+lockedpages	LOCKEDP
+lockedpages.m	LOCKEDP.M
+lockedpages.b	LOCKEDP.B
+lockedpages.l	LOCKEDP.L
+lockedpages.f	LOCKEDP.F
+privvmpages	PRIVVMP
+privvmpages.m	PRIVVMP.M
+privvmpages.b	PRIVVMP.B
+privvmpages.l	PRIVVMP.L
+privvmpages.f	PRIVVMP.F
+shmpages	SHMP
+shmpages.m	SHMP.M
+shmpages.b	SHMP.B
+shmpages.l	SHMP.L
+shmpages.f	SHMP.F
+numproc	NPROC
+numproc.m	NPROC.M
+numproc.b	NPROC.B
+numproc.l	NPROC.L
+numproc.f	NPROC.F
+physpages	PHYSP
+physpages.m	PHYSP.M
+physpages.b	PHYSP.B
+physpages.l	PHYSP.L
+physpages.f	PHYSP.F
+vmguarpages	VMGUARP
+vmguarpages.m	VMGUARP.M
+vmguarpages.b	VMGUARP.B
+vmguarpages.l	VMGUARP.L
+vmguarpages.f	VMGUARP.F
+oomguarpages	OOMGUARP
+oomguarpages.m	OOMGUARP.M
+oomguarpages.b	OOMGUARP.B
+oomguarpages.l	OOMGUARP.L
+oomguarpages.f	OOMGUARP.F
+numtcpsock	NTCPSOCK
+numtcpsock.m	NTCPSOCK.M
+numtcpsock.b	NTCPSOCK.B
+numtcpsock.l	NTCPSOCK.L
+numtcpsock.f	NTCPSOCK.F
+numflock	NFLOCK
+numflock.m	NFLOCK.M
+numflock.b	NFLOCK.B
+numflock.l	NFLOCK.L
+numflock.f	NFLOCK.F
+numpty	NPTY
+numpty.m	NPTY.M
+numpty.b	NPTY.B
+numpty.l	NPTY.L
+numpty.f	NPTY.F
+numsiginfo	NSIGINFO
+numsiginfo.m	NSIGINFO.M
+numsiginfo.b	NSIGINFO.B
+numsiginfo.l	NSIGINFO.L
+numsiginfo.f	NSIGINFO.F
+tcpsndbuf	TCPSNDB
+tcpsndbuf.m	TCPSNDB.M
+tcpsndbuf.b	TCPSNDB.B
+tcpsndbuf.l	TCPSNDB.L
+tcpsndbuf.f	TCPSNDB.F
+tcprcvbuf	TCPRCVB
+tcprcvbuf.m	TCPRCVB.M
+tcprcvbuf.b	TCPRCVB.B
+tcprcvbuf.l	TCPRCVB.L
+tcprcvbuf.f	TCPRCVB.F
+othersockbuf	OTHSOCKB
+othersockbuf.m	OTHSOCKB.M
+othersockbuf.b	OTHSOCKB.B
+othersockbuf.l	OTHSOCKB.L
+othersockbuf.f	OTHSOCKB.F
+dgramrcvbuf	DGRAMRRB
+dgramrcvbuf.m	DGRAMRRB.M
+dgramrcvbuf.b	DGRAMRRB.B
+dgramrcvbuf.l	DGRAMRRB.L
+dgramrcvbuf.f	DGRAMRRB.F
+numothersock	NOTHSOCK
+numothersock.m	NOTHSOCK.M
+numothersock.b	NOTHSOCK.B
+numothersock.l	NOTHSOCK.L
+numothersock.f	NOTHSOCK.F
+dcachesize	DCACHESZ
+dcachesize.m	DCACHESZ.M
+dcachesize.b	DCACHESZ.B
+dcachesize.l	DCACHESZ.L
+dcachesize.f	DCACHESZ.F
+numfile	NFILE
+numfile.m	NFILE.M
+numfile.b	NFILE.B
+numfile.l	NFILE.L
+numfile.f	NFILE.F
+numiptent	NIPTENT
+numiptent.m	NIPTENT.M
+numiptent.b	NIPTENT.B
+numiptent.l	NIPTENT.L
+numiptent.f	NIPTENT.F
+diskspace	DQBLOCKS
+diskspace.s	DQBLOCKS.S
+diskspace.h	DQBLOCKS.H
+diskinodes	DQINODES
+diskinodes.s	DQINODES.S
+diskinodes.h	DQINODES.H
+laverage	LAVERAGE
+cpulimit	CPULIM
+cpuunits	CPUUNI
+.TE
+.SH RETURN CODE
+Returns 0 upon success.
+.SH COPYRIGHT
+Copyright (C) 2000-2005, SWsoft. Licensed under QPL.

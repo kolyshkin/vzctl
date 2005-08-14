@@ -1,0 +1,34 @@
+.\" $Id: vzsplit.8,v 1.3.10.5 2005/09/26 14:58:18 igor Exp $
+.TH vzsplit 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.SH NAME
+vzsplit \- utility to generate VPS config file.
+.SH SYNOPSIS
+vzsplit [\fB-n\fR \fInumvps\fR] [\fB-f\fR \fIconf_name\fR] [\fB-s\fR \fIswapsize\fR]
+.SH DESCRIPTION
+Utility \fBvzsplit\fR is used for division Hardware Node on equal parts. It 
+generates VPS config file on the basis of total physical memory and the number
+of VPS will be running. if any option is not specified the
+total number of VPS will be asked and output printed to stdout.
+
+If there is not enough system resources to run specified number of
+VPS, an appropriate message is shown and config is not generated.
+.SH OPTIONS
+.TP
+\fB-n\fR \fInumvps\fR
+Specified number of VPS.
+.TP
+\fB-f\fR \fIconf_name\fR
+Specified config name. The program output will be placed to
+/etc/sysconfig/vz-scripts/ve-\fIconf_name\fR.conf-sample.
+.TP
+\fB-s\fR \fIswapsize\fR
+Specified swap size in Kbytes. If not given swap size will be read
+from /proc/meminfo.
+.SH DIAGNOSTICS
+\fBvzsplit\fR returns 0 upon successful execution. If something goes wrong, it
+returns with 1.	
+.SH SEE ALSO
+.BR vps.conf (5).
+.SH LICENSE
+Copyright (C) 2000-2005, SWsoft. Licensed under QPL.
+
