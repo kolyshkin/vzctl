@@ -105,9 +105,11 @@ static int stdredir(int rdfd, int wrfd)
 		lenremain = lenr;
 		p = buf;
 		while (lentotal < lenr) {
-			if ((lenw = write(wrfd, p, lenremain)) < 0) {
-				if (errno != EINTR) 
-					return -1;
+			while ((lenw = write(wrfd, p, lenremain)) < 0)
+				if (errno != EINTR && errno != EAGAIN)
+					break;
+			if (lenw < 0) {
+				return -1;
 			} else {
 				lentotal += lenw;
 				lenremain -= lenw;
@@ -181,6 +183,10 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
         act.sa_flags = SA_NOCLDSTOP;
        	act.sa_handler = child_handler;
         sigaction(SIGCHLD, &act, NULL);
+
+	act.sa_handler = SIG_IGN;
+	act.sa_flags = 0;
+	sigaction(SIGPIPE, &act, NULL);
 
 	if ((pid = fork()) < 0) {
 		logger(0, errno, "Unable to fork");
@@ -262,6 +268,8 @@ err:
 	while ((waitpid(pid, &status, 0)) == -1)
 		if (errno != EINTR)
 			break;
+	if (WIFSIGNALED(status))
+		logger(0, 0, "got signal %d", WTERMSIG(status));
 	if (!ret)
 		raw_off();
 	close(in[1]); close(out[0]);
