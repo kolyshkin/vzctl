@@ -28,10 +28,8 @@ fi
 echo -e '#!/sbin/runscript
 
 start() {
-        rm -f /dev/simfs
-        mknod /dev/simfs b 130 64
         rm -f /etc/mtab >/dev/null 2>&1
-        echo "/dev/simfs / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
+        echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
         mnt=`grep -v " / " /proc/mounts`
         if [ $? == 0 ]; then
                 echo "$mnt" >> /etc/mtab
