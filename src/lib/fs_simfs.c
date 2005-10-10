@@ -52,6 +52,12 @@ int vz_fs_is_mounted(char *root)
 	return ret;
 }
 
+static char *fs_name = "simfs";
+const char *vz_fs_get_name()
+{
+	return fs_name;
+}
+
 int vz_mount(fs_param *fs, int remount)
 {
 	int mntopt = 0;
