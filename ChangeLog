@@ -1,5 +1,10 @@
 vzctl (2.7.0)
 
+    2.7.0-23: Mon Oct 10 2005 <igor@sw.ru>
+	vzctl:
+	* fixed enter (handle EAGAIN in write())
+	* fixes in 2level quota setup (use syscal mknod() for device creation)
+	* added -fPIC flag for build under x86_64
     2.7.0-22: Wed Sep 21 2005 <igor@sw.ru>
 	vzctl:
 	* increased privvmpages to '49152:53575' for vps.basic sample config
