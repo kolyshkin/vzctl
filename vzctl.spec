@@ -41,16 +41,16 @@ e.g. create, start, shutdown, set various options and limits etc.
 %prep
 %setup -n %{name}-%{version}-%{release}
 %build
+%ifarch x86_64 ia64 
+LIBFLAGS="-fPIC"
 %ifarch ia64
 export LDFLAGS="-lia64_syscall"
 %endif
-make CFLAGS="$RPM_OPT_FLAGS"
+%endif
+make CFLAGS="$RPM_OPT_FLAGS $LIBFLAGS"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%ifarch ia64
-export LDFLAGS="-lia64_syscall"
-%endif
 make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}
 
 cd $RPM_BUILD_ROOT/%{_scriptdir}
@@ -123,15 +123,20 @@ fi
 %package lib
 Summary: Virtual Private Servers control API library
 Group: System Environment/Kernel
+%ifarch x86_64 ia64
+Provides: libvzctl-fs.so()(64bit)
+%else
 Provides: libvzctl-fs.so
+%endif
 
 %description lib
 Virtual Private Servers control API library
 
 %files lib
 %defattr(-,root,root)
-%attr(755,root,root) %{_libdir}/lib
+%dir %{_libdir}/lib
 %attr(755,root,root) %{_libdir}/lib/libvzctl.so.*
+%attr(755,root,root) %{_libdir}/lib/libvzctl-fs.so
 %attr(755,root,root) %{_libdir}/lib/libvzctl-simfs.so.0.0.1
 %attr(755,root,root) %{_libdir}/scripts/vps-stop
 %attr(755,root,root) %{_libdir}/scripts/vps-functions
