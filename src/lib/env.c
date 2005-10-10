@@ -636,8 +636,8 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to stop VPS is not running");
-		return 0;
+		logger(0, 0, "Unable to stop: VPS is not running");
+		return VZ_VE_NOT_RUNNING;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
