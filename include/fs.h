@@ -85,4 +85,8 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip);
 
 int vps_set_fs(fs_param *g_fs, fs_param *fs);
 
+extern const char *vz_fs_get_name();
+extern int vz_fs_is_mounted(char *root);
+extern int vz_mount(fs_param *fs, int remount);
+
 #endif

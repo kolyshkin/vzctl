@@ -21,9 +21,6 @@
 #include "script.h"
 #include "quota.h"
 
-extern int vz_fs_is_mounted(char *root);
-extern int vz_mount(fs_param *fs, int remount);
-
 int vps_is_run(vps_handler *h, envid_t veid);
 
 /** Get VPS mount status.
