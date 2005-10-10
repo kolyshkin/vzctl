@@ -781,9 +781,32 @@ static int store_dq(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 
 /*********************Devices***************************/
+/*
+ * Parse device permission string and set corresponding bits in the permission
+ * mask.  The caller is responsible for clearing the mask before the call.
+ */
+static int parse_dev_perm(const char *str, unsigned int *perms)
+{
+	const char *ch;
+
+	if (strcmp(str, "none")) {
+		for (ch = str; *ch; ch++) {
+			if (*ch == 'r')
+				*perms |= S_IROTH;
+			else if (*ch == 'w')
+				*perms |= S_IWOTH;
+			else if (*ch == 'q')
+				*perms |= S_IXGRP;
+			else
+				return 1;
+		}
+	}
+	return 0;
+}
+
 static int parse_devices_str(const char *str, dev_res *dev)
 {
-	int i, ret;
+	int ret;
 	unsigned long val, major;
 	char type[2];
 	char minor[32];
@@ -809,14 +832,7 @@ static int parse_devices_str(const char *str, dev_res *dev)
 			return -1;
 		dev->dev |= (val & 0xFF);
 	}
-	for (i = 0; mode[i]; i++) {
-		if (mode[i] == 'r') {
-			dev->mask |= DEV_MODE_READ;
-		} else if (mode[i] == 'w') {
-			dev->mask |= DEV_MODE_WRITE;
-		} else
-			return -1;
-	}
+	ret = parse_dev_perm(mode, &dev->mask);
 	return 0;
 }
 
@@ -888,7 +904,7 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 static int parse_devnodes_str(const char *str, dev_res *dev)
 {
 	char *ch;
-	int i, len;
+	int len;
 	char buf[64];
 	struct stat st;
 
@@ -915,17 +931,8 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
 	}
 	dev->dev = st.st_rdev;
 	dev->type |= VE_USE_MINOR;
-        if (strcmp(ch, "none")) {
-		for (i = 0; ch[i]; i++) {
-			if (ch[i] == 'r')
-				dev->mask |= S_IROTH | S_IXOTH;
-			else if (ch[i] == 'w')
-				dev->mask |= S_IWOTH | S_IXOTH;
-			else {
-				return ERR_INVAL;
-			}
-		}
-	}
+	if (parse_dev_perm(ch, &dev->mask))
+		return ERR_INVAL;
 	return 0;
 }
 

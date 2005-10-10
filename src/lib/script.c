@@ -19,6 +19,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 #include "types.h"
 #include "util.h"
@@ -27,6 +28,7 @@
 #include "vzerror.h"
 #include "util.h"
 #include "script.h"
+#include "fs.h"
 
 static char *envp_bash[] = {"HOME=/", "TERM=linux", "PATH=/bin:/sbin:/usr/bin:/usr/sbin:", NULL};
 
@@ -229,16 +231,35 @@ int mk_reboot_script()
 	return 0;
 }
 
-#define PROC_QUOTA	"/proc/vz/vzaquota/cur"
+#define PROC_QUOTA	"/proc/vz/vzaquota/"
 #define QUOTA_U		"/aquota.user"
 #define QUOTA_G		"/aquota.group"
 int mk_quota_link()
 {
 	struct stat st;
+	char *fs;
+	char buf[64];
 
-	if (stat(QUOTA_U, &st))
-		symlink(PROC_QUOTA QUOTA_U, QUOTA_U);
-	if (stat(QUOTA_G, &st))
-		symlink(PROC_QUOTA QUOTA_G, QUOTA_G );
+	if (stat("/", &st)) {
+		logger(0, errno, "Unable to stat /");
+		return -1;
+	}
+	fs = vz_fs_get_name();
+	/* make dev */
+	snprintf(buf, sizeof(buf), "/dev/%s", fs);
+	unlink(buf);
+	logger(3, 0, "Setup quota dev %s", buf);
+	if (mknod(buf, S_IFBLK | S_IXGRP, st.st_dev))
+		logger(0, errno, "Unable to create %s", buf);
+	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
+		(unsigned long)st.st_dev);
+	if (lstat(QUOTA_U, &st))
+		if (symlink(buf, QUOTA_U)) 
+			logger(0, errno, "Unable to create symlink %s", buf); 
+	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_G,
+		(unsigned long)st.st_dev);
+	if (lstat(QUOTA_G, &st))
+		if (symlink(buf, QUOTA_G))
+			logger(0, errno, "Unable to create symlink %s", buf); 
 	return 0;
 }

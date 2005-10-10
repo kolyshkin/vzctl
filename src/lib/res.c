@@ -136,18 +136,19 @@ int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char *root, dq_param *dq, int state)
 {
-	char *envp[5];
+	char *envp[6];
 	const char *script;
 	int ret, i;
 	char buf[64];
 	const char *str_state;
 	struct stat st;
 	dev_res dev;
+	const char *fs_name;
 
 	if (dq->enable == NO)
 		return 0;
 	if (dq->ugidlimit == NULL)
-		return 0;	
+		return 0;
 	script = actions->set_ugid_quota;
 	if (script == NULL) {
 		logger(0, 0, "Warning: set_ugid_quota action script is not"
@@ -161,7 +162,7 @@ int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	memset(&dev, 0, sizeof(dev));
 	dev.dev = st.st_dev;
 	dev.type = S_IFBLK | VE_USE_MINOR;
-	dev.mask = DEV_MODE_READ | DEV_MODE_WRITE;
+	dev.mask = S_IXGRP;
 	if ((ret = set_devperm(h, veid, &dev)))
 		return ret;
 	i = 0;
@@ -169,9 +170,12 @@ int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	snprintf(buf, sizeof(buf), "VE_STATE=%s", str_state);
 	envp[i++] = strdup(buf);
 	if (*dq->ugidlimit)  {
-		snprintf(buf, sizeof(buf), "MINOR=%d", (int)st.st_dev & 0xFF);
+		fs_name = vz_fs_get_name();
+		snprintf(buf, sizeof(buf), "DEVFS=%s", fs_name);
 		envp[i++] = strdup(buf);
-		snprintf(buf, sizeof(buf), "MAJOR=%d", (int)st.st_dev >> 8);
+		snprintf(buf, sizeof(buf), "MINOR=%d", minor(st.st_dev));
+		envp[i++] = strdup(buf);
+		snprintf(buf, sizeof(buf), "MAJOR=%d", major(st.st_dev));
 		envp[i++] = strdup(buf);
 	}
 	envp[i++] = strdup(ENV_PATH);
