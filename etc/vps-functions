@@ -152,7 +152,7 @@ function vzaddrouting()
 			device="dev ${VE_ROUTE_SRC_DEV}"
 		fi
 		src_addr=`ip route list table local ${device} | grep '^local'|\
-			cut -d' ' -f2 | grep -v '^127\.' | head -1`
+			cut -d' ' -f2 | grep -v '^127\.' | head -n 1`
 		if [ -z "${src_addr}" ]; then
 			vzerror "Unable to get source ip [${device}]" $VZ_CANT_ADDIP
 		fi
