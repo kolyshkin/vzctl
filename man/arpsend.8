@@ -1,4 +1,4 @@
-.\" $Id: arpsend.8,v 1.4.12.7 2005/09/26 14:58:18 igor Exp $
+.\" $Id: arpsend.8,v 1.4.12.8 2005/10/17 11:42:41 igor Exp $
 .TH arpsend 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
 .SH NAME
 arpsend \- utility to send ARP requests.
@@ -46,12 +46,12 @@ System error
 ARP reply was received 
 .SH EXAMPLES
 To send request on interface \fIeth0\fR to detect any neighbour
-computers with IP of \fI192.168.10.200\fR:
+computers with IP \fI192.168.10.200\fR:
 .br
 \f(CW	arpsend -D -e 192.168.10.200 eth0\fR
 .P
 To send request on interface \fIeth0\fR to update neighbours'
-ARP caches with IP of \fI192.168.10.200\fR:
+ARP caches with IP \fI192.168.10.200\fR:
 .br
 \f(CW	arpsend -U -i 192.168.10.200 eth0\fR
 .SH NOTES

@@ -1,32 +1,28 @@
-.\" $Id: vzsplit.8,v 1.3.10.5 2005/09/26 14:58:18 igor Exp $
-.TH vzsplit 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.\" $Id: vzsplit.8,v 1.3.10.6 2005/10/17 11:42:42 igor Exp $
+.TH vzsplit 8 "20 Aug 2002" "OpenVZ" "Virtual Private Servers"
 .SH NAME
-vzsplit \- utility to generate VPS config file.
+vzsplit \- generate a sample VPS configuration file with a certain set of system resource control parameters.
 .SH SYNOPSIS
-vzsplit [\fB-n\fR \fInumvps\fR] [\fB-f\fR \fIconf_name\fR] [\fB-s\fR \fIswapsize\fR]
+vzsplit [\fB-n\fR \fInumve\fR] [\fB-f\fR \fIconf_name\fR] [\fB-s\fR \fIswapsize\fR]
 .SH DESCRIPTION
-Utility \fBvzsplit\fR is used for division Hardware Node on equal parts. It 
-generates VPS config file on the basis of total physical memory and the number
-of VPS will be running. if any option is not specified the
-total number of VPS will be asked and output printed to stdout.
-
-If there is not enough system resources to run specified number of
-VPS, an appropriate message is shown and config is not generated.
+The \fBvzsplit\fR utility is used to split the Hardware Node into equal parts. It generates a full set of system resource control parameters for the given number of Virtual Private Servers. The values are calculated from the total physical memory of the Hardware Node the utility runs on and the number of Virtual Private Servers the Hardware Node shall be able to run even if the given number of Virtual Private Servers consume all resources available.
+Without any option \fBvzsplit\fR prompts for the desired number of Virtual Private Servers and outputs the resulting resource control parameters to the screen.
+If there is not enough system resources to run the specified number of
+VPSs, an appropriate message is shown and the sample configuration file is not generated.
 .SH OPTIONS
 .TP
-\fB-n\fR \fInumvps\fR
-Specified number of VPS.
+\fB-n\fR \fInumve\fR
+Specify the number of VPSs.
 .TP
 \fB-f\fR \fIconf_name\fR
-Specified config name. The program output will be placed to
+Specify the configuration file name. The program output is placed to
 /etc/sysconfig/vz-scripts/ve-\fIconf_name\fR.conf-sample.
 .TP
 \fB-s\fR \fIswapsize\fR
-Specified swap size in Kbytes. If not given swap size will be read
-from /proc/meminfo.
+Specify the swap size in Kbytes. If not provided in the option, the swap size will be read from /proc/meminfo.
 .SH DIAGNOSTICS
-\fBvzsplit\fR returns 0 upon successful execution. If something goes wrong, it
-returns with 1.	
+\fBvzsplit\fR returns 0 upon a sucessful execution. If anything goes wrong, it
+returns 1.	
 .SH SEE ALSO
 .BR vps.conf (5).
 .SH LICENSE

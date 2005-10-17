@@ -1,4 +1,4 @@
-.\" $Id: vzctl.8,v 1.131.10.13 2005/09/26 14:58:18 igor Exp $
+.\" $Id: vzctl.8,v 1.131.10.14 2005/10/17 11:42:42 igor Exp $
 .TH vzctl 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
 .SH NAME
 vzctl \- utility to control Virtual Private Server.
@@ -43,19 +43,19 @@ The following options can be used with \fBset\fR command.
 \fBMiscellaneous parameters\fR
 .TP
 \fB--onboot\fR \fIyes\fR|\fIno\fR
-Whether this VPS will be started during system boot up. VPS will not be
+Sets whether this VPS will be started during system boot up. VPS will not be
 auto-started during system boot up unless this parameter is set to \fIyes\fR.
 .TP
 \fB--root\fR \fIpath\fR
-The path to root directory for this VPS. This is essentially a mount
+Sets the path to root directory for this VPS. This is essentially a mount
 point for VPS root. Value must contain string \fI$VEID\fR, which will
 be substituted with numeric VPS ID. Changing this parameter is not
 recommended, better edit \fBvz\fR(5) global configuration file.
 .TP
 \fB--userpasswd\fR \fIuser\fR:\fIpassword\fR
-A password for the given \fIuser\fR in VPS. If a \fIuser\fR does not exists,
-it is created. Note that this option is not saved in configuration file
-(so \fB--save\fR flag is useless), it is applied to a VPS (by modifying its
+Sets password for given user in VPS, creating the user if it does not exists.
+Note that this option is not saved in configuration file at all (so
+\fB--save\fR flag is useless), it is applied to VPS (by modifying its
 \fB\f(CR/etc/passwd\fR and \fB\f(CR/etc/shadow\fR files).
 
 In case VPS root is not mounted, it is automatically mounted, then all
@@ -64,13 +64,12 @@ appropriate file changes are applied, then it is unmounted.
 Note that VPS area should be created before using this option.
 .TP
 \fB--disabled\fR \fIyes\fR|\fIno\fR
-Disable VPS start. To force start of a disabled VPS, option \fB--force\fR
-to \fBvzctl start\fR can be used.
+Disable VPS start. For force start disabled VPS option \fI--force\fR can be used.
 .TP
 \fBNetwork related parameters\fR
 .TP
 \fB--ipadd\fR \fIaddr\fR
-Adds IP address to a given VPS. Note that this option is incremental, so
+Adds IP address to given VPS. Note that this option is incremental, so
 \fIaddr\fR are added to already existing ones.
 .TP
 \fB--ipdel\fR \fIaddr\fR | \fBall\fR
@@ -78,17 +77,17 @@ Removes IP address \fIaddr\fR from VPS. If you want to remove all addresses,
 use \fB--ipdel all\fR.
 .TP
 \fB--hostname\fR \fIname\fR
-VPS hostname. \fBvzctl\fR writes it to the appropriate file inside a VPS
+Sets VPS hostname. \fBvzctl\fR writes it to the appropriate file inside a VPS
 (distribution-dependent).
 .TP
 \fB--nameserver\fR \fIaddr\fR
-DNS server IP address for VPS. If you want to set several nameservers,
+Sets DNS server IP address for VPS. If you want to set several nameservers,
 you should do it at once, so use \fB--nameserver\fR option multiple times
 in one call to \fBvzctl\fR, as all the name server values set in previous
 calls to \fBvzctl\fR gets overwritten.
 .TP
 \fB--searchdomain\fR \fIname\fR
-DNS search domains for VPS. If you want to set several search domains,
+Sets DNS search domains for VPS. If you want to set several search domains,
 you should do it at once, so use \fB--searchdomain\fR option multiple times
 in one call to \fBvzctl\fR, as all the search domain values set in previous
 calls to \fBvzctl\fR gets overwritten.
