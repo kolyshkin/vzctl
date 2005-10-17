@@ -74,7 +74,6 @@ function add_ip()
 
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		put_param3 "${IFCFG}" "config_${VENET_DEV}" ""
-		shift
 	fi
 
 	for ip in ${IP_ADDR}; do
