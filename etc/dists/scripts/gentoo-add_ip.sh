@@ -80,9 +80,6 @@ function add_ip()
 	for ip in ${IP_ADDR}; do
 		grep -qw "${ip}" ${IFCFG} || \
 			add_param3 "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
-		
-		[ -z "$2" ] && break
-		shift
 	done
 
 	if [ "x${VE_STATE}" = "xrunning" ]; then
