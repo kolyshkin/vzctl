@@ -1723,6 +1723,18 @@ static void merge_dq(dq_param *dst, dq_param *src)
 	
 }
 
+static void merge_dev(dev_param *dst, dev_param *src)
+{
+	dev_res *cur;
+
+	if (list_empty(&src->dev))
+		return;
+	free_dev(dst);
+	list_for_each(cur, &src->dev, list) {
+		add_dev_param(dst, cur);
+	}
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -1732,6 +1744,7 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_misc(&dst->misc, &src->misc);
 	merge_cpu(&dst->cpu, &src->cpu);
 	merge_dq(&dst->dq, &src->dq);
+	merge_dev(&dst->dev, &src->dev);
 	return 0;
 
 }
