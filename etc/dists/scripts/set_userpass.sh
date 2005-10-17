@@ -27,7 +27,10 @@ function set_serrpasswd()
 	if ! grep -E "^${user}:" ${CFGFILE} 2>&1 >/dev/null; then
 		useradd -m "${user}" 2>&1 || exit $VZ_CHANGEPASS
 	fi
-	echo "${user}:${passwd}" | chpasswd 2>&1 || exit $VZ_CHANGEPASS
+	echo "${passwd}" | passwd --stdin "${user}" 2>/dev/null
+	if [ $? -ne 0 ]; then
+		echo "${user}:${passwd}" | chpasswd 2>&1 || exit $VZ_CHANGEPASS
+	fi
 }
 
 [ -z "${USERPW}" ] && return 0
