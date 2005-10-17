@@ -127,7 +127,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	const char *str_state;
 	const char *delall = "IPDELALL=yes";
 
-	if (list_empty(&net->ip) && state != STATE_STARTING) 
+	if (list_empty(&net->ip) && !net->delall && state != STATE_STARTING) 
 		return 0;
 	if (actions == NULL)
 		return 0;
