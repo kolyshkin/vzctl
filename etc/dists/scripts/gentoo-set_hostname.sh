@@ -42,11 +42,11 @@ function set_hostname()
 	local hostname=$2
 
 	[ -z "${hostname}" ] && return 0
-	echo "${hostname}" > /etc/hostname
+	put_param "${cfgfile}" "HOSTNAME" "${hostname}"
 	hostname ${hostname}
 }
 
 set_host /etc/hosts "127.0.0.1" "${HOSTNM}"
-set_hostname /etc/hostname "${HOSTNM}"
+set_hostname /etc/conf.d/hostname "${HOSTNM}"
 
 exit 0

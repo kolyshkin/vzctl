@@ -27,16 +27,8 @@ function del_ip()
 	local ip e_ip
 
 	for ip in ${IP_ADDR}; do
-		if ! grep -qw "${ip}" ${CFGFILE} 2>/dev/null; then
-			continue
-		fi
-		found=true
-		cp -pf ${CFGFILE} ${CFGFILE}.$$ 2>/dev/null 
-		e_ip=`echo "${ip}" | sed -e 's/\./\\./'`
-		sed -e "s/^alias_${VENET_DEV}=\"[ \t]*\\(.*\\)\\b${e_ip}\\b\\(.*\\)[ \t]*\"/alias_${VENET_DEV}=\"\\1 \\2\"/g" < ${CFGFILE} > ${CFGFILE}.$$ && mv -f ${CFGFILE}.$$ ${CFGFILE}
-		if [ $? -ne 0 ]; then
-			rm -f ${CFGFILE}.$$ 2>/dev/null
-		fi
+		grep -qw "${ip}" ${CFGFILE} && found=true && \
+			del_param3 "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
 	done
 	if [ -n "${found}" ]; then
 		/etc/init.d/net.${VENET_DEV} restart 2>/dev/null 1>/dev/null

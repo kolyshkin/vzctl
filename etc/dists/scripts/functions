@@ -98,3 +98,96 @@ function put_param2()
 		echo "$name $value" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 	fi
 }
+
+# Puts line
+# NAME=( value )
+# to config file. If NAME is found, line gets replaced,
+# otherwise it is added to the end of file.
+# Parameters:
+# $1 - config file
+# $2 - NAME
+# $3 - value
+function put_param3() {
+	local file=$1
+	local name=$2
+	local value=$3
+	local path
+	
+	path=${file%/*}
+	if [ ! -d "${path}" ]; then
+		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
+	fi
+	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
+		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		if [ -z "${value}" ]; then
+			/bin/sed -e "s|^$name=\(.*\)|$name=\( \)|" < ${file} > ${file}.$$
+		else
+			/bin/sed -e "s|^$name=\(.*\)|$name=\( \"$value\" \)|" < ${file} > ${file}.$$
+		fi
+		if [ $? -ne 0 ]; then
+			rm -f ${file}.$$ 2>/dev/null 
+			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		fi
+		mv -f ${file}.$$ ${file}
+	else
+		echo "$name=( \"$value\" )" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+	fi
+}
+
+# Adds value to array NAME
+# in config file. If NAME is found, value gets added,
+# otherwise it is added to the end of file.
+# Parameters:
+# $1 - config file
+# $2 - NAME
+# $3 - value
+function add_param3() {
+	local file=$1
+	local name=$2
+	local value=$3
+	local path
+	
+	path=${file%/*}
+	if [ ! -d "${path}" ]; then
+		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
+	fi
+	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
+		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		/bin/sed -r "s|^$name=\((.*)\)|$name=\( \1 \"$value\" \)|" < ${file} > ${file}.$$
+		if [ $? -ne 0 ]; then
+			rm -f ${file}.$$ 2>/dev/null 
+			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		fi
+		mv -f ${file}.$$ ${file}
+	else
+		echo "$name=( \"$value\" )" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+	fi
+}
+
+# Removes value from array NAME
+# in config file. If NAME is found, value gets removed,
+# otherwise this is a noop function.
+# Parameters:
+# $1 - config file
+# $2 - NAME
+# $3 - value
+function del_param3() {
+	local file=$1
+	local name=$2
+	local value=$3
+	
+	[ ! -f $file ] && return
+	
+	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
+		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		/bin/sed -r "s|^($name=\( .*)\"$value\"(.* \))|\1\2|" < ${file} > ${file}.$$
+		if [ $? -ne 0 ]; then
+			rm -f ${file}.$$ 2>/dev/null 
+			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		fi
+		mv -f ${file}.$$ ${file}
+	else
+		return
+	fi
+}
+

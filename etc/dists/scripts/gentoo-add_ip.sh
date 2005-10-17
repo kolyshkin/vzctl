@@ -34,16 +34,15 @@ HOSTFILE=/etc/hosts
 function fix_net()
 {
 	[ -f "${SCRIPT}" ] && return 0
-	if [ ! -f "${SCRIPT}" ]; then
-		rm -f /etc/runlevels/default/net.eth0 2>/dev/null
-		mv -f /etc/init.d/net.eth0 /etc/init.d/net.${VENET_DEV}
-		ln -sf /etc/init.d/net.${VENET_DEV} ${SCRIPT} 2>/dev/null
-	fi
-	if ! grep -qe "^iface_eth" ${IFCFG} 2>/dev/null; then
+	rc-update del net.eth0 &>/dev/null
+	ln -sf /etc/init.d/net.lo /etc/init.d/net.${VENET_DEV}
+	rc-update add net.lo boot &>/dev/null
+	rc-update add net.venet0 default &>/dev/null
+	if ! grep -qe "^config_eth" ${IFCFG} 2>/dev/null; then
 		return 0
 	fi
 	cp -pf ${IFCFG} ${IFCFG}.$$ || error "Unable to copy ${IFCFG}"
-	sed -e 's/^iface_eth/#iface_eth/' -e 's/^alias_eth/#alias_eth/' < ${IFCFG} > ${IFCFG}.$$ && mv -f ${IFCFG}.$$ ${IFCFG} 2>/dev/null
+	sed -e 's/^config_eth/#config_eth/' -e 's/^routes_eth/#routes_eth/' < ${IFCFG} > ${IFCFG}.$$ && mv -f ${IFCFG}.$$ ${IFCFG} 2>/dev/null
 	if [ $? -ne 0 ]; then
 		rm -f ${IFCFG}.$$ 2>/dev/null
 		error "Unable to create ${IFCFG}"
@@ -53,54 +52,39 @@ function fix_net()
 function setup_network()
 {
 	fix_net
-	# Set up venet0 main interface as 127.0.0.1
-	put_param ${IFCFG} "iface_${VENET_DEV}" "127.0.0.1 broadcast 0.0.0.0 netmask 255.255.255.255"
-	put_param ${IFCFG} "alias_${VENET_DEV}" ""
-	put_param ${IFCFG} "routes_${VENET_DEV}" "-net ${FAKEGATEWAYNET}/24 dev ${VENET_DEV}"
-	put_param ${IFCFG} "gateway" "${VENET_DEV}/${FAKEGATEWAY}"
+	put_param3 ${IFCFG} "config_${VENET_DEV}" ""
+	# add fake route
+	put_param3 ${IFCFG} "routes_${VENET_DEV}" "-net ${FAKEGATEWAYNET}/24"
+	add_param3 ${IFCFG} "routes_${VENET_DEV}" "default via ${FAKEGATEWAY}"
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
 	fi
 }
 
-function add_alias()
-{
-	local ip="${1}"
-
-	cp -fp ${IFCFG} ${IFCFG}.$$ || error "unable to copy ${IFCFG}"
-	sed -e "s/^alias_${VENET_DEV}=\"\\(.*\\)\"/alias_${VENET_DEV}=\"\\1 $ip\"/" < ${IFCFG} > ${IFCFG}.$$ &&
-		mv -f ${IFCFG}.$$ ${IFCFG}
-	if [ $? -ne 0 ]; then
-		rm -f ${IFCFG}.$$
-	fi
-}
-
 function add_ip()
 {
 	local ip
-	local new_ips 
+	local new_ips
 
 	# In case we are starting VE
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		setup_network
 	fi
+
 	if [ "x${IPDELALL}" = "xyes" ]; then
-		put_param ${IFCFG} "alias_${VENET_DEV}" "${IP_ADDR}"
-	else
-		new_ips=
-		for ip in ${IP_ADDR}; do
-			if grep -qw "${ip}" ${IFCFG} 2>/dev/null; then
-				continue
-			fi
-			if [ -n "${new_ips}" ]; then
-				new_ips="${new_ips} ${ip}"
-			else
-				new_ips="${ip}"
-			fi
-		done
-		[ -n "${new_ips}" ] && add_alias "${new_ips}"
+		put_param3 "${IFCFG}" "config_${VENET_DEV}" ""
+		shift
 	fi
+
+	for ip in ${IP_ADDR}; do
+		grep -qw "${ip}" ${IFCFG} || \
+			add_param3 "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
+		
+		[ -z "$2" ] && break
+		shift
+	done
+
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		# synchronyze config files & interfaces
 		/etc/init.d/net.${VENET_DEV} restart 
