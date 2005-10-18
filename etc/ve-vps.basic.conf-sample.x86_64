@@ -1,0 +1,50 @@
+# This is an example configuration file for so-called "vps.basic" VPS.
+# Copyright (C) 2000-2005 SWsoft. All rights reserved.
+#
+# This file may be distributed under the terms of the Q Public License
+# as defined by Trolltech AS of Norway and appearing in the file
+# LICENSE.QPL included in the packaging of this file.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+VERSION="2"
+
+ONBOOT="no"
+CLASSID="2"
+
+# UBC parameters (in form of barrier:limit)
+# Primary parameters
+AVNUMPROC="40:40"
+NUMPROC="65:65"
+NUMTCPSOCK="80:80"
+NUMOTHERSOCK="80:80"
+VMGUARPAGES="6144:9223372036854775807"
+# Secondary parameters
+KMEMSIZE="3194880:3407872"
+TCPSNDBUF="319488:524288"
+TCPRCVBUF="319488:524288"
+OTHERSOCKBUF="132096:336896"
+DGRAMRCVBUF="132096:132096"
+OOMGUARPAGES="6144:9223372036854775807"
+# Auxiliary parameters
+LOCKEDPAGES="32:32"
+SHMPAGES="8192:8192"
+PRIVVMPAGES="22528:24576"
+NUMFILE="1280:1280"
+NUMFLOCK="100:110"
+NUMPTY="16:16"
+NUMSIGINFO="256:256"
+DCACHESIZE="524288:548864"
+
+PHYSPAGES="0:9223372036854775807"
+NUMIPTENT="128:128"
+
+# Disk quota parameters (in form of softlimit:hardlimit)
+DISKSPACE="1048576:1153434"
+DISKINODES="200000:220000"
+QUOTATIME="0"
+
+# CPU fair sheduler parameter
+CPUUNITS="1000"
+OFFLINE_MANAGEMENT="yes"
