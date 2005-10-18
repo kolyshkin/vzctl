@@ -28,6 +28,7 @@ CC = gcc
 CFLAGS = -Wall -g2 
 VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
 INC = -I ../include -I$(VZKERNEL_HEADERS)
+ARCH=$(shell uname -i)
 
 OBJ_libvzctl = lib/env.o lib/ub.o lib/net.o lib/logger.o lib/exec.o lib/cap.o \
 	lib/cpu.o lib/res.o lib/util.o lib/dist.o lib/list.o lib/script.o \
@@ -40,7 +41,7 @@ OBJ_arp = arpsend.o
 OBJ_split = vzsplit.o
 OBJ_memcheck = vzmemcheck.o validate.o
 OBJ_cfgvalidate = vzcfgvalidate.o validate.o
-OBJ_cacl = vzcalc.o
+OBJ_calc = vzcalc.o
 OBJ = $(OBJ_libvzctl) $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_split)
 LIB_vzctl = libvzctl.so.$(LIB_VER)
 LIB_simfs = libvzctl-simfs.so.$(LIB_VER)
@@ -58,6 +59,9 @@ CRONSCRIPTS = vpsreboot vpsnetclean
 SCRIPTS = vpsreboot vpsnetclean
 NETSCRIPTS = ifcfg-venet0 ifdown-venet ifup-venet
 VECONFIG = ve-light.conf-sample ve-vps.basic.conf-sample 
+VECONFIG_IA64 = ve-light.conf-sample ve-vps.basic.conf-sample
+VECONFIG_X86_64 = ve-light.conf-sample ve-vps.basic.conf-sample
+
 default: all
 
 all: $(PROGS) $(LIBS)
@@ -74,16 +78,16 @@ libvzctl.a: $(OBJ_libvzctl)
 	ranlib $@
 
 $(LIB_vzctl) : $(LIB_simfs) $(OBJ_libvzctl)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_libvzctl) $(LD_FLAGS) $(LIB_fs) -shared -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_libvzctl) $(LD_FLAGS) -shared -o $@
 
 vzctl-static: $(OBJ_vzctl) libvzctl.a
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(OBJ_simfs) libvzctl.a -rdynamic -ldl -lutil -o $@
 
 vzctl: $(LIB_vzctl) $(OBJ_vzctl) 
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) -lutil -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) $(LIB_fs) -lutil -o $@
 
 vzlist: $(OBJ_vzlist) 
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_vzctl) -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
 
 arpsend: $(OBJ_arp)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
@@ -92,19 +96,19 @@ vzsplit: $(OBJ_split)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 vzmemcheck: $(OBJ_memcheck)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(LD_FLAGS) $(LIB_vzctl) $^ -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $^ -o $@
 
 vzcfgvalidate: $(OBJ_cfgvalidate)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_vzctl) -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
 
-vzcalc: $(OBJ_cacl)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_vzctl) -o $@
+vzcalc: $(OBJ_calc)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
 
 inst-sbin :$(PROGS)
 	for file in $(PROGS); do \
 		$(INSTALL) $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
-inst-lib: $(LIB_vzctl)
+install-lib: $(LIB_vzctl)
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/lib
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/scripts
 	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/lib/$(LIB_vzctl)
@@ -124,13 +128,19 @@ inst-netscripts:
 inst-configs:
 	$(INSTALL) -m 644 ../etc/vz $(DESTDIR)$(GLBCONFIG)
 ifeq ($(ARCH),ia64)
-	for file in $(VECONFIG); do \
+	for file in $(VECONFIG_IA64); do \
 		$(INSTALL) ../etc/$$file.ia64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
+	done
+else
+ifeq ($(ARCH),x86_64)
+	for file in $(VECONFIG_X86_64); do \
+		$(INSTALL) ../etc/$$file.x86_64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
 else
 	for file in $(VECONFIG); do \
 		$(INSTALL) ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
+endif
 endif
 inst-initd:
 	for file in $(INITSCRIPTS); do \
@@ -155,14 +165,10 @@ inst-dirs:
 	$(INSTALL) -d $(DESTDIR)$(CACHEDIR)
 	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl
 
-install-lib: inst-lib
-
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
 	inst-netscripts inst-configs inst-initd inst-cron
 clean:
-	rm -f $(PROGS) $(OBJ_libvzctl) $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_arp) \
-	$(OBJ_split) $(OBJ_memcheck) $(OBJ_cfgvalidate) $(LIB_vzctl) \
-	$(OBJ_calc) .depend
+	rm -f *.o lib/*.o $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_simfs) .depend
 
 .depend:: $(OBJ:.o=.c)
 	$(CC) -M $(FLAGS) $(DEPFLAGS) $(INC) $(OBJ:.o=.c) >.depend
