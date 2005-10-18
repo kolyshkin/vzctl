@@ -62,7 +62,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
-%attr(755,root,root) %{_crondir}/vpsreboot
+%attr(755,root,root) %config(noreplace) %{_crondir}/vpsreboot
 %attr(755,root,root) %{_crondir}/vpsnetclean
 %attr(755,root,root) %{_lockdir}
 %attr(755,root,root) /vz/template/cache
