@@ -55,4 +55,6 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 int vps_exec_script(vps_handler *h, envid_t veid, char *root,
 	char *const argv[], char *const envp[], const char *fname, char *func,
 	int timeout);
+
+int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p);
 #endif

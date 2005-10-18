@@ -237,7 +237,7 @@ int mk_reboot_script()
 int mk_quota_link()
 {
 	struct stat st;
-	char *fs;
+	const char *fs;
 	char buf[64];
 
 	if (stat("/", &st)) {
