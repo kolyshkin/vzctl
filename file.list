@@ -5,8 +5,10 @@ etc/ifdown-venet
 etc/ifup-venet
 etc/ve-light.conf-sample
 etc/ve-light.conf-sample.ia64
+etc/ve-light.conf-sample.x86_64
 etc/ve-vps.basic.conf-sample
 etc/ve-vps.basic.conf-sample.ia64
+etc/ve-vps.basic.conf-sample.x86_64
 etc/vpsnetclean
 etc/vpsreboot
 etc/vps-create
