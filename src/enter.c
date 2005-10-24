@@ -209,13 +209,17 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		if ((ret = pty_alloc(&master, &slave)))
 			goto err;
 		for (i = 0; i < FOPEN_MAX; i++) {
-			if (i != in[0] && i != out[1] &&
+			if (i != in[0] && i != out[1] && i != st[1] &&
 				i != master && i != slave)
 			{
 				close(i);
 			}
 		}
 		child_term = 0;
+	        sigemptyset(&act.sa_mask);
+	        act.sa_flags = SA_NOCLDSTOP;
+	       	act.sa_handler = child_handler;
+	        sigaction(SIGCHLD, &act, NULL);
 		if ((pid = fork()) == 0) {
 			char buf[64];
 			char *term;
@@ -242,9 +246,11 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		} else if (pid < 0) {
 			logger(0, errno, "Unable to fork");
 			ret = VZ_RESOURCE_ERROR;
+			write(st[1], &ret, sizeof(ret));
 			exit(ret);
 		}
 		close(slave);
+		close(st[1]);
 		e_loop(in[0], master, master, out[1]);
 		while ((ret = waitpid(pid, &status, 0)) == -1)
 			if (errno != EINTR)
