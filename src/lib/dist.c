@@ -120,25 +120,18 @@ void free_dist_actions(dist_actions *d_actions)
 static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 {
 	char buf[256];
-	char *p;
+	char *ep;
 
 	if (dist_name != NULL) {
-		snprintf(file, len, "%s/%s.conf", dir, dist_name);
-		/* first match exact name */
-		if (stat_file(file)) 
-			return 0;
-		/* skip version */
 		snprintf(buf, sizeof(buf), "%s", dist_name);
-		if ((p = strrchr(buf, '-')) != NULL)
-			*p = 0;
-		snprintf(file, len, "%s/%s.conf", dir, buf);
-		if (stat_file(file))
-			return 0;
-		if ((p = strchr(buf, '-')) != NULL)
-			*p = 0;
-		snprintf(file, len, "%s/%s.conf", dir, buf);
-		if (stat_file(file))
-			return 0;
+		ep = buf + strlen(buf);
+		do {
+			snprintf(file, len, "%s/%s.conf", dir, buf);
+			if (stat_file(file))
+				return 0;
+			while (ep > buf && *ep !=  '-') --ep;
+			*ep = 0;
+		} while (ep > buf);
 		snprintf(file, len, "%s/%s", dir, DIST_CONF_DEF);
 		logger(0, 0, "Warning: configuration file"
 			" for distribution %s not found default used",
@@ -149,8 +142,7 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 			" default used %s", file);
 	}
 	if (!stat_file(file)) {
-		logger(0, 0, "Distribution configuration not found %s",
-			file);
+		logger(0, 0, "Distribution configuration not found %s", file);
 		return VZ_NO_DISTR_CONF;
 	}
 	return 0;
