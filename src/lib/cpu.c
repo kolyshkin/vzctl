@@ -23,15 +23,29 @@
 #include "logger.h"
 
 #ifndef __NR_fairsched_chwt
+#ifdef __ia64__
+#define __NR_fairsched_chwt    1502
+#else
 #define __NR_fairsched_chwt    502
 #endif
+#endif
 #ifndef __NR_fairsched_rate
+#ifdef __ia64__
+#define __NR_fairsched_rate    1504
+#else
 #define __NR_fairsched_rate    504
 #endif
+#endif
 
-static _syscall2(long, fairsched_chwt, unsigned int, id, unsigned, wght);
-static _syscall3(long, fairsched_rate, unsigned int, id, int, op,
-		unsigned, rate);
+static inline int fairsched_chwt(unsigned int id, unsigned wght)
+{
+        return syscall(__NR_fairsched_chwt, id, wght);
+}
+
+static inline int fairsched_rate(unsigned int id, int op, unsigned rate)
+{
+        return syscall(__NR_fairsched_rate, id, op, rate);
+}
 
 static int set_cpulimit(envid_t veid, unsigned int cpulimit)
 {

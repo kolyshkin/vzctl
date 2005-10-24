@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 #include <linux/capability.h>
 #include <string.h>
 
@@ -83,12 +85,12 @@ static char *cap_names[] = {
 
 "FS_MASK"		/*	0x1f	*/
 };
-/*
-static _syscall2(long, capget, cap_user_header_t, header,
-			 cap_user_data_t, data);
-*/
-static _syscall2(long, capset, cap_user_header_t, header,
-			 cap_user_data_t, data);
+
+static inline int capset(cap_user_header_t header, cap_user_data_t data)
+{
+        return syscall(__NR_capset, header, data);
+}
+
 /** Add capability name to capability mask.
  *
  * @param name		capability name.

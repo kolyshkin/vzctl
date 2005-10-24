@@ -36,8 +36,13 @@
 #define ENVRETRY	3
 #define VZCTLDEV	"/dev/vzctl"
 
-static _syscall1(long, setluid, uid_t, uid);
+
 static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode);
+
+static inline int setluid(uid_t uid)
+{
+	return syscall(__NR_setluid, uid);
+}
 
 int vz_env_create_data_ioctl(vps_handler *h,
 	struct vzctl_env_create_data *data)

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <ub/beancounter.h>
@@ -22,8 +23,12 @@
 #include "vzerror.h"
 #include "logger.h"
 
-static _syscall3(long, setublimit, uid_t, uid, unsigned long, resource,
-	unsigned long *, rlim);
+
+static inline int setublimit(uid_t uid, unsigned long resource,
+        unsigned long *rlim)
+{
+	return syscall(__NR_setublimit, uid, resource, rlim);
+}
 
 static struct ubname2id {
 	char *name;
