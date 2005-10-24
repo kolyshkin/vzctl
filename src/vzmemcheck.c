@@ -60,7 +60,8 @@ int calculate(int numerator, int verbose)
 	struct ub_struct ub_s;
 
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		logger(0, errno, "Unable to open file " PROCUBC);
+		fprintf(stderr, "Unable to open file " PROCUBC ": %s",
+			strerror(errno));
 		return 1;
 	}
 	if (get_mem(&mem.ram))
