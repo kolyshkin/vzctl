@@ -70,7 +70,9 @@ all: $(PROGS) $(LIBS)
 	$(CC) -c $(CFLAGS) $(INC) $< -o $@
 
 $(LIB_simfs) : $(OBJ_simfs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_simfs) -shared -o $@; \
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_simfs) -shared -o $@
+
+$(LIB_fs): $(LIB_simfs)
 	ln -sf $(LIB_simfs) $(LIB_fs)
 
 libvzctl.a: $(OBJ_libvzctl)
@@ -83,10 +85,10 @@ $(LIB_vzctl) : $(LIB_simfs) $(OBJ_libvzctl)
 vzctl-static: $(OBJ_vzctl) libvzctl.a
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(OBJ_simfs) libvzctl.a -rdynamic -ldl -lutil -o $@
 
-vzctl: $(LIB_vzctl) $(OBJ_vzctl) 
+vzctl: $(LIB_vzctl) $(OBJ_vzctl) $(LIB_fs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) $(LIB_fs) -lutil -o $@
 
-vzlist: $(OBJ_vzlist) 
+vzlist: $(OBJ_vzlist) $(LIB_vzctl) $(LIB_fs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
 
 arpsend: $(OBJ_arp)
@@ -95,20 +97,20 @@ arpsend: $(OBJ_arp)
 vzsplit: $(OBJ_split)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
-vzmemcheck: $(OBJ_memcheck)
+vzmemcheck: $(OBJ_memcheck) $(LIB_vzctl) $(LIB_fs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $^ -o $@
 
-vzcfgvalidate: $(OBJ_cfgvalidate)
+vzcfgvalidate: $(OBJ_cfgvalidate) $(LIB_vzctl) $(LIB_fs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
 
-vzcalc: $(OBJ_calc)
+vzcalc: $(OBJ_calc) $(LIB_vzctl) $(LIB_fs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
 
 inst-sbin :$(PROGS)
 	for file in $(PROGS); do \
 		$(INSTALL) $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
-install-lib: $(LIB_vzctl)
+install-lib: $(LIB_vzctl) $(LIB_fs)
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/lib
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/scripts
 	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/lib/$(LIB_vzctl)
