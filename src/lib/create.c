@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 #include "list.h"
 #include "logger.h"
@@ -32,6 +33,8 @@
 
 #define BACKUP		0
 #define DESTR		1
+#define VZOSTEMPLATE	"/usr/bin/vzosname"
+
 int destroydir(char *dir);
 
 /* Renames (to "*.destroyed" if action == MOVE) or removes config,
@@ -85,6 +88,31 @@ static int destroy(envid_t veid, char *dir)
 	if ((ret = destroydir(dir)))
 		return ret;
         return 0;
+}
+
+static char *get_ostemplate_name(char *ostmpl)
+{
+	FILE *fd;
+	char buf[STR_SIZE];
+	char *p;
+	int status;
+
+	snprintf(buf, sizeof(buf), VZOSTEMPLATE " %s", ostmpl);
+	if ((fd = popen(buf, "r")) == NULL) {
+		logger(0, errno, "Error in popen(%s)", buf);
+		return NULL;
+	}
+	*buf = 0;
+	while((p = fgets(buf, sizeof(buf), fd)) != NULL);
+	status = pclose(fd);
+	if (WEXITSTATUS(status) || *buf == 0) {
+		logger(0, 0, "Unable to get full ostemplate name for %s",
+			ostmpl);
+		return NULL;
+	}
+	if ((p = strchr(buf, '\n')))
+		*p = 0;
+	return strdup(buf);
 }
 
 int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
@@ -179,6 +207,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	tmpl_param *tmpl = &vps_p->res.tmpl;
 	vps_param *conf_p;
 	int cfg_exists;
+	char *full_ostmpl;
 
 	get_vps_conf_path(veid, dst, sizeof(dst));
 	sample_config = NULL;
@@ -231,7 +260,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	if (action != NULL && action->mod_count) {
 		ret = mod_setup(h, veid, 0, 0, action, vps_p);
 	} else {
-		/* Set default ostemplate of not specified */
+		/* Set default ostemplate if not specified */
 		if (cmd_p->res.tmpl.ostmpl == NULL &&
 			tmpl->ostmpl == NULL &&
 			tmpl->def_ostmpl != NULL)
@@ -240,6 +269,13 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		}
 		if (check_var(tmpl->ostmpl, "OS template is not specified"))
 			return VZ_VE_PKGSET_NOTSET;
+		if (stat_file(VZOSTEMPLATE)) {
+			full_ostmpl = get_ostemplate_name(tmpl->ostmpl);
+			if (full_ostmpl != NULL) {
+				free(tmpl->ostmpl);
+				tmpl->ostmpl = full_ostmpl;
+			}
+		}
 		snprintf(tar_nm, sizeof(tar_nm), "cache/%s", tmpl->ostmpl);
 		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, tar_nm);
 	}
@@ -263,9 +299,10 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	{
 		cmd_p->res.fs.private_orig = strdup(fs->private_orig);
 	}
-	if (cmd_p->res.tmpl.ostmpl == NULL &&
-		tmpl->ostmpl != NULL)
-	{
+	/* Store full ostemplate name */
+	if (tmpl->ostmpl != NULL) {
+		if (cmd_p->res.tmpl.ostmpl != NULL)
+			free(cmd_p->res.tmpl.ostmpl);
 		cmd_p->res.tmpl.ostmpl = strdup(tmpl->ostmpl);
 	}
 	vps_save_config(veid, dst, cmd_p, vps_p, action);
@@ -310,8 +347,6 @@ err:
 	free_dist_actions(&actions);
 	return ret;
 }
-
-
 
 static char *get_destroy_root(char *dir)
 {
