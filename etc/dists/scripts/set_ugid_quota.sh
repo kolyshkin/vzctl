@@ -25,6 +25,7 @@ if [ -z "$MAJOR" ]; then
 fi
 echo -e '#!/bin/sh
 start() {
+	[ -e "/dev/${DEVFS}" ] || mknod /dev/${DEVFS} b '$MAJOR' '$MINOR'
 	rm -f /etc/mtab >/dev/null 2>&1
 	echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
 	mnt=`grep -v " / " /proc/mounts`
