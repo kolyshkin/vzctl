@@ -1735,6 +1735,18 @@ static void merge_dev(dev_param *dst, dev_param *src)
 	}
 }
 
+static void merge_cap(cap_param *dst, cap_param *src)
+{
+	MERGE_INT(on);
+	MERGE_INT(off);
+}
+
+static void merge_env(env_param *dst, env_param *src)
+{
+	MERGE_INT(veid);
+	MERGE_INT(ipt_mask);
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -1743,8 +1755,10 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_net(&dst->net, &src->net);
 	merge_misc(&dst->misc, &src->misc);
 	merge_cpu(&dst->cpu, &src->cpu);
+	merge_cap(&dst->cap, &src->cap);
 	merge_dq(&dst->dq, &src->dq);
 	merge_dev(&dst->dev, &src->dev);
+	merge_env(&dst->env, &src->env);
 	return 0;
 
 }
