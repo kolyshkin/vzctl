@@ -33,6 +33,8 @@
 
 static volatile sig_atomic_t child_term;
 static struct termios s_tios;
+extern char *_proc_title;
+extern int _proc_title_len;
 
 static int pty_alloc(int *master, int *slave)
 {
@@ -92,6 +94,18 @@ static void raw_on(void)
 static void child_handler(int sig)
 {
 	child_term = 1;
+}
+
+void set_proc_title(char *tty)
+{
+	char *p;
+
+	p = tty;
+	if (p != NULL && !strncmp(p, "/dev/", 5))
+		p += 5;
+	memset(_proc_title, 0, _proc_title_len);
+	snprintf(_proc_title, _proc_title_len - 1, "vzctl: %s",
+		p != NULL ? p : "");
 }
 
 static int stdredir(int rdfd, int wrfd)
@@ -208,6 +222,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		}
 		if ((ret = pty_alloc(&master, &slave)))
 			goto err;
+		set_proc_title(ttyname(slave));
 		for (i = 0; i < FOPEN_MAX; i++) {
 			if (i != in[0] && i != out[1] && i != st[1] &&
 				i != master && i != slave)

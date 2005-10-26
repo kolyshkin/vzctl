@@ -27,6 +27,8 @@
 LOG_DATA
 
 struct mod_action g_action;
+char *_proc_title;
+int _proc_title_len;
 
 void init_modules(struct mod_action *action, const char *name);
 void free_modules(struct mod_action *action);
@@ -84,7 +86,7 @@ void usage()
 	free_modules(&mod);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[], char *envp[])
 {
 	int action = 0;
 	int verbose = 0;
@@ -93,6 +95,9 @@ int main(int argc, char *argv[])
 	char buf[256];
 	vps_param *gparam = NULL, *vps_p = NULL, *cmd_p = NULL;
 	const char *action_nm;
+
+	_proc_title = argv[0];
+	_proc_title_len = envp[0] - argv[0];
 
 	gparam = init_vps_param();
 	vps_p = init_vps_param();
