@@ -1,5 +1,9 @@
 vzctl (2.7.0)
-
+    2.7.0-24: Fri Oct 28 2005 <igor@sw.ru>
+	* set proc title as 'vzctl: ttyname' on enter
+	* fixed enter freeze if any processes running in bg
+	* changed _syscallN -> syscall()
+	* added vzosname call on create action for getting full name
     2.7.0-23: Mon Oct 10 2005 <igor@sw.ru>
 	vzctl:
 	* fixes in gentoo network setup <Benedikt Boehm hollow@gentoo.org>
