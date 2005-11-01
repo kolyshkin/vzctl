@@ -56,7 +56,7 @@ BEGIN { srand(); }
 
 function disableroot()
 {
-	Ffile=${VE_ROOT}"/etc/passwd"
+	file=${VE_ROOT}"/etc/passwd"
 
 	[ -f "$file" ] || return 0
 
