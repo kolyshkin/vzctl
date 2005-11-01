@@ -58,6 +58,14 @@ static int move_config(int veid, int action)
 	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
 	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
 
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." START_PREFIX, veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." STOP_PREFIX, veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+
 	return 0;
 }
 
