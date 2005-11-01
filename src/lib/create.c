@@ -391,10 +391,14 @@ char *maketmpdir(const char *dir)
 	int len;
 
         snprintf(buf, sizeof(buf), "%s/XXXXXXX", dir);
-        if (!(tmp = mkdtemp(buf)))
-                return NULL;
+	if ((tmp = mkdtemp(buf)) == NULL) {
+		logger(0, errno, "Error in mkdtemp(%s)", buf);
+		return NULL;
+	}
 	len = strlen(dir);
         tmp_dir = (char *)malloc(strlen(tmp) - len);
+	if (tmp_dir == NULL)
+		return NULL;
         strcpy(tmp_dir, tmp + len + 1);
 
         return tmp_dir;
@@ -441,9 +445,23 @@ int destroydir(char *dir)
 	int fd_lock, pid;
 	struct sigaction act, actold;
 	int ret = 0;
+	struct stat st;
 
-	if (!stat_file(dir))
+	if (stat(dir, &st)) {
+		if (errno != ENOENT) {
+			logger(0, errno, "Unable to stat %s", dir);
+			return -1;
+		}
 		return 0;
+	}
+	if (!S_ISDIR(st.st_mode)) {
+		logger(0, 0, "Warning: VPS private area is not a directory");
+		if (unlink(dir)) {
+			logger(0, errno, "Unable to unlink %s", dir);
+			return -1;
+		}
+		return 0;
+	}
 	root = get_destroy_root(dir);
 	if (root == NULL) {
 		logger(0, 0, "Unable to get root for %s", dir);
