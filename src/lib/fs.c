@@ -60,10 +60,19 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 
 static int real_umount(envid_t veid, char *root)
 {
-	int i, ret;
+	int i, ret, n;
 
+	n = 0;
 	for (i = 0; i < 2; i++) {
-		ret = umount2(root, MNT_DETACH);
+		while (1) {
+			ret = umount2(root, MNT_DETACH);
+			if (ret < 0) {
+				if (n > 0 && errno == EINVAL)
+					ret = 0;
+				break;
+			}
+			n++;
+		}
 		if (ret == 0 || (ret < 0 && errno != EBUSY))
 			break;
 		sleep(1);
