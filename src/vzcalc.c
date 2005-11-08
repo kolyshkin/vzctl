@@ -73,6 +73,7 @@ int calculate(int veid, ub_param *ub, int verbose)
 	if (get_lowmem(&lowmem))
 		return 1;
 	page = get_pagesize();
+	lm_cur = tr_cur = ms_cur = al_cur = np_cur = 0;
 	lowmem *= 0.4;
 	memset(&ub_cur, 0, sizeof(ub_cur));
 	if (!(run = vps_read_ubc(veid, &ub_cur))) {

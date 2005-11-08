@@ -96,7 +96,7 @@ int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
  */
 int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev)
 {
-	int ret;
+	int ret = 0;
 	dev_res *res;
 	list_head_t *dev_h = &dev->dev;
 

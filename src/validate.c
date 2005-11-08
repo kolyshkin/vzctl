@@ -531,14 +531,13 @@ if (ubs.name != NULL) {						\
 
 int vps_validate(vps_res *param, int mode)
 {
-	int id;
 	int ret;
 
 	if (mode == ACT_NONE)
 		return 0;	
 	logger(0, 0, "Validate VPS:");
-	ret  = validate(param, id == ACT_FIX, 0);
-	if (id == ACT_ERROR && ret)
+	ret  = validate(param, mode == ACT_FIX, 0);
+	if (mode == ACT_ERROR && ret)
 		return VZ_VALIDATE_ERROR;
 	return 0;
 }
@@ -766,6 +765,7 @@ int check_hn_overcommitment(int veid, struct ub_struct *param,
 
 	if (param == NULL)
 		return 0;
+	actid = ovrc->action;
 	if (ovrc->action == ACT_NONE)
 		return 0;
 	memset(&ru_comm, 0, sizeof(ru_comm));

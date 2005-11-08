@@ -241,8 +241,9 @@ int calculate_values()
 	long long kmem, numproc, avnproc, sockbuf, tcpbuf, iptent, numfile;
 	long long dcache, numflock;
 	long long lockedpages, numpty, guarpg, privvm, shmpg, di_pve, ds_pve;
-	int sl;
+	int sl = 0;
 
+	avnproc = tcpbuf = 0;
 	tot_pve = (mem_total + swap_total - SYSRSRV) / num_ve;
 	for (osl = 0; osl < MAX_SL; osl++) {
 		numproc = k_nproc[osl] * proc_calc / num_ve;

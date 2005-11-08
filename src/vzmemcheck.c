@@ -50,8 +50,8 @@ int calculate(int numerator, int verbose)
 	struct CRusage ru_comm, ru_utl;
 	char str[STR_SIZE];
 	char name[STR_SIZE];
-	const char *fmt;
-	int veid, res, id, ret = 0, found = 0, new_veid = 0;
+	const char *fmt = NULL;
+	int veid = 0, res, id, ret = 0, found = 0, new_veid = 0;
 	int exited = 0;
 	double r, rs, lm, k;
 	struct mem_struct mem;

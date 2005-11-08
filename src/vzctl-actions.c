@@ -561,6 +561,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 	struct sigaction act;
 	char fname[STR_SIZE];
 
+	ret = 0;
 	if ((h = vz_open(veid)) == NULL)
 		return VZ_BAD_KERNEL;
 	if (action != ACTION_EXEC && 

@@ -121,7 +121,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 {
 	char *envp[5];
 	char *str;
-	const char *script;
+	const char *script = NULL;
 	int ret, i;
 	char vps_state[32];
 	const char *str_state;
@@ -301,7 +301,7 @@ static int netdev_ctl(vps_handler *h, int veid, int op, char *name)
 
 int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
 {
-	int ret;
+	int ret = 0;
 	list_head_t *dev_h = &net->dev;
 	net_dev_param *dev;
 	int cmd;
