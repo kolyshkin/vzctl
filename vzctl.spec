@@ -41,13 +41,7 @@ e.g. create, start, shutdown, set various options and limits etc.
 %prep
 %setup -n %{name}-%{version}-%{release}
 %build
-%ifarch x86_64 ia64 
-LIBFLAGS="-fPIC"
-%ifarch ia64
-export LDFLAGS="-lia64_syscall"
-%endif
-%endif
-make CFLAGS="$RPM_OPT_FLAGS $LIBFLAGS"
+make CFLAGS="$RPM_OPT_FLAGS"
 
 %install
 rm -rf $RPM_BUILD_ROOT
