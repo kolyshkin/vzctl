@@ -25,16 +25,17 @@ NETSCRIPTDIR = /etc/sysconfig/network-scripts
 
 export LD_LIBRARY_PATH=.
 CC = gcc
-CFLAGS = -Wall -g2 
+CFLAGS = -Wall -g2
+SHAREDLIB_CFLAGS = -fPIC
 VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
 INC = -I ../include -I$(VZKERNEL_HEADERS)
 ARCH=$(shell uname -i)
 
-OBJ_libvzctl = lib/env.o lib/ub.o lib/net.o lib/logger.o lib/exec.o lib/cap.o \
-	lib/cpu.o lib/res.o lib/util.o lib/dist.o lib/list.o lib/script.o \
-	lib/dev.o lib/config.o lib/lock.o lib/quota.o lib/modules.o \
-	lib/iptables.o lib/fs.o lib/create.o
-OBJ_simfs=lib/fs_simfs.o
+OBJ_libvzctl = lib/env.lo lib/ub.lo lib/net.lo lib/logger.lo lib/exec.lo \
+	lib/cap.lo lib/cpu.lo lib/res.lo lib/util.lo lib/dist.lo lib/list.lo \
+	lib/script.lo lib/dev.lo lib/config.lo lib/lock.lo lib/quota.lo \
+	lib/modules.lo lib/iptables.lo lib/fs.lo lib/create.lo
+OBJ_simfs=lib/fs_simfs.lo
 OBJ_vzctl = vzctl.o vzctl-actions.o modules.o enter.o
 OBJ_vzlist = vzlist.o
 OBJ_arp = arpsend.o
@@ -42,7 +43,9 @@ OBJ_split = vzsplit.o
 OBJ_memcheck = vzmemcheck.o validate.o
 OBJ_cfgvalidate = vzcfgvalidate.o validate.o
 OBJ_calc = vzcalc.o
-OBJ = $(OBJ_libvzctl) $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_split)
+OBJ = $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_arp) $(OBJ_split) $(OBJ_memcheck) \
+	$(OBJ_cfgvalidate) $(OBJ_calc)
+LOBJ = $(OBJ_libvzctl) $(OBJ_simfs)
 LIB_vzctl = libvzctl.so.$(LIB_VER)
 LIB_simfs = libvzctl-simfs.so.$(LIB_VER)
 LIB_fs = libvzctl-fs.so
@@ -68,6 +71,9 @@ all: $(PROGS) $(LIBS)
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $(INC) $< -o $@
+
+%.lo: %.c
+	$(CC) -c $(CFLAGS) $(SHAREDLIB_CFLAGS) $(INC) $< -o $@
 
 $(LIB_simfs) : $(OBJ_simfs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_simfs) -shared -o $@
@@ -170,10 +176,10 @@ inst-dirs:
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
 	inst-netscripts inst-configs inst-initd inst-cron
 clean:
-	rm -f *.o lib/*.o $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_simfs) .depend
+	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_simfs) .depend
 
-.depend:: $(OBJ:.o=.c)
-	$(CC) -M $(FLAGS) $(DEPFLAGS) $(INC) $(OBJ:.o=.c) >.depend
+.depend:: $(OBJ:.o=.c) $(LOBJ:.lo=.c)
+	$(CC) -M $(FLAGS) $(DEPFLAGS) $(INC) $^ >.depend
 
 depend:: .depend
 
