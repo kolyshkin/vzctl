@@ -20,6 +20,7 @@
 #   IPDELALL      - deleet all ip addresse
 #
 VENET_DEV=venet0
+LOOPBACK=lo
 FAKEGATEWAY=191.255.255.1
 FAKEGATEWAYNET=191.255.255.0
 CFGFILE=/etc/network/interfaces
@@ -37,13 +38,14 @@ function setup_network()
 	fi
 	echo -e "
 # Auto generated venet0 interfaces
-auto ${VENET_DEV}
+auto ${VENET_DEV} ${LOOPBACK}
 iface ${VENET_DEV} inet static
 	address 127.0.0.1
 	netmask 255.255.255.255
 	broadcast 0.0.0.0
 	up route add -net ${FAKEGATEWAY} netmask 255.255.255.255 dev ${VENET_DEV}
 	up route add default gw ${FAKEGATEWAY}
+iface ${LOOPBACK} inet loopback
 " >> ${CFGFILE}
 	# Set up /etc/hosts
 	if [ ! -f $HOSTFILE ]; then
