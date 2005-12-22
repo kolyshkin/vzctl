@@ -12,6 +12,15 @@
 #
 # chkconfig: 2345 96 88
 # description: OpenVZ startup script.
+### BEGIN INIT INFO
+# Provides: vz
+# required-start: $network $remote_fs $local_fs sshd
+# Required-Stop:
+# Default-Start: 2 3 5
+# Default-Stop:
+# Description: OpenVZ startup script.
+### END INIT INFO
+
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -34,6 +43,7 @@ VZDEV=venet0
 PRELOAD_MODULES="af_packet"
 MODULES="vzmon vzdquota vzdev"
 NET_MODULES="vznetdev vznet"
+IPT_MODULES="ip_tables ${IPTABLES}"
 if [ "${VZWDOG}" = "yes" ]; then
 	MODULES="${MODULES} vzwdog"
 fi
@@ -285,6 +295,7 @@ function start()
 		fi
 	fi
 	echo -n  $"Starting OpenVZ: "
+	load_modules "${IPT_MODULES}"
 	for MOD in $PRELOAD_MODULES; do
 		/sbin/modprobe -r $MOD >/dev/null 2>&1
 		/sbin/modprobe $MOD >/dev/null 2>&1
