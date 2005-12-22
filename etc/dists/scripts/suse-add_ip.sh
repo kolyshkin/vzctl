@@ -46,9 +46,14 @@ NETMASK=255.255.255.255
 IPADDR=127.0.0.1" > ${IFCFG} || \
 	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
 
-	echo "${FAKEGATEWAYNET}	0.0.0.0 255.255.255.0	${VENET_DEV}	
-default	${FAKEGATEWAY}	0.0.0.0	${VENET_DEV}" > ${ROUTES} || \
-	error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
+	if ! grep -q -E "${FAKEGATEWAYNET}[[:space:]]0.0.0.0[[:space:]]255.255.255.0[[:space:]]${VENET_DEV}" ${ROUTES};
+	then
+		echo "${FAKEGATEWAYNET} 0.0.0.0 255.255.255.0   ${VENET_DEV}" >> ${ROUTES}
+	fi
+	if ! grep -q -E "default[[:space:]]${FAKEGATEWAY}[[:space:]]0.0.0.0[[:space:]]${VENET_DEV}" ${ROUTES};
+	then
+		echo "default ${FAKEGATEWAY}    0.0.0.0 ${VENET_DEV}" >> ${ROUTES}
+	fi
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
