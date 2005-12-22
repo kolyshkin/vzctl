@@ -33,6 +33,7 @@
 #include "fs.h"
 #include "res.h"
 #include "logger.h"
+#include "util.h"
 
 LOG_DATA
 static struct Cveinfo *veinfo = NULL; 
