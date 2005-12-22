@@ -52,7 +52,7 @@ for RC in ${RCDIRS}; do
 done
 
 if [ -z "${RC}" ]; then
-	echo "Unable to find runlevel derectories"
+	echo "Unable to find runlevel directories"
 	exit 1
 fi
 
