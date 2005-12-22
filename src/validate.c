@@ -270,7 +270,8 @@ if (ubs.name != NULL) {						\
 	CHECK_BL(param->dq.diskinodes, diskinodes)
 
 /*	2 Check formulas			*/
-	val =  40 * 1024 * avnumproc + ubs.dcachesize[1];
+	val = (40 * 1024 * avnumproc) + ubs.dcachesize[1];
+	val &= LONG_MAX;
 	if (ubs.kmemsize[0] < val) {
 		logger(0, 0, "Error: kmemsize.bar should be > %lu"
 				" (currently, %lu)", val, ubs.kmemsize[0]);
@@ -310,6 +311,7 @@ if (ubs.name != NULL) {						\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val = 2.5 * 1024 * ubs.numtcpsock[0];
+	val &= LONG_MAX;
 	if (ubs.tcpsndbuf[1] - ubs.tcpsndbuf[0] < val) {
 		logger(0, 0, "Error: tcpsndbuf.lim-tcpsndbuf.bar"
 				" should be > %lu (currently, %lu)", val,
@@ -329,6 +331,7 @@ if (ubs.name != NULL) {						\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val = 2.5 * 1024 * ubs.numothersock[0];
+	val &= LONG_MAX;
 	if (ubs.othersockbuf[1] - ubs.othersockbuf[0] < val) {
 		logger(0, 0, "Error: othersockbuf.lim-othersockbuf.bar"
 			       " should be > %lu (currently, %lu)", val,
@@ -348,6 +351,7 @@ if (ubs.name != NULL) {						\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val =  2.5 * 1024 * ubs.numtcpsock[0];
+	val &= LONG_MAX;
 	if (ubs.tcprcvbuf[1] - ubs.tcprcvbuf[0] < val) {
 		logger(0, 0, "Warning: tcprcvbuf.lim-tcprcvbuf.bar"
 			       " should be > %lu (currently, %lu)", val,
@@ -490,6 +494,7 @@ if (ubs.name != NULL) {						\
 	val1 = ubs.numtcpsock[0] + ubs.numothersock[0] + ubs.numpty[0];
 	if (val1 > val)
 		val = val1;
+	val &= LONG_MAX;
 	if (ubs.numfile[0] < val) {
 		logger(0, 0, "Warning: numfile should be > %lu"
 				" (currently, %lu)", val, ubs.numfile[0]);
@@ -509,6 +514,7 @@ if (ubs.name != NULL) {						\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val = ubs.numfile[0] * 384;
+	val &= LONG_MAX;
 	if (ubs.dcachesize[1] < val) {
 		logger(0, 0, "Warning: dcachesize.lim should be > %lu"
 				" (currently, %lu)", val,
