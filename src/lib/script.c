@@ -253,13 +253,13 @@ int mk_quota_link()
 		logger(0, errno, "Unable to create %s", buf);
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
 		(unsigned long)st.st_dev);
-	if (lstat(QUOTA_U, &st))
-		if (symlink(buf, QUOTA_U)) 
-			logger(0, errno, "Unable to create symlink %s", buf); 
+	unlink(QUOTA_U);
+	if (symlink(buf, QUOTA_U)) 
+		logger(0, errno, "Unable to create symlink %s", buf); 
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_G,
 		(unsigned long)st.st_dev);
-	if (lstat(QUOTA_G, &st))
-		if (symlink(buf, QUOTA_G))
-			logger(0, errno, "Unable to create symlink %s", buf); 
+	unlink(QUOTA_G);	
+	if (symlink(buf, QUOTA_G))
+		logger(0, errno, "Unable to create symlink %s", buf); 
 	return 0;
 }
