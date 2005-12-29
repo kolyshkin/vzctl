@@ -1,4 +1,13 @@
 vzctl (2.7.0)
+   2.7.0-25
+	* do VPS umount in loop untill EINVAL
+	* close all fds before VPS enter
+	* set mode 600 for /dev/vzctl
+	* fixed destroy in case VPS private area is not a directory
+	* increased parameters in VPS samples:
+		kmemsize *= 1.2, numfiles *= 1.6 dcachesize *= 2 
+	* load iptables modules form /etc/init.d/vz
+	* do preload libnss on enter action
     2.7.0-24: Fri Oct 28 2005 <igor@sw.ru>
 	* set proc title as 'vzctl: ttyname' on enter
 	* fixed enter freeze if any processes running in bg
