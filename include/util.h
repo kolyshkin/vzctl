@@ -39,5 +39,7 @@ unsigned long max_ul(unsigned long val1, unsigned long val2);
 void str_tolower(const char *from, char *to);
 char *get_file_name(char *str);
 const char *get_vps_state_str(int vps_state);
+int set_not_blk(int fd);
+void close_fds(int close_std, ...);
 
 #endif

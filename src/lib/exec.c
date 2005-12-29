@@ -77,18 +77,6 @@ int execvep(const char *path, char *const argv[], char *const envp[])
 		return execve(path, argv, envp);
 }
 
-int set_not_blk(int fd)
-{
-	int oldfl, ret;
-
-	if ((oldfl = fcntl(fd, F_GETFL)) == -1)
-		return -1;
-	oldfl |= O_NONBLOCK;
-	ret = fcntl(fd, F_SETFL, oldfl);
-
-	return ret;	
-}
-
 static int stdredir(int rdfd, int wrfd)
 {
 	int lenr, lenw, lentotal, lenremain;
@@ -178,8 +166,6 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	} else if (pid == 0) {
-		int i;
-
 		close(0); close(1); close(2);
 		dup2(in[0], STDIN_FILENO);
 		dup2(out[1], STDOUT_FILENO);
@@ -189,10 +175,9 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		close(in[1]); close(out[0]); close(err[0]);
 		close(st[0]);
 		fcntl(st[1], F_SETFD, FD_CLOEXEC);
-
-		/* Logging can not be used after chroot */
 		if ((ret = vz_chroot(root)))
 			goto  env_err;
+		close_fds(0, st[1], h->vzfd, -1);
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
 		if (ret < 0) {
 			if (errno == ESRCH) 
@@ -201,11 +186,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 				ret = VZ_ENVCREATE_ERROR;
 			goto env_err;
 		}
-		/* Close all fds */
-		for (i = 3; i < FOPEN_MAX; i++) {
-			if (i != st[1])
-				close(i);
-		}
+		close(h->vzfd);
 		if (exec_mode == MODE_EXEC && argv != NULL) {
 			execvep(argv[0], argv, envp != NULL ? envp : envp_bash);
 		} else {

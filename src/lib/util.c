@@ -20,9 +20,15 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <stdarg.h>
+#include <linux/limits.h>
 
 #include "util.h"
 #include "logger.h"
+
+#ifndef NR_OPEN
+#define NR_OPEN 1024
+#endif
 
 char *unescapestr(char *src)
 {
@@ -453,4 +459,55 @@ const char *get_vps_state_str(int vps_state)
 		break;
 	}
 	return p;
+}
+
+int set_not_blk(int fd)
+{
+	int oldfl, ret;
+
+	if ((oldfl = fcntl(fd, F_GETFL)) == -1)
+		return -1;
+	oldfl |= O_NONBLOCK;
+	ret = fcntl(fd, F_SETFL, oldfl);
+
+	return ret;
+}
+
+/** Close all fd.
+ * @param close_std	flag for closing the [0-2] fds
+ * @param ...		list of fds are skiped, (-1 is the end mark) 
+*/
+void close_fds(int close_std, ...)
+{
+	int fd, max, i;
+	va_list ap;
+	int skip_fds[255];
+
+	max = sysconf(_SC_OPEN_MAX);
+	if (max < NR_OPEN)
+		max = NR_OPEN; 
+	if (close_std) {
+		fd = open("/dev/null", O_RDWR);
+		if (fd != -1) {
+			dup2(fd, 0); dup2(fd, 1); dup2(fd, 2);
+		} else {
+			close(0); close(1); close(2);
+		}
+	}
+	/* build aray of skiped fds */
+	va_start(ap, "%d");
+	skip_fds[0] = -1;
+	for (i = 0; i < sizeof(skip_fds); i++) {
+		fd = va_arg(ap, int);
+		skip_fds[i] = fd;
+		if (fd == -1)
+			break;
+	}
+	va_end(ap);
+	for (fd = 3; fd < max; fd++) {
+		for (i = 0; skip_fds[i] != fd && skip_fds[i] != -1; i++);
+		if (skip_fds[i] == fd) 
+			continue;
+		close(fd);
+	}
 }

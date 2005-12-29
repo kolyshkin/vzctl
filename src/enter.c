@@ -23,11 +23,13 @@
 #include <wait.h>
 #include <termios.h>
 #include <pty.h>
+#include <grp.h>
+#include <pwd.h>
 
 #include "vzerror.h"
 #include "logger.h"
 #include "env.h"
-
+#include "util.h"
 
 #define DEV_TTY		"/dev/tty"
 
@@ -36,15 +38,12 @@ static struct termios s_tios;
 extern char *_proc_title;
 extern int _proc_title_len;
 
-static int pty_alloc(int *master, int *slave)
+static int pty_alloc(int *master, int *slave, struct termios *tios,
+	struct winsize *ws)
 {
 	char *name;
-	struct termios tios;
-	struct winsize ws;
 
-	ioctl(0, TIOCGWINSZ, &ws);
-	tcgetattr(0, &tios);
-	if (openpty(master, slave, NULL, &tios, &ws) < 0) {
+	if (openpty(master, slave, NULL, tios, ws) < 0) {
 		logger(0, errno, "Unable to open pty");
 		return -1;
 	}
@@ -179,19 +178,28 @@ static void e_loop(int r_in, int w_in,  int r_out, int w_out)
 		while (stdredir(r_out, w_out) == 0);
 }
 
+static void preload_lib()
+{
+	/* Preload libnss */
+	(void)getpwnam("root");
+	endpwent();
+	(void)getgrnam("root");
+	endgrent();
+}
+
 int do_enter(vps_handler *h, envid_t veid, char *root)
 {
 	int pid, ret, status;
-	int i, in[2], out[2], st[2];
+	int in[2], out[2], st[2];
 	struct sigaction act;
 
 	if (pipe(in) < 0 || pipe(out) < 0 || pipe(st) < 0) {
 		logger(0, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
-	
 	if ((ret = vz_setluid(veid)))
 		return ret;
+	preload_lib();
 	child_term = 0;
         sigemptyset(&act.sa_mask);
         act.sa_flags = SA_NOCLDSTOP;
@@ -208,8 +216,15 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		return ret;
 	} else if (pid == 0) {
 		int master, slave;
+		struct termios tios;
+		struct winsize ws;
 
+		/* get terminal settings from 0 */
+		ioctl(0, TIOCGWINSZ, &ws);
+		tcgetattr(0, &tios);
 		close(in[1]); close(out[0]); close(st[0]);
+		/* list of skipped fds -1 the end mark */
+		close_fds(1, in[0], out[1], st[1], h->vzfd, -1);
 		if ((ret = vz_chroot(root)))
 			goto err;
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
@@ -220,16 +235,10 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 				ret = VZ_ENVCREATE_ERROR;
 			goto err;
 		}
-		if ((ret = pty_alloc(&master, &slave)))
+		close(h->vzfd);
+		if ((ret = pty_alloc(&master, &slave, &tios, &ws)))
 			goto err;
 		set_proc_title(ttyname(slave));
-		for (i = 0; i < FOPEN_MAX; i++) {
-			if (i != in[0] && i != out[1] && i != st[1] &&
-				i != master && i != slave)
-			{
-				close(i);
-			}
-		}
 		child_term = 0;
 	        sigemptyset(&act.sa_mask);
 	        act.sa_flags = SA_NOCLDSTOP;
@@ -238,7 +247,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		if ((pid = fork()) == 0) {
 			char buf[64];
 			char *term;
-		        char *arg[] = {"bash",  "-i", NULL};
+		        char *arg[] = {"bash",  "--login", "-i", NULL};
 		        char *env[] = {"HOME=/", "HISTFILE=/dev/null",
 				"PATH=/bin:/sbin:/usr/bin:/usr/sbin:", NULL, NULL};
 			close(master);
@@ -248,8 +257,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			dup2(slave, 2);
 			/* Close the extra descriptor for the pseudo tty. */
 			close(slave);
-			for (i = 3; i < FOPEN_MAX; i++)
-				close(i);
+			close_fds(NULL, 0);
 			if ((term = getenv("TERM")) != NULL) {
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
 				env[2] = buf;
@@ -291,8 +299,10 @@ err:
 			break;
 	if (WIFSIGNALED(status))
 		logger(0, 0, "got signal %d", WTERMSIG(status));
-	if (!ret)
+	if (!ret) {
 		raw_off();
+		logger(0, 0, "exited from VPS %d\n", veid);
+	}
 	close(in[1]); close(out[0]);
 	return 0;
 }

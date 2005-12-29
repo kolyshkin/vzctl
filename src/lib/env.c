@@ -147,14 +147,6 @@ int vps_is_run(vps_handler *h, envid_t veid)
         return 1;
 }
 
-static void vps_close_fd()
-{
-        int i;
-
-	for (i = 0; i < FOPEN_MAX; i++)
-		close(i);
-}
-
 /** Change root to specified directory
  *
  * @param		VPS root
@@ -202,7 +194,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 {
 	struct vzctl_env_create_data env_create_data;
 	struct env_create_param create_param;
-	int i, fd, ret;
+	int fd, ret;
 	vps_res *res;
 	char *argv[] = {"init", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
@@ -235,6 +227,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		}
 		goto env_err;
 	}
+	close(h->vzfd);
 	/* Create /fastboot to skip run fsck */
 	fd = open("/fastboot", O_CREAT | O_RDONLY);
 	close(fd);
@@ -251,11 +244,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	*/
 	if (read(wait_p, &ret, sizeof(ret)) != 0)
 		return 0;
-	/* close all fd */
 	logger(10, 0, "Starting init");
-	for (i = 0; i < FOPEN_MAX; i++) 
-		if (i != err_p)
-			close(i);
 	execve("/sbin/init", argv, envp);
 	execve("/etc/init", argv, envp);
 	execve("/bin/init", argv, envp);
@@ -285,6 +274,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 
 		if ((ret = vps_set_cap(veid, &res->cap)))
 			goto env_err;
+		close_fds(0, wait_p, err_p, h->vzfd, -1);
 		if (fn == NULL) {
 			ret = _env_create(h, veid, wait_p, err_p, (void *)res);
 		} else {
@@ -458,6 +448,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	{
 		goto err;
 	}
+
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
 			START_PREFIX);	
@@ -530,13 +521,14 @@ static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
 		return ret;
 	if ((ret = vz_setluid(veid)))
 		return ret;
+	close_fds(1, h->vzfd, -1);
 	if ((ret = vz_env_create_ioctl(h, veid, VE_ENTER)) < 0) {
 		if (errno == ESRCH)
 			return 0;
 		logger(0, errno, "VPS enter failed");
 		return ret;
 	}
-	vps_close_fd();
+	close(h->vzfd);
 	switch (stop_mode) {
 		case M_REBOOT:
 		{
