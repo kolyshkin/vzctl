@@ -482,7 +482,6 @@ void close_fds(int close_std, ...)
 	int fd, max, i;
 	va_list ap;
 	int skip_fds[255];
-	char *last = "%d";
 
 	max = sysconf(_SC_OPEN_MAX);
 	if (max < NR_OPEN)
@@ -496,7 +495,7 @@ void close_fds(int close_std, ...)
 		}
 	}
 	/* build aray of skiped fds */
-	va_start(ap, last);
+	va_start(ap, close_std);
 	skip_fds[0] = -1;
 	for (i = 0; i < sizeof(skip_fds); i++) {
 		fd = va_arg(ap, int);
