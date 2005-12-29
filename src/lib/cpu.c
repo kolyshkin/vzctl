@@ -39,12 +39,22 @@
 
 static inline int fairsched_chwt(unsigned int id, unsigned wght)
 {
-        return syscall(__NR_fairsched_chwt, id, wght);
+	int ret;
+
+	ret = syscall(__NR_fairsched_chwt, id, wght);
+	if (ret && errno == ENOSYS)
+		ret = 0;
+	return ret;
 }
 
 static inline int fairsched_rate(unsigned int id, int op, unsigned rate)
 {
-        return syscall(__NR_fairsched_rate, id, op, rate);
+	int ret;
+
+	ret = syscall(__NR_fairsched_rate, id, op, rate);
+	if (ret && errno == ENOSYS)
+		ret = 0;
+	return ret;
 }
 
 static int set_cpulimit(envid_t veid, unsigned int cpulimit)
