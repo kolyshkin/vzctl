@@ -60,7 +60,7 @@ int calculate(int numerator, int verbose)
 	struct ub_struct ub_s;
 
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		fprintf(stderr, "Unable to open file " PROCUBC ": %s",
+		fprintf(stderr, "Unable to open file " PROCUBC ": %s\n",
 			strerror(errno));
 		return 1;
 	}
