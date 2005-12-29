@@ -76,6 +76,7 @@ suse:
 		    $(DESTDIR)$(DISTCONFDIR)/suse-$$ver.conf; \
 	done
 	$(INSTALL) suse.conf $(DESTDIR)$(DISTCONFDIR)/suse.conf
+	$(INSTALL) suse.conf $(DESTDIR)$(DISTCONFDIR)/opensuse.conf
 sles:
 	for ver in $(SLES_VER); do \
 		$(INSTALL) sles.conf \

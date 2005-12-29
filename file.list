@@ -60,6 +60,7 @@ etc/dists/sles.conf
 etc/dists/suse-7.3.conf
 etc/dists/suse-8.0.conf
 etc/dists/suse.conf
+etc/dists/opensuse.conf
 etc/dists/rhel-3.conf
 etc/dists/default
 etc/dists/Makefile
