@@ -1,5 +1,6 @@
 vzctl (2.7.0)
    2.7.0-25
+	* setup loopback for debian
 	* skip fairsched setup if not supported
 	* do VPS umount in loop untill EINVAL
 	* close all fds before VPS enter
