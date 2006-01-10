@@ -105,12 +105,12 @@ if [ -f %{_configdir}/vz ]; then
 		echo 'IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length"' >> %{_configdir}/vz
 	fi
 fi
-/sbin/chkconfig --add vz
+/sbin/chkconfig --add vz > /dev/null
 
 %preun
 if [ $1 = 0 ]; then 
 	rm -f  /etc/profile.d/vz.sh
-	/sbin/chkconfig --del vz
+	/sbin/chkconfig --del vz >/dev/null
 	rm -f %{_scriptdir}/ve-unlimited.conf-sample >/dev/null 2>&1
 fi
 
