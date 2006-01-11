@@ -25,6 +25,8 @@
 #ifndef __NR_fairsched_chwt
 #ifdef __ia64__
 #define __NR_fairsched_chwt    1502
+#elif __x86_64__
+#define __NR_fairsched_chwt    506
 #else
 #define __NR_fairsched_chwt    502
 #endif
@@ -32,6 +34,8 @@
 #ifndef __NR_fairsched_rate
 #ifdef __ia64__
 #define __NR_fairsched_rate    1504
+#elif __x86_64__
+#define __NR_fairsched_rate    508
 #else
 #define __NR_fairsched_rate    504
 #endif
