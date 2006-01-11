@@ -9,21 +9,21 @@
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 # OpenVZ startup script
-#
+
+###
 # chkconfig: 2345 96 88
 # description: OpenVZ startup script.
+###
+
 ### BEGIN INIT INFO
 # Provides: vz
 # required-start: $network $remote_fs $local_fs sshd
-# Required-Stop:
+# required-stop:
 # Default-Start: 2 3 5
 # Default-Stop:
 # Description: OpenVZ startup script.
 ### END INIT INFO
 
-
-# Source function library.
-. /etc/rc.d/init.d/functions
 
 # This line is needed to cheat /etc/init.d/rc who expects action word
 
@@ -48,6 +48,18 @@ if [ "${VZWDOG}" = "yes" ]; then
 	MODULES="${MODULES} vzwdog"
 fi
 CONFIG_DIR=/etc/sysconfig/vz-scripts
+
+# Source function library.
+if [ -r /etc/rc.d/init.d/functions ]; then
+	DISTR=redhat
+	source /etc/rc.d/init.d/functions
+elif [ -r /etc/rc.status ]; then
+	DISTR=suse
+	source /etc/rc.status
+else
+	rc_done='^[[71G done'
+	rc_failed='^[[71Gfailed'
+fi
 
 VEINFO=""
 RETVAL=0
@@ -75,28 +87,45 @@ get_veinfo()
 	return 0
 }
 
+print_success()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		echo_success
+	else
+		echo -n "$rc_done"
+	fi
+	echo
+}
+
+print_failure()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		failure $"$1"
+	else
+		echo -n "$rc_failed"
+	fi
+	echo
+}
+
+__echo()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		echo -n $"$1"
+	else
+		echo -n "$1"
+	fi
+}
+
 status()
 {
 	local base=${0##*/}
 	if get_veinfo; then
-		echo $"OpenVZ is running..."
+		echo "OpenVZ is running..."
 		return 0
 	else
-		echo $"OpenVZ is stopped."
+		echo "OpenVZ is stopped."
 		return 3
 	fi
-}
-
-runcmd()
-{
-   echo -n $"$1 "
-   shift
-   if [ "$BOOTUP" = "color" ]; then
-      $* && echo_success || echo_failure
-   else
-      $*
-   fi
-   echo
 }
 
 function setup_net()
@@ -109,11 +138,21 @@ function setup_net()
 	for mod in ${NET_MODULES}; do
         	modprobe ${mod} 2>/dev/null
 	done
-	action $"Bringing up interface $VZDEV: " \
-		ip link set $VZDEV up
+	__echo "Bringing up interface $VZDEV: " \
+	ip link set $VZDEV up 
+	if [ $? -eq 0 ] ; then
+		print_success
+	else
+		print_failure
+	fi
 	ip addr add 0.0.0.0/0 dev $VZDEV
-	action $"Configuring interface $VZDEV: " \
-		sysctl -w net.ipv4.conf.$VZDEV.send_redirects=0
+	__echo "Configuring interface $VZDEV: "
+	sysctl -w net.ipv4.conf.$VZDEV.send_redirects=0
+	if [ $? -eq 0 ] ; then
+		print_success
+	else
+		print_failure
+	fi
 }
 
 function ve_start()
@@ -130,7 +169,7 @@ function ve_start()
 	cd - >/dev/null
 	echo "0" > /proc/sys/net/ipv4/route/src_check
 	for veid in $velist; do
-		echo -n  $"Starting VPS ${veid}: "
+		__echo "Starting VPS ${veid}: "
 		if [ "x${VZFASTBOOT}" = "xyes" -a "x${DISK_QUOTA}" = "xyes" ]; 
 		then
 			$VZQUOTA stat ${veid} >/dev/null 2>&1
@@ -143,29 +182,26 @@ function ve_start()
 		fi
 		msg=`$VZCTL start ${veid} 2>&1`
 		if [ $? -eq 0 ]; then
-			success
+			print_success
 		else
-			failure "$msg"
+			print_failure "$msg"
 		fi
-		echo
 	done
 	for veid in ${need_restart}; do
-		echo -n  $"Stopping VPS ${veid}: "
+		__echo "Stopping VPS ${veid}: "
 		$VZCTL stop ${veid} 2>&1 >/dev/null 2>&1
 		if [ $? -eq 0 ]; then
-			success
+			print_success
 		else
-			failure "$msg"
+			print_failure "$msg"
 		fi
-		echo
-		echo -n  $"Starting VPS ${veid}: "
+		__echo "Starting VPS ${veid}: "
 		msg=`$VZCTL start ${veid} 2>&1`
 		if [ $? -eq 0 ]; then
-			success
+			print_success
 		else
-			failure "$msg"
+			print_failure "$msg"
 		fi
-		echo
 	done
 }
 
@@ -214,32 +250,30 @@ function ve_stop()
 		fail=0
 		mounts=`awk '{if ($3=="simfs") print $2}' /proc/mounts`
 		for m in $mounts; do
-			echo -n $"Unmounting VPS area "
+			__echo "Unmounting VPS area "
 			echo -n $m
 			msg=`umount $m 2>&1`
 			if [ $? -eq 0 ]; then
-				success
+				print_success
 			else
-				failure "$msg"
+				print_failure "$msg"
 				fail=$((fail+1))
 				fuser -k -m ${m} > /dev/null 2>&1
 			fi
-			echo
 		done
 		iter=$((iter+1))
 	done
 	# turn quota off
 	quota=`awk -F: '/^[0-9]+:/{print $1}' /proc/vz/vzquota 2>/dev/null`
 	for m in ${quota}; do
-		echo -n $"Turn quota off for VPS "
+		__echo "Turn quota off for VPS "
 		echo -n $m
 		msg=`vzquota off ${m} 2>&1`
 		if [ $? -eq 0 ]; then
-			success
+			print_success
 		else
-			failure "$msg"
+			print_failure "$msg"
 		fi
-		echo
 	done
 }
 
@@ -274,27 +308,25 @@ function start()
 	local msg
 
 	if ! lockfile $LOCKFILE; then
-		echo -n "OpenVZ is locked"
-		failure
-		echo
+		__echo "OpenVZ is locked"
+		print_failure
 		return 1
 	fi
 	if [ -f /var/lock/subsys/vz ]; then
-		echo -n "OpenVZ already running"
-		failure
-		echo	
+		__echo "OpenVZ already running"
+		print_failure
 		return 1
 	fi
 	if [ ! -e /dev/vzctl ]; then
 		/bin/mknod -m 600 /dev/vzctl c 126 0 > /dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
-			failure $"creating vzctl device"
-			echo
+			__echo "creating vzctl device"
+			print_failure
 			return $RETVAL
 		fi
 	fi
-	echo -n  $"Starting OpenVZ: "
+	__echo "Starting OpenVZ: "
 	load_modules "${IPT_MODULES}"
 	for MOD in $PRELOAD_MODULES; do
 		/sbin/modprobe -r $MOD >/dev/null 2>&1
@@ -304,13 +336,11 @@ function start()
 		/sbin/modprobe $MOD >/dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
-			failure $"Loading module ${MOD}"
-			echo
+			print_failure "Loading module ${MOD}"
 			return $RETVAL
 		fi
 	done
-	success $"loading OpenVZ modules"
-	echo
+	print_success "loading OpenVZ modules"
 	setup_net
 	if test -z "${VE0CPUUNITS}"; then
 		echo "Warning: VE0CPUUNITS is not set in /etc/sysconfig/vz; using value of 1000"
@@ -318,7 +348,7 @@ function start()
 	fi
 	msg=`${VZCTL} set 0 --cpuunits ${VE0CPUUNITS} 2>&1`
 	if [ $? -ne 0 ]; then
-		failure $"vzctl set 0 --cpuunits ${VE0CPUUNITS} failed: $msg"
+		print_failure "vzctl set 0 --cpuunits ${VE0CPUUNITS} failed: $msg"
 	fi
 	ve_start
 	
@@ -329,15 +359,14 @@ function start()
 function stop()
 {
 	if ! lockfile $LOCKFILE; then
-		echo -n "OpenVZ is locked"
-		failure
-		echo
+		__echo "OpenVZ is locked"
+		print_failure
 		RETVAL=1
 		return 1
 	fi
 
 	ve_stop
-	echo -n  $"Stopping OpenVZ: "
+	__echo "Stopping OpenVZ: "
 	ip link set ${VZDEV} down 2>/dev/null
 	for MOD in $MODULES; do
 		/sbin/modprobe -r $MOD > /dev/null 2>&1
@@ -345,8 +374,7 @@ function stop()
 	for MOD in $PRELOAD_MODULES ${IPT_MODULES2} ${NET_MODULES}; do
 		/sbin/modprobe -r $MOD > /dev/null 2>&1
 	done
-	success
-	echo
+	print_success
 	rm -f $LOCKFILE
 	rm -f /var/lock/subsys/vz
 }
@@ -363,8 +391,6 @@ function load_modules()
 		/sbin/modprobe $mod >/dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
-			failure $"Loading module ${mod}"
-			echo
 			return $RETVAL
 		fi
 	done
