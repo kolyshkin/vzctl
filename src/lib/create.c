@@ -35,7 +35,7 @@
 #define DESTR		1
 #define VZOSTEMPLATE	"/usr/bin/vzosname"
 
-int destroydir(char *dir);
+static int destroydir(char *dir);
 
 /* Renames (to "*.destroyed" if action == MOVE) or removes config,
  * (if action == DESTR)
@@ -415,10 +415,10 @@ char *maketmpdir(const char *dir)
 static void _destroydir(char *root)
 {
 	char buf[STR_SIZE];
-        struct stat st;
-        struct dirent *ep;
-        DIR *dp;
-	int del;
+	struct stat st;
+	struct dirent *ep;
+	DIR *dp;
+	int del, ret;
 
 	do {
 		if (!(dp = opendir(root)))
@@ -437,14 +437,16 @@ static void _destroydir(char *root)
 				continue;
 			snprintf(buf, sizeof(buf), "rm -rf %s/%s",
 				root, ep->d_name);
-			system(buf);
+			ret = system(buf);
+			if (ret == -1 || WEXITSTATUS(ret))
+				sleep(10);
 			del = 1;
 		}
 		closedir(dp);
 	} while(del);
 }
 
-int destroydir(char *dir)
+static int destroydir(char *dir)
 {
 	char buf[STR_SIZE];
 	char tmp[STR_SIZE];
