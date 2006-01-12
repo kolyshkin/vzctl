@@ -8,19 +8,24 @@
 # This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-CONFIG=${1}
-if ! . "$CONFIG"; then
-	echo "can't source interface config $CONFIG" >&2
-	exit 1
-fi
-
-# VZNET device
-vznet=$DEVICE
+test -f /etc/sysconfig/vz || exit 1
+test -f /usr/lib/vzctl/scripts/vps-functions || exit 1
+test -f /etc/init.d/functions && . /etc/init.d/functions
 
 # configure VZNET
 modvenet="vznetdev vznet"
 
-. /etc/init.d/functions
+## SuSE distro
+if [ -f /etc/sysconfig/network/scripts/functions ]; then
+	vznet=$1
+else
+	CONFIG=${1}
+	if ! . "$CONFIG"; then
+		echo "can't source interface config $CONFIG" >&2
+		exit 1
+	fi
+	vznet=$DEVICE
+fi
 . /usr/lib/vzctl/scripts/vps-functions
 . /etc/sysconfig/vz
 
@@ -32,10 +37,12 @@ for mod in ${modvenet}; do
 	modprobe ${mod} 2>/dev/null
 done
 ip link set $vznet up
-action $"Bringing up interface $vznet: " \
-		ip addr add 0.0.0.0/0 dev $vznet
-action $"Configuring interface $vznet: " \
-	sysctl -w net.ipv4.conf.$vznet.send_redirects=0
+
+echo "Bringing up interface $vznet: " 
+ip addr add 0.0.0.0/0 dev $vznet
+
+echo "Configuring interface $vznet: " 
+sysctl -w net.ipv4.conf.$vznet.send_redirects=0
 
 if [ -r $veinfo ]; then
 	vzgetnetdev

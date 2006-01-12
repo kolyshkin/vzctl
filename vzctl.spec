@@ -107,6 +107,17 @@ if [ -f %{_configdir}/vz ]; then
 fi
 /sbin/chkconfig --add vz > /dev/null
 
+if [ -f /etc/SuSE-release ]; then
+	NET_CFG='ifdown-venet ifup-venet'
+	if ! grep -q -E "^alias venet0" /etc/modprobe.conf; then 
+		echo "alias venet0 vznet" >> /etc/modprobe.conf
+	fi
+	ln -f /etc/sysconfig/network-scripts/ifcfg-venet0 /etc/sysconfig/network/ifcfg-venet0
+	for file in ${NET_CFG}; do
+		ln -sf /etc/sysconfig/network-scripts/${file} /etc/sysconfig/network/scripts/${file}
+	done
+fi
+
 %preun
 if [ $1 = 0 ]; then 
 	rm -f  /etc/profile.d/vz.sh

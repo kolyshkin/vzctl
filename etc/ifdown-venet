@@ -8,18 +8,23 @@
 # This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-CONFIG=${1} 
-if ! . "$CONFIG"; then 
-        echo "can't source interface config $CONFIG" >&2
-        exit 1
+test -f /etc/sysconfig/vz || exit 1
+test -f /usr/lib/vzctl/scripts/vps-functions || exit 1
+test -f /etc/init.d/functions && . /etc/init.d/functions
+
+## SuSE distro
+if [ -f /etc/sysconfig/network/scripts/functions ]; then
+	vznet=$1
+else
+	CONFIG=${1}
+	if ! . "$CONFIG"; then
+		echo "can't source interface config $CONFIG" >&2
+		exit 1
+	fi
+	vznet=$DEVICE
 fi
+. /usr/lib/vzctl/scripts/vps-functions
+. /etc/sysconfig/vz
 
-# VZNET device
-vznet=$DEVICE
-
-. /etc/init.d/functions
-
-action $"Shutting down interface $vznet: " \
-        ip link set $vznet down
-
-
+echo "Shutting down interface $vznet: " 
+ip link set $vznet down
