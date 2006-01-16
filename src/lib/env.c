@@ -380,10 +380,8 @@ static void fix_numiptent(ub_param *ub)
 
 static void fix_cpu(cpu_param *cpu)
 {
-	unsigned long *units;
-
 	if (cpu->units == NULL && cpu->weight == NULL) {
-		units = malloc(sizeof(*units));
+		cpu->units = malloc(sizeof(*cpu->units));
 		*cpu->units = UNLCPUUNITS;
 	}
 }
