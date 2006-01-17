@@ -50,9 +50,9 @@ fi
 CONFIG_DIR=/etc/sysconfig/vz-scripts
 
 # Source function library.
-if [ -r /etc/rc.d/init.d/functions ]; then
+if [ -r /etc/init.d/functions ]; then
 	DISTR=redhat
-	source /etc/rc.d/init.d/functions
+	source /etc/init.d/functions
 elif [ -r /etc/rc.status ]; then
 	DISTR=suse
 	source /etc/rc.status
