@@ -1,6 +1,6 @@
 vzctl (2.7.0)
    2.7.0-26: Tue Jan 17 2006 <igor@sw.ru>
-	* fixed OpenVZ sturtup under SuSE
+	* fixed OpenVZ startup under SuSE
    2.7.0-25: Thu Dec 29 2005 <igor@sw.ru>
 	* setup loopback for debian
 	* skip fairsched setup if not supported
