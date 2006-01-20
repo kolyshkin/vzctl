@@ -11,7 +11,7 @@
 #ifndef _VZCTL_H_
 #define _VZCTL_H_
 
-#define	VERSION			"2.7.0-25"
+#define	VERSION			"2.7.0-26"
 
 /* Action numeration should begin with 1. Value 0 is reserved. */
 #define ACTION_CREATE		1
