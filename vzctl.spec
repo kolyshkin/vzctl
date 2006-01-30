@@ -21,7 +21,7 @@ Source: vzctl-%{version}-%{release}.tar.bz2
 ExclusiveOS: Linux
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: vzkernel >= 2.6.8-022stab034
-Requires: vzkernel >= 2.6.8-022stab028
+Requires: vzkernel
 # these reqs are for vz helper scripts
 Requires: bash
 Requires: gawk
