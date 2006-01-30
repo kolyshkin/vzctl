@@ -41,7 +41,7 @@ PROC_VZVEINFO=/proc/vz/veinfo
 
 VZDEV=venet0
 PRELOAD_MODULES="af_packet"
-MODULES="vzmon vzdquota vzdev"
+MODULES="vzmon vzdquota vzdev vzcompat"
 NET_MODULES="vznetdev vznet"
 IPT_MODULES="ip_tables ${IPTABLES}"
 if [ "${VZWDOG}" = "yes" ]; then
