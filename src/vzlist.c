@@ -1377,7 +1377,7 @@ int build_field_order(char *fields)
 	struct Cfield_order *tmp, *prev = NULL;
 	char *sp, *ep, *p;
 	char name[32];
-	int order;
+	int order, nm_len;
 
 	sp = fields;
 	if (fields == NULL)
@@ -1386,7 +1386,12 @@ int build_field_order(char *fields)
 	do {
 		if ((p = strchr(sp, ',')) == NULL) 
 			p = ep;
-		snprintf(name, p - sp + 1, "%s", sp);
+		nm_len = p - sp + 1;
+		if (nm_len > sizeof(name) - 1) {
+			fprintf(stderr, "Invalid field: %s\n", sp);
+			return 1;
+		}
+		snprintf(name, nm_len, "%s", sp);
 		sp = p + 1;
 		if ((order = search_field(name)) < 0) {
 			fprintf(stderr, "Unknown field: %s\n", name);
