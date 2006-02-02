@@ -23,8 +23,6 @@ else
 	fi
 	vznet=$DEVICE
 fi
-. /usr/lib/vzctl/scripts/vps-functions
-. /etc/sysconfig/vz
 
 echo "Shutting down interface $vznet: " 
 ip link set $vznet down
