@@ -1,7 +1,10 @@
 vzctl (2.7.0)
-   2.7.0-26: Tue Jan 17 2006 <igor@sw.ru>
+   2.7.0-26: Thu Feb  2 2006 <igor@sw.ru>
 	* fixed OpenVZ startup under SuSE
 	* fixed buffer overflow in vzlist
+	* fixed __NR_fairsched_chwt, __NR_fairsched_rate ioctl numbers
+		under x86_64
+	* fixed src/arpsend.c compilation under gcc4
    2.7.0-25: Thu Dec 29 2005 <igor@sw.ru>
 	* setup loopback for debian
 	* skip fairsched setup if not supported
