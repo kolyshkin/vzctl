@@ -340,7 +340,8 @@ void create_arp_packet(struct arp_packet* pkt)
 	*pkt = ((struct arp_packet)
 		{COMMON_ARP, op : htons(cmd == AR_REPLY ? REPLY : REQUEST)});
 
-	set_ip(pkt->sndr_ip_addr, &(check(src_ipaddr,real_ipaddr)));
+	set_ip(pkt->sndr_ip_addr,
+		(src_ipaddr_flag ? &src_ipaddr : &real_ipaddr));
 
 	set_hw(pkt->targ_hw_addr, check(trg_hwaddr, broadcast));
 	set_hw(pkt->src_hw_addr, check(src_hwaddr, real_hwaddr));
