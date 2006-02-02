@@ -41,7 +41,8 @@ PROC_VZVEINFO=/proc/vz/veinfo
 
 VZDEV=venet0
 PRELOAD_MODULES="af_packet"
-MODULES="vzmon vzdquota vzdev vzcompat"
+MODULES="vzmon vzdquota vzdev"
+MODULES_OTHER="vzcompat"
 NET_MODULES="vznetdev vznet"
 IPT_MODULES="ip_tables ${IPTABLES}"
 if [ "${VZWDOG}" = "yes" ]; then
@@ -340,6 +341,7 @@ function start()
 			return $RETVAL
 		fi
 	done
+	load_modules "${MODULES_OTHER}"
 	print_success "loading OpenVZ modules"
 	setup_net
 	if test -z "${VE0CPUUNITS}"; then
@@ -389,10 +391,6 @@ function load_modules()
 			continue
 		fi
 		/sbin/modprobe $mod >/dev/null 2>&1
-		RETVAL=$?
-		if [ $RETVAL -ne 0 ]; then
-			return $RETVAL
-		fi
 	done
 }
 
