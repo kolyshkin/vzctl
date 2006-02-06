@@ -139,7 +139,7 @@ function setup_net()
 	for mod in ${NET_MODULES}; do
         	modprobe ${mod} 2>/dev/null
 	done
-	__echo "Bringing up interface $VZDEV: " \
+	__echo "Bringing up interface $VZDEV: " 
 	ip link set $VZDEV up 
 	if [ $? -eq 0 ] ; then
 		print_success
