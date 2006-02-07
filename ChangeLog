@@ -1,4 +1,6 @@
 vzctl (2.7.0)
+   2.7.0-27: Tue Feb  7 2006 <igor@sw.ru>
+	* fixed VE_CONFFILE variable passed to vps.mount script
    2.7.0-26: Thu Feb  2 2006 <igor@sw.ru>
 	* fixed OpenVZ startup under SuSE
 	* fixed buffer overflow in vzlist

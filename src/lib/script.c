@@ -181,10 +181,9 @@ int run_pre_script(int veid, char *script)
 	arg[0] = script;
 	arg[1] = NULL;
 	/* enviroment parameters*/
-	snprintf(buf,  sizeof(buf), "VEID=%d", veid);
+	snprintf(buf, sizeof(buf), "VEID=%d", veid);
 	env[0] = strdup(buf);
-	snprintf(buf,  sizeof(buf), "VE_CONFFILE=%s%d.conf", VPS_CONF_DIR,
-		veid);
+	snprintf(buf, sizeof(buf), "VE_CONFFILE=%s%d.conf", VPS_CONF_DIR, veid);
 	env[1] = strdup(buf);
 	env[2] = strdup(ENV_PATH);
 	env[3] = NULL;
