@@ -67,8 +67,8 @@ void usage()
 "   [--devnodes device:r|w|rw|none]\n"
 "   [--applyconfig <name>]\n");
    
-	fprintf(stderr, "   [--iptables <name>] [--disabled <yes|no>]\n");
-	fprintf(stderr, "   [UBC parameters]\n"
+	fprintf(stdout, "   [--iptables <name>] [--disabled <yes|no>]\n");
+	fprintf(stdout, "   [UBC parameters]\n"
 "UBC parameters (N - items, P - pages, B - bytes):\n"
 "Two numbers divided by colon means barrier:limit.\n"
 "In case the limit is not given it is set to the same value as the barrier.\n"
