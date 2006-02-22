@@ -1,6 +1,10 @@
 vzctl (2.7.0)
+   2.7.0-28: Wed Feb 22 2006 <igor@sw.ru>
+	* enable sysfs for SuSE like distributions
+	* added possibility to setup UBC parameters in form xxx[GMKPB]:yyy[GMKPB]
    2.7.0-27: Tue Feb  7 2006 <igor@sw.ru>
 	* fixed VE_CONFFILE variable passed to vps.mount script
+	* fixed venet0 initialization in vz initscript (bug #99)
    2.7.0-26: Thu Feb  2 2006 <igor@sw.ru>
 	* fixed OpenVZ startup under SuSE
 	* fixed buffer overflow in vzlist
