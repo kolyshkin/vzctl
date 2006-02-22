@@ -189,15 +189,43 @@ int vz_setluid(envid_t veid)
         return 0;
 }
 
+/*
+ * enable sys fs only for sysfs_dists .
+ * Fixme: generic way should be used for  enable/disable sysfs
+*/
+static char *sysfs_dists[] = {"opesuse", "suse", "sles", NULL};
+static int enable_sysfs(vps_res *res)
+{
+	tmpl_param *tmp = &res->tmpl;
+	int len, i;
+	char *name;
+
+	for (i = 0; name = sysfs_dists[i], name != NULL; i++) {
+		len = strlen(name);
+		if (tmp->ostmpl != NULL &&
+			!strncmp(tmp->ostmpl, name, len))
+		{
+			return 1;
+		}
+		if (tmp->dist != NULL &&
+			!strncmp(tmp->dist, name, len))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
 	struct vzctl_env_create_data env_create_data;
-	struct env_create_param create_param;
+	struct env_create_param2 create_param;
 	int fd, ret;
 	vps_res *res;
 	char *argv[] = {"init", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
+	int sysfs;
 
 	res = (vps_res *) data;
 	memset(&create_param, 0, sizeof(create_param));
@@ -208,10 +236,25 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
 	env_create_data.data = &create_param;
 	env_create_data.datalen = sizeof(create_param);
-
+	sysfs = enable_sysfs(res);
+	if (sysfs) 
+		create_param.feature_mask = VE_FEATURE_SYSFS;
+try:
 	ret = vz_env_create_data_ioctl(h, &env_create_data);
 	if (ret < 0) {
 		switch(errno) {
+			case EINVAL:
+				ret = VZ_ENVCREATE_ERROR;
+				if (sysfs) {
+					/* kernel do not support feature_mask
+					 * try old style
+					*/
+					env_create_data.datalen =
+						sizeof(struct env_create_param);
+					sysfs = 0;
+					goto try;
+				}
+				break;
 			case EACCES:
 			/* License is not loaded */
 				ret = VZ_NO_ACCES;
