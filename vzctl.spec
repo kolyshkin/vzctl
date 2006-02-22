@@ -13,8 +13,8 @@
 
 Summary: Virtual Private Server control utility
 Name: vzctl
-Version: 2.7.0
-Release: 28
+Version: 3.0.0
+Release: 1
 License: QPL
 Group: System Environment/Kernel
 Source: vzctl-%{version}-%{release}.tar.bz2
