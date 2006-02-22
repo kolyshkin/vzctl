@@ -193,7 +193,7 @@ int vz_setluid(envid_t veid)
  * enable sys fs only for sysfs_dists .
  * Fixme: generic way should be used for  enable/disable sysfs
 */
-static char *sysfs_dists[] = {"opesuse", "suse", "sles", NULL};
+static char *sysfs_dists[] = {"opensuse", "suse", "sles", NULL};
 static int enable_sysfs(vps_res *res)
 {
 	tmpl_param *tmp = &res->tmpl;
