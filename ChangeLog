@@ -1,5 +1,5 @@
 vzctl (2.7.0)
-   2.7.0-28: Wed Feb 22 2006 <igor@sw.ru>
+   3.0.0-1: Wed Feb 22 2006 <igor@sw.ru>
 	* enable sysfs for SuSE like distributions
 	* added possibility to setup UBC parameters in form xxx[GMKPB]:yyy[GMKPB]
    2.7.0-27: Tue Feb  7 2006 <igor@sw.ru>
