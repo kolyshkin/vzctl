@@ -33,6 +33,9 @@
 #include "vzctl.h"
 #include "res.h"
 
+
+static int _page_size;
+
 static struct iptables_s {
 	char *name;
 	unsigned long id;
@@ -425,6 +428,74 @@ static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 
 /********************** UB **************************************/
+static int get_mul(char c)
+{
+	switch (c) {
+	case 'G':
+	case 'g':
+		return 1024 * 1024 * 1024;
+	case 'M':
+	case 'm':
+		return 1024 * 1024;
+	case 'K':
+	case 'k':
+		return 1024;
+	case 'P':
+	case 'p':
+		return _page_size;
+	case 'B':	
+	case 'b':
+		return 1;
+	}
+	return -1;
+}
+
+/* This function parse string in form xxx[GMKPB]:yyy[GMKPB]
+ * If :yyy is omitted, it is set to xxx.
+ */
+static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
+{
+	int n;
+	char *tail;
+	unsigned long long tmp;
+
+	if (!str || !val)
+		return 1;
+	errno = 0;
+	tmp = strtoull(str, &tail, 10);
+	if (errno == ERANGE)
+		return 1;
+	if (*tail != ':' && *tail != '\0') {
+		if ((n = get_mul(*tail)) < 0)
+			return 1;
+		tmp = tmp * n / divisor;
+		tail++;
+	}
+	if (tmp > ULONG_MAX)
+		return 1;
+	val[0] = tmp;
+	if (*tail == ':') {
+		tail++;
+		errno = 0;
+		tmp = strtoull(tail, &tail, 10);
+		if (errno == ERANGE)
+			return 1;
+		if (*tail != '\0') {
+			if (*(tail + 1) != '\0')
+				return 1;
+			if ((n = get_mul(*tail)) < 0)
+				return 1;
+			tmp = tmp * n / divisor;
+		}
+		if (tmp > ULONG_MAX)
+			return 1;
+		val[1] = tmp;
+	} else if (*tail == 0) {
+		val[1] = val[0];
+	} else 
+		return 1;
+	return 0;
+}
 
 /* This function parse string in form xxx:yyy
  * If :yyy is omitted, it is set to xxx.
@@ -448,8 +519,6 @@ int parse_twoul(const char *str, unsigned long *val)
 		if ((*tail != '\0') || (errno == ERANGE))
 			return 1;
 	} else if (*tail == 0) {
-		if ((*tail != '\0') || (errno == ERANGE))
-			return 1;
 		val[1] = val[0];
 	} else {
 		return 1;
@@ -457,8 +526,9 @@ int parse_twoul(const char *str, unsigned long *val)
 	return 0;
 }
 
-int parse_ub(vps_param *vps_p, char *val, int id)
+int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
 {
+	int ret;
 	ub_res res;
 	const vps_config *conf;
 
@@ -466,7 +536,11 @@ int parse_ub(vps_param *vps_p, char *val, int id)
 		return ERR_INVAL;
 	if ((res.res_id = get_ub_resid(conf->name)) < 0) 
 		return ERR_UNK;
-	if (parse_twoul(val, res.limit))
+	if (divisor)
+		ret = parse_twoul_sfx(val, res.limit, divisor);
+	else
+		ret = parse_twoul(val, res.limit);
+	if (ret)
 		return ERR_INVAL;
 	if (get_ub_res(&vps_p->res.ub, res.res_id) != NULL)
 		return ERR_DUP;
@@ -1066,6 +1140,11 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	unsigned long uid;
 
 	ret = 0;
+	if (!_page_size) {
+		_page_size = get_pagesize();
+		if (_page_size == -1)
+			return -1;
+	}
 	switch (id) {
 	case PARAM_CONFIG:
 		ret = conf_parse_str(&vps_p->opt.config, val, 1);
@@ -1117,28 +1196,32 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_IPTABLES:
 		ret = parse_iptables(&vps_p->res.env, val);
 		break;
-	case PARAM_KMEMSIZE:
 	case PARAM_LOCKEDPAGES:
 	case PARAM_PRIVVMPAGES:
 	case PARAM_SHMPAGES:
-	case PARAM_NUMPROC:
 	case PARAM_PHYSPAGES:
 	case PARAM_VMGUARPAGES:
 	case PARAM_OOMGUARPAGES:
+		ret = parse_ub(vps_p, val, id, _page_size);
+		break;
+	case PARAM_NUMPROC:
 	case PARAM_NUMTCPSOCK:
 	case PARAM_NUMFLOCK:
 	case PARAM_NUMPTY:
 	case PARAM_NUMSIGINFO:
+	case PARAM_NUMOTHERSOCK:
+	case PARAM_NUMFILE:
+	case PARAM_NUMIPTENT:
+	case PARAM_AVNUMPROC:
+		ret = parse_ub(vps_p, val, id, 0);
+		break;
+	case PARAM_KMEMSIZE:
 	case PARAM_TCPSNDBUF:
 	case PARAM_TCPRCVBUF:
 	case PARAM_OTHERSOCKBUF:
 	case PARAM_DGRAMRCVBUF:
-	case PARAM_NUMOTHERSOCK:
-	case PARAM_NUMFILE:
 	case PARAM_DCACHE:
-	case PARAM_NUMIPTENT:
-	case PARAM_AVNUMPROC:
-		ret = parse_ub(vps_p, val, id);
+		ret = parse_ub(vps_p, val, id, 1);
 		break;
 	case PARAM_CAP:
 		ret = parse_cap(val, &vps_p->res.cap);
