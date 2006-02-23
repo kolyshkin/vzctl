@@ -1,4 +1,6 @@
 vzctl (2.7.0)
+   3.0.0-2: Thu Feb 23 2006 <igor@sw.ru>
+	* fixed VPS start on old kernel (witthout feature_mask support)	
    3.0.0-1: Wed Feb 22 2006 <igor@sw.ru>
 	* enable sysfs for SuSE like distributions
 	* added possibility to setup UBC parameters in form xxx[GMKPB]:yyy[GMKPB]
