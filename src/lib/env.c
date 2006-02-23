@@ -226,6 +226,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	char *argv[] = {"init", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
 	int sysfs;
+	int retry = 0;
 
 	res = (vps_res *) data;
 	memset(&create_param, 0, sizeof(create_param));
@@ -245,15 +246,13 @@ try:
 		switch(errno) {
 			case EINVAL:
 				ret = VZ_ENVCREATE_ERROR;
-				if (sysfs) {
-					/* kernel do not support feature_mask
-					 * try old style
-					*/
-					env_create_data.datalen =
-						sizeof(struct env_create_param);
-					sysfs = 0;
+				/* kernel do not support feature_mask
+				 * try old style
+				 */
+				env_create_data.datalen =
+					sizeof(struct env_create_param);
+				if (!retry++)
 					goto try;
-				}
 				break;
 			case EACCES:
 			/* License is not loaded */
