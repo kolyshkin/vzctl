@@ -189,13 +189,16 @@ int vz_setluid(envid_t veid)
         return 0;
 }
 
+
 /*
- * enable sys fs only for sysfs_dists .
- * Fixme: generic way should be used for  enable/disable sysfs
+ * Checks if sysfs needs to be enabled for this VPS.
+ * Now we do that only for distributions from sysfs_dists.
+ * FIXME: priovide a generic way to enable/disable sysfs per VPS
 */
-static char *sysfs_dists[] = {"opensuse", "suse", "sles", NULL};
-static int enable_sysfs(vps_res *res)
+static int sysfs_required(vps_res *res)
 {
+	static char *sysfs_dists[] = {"opensuse", "suse", "sles", NULL};
+
 	tmpl_param *tmp = &res->tmpl;
 	int len, i;
 	char *name;
@@ -216,16 +219,24 @@ static int enable_sysfs(vps_res *res)
 	return 0;
 }
 
+#ifdef VE_FEATURE_SYSFS
+/* Kernel understands new style env. create struct - with features etc. */
+#define KERNEL_HAVE_ENV_CREATE_PARAM2
+#endif
+
 static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
 	struct vzctl_env_create_data env_create_data;
+#ifdef KERNEL_HAVE_ENV_CREATE_PARAM2
 	struct env_create_param2 create_param;
+#else
+	struct env_create_param create_param;
+#endif
 	int fd, ret;
 	vps_res *res;
 	char *argv[] = {"init", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
-	int sysfs;
 	int retry = 0;
 
 	res = (vps_res *) data;
@@ -237,22 +248,26 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
 	env_create_data.data = &create_param;
 	env_create_data.datalen = sizeof(create_param);
-	sysfs = enable_sysfs(res);
-	if (sysfs) 
+#ifdef VE_FEATURE_SYSFS
+	if (sysfs_required(res))
 		create_param.feature_mask = VE_FEATURE_SYSFS;
+#endif
 try:
 	ret = vz_env_create_data_ioctl(h, &env_create_data);
 	if (ret < 0) {
 		switch(errno) {
 			case EINVAL:
 				ret = VZ_ENVCREATE_ERROR;
-				/* kernel do not support feature_mask
-				 * try old style
+#ifdef KERNEL_HAVE_ENV_CREATE_PARAM2
+				/* Run-time kernel did not understand
+				 * env_create_param2 -- so retry with
+				 * the old env_create_param struct.
 				 */
 				env_create_data.datalen =
 					sizeof(struct env_create_param);
 				if (!retry++)
 					goto try;
+#endif
 				break;
 			case EACCES:
 			/* License is not loaded */
