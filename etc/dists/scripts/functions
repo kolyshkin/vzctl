@@ -130,7 +130,11 @@ function put_param3() {
 		fi
 		mv -f ${file}.$$ ${file}
 	else
-		echo "$name=( \"$value\" )" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		if [ -z "${value}" ]; then
+			echo "$name=( )" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		else
+			echo "$name=( \"$value\" )" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		fi
 	fi
 }
 
