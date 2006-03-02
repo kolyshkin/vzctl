@@ -37,7 +37,7 @@ function fix_net()
 	rc-update del net.eth0 &>/dev/null
 	ln -sf /etc/init.d/net.lo /etc/init.d/net.${VENET_DEV}
 	rc-update add net.lo boot &>/dev/null
-	rc-update add net.venet0 default &>/dev/null
+	rc-update add net.${VENET_DEV} default &>/dev/null
 	if ! grep -qe "^config_eth" ${IFCFG} 2>/dev/null; then
 		return 0
 	fi
@@ -54,7 +54,8 @@ function setup_network()
 	fix_net
 	put_param3 ${IFCFG} "config_${VENET_DEV}" ""
 	# add fake route
-	put_param3 ${IFCFG} "routes_${VENET_DEV}" "-net ${FAKEGATEWAYNET}/24"
+	put_param3 ${IFCFG} "routes_${VENET_DEV}" \
+		"-net ${FAKEGATEWAYNET}/24 dev ${VENET_DEV}"
 	add_param3 ${IFCFG} "routes_${VENET_DEV}" "default via ${FAKEGATEWAY}"
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
