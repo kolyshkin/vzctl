@@ -1,4 +1,4 @@
-.\" $Id: vzctl.8,v 1.131.10.14 2005/10/17 11:42:42 igor Exp $
+.\" $Id: vzctl.8,v 1.131.10.15 2006/03/02 10:23:13 igor Exp $
 .TH vzctl 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
 .SH NAME
 vzctl \- utility to control Virtual Private Server.
@@ -101,6 +101,22 @@ and the second is a limit.
 
 Arguments are in items, pages or bytes. Note that page size
 is architecture-specific, it is 4096 bytes on IA32 platform.
+
+Starting from vzctl-3.0.0-1, it has an ability to accept different suffixes for
+set parameters (except the parameters that name started with \fBnum\fR).
+E.g. vzctl set XXX --privvmpages 5M:6M should set privvmpages
+barrier to 5 megabytes and limit to 6 megabytes.
+
+Available suffixes are:
+.br
+\fBg\fR, \fBG\fR -- gigabytes
+.br
+\fBm\fR, \fBM\fR -- megabytes
+.br
+\fBk\fR, \fBK\fR -- kilobytes
+.br
+\fBp\fR, \fBP\fR -- pages (page is 4096 bytes on x86 architecture, other arches may differ)
+
 .TP
 \fB--numproc\fR \fIitems\fR[:\fIitems\fR]
 Maximum number of processes and kernel-level threads.
