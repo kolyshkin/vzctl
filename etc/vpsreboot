@@ -64,6 +64,10 @@ function lockfile()
 	exit
 }
 
+# If VZ is not running -- do nothing
+# Fix for OpenVZ bug #107
+test -f ${VEINFO} || exit 0
+
 lockfile
 
 cd ${CONF_DIR} 2>/dev/null || exit 

@@ -82,6 +82,10 @@ function clear_ve_net()
 	done
 }
 
+# If VZ is not running -- do nothing
+# Fix for OpenVZ bug #107
+test -f ${VEINFO} || exit 0
+
 VES_INFO=`cat ${VEINFO} 2>/dev/null` || exit
 get_stopped_ve
 for ve in ${VE_STOPPED}
