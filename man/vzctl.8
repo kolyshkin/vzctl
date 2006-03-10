@@ -1,4 +1,4 @@
-.\" $Id: vzctl.8,v 1.131.10.15 2006/03/02 10:23:13 igor Exp $
+.\" $Id: vzctl.8,v 1.131.10.16 2006/03/10 13:23:56 kir Exp $
 .TH vzctl 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
 .SH NAME
 vzctl \- utility to control Virtual Private Server.
@@ -102,20 +102,22 @@ and the second is a limit.
 Arguments are in items, pages or bytes. Note that page size
 is architecture-specific, it is 4096 bytes on IA32 platform.
 
-Starting from vzctl-3.0.0-1, it has an ability to accept different suffixes for
-set parameters (except the parameters that name started with \fBnum\fR).
-E.g. vzctl set XXX --privvmpages 5M:6M should set privvmpages
-barrier to 5 megabytes and limit to 6 megabytes.
+You can also specify different suffixes for \fBset\fR parameters
+(except for the parameters which names start with \fBnum\fR).
+For example, \fBvzctl set\fR \fIVPSID\fR \fB--privvmpages 5M:6M\fR
+should set \fBprivvmpages\fR' barrier to 5 megabytes and its limit
+to 6 megabytes.
 
 Available suffixes are:
 .br
-\fBg\fR, \fBG\fR -- gigabytes
+\fBg\fR, \fBG\fR -- gigabytes.
 .br
-\fBm\fR, \fBM\fR -- megabytes
+\fBm\fR, \fBM\fR -- megabytes.
 .br
-\fBk\fR, \fBK\fR -- kilobytes
+\fBk\fR, \fBK\fR -- kilobytes.
 .br
-\fBp\fR, \fBP\fR -- pages (page is 4096 bytes on x86 architecture, other arches may differ)
+\fBp\fR, \fBP\fR -- pages (page is 4096 bytes on x86 architecture,
+other architectures may differ).
 
 .TP
 \fB--numproc\fR \fIitems\fR[:\fIitems\fR]
