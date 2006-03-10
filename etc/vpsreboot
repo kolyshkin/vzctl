@@ -67,6 +67,7 @@ function lockfile()
 lockfile
 
 cd ${CONF_DIR} 2>/dev/null || exit 
+[ -f "${VE_INFO}" ] || exit
 VE_TOTAL=`ls -1 *.conf 2>/dev/null | sed s/.conf//`
 VE_RUN=`cat ${VE_INFO} | awk '{
 	if ($1 != 0) {
