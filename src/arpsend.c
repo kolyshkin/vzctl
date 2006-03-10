@@ -116,10 +116,10 @@ struct in_addr zero = {0x00000000};
 
 struct sockaddr_ll iaddr;
 
-char* print_hw_addr(const char* addr);
-char* print_ip_addr(const char* addr);
+char* print_hw_addr(const u_char* addr);
+char* print_ip_addr(const u_char* addr);
 char* print_arp_packet(struct arp_packet* pkt);
-int read_hw_addr(char* buf, const char* str);
+int read_hw_addr(u_char* buf, const char* str);
 int read_ip_addr(struct in_addr* in_addr, const char* str);
 
 char* programm_name = NULL;
@@ -262,7 +262,7 @@ void parse_options (int argc, char **argv)
 	hw_addr_size :		ETH_ALEN,		\
 	prot_addr_size :	IP_ADDR_LEN	
 
-unsigned char real_hwaddr[ETH_ALEN];
+u_char real_hwaddr[ETH_ALEN];
 struct in_addr real_ipaddr;
 
 int init_device_addresses(int sock, const char* device)
@@ -315,8 +315,8 @@ int init_device_addresses(int sock, const char* device)
 	memcpy(&real_ipaddr, ifr.ifr_addr.sa_data + 2, IP_ADDR_LEN);	
 
 	logger(LOG_DEBUG, "got addresses hw='%s', ip='%s'",
-	       print_hw_addr(real_hwaddr),
-	       print_ip_addr((char*) &real_ipaddr));
+		print_hw_addr(real_hwaddr),
+		print_ip_addr((u_char*) &real_ipaddr));
 
 	/* fill interface description struct */
 	iaddr.sll_ifindex = ifindex;
@@ -413,8 +413,8 @@ int recv_pack(unsigned char *buf, int len, struct sockaddr_ll *from)
 			continue;
 		logger(LOG_DEBUG, "recv packet %s", print_arp_packet(recv_pkt));			
 		logger(LOG_INFO, "%s is detected on another computer : %s",
-		       print_ip_addr((char*) &trg_ipaddr[i]),
-		       print_hw_addr(recv_pkt->sndr_hw_addr));
+			print_ip_addr((u_char*) &trg_ipaddr[i]),
+			print_hw_addr(recv_pkt->sndr_hw_addr));
 		recv_response++;
 		/* finish on first response */
 		if (at_once)
@@ -486,9 +486,9 @@ int main(int argc,char** argv)
 	while(1)
 	{
 		sigset_t sset, osset;
-		char packet[4096];
+		u_char packet[4096];
 		struct sockaddr_ll from;
-		int alen = sizeof(from);
+		socklen_t alen = sizeof(from);
 		int cc;
 
 		cc = recvfrom(sock, packet, sizeof(packet), 0, (struct sockaddr *)&from, &alen);
@@ -500,9 +500,9 @@ int main(int argc,char** argv)
 
 		sigemptyset(&sset);
 		sigaddset(&sset, SIGALRM);
-		//sigaddset(&sset, SIGINT);
+		/* sigaddset(&sset, SIGINT); */
 		sigprocmask(SIG_BLOCK, &sset, &osset);
-		recv_pack(packet, cc, &from);		
+		recv_pack(packet, cc, &from);
 		sigprocmask(SIG_SETMASK, &osset, NULL);
 	}
 
@@ -531,33 +531,35 @@ char* print_arp_packet(struct arp_packet* pkt)
 }
 
 /* get MAC address in user form */
-char* print_hw_addr(const char* addr)
+char* print_hw_addr(const u_char* addr)
 {
 	int i;
 	char* point = get_buf();
 	char* current = point;
 
 	for (i = 0; i < ETH_ALEN; i++)
-		point += sprintf(point, i == (ETH_ALEN-1) ? "%02x" : "%02x:", (unsigned char) addr[i]);
+		point += sprintf(point, i == (ETH_ALEN-1) ? "%02x" : "%02x:",
+			addr[i]);
 
 	return current;
 }
 
 /* get IP address in user form */
-char* print_ip_addr(const char* addr)
+char* print_ip_addr(const u_char* addr)
 {
 	int i;
 	char* point = get_buf();
 	char* current = point;
 
 	for (i = 0; i < IP_ADDR_LEN; i++)
-		point += sprintf(point, i == (IP_ADDR_LEN-1) ? "%u" : "%u.", (unsigned char) addr[i]);
+		point += sprintf(point, i == (IP_ADDR_LEN-1) ? "%u" : "%u.",
+			addr[i]);
 
 	return current;
 }
 
 /* trasform user -> computer freindly MAC address */
-int read_hw_addr(char* buf, const char* str)
+int read_hw_addr(u_char* buf, const char* str)
 {
 	int rc = -1;
 	int i;
