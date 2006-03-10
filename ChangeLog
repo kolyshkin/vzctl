@@ -3,18 +3,17 @@
 	* cosmetic vzctl.8 man page fixes
    3.0.0-3: Thu Mar  2 2006 <igor@sw.ru>
 	* put_param3() can incorrectly set $name=( "" ) (bug #111).
-		Thanks to <jstubbs@gentoo.org>
-	* fixed compilation against old kernels (>= 022stab070)
-	* description of set parameter suffixes (K, M, G, P) added to vzctl.8 
-		man page (bug #105)
-	* vpsnetclean and vpsreboot scripts do nothing if VZ is not loaded
-		(bug #107)
+		Affects gentoo VPSs. Thanks to <jstubbs@gentoo.org>
+	* fixed compilation against old kernels (<= 022stab070)
+	* description of set parameter suffixes (K, M, G, P) added
+		to vzctl.8 man page (bug #105)
 	* fixed gentoo-add_ip.sh script (bug #110)
    3.0.0-2: Thu Feb 23 2006 <igor@sw.ru>
 	* fixed VPS start on old kernel (witthout feature_mask support)	
    3.0.0-1: Wed Feb 22 2006 <igor@sw.ru>
 	* enable sysfs for SuSE like distributions
-	* added possibility to setup UBC parameters in form xxx[GMKPB]:yyy[GMKPB]
+	* added possibility to setup UBC parameters in the form
+		xxx[GMKPB]:yyy[GMKPB]
    2.7.0-27: Tue Feb  7 2006 <igor@sw.ru>
 	* fixed VE_CONFFILE variable passed to vps.mount script
 	* fixed venet0 initialization in vz initscript (bug #99)
