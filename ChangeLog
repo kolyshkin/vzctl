@@ -1,6 +1,7 @@
-   3.0.0-4: Fri Mar 10 2006 <kir@openvz.org>
+   3.0.0-4: Thu Mar 16 2006 <kir@openvz.org>
 	* cron scripts do nothing if VZ is not loaded (bug #107)
 	* cosmetic vzctl.8 man page fixes
+	* reverted bug #110 changes, see http://bugzilla.openvz.org/111
    3.0.0-3: Thu Mar  2 2006 <igor@sw.ru>
 	* put_param3() can incorrectly set $name=( "" ) (bug #111).
 		Affects gentoo VPSs. Thanks to <jstubbs@gentoo.org>
