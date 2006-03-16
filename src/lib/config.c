@@ -62,7 +62,10 @@ static struct iptables_s {
 	{"iptable_nat", VE_IP_NAT},
 	{"ip_nat_ftp", VE_IP_NAT_FTP},
 	{"ip_nat_irc", VE_IP_NAT_IRC},
+#ifdef VE_IP_TARGET_REDIRECT
+	{"ipt_REDIRECT", VE_IP_TARGET_REDIRECT},
 #endif
+#endif /* VZCTL_ENV_CREATE_DATA */
 	{NULL, 0}
 };
 

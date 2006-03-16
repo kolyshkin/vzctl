@@ -2,9 +2,10 @@
 	* cron scripts do nothing if VZ is not loaded (bug #107)
 	* cosmetic vzctl.8 man page fixes
 	* reverted bug #110 changes, see http://bugzilla.openvz.org/111
+	* added ipt_REDIRECT support, thanks to jstubbs-at-gentoo.org
    3.0.0-3: Thu Mar  2 2006 <igor@sw.ru>
 	* put_param3() can incorrectly set $name=( "" ) (bug #111).
-		Affects gentoo VPSs. Thanks to <jstubbs@gentoo.org>
+		Affects gentoo VPSs. Thanks to jstubbs-at-gentoo.org
 	* fixed compilation against old kernels (<= 022stab070)
 	* description of set parameter suffixes (K, M, G, P) added
 		to vzctl.8 man page (bug #105)
