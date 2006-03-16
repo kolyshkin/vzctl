@@ -55,7 +55,7 @@ function setup_network()
 	put_param3 ${IFCFG} "config_${VENET_DEV}" ""
 	# add fake route
 	put_param3 ${IFCFG} "routes_${VENET_DEV}" \
-		"-net ${FAKEGATEWAYNET}/24 dev ${VENET_DEV}"
+		"-net ${FAKEGATEWAYNET}/24" # dev ${VENET_DEV}
 	add_param3 ${IFCFG} "routes_${VENET_DEV}" "default via ${FAKEGATEWAY}"
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
