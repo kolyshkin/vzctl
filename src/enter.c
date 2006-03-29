@@ -247,7 +247,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		if ((pid = fork()) == 0) {
 			char buf[64];
 			char *term;
-		        char *arg[] = {"bash",  "--login", "-i", NULL};
+		        char *arg[] = {"-bash", NULL};
 		        char *env[] = {"HOME=/", "HISTFILE=/dev/null",
 				"PATH=/bin:/sbin:/usr/bin:/usr/sbin:", NULL, NULL};
 			close(master);
