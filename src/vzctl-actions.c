@@ -51,7 +51,7 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 		ret = vps_parse_opt(veid, param, c, optarg, &g_action);
 		if (!ret)
 			continue;
-		else if (ret == ERR_INVAL) {
+		else if (ret == ERR_INVAL || ret == ERR_INVAL_SKIP) {
 			if (option_index < 0) {
 				logger(0, 0, "Bad parameter for"
 					" -%c : %s", c, optarg);

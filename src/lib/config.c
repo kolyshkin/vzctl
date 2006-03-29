@@ -32,42 +32,10 @@
 #include "ub.h"
 #include "vzctl.h"
 #include "res.h"
+#include "iptables.h"
 
 
 static int _page_size;
-
-static struct iptables_s {
-	char *name;
-	unsigned long id;
-} iptables[] = {
-#ifdef VZCTL_ENV_CREATE_DATA
-	{"iptable_filter", VE_IP_FILTER},
-	{"iptable_mangle", VE_IP_MANGLE},
-	{"ipt_limit", VE_IP_MATCH_LIMIT},
-	{"ipt_multiport", VE_IP_MATCH_MULTIPORT},
-	{"ipt_tos", VE_IP_MATCH_TOS},
-	{"ipt_TOS", VE_IP_TARGET_TOS},
-	{"ipt_REJECT", VE_IP_TARGET_REJECT},
-	{"ipt_TCPMSS", VE_IP_TARGET_TCPMSS},
-	{"ipt_tcpmss", VE_IP_MATCH_TCPMSS},
-	{"ipt_ttl", VE_IP_MATCH_TTL},
-	{"ipt_LOG", VE_IP_TARGET_LOG},
-	{"ipt_length", VE_IP_MATCH_LENGTH},
-	{"ip_conntrack", VE_IP_CONNTRACK},
-	{"ip_conntrack_ftp", VE_IP_CONNTRACK_FTP},
-	{"ip_conntrack_irc", VE_IP_CONNTRACK_IRC},
-	{"ipt_conntrack", VE_IP_MATCH_CONNTRACK},
-	{"ipt_state", VE_IP_MATCH_STATE},
-	{"ipt_helper", VE_IP_MATCH_HELPER},
-	{"iptable_nat", VE_IP_NAT},
-	{"ip_nat_ftp", VE_IP_NAT_FTP},
-	{"ip_nat_irc", VE_IP_NAT_IRC},
-#ifdef VE_IP_TARGET_REDIRECT
-	{"ipt_REDIRECT", VE_IP_TARGET_REDIRECT},
-#endif
-#endif /* VZCTL_ENV_CREATE_DATA */
-	{NULL, 0}
-};
 
 static vps_config config[] = {
 /*	Op	*/
@@ -364,54 +332,36 @@ int conf_store_yesno(list_head_t *conf, char *name, int val)
 }
 
 /******************** Iptables *************************/
-static int find_ipt(const char *name)
-{
-	int i;
-
-	for (i = 0; iptables[i].name != NULL; i++) 
-		if (!strcmp(name, iptables[i].name))
-			return i;
-	return -1;
-}
-
 static int parse_iptables(env_param *env, char *val)
 {
-	int id;
 	char *token;
+	struct iptables_s *ipt;
+	int ret;
 
 	if ((token = strtok(val, "\t ")) == NULL)
 		return 0;
+	ret = 0;
 	do {
-		if ((id = find_ipt(token)) < 0) { 
-			logger(0, 0, "Unknown iptable module %s", token);
-			env->ipt_mask = 0;
-			return ERR_INVAL;
+		if ((ipt = find_ipt(token)) == NULL) { 
+			logger(0, 0, "Warning: Unknown iptable module: %s,"
+				" skipped", token);
+			ret = ERR_INVAL_SKIP;
+			continue;
 		}
-		env->ipt_mask |= iptables[id].id;
+		env->ipt_mask |= ipt->id;
 	} while ((token = strtok(NULL, "\t ")));
-	return 0;
+	return ret;
 }
 
 static void store_iptables(unsigned long ipt_mask, vps_config *conf,
 	list_head_t *conf_h)
 {
-	int i, r;
 	char buf[STR_SIZE];
-	char *sp, *ep;
+	int r;
 
-	sp = buf;
-	ep = buf + sizeof(buf);
 	r = snprintf(buf, sizeof(buf), "%s=\"", conf->name);
-	sp += r;
-	for (i = 0; iptables[i].name != NULL; i++) {
-		if (!VE_IPT_CMP(ipt_mask, iptables[i].id))
-			continue;
-		r = snprintf(sp, ep - sp, "%s ", iptables[i].name);
-		if (r < 0 || sp + r >= ep)
-			break;
-		sp += r;
-	}
-	snprintf(sp, ep - sp, "\"");
+	ipt_mask2str(ipt_mask, buf + r, sizeof(buf) - r - 1);
+	strcat(buf, "\"");
 	add_str_param(conf_h, buf);
 }
 
@@ -1407,6 +1357,8 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 		else
 			continue;
 		if (!ret) {
+			continue;
+		} else if (ret == ERR_INVAL_SKIP) {
 			continue;
 		} else if (ret == ERR_DUP) {
 			logger(0, 0, "Warning: dup for %s=%s in line %d"

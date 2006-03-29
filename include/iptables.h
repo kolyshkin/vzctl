@@ -11,7 +11,14 @@
 #ifndef	_IPTABLES_H_
 #define _IPTABLES_H_
 
+struct iptables_s {
+	char *name;
+	unsigned long id;
+	unsigned long long mask;
+};
 
-unsigned long get_ipt_mask(unsigned long mask);
+struct iptables_s *find_ipt(const char *name);
+void ipt_mask2str(unsigned long mask, char *buf, int size);
+unsigned long long get_ipt_mask(unsigned long mask);
 
 #endif //_IPTABLES_H_
