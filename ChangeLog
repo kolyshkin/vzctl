@@ -1,3 +1,6 @@
+	* fixed --iptables store (do not store dependent modules)
+	* skip unknown iptables modules in config
+ 	* set arg[0] = "-bash" on enter
    3.0.0-4: Thu Mar 16 2006 <kir@openvz.org>
 	* cron scripts do nothing if VZ is not loaded (bug #107)
 	* cosmetic vzctl.8 man page fixes
