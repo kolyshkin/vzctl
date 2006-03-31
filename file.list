@@ -109,6 +109,8 @@ include/vzctl.h
 include/vzctl_param.h
 include/vzerror.h
 include/vzlist.h
+include/linux/vzcalluser.h
+include/linux/vzctl_venet.h
 src/lib/config.c
 src/lib/cap.c
 src/lib/create.c
