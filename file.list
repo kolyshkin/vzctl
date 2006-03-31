@@ -98,6 +98,7 @@ include/logger.h
 include/modules.h
 include/net.h
 include/quota.h
+include/readelf.h
 include/res.h
 include/script.h
 include/types.h
@@ -126,6 +127,7 @@ src/lib/logger.c
 src/lib/modules.c
 src/lib/net.c
 src/lib/quota.c
+src/lib/readelf.c
 src/lib/res.c
 src/lib/script.c
 src/lib/ub.c
