@@ -22,6 +22,7 @@
 #include <sys/ioctl.h>
 #include <asm/timex.h>
 #include <linux/vzcalluser.h>
+#include <sys/personality.h>
 
 #include "vzerror.h"
 #include "res.h"
@@ -32,6 +33,7 @@
 #include "util.h"
 #include "script.h"
 #include "iptables.h"
+#include "readelf.h"
 
 #define ENVRETRY	3
 #define VZCTLDEV	"/dev/vzctl"
@@ -219,6 +221,21 @@ static int sysfs_required(vps_res *res)
 	return 0;
 }
 
+#ifdef  __x86_64__
+static int set_personality()
+{
+	unsigned long per;
+
+	per = personality(0xffffffff) | PER_LINUX32;
+	logger(2, 0, "Set personality %#10.8x", per);
+	if (personality(per) == -1) {
+		logger(2, errno, "Unable to set personality PER_LINUX32");
+		return  -1;
+	}
+	return 0;
+}
+#endif
+
 #ifdef VE_FEATURE_SYSFS
 /* Kernel understands new style env. create struct - with features etc. */
 #define KERNEL_HAVE_ENV_CREATE_PARAM2
@@ -242,7 +259,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	res = (vps_res *) data;
 	memset(&create_param, 0, sizeof(create_param));
 	create_param.iptables_mask = get_ipt_mask(res->env.ipt_mask);
-	logger(3, 0, "Set iptables mask %d", create_param.iptables_mask);
+	logger(3, 0, "Set iptables mask %#10.8x", create_param.iptables_mask);
 	env_create_data.veid = veid;
 	env_create_data.class_id = 0;
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
@@ -292,6 +309,10 @@ try:
 	mk_reboot_script();
 	if (res->dq.ugidlimit != NULL)
 		mk_quota_link();
+#ifdef  __x86_64__
+	if (get_arch_from_elf("/sbin/init") == elf_32)
+		set_personality();
+#endif
 	/* Close status descriptor to report that
 	 * environment is created.
 	*/
@@ -328,7 +349,6 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		logger(0, errno, "Unable to fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
-
 		if ((ret = vps_set_cap(veid, &res->cap)))
 			goto env_err;
 		close_fds(0, wait_p, err_p, h->vzfd, -1);
@@ -454,14 +474,15 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	char *dist_name;
 	struct sigaction act;
 	vps_res *res = &param->res;
-	dist_actions *actions = NULL;
+	dist_actions actions;
 
-	actions = malloc(sizeof(*actions));
+	memset(&actions, 0, sizeof(actions));
 	dist_name = get_dist_name(&res->tmpl);
-	if ((ret = read_dist_actions(dist_name, DIST_DIR, actions)))
-		return ret;
+	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
 	if (dist_name != NULL)
 		free(dist_name);
+	if (ret)
+		return ret;
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (vps_is_run(h, veid)) {
@@ -498,12 +519,11 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	fix_cpu(&res->cpu);
 	if ((ret = vz_env_create(h, veid, res, wait_p, err_p, fn, data)))
 		goto err;
-	if ((ret = vps_setup_res(h, veid, actions, &res->fs, param,
+	if ((ret = vps_setup_res(h, veid, &actions, &res->fs, param,
 		STATE_STARTING, skip, mod)))
 	{
 		goto err;
 	}
-
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
 			START_PREFIX);	
@@ -520,7 +540,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (close(wait_p[1]))
 		logger(0, errno, "Unable to close fd to start init");
 err:
-	free_dist_actions(actions);
+	free_dist_actions(&actions);
 	if (ret) {
 		int err;
 		/* Kill enviroment */
