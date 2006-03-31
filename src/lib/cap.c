@@ -146,7 +146,7 @@ void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
 	sprintf(sp--, "\"");
 }
 
-static int set_cap(int veid, cap_t mask, int pid)
+static int set_cap(envid_t veid, cap_t mask, int pid)
 {
 	struct __user_cap_header_struct header;
 	struct __user_cap_data_struct data;
@@ -177,7 +177,7 @@ static inline cap_t make_cap_mask(cap_t on, cap_t off)
  * @param cap		capability mask.
  * @return		0 on success.
  */
-int vps_set_cap(int veid, cap_param *cap)
+int vps_set_cap(envid_t veid, cap_param *cap)
 {
 	cap_t mask;
 
