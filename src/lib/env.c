@@ -221,8 +221,7 @@ static int sysfs_required(vps_res *res)
 	return 0;
 }
 
-#ifdef  __x86_64__
-static int set_personality()
+int set_personality()
 {
 	unsigned long per;
 
@@ -234,7 +233,6 @@ static int set_personality()
 	}
 	return 0;
 }
-#endif
 
 #ifdef VE_FEATURE_SYSFS
 /* Kernel understands new style env. create struct - with features etc. */
