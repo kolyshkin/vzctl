@@ -12,6 +12,7 @@
 #define _CAP_H_
 
 #include <linux/types.h>
+#include "types.h"
 
 typedef __u32 cap_t;
 
@@ -40,7 +41,7 @@ int get_cap_mask(char *name, unsigned long *mask);
  * @param cap		capability mask.
  * @return		0 on success.
  */
-int vps_set_cap(int veid, cap_param *cap);
+int vps_set_cap(envid_t veid, cap_param *cap);
 
 /** Merge capabilities and return in string format.
  *
