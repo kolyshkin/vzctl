@@ -177,8 +177,6 @@ int vps_is_run(vps_handler *h, envid_t veid)
         return 1;
 }
 
-
-
 /** Change root to specified directory
  *
  * @param		VPS root
@@ -220,7 +218,6 @@ int vz_setluid(envid_t veid)
                 return VZ_SETLUID_ERROR;
         return 0;
 }
-
 
 /*
  * Checks if sysfs needs to be enabled for this VPS.
