@@ -46,6 +46,26 @@ static inline int setluid(uid_t uid)
 	return syscall(__NR_setluid, uid);
 }
 
+static int set_personality(unsigned long mask)
+{
+	unsigned long per;
+
+	per = personality(0xffffffff) | mask;
+	logger(3, 0, "Set personality %#10.8x", per);
+	if (personality(per) == -1) {
+		logger(2, errno, "Unable to set personality PER_LINUX32");
+		return  -1;
+	}
+	return 0;
+}
+
+static int set_personality32()
+{
+	if (get_arch_from_elf("/sbin/init") != elf_32)
+		return 0;
+	return  set_personality(PER_LINUX32);
+}
+
 int vz_env_create_data_ioctl(vps_handler *h,
 	struct vzctl_env_create_data *data)
 {
@@ -57,7 +77,11 @@ int vz_env_create_data_ioctl(vps_handler *h,
 			sleep(1);
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE_DATA, data);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
-
+#ifdef  __x86_64__
+	/* Set personality PER_LINUX32 for i386 based VPSes */
+	if (errcode >= 0)
+		set_personality32();
+#endif
 	return errcode;
 }
 
@@ -75,7 +99,11 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 			sleep(1);
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE, &env_create);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
-
+#ifdef  __x86_64__
+	/* Set personality PER_LINUX32 for i386 based VPSes */
+	if (errcode >= 0 && (flags & VE_ENTER))
+		set_personality32();
+#endif
 	return errcode;
 }
 
@@ -149,6 +177,8 @@ int vps_is_run(vps_handler *h, envid_t veid)
         return 1;
 }
 
+
+
 /** Change root to specified directory
  *
  * @param		VPS root
@@ -221,18 +251,7 @@ static int sysfs_required(vps_res *res)
 	return 0;
 }
 
-int set_personality()
-{
-	unsigned long per;
 
-	per = personality(0xffffffff) | PER_LINUX32;
-	logger(3, 0, "Set personality %#10.8x", per);
-	if (personality(per) == -1) {
-		logger(2, errno, "Unable to set personality PER_LINUX32");
-		return  -1;
-	}
-	return 0;
-}
 
 #ifdef VE_FEATURE_SYSFS
 /* Kernel understands new style env. create struct - with features etc. */
@@ -307,10 +326,6 @@ try:
 	mk_reboot_script();
 	if (res->dq.ugidlimit != NULL)
 		mk_quota_link();
-#ifdef  __x86_64__
-	if (get_arch_from_elf("/sbin/init") == elf_32)
-		set_personality();
-#endif
 	/* Close status descriptor to report that
 	 * environment is created.
 	*/

@@ -30,7 +30,6 @@
 #include "logger.h"
 #include "env.h"
 #include "util.h"
-#include "readelf.h"
 
 #define DEV_TTY		"/dev/tty"
 
@@ -262,10 +261,6 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
 				env[2] = buf;
 			}
-#ifdef  __x86_64__
-			if (get_arch_from_elf("/sbin/init") == elf_32)
-				set_personality();
-#endif
 			execve("/bin/bash", arg, env);
 			execve("/bin/sh", arg, env);
 			logger(0, errno, "enter failed: unable to exec bash");

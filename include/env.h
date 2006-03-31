@@ -93,5 +93,4 @@ int vz_chroot(char *root);
 
 int vz_setluid(envid_t veid);
 int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
-int set_personality();
 #endif
