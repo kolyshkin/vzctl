@@ -227,7 +227,7 @@ static int set_personality()
 	unsigned long per;
 
 	per = personality(0xffffffff) | PER_LINUX32;
-	logger(2, 0, "Set personality %#10.8x", per);
+	logger(3, 0, "Set personality %#10.8x", per);
 	if (personality(per) == -1) {
 		logger(2, errno, "Unable to set personality PER_LINUX32");
 		return  -1;
