@@ -63,7 +63,7 @@ static int set_personality32()
 {
 	if (get_arch_from_elf("/sbin/init") != elf_32)
 		return 0;
-	return  set_personality(PER_LINUX32);
+	return set_personality(PER_LINUX32);
 }
 
 int vz_env_create_data_ioctl(vps_handler *h,
