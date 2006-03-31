@@ -23,6 +23,15 @@
 #include "vzerror.h"
 #include "logger.h"
 
+#ifndef __NR_setublimit
+#ifdef __ia64__
+#define __NR_setublimit	1507
+#elif __x86_64__
+#define __NR_setublimit	502
+#else
+#define __NR_setublimit	512
+#endif
+#endif
 
 static inline int setublimit(uid_t uid, unsigned long resource,
         unsigned long *rlim)

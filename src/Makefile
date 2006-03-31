@@ -28,7 +28,7 @@ CC = gcc
 CFLAGS = -Wall -g2
 SHAREDLIB_CFLAGS = -fPIC
 VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
-INC = -I ../include -I$(VZKERNEL_HEADERS)
+INC = -I../include -I$(VZKERNEL_HEADERS) -I../include-kernel
 ARCH=$(shell uname -i)
 
 OBJ_libvzctl = lib/env.lo lib/ub.lo lib/net.lo lib/logger.lo lib/exec.lo \

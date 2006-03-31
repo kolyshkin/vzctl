@@ -15,6 +15,78 @@
 
 #define PROCUBC		"/proc/user_beancounters"
 
+#ifndef UB_KMEMSIZE
+#define UB_KMEMSIZE	0	/* Unswappable kernel memory size including
+				 * struct task, page directories, etc.
+				 */
+#endif
+#ifndef UB_LOCKEDPAGES
+#define UB_LOCKEDPAGES	1	/* Mlock()ed pages. */
+#endif
+#ifndef UB_PRIVVMPAGES
+#define UB_PRIVVMPAGES	2	/* Total number of pages, counting potentially
+				 * private pages as private and used.
+				 */
+#endif
+#ifndef UB_SHMPAGES
+#define UB_SHMPAGES	3	/* IPC SHM segment size. */
+#endif
+#ifndef UB_ZSHMPAGES
+#define UB_ZSHMPAGES	4	/* Anonymous shared memory. */
+#endif
+#ifndef UB_NUMPROC
+#define UB_NUMPROC	5	/* Number of processes. */
+#endif
+#ifndef UB_PHYSPAGES
+#define UB_PHYSPAGES	6	/* All resident pages, for swapout guarantee. */
+#endif
+#ifndef UB_VMGUARPAGES
+#define UB_VMGUARPAGES	7	/* Guarantee for memory allocation,
+				 * checked against PRIVVMPAGES.
+				 */
+#endif
+#ifndef UB_OOMGUARPAGES
+#define UB_OOMGUARPAGES	8	/* Guarantees against OOM kill.
+				 * Only limit is used, no accounting.
+				 */
+#endif
+#ifndef UB_NUMTCPSOCK
+#define UB_NUMTCPSOCK	9	/* Number of TCP sockets. */
+#endif
+#ifndef UB_NUMFLOCK
+#define UB_NUMFLOCK	10	/* Number of file locks. */
+#endif
+#ifndef UB_NUMPTY
+#define UB_NUMPTY	11	/* Number of PTYs. */
+#endif
+#ifndef UB_NUMSIGINFO
+#define UB_NUMSIGINFO	12	/* Number of siginfos. */
+#endif
+#ifndef UB_TCPSNDBUF
+#define UB_TCPSNDBUF	13	/* Total size of tcp send buffers. */
+#endif
+#ifndef UB_TCPRCVBUF
+#define UB_TCPRCVBUF	14	/* Total size of tcp receive buffers. */
+#endif
+#ifndef UB_OTHERSOCKBUF
+#define UB_OTHERSOCKBUF	15	/* Total size of other socket
+				 * send buffers (all buffers for PF_UNIX).
+				 */
+#endif
+#ifndef UB_DGRAMRCVBUF
+#define UB_DGRAMRCVBUF	16	/* Total size of other socket
+				 * receive buffers.
+				 */
+#endif
+#ifndef UB_NUMOTHERSOCK
+#define UB_NUMOTHERSOCK	17	/* Number of other sockets. */
+#endif
+#ifndef UB_DCACHESIZE
+#define UB_DCACHESIZE	18	/* Size of busy dentry/inode cache. */
+#endif
+#ifndef UB_NUMFILE
+#define UB_NUMFILE	19	/* Number of open files. */
+#endif
 #ifndef UB_IPTENTRIES
 #define UB_IPTENTRIES	23 /* Number of iptables rules */
 #endif

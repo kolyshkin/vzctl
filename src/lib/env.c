@@ -38,6 +38,15 @@
 #define ENVRETRY	3
 #define VZCTLDEV	"/dev/vzctl"
 
+#ifndef __NR_setluid
+#ifdef __ia64__
+#define __NR_setluid	1506
+#elif __x86_64__
+#define __NR_setluid	501
+#else
+#define __NR_setluid	511
+#endif
+#endif
 
 static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode);
 
@@ -46,6 +55,7 @@ static inline int setluid(uid_t uid)
 	return syscall(__NR_setluid, uid);
 }
 
+#ifdef  __x86_64__
 static int set_personality(unsigned long mask)
 {
 	unsigned long per;
@@ -65,6 +75,7 @@ static int set_personality32()
 		return 0;
 	return set_personality(PER_LINUX32);
 }
+#endif
 
 int vz_env_create_data_ioctl(vps_handler *h,
 	struct vzctl_env_create_data *data)
