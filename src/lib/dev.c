@@ -25,7 +25,6 @@
 #include <sys/ioctl.h>
 #include <string.h>
 
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 
 #include "vzerror.h"

@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/syscall.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <errno.h>
 

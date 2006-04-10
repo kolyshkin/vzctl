@@ -32,7 +32,6 @@
 #include <fnmatch.h>
 #include <sys/ioctl.h>
 #include <errno.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 
 #include "vzlist.h"

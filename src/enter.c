@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <wait.h>
 #include <termios.h>
