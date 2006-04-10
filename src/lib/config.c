@@ -25,7 +25,6 @@
 #include <arpa/inet.h>
 #include <getopt.h>
 #include <sys/stat.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -47,6 +46,7 @@ static int _page_size;
 static vps_config config[] = {
 /*	Op	*/
 {"LOCKDIR",	NULL, PARAM_LOCKDIR},
+{"DUMPDIR",	NULL, PARAM_DUMPDIR},
 /*	Log	*/
 {"LOGGING",	NULL, PARAM_LOGGING},
 {"LOG_LEVEL",	NULL, PARAM_LOGLEVEL},
@@ -1145,6 +1145,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_LOCKDIR:
 		ret = conf_parse_str(&vps_p->opt.lockdir, val, 1);
 		break;
+	case PARAM_DUMPDIR:
+		ret = conf_parse_str(&vps_p->res.cpt.dumpdir, val, 1);
+		break;
 	case PARAM_LOGGING:
 		ret = conf_parse_yesno(&vps_p->log.enable, val, 1);
 		break;
@@ -1646,6 +1649,12 @@ static void free_dq(dq_param *dq)
 	FREE_P(dq->exptime)
 	FREE_P(dq->ugidlimit)
 }
+
+static void free_cpt(cpt_param *cpt)
+{
+	FREE_P(cpt->dumpdir)
+	FREE_P(cpt->dumpfile)
+}
 #undef FREE_P
 
 static void free_vps_res(vps_res *res)
@@ -1658,6 +1667,7 @@ static void free_vps_res(vps_res *res)
 	free_dev(&res->dev);
 	free_cpu(&res->cpu);
 	free_dq(&res->dq);
+	free_cpt(&res->cpt);
 }
 
 void free_vps_param(vps_param *param)
@@ -1748,6 +1758,8 @@ static void merge_net(net_param *dst, net_param *src)
 {
 	MERGE_LIST(ip)
 	MERGE_LIST(dev)
+	MERGE_INT(delall)
+	MERGE_INT(skip_arpdetect)
 }
 
 static void merge_misc(misc_param *dst, misc_param *src)
@@ -1792,6 +1804,15 @@ static void merge_env(env_param *dst, env_param *src)
 	MERGE_INT(ipt_mask);
 }
 
+static void merge_cpt(cpt_param *dst, cpt_param *src)
+{
+	MERGE_STR(dumpdir);
+	MERGE_STR(dumpfile);
+	MERGE_INT(ctx);
+	MERGE_INT(cpu_flags);
+	MERGE_INT(cmd);
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -1804,8 +1825,8 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_dq(&dst->dq, &src->dq);
 	merge_dev(&dst->dev, &src->dev);
 	merge_env(&dst->env, &src->env);
+	merge_cpt(&dst->cpt, &src->cpt);
 	return 0;
-
 }
 
 int merge_vps_param(vps_param *dst, vps_param *src)

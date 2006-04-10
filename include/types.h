@@ -47,6 +47,8 @@ enum {
 	STATE_RUNNING = 2,
 	STATE_STOPPED = 3,
 	STATE_STOPPING = 4,
+	STATE_RESTORING = 5,
+	STATE_CHECKPOINTING = 6,
 };
 
 /* Parse errro codes */
@@ -69,6 +71,8 @@ typedef enum {
 	SKIP_CONFIGURE =	(1<<1),
 	SKIP_ACTION_SCRIPT =	(1<<2)
 } skipFlags;
+
+typedef int (* execFn)(void *data);
 
 #endif
 

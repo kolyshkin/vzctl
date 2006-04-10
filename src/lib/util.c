@@ -464,6 +464,12 @@ const char *get_vps_state_str(int vps_state)
 	case STATE_STOPPING:
 		p = "stopping";
 		break;
+	case STATE_RESTORING:
+		p = "restoring";
+		break;
+	case STATE_CHECKPOINTING:
+		p = "checkpointing";
+		break;
 	}
 	return p;
 }

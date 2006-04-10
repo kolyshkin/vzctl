@@ -1,6 +1,7 @@
 %define _initddir /etc/init.d
 %define _crondir /etc/cron.d
 %define _lockdir /vz/lock 
+%define _dumpdir /vz/dump 
 %define _libdir /usr/lib/vzctl
 %define _configdir /etc/sysconfig
 %define _scriptdir %{_configdir}/vz-scripts
@@ -14,13 +15,12 @@
 Summary: Virtual Private Server control utility
 Name: vzctl
 Version: 3.0.0
-Release: 4
+Release: 5
 License: GPL
 Group: System Environment/Kernel
 Source: vzctl-%{version}-%{release}.tar.bz2
 ExclusiveOS: Linux
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-BuildPrereq: vzkernel >= 2.6.8-022stab069
 Requires: vzkernel
 # these reqs are for vz helper scripts
 Requires: bash
@@ -59,6 +59,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %config(noreplace) %{_crondir}/vpsreboot
 %attr(644,root,root) %{_crondir}/vpsnetclean
 %attr(755,root,root) %{_lockdir}
+%attr(755,root,root) %{_dumpdir}
 %attr(755,root,root) /vz/template/cache
 %attr(755,root,root) %{_sbindir}/vzctl
 %attr(755,root,root) %{_sbindir}/arpsend
@@ -142,7 +143,7 @@ Virtual Private Servers control API library
 %dir %{_libdir}/lib
 %attr(755,root,root) %{_libdir}/lib/libvzctl.so.*
 %attr(755,root,root) %{_libdir}/lib/libvzctl-fs.so
-%attr(755,root,root) %{_libdir}/lib/libvzctl-simfs.so.0.0.1
+%attr(755,root,root) %{_libdir}/lib/libvzctl-simfs.so.0.0.2
 %attr(755,root,root) %{_libdir}/scripts/vps-stop
 %attr(755,root,root) %{_libdir}/scripts/vps-functions
 %attr(755,root,root) %{_libdir}/scripts/vps-net_add

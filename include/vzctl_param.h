@@ -99,5 +99,15 @@
 #define	PARAM_DEF_OSTEMPLATE	328
 #define	PARAM_LOCKDIR		329
 
+#define PARAM_DUMPFILE		330
+#define PARAM_CPTCONTEXT	331
+#define PARAM_CPU_FLAGS		332
+#define PARAM_KILL		333
+#define PARAM_RESUME		334
+#define PARAM_DUMP		335
+#define PARAM_SUSPEND		336
+#define PARAM_UNDUMP		337
+#define PARAM_DUMPDIR		338
+
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

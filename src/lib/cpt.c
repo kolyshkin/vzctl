@@ -277,7 +277,7 @@ err:
 	}
 	if (dump_fd != -1)
 		close(dump_fd);
-	 close(cpt_fd);
+	close(cpt_fd);
 
 	return ret;
 }

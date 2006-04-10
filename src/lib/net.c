@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <linux/vzctl_venet.h>
 
@@ -106,7 +105,9 @@ static struct vps_state{
 	int id;
 } vps_states[] = {
 	{"starting", STATE_STARTING},
-	{"running", STATE_RUNNING}
+	{"running", STATE_RUNNING},
+	{"running", STATE_RUNNING},
+	{"restoring", STATE_RESTORING},
 };
 
 const char *state2str(int state)
@@ -167,7 +168,6 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		envp[i++] = (char *) delall;
 	envp[i++] = ENV_PATH;
 	envp[i] = NULL;
-
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
 	if (str != NULL) free(str);
@@ -175,14 +175,16 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	return ret;
 }
 
-int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state)
+int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state,
+	int skip_arpdetect)
 {
-	char *argv[2];
+	char *argv[3];
 	char *envp[10];
 	const char *script;
 	int ret;
 	char buf[STR_SIZE];
 	int i = 0;
+	char *skip_str = "SKIP_ARPDETECT=yes";
 
 	if (list_empty(ip_h))
 		return 0;
@@ -192,6 +194,8 @@ int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state)
 	envp[i++] = strdup(buf);
 	envp[i++] = list2str("IP_ADDR", ip_h);
 	envp[i++] = strdup(ENV_PATH);
+	if (skip_arpdetect)
+		envp[i++] = strdup(skip_str);
 	envp[i] = NULL;
 	switch (op) {
 		case ADD:
@@ -242,10 +246,11 @@ static int vps_ip_ctl(vps_handler *h, envid_t veid, int op,
 }
 
 static inline int vps_add_ip(vps_handler *h, envid_t veid,
-	list_head_t *ip_h)
+	net_param *net, int state)
 {
 	char *str;
 	int ret;
+	list_head_t *ip_h = &net->ip;
 
 	if ((str = list2str(NULL, ip_h)) != NULL) {
 		logger(0, 0, "Adding IP address(es): %s", str);
@@ -253,17 +258,18 @@ static inline int vps_add_ip(vps_handler *h, envid_t veid,
 	}
 	if ((ret = vps_ip_ctl(h, veid, VE_IP_ADD, ip_h, 1)))
 		return ret;
-	if ((ret = run_net_script(veid, ADD, ip_h, STATE_RUNNING)))
+	if ((ret = run_net_script(veid, ADD, ip_h, state, net->skip_arpdetect)))
 		vps_ip_ctl(h, veid, VE_IP_DEL, ip_h, 0);
 	
 	return ret;
 }
 
 static inline int vps_del_ip(vps_handler *h, envid_t veid,
-	list_head_t *ip_h)
+	net_param *net, int state)
 {
 	char *str;
 	int ret;
+	list_head_t *ip_h = &net->ip;
 
 	if ((str = list2str(NULL, ip_h)) != NULL) {
 		logger(0, 0, "Deleting IP address(es): %s", str);
@@ -271,25 +277,26 @@ static inline int vps_del_ip(vps_handler *h, envid_t veid,
 	}
 	if ((ret = vps_ip_ctl(h, veid, VE_IP_DEL, ip_h, 1)))
 		return ret;
-	run_net_script(veid, DEL, ip_h, STATE_RUNNING);
+	run_net_script(veid, DEL, ip_h, state, net->skip_arpdetect);
 
 	return ret;
 }
 
 static inline int vps_set_ip(vps_handler *h, envid_t veid,
-	list_head_t *ip_h)
+	net_param *net, int state)
 {
 	int ret;
-	list_head_t oldip;
+	net_param oldnet;
 
-	list_head_init(&oldip);
-	if (get_vps_ip(h, veid, &oldip) < 0)
+	bzero(&oldnet, sizeof(oldnet));
+	list_head_init(&oldnet.ip);
+	if (get_vps_ip(h, veid, &oldnet.ip) < 0)
 		return VZ_GET_IP_ERROR;
-	if (!(ret = vps_del_ip(h, veid, &oldip))) {
-		if ((ret = vps_add_ip(h, veid, ip_h)))
-			vps_add_ip(h, veid, &oldip);
+	if (!(ret = vps_del_ip(h, veid, &oldnet, state))) {
+		if ((ret = vps_add_ip(h, veid, net, state)))
+			vps_add_ip(h, veid, &oldnet, state);
 	}
-	free_str_param(&oldip);
+	free_str_param(&oldnet.ip);
 
 	return ret;
 }
@@ -332,7 +339,7 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
 }
 
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
-	dist_actions *actions, char *root, int state)
+	dist_actions *actions, char *root, int state, int skip)
 {
 	list_head_t *ip_h = &net->ip;
 	int ret = 0;
@@ -340,7 +347,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	if (list_empty(ip_h) &&	!net->delall) {
 		/* make initial network setup on VPS start*/
 		if (state == STATE_STARTING && op == ADD)
-			vps_ip_configure(h, veid, actions, root, op, net,state);
+			goto configure;
 		return 0;
 	}
 	if (!vps_is_run(h, veid)) {
@@ -350,13 +357,14 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	}
 	if (op == ADD) {
 		if (net->delall == YES)
-			ret = vps_set_ip(h, veid, ip_h);
+			ret = vps_set_ip(h, veid, net, state);
 		else
-			ret = vps_add_ip(h, veid, ip_h);
+			ret = vps_add_ip(h, veid, net, state);
 	} else if (op == DEL) {
-		ret = vps_del_ip(h, veid, ip_h);
+		ret = vps_del_ip(h, veid, net, state);
 	}
-	if (!ret)
+configure:
+	if (!ret && !(skip & SKIP_CONFIGURE))
 		vps_ip_configure(h, veid, actions, root, op, net, state);
 	return ret;
 }

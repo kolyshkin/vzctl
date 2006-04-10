@@ -39,7 +39,9 @@
 #define VZ_SET_CAP			13
 #define VZ_NOVECONFIG                   14
 #define VZ_EXEC_TIMEOUT			15
-#define	VZ_SETLUID_ERROR		17
+#define VZ_CHKPNT_ERROR			16
+#define VZ_RESTORE_ERROR		17
+#define	VZ_SETLUID_ERROR		18
 
 /****************************
     Argument errors
@@ -139,5 +141,6 @@
 #define	VZ_NO_DISTR_ACTION_SCRIPT	108
 #define VZ_APPLY_CONFIG_ERROR		109
 #define VZ_CUSTOM_REINSTALL_ERROR	128
+
 #endif /* _VZ_ERROR_H_ */
 

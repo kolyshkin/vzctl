@@ -1,6 +1,10 @@
+   3.0.0-5: Fri Apr  7 2006 <igor@sw.ru>
+	* added checkpointing support
+	* added kernel headers for standalone compilation 
+	* chaged license from QPL to GPL
 	* set personality PER_LINUX32 on x86_64 arch for i386 VPSes
 	* fixed --iptables store (do not store dependent modules)
-	* skip unknown iptables modules in config
+	* Do skip unknown iptables modules in config
  	* set arg[0] = "-bash" on enter
    3.0.0-4: Thu Mar 16 2006 <kir@openvz.org>
 	* cron scripts do nothing if VZ is not loaded (bug #107)

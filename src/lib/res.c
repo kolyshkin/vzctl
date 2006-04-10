@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 
 #include "vzerror.h"
@@ -255,15 +254,13 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		if ((ret = vps_set_ublimit(h, veid, &res->ub)))
 			return ret;
 	}
-	if ((ret = vps_set_quota(veid, &res->dq)))
-		return ret;
 	if ((ret = vps_net_ctl(h, veid, DEL, &param->del_res.net, actions,
-		fs->root, vps_state)))
+		fs->root, vps_state, skip)))
 	{
 		return ret;
 	}
 	if ((ret = vps_net_ctl(h, veid, ADD, &res->net, actions, fs->root,
-		vps_state)))
+		vps_state, skip)))
 	{
 		return ret;
 	}
@@ -287,6 +284,9 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	}
 	if (!(skip & SKIP_CONFIGURE))
 		vps_configure(h, veid, actions, fs->root, ADD, res, vps_state);
+	/* Setup quota limits after configure steps */
+	if ((ret = vps_set_quota(veid, &res->dq)))
+		return ret;
 	ret = mod_setup(h, veid, vps_state, skip, action, param);
 
 	return ret;

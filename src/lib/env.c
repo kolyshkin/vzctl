@@ -27,7 +27,6 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <sys/personality.h>
 
@@ -301,6 +300,8 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	if (sysfs_required(res))
 		create_param.feature_mask = VE_FEATURE_SYSFS;
 #endif
+	/* Close all fds  except std */
+	close_fds(0, wait_p, err_p, h->vzfd, -1);
 try:
 	ret = vz_env_create_data_ioctl(h, &env_create_data);
 	if (ret < 0) {
@@ -379,7 +380,6 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	} else if (pid == 0) {
 		if ((ret = vps_set_cap(veid, &res->cap)))
 			goto env_err;
-		close_fds(0, wait_p, err_p, h->vzfd, -1);
 		if (fn == NULL) {
 			ret = _env_create(h, veid, wait_p, err_p, (void *)res);
 		} else {
@@ -587,7 +587,8 @@ err:
 	if (ret) {
 		if (vps_is_run(h, veid))
 			env_stop(h, veid, res->fs.root, M_KILL);
-		vps_quotaoff(veid, &res->dq);
+		/* restore original quota values */
+		vps_set_quota(veid, &res->dq);
 		if (vps_is_mounted(res->fs.root))
 			vps_umount(h, veid, res->fs.root, skip);
 	}
@@ -755,7 +756,8 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 		return ret;
 	mod_cleanup(h, veid, action, param);
 	if (!res->net.skip_route_cleanup)
-		run_net_script(veid, DEL, &ips, STATE_RUNNING);
+		run_net_script(veid, DEL, &ips, STATE_RUNNING,
+			param->res.net.skip_arpdetect);
 	ret = vps_umount(h, veid, res->fs.root, skip);
 	/* Clear VPS network configuration*/
 	ret = run_pre_script(veid, VPS_STOP);

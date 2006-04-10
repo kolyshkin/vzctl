@@ -18,7 +18,7 @@
 #ifndef _VZCTL_H_
 #define _VZCTL_H_
 
-#define	VERSION			"3.0.0-4"
+#define	VERSION			"3.0.0-5"
 
 /* Action numeration should begin with 1. Value 0 is reserved. */
 #define ACTION_CREATE		1
@@ -45,6 +45,8 @@
 #define ST_QUOTA_INIT		"initializing-quota"
 #define	ACTION_RUNSCRIPT	14
 #define	ACTION_CUSTOM		15
+#define ACTION_CHKPNT		16
+#define ACTION_RESTORE		17
 
 /* default cpu units values */
 #define LHTCPUUNITS             250

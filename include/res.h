@@ -27,6 +27,7 @@
 #include "quota.h"
 #include "fs.h"
 #include "dist.h"
+#include "cpt.h"
 
 typedef struct {
 	envid_t veid;
@@ -55,6 +56,7 @@ typedef struct {
 	ub_param ub;		/**< UBC aprameters. */
 	cap_param cap;		/**< capability parameters. */
 	dq_param dq;		/**< disk quota parameters. */
+	cpt_param cpt;		/**< chekpointing parameters */
 	misc_param misc;	
 } vps_res;
 

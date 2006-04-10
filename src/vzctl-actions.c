@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <errno.h>
 #include <signal.h>
@@ -70,14 +69,12 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 				return VZ_INVALID_PARAMETER_VALUE;
 			}
 		} else if (ret == ERR_UNK) {
-			if (option_index < 0) {
+			if (option_index < 0)
 				logger(0, 0, "Invalid option -%c", c);
-				return VZ_INVALID_PARAMETER_SYNTAX;
-			} else {
+			else
 				logger(0, 0, "Invalid option --%s",
 					opt[option_index].name);
-				return VZ_INVALID_PARAMETER_SYNTAX;
-			}
+			return VZ_INVALID_PARAMETER_SYNTAX;
                 }
 	}
 	if (optind < argc) {
@@ -234,6 +231,142 @@ static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	return vps_destroy(h, veid, &g_p->res.fs);
 }
 
+static int parse_chkpnt_opt(int argc, char **argv, cpt_param *cpt)
+{
+	int c, ret;
+	int option_index;
+	static struct option chkpnt_options[] = {
+	/*	sub commands	*/
+	{"dump",	no_argument, NULL, PARAM_DUMP},
+	{"suspend",	no_argument, NULL, PARAM_SUSPEND},
+	{"resume",      no_argument, NULL, PARAM_RESUME},
+	{"kill",        no_argument, NULL, PARAM_KILL},
+	/*	flags		*/
+	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
+	{"context",	required_argument, NULL, PARAM_CPTCONTEXT},
+	{"dumpfile",	required_argument, NULL, PARAM_DUMPFILE},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	ret = 0;
+	while (1) {
+		option_index = -1;
+		c = getopt_long (argc, argv, "", chkpnt_options, NULL); 
+		if (c == -1)
+			break;
+		switch (c) {
+		case PARAM_DUMPFILE:
+			cpt->dumpfile = strdup(optarg);
+			break;
+		case PARAM_CPTCONTEXT:
+			cpt->ctx = strtoul(optarg, NULL, 16);
+			break;
+		case PARAM_CPU_FLAGS:
+			cpt->cpu_flags = strtoul(optarg, NULL, 0);
+			break;
+		case PARAM_DUMP:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_DUMP;
+			break;
+		case PARAM_KILL:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_KILL;
+			break;
+		case PARAM_RESUME:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_RESUME;
+			break;
+		case PARAM_SUSPEND:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_SUSPEND;
+			break;
+
+		default:
+			if (option_index < 0)
+				logger(0, 0, "Invalid option -%c", c);
+			else
+				logger(0, 0, "Invalid option --%s", 
+					chkpnt_options[option_index].name);
+			return VZ_INVALID_PARAMETER_SYNTAX;
+		}
+	}
+	/* Do full checkpointing */
+	if (!cpt->cmd)
+		cpt->cmd = CMD_CHKPNT;
+	return 0;
+
+err_syntax:
+	logger(0, 0, "Invalid syntax: only one sub command may be used");
+	return VZ_INVALID_PARAMETER_SYNTAX;
+}
+
+static int parse_restore_opt(int argc, char **argv, cpt_param *cpt)
+{
+	int c;
+	int option_index;
+	static struct option restore_options[] = {
+	/*	sub commands	*/
+	{"undump",	no_argument, NULL, PARAM_UNDUMP},
+	{"kill",        no_argument, NULL, PARAM_KILL},
+	{"resume",      no_argument, NULL, PARAM_RESUME},
+	/*	flags		*/
+	{"dumpfile",	required_argument, NULL, PARAM_DUMPFILE},
+	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
+	{"context",	required_argument, NULL, PARAM_CPTCONTEXT},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	while (1) {
+		option_index = -1;
+		c = getopt_long (argc, argv, "", restore_options, NULL); 
+		if (c == -1)
+			break;
+		switch (c) {
+		case PARAM_DUMPFILE:
+			cpt->dumpfile = strdup(optarg);
+			break;
+		case PARAM_CPTCONTEXT:
+			cpt->ctx = strtoul(optarg, NULL, 16);
+			break;
+		case PARAM_CPU_FLAGS:
+			cpt->cpu_flags = strtoul(optarg, NULL, 0);
+			break;
+		case PARAM_UNDUMP:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_UNDUMP;
+			break;
+		case PARAM_KILL:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_KILL;
+			break;
+		case PARAM_RESUME:
+			if (cpt->cmd)
+				goto err_syntax;
+			cpt->cmd = CMD_RESUME;
+			break;
+		default:
+			if (option_index < 0)
+				logger(0, 0, "Invalid option -%c", c);
+			else
+				logger(0, 0, "Invalid option --%s", 
+					restore_options[option_index].name);
+			return VZ_INVALID_PARAMETER_SYNTAX;
+		}
+	}
+	/* Do full restore */
+	if (!cpt->cmd)
+		cpt->cmd = CMD_RESTORE;
+	return 0;
+err_syntax:
+	logger(0, 0, "Invalid syntax: only one sub command may be used");
+	return VZ_INVALID_PARAMETER_SYNTAX;
+}
 int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	vps_res *new_res, vps_res *old_res)
 {
@@ -477,6 +610,31 @@ static int exec(vps_handler *h, int action, envid_t veid, char *root, int argc,
 	return ret;
 }
 
+static int chkpnt(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
+{
+	int cmd;
+
+	cmd = cmd_p->res.cpt.cmd;
+	if (g_p->res.cpt.dumpdir != NULL)
+		cmd_p->res.cpt.dumpdir = strdup(g_p->res.cpt.dumpdir);
+	if (cmd == CMD_KILL || cmd == CMD_RESUME)
+		return cpt_cmd(h, veid, CMD_CHKPNT, &cmd_p->res.cpt);
+	return vps_chkpnt(h, veid, g_p, cmd, &cmd_p->res.cpt);
+}
+
+static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
+	vps_param *cmd_p)
+{
+	int cmd;
+
+	cmd = cmd_p->res.cpt.cmd;
+	if (g_p->res.cpt.dumpdir != NULL)
+		cmd_p->res.cpt.dumpdir = strdup(g_p->res.cpt.dumpdir);
+	if (cmd == CMD_KILL || cmd == CMD_RESUME)
+		return cpt_cmd(h, veid, CMD_RESTORE, &cmd_p->res.cpt);
+	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt);
+}
+
 static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 {
 	int exist = 0, mounted = 0, run = 0;
@@ -548,6 +706,12 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 		break;
 	case ACTION_CUSTOM:
 		ret = parse_custom_opt(veid, argc, argv, param, name);
+		break;
+	case ACTION_CHKPNT:
+		ret = parse_chkpnt_opt(argc, argv, &param->res.cpt);
+		break;
+	case ACTION_RESTORE:
+		ret = parse_restore_opt(argc, argv, &param->res.cpt);
 		break;
 	default :
 		if ((argc - 1) > 0) {
@@ -649,6 +813,12 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		ret = exec(h, action, veid, g_p->res.fs.root, argc, argv);
 		if (ret && action == ACTION_EXEC)
 			ret = VZ_COMMAND_EXECUTION_ERROR;
+		break;
+	case ACTION_CHKPNT:
+		ret = chkpnt(h, veid, g_p, cmd_p);
+		break;
+	case ACTION_RESTORE:
+		ret = restore(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_RUNSCRIPT:
 		ret = vps_run_script(h, veid, argv[0], g_p);

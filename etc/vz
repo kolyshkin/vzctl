@@ -1,6 +1,7 @@
 ## Global parameters
 VIRTUOZZO=yes
 LOCKDIR=/vz/lock
+DUMPDIR=/vz/dump
 VE0CPUUNITS=1000
 
 ## Logging parameters

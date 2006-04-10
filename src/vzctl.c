@@ -63,6 +63,8 @@ void usage()
 "vzctl start <veid> [--force]\n"
 "vzctl exec | exec2 <veid> <command> [arg ...]\n"
 "vzctl runscript <veid> <script>\n"
+"vzctl chkpnt <vpsid> [--dumpfile <name>]\n"
+"vzctl restore <vpsid> [--dumpfile <name>]\n"
 "vzctl set veid [--save] [--setmode restart|ignore]\n"
 "   [--ipadd <addr>] [--ipdel <addr>|all] [--hostname <name>]\n"
 "   [--nameserver <addr>] [--searchdomain <name>] [--onboot yes|no]\n"
@@ -171,6 +173,10 @@ int main(int argc, char *argv[], char *envp[])
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
 		quiet = 1;
+	} else if (!strcmp(argv[1], "chkpnt")) {
+		action = ACTION_CHKPNT;
+	} else if (!strcmp(argv[1], "restore")) {
+		action = ACTION_RESTORE;
 	} else if (!strcmp(argv[1], "--help")) {
 		usage();
 		exit(0);

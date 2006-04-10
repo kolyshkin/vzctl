@@ -120,6 +120,7 @@ function vzarpipdetect()
 	local cmd
 
 	[ -z "${1}" ] && return
+	[ "${SKIP_ARPDETECT}" = "yes" ] && return
 
 	for ip in ${1}; do
 		cmd="$cmd -e $ip"

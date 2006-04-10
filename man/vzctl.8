@@ -1,4 +1,4 @@
-.\" $Id: vzctl.8,v 1.131.10.17 2006/03/16 13:56:02 kir Exp $
+.\" $Id: vzctl.8,v 1.131.10.18 2006/04/05 14:26:53 igor Exp $
 .TH vzctl 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
 .SH NAME
 vzctl \- utility to control Virtual Private Server.
@@ -340,6 +340,17 @@ Read VPS parameters from VPS sample configuration file
 \f(CW\fB/etc/sysconfig/vz-scripts/ve-\fIname\fR\f(CW\fB.conf-sample\fR, and
 apply them, if --save option specified save to VPS config file. These parameters
 are not changed (\fBHOSTNAME\fR \fBIP_ADDRESS\fR \fBOSTEMPLATE\fR \fBVE_ROOT\fR \fBVE_PRIVATE\fR)
+.SS Checkpoint/Restore
+.TP
+CPT is an extension of Virtuozzo kernel which allows to save full state of running VPS and to restore it later.
+.TP
+\fBchkpnt\fR <\fIvpsid\fR> \fB[--dumpfile <name>]\fR
+This command saves all the state of running VPS to dump file and stop the VPS.
+if option \fB--dumpfile\fR is not set default path \fB/vz/dump/Dump.VPSID\fR
+is used.
+.TP
+\fBrestore\fR <\fIvpsid\fR> \fB[--dumpfile <name>]\fR
+This command restore VPS from dump file created by \fBchkpnt\fR command.
 .SS Performing VPS actions
 .IP "\fBcreate\fR \fIvpsid\fR \fB--ostemlate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR]" 4
 Creates VPS area. This operation should be done once, before the first

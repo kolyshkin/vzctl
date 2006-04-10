@@ -26,21 +26,23 @@ NETSCRIPTDIR = /etc/sysconfig/network-scripts
     CRONDDIR = /etc/cron.d
     INITDDIR = /etc/init.d
    VZLOCKDIR = /vz/lock
+   VZDUMPDIR = /vz/dump
      LOGRDIR = /etc/logrotate.d
-     LIB_VER = 0.0.1
+     LIB_VER = 0.0.2
 
 export LD_LIBRARY_PATH=.
 CC = gcc
 CFLAGS = -Wall -g2
 SHAREDLIB_CFLAGS = -fPIC
-VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
-INC = -I ../include -I$(VZKERNEL_HEADERS)
+#VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
+INC = -I ../include
 ARCH=$(shell uname -i)
 
 OBJ_libvzctl = lib/env.lo lib/ub.lo lib/net.lo lib/logger.lo lib/exec.lo \
 	lib/cap.lo lib/cpu.lo lib/res.lo lib/util.lo lib/dist.lo lib/list.lo \
 	lib/script.lo lib/dev.lo lib/config.lo lib/lock.lo lib/quota.lo \
-	lib/modules.lo lib/iptables.lo lib/fs.lo lib/create.lo lib/readelf.lo
+	lib/modules.lo lib/iptables.lo lib/fs.lo lib/create.lo lib/readelf.lo \
+	lib/cpt.lo
 OBJ_simfs=lib/fs_simfs.lo
 OBJ_vzctl = vzctl.o vzctl-actions.o modules.o enter.o
 OBJ_vzlist = vzlist.o
@@ -175,6 +177,7 @@ inst-dirs:
 	$(INSTALL) -d $(DESTDIR)$(CRONDDIR)
 	$(INSTALL) -d $(DESTDIR)$(INITDDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZLOCKDIR)
+	$(INSTALL) -d $(DESTDIR)$(VZDUMPDIR)
 	$(INSTALL) -d $(DESTDIR)$(LOGRDIR)
 	$(INSTALL) -d $(DESTDIR)$(CACHEDIR)
 	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl

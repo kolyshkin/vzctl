@@ -77,6 +77,10 @@ int vps_is_run(vps_handler *h, envid_t veid);
  */
 int vps_start(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *action);
+	
+int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
+	skipFlags skip, struct mod_action *mod,
+	env_create_FN fn, void *data);
 
 /** Stop VPS.
  *

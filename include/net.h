@@ -36,9 +36,10 @@ typedef struct str_struct ip_param;
 /** Data structure for network parameters.
  */
 typedef struct {
-	list_head_t ip;	/**< VPS ip adresses list. */
+	list_head_t ip;		/**< VPS ip adresses list. */
 	list_head_t dev;	/**< VPS network devices list. */
 	int delall;		/**< flag to delete all ip addresses. */
+	int skip_arpdetect;
 	int skip_route_cleanup;
 	
 } net_param;
@@ -55,7 +56,7 @@ typedef struct {
  * @retun		0 on success.
  */
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
-	dist_actions *actions, char *root, int state);
+	dist_actions *actions, char *root, int state, int skip_arpdetect);
 
 /** Setup access to Host system network devices.
  *
@@ -77,5 +78,6 @@ int find_ip(list_head_t *ip_h,  char *ipaddr);
  * @return		0 on success.
  */
 int get_vps_ip(vps_handler *h, envid_t veid, list_head_t *ip_h);
-int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state);
+int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state,
+	int skip_arpdetect);
 #endif
