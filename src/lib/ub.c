@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-#include <ub/beancounter.h>
 
 #include "types.h"
 #include "ub.h"

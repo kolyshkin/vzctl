@@ -22,8 +22,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
-#include <ub/beancounter.h>
 
+#include "ub.h"
 #include "res.h"
 #include "validate.h"
 #include "vzerror.h"
