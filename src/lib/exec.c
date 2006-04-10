@@ -17,7 +17,6 @@
  */
 
 #include <sys/ioctl.h>
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 
 #include <stdlib.h>
@@ -335,6 +334,75 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 	} else if (pid == 0) {
 		ret = vps_real_exec(h, veid, root, exec_mode, argv, envp,
 			std_in, timeout);
+		exit(ret);
+	}
+	while ((ret = waitpid(pid, &status, 0)) == -1)
+		if (errno != EINTR)
+			break;
+	if (ret == pid) {
+		ret = VZ_SYSTEM_ERROR;
+		if (WIFEXITED(status))
+			ret = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status)) {
+			logger(0, 0, "Got signal %d", WTERMSIG(status));
+		}
+	} else if (pid < 0) {
+		ret = VZ_SYSTEM_ERROR;
+		logger(0, errno, "Error in waitpid()");
+	}
+	return ret;
+}
+
+int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
+	int flags)
+{
+	int ret, pid, status;
+
+	if ((ret = vz_setluid(veid)))
+		return ret;
+	if ((pid = fork()) < 0) {
+		logger(0, errno, "Unable to fork");
+		return VZ_RESOURCE_ERROR;
+	} else if (pid == 0) {
+		if ((ret = vz_chroot(root)))
+			goto  env_err;
+		close_fds(1, h->vzfd, -1);
+		ret = vz_env_create_ioctl(h, veid, VE_ENTER | flags);
+		if (ret < 0) {
+			if (errno == ESRCH) 
+	                        ret = VZ_VE_NOT_RUNNING;
+			else
+				ret = VZ_ENVCREATE_ERROR;
+			goto env_err;
+		}
+		close(h->vzfd);
+		ret = fn(data);
+env_err:
+		exit(ret);
+	}
+	while ((ret = waitpid(pid, &status, 0)) == -1)
+		if (errno != EINTR)
+			break;
+	ret = WEXITSTATUS(status);
+	return ret;
+}
+
+int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
+	int flags) 
+{
+	int pid, ret, status;
+
+	if (check_var(root, "VPS root is not set"))
+		return VZ_VE_ROOT_NOTSET;
+	if (!vps_is_run(h, veid)) {
+		logger(0, 0, "VPS is not running");
+		return VZ_VE_NOT_RUNNING;
+	}
+	if ((pid = fork()) < 0) {
+		logger(0, errno, "Can not fork");
+		return VZ_RESOURCE_ERROR;
+	} else if (pid == 0) {
+		ret = _real_execFn(h, veid, root, fn, data, flags);
 		exit(ret);
 	}
 	while ((ret = waitpid(pid, &status, 0)) == -1)
