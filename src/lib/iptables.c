@@ -16,7 +16,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <asm/timex.h>
 #include <linux/vzcalluser.h>
 #include <string.h>
 #include <stdio.h>
@@ -81,9 +80,18 @@ void ipt_mask2str(unsigned long mask, char *buf, int size)
 	}
 }
 
-unsigned long long get_ipt_mask(unsigned long mask)
+unsigned long long get_ipt_mask(unsigned long ids)
 {
-	if (!mask)
+	unsigned long long mask;
+	int i;
+
+	if (!ids)
 		return VE_IP_DEFAULT;
+	mask = 0;
+	for (i = 0; iptables[i].name != NULL; i++) {
+		if (iptables[i].id & ids)
+			mask |= iptables[i].mask;
+	}
 	return mask; 
 }
+
