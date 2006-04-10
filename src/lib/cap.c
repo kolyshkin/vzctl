@@ -29,6 +29,13 @@
 #include "vzerror.h"
 #include "logger.h"
 
+#ifndef	CAP_SETVEID
+#define	CAP_SETVEID	29
+#endif
+#ifndef	CAP_VE_ADMIN
+#define	CAP_VE_ADMIN	30
+#endif
+
 #define CAPDEFAULTMASK	(CAP_TO_MASK(CAP_CHOWN)		| \
 	CAP_TO_MASK(CAP_DAC_OVERRIDE)			| \
 	CAP_TO_MASK(CAP_DAC_READ_SEARCH)		| \
