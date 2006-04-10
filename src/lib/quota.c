@@ -291,7 +291,7 @@ int quota_off(envid_t veid, int force)
 	arg[i] = NULL;
 	if ((ret = run_script(VZQUOTA, arg, NULL, 0))) {
 		if (ret != EXITCODE_QUOTANOTRUN) {
-			logger(0, 0, "vzquota setlimit -f failed [%d]", ret);
+			logger(0, 0, "vzquota off failed [%d]", ret);
 			ret = VZ_DQ_OFF;
 		}
 	}
