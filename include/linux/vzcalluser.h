@@ -15,6 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 #ifndef _LINUX_VZCALLUSER_H
 #define _LINUX_VZCALLUSER_H
 
@@ -89,6 +90,7 @@ struct vzctl_ve_netdev {
 #define VE_IP_NAT_MOD			(1U<<20)
 #define VE_IP_NAT_FTP_MOD		(1U<<21)
 #define VE_IP_NAT_IRC_MOD		(1U<<22)
+#define VE_IP_TARGET_REDIRECT_MOD	(1U<<23)
 
 /* these masks represent modules with their dependences */
 #define VE_IP_IPTABLES		(VE_IP_IPTABLES_MOD)
@@ -134,6 +136,8 @@ struct vzctl_ve_netdev {
 					| VE_IP_NAT | VE_IP_CONNTRACK_FTP)
 #define VE_IP_NAT_IRC		(VE_IP_NAT_IRC_MOD		\
 					| VE_IP_NAT | VE_IP_CONNTRACK_IRC)
+#define VE_IP_TARGET_REDIRECT	(VE_IP_TARGET_REDIRECT_MOD	\
+					| VE_IP_NAT)
 
 /* safe iptables mask to be used by default */
 #define VE_IP_DEFAULT					\
@@ -161,6 +165,7 @@ struct vzctl_env_create {
 struct env_create_param {
 	__u64 iptables_mask;
 };
+
 #define VZCTL_ENV_CREATE_DATA_MINLEN	sizeof(struct env_create_param)
 
 struct env_create_param2 {
