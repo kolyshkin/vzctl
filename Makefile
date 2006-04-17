@@ -20,7 +20,7 @@ INSTALL = install
 PREFIX = /usr
 SBINDIR = ${PREFIX}/sbin
 
-SCRIPTS=vzpid vzcpucheck
+SCRIPTS=vzpid vzcpucheck vzmigrate
 
 all install %::
 	for file in ${DIRS}; do \

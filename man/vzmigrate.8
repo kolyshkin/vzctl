@@ -1,0 +1,103 @@
+.TH vzmigrate 8 "April 2006" "OpenVZ" "Virtual Private Servers"
+
+.SH NAME
+vzmigrate - utility for virtual environment migration between hardware nodes.
+
+.SH SYNOPSIS
+.TP
+\fBvzmigrate\fR [\fB-r\fR|\fB--remove-area\fR \fByes\fR|\fBno\fR] [\fB--ssh=\fIssh_options\fR] \
+[\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fIVPSID\fR
+
+.SH DESCRIPTION
+This utility is used to migrate a VPS from one (source) Hardware
+Node (HN) to another (destination) HN. The utility can migrate either stopped or running
+VPS. For stopped VPS, simple VPS private area transfer is performed
+(\fBrsync\fR(1) is used for file transfer). For running VPSs 
+migration may be offline (default) or online.
+
+This program uses ssh as a transport layer. You will need to put ssh
+public key to destination node and be able to connect to node without
+entering password.
+
+.SH OPTIONS
+.TP
+\fB-r\fR, \fB--remove-area\fR \fByes\fR|\fBno\fR
+Whether to remove VPS on source HN for successfully migrated VPS.
+
+.TP
+\fB--ssh=\fIoptions\fR
+Additional \fIoptions\fR that will be passed to ssh while establishing
+connection to destination HN. You may add options like \fB-c blowfish\rR
+or the like.
+
+.TP
+.B --keep-dst
+Do not clean synced destination VPS private area in case of some
+error. It makes sense to use this option on big VPS migration to avoid
+syncing VPS private area again in case some error (on VPS stop for
+example) occurs during first migration attempt.
+ 
+.TP
+.B --online
+Perform online (zero-downtime) migration: during the migration the VPS
+hangs for a while and after the migration it continues working as though nothing has
+happened.
+
+.TP
+.B -v
+Verbose mode. Causes \fBvzmigrate\fP to print debugging messages about its progress.
+
+.SH EXAMPLES
+Migration of VPS#101 to \fI192.168.1.130\fR with downtime:
+.br
+\f(CR	vzmigrate 192.168.1.130 101
+\fR
+.br
+
+Online migration of VPS#102 to \fI192.168.1.130\fR:
+.br
+\f(CR	vzmigrate --online 192.168.1.130 102
+\fR
+
+.SH EXIT STATUS
+.TP
+.B 0 EXIT_OK
+Command completed successfully.
+.TP
+.B 1 EXIT_USAGE
+Bad command line options.
+.TP
+.B 2 EXIT_VPS_STOPPED
+VPS is stopped.
+.TP
+.B 4 EXIT_CONNECT
+Can't connect to destination (source) HN.
+.TP
+.B 6 EXIT_COPY
+VPS private area copying/moving failed.
+.TP
+.B 7 EXIT_VPS_START
+Can't start or restore destination VPS.
+.TP
+.B 8 EXIT_VPS_STOP
+Can't stop or checkpoint source VPS.
+.TP
+.B 9 EXIT_EXISTS
+VPS already exists on destination HN.
+.TP
+.B 10 EXIT_NOTEXIST
+VPS does not exists on source HN.
+.TP
+.B 12 EXIT_IP_INUSE
+You attempt to migrate VPS which IP address(es) are already in use
+on the destination node. 
+.TP
+.B 13 EXIT_QUOTA
+Operation with VPS quota failed.
+
+
+.SH SEE ALSO
+.BR rsync (1)
+
+.SH COPYRIGHT
+Copyright (C) 2001-2006, SWsoft. Licensed under GNU GPL v2.

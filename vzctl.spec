@@ -34,6 +34,11 @@ Requires: fileutils
 Requires: vzctl-lib = %{version}-%{release}
 Requires: tar
 
+# requires for vzmigrate purposes
+Requires: rsync
+Requires: awk
+Requires: ssh
+
 %description
 This utility allows system administator to control VPS,
 e.g. create, start, shutdown, set various options and limits etc.
@@ -70,6 +75,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/vzcalc
 %attr(755,root,root) %{_sbindir}/vzpid
 %attr(755,root,root) %{_sbindir}/vzcfgvalidate
+%attr(755,root,root) %{_sbindir}/vzmigrate
 %attr(755,root,root) %{_scriptdir}/vpsreboot
 %attr(755,root,root) %{_scriptdir}/vpsnetclean
 %attr(644,root,root) %{_logrdir}/vzctl
