@@ -40,7 +40,8 @@
 #include "logger.h"
 #include "util.h"
 
-int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param)
+int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
+	vps_param *vps_p)
 {
 	int fd;
 	list_head_t iplist;
@@ -87,6 +88,12 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param)
 		if ((ret = ioctl(fd, CPT_RESUME, 0)) < 0) {
 			logger(0, errno, "cannot resume VPS");
 			goto err;
+		}
+		if (action == CMD_CHKPNT) {
+			/* restore arp/routing cleared on dump stage */
+			run_net_script(veid, ADD, &vps_p->res.net.ip,
+				STATE_RUNNING,
+				vps_p->res.net.skip_arpdetect);
 		}
 		break;
 	}
@@ -260,13 +267,13 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	ret = WEXITSTATUS(status);
 	if (ret)
 		goto err;
-	if (cmd == CMD_CHKPNT) {
+	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
 		/* Clear VPS network configuration */
-		get_vps_ip(h, veid, &iplist);
-		run_net_script(veid, DEL, &iplist, STATE_RUNNING,
+		run_net_script(veid, DEL, &vps_p->res.net.ip, STATE_RUNNING,
 			vps_p->res.net.skip_arpdetect);
 		free_str_param(&iplist);
-		vps_umount(h, veid, root, 0);
+		if (cmd == CMD_CHKPNT)
+			vps_umount(h, veid, root, 0);
 	}
 	ret = 0;
 	logger(0, 0, "Checkpointing completed succesfully");
@@ -410,7 +417,6 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	}
 	param->rst_fd = rst_fd;
 	param->cmd = cmd;
-	vps_p->res.net.skip_arpdetect = 1;
 	ret = vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE, 
 		NULL, restrore_FN, param);
 	if (ret)

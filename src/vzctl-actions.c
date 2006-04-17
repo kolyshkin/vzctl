@@ -231,16 +231,18 @@ static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	return vps_destroy(h, veid, &g_p->res.fs);
 }
 
-static int parse_chkpnt_opt(int argc, char **argv, cpt_param *cpt)
+static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 {
 	int c, ret;
 	int option_index;
+	cpt_param *cpt = &vps_p->res.cpt;
 	static struct option chkpnt_options[] = {
 	/*	sub commands	*/
 	{"dump",	no_argument, NULL, PARAM_DUMP},
 	{"suspend",	no_argument, NULL, PARAM_SUSPEND},
 	{"resume",      no_argument, NULL, PARAM_RESUME},
 	{"kill",        no_argument, NULL, PARAM_KILL},
+	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
 	/*	flags		*/
 	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
 	{"context",	required_argument, NULL, PARAM_CPTCONTEXT},
@@ -284,7 +286,9 @@ static int parse_chkpnt_opt(int argc, char **argv, cpt_param *cpt)
 				goto err_syntax;
 			cpt->cmd = CMD_SUSPEND;
 			break;
-
+		case PARAM_SKIPARPDETECT:
+			vps_p->res.net.skip_arpdetect = YES;
+			break;
 		default:
 			if (option_index < 0)
 				logger(0, 0, "Invalid option -%c", c);
@@ -304,10 +308,11 @@ err_syntax:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
-static int parse_restore_opt(int argc, char **argv, cpt_param *cpt)
+static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 {
 	int c;
 	int option_index;
+	cpt_param *cpt = &vps_p->res.cpt;
 	static struct option restore_options[] = {
 	/*	sub commands	*/
 	{"undump",	no_argument, NULL, PARAM_UNDUMP},
@@ -317,6 +322,7 @@ static int parse_restore_opt(int argc, char **argv, cpt_param *cpt)
 	{"dumpfile",	required_argument, NULL, PARAM_DUMPFILE},
 	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
 	{"context",	required_argument, NULL, PARAM_CPTCONTEXT},
+	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
 	{ NULL, 0, NULL, 0 }
 	};
 
@@ -349,6 +355,9 @@ static int parse_restore_opt(int argc, char **argv, cpt_param *cpt)
 			if (cpt->cmd)
 				goto err_syntax;
 			cpt->cmd = CMD_RESUME;
+			break;
+		case PARAM_SKIPARPDETECT:
+			vps_p->res.net.skip_arpdetect = YES;
 			break;
 		default:
 			if (option_index < 0)
@@ -615,10 +624,9 @@ static int chkpnt(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p
 	int cmd;
 
 	cmd = cmd_p->res.cpt.cmd;
-	if (g_p->res.cpt.dumpdir != NULL)
-		cmd_p->res.cpt.dumpdir = strdup(g_p->res.cpt.dumpdir);
-	if (cmd == CMD_KILL || cmd == CMD_RESUME)
-		return cpt_cmd(h, veid, CMD_CHKPNT, &cmd_p->res.cpt);
+	merge_vps_param(g_p, cmd_p);
+	if (cmd == CMD_KILL || cmd == CMD_RESUME) 
+		return cpt_cmd(h, veid, CMD_CHKPNT, &cmd_p->res.cpt, g_p);
 	return vps_chkpnt(h, veid, g_p, cmd, &cmd_p->res.cpt);
 }
 
@@ -628,10 +636,9 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	int cmd;
 
 	cmd = cmd_p->res.cpt.cmd;
-	if (g_p->res.cpt.dumpdir != NULL)
-		cmd_p->res.cpt.dumpdir = strdup(g_p->res.cpt.dumpdir);
+	merge_vps_param(g_p, cmd_p);
 	if (cmd == CMD_KILL || cmd == CMD_RESUME)
-		return cpt_cmd(h, veid, CMD_RESTORE, &cmd_p->res.cpt);
+		return cpt_cmd(h, veid, CMD_RESTORE, &cmd_p->res.cpt, g_p);
 	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt);
 }
 
@@ -708,10 +715,10 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 		ret = parse_custom_opt(veid, argc, argv, param, name);
 		break;
 	case ACTION_CHKPNT:
-		ret = parse_chkpnt_opt(argc, argv, &param->res.cpt);
+		ret = parse_chkpnt_opt(argc, argv, param);
 		break;
 	case ACTION_RESTORE:
-		ret = parse_restore_opt(argc, argv, &param->res.cpt);
+		ret = parse_restore_opt(argc, argv, param);
 		break;
 	default :
 		if ((argc - 1) > 0) {

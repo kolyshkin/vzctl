@@ -27,7 +27,8 @@ typedef struct {
 } cpt_param;
 
 struct vps_param;
-int cpt_cmd(vps_handler *h, envid_t veid, int cmd, cpt_param *param);
+int cpt_cmd(vps_handler *h, envid_t veid, int cmd, cpt_param *param,
+	struct vps_param *vps_p);
 int vps_chkpnt(vps_handler *h, envid_t veid, struct vps_param *vps_p, int cmd,
 	cpt_param *param);
 int vps_restore(vps_handler *h, envid_t veid, struct vps_param *vps_p, int cmd,

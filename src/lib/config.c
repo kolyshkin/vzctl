@@ -151,6 +151,7 @@ static struct option set_opt[] = {
 {"ipadd",	required_argument, NULL, PARAM_IP_ADD},
 {"ip",		required_argument, NULL, PARAM_IP_ADD},
 {"ipdel",	required_argument, NULL, PARAM_IP_DEL},
+{"skip_arpdetect",no_argument, NULL, PARAM_SKIPARPDETECT},
 {"netdev_add",	required_argument, NULL, PARAM_NETDEV_ADD},
 {"netdev_del",	required_argument, NULL, PARAM_NETDEV_DEL},
 {"hostname",	required_argument, NULL, PARAM_HOSTNAME},
@@ -1192,6 +1193,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_IP_ADD:
 	case PARAM_IP_DEL:
 		ret = parse_ip(vps_p, val, id);
+		break;
+	case PARAM_SKIPARPDETECT:
+		vps_p->res.net.skip_arpdetect = YES;
 		break;
 	case PARAM_NETDEV_ADD:
 		ret = add_netdev(&vps_p->res.net, val);
