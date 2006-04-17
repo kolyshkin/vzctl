@@ -47,6 +47,9 @@
 #define	ACTION_CUSTOM		15
 #define ACTION_CHKPNT		16
 #define ACTION_RESTORE		17
+#define ACTION_QUOTAON		18
+#define ACTION_QUOTAOFF		19
+#define ACTION_QUOTAINIT	20
 
 /* default cpu units values */
 #define LHTCPUUNITS             250

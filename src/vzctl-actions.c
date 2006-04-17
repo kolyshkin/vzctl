@@ -830,6 +830,15 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 	case ACTION_RUNSCRIPT:
 		ret = vps_run_script(h, veid, argv[0], g_p);
 		break;
+	case ACTION_QUOTAON:
+		ret = vps_quotaon(veid, g_p->res.fs.private, &g_p->res.dq);
+		break;
+	case ACTION_QUOTAOFF:
+		ret = vps_quotaoff(veid, &g_p->res.dq);
+		break;
+	case ACTION_QUOTAINIT:
+		ret = quota_init(veid, g_p->res.fs.private, &g_p->res.dq);
+		break;
 	case ACTION_CUSTOM:
 		ret = mod_setup(h, veid, 0, 0, &g_action, g_p);
 		break;

@@ -177,6 +177,12 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_CHKPNT;
 	} else if (!strcmp(argv[1], "restore")) {
 		action = ACTION_RESTORE;
+	} else if (!strcmp(argv[1], "quotaon")) {
+		action = ACTION_QUOTAON;
+	} else if (!strcmp(argv[1], "quotaoff")) {
+		action = ACTION_QUOTAOFF;
+	} else if (!strcmp(argv[1], "quotainit")) {
+		action = ACTION_QUOTAINIT;
 	} else if (!strcmp(argv[1], "--help")) {
 		usage();
 		exit(0);
