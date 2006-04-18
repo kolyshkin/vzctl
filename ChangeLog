@@ -1,3 +1,5 @@
+   3.0.0-6: Tue Apr 18 2006 <kir@openvz.org>
+	* man page fixes
    3.0.0-5: Fri Apr  7 2006 <igor@sw.ru>
 	* added checkpointing support
 	* added kernel headers for standalone compilation 
