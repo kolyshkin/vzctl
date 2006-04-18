@@ -352,7 +352,7 @@ is used.
 \fBrestore\fR <\fIvpsid\fR> \fB[--dumpfile <name>]\fR
 This command restore VPS from dump file created by \fBchkpnt\fR command.
 .SS Performing VPS actions
-.IP "\fBcreate\fR \fIvpsid\fR \fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR]" 4
+.IP "\fBcreate\fR \fIvpsid\fR [\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]" 4
 Creates VPS area. This operation should be done once, before the first
 startup of VPS.
 
@@ -370,7 +370,13 @@ be substituted with numeric VPS ID.
 You can use \fB--private\fR \fIpath\fR option to set the path to directory
 in which all the files and directories specific to this very VPS are stored
 (default is \fBVE_PRIVATE\fR specified in \fBvz\fR(5) file). Argument can
-contain string \fI$VEID\fR, which will be substituted with numeric VPS ID. 
+contain string \fI$VEID\fR, which will be substituted with numeric VPS ID.
+
+You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to a VPS.
+Note that this option can be used multiple times.
+
+You can use \fB--hostname\fR \fIname\fR option to set a host name for a VPS.
+
 .IP \fBdestroy\fR 4
 Removes VPS private area by deleting all files, directories and configuration
 file of this VPS.
