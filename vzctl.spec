@@ -36,8 +36,8 @@ Requires: tar
 
 # requires for vzmigrate purposes
 Requires: rsync
-Requires: awk
-Requires: ssh
+Requires: gawk
+Requires: openssh
 
 %description
 This utility allows system administator to control VPS,
