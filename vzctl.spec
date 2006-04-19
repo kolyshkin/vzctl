@@ -15,7 +15,7 @@
 Summary: Virtual Private Server control utility
 Name: vzctl
 Version: 3.0.0
-Release: 6
+Release: 7
 License: GPL
 Group: System Environment/Kernel
 Source: vzctl-%{version}-%{release}.tar.bz2
@@ -51,9 +51,6 @@ make CFLAGS="$RPM_OPT_FLAGS"
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}
-
-cd $RPM_BUILD_ROOT/%{_scriptdir}
-ln -sf ./ve-vps.basic.conf-sample ./ve-unlimited.conf-sample
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -129,7 +126,6 @@ fi
 if [ $1 = 0 ]; then 
 	rm -f  /etc/profile.d/vz.sh
 	/sbin/chkconfig --del vz >/dev/null
-	rm -f %{_scriptdir}/ve-unlimited.conf-sample >/dev/null 2>&1
 fi
 
 %package lib
