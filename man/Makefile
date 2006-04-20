@@ -4,7 +4,7 @@ PREFIX=/usr
 MANDIR=$(PREFIX)/share/man
 
 MAN8 = vzctl.8 arpsend.8 vzsplit.8 vzcfgvalidate.8 vzmemcheck.8 vzlist.8 \
-	vzcalc.8 vzpid.8 vzcpucheck.8
+	vzcalc.8 vzpid.8 vzcpucheck.8 vzmigrate.8
 MAN5 = vz.5 vps.conf.5 
 MANS = $(MAN8) $(MAN5)
 

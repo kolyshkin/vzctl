@@ -86,6 +86,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_netdir}/ifdown-venet
 %attr(644,root,root) %{_netdir}/ifcfg-venet0
 %attr(644, root, root) %{_mandir}/man8/vzctl.8.*
+%attr(644, root, root) %{_mandir}/man8/vzmigrate.8.*
 %attr(644, root, root) %{_mandir}/man8/arpsend.8.*
 %attr(644, root, root) %{_mandir}/man8/vzsplit.8.*
 %attr(644, root, root) %{_mandir}/man8/vzcfgvalidate.8.*
