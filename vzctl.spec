@@ -15,7 +15,7 @@
 Summary: Virtual Private Server control utility
 Name: vzctl
 Version: 3.0.0
-Release: 7
+Release: 8
 License: GPL
 Group: System Environment/Kernel
 Source: vzctl-%{version}-%{release}.tar.bz2
@@ -46,11 +46,11 @@ e.g. create, start, shutdown, set various options and limits etc.
 %prep
 %setup -n %{name}-%{version}-%{release}
 %build
-make CFLAGS="$RPM_OPT_FLAGS"
+make CFLAGS="$RPM_OPT_FLAGS" ARCH=%{_arch}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}
+make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
