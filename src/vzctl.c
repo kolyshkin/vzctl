@@ -55,7 +55,7 @@ void usage()
 
 	version();
 	fprintf(stdout, "Copyright (C) 2000-2005 SWsoft.\n");
-	fprintf(stdout, "This program may be distributed under the terms of the Q Public License.\n\n");
+	fprintf(stdout, "This program may be distributed under the terms of the GNU GPL License.\n\n");
 	fprintf(stdout, "Usage: vzctl [options] <command> <veid> [parameters]\n"
 "vzctl destroy | mount | umount | stop | status | enter <veid>\n"
 "vzctl create <veid> {--ostemplate <name>] [--config <name>]\n"
