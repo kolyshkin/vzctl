@@ -77,6 +77,19 @@ default: all
 
 all: $(PROGS) $(LIBS)
 
+check-version:
+	@SPEC_VERSION=`awk ' \
+	 /^Version:/ {printf "%s", $$2} \
+	 /^Release:/ {print "-" $$2}' < ../vzctl.spec`; \
+	H_VERSION=`awk '/#define[\t\ ]VERSION/ {print $$3}' < \
+	../include/vzctl.h | tr -d \"`; \
+	if test $$SPEC_VERSION != $$H_VERSION; then \
+		echo "Version in vzctl.spec is $$SPEC_VERSION"; \
+		echo "Version in vzctl.h is $$H_VERSION"; \
+		echo "VERSION mismatch; please fix" 1>&2; \
+		exit 1; \
+	fi
+
 %.o: %.c
 	$(CC) -c $(CFLAGS) $(INC) $< -o $@
 
@@ -99,7 +112,7 @@ $(LIB_vzctl) : $(LIB_simfs) $(OBJ_libvzctl)
 vzctl-static: $(OBJ_vzctl) libvzctl.a
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(OBJ_simfs) libvzctl.a -rdynamic -ldl -lutil -o $@
 
-vzctl: $(LIB_vzctl) $(OBJ_vzctl) $(LIB_fs)
+vzctl: check-version $(LIB_vzctl) $(OBJ_vzctl) $(LIB_fs)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) $(LIB_fs) -lutil -o $@
 
 vzlist: $(OBJ_vzlist) $(LIB_vzctl) $(LIB_fs)
