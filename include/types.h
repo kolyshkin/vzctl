@@ -58,6 +58,7 @@ enum {
 #define ERR_NOMEM	-4
 #define ERR_OTHER	-5
 #define ERR_INVAL_SKIP	-6
+#define ERR_LONG_TRUNC  -7
 
 /** VPS handler.
  */

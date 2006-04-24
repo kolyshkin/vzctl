@@ -419,43 +419,48 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 	int n;
 	char *tail;
 	unsigned long long tmp;
+	int ret;
 
 	if (!str || !val)
-		return 1;
-	errno = 0;
+		return ERR_INVAL;
+	ret = errno = 0;
 	tmp = strtoull(str, &tail, 10);
 	if (errno == ERANGE)
-		return 1;
+		return ERR_INVAL;
 	if (*tail != ':' && *tail != '\0') {
 		if ((n = get_mul(*tail)) < 0)
-			return 1;
+			return ERR_INVAL;
 		tmp = tmp * n / divisor;
 		tail++;
 	}
-	if (tmp > ULONG_MAX)
-		return 1;
+	if (tmp > LONG_MAX) {
+		tmp = LONG_MAX;
+		ret = ERR_LONG_TRUNC;
+	}
 	val[0] = tmp;
 	if (*tail == ':') {
 		tail++;
 		errno = 0;
 		tmp = strtoull(tail, &tail, 10);
 		if (errno == ERANGE)
-			return 1;
+			return ERR_INVAL;
 		if (*tail != '\0') {
 			if (*(tail + 1) != '\0')
-				return 1;
+				return ERR_INVAL;
 			if ((n = get_mul(*tail)) < 0)
-				return 1;
+				return ERR_INVAL;
 			tmp = tmp * n / divisor;
 		}
-		if (tmp > ULONG_MAX)
-			return 1;
+		if (tmp > LONG_MAX) {
+			tmp = LONG_MAX;
+			ret = ERR_LONG_TRUNC;
+		}
 		val[1] = tmp;
 	} else if (*tail == 0) {
 		val[1] = val[0];
 	} else 
-		return 1;
-	return 0;
+		return ERR_INVAL;
+	return ret;
 }
 
 /* This function parse string in form xxx:yyy
@@ -464,27 +469,38 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 
 int parse_twoul(const char *str, unsigned long *val)
 {
+	unsigned long long tmp;
 	char *tail;
+	int ret;
 
 	if (!str || !val)
-		return 1;
-	errno = 0;
-	val[0] = strtoul(str, &tail, 10);
+		return ERR_INVAL;
+	ret = errno = 0;
+	tmp = strtoull(str, &tail, 10);
 	if (errno == ERANGE)
-		return 1;
-
+		return ERR_INVAL;
+	if (tmp > LONG_MAX) {
+		tmp = LONG_MAX;
+		ret = ERR_LONG_TRUNC;
+	}
+	val[0] = tmp;
 	if (*tail == ':') {
 		tail++;
 		errno = 0;
-		val[1] = strtoul(tail, &tail, 10);
+		tmp = strtoull(tail, &tail, 10);
 		if ((*tail != '\0') || (errno == ERANGE))
 			return 1;
+		if (tmp > LONG_MAX) {
+			tmp = LONG_MAX;
+			ret = ERR_LONG_TRUNC;
+		}
+		val[1] = tmp;
 	} else if (*tail == 0) {
 		val[1] = val[0];
 	} else {
-		return 1;
+		return ERR_INVAL;
 	}
-	return 0;
+	return ret;
 }
 
 int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
@@ -501,13 +517,13 @@ int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
 		ret = parse_twoul_sfx(val, res.limit, divisor);
 	else
 		ret = parse_twoul(val, res.limit);
-	if (ret)
-		return ERR_INVAL;
+	if (ret && ret != ERR_LONG_TRUNC)
+		return ret;
 	if (get_ub_res(&vps_p->res.ub, res.res_id) != NULL)
 		return ERR_DUP;
 	if (add_ub_param(&vps_p->res.ub, &res))
 		return ERR_NOMEM;
-	return 0;
+	return ret;
 }
 
 static int store_ub(vps_param *old_p, vps_param *vps_p,
@@ -769,10 +785,12 @@ static int parse_dq(unsigned long **param, const char *val)
 	tmp = malloc(sizeof(unsigned long) * 2);
 	if (tmp == NULL)
 		return ERR_NOMEM;
-	if ((ret = parse_twoul(val, tmp)))
+	ret = parse_twoul(val, tmp);
+	if (ret && ret != ERR_LONG_TRUNC) {
 		free(tmp);
-	else
-		*param = tmp;
+		return ret;
+	}
+	*param = tmp;
 	return ret;
 }
 
@@ -1374,6 +1392,9 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 			continue;
 		} else if (ret == ERR_INVAL_SKIP) {
 			continue;
+		} else if (ret == ERR_LONG_TRUNC) {
+			logger(0, 0, "Warning: too large value for %s=%s"
+				" was truncated", ltoken, rtoken);
 		} else if (ret == ERR_DUP) {
 			logger(0, 0, "Warning: dup for %s=%s in line %d"
 				" is ignored", ltoken, rtoken, line);

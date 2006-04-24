@@ -1,3 +1,7 @@
+   3.0.0-8: Mon Apr 24 2006 <igor@openvz.ru>
+	* UBC parameters > LONG_MAX in VPS conf truncate to LONG_MAX
+	* added installation of vzmigrate.8 man page
+	* use 'uname -m' for arch selection	
    3.0.0-6: Tue Apr 18 2006 <kir@openvz.org>
 	* man page fixes
    3.0.0-5: Fri Apr  7 2006 <igor@sw.ru>
