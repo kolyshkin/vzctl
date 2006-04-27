@@ -124,8 +124,6 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 {
 	int ret;
 
-	if ((ret = check_ub(&g_p->res.ub)))
-		return ret;
 	if (g_p->opt.start_disabled == YES &&
 		cmd_p->opt.start_force != YES)
 	{
