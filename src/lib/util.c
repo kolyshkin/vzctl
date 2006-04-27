@@ -32,6 +32,7 @@
 
 #include "util.h"
 #include "logger.h"
+#include "fs.h"
 
 #ifndef NR_OPEN
 #define NR_OPEN 1024
@@ -523,4 +524,36 @@ void close_fds(int close_std, ...)
 			continue;
 		close(fd);
 	}
+}
+
+/* Renames (to "*.destroyed" if action == MOVE) or removes config,
+ * (if action == DESTR)
+ * Also, appropriate mount/umount scripts are linked.
+ */
+int move_config(int veid, int action)
+{
+	char conf[PATH_LEN];
+	char newconf[PATH_LEN];
+
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d.conf", veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." MOUNT_PREFIX, veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+	
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." UMOUNT_PREFIX, veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." START_PREFIX, veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." STOP_PREFIX, veid);
+	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
+	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+
+	return 0;
 }

@@ -19,6 +19,9 @@
 #define	_UTIL_H_
 
 #include "types.h"
+#define BACKUP		0
+#define DESTR		1
+
 #define PROCMEM		"/proc/meminfo"
 #define PROCTHR		"/proc/sys/kernel/threads-max"
 
@@ -48,5 +51,5 @@ char *get_file_name(char *str);
 const char *get_vps_state_str(int vps_state);
 int set_not_blk(int fd);
 void close_fds(int close_std, ...);
-
+int move_config(int veid, int action);
 #endif
