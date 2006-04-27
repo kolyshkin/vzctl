@@ -729,11 +729,9 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	skipFlags skip, struct mod_action *action)
 {
 	int ret;
-	list_head_t ips;
 	char buf[64];
 	vps_res *res = &param->res;
 
-	list_head_init(&ips);
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
@@ -751,17 +749,15 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 			}
 		}
 	}
-	get_vps_ip(h, veid, &ips);
+	/* get VPS ip adresses for cleanup */
+	get_vps_ip(h, veid, &param->del_res.net.ip);
 	if ((ret = env_stop(h, veid, res->fs.root, stop_mode)))
 		return ret;
 	mod_cleanup(h, veid, action, param);
-	if (!res->net.skip_route_cleanup)
-		run_net_script(veid, DEL, &ips, STATE_RUNNING,
-			param->res.net.skip_arpdetect);
+	vps_cleanup_res(h, veid, param, STATE_STOPPING);
 	ret = vps_umount(h, veid, res->fs.root, skip);
 	/* Clear VPS network configuration*/
 	ret = run_pre_script(veid, VPS_STOP);
-	free_str_param(&ips);
 
 	return ret;
 }

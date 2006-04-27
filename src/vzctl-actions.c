@@ -36,6 +36,7 @@
 #include "create.h"
 #include "util.h"
 #include "lock.h"
+#include "vps_configure.h"
 #include "modules.h"
 
 extern struct mod_action g_action;

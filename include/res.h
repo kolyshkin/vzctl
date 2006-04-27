@@ -45,7 +45,6 @@ struct mod_action;
 
 /** Data structure for VPS resources.
  */
-
 typedef struct {
 	fs_param fs;		/**< file system parameters. */
 	tmpl_param tmpl;	/**< template parameters. */
@@ -105,17 +104,9 @@ typedef struct vps_param vps_param;
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
 	struct mod_action *action);
-
-/** Setup user password
- *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param actions	distribution action scripts.
- * @param root		VPS root.
- * @param pw		list of user:password parameters.
- * @return		0 on success.
- */
-int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, list_head_t *pw);
+int vps_cleanup_res(vps_handler *h, envid_t veid, vps_param *param,
+	int vps_state);
+int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res);
 int need_configure(vps_res *res);
+
 #endif

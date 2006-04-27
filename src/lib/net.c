@@ -36,6 +36,7 @@
 #include "env.h"
 #include "script.h"
 #include "util.h"
+#include "vps_configure.h"
 
 
 int find_ip(list_head_t *ip_h, char *ipaddr)
@@ -97,81 +98,6 @@ int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
 		logger(0, errno, "Unable to %s IP %s",
 			op == VE_IP_ADD ? "add" : "del", ip);
 	}
-	return ret;
-}
-
-static struct vps_state{
-	char *name;
-	int id;
-} vps_states[] = {
-	{"starting", STATE_STARTING},
-	{"running", STATE_RUNNING},
-	{"running", STATE_RUNNING},
-	{"restoring", STATE_RESTORING},
-};
-
-const char *state2str(int state)
-{
-	int i;
-
-	for (i = 0; i < sizeof(vps_states) / sizeof(*vps_states); i++)
-		if (vps_states[i].id == state)
-			return vps_states[i].name;
-
-	return NULL;		
-}
-
-/*
- * Setup (add/delete) ip addreses inside VPS
- */
-int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, int op, net_param *net, int state)
-{
-	char *envp[5];
-	char *str;
-	const char *script = NULL;
-	int ret, i;
-	char vps_state[32];
-	const char *str_state;
-	const char *delall = "IPDELALL=yes";
-
-	if (list_empty(&net->ip) && !net->delall && state != STATE_STARTING) 
-		return 0;
-	if (actions == NULL)
-		return 0;
-	switch (op) {
-		case ADD:
-			script = actions->add_ip;
-			if (script == NULL) {
-				logger(0, 0, "Warning: add_ip action script"
-					" is not specified");
-				return 0;
-			}
-			break;
-		case DEL:
-			script = actions->del_ip;
-			if (script == NULL) {
-				logger(0, 0, "Warning: del_ip action script"
-					" is not specified");
-				return 0;
-			}
-			break;
-	}
-	i = 0;
-	str_state = state2str(state);
-	snprintf(vps_state, sizeof(vps_state), "VE_STATE=%s", str_state);
-	envp[i++] = vps_state;
-	str = list2str("IP_ADDR", &net->ip);
-	if (str != NULL)
-		envp[i++] = str;
-	if (net->delall)
-		envp[i++] = (char *) delall;
-	envp[i++] = ENV_PATH;
-	envp[i] = NULL;
-	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
-		SCRIPT_EXEC_TIMEOUT);
-	if (str != NULL) free(str);
-
 	return ret;
 }
 
