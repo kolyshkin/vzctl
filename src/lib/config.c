@@ -72,7 +72,7 @@ static vps_config config[] = {
 {"DGRAMRCVBUF",	NULL, PARAM_DGRAMRCVBUF},
 {"NUMOTHERSOCK",NULL, PARAM_NUMOTHERSOCK},
 {"NUMFILE",	NULL, PARAM_NUMFILE},
-{"DCACHESIZE",	NULL, PARAM_DCACHE},
+{"DCACHESIZE",	NULL, PARAM_DCACHESIZE},
 {"DCACHE",	"DCACHESIZE", -1},
 {"NUMIPTENT",	NULL, PARAM_NUMIPTENT},
 {"IPTENTRIES",	"NUMIPTENT", -1},
@@ -142,7 +142,7 @@ static struct option set_opt[] = {
 {"dgramrcvbuf",	required_argument, NULL, PARAM_DGRAMRCVBUF},
 {"numothersockk",required_argument, NULL, PARAM_NUMOTHERSOCK},
 {"numfile",	required_argument, NULL, PARAM_NUMFILE},
-{"dcachesize",	required_argument, NULL, PARAM_DCACHE},
+{"dcachesize",	required_argument, NULL, PARAM_DCACHESIZE},
 {"numiptent",	required_argument, NULL, PARAM_NUMIPTENT},
 {"avnumproc",	required_argument, NULL, PARAM_AVNUMPROC},
 /*	Capability */
@@ -511,16 +511,13 @@ int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
 
 	if ((conf = conf_get_by_id(config, id)) == NULL)
 		return ERR_INVAL;
-	if ((res.res_id = get_ub_resid(conf->name)) < 0) 
-		return ERR_UNK;
 	if (divisor)
 		ret = parse_twoul_sfx(val, res.limit, divisor);
 	else
 		ret = parse_twoul(val, res.limit);
 	if (ret && ret != ERR_LONG_TRUNC)
 		return ret;
-	if (get_ub_res(&vps_p->res.ub, res.res_id) != NULL)
-		return ERR_DUP;
+	res.res_id = id;
 	if (add_ub_param(&vps_p->res.ub, &res))
 		return ERR_NOMEM;
 	return ret;
@@ -529,19 +526,42 @@ int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
 static int store_ub(vps_param *old_p, vps_param *vps_p,
 	list_head_t *conf_h)
 {
-	int i;
-	const char *name;
+	const vps_config *conf;
+	ub_param *ub = &vps_p->res.ub;
 	char buf[128];
-	const ub_param *ubp = &vps_p->res.ub;
 
-	for (i = 0; i < ubp->num_res; i++) {
-		const ub_res *ub = ubp->ub;
-		if ((name = get_ub_name(ub[i].res_id)) == NULL)
-			continue;
-		snprintf(buf, sizeof(buf), "%s=\"%lu:%lu\"", name,
-			ub[i].limit[0], ub[i].limit[1]);
-		add_str_param(conf_h, buf);
-	}
+#define ADD_UB_PARAM(res, id)						\
+if (ub->res != NULL) {							\
+	conf = conf_get_by_id(config, id);				\
+	snprintf(buf, sizeof(buf), "%s=\"%lu:%lu\"", conf->name,	\
+		ub->res[0], ub->res[1]);				\
+	if (add_str_param(conf_h, buf))					\
+		return ERR_NOMEM;					\
+}
+
+	ADD_UB_PARAM(kmemsize, PARAM_KMEMSIZE)
+	ADD_UB_PARAM(lockedpages, PARAM_LOCKEDPAGES)
+	ADD_UB_PARAM(privvmpages, PARAM_PRIVVMPAGES)
+	ADD_UB_PARAM(shmpages, PARAM_SHMPAGES)
+	ADD_UB_PARAM(numproc, PARAM_NUMPROC)
+	ADD_UB_PARAM(physpages,	PARAM_PHYSPAGES)
+	ADD_UB_PARAM(vmguarpages, PARAM_VMGUARPAGES)
+	ADD_UB_PARAM(oomguarpages, PARAM_OOMGUARPAGES)
+	ADD_UB_PARAM(numtcpsock, PARAM_NUMTCPSOCK)
+	ADD_UB_PARAM(numflock, PARAM_NUMFLOCK)
+	ADD_UB_PARAM(numpty, PARAM_NUMPTY)
+	ADD_UB_PARAM(numsiginfo, PARAM_NUMSIGINFO)
+	ADD_UB_PARAM(tcpsndbuf,	PARAM_TCPSNDBUF)
+	ADD_UB_PARAM(tcprcvbuf, PARAM_TCPRCVBUF)
+	ADD_UB_PARAM(othersockbuf, PARAM_OTHERSOCKBUF)
+	ADD_UB_PARAM(dgramrcvbuf, PARAM_DGRAMRCVBUF)
+	ADD_UB_PARAM(numothersock, PARAM_NUMOTHERSOCK)
+	ADD_UB_PARAM(numfile, PARAM_NUMFILE)
+	ADD_UB_PARAM(dcachesize, PARAM_DCACHESIZE)
+	ADD_UB_PARAM(numiptent, PARAM_NUMIPTENT)
+	ADD_UB_PARAM(avnumproc, PARAM_AVNUMPROC)
+#undef ADD_UB_PARAM
+
 	return 0;
 }
 
@@ -1202,7 +1222,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_TCPRCVBUF:
 	case PARAM_OTHERSOCKBUF:
 	case PARAM_DGRAMRCVBUF:
-	case PARAM_DCACHE:
+	case PARAM_DCACHESIZE:
 		ret = parse_ub(vps_p, val, id, 1);
 		break;
 	case PARAM_CAP:

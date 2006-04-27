@@ -95,7 +95,7 @@
 #define UB_NUMFILE	19	/* Number of open files. */
 #endif
 #ifndef UB_IPTENTRIES
-#define UB_IPTENTRIES	23 /* Number of iptables rules */
+#define UB_IPTENTRIES	23	/* Number of iptables rules */
 #endif
 #define UB_DUMMY	255
 
@@ -106,14 +106,7 @@ typedef struct {
         unsigned long limit[2];	/**< UBC resource barrier:limit. */
 } ub_res;
 
-/** Data structure for array of UBC parameters.
- */
-typedef struct {
-        int num_res;		/**< Number of resources in array. */
-        ub_res *ub;		/**< pointer on first element. */
-} ub_param;
-
-/** Static UBC structure
+/** Data structure for UBC parameters. 
  */
 struct ub_struct {
 	unsigned long *kmemsize;
@@ -138,6 +131,7 @@ struct ub_struct {
 	unsigned long *numiptent;
 	unsigned long *avnumproc;
 };
+typedef struct ub_struct ub_param;
 
 /** Apply UBC resources.
  *
@@ -147,7 +141,6 @@ struct ub_struct {
  * @return		0 on success
  */
 int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ubc);
-
 int set_ublimit(vps_handler *h, envid_t veid, ub_param *ubc);
 
 /** Check that all required parameters are specified in ub.
@@ -156,13 +149,25 @@ int set_ublimit(vps_handler *h, envid_t veid, ub_param *ubc);
  * @return		0 on success.
  */
 int check_ub(ub_param *ub);
-int get_ub_resid(char *name);
-ub_res *get_ub_res(ub_param *ub, int res_id);
-const char *get_ub_name(int res_id);
+
+/** Add UBC resource in ub_res format to UBC struct
+ *
+ * @param ub		UBC parameters.
+ * @param res		UBC resource in ub_res format.
+ * @return		0 on success.
+ */
 int add_ub_param(ub_param *ub, ub_res *res);
+
+/** Read UBC resources current usage from /proc/user_beancounters
+ *
+ * @param veid		VPS id.
+ * @param ub		UBC parameters.
+ * @return		0 on success.
+ */
+int vps_read_ubc(envid_t veid, ub_param *ub);
+int get_ub_resid(char *name);
+const char *get_ub_name(int res_id);
+void add_ub_limit(struct ub_struct *ub, int res_id, unsigned long *limit);
 void free_ub_param(ub_param *ub);
 void merge_ub(ub_param *dst, ub_param *src);
-int vps_read_ubc(envid_t veid, ub_param *ub);
-void ub2ubs(ub_param *ub, struct ub_struct *ubs);
-void add_ubs_limit(struct ub_struct *ubs, int res_id, unsigned long *limit);
 #endif

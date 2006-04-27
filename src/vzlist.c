@@ -758,18 +758,6 @@ char *parse_var(char *var)
 	return strdup(sp);
 }
 
-#define MERGE_UBC(name, ubc, res)				\
-do {								\
-	ub_res *ub;						\
-	int id;							\
-	if ((id = get_ub_resid("" #name "")) < 0)		\
-		break;						\
-	if ((ub = get_ub_res(&res->ub, id)) == NULL)		\
-		break;						\
-	ubc->name[2] = ub->limit[0];     			\
-	ubc->name[3] = ub->limit[1];				\
-} while(0);							
-
 #define MERGE_QUOTA(name, quota, dq)				\
 do {								\
 	if (dq.name != NULL) {					\
@@ -783,6 +771,13 @@ void merge_conf(struct Cveinfo *ve, vps_res *res)
 	if (ve->ubc == NULL) {
 		ve->ubc = x_malloc(sizeof(struct Cubc));
 		memset(ve->ubc, 0, sizeof(struct Cubc));
+#define MERGE_UBC(name, ubc, res)				\
+do {								\
+	if (res == NULL || res->ub.name == NULL) 		\
+		break;						\
+	ubc->name[2] = res->ub.name[0];     			\
+	ubc->name[3] = res->ub.name[1];				\
+} while(0);							
 
 		MERGE_UBC(kmemsize, ve->ubc, res);
 		MERGE_UBC(lockedpages, ve->ubc, res);
@@ -804,6 +799,7 @@ void merge_conf(struct Cveinfo *ve, vps_res *res)
 		MERGE_UBC(dcachesize, ve->ubc, res);
 		MERGE_UBC(numfile, ve->ubc, res);
 		MERGE_UBC(numiptent, ve->ubc, res);
+#undef MERGE_UBC
 	}
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
 		ve->ip = strdup(list2str(NULL, &res->net.ip));

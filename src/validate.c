@@ -26,6 +26,7 @@
 #include "ub.h"
 #include "res.h"
 #include "validate.h"
+#include "vzctl_param.h"
 #include "vzerror.h"
 #include "logger.h"
 #include "util.h"
@@ -82,7 +83,7 @@ static int check_param(struct ub_struct *param, int log)
 	if (param->name == NULL) {					\
 		if (log)						\
 			logger(0, 0, "Error: parameter " #name		\
-				" not found\n");			\
+				" not found");				\
 		ret = 1;						\
 	}								\
 
@@ -112,83 +113,83 @@ int validate(vps_res *param, int recover, int ask)
 	unsigned long val, val1;
 	unsigned long tmp_val0, tmp_val1;
 	int changed = 0;
-	struct ub_struct ubs;
+	struct ub_struct *ub;
 
 #define SET_MES(val)	logger(0, 0, "set to %lu", val);
 #define SET2_MES(val1, val2) logger(0, 0,"set to %lu:%lu", val1, val2);
 
-#define CHECK_BL(x, name) \
-if (x != NULL) { 						\
-	if (x[0] > x[1]) {				\
-		logger(0, 0, "Error: barrier should be <= limit for " \
+#define CHECK_BL(x, name) 						\
+if (x != NULL) { 							\
+	if (x[0] > x[1]) {						\
+		logger(0, 0, "Error: barrier should be <= limit for " 	\
 			#name " (currently, %lu:%lu)",			\
-			x[0], x[1]);		\
+			x[0], x[1]);					\
 		if (ask || recover) {					\
-			tmp_val1 = x[0];			\
-			tmp_val0 = x[0];			\
+			tmp_val1 = x[0];				\
+			tmp_val0 = x[0];				\
 			SET2_MES(tmp_val0, tmp_val1)			\
 			if (ask) recover = read_yn();			\
 			if (recover) {					\
-				x[1] = tmp_val1;		\
+				x[1] = tmp_val1;			\
 			       	changed++;				\
 			}						\
 		}							\
 		if (!recover) ret = 1;					\
 	}								\
 } else {								\
-	logger(0, 0, "Error: parameter "  #name " not found\n");	\
+	logger(0, 0, "Error: parameter "  #name " not found");		\
 	ret = 1;							\
 }
 
 #define CHECK_B(name)							\
-if (ubs.name != NULL) {						\
-	if ((ubs.name[0] != ubs.name[1])) {			\
+if (ub->name != NULL) {							\
+	if ((ub->name[0] != ub->name[1])) {				\
 		logger(0, 0, "Error: barrier should be equal limit for " \
 			#name " (currently, %lu:%lu)",			\
-			ubs.name[0], ubs.name[1]);		\
+			ub->name[0], ub->name[1]);			\
 		if (ask || recover) {					\
-			tmp_val0 = max_ul(ubs.name[0], ubs.name[1]); \
+			tmp_val0 = max_ul(ub->name[0], ub->name[1]); 	\
 			tmp_val1 = tmp_val0;				\
 			SET2_MES(tmp_val0, tmp_val1)			\
 			if (ask) recover = read_yn();			\
 			if (recover) {					\
-				ubs.name[0] = tmp_val0;		\
-				ubs.name[1] = tmp_val1;		\
+				ub->name[0] = tmp_val0;			\
+				ub->name[1] = tmp_val1;			\
 				changed++;				\
 			}						\
 		}							\
 		if (!recover) ret = 1;					\
 	}								\
 } else {								\
-	logger(0, 0, "Error: parameter "  #name " not found\n");	\
+	logger(0, 0, "Error: parameter "  #name " not found");		\
 	ret = 1;							\
 }
 
 	if (param == NULL)
 		return 1;
-	ub2ubs(&param->ub, &ubs);
-	if (check_param(&ubs, 1))
+	ub = &param->ub;
+	if (check_param(ub, 1))
 		return 1;
-	if (ubs.avnumproc != NULL)
-		avnumproc = ubs.avnumproc[0];
+	if (ub->avnumproc != NULL)
+		avnumproc = ub->avnumproc[0];
 	else
-		avnumproc = ubs.numproc[0] / 2;
+		avnumproc = ub->numproc[0] / 2;
 /*	1 Check barrier & limit	*/
 	/* Primary */
 	CHECK_B(numproc)
 	CHECK_B(numtcpsock)
 	CHECK_B(numothersock)
-	if (ubs.vmguarpages != NULL) {
-		if (ubs.vmguarpages[1] != LONG_MAX) {
+	if (ub->vmguarpages != NULL) {
+		if (ub->vmguarpages[1] != LONG_MAX) {
 			logger(0, 0, "Error: limit should be = %lu for"
 			       " vmguarpages (currently, %lu)", LONG_MAX,
-				ubs.vmguarpages[1]);
+				ub->vmguarpages[1]);
 			if (ask || recover) {
 				SET_MES((unsigned long) LONG_MAX);
 				if (ask)
 					recover = read_yn();
 				if (recover) {
-					ubs.vmguarpages[1] = LONG_MAX;
+					ub->vmguarpages[1] = LONG_MAX;
 					changed++;
 				}
 			}
@@ -196,26 +197,26 @@ if (ubs.name != NULL) {						\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 	} else {
-		logger(0, 0, "Error: parameter vmguarpages not found\n");
+		logger(0, 0, "Error: parameter vmguarpages not found");
 		ret = 1;
 	}
 	/* Secondary */
-	CHECK_BL(ubs.kmemsize, kmemsize)
-	CHECK_BL(ubs.tcpsndbuf, tcpsndbuf)
-	CHECK_BL(ubs.tcprcvbuf, tcprcvbuf)
-	CHECK_BL(ubs.othersockbuf, othersockbuf)
-	CHECK_BL(ubs.dgramrcvbuf, dgramrcvbuf)
-	if (ubs.oomguarpages != NULL) {
-		if (ubs.oomguarpages[1] != LONG_MAX) {
+	CHECK_BL(ub->kmemsize, kmemsize)
+	CHECK_BL(ub->tcpsndbuf, tcpsndbuf)
+	CHECK_BL(ub->tcprcvbuf, tcprcvbuf)
+	CHECK_BL(ub->othersockbuf, othersockbuf)
+	CHECK_BL(ub->dgramrcvbuf, dgramrcvbuf)
+	if (ub->oomguarpages != NULL) {
+		if (ub->oomguarpages[1] != LONG_MAX) {
 			logger(0, 0, "Error: limit should be = %lu for"
 			       " oomguarpages (currently, %lu)", LONG_MAX,
-				ubs.oomguarpages[1]);
+				ub->oomguarpages[1]);
 			if (ask || recover) {
 				SET_MES((unsigned long) LONG_MAX);
 				if (ask)
 					recover = read_yn();
 				if (recover) {
-					ubs.oomguarpages[1] = LONG_MAX;
+					ub->oomguarpages[1] = LONG_MAX;
 					changed++;
 				}
 			}
@@ -223,40 +224,40 @@ if (ubs.name != NULL) {						\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 	} else {
-		logger(0, 0, "Error: parameter oomguarpages not found\n");
+		logger(0, 0, "Error: parameter oomguarpages not found");
 		ret = 1;
 	}
-	CHECK_BL(ubs.privvmpages, privvmpages)
+	CHECK_BL(ub->privvmpages, privvmpages)
 	/* Auxiliary */
-	CHECK_BL(ubs.lockedpages, lockedpages)
+	CHECK_BL(ub->lockedpages, lockedpages)
 	CHECK_B(shmpages)
-	if (ubs.physpages != NULL) {
-		if (ubs.physpages[0] != 0) {
+	if (ub->physpages != NULL) {
+		if (ub->physpages[0] != 0) {
 			logger(0, 0, "Error: barrier should be = 0 for"
 			       " physpages (currently, %lu)",
-				ubs.physpages[0]);
+				ub->physpages[0]);
 			if (ask || recover) {
 				SET_MES((unsigned long) 0);
 				if (ask)
 					recover = read_yn();
 				if (recover) {
-					ubs.physpages[0] = 0;
+					ub->physpages[0] = 0;
 					changed++;
 				}
 			}
 			if (!recover) ret = 1;
 //			if (!ask) fprintf(stderr, "\n");
 		}
-		if (ubs.physpages[1] != LONG_MAX) {
+		if (ub->physpages[1] != LONG_MAX) {
 			logger(0, 0, "Error: limit should be = %lu for"
 			       " physpages (currently, %lu)", LONG_MAX,
-				ubs.physpages[1]);
+				ub->physpages[1]);
 			if (ask || recover) {
 				SET_MES((unsigned long) LONG_MAX);
 				if (ask)
 					recover = read_yn();
 				if (recover) {
-					ubs.physpages[1] = LONG_MAX;
+					ub->physpages[1] = LONG_MAX;
 					changed++;
 				}
 			}
@@ -264,113 +265,113 @@ if (ubs.name != NULL) {						\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 	} else {
-		logger(0, 0, "Error: parameter physpages not found\n");
+		logger(0, 0, "Error: parameter physpages not found");
 		ret = 1;
 	}
 	CHECK_B(numfile)
-	CHECK_BL(ubs.numflock, numflock)
+	CHECK_BL(ub->numflock, numflock)
 	CHECK_B(numpty)
 	CHECK_B(numsiginfo)
-	CHECK_BL(ubs.dcachesize, dcachesize)
+	CHECK_BL(ub->dcachesize, dcachesize)
 	CHECK_B(numiptent)
 	CHECK_BL(param->dq.diskspace, diskspace)
 	CHECK_BL(param->dq.diskinodes, diskinodes)
 
 /*	2 Check formulas			*/
-	val = (40 * 1024 * avnumproc) + ubs.dcachesize[1];
+	val = (40 * 1024 * avnumproc) + ub->dcachesize[1];
 	val &= LONG_MAX;
-	if (ubs.kmemsize[0] < val) {
+	if (ub->kmemsize[0] < val) {
 		logger(0, 0, "Error: kmemsize.bar should be > %lu"
-				" (currently, %lu)", val, ubs.kmemsize[0]);
+				" (currently, %lu)", val, ub->kmemsize[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.kmemsize[1] + val - ubs.kmemsize[0];
+			tmp_val1 = ub->kmemsize[1] + val - ub->kmemsize[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1);
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.kmemsize[1] = tmp_val1;
-				ubs.kmemsize[0] = tmp_val0;
+				ub->kmemsize[1] = tmp_val1;
+				ub->kmemsize[0] = tmp_val0;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	}
-	if (ubs.privvmpages[0] < ubs.vmguarpages[0]) {
+	if (ub->privvmpages[0] < ub->vmguarpages[0]) {
 		logger(0, 0, "Warning: privvmpages.bar should be > %lu"
-				" (currently, %lu)", ubs.vmguarpages[0],
-				ubs.privvmpages[0]);
+				" (currently, %lu)", ub->vmguarpages[0],
+				ub->privvmpages[0]);
 		if (ask || recover) {
-			tmp_val0 = ubs.vmguarpages[0];
-			tmp_val1 = ubs.privvmpages[1] < tmp_val0 ?
-				tmp_val0 : ubs.vmguarpages[1];
+			tmp_val0 = ub->vmguarpages[0];
+			tmp_val1 = ub->privvmpages[1] < tmp_val0 ?
+				tmp_val0 : ub->vmguarpages[1];
 			SET_MES(tmp_val0);
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.privvmpages[0] = tmp_val0;
-                                ubs.privvmpages[1] = tmp_val1;
+				ub->privvmpages[0] = tmp_val0;
+				ub->privvmpages[1] = tmp_val1;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	}
-	val = 2.5 * 1024 * ubs.numtcpsock[0];
+	val = 2.5 * 1024 * ub->numtcpsock[0];
 	val &= LONG_MAX;
-	if (ubs.tcpsndbuf[1] - ubs.tcpsndbuf[0] < val) {
+	if (ub->tcpsndbuf[1] - ub->tcpsndbuf[0] < val) {
 		logger(0, 0, "Error: tcpsndbuf.lim-tcpsndbuf.bar"
 				" should be > %lu (currently, %lu)", val,
-				ubs.tcpsndbuf[1]-ubs.tcpsndbuf[0]);
+				ub->tcpsndbuf[1]-ub->tcpsndbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.tcpsndbuf[0] + val;
-			tmp_val0 = ubs.tcpsndbuf[0];
+			tmp_val1 = ub->tcpsndbuf[0] + val;
+			tmp_val0 = ub->tcpsndbuf[0];
 			SET2_MES(tmp_val0, tmp_val1);
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.tcpsndbuf[1] = tmp_val1;
+				ub->tcpsndbuf[1] = tmp_val1;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	}
-	val = 2.5 * 1024 * ubs.numothersock[0];
+	val = 2.5 * 1024 * ub->numothersock[0];
 	val &= LONG_MAX;
-	if (ubs.othersockbuf[1] - ubs.othersockbuf[0] < val) {
+	if (ub->othersockbuf[1] - ub->othersockbuf[0] < val) {
 		logger(0, 0, "Error: othersockbuf.lim-othersockbuf.bar"
 			       " should be > %lu (currently, %lu)", val,
-				ubs.othersockbuf[1]-ubs.othersockbuf[0]);
+				ub->othersockbuf[1]-ub->othersockbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.othersockbuf[0] + val;
-			tmp_val0 = ubs.othersockbuf[0];
+			tmp_val1 = ub->othersockbuf[0] + val;
+			tmp_val0 = ub->othersockbuf[0];
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.othersockbuf[1] = tmp_val1;
+				ub->othersockbuf[1] = tmp_val1;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	}
-	val =  2.5 * 1024 * ubs.numtcpsock[0];
+	val =  2.5 * 1024 * ub->numtcpsock[0];
 	val &= LONG_MAX;
-	if (ubs.tcprcvbuf[1] - ubs.tcprcvbuf[0] < val) {
+	if (ub->tcprcvbuf[1] - ub->tcprcvbuf[0] < val) {
 		logger(0, 0, "Warning: tcprcvbuf.lim-tcprcvbuf.bar"
 			       " should be > %lu (currently, %lu)", val,
-				ubs.tcprcvbuf[1] - ubs.tcprcvbuf[0]);
+				ub->tcprcvbuf[1] - ub->tcprcvbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.tcprcvbuf[0] + val;
-			tmp_val0 = ubs.tcprcvbuf[0];
+			tmp_val1 = ub->tcprcvbuf[0] + val;
+			tmp_val0 = ub->tcprcvbuf[0];
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.tcprcvbuf[1] = tmp_val1;
+				ub->tcprcvbuf[1] = tmp_val1;
 				changed++;
 			}
 		}
@@ -378,19 +379,19 @@ if (ubs.name != NULL) {						\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val = 64 * 1024;
-	if (ubs.tcprcvbuf[0] < val) {
-		logger(0, 0, "Warning: tcprcvbuf.bar should be > %lu\n"
+	if (ub->tcprcvbuf[0] < val) {
+		logger(0, 0, "Warning: tcprcvbuf.bar should be > %lu"
 				" (currently, %lu)", val,
-				ubs.tcprcvbuf[0]);
+				ub->tcprcvbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.tcprcvbuf[1]+val-ubs.tcprcvbuf[0];
+			tmp_val1 = ub->tcprcvbuf[1]+val-ub->tcprcvbuf[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.tcprcvbuf[1] = tmp_val1;
-				ubs.tcprcvbuf[0] = tmp_val0;
+				ub->tcprcvbuf[1] = tmp_val1;
+				ub->tcprcvbuf[0] = tmp_val0;
 				changed++;
 			}
 		}
@@ -398,19 +399,19 @@ if (ubs.name != NULL) {						\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val = 64 * 1024;
-	if (ubs.tcpsndbuf[0] <  val) {
+	if (ub->tcpsndbuf[0] <  val) {
 		logger(0, 0, "Warning: tcpsndbuf.bar should be > %lu"
 				" (currently, %lu)", val,
-				ubs.tcpsndbuf[0]);
+				ub->tcpsndbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.tcpsndbuf[1]+val-ubs.tcpsndbuf[0];
+			tmp_val1 = ub->tcpsndbuf[1]+val-ub->tcpsndbuf[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.tcpsndbuf[1] = tmp_val1;
-				ubs.tcpsndbuf[0] = tmp_val0;
+				ub->tcpsndbuf[1] = tmp_val1;
+				ub->tcpsndbuf[0] = tmp_val0;
 				changed++;
 			}
 		}
@@ -419,39 +420,39 @@ if (ubs.name != NULL) {						\
 	}
 	val = 32 * 1024;
 	val1 = 129 * 1024;
-	if (ubs.dgramrcvbuf[0] < val) {
+	if (ub->dgramrcvbuf[0] < val) {
 		logger(0, 0, "Warning: dgramrcvbuf.bar should be >"
 				" %lu (currently, %lu)", val,
-				ubs.dgramrcvbuf[0]);
+				ub->dgramrcvbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.dgramrcvbuf[1] + val - 
-					ubs.dgramrcvbuf[0];
+			tmp_val1 = ub->dgramrcvbuf[1] + val - 
+					ub->dgramrcvbuf[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.dgramrcvbuf[1] = tmp_val1;
-				ubs.dgramrcvbuf[0] = tmp_val0;
+				ub->dgramrcvbuf[1] = tmp_val1;
+				ub->dgramrcvbuf[0] = tmp_val0;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
-	} else if (ubs.dgramrcvbuf[0] < val1) {
+	} else if (ub->dgramrcvbuf[0] < val1) {
 		logger(0, 0, "Recommendation: dgramrcvbuf.bar should be >"
 				" %lu (currently, %lu)", val1,
-				ubs.dgramrcvbuf[0]);
+				ub->dgramrcvbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.dgramrcvbuf[1] + val1 -
-					ubs.dgramrcvbuf[0];
+			tmp_val1 = ub->dgramrcvbuf[1] + val1 -
+					ub->dgramrcvbuf[0];
 			tmp_val0 = val1;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.dgramrcvbuf[1] = tmp_val1;
-				ubs.dgramrcvbuf[0] = tmp_val0;
+				ub->dgramrcvbuf[1] = tmp_val1;
+				ub->dgramrcvbuf[0] = tmp_val0;
 				changed++;
 			}
 		}
@@ -459,79 +460,79 @@ if (ubs.name != NULL) {						\
 	}
 	val =  32 * 1024;
 	val1 = 129 * 1024;
-	if (ubs.othersockbuf[0] < val) {
+	if (ub->othersockbuf[0] < val) {
 		logger(0, 0, "Warning: othersockbuf.bar should be >"
 				" %lu (currently, %lu)", val, 
-				ubs.othersockbuf[0]);
+				ub->othersockbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.othersockbuf[1] + val - 
-					ubs.othersockbuf[0];
+			tmp_val1 = ub->othersockbuf[1] + val - 
+					ub->othersockbuf[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.othersockbuf[1] = tmp_val1;
-				ubs.othersockbuf[0] = tmp_val0;
+				ub->othersockbuf[1] = tmp_val1;
+				ub->othersockbuf[0] = tmp_val0;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
-	} else if (ubs.othersockbuf[0] < val1) {
+	} else if (ub->othersockbuf[0] < val1) {
 		logger(0, 0,"Recommendation: othersockbuf.bar should be >"
 				" %lu (currently, %lu)", val1, 
-				ubs.othersockbuf[0]);
+				ub->othersockbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.othersockbuf[1] + val1 - 
-					ubs.othersockbuf[0];
+			tmp_val1 = ub->othersockbuf[1] + val1 - 
+					ub->othersockbuf[0];
 			tmp_val0 = val1;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.othersockbuf[1] = tmp_val1;
-				ubs.othersockbuf[0] = tmp_val0;
+				ub->othersockbuf[1] = tmp_val1;
+				ub->othersockbuf[0] = tmp_val0;
 				changed++;
 			}
 		}
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	val = avnumproc * 32;
-	val1 = ubs.numtcpsock[0] + ubs.numothersock[0] + ubs.numpty[0];
+	val1 = ub->numtcpsock[0] + ub->numothersock[0] + ub->numpty[0];
 	if (val1 > val)
 		val = val1;
 	val &= LONG_MAX;
-	if (ubs.numfile[0] < val) {
+	if (ub->numfile[0] < val) {
 		logger(0, 0, "Warning: numfile should be > %lu"
-				" (currently, %lu)", val, ubs.numfile[0]);
+				" (currently, %lu)", val, ub->numfile[0]);
 		if (ask || recover) {
-			tmp_val1 = ubs.numfile[1] + val - ubs.numfile[0];
+			tmp_val1 = ub->numfile[1] + val - ub->numfile[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.numfile[1] = tmp_val1;
-				ubs.numfile[0] = tmp_val0;
+				ub->numfile[1] = tmp_val1;
+				ub->numfile[0] = tmp_val0;
 				changed++;
 			}
 		}
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	}
-	val = ubs.numfile[0] * 384;
+	val = ub->numfile[0] * 384;
 	val &= LONG_MAX;
-	if (ubs.dcachesize[1] < val) {
+	if (ub->dcachesize[1] < val) {
 		logger(0, 0, "Warning: dcachesize.lim should be > %lu"
 				" (currently, %lu)", val,
-				ubs.dcachesize[1]);
+				ub->dcachesize[1]);
 		if (ask || recover) {
 			SET_MES(val);
 			if (ask)
 				recover = read_yn();
 			if (recover) {
-				ubs.dcachesize[1] = val;
+				ub->dcachesize[1] = val;
 				changed++;
 			}
 		}
@@ -730,7 +731,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 				}
 			}
 			veid = id;
-			free_ubs_limit(&ub_s);
+			free_ub_param(&ub_s);
 		} else {
 			fmt = "%s%lu%lu%lu%lu";
 		}
@@ -746,7 +747,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 				par[0] = held;
 				par[1] = barrier;
 				par[2] = limit;
-				add_ubs_limit(&ub_s, res, par);
+				add_ub_limit(&ub_s, res, par);
 			}
 		}
 	}
@@ -761,7 +762,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 			calc_ve_commitment(&ub_s, &comm, &mem, 0);
 			inc_rusage(ru_comm, &comm);
 		}
-		free_ubs_limit(&ub_s);
+		free_ub_param(&ub_s);
 	}
 	fclose(fd);
 	return 0;

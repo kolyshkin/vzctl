@@ -34,7 +34,7 @@ void usage()
 	printf("Usage: vzcalc [-v] <veid>\n");
 }
 
-int check_param(struct ub_struct *param)
+static int check_param(struct ub_struct *param)
 {
 	int ret = 0;	
 #define CHECKPARAM(name, str_name) \
@@ -57,8 +57,6 @@ if (param->name == NULL) { \
 int calculate(int veid, ub_param *ub, int verbose)
 {
 	ub_param ub_cur;
-	struct ub_struct ubs;
-	struct ub_struct ubs_cur;
 	char tmp[STR_SIZE];
 	int ret = 0;
 	double kmem_net_cur, lm_cur, tr_cur, ms_cur, al_cur, np_cur;
@@ -69,8 +67,7 @@ int calculate(int veid, ub_param *ub, int verbose)
 	int run, thrmax;
 	int page;
 
-	ub2ubs(ub, &ubs);
-	if (check_param(&ubs))
+	if (check_param(ub))
 		return 1;
 	if (get_mem(&ram))
 		return 1;
@@ -84,47 +81,46 @@ int calculate(int veid, ub_param *ub, int verbose)
 	lowmem *= 0.4;
 	memset(&ub_cur, 0, sizeof(ub_cur));
 	if (!(run = vps_read_ubc(veid, &ub_cur))) {
-		ub2ubs(&ub_cur, &ubs_cur);
-		if (check_param(&ubs_cur))
+		if (check_param(&ub_cur))
 			return 1;
-		kmem_net_cur = (double)ubs_cur.kmemsize[0] + 
-			(double)ubs_cur.tcprcvbuf[0] + 
-			(double)ubs_cur.tcpsndbuf[0] +
-			(double)ubs_cur.dgramrcvbuf[0] +
-			(double)ubs_cur.othersockbuf[0];
+		kmem_net_cur = (double)ub_cur.kmemsize[0] + 
+			(double)ub_cur.tcprcvbuf[0] + 
+			(double)ub_cur.tcpsndbuf[0] +
+			(double)ub_cur.dgramrcvbuf[0] +
+			(double)ub_cur.othersockbuf[0];
 		/*	Low memory	*/
 		lm_cur = kmem_net_cur / lowmem;
 		/*	Total RAM	*/
-		tr_cur = ((double)ubs_cur.physpages[0] * page + kmem_net_cur) 
+		tr_cur = ((double)ub_cur.physpages[0] * page + kmem_net_cur) 
 					/ ram;
 		/*	Mem + Swap	*/
-		ms_cur = ((double)ubs_cur.oomguarpages[0] * page +
+		ms_cur = ((double)ub_cur.oomguarpages[0] * page +
 				kmem_net_cur) /	(ram + swap);
 		/*	Allocated	*/
-		al_cur = ((double)ubs_cur.privvmpages[0] * page +
+		al_cur = ((double)ub_cur.privvmpages[0] * page +
 			       kmem_net_cur) / (ram + swap);
 		/*	Numproc		*/
-		np_cur = (double)ubs_cur.numproc[0] / thrmax;	
+		np_cur = (double)ub_cur.numproc[0] / thrmax;	
 	}
-	kmem_net_max = (double)ubs.kmemsize[1] + 
-		(double)ubs.tcprcvbuf[1] +
-		(double)ubs.tcpsndbuf[1] +
-		(double)ubs.dgramrcvbuf[1] +
-		(double)ubs.othersockbuf[1];
+	kmem_net_max = (double)ub->kmemsize[1] + 
+		(double)ub->tcprcvbuf[1] +
+		(double)ub->tcpsndbuf[1] +
+		(double)ub->dgramrcvbuf[1] +
+		(double)ub->othersockbuf[1];
 	
 	/*      Low memory      */
 	lm_max = kmem_net_max / lowmem;
 	lm_prm = lm_max;
 	/*      Mem + Swap      */
-	ms_prm = ((double)ubs.oomguarpages[0] * page + kmem_net_max) /
+	ms_prm = ((double)ub->oomguarpages[0] * page + kmem_net_max) /
 			(ram + swap);
 	/*      Allocated       */
-	al_prm = ((double)ubs.vmguarpages[0] * page + kmem_net_max) / 
+	al_prm = ((double)ub->vmguarpages[0] * page + kmem_net_max) / 
 			(ram + swap);
-	al_max = ((double)ubs.privvmpages[1] * page + kmem_net_max) /
+	al_max = ((double)ub->privvmpages[1] * page + kmem_net_max) /
 			(ram + swap);
 	/*	Numproc		*/
-	np_max = (double)ubs.numproc[0] / thrmax;
+	np_max = (double)ub->numproc[0] / thrmax;
 
 	/* Calculate maximum for current */
 	cur = lm_cur;

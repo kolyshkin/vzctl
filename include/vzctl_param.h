@@ -38,7 +38,7 @@
 #define PARAM_NUMOTHERSOCK	10
 #define PARAM_NUMIPTENT		'e'
 #define PARAM_NUMFILE		'n'
-#define PARAM_DCACHE		'x'
+#define PARAM_DCACHESIZE	'x'
 
 #define PARAM_PKGVER		11
 #define PARAM_PKGSET		12

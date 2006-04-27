@@ -139,7 +139,7 @@ int calculate(int numerator, int verbose)
 			}
 			inc_rusage(&rutotal_utl, &ru_utl);
 			inc_rusage(&rutotal_comm, &ru_comm);
-			free_ubs_limit(&ub_s);
+			free_ub_param(&ub_s);
 		}
 		if (!exited) {
 			if ((res = sscanf(str, fmt, name, &held, &maxheld,
@@ -153,7 +153,7 @@ int calculate(int numerator, int verbose)
 				par[0] = held;
 				par[1] = barrier;
 				par[2] = limit;
-				add_ubs_limit(&ub_s, res, par);
+				add_ub_limit(&ub_s, res, par);
 			}
 		}
 	}

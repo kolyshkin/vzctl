@@ -467,19 +467,17 @@ err:
 static void fix_numiptent(ub_param *ub)
 {
 	unsigned long min_ipt;
-        ub_res *res;
 
-	res = get_ub_res(ub, UB_IPTENTRIES);
-	if (res == NULL)
+	if (ub->numiptent == NULL)
 		return;
-	min_ipt = min_ul(res->limit[0], res->limit[1]);
-        if (min_ipt < MIN_NUMIPTENT) {
+	min_ipt = min_ul(ub->numiptent[0], ub->numiptent[1]);
+	if (min_ipt < MIN_NUMIPTENT) {
 		logger(0, 0, "Warning: NUMIPTENT %d:%d is less"
 			" than minimally allowable value, set to %d:%d",
-                        res->limit[0], res->limit[1],
-                        MIN_NUMIPTENT, MIN_NUMIPTENT);
-		res->limit[0] = MIN_NUMIPTENT;
-		res->limit[1] = MIN_NUMIPTENT;
+			ub->numiptent[0], ub->numiptent[1],
+			MIN_NUMIPTENT, MIN_NUMIPTENT);
+		ub->numiptent[0] = MIN_NUMIPTENT;
+		ub->numiptent[1] = MIN_NUMIPTENT;
 	}
 }
 
@@ -505,18 +503,20 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	dist_actions actions;
 
 	memset(&actions, 0, sizeof(actions));
-	dist_name = get_dist_name(&res->tmpl);
-	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
-	if (dist_name != NULL)
-		free(dist_name);
-	if (ret)
-		return ret;
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (vps_is_run(h, veid)) {
 		logger(0, 0, "VPS is already running");
 		return VZ_VE_RUNNING;
 	}
+	if ((ret = check_ub(&res->ub)))
+		return ret;
+	dist_name = get_dist_name(&res->tmpl);
+	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
+	if (dist_name != NULL)
+		free(dist_name);
+	if (ret)
+		return ret;
 	logger(0, 0, "Starting VPS ...");
 	if (vps_is_mounted(res->fs.root)) {
 		/* if VPS mounted umount first, to cleanup mount state */
