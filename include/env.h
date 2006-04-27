@@ -105,4 +105,5 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	int wait_p[2], int err_p[2], env_create_FN fn, void *data);
 int vz_setluid(envid_t veid);
 int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
+int vps_restart(vps_handler *h, envid_t veid, vps_param *param);
 #endif

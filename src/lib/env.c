@@ -761,3 +761,18 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 
 	return ret;
 }
+
+int vps_restart(vps_handler *h, envid_t veid, vps_param *param)
+{
+	int ret;
+
+	logger(0, 0, "Restarting VPS");
+	if (vps_is_run(h, veid) &&
+		(ret = vps_stop(h, veid, param, M_REBOOT, SKIP_NONE, NULL)))
+	{
+		return ret;
+	}
+	ret = vps_start(h, veid, param, SKIP_NONE, NULL);
+
+	return ret;
+}

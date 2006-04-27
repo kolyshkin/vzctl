@@ -180,14 +180,7 @@ static int stop(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
 static int restart(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
-	int ret;
-
-	logger(0, 0, "Restarting VPS");
-	if (vps_is_run(h, veid) && (ret = stop(h, veid, g_p, cmd_p)))
-		return ret;
-	ret = start(h, veid, g_p, cmd_p);
-
-	return ret;
+	return vps_restart(h, veid, g_p);
 }
 
 static int parse_create_opt(envid_t veid, int argc, char **argv,
@@ -541,7 +534,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 				goto err;	
 			} else {
 				merge_vps_param(g_p, cmd_p);
-				ret = restart(h, veid, g_p, cmd_p);
+				ret = vps_restart(h, veid, g_p);
 				goto err;
 			}
 		}
