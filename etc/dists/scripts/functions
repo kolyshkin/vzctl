@@ -19,6 +19,7 @@
 
 # Set the sane umask
 umask 022
+CP='/bin/cp -f --preserve=mode,ownership'
 
 # Error codes
 VZ_INVALID_PARAMETER_SYNTAX=20
@@ -63,7 +64,7 @@ function put_param()
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
 	fi
 	if grep -E "^$name=.*" $file>/dev/null 2>&1; then
-		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -e "s|^$name=.*|$name=\"$value\"|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
 			rm -f ${file}.$$ 2>/dev/null 
@@ -95,7 +96,7 @@ function put_param2()
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
 	fi
 	if grep -E "^\<$name\>" $file>/dev/null 2>&1; then
-		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -e "s|^\<$name\>.*|$name $value|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
 			rm -f ${file}.$$ 2>/dev/null 
@@ -126,7 +127,7 @@ function put_param3() {
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
 	fi
 	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
-		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		if [ -z "${value}" ]; then
 			/bin/sed -e "s|^$name=\(.*\)|$name=\( \)|" < ${file} > ${file}.$$
 		else
@@ -164,7 +165,7 @@ function add_param3() {
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
 	fi
 	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
-		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -r "s|^$name=\((.*)\)|$name=\( \1 \"$value\" \)|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
 			rm -f ${file}.$$ 2>/dev/null 
@@ -191,7 +192,7 @@ function del_param3() {
 	[ ! -f $file ] && return
 	
 	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
-		/bin/cp -fp ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -r "s|^($name=\( .*)\"$value\"(.* \))|\1\2|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
 			rm -f ${file}.$$ 2>/dev/null 

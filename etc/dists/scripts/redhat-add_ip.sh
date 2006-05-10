@@ -27,6 +27,8 @@
 #                     starting | stopping | running | stopped
 #   IPDELALL	  - delete all old interfaces
 #
+CP='/bin/cp -f --preserve=mode,ownership'
+
 VENET_DEV=venet0
 VENET_DEV_CFG=ifcfg-$VENET_DEV
 
@@ -47,7 +49,7 @@ function fix_ifup()
 
 	if grep -q 'if \[ "\${DEVICE}" = "lo" \]; then' ${file} 2>/dev/null
 	then
-		cp -fp ${file} ${file}.$$ || return 1
+		${CP} ${file} ${file}.$$ || return 1
 		/bin/sed -e 's/if \[ "\${DEVICE}" = "lo" \]; then/if \[ "${IPADDR}" = "127.0.0.1" \]; then/g' < ${file} > ${file}.$$ && \
 			mv -f ${file}.$$ ${file}
 		rm -f ${file}.$$ 2>/dev/null
@@ -135,7 +137,7 @@ function backup_configs()
 
 	cd ${IFCFG_DIR} || return 1
 	if ls ${VENET_DEV_CFG}:* > /dev/null 2>&1; then
-		cp -rf ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ || \
+		${CP} ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ || \
 			error "Unable to backup intrface config files" ${VZ_FS_NO_DISK_SPACE}
 	fi
 }
