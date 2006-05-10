@@ -36,6 +36,7 @@ SUSE_7x_VER = 7.3
 SUSE_8x_VER = 8.0 8.1 8.2
 SUSE_VER = 9.0 9.1 9.2 9.3
 DEBIAN_VER = 3.0 3.1
+UBUNTU_VER = 5.1
 SLACK_9x_VER = 9.0 9.1
 SLACK_VER = 10.0 10.1
 SLES_VER = 9
@@ -96,6 +97,12 @@ debian:
 		    $(DESTDIR)$(DISTCONFDIR)/debian-$$ver.conf; \
 	done
 	$(INSTALL) debian.conf $(DESTDIR)$(DISTCONFDIR)/debian.conf
+ubuntu:
+	for ver in $(UBUNTU_VER); do \
+		$(INSTALL) debian.conf \
+		    $(DESTDIR)$(DISTCONFDIR)/ubuntu-$$ver.conf; \
+	done
+	$(INSTALL) debian.conf $(DESTDIR)$(DISTCONFDIR)/ubuntu.conf
 slack:
 	for ver in $(SLACK_9x_VER); do \
 		$(INSTALL) slackware-9.0.conf \
@@ -125,9 +132,9 @@ inst-distscripts:
 
 
 install: inst-dirs inst-distscripts redhat centos rhel fc suse debian slack \
-	gentoo mandrake sles
+	gentoo mandrake sles ubuntu
 	
 
 .PHONY: install redhat centos rhel fc suse debian slack gentoo mandrake \
-	inst-dirs inst-distscripts
+	inst-dirs inst-distscripts ubuntu
 
