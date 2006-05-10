@@ -51,6 +51,8 @@
 #	public key to destination node and be able to connect without
 #	entering a password.
 
+
+ACT_SCRIPTS_SFX="start stop mount umount"
 SSH_OPTIONS=""
 SSH="ssh $SSH_OPTIONS"
 SCP="scp $SSH_OPTIONS"
@@ -64,6 +66,7 @@ out="/dev/null"
 confdir="/etc/sysconfig/vz-scripts"
 vzconf="/etc/sysconfig/vz"
 tmpdir="/var/tmp"
+act_scripts=
 
 # Errors:
 MIG_ERR_USAGE=1
@@ -123,11 +126,18 @@ undo_conf () {
 	$SSH "root@$host" "rm -f $vpsconf"
 }
 
+undo_act_scripts () {
+	if [ -n "$act_scripts" ] ; then
+		$SSH "root@$host" "rm -f $act_scripts"
+	fi
+	undo_conf
+}
+
 undo_private () {
 	if [ $keep_dst -eq 0 ]; then
 		$SSH "root@$host" "rm -rf $VE_PRIVATE"
 	fi
-	undo_conf
+	undo_act_scripts
 }
 
 undo_root () {
@@ -318,10 +328,25 @@ if ! $SCP "$vpsconf" "root@$host:$vpsconf" &> $out; then
 	exit $MIG_ERR_COPY
 fi
 
+for sfx in $ACT_SCRIPTS_SFX; do
+	file="$confdir/$VEID.$sfx"
+	if [ -f "$file" ]; then
+		act_scripts="$act_scripts $file"
+	fi
+done
+if [ -n "$act_scripts" ]; then
+	log 2 "Copying action scripts"
+	if ! $SCP $act_scripts "root@$host:$confdir" &> $out; then
+		log 1 "Failed to copy action scripts"
+		undo_conf
+		exit $MIG_ERR_COPY
+	fi
+fi
+
 log 2 "Creating remote VPS root dir"
 if ! $SSH "root@$host" "mkdir -p $VE_ROOT"; then
 	log 1 "Failed to make VPS root"
-	undo_conf
+	undo_act_scripts
 	exit $MIG_ERR_COPY
 fi
 
