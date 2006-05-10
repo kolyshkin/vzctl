@@ -89,6 +89,7 @@ include/cap.h
 include/cpu.h
 include/cpt.h
 include/create.h
+include/destroy.h
 include/dev.h
 include/dist.h
 include/env.h
@@ -108,6 +109,7 @@ include/types.h
 include/ub.h
 include/util.h
 include/validate.h
+include/vps_configure.h
 include/vzctl.h
 include/vzctl_param.h
 include/vzerror.h
@@ -119,6 +121,7 @@ src/lib/config.c
 src/lib/cap.c
 src/lib/cpt.c
 src/lib/create.c
+src/lib/destroy.c
 src/lib/fs_bind.c
 src/lib/fs_simfs.c
 src/lib/cpu.c
@@ -137,6 +140,7 @@ src/lib/quota.c
 src/lib/readelf.c
 src/lib/res.c
 src/lib/script.c
+src/lib/vps_configure.c
 src/lib/ub.c
 src/lib/util.c
 src/Makefile
