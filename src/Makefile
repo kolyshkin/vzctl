@@ -158,16 +158,16 @@ inst-configs:
 	$(INSTALL) -m 644 ../etc/vz $(DESTDIR)$(GLBCONFIG)
 ifeq ($(ARCH),ia64)
 	for file in $(VECONFIG_IA64); do \
-		$(INSTALL) ../etc/$$file.ia64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
+		$(INSTALL) -m 644 ../etc/$$file.ia64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
 else
 ifeq ($(ARCH),x86_64)
 	for file in $(VECONFIG_X86_64); do \
-		$(INSTALL) ../etc/$$file.x86_64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
+		$(INSTALL) -m 644 ../etc/$$file.x86_64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
 else
 	for file in $(VECONFIG); do \
-		$(INSTALL) ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
+		$(INSTALL) -m 644 ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
 endif
 endif
@@ -178,7 +178,7 @@ inst-initd:
 
 inst-cron:
 	for file in $(CRONSCRIPTS); do \
-		$(INSTALL) ../etc/cron.d/$$file $(DESTDIR)$(CRONDDIR)/$$file; \
+		$(INSTALL) -m 644 ../etc/cron.d/$$file $(DESTDIR)$(CRONDDIR)/$$file; \
 	done
 
 inst-dirs:

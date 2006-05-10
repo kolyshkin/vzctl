@@ -14,7 +14,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-INSTALL = install
+INSTALL = install -m 644
 DISTCONFDIR = /etc/sysconfig/vz-scripts/dists
 DISTSCRIPTDIR = ${DISTCONFDIR}/scripts
 DISTSCRIPTS = debian-add_ip.sh debian-del_ip.sh debian-set_hostname.sh 	\
@@ -120,14 +120,14 @@ mandrake:
 
 
 inst-dirs:
-	$(INSTALL) -d $(DESTDIR)$(DISTCONFDIR)
-	 $(INSTALL) -d $(DESTDIR)$(DISTSCRIPTDIR)
+	install -d $(DESTDIR)$(DISTCONFDIR)
+	install -d $(DESTDIR)$(DISTSCRIPTDIR)
 	$(INSTALL) distribution.conf-template $(DESTDIR)$(DISTCONFDIR)/distribution.conf-template
 	$(INSTALL) default $(DESTDIR)$(DISTCONFDIR)/default
 
 inst-distscripts:
 	for file in $(DISTSCRIPTS); do \
-		$(INSTALL) scripts/$$file $(DESTDIR)$(DISTSCRIPTDIR)/$$file; \
+		install scripts/$$file $(DESTDIR)$(DISTSCRIPTDIR)/$$file; \
 	done
 
 
