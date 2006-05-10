@@ -124,7 +124,7 @@ undo_conf () {
 }
 
 undo_private () {
-	if [ $keep_dst -eq 1 ]; then
+	if [ $keep_dst -eq 0 ]; then
 		$SSH "root@$host" "rm -rf $VE_PRIVATE"
 	fi
 	undo_conf
