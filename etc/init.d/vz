@@ -59,16 +59,19 @@ if [ "${VZWDOG}" = "yes" ]; then
 fi
 CONFIG_DIR=/etc/sysconfig/vz-scripts
 
+rc_done='..done'
+rc_failed='..failed'
 # Source function library.
 if [ -r /etc/init.d/functions ]; then
-	DISTR=redhat
 	source /etc/init.d/functions
+	if [ -r /etc/redhat-release ] || [ -r /etc/centos-release ]; then
+		DISTR=redhat
+	fi
 elif [ -r /etc/rc.status ]; then
-	DISTR=suse
 	source /etc/rc.status
-else
-	rc_done='^[[71G done'
-	rc_failed='^[[71Gfailed'
+	if [ -r /etc/SuSE-release ]; then
+		DISTR=suse
+	fi
 fi
 
 VEINFO=""
