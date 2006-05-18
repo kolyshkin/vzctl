@@ -225,7 +225,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			goto err;
 		}
 	}
-	if (cmd > CMD_SUSPEND) {
+	if (param->ctx || cmd > CMD_SUSPEND) {
 		logger(0, 0, "\tjoin context..");
 		if (ioctl(cpt_fd, CPT_JOIN_CONTEXT,
 			param->ctx ? : veid) < 0)
