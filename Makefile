@@ -29,9 +29,8 @@ all install %::
 
 install::
 	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
-	(cd etc/dists && ${MAKE} -f Makefile $@)
 	for file in $(SCRIPTS); do \
-		$(INSTALL) $$file $(DESTDIR)$(SBINDIR)/$$file; \
+		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
 	${MAKE} -C man $@
 	${MAKE} -C etc/dists $@
@@ -42,3 +41,5 @@ tar:
 	ln -sf `pwd` vzctl-$$VERSION-$$RELEASE && \
 	tar -cjf vzctl-$$VERSION-$$RELEASE.tar.bz2 `cat file.list | sed "s/\(.*\)/vzctl-$$VERSION-$$RELEASE\/\1/"`; \
 	rm -f vzctl-$$VERSION-$$RELEASE)
+
+.PHONY: install tar
