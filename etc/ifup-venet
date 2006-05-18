@@ -16,7 +16,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-test -f /etc/sysconfig/vz || exit 1
+VZCONF=/etc/vz/vz.conf
+test -f ${VZCONF} || exit 1
 test -f /usr/lib/vzctl/scripts/vps-functions || exit 1
 test -f /etc/init.d/functions && . /etc/init.d/functions
 
@@ -35,7 +36,7 @@ else
 	vznet=$DEVICE
 fi
 . /usr/lib/vzctl/scripts/vps-functions
-. /etc/sysconfig/vz
+. ${VZCONF}
 
 veinfo="/proc/vz/veinfo"
 

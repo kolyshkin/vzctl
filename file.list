@@ -17,7 +17,7 @@ etc/vps-net_add
 etc/vps-net_del
 etc/vps-postcreate
 etc/vps-stop
-etc/vz
+etc/vz.conf
 etc/dists/scripts/debian-add_ip.sh
 etc/dists/scripts/debian-del_ip.sh
 etc/dists/scripts/debian-set_hostname.sh
@@ -69,7 +69,7 @@ etc/logrotate.d/vzctl
 man/Makefile
 man/arpsend.8
 man/vps.conf.5
-man/vz.5
+man/vz.conf.5
 man/vzcalc.8
 man/vzcfgvalidate.8
 man/vzcpucheck.8

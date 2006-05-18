@@ -19,13 +19,14 @@
 # Script to start VPS was rebooted
 #
 
-CONF_DIR=/etc/sysconfig/vz-scripts
+VZCONF=/etc/vz/vz.conf
+CONF_DIR=/etc/vz/conf
 VE_INFO=/proc/vz/veinfo
 REBOOT_MARK='reboot'
 LOCKFILE='/var/lock/vereboot.lock'
 
-[ -f /etc/sysconfig/vz ] || exit
-. /etc/sysconfig/vz
+[ -f ${VZCONF} ] || exit
+. ${VZCONF}
 
 function check_reboot()
 {
@@ -36,7 +37,7 @@ function check_reboot()
 	VEID=${veid}
 	[ -f "${CONF_DIR}/${veid}.conf" ] || return
 	eval ` (
-		. /etc/sysconfig/vz;
+		. ${VZCONF};
 		. ${CONF_DIR}/${veid}.conf;
 		echo ve_root=${VE_ROOT}\;;
 		echo allowreboot=${ALLOWREBOOT}\;;
@@ -74,12 +75,10 @@ function lockfile()
 
 # If VZ is not running -- do nothing
 # Fix for OpenVZ bug #107
-test -f ${VEINFO} || exit 0
-
+test -f ${VE_INFO} || exit 0
 lockfile
 
-cd ${CONF_DIR} 2>/dev/null || exit 
-[ -f "${VE_INFO}" ] || exit
+cd ${CONF_DIR} 2>/dev/null || exit 0 
 VE_TOTAL=`ls -1 *.conf 2>/dev/null | sed s/.conf//`
 VE_RUN=`cat ${VE_INFO} | awk '{
 	if ($1 != 0) {

@@ -36,7 +36,7 @@ for IP in $IP_ADDR; do
 	vzdelrouting $IP
 	vzarp del $IP
 	# Update ip address information
-	if [ "${VE_STATE}" = "running" ]; then
+	if [ "${VE_STATE}" = "running" -a -f "${VE_STATE_DIR}/${VEID}" ]; then
 		cat ${VE_STATE_DIR}/${VEID} | tr ' ' '\n' | \
 		grep -w -v "${IP}" | tr '\n' ' ' > ${VE_STATE_DIR}/${VEID}
 	fi		

@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-test -f /etc/sysconfig/vz || exit 1
+test -f /etc/vz/vz.conf || exit 1
 test -f /usr/lib/vzctl/scripts/vps-functions || exit 1
 test -f /etc/init.d/functions && . /etc/init.d/functions
 

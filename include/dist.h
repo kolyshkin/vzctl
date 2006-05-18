@@ -30,8 +30,6 @@
 #define	SET_UGID_QUOTA		6
 #define	POST_CREATE		7
 
-#define DIST_DIR		"/etc/sysconfig/vz-scripts/dists"
-
 typedef struct {
 	char *def_ostmpl;
 	char *ostmpl;

@@ -1,13 +1,17 @@
 %define _initddir /etc/init.d
 %define _crondir /etc/cron.d
-%define _lockdir /vz/lock 
-%define _dumpdir /vz/dump 
+%define _vzdir /vz
+%define _lockdir %{_vzdir}/lock 
+%define _dumpdir %{_vzdir}/dump 
+%define _cachedir %{_vzdir}/template/cache 
+%define _veipdir /var/lib/vzctl/veip 
 %define _libdir /usr/lib/vzctl
-%define _configdir /etc/sysconfig
-%define _scriptdir %{_configdir}/vz-scripts
+%define _configdir /etc/vz
+%define _scriptdir /usr/share/vzctl//scripts
+%define _vpsconfdir /etc/sysconfig/vz-scripts
 %define _netdir	/etc/sysconfig/network-scripts
 %define _logrdir /etc/logrotate.d
-%define _distconfdir %{_scriptdir}/dists
+%define _distconfdir %{_configdir}/dists
 %define _distscriptdir %{_distconfdir}/scripts
 # rh macros defines _mandir incrorrectly
 %define _mandir %{_datadir}/man
@@ -50,7 +54,10 @@ make CFLAGS="$RPM_OPT_FLAGS" ARCH=%{_arch}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch}
+make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch} \
+	VPSCONFDIR=%{_vpsconfdir}
+ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/etc/vz/conf
+ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -60,9 +67,15 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_initddir}/vz
 %attr(644,root,root) %config(noreplace) %{_crondir}/vpsreboot
 %attr(644,root,root) %{_crondir}/vpsnetclean
-%attr(755,root,root) %{_lockdir}
-%attr(755,root,root) %{_dumpdir}
-%attr(755,root,root) /vz/template/cache
+%dir %attr(755,root,root) %{_lockdir}
+%dir %attr(755,root,root) %{_dumpdir}
+%dir %attr(755,root,root) %{_cachedir}
+%dir %attr(755,root,root) %{_veipdir}
+%dir %attr(755,root,root) %{_configdir}
+%dir %attr(755,root,root) %{_vpsconfdir}
+%dir %attr(755,root,root) %{_distconfdir}
+%dir %attr(755,root,root) %{_distscriptdir}
+%dir %attr(755,root,root) %{_vzdir}
 %attr(755,root,root) %{_sbindir}/vzctl
 %attr(755,root,root) %{_sbindir}/arpsend
 %attr(755,root,root) %{_sbindir}/vzsplit
@@ -76,8 +89,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_scriptdir}/vpsreboot
 %attr(755,root,root) %{_scriptdir}/vpsnetclean
 %attr(644,root,root) %{_logrdir}/vzctl
-%attr(644,root,root) %{_scriptdir}/ve-vps.basic.conf-sample
-%attr(644,root,root) %{_scriptdir}/ve-light.conf-sample
 %attr(644,root,root) %{_distconfdir}/distribution.conf-template
 %attr(644,root,root) %{_distconfdir}/default
 %attr(755,root,root) %{_distscriptdir}/*.sh
@@ -97,20 +108,25 @@ rm -rf $RPM_BUILD_ROOT
 #%attr(644, root, root) %{_mandir}/man8/vzcheckovr.8.*
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man5/vps.conf.5.*
-%attr(644, root, root) %{_mandir}/man5/vz.5.*
+%attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 
-%config(noreplace) %{_configdir}/vz
+%config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf
+%config %{_vpsconfdir}/ve-vps.basic.conf-sample
+%config %{_vpsconfdir}/ve-light.conf-sample
+
+%attr(777, root, root) /etc/vz/conf
+%config /etc/sysconfig/vz
 
 %post
 /bin/rm -rf /dev/vzctl
 /bin/mknod -m 600 /dev/vzctl c 126 0
-if [ -f %{_configdir}/vz ]; then
-	if ! grep "IPTABLES=" %{_configdir}/vz >/dev/null 2>&1; then
-		echo 'IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length"' >> %{_configdir}/vz
+if [ -f %{_configdir}/vz.conf ]; then
+	if ! grep "IPTABLES=" %{_configdir}/vz.conf >/dev/null 2>&1; then
+		echo 'IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length"' >> %{_configdir}/vz.conf
 	fi
 fi
-/sbin/chkconfig --add vz > /dev/null
+/sbin/chkconfig --add vz > /dev/null 2>&1
 
 if [ -f /etc/SuSE-release ]; then
 	NET_CFG='ifdown-venet ifup-venet'
@@ -125,8 +141,7 @@ fi
 
 %preun
 if [ $1 = 0 ]; then 
-	rm -f  /etc/profile.d/vz.sh
-	/sbin/chkconfig --del vz >/dev/null
+	/sbin/chkconfig --del vz >/dev/null 2>&1
 fi
 
 %package lib
@@ -154,4 +169,3 @@ Virtual Private Servers control API library
 %attr(755,root,root) %{_libdir}/scripts/vps-create
 %attr(755,root,root) %{_libdir}/scripts/vps-postcreate
 
-%changelog

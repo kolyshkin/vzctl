@@ -19,7 +19,7 @@
 #define	_CREATE_H_
 #include "res.h"
 
-#define VPS_CREATE	VPS_SCRIPTS_DIR "vps-create"
+#define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
 
 struct mod_action;
 

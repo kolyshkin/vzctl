@@ -25,6 +25,8 @@
 #include <sys/vfs.h>
 #include <unistd.h>
 
+#include "types.h"
+
 #define SYSRSRV		52428800
 #define MEMPERVE	5542912
 #define LOWPERVE	1348608
@@ -34,7 +36,6 @@
 
 #define PROCMEM		"/proc/meminfo"
 #define PROCTHREADS	"/proc/sys/kernel/threads-max"
-#define OUTPATH		"/etc/sysconfig/vz-scripts/"
 #define PROCCPU		"/proc/cpuinfo"
 
 #define MAX_SL		3
@@ -424,10 +425,10 @@ int main(int argc, char **argv)
 	while ((opt = getopt(argc, argv, "f:n:s:h")) > 0) {
 		switch(opt) {
 		case 'f':
-			len = strlen(optarg) + strlen(OUTPATH) +
+			len = strlen(optarg) + strlen(VPS_CONF_DIR) +
 			       strlen("ve-.conf-sample");
 			name = (char*)malloc(len + 1);
-			sprintf(name, OUTPATH "ve-%s.conf-sample", optarg);
+			sprintf(name, VPS_CONF_DIR "ve-%s.conf-sample", optarg);
 			if (!stat(name, &st)) {
 				fprintf(stderr,"File %s already exist\n",
 					name);

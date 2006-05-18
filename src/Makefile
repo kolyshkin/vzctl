@@ -18,15 +18,19 @@
       PREFIX = /usr
      SBINDIR = $(PREFIX)/sbin
       LIBDIR = $(PREFIX)/lib/vzctl
-    CACHEDIR = /vz/template/cache
-   GLBCONFIG = /etc/sysconfig/vz
-  VPSCONFDIR = /etc/sysconfig/vz-scripts
- DISTCONFDIR = $(VPSCONFDIR)/dists
+     CONFDIR = /etc/vz
+   GLBCONFIG = $(CONFDIR)/vz.conf
+  VPSCONFDIR = /etc/vz/conf
+LIBSCRIPTSDIR = /usr/lib/vzctl/scripts/
+  SCRIPTSDIR = /usr/share/vzctl/scripts
 NETSCRIPTDIR = /etc/sysconfig/network-scripts
     CRONDDIR = /etc/cron.d
     INITDDIR = /etc/init.d
-   VZLOCKDIR = /vz/lock
-   VZDUMPDIR = /vz/dump
+       VZDIR = /vz
+    CACHEDIR = $(VZDIR)/template/cache
+   VZLOCKDIR = $(VZDIR)/lock
+   VZDUMPDIR = $(VZDIR)/dump
+ VEIPDUMPDIR = /var/lib/vzctl/veip
      LOGRDIR = /etc/logrotate.d
      LIB_VER = 0.0.2
 
@@ -135,27 +139,30 @@ vzcalc: $(OBJ_calc) $(LIB_vzctl) $(LIB_fs)
 
 inst-sbin :$(PROGS)
 	for file in $(PROGS); do \
-		$(INSTALL) $$file $(DESTDIR)$(SBINDIR)/$$file; \
+		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
 install-lib: $(LIB_vzctl) $(LIB_fs)
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/lib
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/scripts
+	$(INSTALL) -d $(DESTDIR)$(LIBSCRIPTSDIR)
 	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/lib/$(LIB_vzctl)
 	$(INSTALL) $(LIB_simfs) $(DESTDIR)$(LIBDIR)/lib/$(LIB_simfs)
 	cp -a $(LIB_fs) $(DESTDIR)$(LIBDIR)/lib/$(LIB_fs)
 	for file in $(LIBSCRIPTS); do 					\
-		$(INSTALL) ../etc/$$file $(DESTDIR)$(LIBDIR)/scripts/$$file; \
+		$(INSTALL) -m 755 ../etc/$$file $(DESTDIR)$(LIBSCRIPTSDIR)/$$file; \
 	done
 inst-scripts:
 	for file in $(SCRIPTS); do \
-		$(INSTALL) ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
+		$(INSTALL) -m755 ../etc/$$file $(DESTDIR)$(SCRIPTSDIR)/$$file; \
 	done
 inst-netscripts:
+ifneq "" "$(NETSCRIPTS)"
+	$(INSTALL) -d $(DESTDIR)$(NETSCRIPTDIR)
 	for file in $(NETSCRIPTS); do \
-		$(INSTALL) ../etc/$$file $(DESTDIR)$(NETSCRIPTDIR)/$$file; \
+		$(INSTALL) -m 755 ../etc/$$file $(DESTDIR)$(NETSCRIPTDIR)/$$file; \
 	done
+endif
 inst-configs:
-	$(INSTALL) -m 644 ../etc/vz $(DESTDIR)$(GLBCONFIG)
+	$(INSTALL) -m 644 ../etc/vz.conf $(DESTDIR)$(GLBCONFIG)
 ifeq ($(ARCH),ia64)
 	for file in $(VECONFIG_IA64); do \
 		$(INSTALL) -m 644 ../etc/$$file.ia64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
@@ -173,7 +180,7 @@ endif
 endif
 inst-initd:
 	for file in $(INITSCRIPTS); do \
-		$(INSTALL) ../etc/init.d/$$file $(DESTDIR)$(INITDDIR)/$$file; \
+		$(INSTALL) -m 755 ../etc/init.d/$$file $(DESTDIR)$(INITDDIR)/$$file; \
 	done
 
 inst-cron:
@@ -182,21 +189,23 @@ inst-cron:
 	done
 
 inst-dirs:
+	$(INSTALL) -d $(DESTDIR)$(CONFDIR)
 	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -d $(DESTDIR)$(VPSCONFDIR)
-	$(INSTALL) -d $(DESTDIR)$(DISTCONFDIR)
-	$(INSTALL) -d $(DESTDIR)$(NETSCRIPTDIR)
-	$(INSTALL) -d $(DESTDIR)$(VPSCONFDIR)
+	$(INSTALL) -d $(DESTDIR)$(LIBSCRIPTSDIR)
+	$(INSTALL) -d $(DESTDIR)$(SCRIPTSDIR)
 	$(INSTALL) -d $(DESTDIR)$(CRONDDIR)
 	$(INSTALL) -d $(DESTDIR)$(INITDDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZLOCKDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZDUMPDIR)
 	$(INSTALL) -d $(DESTDIR)$(LOGRDIR)
 	$(INSTALL) -d $(DESTDIR)$(CACHEDIR)
+	$(INSTALL) -d $(DESTDIR)$(VEIPDUMPDIR)
+	$(INSTALL) -d $(DESTDIR)$(IPSTATEDIR)
 	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl
 
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
-	inst-netscripts inst-configs inst-initd inst-cron
+	inst-netscripts inst-configs inst-initd inst-cron 
 clean:
 	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_simfs) .depend
 
@@ -209,6 +218,6 @@ include .depend
 
 
 .PHONY: clean depend install inst-dirs inst-config \
-	inst-initd install-cron all default inst-config inst-lib
+	inst-initd install-cron all default inst-config inst-lib inst-vzdir
 
 

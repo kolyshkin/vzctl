@@ -40,6 +40,7 @@
 #include "res.h"
 #include "logger.h"
 #include "util.h"
+#include "types.h"
 
 LOG_DATA
 static struct Cveinfo *veinfo = NULL; 
@@ -844,26 +845,30 @@ int read_ves_param()
 
 	param = init_vps_param();
 	/* Parse global config file */
-	vps_parse_config(0, CFG_FILE, param, NULL);
+	vps_parse_config(0, GLOBAL_CFG, param, NULL);
 	if (param->res.fs.root != NULL)
-		ve_root = strdup(param->res.fs.root);
+		ve_root = strdup(param->res.fs.root_orig);
 	if (param->res.fs.private != NULL)
-		ve_private = strdup(param->res.fs.private);
+		ve_private = strdup(param->res.fs.private_orig);
 	free_vps_param(param);
 	for (i = 0; i < n_veinfo; i++) { 
 		veid = veinfo[i].veid;
 		param = init_vps_param();
-		snprintf(buf, sizeof(buf), SCRIPT_DIR "%d.conf", veid);
+		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.conf", veid);
 		vps_parse_config(veid, buf, param, NULL);
 		merge_conf(&veinfo[i], &param->res);
 		if (veinfo[i].ve_root == NULL)
-			veinfo[i].ve_root = strdup(ve_root);
+			veinfo[i].ve_root = subst_VEID(veinfo[i].veid, ve_root);
 		if (veinfo[i].ve_private == NULL)
-			veinfo[i].ve_private = strdup(ve_private);
+			veinfo[i].ve_private = subst_VEID(veinfo[i].veid,
+								ve_private);
 		free_vps_param(param);
 	}
 	if (ve_root != NULL)
 		free(ve_root);
+	if (ve_private != NULL)
+		free(ve_private);
+
 	return 0;
 }
 
@@ -1340,7 +1345,7 @@ int get_ve_list()
 	struct Cveinfo ve;
 	char str[6];
 
-	dp = opendir(SCRIPT_DIR);
+	dp = opendir(VPS_CONF_DIR);
 	if (dp == NULL) {
 		return -1;
 	}

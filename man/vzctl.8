@@ -337,7 +337,7 @@ Give access (\fBr\fR - read, \fBw\fR - write, \fBrw\fR - read write, \fBnone\fR 
 .TP
 \fB--applyconfig\fR \fIname\fR
 Read VPS parameters from VPS sample configuration file
-\f(CW\fB/etc/sysconfig/vz-scripts/ve-\fIname\fR\f(CW\fB.conf-sample\fR, and
+\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR, and
 apply them, if --save option specified save to VPS config file. These parameters
 are not changed (\fBHOSTNAME\fR \fBIP_ADDRESS\fR \fBOSTEMPLATE\fR \fBVE_ROOT\fR \fBVE_PRIVATE\fR)
 .SS Checkpoint/Restore
@@ -358,7 +358,7 @@ startup of VPS.
 
 If the \fB--config\fR \fIname\fR option is specified, values from
 example configuration file
-\f(CW\fB/etc/sysconfig/vz-scripts/ve-\fIname\fR\f(CW\fB.conf-sample\fR
+\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR
 are put into VPS configuration file. If VPS configuration file already exists,
 it will be removed.
 
@@ -456,9 +456,9 @@ To permanently remove this VPS:
 .SH FILES
 .ad l
 \f(CR
-/etc/sysconfig/vz
+/etc/vz/vz.conf
 .br
-/etc/sysconfig/vz-scripts/vpsid.conf
+/etc/vz/conf/vpsid.conf
 .br
 /proc/vz/veinfo
 .br

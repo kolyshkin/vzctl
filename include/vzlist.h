@@ -32,8 +32,6 @@
 #define PROCVEINFO	"/proc/vz/veinfo"
 #define PROCFSHED	"/proc/fairsched"
 
-#define SCRIPT_DIR	"/etc/sysconfig/vz-scripts/"
-#define CFG_FILE	"/etc/sysconfig/vz"
 #define VZQUOTA		"/usr/sbin/vzquota"
 
 #define MAXCPUUNITS	500000

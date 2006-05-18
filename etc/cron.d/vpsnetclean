@@ -17,5 +17,5 @@
 # Clean VPS network rules (arp,route,iptables)
 #
 
-*/5 * * * * root /etc/sysconfig/vz-scripts/vpsnetclean
+*/5 * * * * root /usr/share/vzctl/scripts/vpsnetclean
 

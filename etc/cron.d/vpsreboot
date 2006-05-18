@@ -18,4 +18,4 @@
 # If vzagent not installed you can enable reboot functionality by
 # commented out the line below.
 
-*/5 * * * * root /etc/sysconfig/vz-scripts/vpsreboot
+*/5 * * * * root /usr/share/vzctl/scripts/vpsreboot

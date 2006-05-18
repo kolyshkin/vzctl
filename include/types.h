@@ -18,14 +18,15 @@
 #ifndef	_TYPES_H_
 #define	_TYPES_H_
 
-#define GLOBAL_CFG              "/etc/sysconfig/vz"
-#define VPS_CONF_DIR            "/etc/sysconfig/vz-scripts/"
-#define LIB_DIR			"/usr/lib/vzctl/lib/"
-#define VPS_SCRIPTS_DIR         "/usr/lib/vzctl/scripts/"
+#define VZ_DIR			"/etc/vz/"
+#define GLOBAL_CFG		VZ_DIR"vz.conf"
+#define VPS_CONF_DIR		VZ_DIR"/conf/"
+#define LIB_SCRIPTS_DIR		"/usr/lib/vzctl/scripts/"
+#define DIST_DIR		VZ_DIR"dists"
 
-#define VPS_STOP		VPS_SCRIPTS_DIR "vps-stop"
-#define VPS_NET_ADD		VPS_SCRIPTS_DIR "vps-net_add"
-#define VPS_NET_DEL		VPS_SCRIPTS_DIR "vps-net_del"
+#define VPS_STOP		LIB_SCRIPTS_DIR "vps-stop"
+#define VPS_NET_ADD		LIB_SCRIPTS_DIR "vps-net_add"
+#define VPS_NET_DEL		LIB_SCRIPTS_DIR "vps-net_del"
 
 #define envid_t 	unsigned int
 #define STR_SIZE	512

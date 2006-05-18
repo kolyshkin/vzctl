@@ -15,7 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 INSTALL = install -m 644
-DISTCONFDIR = /etc/sysconfig/vz-scripts/dists
+DISTCONFDIR = /etc/vz/dists
 DISTSCRIPTDIR = ${DISTCONFDIR}/scripts
 DISTSCRIPTS = debian-add_ip.sh debian-del_ip.sh debian-set_hostname.sh 	\
 	functions postcreate.sh redhat-7.x_add_ip.sh redhat-add_ip.sh 	\

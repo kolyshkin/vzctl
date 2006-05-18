@@ -35,8 +35,10 @@
 
 # This line is needed to cheat /etc/init.d/rc who expects action word
 
-[ -f  /etc/sysconfig/vz  ] || exit 0
-. /etc/sysconfig/vz
+VZCONF=/etc/vz/vz.conf
+
+[ -f ${VZCONF}   ] || exit 0
+. ${VZCONF}
 [ "${VIRTUOZZO}" = "no" ] && exit 0
 
 VZCTL=/usr/sbin/vzctl
@@ -57,7 +59,7 @@ IPT_MODULES="ip_tables ${IPTABLES}"
 if [ "${VZWDOG}" = "yes" ]; then
 	MODULES="${MODULES} vzwdog"
 fi
-CONFIG_DIR=/etc/sysconfig/vz-scripts
+CONFIG_DIR=/etc/vz/conf
 
 rc_done='..done'
 rc_failed='..failed'
@@ -357,7 +359,7 @@ function start()
 	print_success "loading OpenVZ modules"
 	setup_net
 	if test -z "${VE0CPUUNITS}"; then
-		echo "Warning: VE0CPUUNITS is not set in /etc/sysconfig/vz; using value of 1000"
+		echo "Warning: VE0CPUUNITS is not set in ${VZCONF}; using value of 1000"
 		VE0CPUUNITS=1000
 	fi
 	msg=`${VZCTL} set 0 --cpuunits ${VE0CPUUNITS} 2>&1`

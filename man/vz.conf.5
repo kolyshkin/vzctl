@@ -1,0 +1,73 @@
+.TH vz 5 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.SH NAME
+vz \- global OpenVZ configuration file
+.SH SYNOPSIS
+/etc/vz/vz.conf
+.SH DESCRIPTION
+This is global configuration file for OpenVZ.
+It consists of lines in the form
+.PP
+\fBPARAMETER\fR="\fIvalue\fR"
+.PP
+All parameter names and values are case-sensitive.
+Quotes surrounding \fIvalue\fR are required if value contains spaces, and
+are optional otherwise. Extra spaces are not allowed. All unrecognized lines
+will be ignored.
+.SS Global parameters
+.IP \fBVIRTUOZZO\fR=\fIyes\fR|\fIno\fR
+This parameter can be set to \fIyes\fR or \fIno\fR, and used by
+\f(CW/etc/init.d/vz\fR script. In case it is \fBnot\fR
+set to \fIyes\fR, nothing will be done to boot up OpenVZ on this node.
+.IP "\fBLOCKDIR\fR=\fIdirectory\fR"
+Set the directory to put lock files to.
+.IP \fBVE0CPUUNITS\fR=\fInumber\fR
+Value of this parameter sets \fBcpuunits\fR for VPS0.
+.IP "\fBLOGGING\fR=\fIyes\fR|\fIno\fR"
+Enables or disables logging. This parameter can be set to \fIyes\fR or
+\fIno\fR, default is \fIyes\fR.
+.IP \fBLOGFILE\fR=\fIfile\fR
+Set location of log file, default is \f(CR/var/log/vzctl.log\fR.
+.IP "\fBLOG_LEVEL\fR=\fInumber\fR"
+Set the logging level. The more \fInumber\fR is, the more information will be
+displayed.
+.SS Disk quota parameters
+.IP \fBDISK_QUOTA\fR=\fIyes\fR|\fIno\fR
+In case the value of this parameter is set to \fIno\fR, all disk
+quota operations are disabled.
+.IP \fBVZFASTBOOT\fR=\fIyes\fR|\fIno\fR
+This parameter is used by \f(CR/etc/init.d/vz start\fR script. In case the value
+of this parameter is set to \fIyes\fR, VPS with incorrectly shutdown quota state
+started without quota check and after all VPSs started marked VPSs restarted.
+.SS Network interface parameters
+.IP \fBVE_ROUTE_SRC_DEV\fR="\fIdevice\fR"
+This parameter specifies the network device name which ip address will used for
+source ip. If on HN configured > 1 network interfaces and needed to specify
+the source ip address, set corresponding \fIdevice\fR. By default takes the
+first in network device list.
+.IP \fBTEMPLATE\fR=\fIdirectory\fR
+Value of this parameter is a directory in which all VPS template data are
+stored.
+.SS Defaults for VPS
+Below parameters are defaults for VPS, and gets overwritten by parameters in
+\fBvps.conf\fR(5) VPS configuration file.
+.IP \fBVE_ROOT\fR=\fIdirectory\fR
+Value of this parameter is the \fIdirectory\fR which serves as VPS root
+mount point. Value must contain string \fI$VPSID\fR, it gets substituted
+with actual numeric VPS id.
+.IP \fBVE_PRIVATE\fR=\fIdirectory\fR
+Value of this parameter is the \fIdirectory\fR in which all the
+files and directories specific to that VPS are stored. Value must contain
+string \fI$VPSID\fR, it gets substituted with actual numeric VPS id.
+.IP \fBCONFIGFILE\fR=\fIname\fR
+Specified default configuration file on create action, corresponds to --config
+option 
+.PP
+Any other parameter that appears in per-VPS configuration file \fBvps.conf\fR(5)
+can be also set here. Still, it is recommended to keep \fBTEMPLATE\fR,
+\fBVE_PRIVATE\fR and \fBVE_ROOT\fR in this configuration files, and all the
+other VPS-related parameters in per-VPS configuration files.
+.SH SEE ALSO
+.BR vzctl (8),
+.BR vps.conf (5).
+.SH LICENSE
+Copyright (C) 2000-2006, SWsoft. Licensed under GNU GPL.

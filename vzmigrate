@@ -63,8 +63,8 @@ remove_area=1
 keep_dst=0
 debug=0
 out="/dev/null"
-confdir="/etc/sysconfig/vz-scripts"
-vzconf="/etc/sysconfig/vz"
+confdir="/etc/vz/conf"
+vzconf="/etc/vz/vz.conf"
 tmpdir="/var/tmp"
 act_scripts=
 
