@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+#include <signal.h>
 
 #include "vzctl.h"
 #include "env.h"
@@ -104,6 +105,7 @@ int main(int argc, char *argv[], char *envp[])
 	char buf[256];
 	vps_param *gparam = NULL, *vps_p = NULL, *cmd_p = NULL;
 	const char *action_nm;
+	struct sigaction act;
 
 	_proc_title = argv[0];
 	_proc_title_len = envp[0] - argv[0];
@@ -111,6 +113,11 @@ int main(int argc, char *argv[], char *envp[])
 	gparam = init_vps_param();
 	vps_p = init_vps_param();
 	cmd_p = init_vps_param();
+
+	sigemptyset(&act.sa_mask);
+	act.sa_handler = SIG_IGN;
+	act.sa_flags = 0;
+	sigaction(SIGPIPE, &act, NULL);
 
 	while (argc > 1) {
 		if (!strcmp(argv[1], "--verbose")) {
