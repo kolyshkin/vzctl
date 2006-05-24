@@ -409,6 +409,24 @@ int get_swap(unsigned long long *swap)
 	return -1;
 }
 
+int get_num_cpu()
+{
+	FILE *fd;
+	char str[128];
+	int ncpu = 0;
+
+	if ((fd = fopen("/proc/cpuinfo", "r")) == NULL)	{
+		logger(0, errno, "Cannot open /proc/cpuinfo");
+		return 1;
+	}
+	while (fgets(str, sizeof(str), fd)) {
+		if (!strncmp(str, "processor", 9))
+			ncpu++;
+	}
+	fclose(fd);
+	return !ncpu ? 1 : ncpu;
+}
+
 int get_lowmem(unsigned long long *mem)
 {
 	FILE *fd;

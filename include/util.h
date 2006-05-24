@@ -44,6 +44,7 @@ int get_pagesize();
 int get_mem(unsigned long long *mem);
 int get_thrmax(int *thrmax);
 int get_swap(unsigned long long *swap);
+int get_num_cpu();
 int get_lowmem(unsigned long long *mem);
 unsigned long max_ul(unsigned long val1, unsigned long val2);
 void str_tolower(const char *from, char *to);

@@ -1103,6 +1103,27 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 
 /****************** CPU**********************************/
 
+static int parse_cpulimit(unsigned long **param, const char *str)
+{
+	char *tail;
+	int ncpu;
+	unsigned long val;
+
+	errno = 0;
+	val = (int)strtoul(str, (char **)&tail, 10);
+	if (*tail == '%' && *(tail + 1) == '\0') {
+		if (val > 100)
+			return ERR_INVAL;
+		ncpu = get_num_cpu();
+		val *= ncpu;
+	} else if (*tail != '\0' || errno == ERANGE)
+		return ERR_INVAL;
+
+	*param = malloc(sizeof(unsigned long));
+	**param = val;
+	return 0;
+}
+
 static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
@@ -1336,12 +1357,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_CPULIMIT:
 		if (vps_p->res.cpu.limit != NULL)
 			break;
-	        if (parse_ul(val, &uid))
+	        if (parse_cpulimit(&vps_p->res.cpu.limit, val))
         	        return ERR_INVAL;
-		vps_p->res.cpu.limit = malloc(sizeof(unsigned long));
-		if (vps_p->res.cpu.limit == NULL)
-			return ERR_NOMEM;
-		*vps_p->res.cpu.limit = uid;
 		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);

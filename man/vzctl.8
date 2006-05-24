@@ -258,7 +258,7 @@ weights of all the other running VPSs. If cpuunits not specified default value
 You can set CPU weight for VPS0 (hardware node itself) as well
 (use \fBvzctl set 0 --cpuunits \fInum\fR).
 .TP
-\fB--cpulimit\fR \fInum\fR
+\fB--cpulimit\fR \fInum\fR[\fI%\fR]
 Limit of CPU usage for the VPS, in per cent.
 Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU
 limit is 0 (no CPU limit).
