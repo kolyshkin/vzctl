@@ -311,7 +311,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 #endif
 	int fd, ret;
 	vps_res *res;
-	char *argv[] = {"init", NULL};
+	char *argv[] = {"init", "-z", "      ", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
 	int retry = 0;
 
