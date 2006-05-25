@@ -143,9 +143,6 @@ int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
 			if (cmd == CMD_CHKPNT)
 				if (ioctl(cpt_fd, CPT_RESUME, 0) < 0)
 					logger(0, errno, "Can not resume VPS");
-			if (cmd == CMD_DUMP && !param->ctx)
-				if (ioctl(cpt_fd, CPT_PUT_CONTEXT, 0) < 0)
-					logger(0, errno, "Can not put context");
 			goto err_out;
 		}
 	}
