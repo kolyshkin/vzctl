@@ -18,11 +18,11 @@
 
 Summary: Virtual Private Server control utility
 Name: vzctl
-Version: 3.0.0
-Release: 8
+Version: 3.0.9
+Release: 1
 License: GPL
 Group: System Environment/Kernel
-Source: vzctl-%{version}-%{release}.tar.bz2
+Source: vzctl-%{version}.tar.bz2
 ExclusiveOS: Linux
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires: vzkernel
@@ -48,7 +48,7 @@ This utility allows system administator to control VPS,
 e.g. create, start, shutdown, set various options and limits etc.
 
 %prep
-%setup -n %{name}-%{version}-%{release}
+%setup
 %build
 make CFLAGS="$RPM_OPT_FLAGS" ARCH=%{_arch}
 

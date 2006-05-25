@@ -37,9 +37,8 @@ install::
 
 tar:
 	(VERSION=`awk '/Version:/{print $$2}' < vzctl.spec` && \
-	RELEASE=`awk '/Release:/{print $$2}' < vzctl.spec` && \
-	ln -sf `pwd` vzctl-$$VERSION-$$RELEASE && \
-	tar -cjf vzctl-$$VERSION-$$RELEASE.tar.bz2 `cat file.list | sed "s/\(.*\)/vzctl-$$VERSION-$$RELEASE\/\1/"`; \
-	rm -f vzctl-$$VERSION-$$RELEASE)
+	ln -sf `pwd` vzctl-$$VERSION && \
+	tar -cjf vzctl-$$VERSION.tar.bz2 `cat file.list | sed "s/\(.*\)/vzctl-$$VERSION\/\1/"`; \
+	rm -f vzctl-$$VERSION)
 
 .PHONY: install tar

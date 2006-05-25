@@ -83,8 +83,7 @@ all: $(PROGS) $(LIBS)
 
 check-version:
 	@SPEC_VERSION=`awk ' \
-	 /^Version:/ {printf "%s", $$2} \
-	 /^Release:/ {print "-" $$2}' < ../vzctl.spec`; \
+	 /^Version:/ {printf "%s", $$2}'< ../vzctl.spec`; \
 	H_VERSION=`awk '/#define[\t\ ]VERSION/ {print $$3}' < \
 	../include/vzctl.h | tr -d \"`; \
 	if test $$SPEC_VERSION != $$H_VERSION; then \
