@@ -65,6 +65,7 @@ enum {
  */
 typedef struct {
         int vzfd;	/**< /dev/vzctl file deccriptor. */
+	int stdfd;
 } vps_handler;
 
 typedef enum {

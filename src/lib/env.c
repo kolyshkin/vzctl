@@ -124,6 +124,27 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 	return errcode;
 }
 
+/*
+ * Reset standart file descriptord to /dev/null in case they are closed.
+ */
+static int reset_std()
+{
+	int ret, i, stdfd;
+
+	stdfd = -1;
+	for (i = 0; i < 3; i++) {
+		ret = fcntl(i, F_GETFL);
+		if (ret < 0 && errno == EBADF) {
+			if (stdfd < 0) {
+				if ((stdfd = open("/dev/null", O_RDWR)) < 0)
+					return -1;
+			}
+			dup2(stdfd, i);
+		}
+	}
+	return stdfd;
+}
+
 /** Allocate and inittialize VPS handler.
  *
  * @param veid		VPS id.
@@ -131,20 +152,22 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
  */
 vps_handler *vz_open(envid_t veid)
 {
-	int vzfd;
+	int vzfd, stdfd;
 	vps_handler *h = NULL;
 
+	stdfd = reset_std();
         if ((vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
                 logger(0, errno, "Unable to open %s", VZCTLDEV);
                 logger(0, 0, "Please check that vzdev kernel module is loaded"
                         " and you have sufficient permissions"
                         " to access the file.");
-		return NULL;
+		goto err;
         }
 	h = calloc(1, sizeof(*h));
 	if (h == NULL) 
 		goto err;
 	h->vzfd = vzfd;
+	h->stdfd = stdfd;
         if (vz_env_create_ioctl(h, 0, 0) < 0 &&
 		(errno == ENOSYS || errno == EPERM))
         {
@@ -157,7 +180,10 @@ vps_handler *vz_open(envid_t veid)
 err:
 	if (h != NULL)
 		free(h);
-	close(vzfd);
+	if (vzfd != -1)
+		close(vzfd);
+	if (stdfd != -1)
+		close(stdfd);
 	return NULL;
 }
 
@@ -170,6 +196,8 @@ void vz_close(vps_handler *h)
 	if (h == NULL)
 		return;
 	close(h->vzfd);
+	if (h->stdfd != -1)
+		close(h->stdfd);
 	free(h);
 }
 
