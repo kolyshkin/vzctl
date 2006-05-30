@@ -37,8 +37,8 @@ install::
 
 tar:
 	(VERSION=`awk '/Version:/{print $$2}' < vzctl.spec` && \
-	ln -sf `pwd` vzctl-$$VERSION && \
-	tar -cjf vzctl-$$VERSION.tar.bz2 `cat file.list | sed "s/\(.*\)/vzctl-$$VERSION\/\1/"`; \
-	rm -f vzctl-$$VERSION)
+	rm -f ../vzctl-$$VERSION; ln -sf `pwd` ../vzctl-$$VERSION && \
+	tar --directory ..  --exclude CVS --exclude .git --exclude \*.tar.bz2 -cvhjf vzctl-$$VERSION.tar.bz2 vzctl-$$VERSION; \
+	rm -f ../vzctl-$$VERSION)
 
 .PHONY: install tar
