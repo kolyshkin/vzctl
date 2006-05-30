@@ -213,6 +213,8 @@ int vps_is_run(vps_handler *h, envid_t veid)
 	int ret;
 	int errno;
 
+	if (veid == 0)
+		return 1;
 	ret = vz_env_create_ioctl(h, veid, VE_TEST);
 
 	if (ret < 0 && (errno == ESRCH || errno == ENOTTY))
