@@ -114,6 +114,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_distconfdir}/*.conf
 %config %{_vpsconfdir}/ve-vps.basic.conf-sample
 %config %{_vpsconfdir}/ve-light.conf-sample
+%config %{_vpsconfdir}/0.conf
 
 %attr(777, root, root) /etc/vz/conf
 %config /etc/sysconfig/vz

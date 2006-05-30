@@ -122,6 +122,7 @@ static struct option set_opt[] = {
 {"save",	no_argument, NULL, PARAM_SAVE},
 {"applyconfig",	required_argument, NULL, PARAM_APPLYCONFIG},
 {"config",	required_argument, NULL, PARAM_CONFIG},
+{"reset-ub",	no_argument, NULL, PARAM_RESET_UB},
 {"iptables",	required_argument, NULL, PARAM_IPTABLES},
 /*	UB	*/
 {"kmemsize",	required_argument, NULL, PARAM_KMEMSIZE},
@@ -1177,6 +1178,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_SAVE:
 		vps_p->opt.save = YES;
+		break;
+	case PARAM_RESET_UB:
+		vps_p->opt.reset_ub = YES;
 		break;
 	case PARAM_ONBOOT:
 		ret = conf_parse_yesno(&vps_p->opt.onboot, val, 1);

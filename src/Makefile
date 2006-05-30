@@ -73,6 +73,7 @@ INITSCRIPTS = vz
 CRONSCRIPTS = vpsreboot vpsnetclean
 SCRIPTS = vpsreboot vpsnetclean
 NETSCRIPTS = ifcfg-venet0 ifdown-venet ifup-venet
+VE0CONFIG = 0.conf
 VECONFIG = ve-light.conf-sample ve-vps.basic.conf-sample 
 VECONFIG_IA64 = ve-light.conf-sample ve-vps.basic.conf-sample
 VECONFIG_X86_64 = ve-light.conf-sample ve-vps.basic.conf-sample
@@ -166,15 +167,18 @@ ifeq ($(ARCH),ia64)
 	for file in $(VECONFIG_IA64); do \
 		$(INSTALL) -m 644 ../etc/$$file.ia64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
+	$(INSTALL) -m 644 ../etc/$(VE0CONFIG).ia64 $(DESTDIR)$(VPSCONFDIR)/$(VE0CONFIG)
 else
 ifeq ($(ARCH),x86_64)
 	for file in $(VECONFIG_X86_64); do \
 		$(INSTALL) -m 644 ../etc/$$file.x86_64 $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
+	$(INSTALL) -m 644 ../etc/$(VE0CONFIG).x86_64 $(DESTDIR)$(VPSCONFDIR)/$(VE0CONFIG)
 else
 	for file in $(VECONFIG); do \
 		$(INSTALL) -m 644 ../etc/$$file $(DESTDIR)$(VPSCONFDIR)/$$file; \
 	done
+	$(INSTALL) -m 644 ../etc/$(VE0CONFIG) $(DESTDIR)$(VPSCONFDIR)/$(VE0CONFIG)
 endif
 endif
 inst-initd:

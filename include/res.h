@@ -72,6 +72,7 @@ typedef struct {
         char *origin_sample;
         char *lockdir;
         char *apply_cfg;
+	int reset_ub;
 } vps_opt;
 
 struct log_s {

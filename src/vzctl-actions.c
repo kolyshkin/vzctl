@@ -455,6 +455,31 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	return ret;
 }
 
+static int set_ve0(vps_handler *h, vps_param *g_p,
+	vps_param *vps_p, vps_param *cmd_p)
+{
+	int ret;
+	ub_param *ub;
+	cpu_param *cpu = NULL;
+
+	if (cmd_p->opt.reset_ub == YES) {
+		/* Apply parameters from config */
+		ub = &vps_p->res.ub;
+		cmd_p->opt.save = NO; // suppress savewarning
+	} else {
+		/* Apply parameters from command line */
+		ub = &cmd_p->res.ub;
+		cpu = &cmd_p->res.cpu;
+	}
+	ret = vps_set_ublimit(h, 0, ub);
+	if (ret)
+		return ret;
+	if (cpu != NULL)
+		if ((ret = hn_set_cpu(cpu)))
+			return ret;
+	return 0;
+}
+
 static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p)
 {
@@ -465,6 +490,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	ret = 0;
 
 	cmd_p->g_param = g_p;
+
+	/* Reset UB parameters from config  */
+	if (cmd_p->opt.reset_ub == YES) {
+		ret = vps_set_ublimit(h, veid, &vps_p->res.ub);
+		cmd_p->opt.save = NO; // suppress savewarning
+		return ret;
+	}
 	if (cmd_p->opt.setmode == SET_RESTART && !cmd_p->opt.save) {
 		logger(0, 0, "it's impossible to use"
 			" restart mode without --save");
@@ -782,19 +814,15 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		ret = restart(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_SET:
-		if (veid == 0) {
-			ret = hn_set_cpu(&cmd_p->res.cpu);
-			if (cmd_p->opt.save == YES) 
-				logger(0, 0, "Warning: --save option"
-					" not take affect for VPS0");
-			break;
-		}
-		ret = set(h, veid, g_p, vps_p, cmd_p);
-		if (cmd_p->opt.save) {
+		if (veid == 0) 
+			ret = set_ve0(h, g_p, vps_p, cmd_p);
+		else
+			ret = set(h, veid, g_p, vps_p, cmd_p);
+		if (cmd_p->opt.save == YES) {
 			get_vps_conf_path(veid, fname, sizeof(fname));
 			vps_save_config(veid, fname, cmd_p, vps_p, &g_action);
 			logger(0, 0, "Saved parameters for VPS %d", veid);
-		} else {
+		} else if (cmd_p->opt.save != NO) {
 			if (list_empty(&cmd_p->res.misc.userpw)) {
 				logger(0, 0, "WARNING: Settings were not saved"
 				" and will be resetted to original values on"

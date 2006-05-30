@@ -109,6 +109,7 @@
 #define PARAM_UNDUMP		337
 #define PARAM_DUMPDIR		338
 #define PARAM_SKIPARPDETECT	339
+#define PARAM_RESET_UB		340
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

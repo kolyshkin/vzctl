@@ -170,6 +170,33 @@ function setup_net()
 	fi
 }
 
+function hn_setup()
+{
+	if test -z "${VE0CPUUNITS}"; then
+		echo "Warning: VE0CPUUNITS is not set in ${VZCONF}; using value of 1000"
+		VE0CPUUNITS=1000
+	fi
+	msg=`${VZCTL} set 0 --cpuunits ${VE0CPUUNITS} 2>&1`
+	if [ $? -ne 0 ]; then
+		print_failure "vzctl set 0 --cpuunits ${VE0CPUUNITS} failed: $msg"
+	fi
+
+	if ! test -f "${CONFIG_DIR}/0.conf"; then
+		return
+	fi
+	if ! grep -q '^ONBOOT=yes\|^ONBOOT=\"yes\"' ${CONFIG_DIR}/0.conf;
+	then
+		return
+	fi
+	__echo "Configure node UB resources: "
+	msg=`$VZCTL set 0 --reset-ub 2>&1`
+	if [ $? -eq 0 ]; then
+		print_success
+	else
+		print_failure "$msg"
+	fi
+}
+
 function ve_start()
 {
 	local veid
@@ -184,6 +211,7 @@ function ve_start()
 	cd - >/dev/null
 	echo "0" > /proc/sys/net/ipv4/route/src_check
 	for veid in $velist; do
+		[ "${veid}" = "0" ] && continue 
 		__echo "Starting VPS ${veid}: "
 		if [ "x${VZFASTBOOT}" = "xyes" -a "x${DISK_QUOTA}" = "xyes" ]; 
 		then
@@ -358,14 +386,7 @@ function start()
 	load_modules "${MODULES_OTHER}"
 	print_success "loading OpenVZ modules"
 	setup_net
-	if test -z "${VE0CPUUNITS}"; then
-		echo "Warning: VE0CPUUNITS is not set in ${VZCONF}; using value of 1000"
-		VE0CPUUNITS=1000
-	fi
-	msg=`${VZCTL} set 0 --cpuunits ${VE0CPUUNITS} 2>&1`
-	if [ $? -ne 0 ]; then
-		print_failure "vzctl set 0 --cpuunits ${VE0CPUUNITS} failed: $msg"
-	fi
+	hn_setup
 	ve_start
 	
 	rm -f $LOCKFILE
