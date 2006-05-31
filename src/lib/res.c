@@ -95,6 +95,9 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 	if ((ret = vps_set_fs(fs, &res->fs)))
 		return ret;
+	if((ret = vps_meminfo_set(h, veid, &res->meminfo, param)))
+		return ret;
+
 	if (vps_state == STATE_RUNNING && vps_is_run(h, veid)) {
 		if (res->cap.on || res->cap.off)
 			logger(0, 0, "Unable to set capability on running VPS");

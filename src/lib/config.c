@@ -39,7 +39,7 @@
 #include "vzctl.h"
 #include "res.h"
 #include "iptables.h"
-
+#include "meminfo.h"
 
 static int _page_size;
 
@@ -114,6 +114,7 @@ static vps_config config[] = {
 {"DISKINODES",	NULL, PARAM_DISKINODES},
 {"QUOTATIME",	NULL, PARAM_QUOTATIME},
 {"QUOTAUGIDLIMIT",NULL, PARAM_QUOTAUGIDLIMIT},
+{"MEMINFO",	NULL, PARAM_MEMINFO},
 
 {NULL		,NULL, -1}
 };
@@ -183,6 +184,7 @@ static struct option set_opt[] = {
 {"diskinodes",	required_argument, NULL, PARAM_DISKINODES},
 {"quotatime",	required_argument, NULL, PARAM_QUOTATIME},
 {"quotaugidlimit", required_argument, NULL, PARAM_QUOTAUGIDLIMIT},
+{"meminfo",	required_argument, NULL, PARAM_MEMINFO},
 
 {NULL, 0, NULL, 0}
 };
@@ -502,6 +504,55 @@ int parse_twoul(const char *str, unsigned long *val)
 		return ERR_INVAL;
 	}
 	return ret;
+}
+/******************** totalmem *************************/
+int parse_meminfo(meminfo_param *param, char *val)
+{
+	int mode;
+	char mode_nm[32];
+	unsigned long meminfo_val;
+	int ret;
+
+	if (*val == 0)
+		return 0;
+	meminfo_val = 0;
+	ret = sscanf(val, "%31[^:]:%lu", mode_nm, &meminfo_val);
+	if (ret != 2 && ret != 1)
+		return ERR_INVAL;
+	if ((mode = get_meminfo_mode(mode_nm)) < 0)
+		return ERR_INVAL;
+	if ((mode != VE_MEMINFO_NONE && ret !=2) ||
+	    (mode == VE_MEMINFO_NONE && ret == 2))
+		return ERR_INVAL;
+	if((mode != VE_MEMINFO_NONE) && meminfo_val == 0)
+		return ERR_INVAL;
+	param->mode = mode;
+	param->val = meminfo_val;
+
+	return 0;
+}
+
+static int store_meminfo(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+	list_head_t *conf_h)
+{
+	char buf[64];
+	const char *mode_nm;
+	meminfo_param *meminfo = &vps_p->res.meminfo;
+
+	if (conf->id != PARAM_MEMINFO || meminfo->mode < 0)
+		return 0;
+	mode_nm = get_meminfo_mode_nm(meminfo->mode);
+	if (mode_nm == NULL)
+		return 0;
+	if (meminfo->mode == VE_MEMINFO_NONE) {
+		snprintf(buf, sizeof(buf), "%s=\"%s\"",
+		conf->name, mode_nm);
+	} else {
+		snprintf(buf, sizeof(buf), "%s=\"%s:%lu\"",
+		conf->name, mode_nm, meminfo->val);
+	}
+	add_str_param(conf_h, buf);
+	return 0;
 }
 
 int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
@@ -1364,6 +1415,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	        if (parse_cpulimit(&vps_p->res.cpu.limit, val))
         	        return ERR_INVAL;
 		break;
+	case PARAM_MEMINFO:
+		ret = parse_meminfo(&vps_p->res.meminfo, val);
+		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);
 		break;
@@ -1388,6 +1442,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_devnodes(old_p, vps_p, conf, conf_h);
 		store_misc(old_p, vps_p, conf, conf_h);
 		store_cpu(old_p, vps_p, conf, conf_h);
+		store_meminfo(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }
@@ -1643,6 +1698,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->del_res.misc.nameserver);
 	list_head_init(&param->del_res.misc.searchdomain);
 	list_head_init(&param->del_res.dev.dev);
+	param->res.meminfo.mode = -1;
 
 	return param;
 }
@@ -1882,6 +1938,12 @@ static void merge_cpt(cpt_param *dst, cpt_param *src)
 	MERGE_INT(cmd);
 }
 
+static void merge_meminfo(meminfo_param *dst, meminfo_param *src)
+{
+	MERGE_INT(mode);
+	MERGE_INT(val);
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -1895,6 +1957,7 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_dev(&dst->dev, &src->dev);
 	merge_env(&dst->env, &src->env);
 	merge_cpt(&dst->cpt, &src->cpt);
+	merge_meminfo(&dst->meminfo, &src->meminfo);
 	return 0;
 }
 

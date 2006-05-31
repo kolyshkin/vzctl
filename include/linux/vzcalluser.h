@@ -67,6 +67,11 @@ struct vzctl_ve_netdev {
 	char *dev_name;
 };
 
+struct vzctl_ve_meminfo {
+	envid_t veid;
+	unsigned long val;
+};
+
 /* these masks represent modules */
 #define VE_IP_IPTABLES_MOD		(1U<<0)
 #define VE_IP_FILTER_MOD		(1U<<1)
@@ -224,6 +229,7 @@ struct vzctl_cpustatctl {
 					struct vzctl_env_create_data)
 #define VZCTL_VE_NETDEV		_IOW(VZCTLTYPE, 11,			\
 					struct vzctl_ve_netdev)
-
+#define VZCTL_VE_MEMINFO	_IOW(VZCTLTYPE, 13,			\
+					struct vzctl_ve_meminfo)
 
 #endif

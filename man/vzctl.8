@@ -263,6 +263,19 @@ Limit of CPU usage for the VPS, in per cent.
 Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU
 limit is 0 (no CPU limit).
 .TP
+\fBMemory output parameters\fR
+This parameter control output of /proc/meminfo inside VPS
+.IP "\fB--meminfo\fR \fInone\fR
+No /proc/meminfo virtualization (the same as on host system).
+.IP "\fB--meminfo\fR \fImode\fR:\fIvalue\fR"
+Configure total memory output in VPS. Free memory is evaluated accordingly.
+.br
+You can use the following modes for \fImode\fR:
+.br
+\fIpages\fR:\fIvalue\fR - set total memory in pages
+.br
+\fIprivvmpages\fR:\fIvalue\fR - set total memory as expression \fIprivvmpages * value\fR 
+.TP
 \fBIptables control parameters\fR
 .TP
 .IP "\fB--iptables\fR \fIname\fR"
