@@ -189,7 +189,7 @@ function hn_setup()
 		return
 	fi
 	__echo "Configure node UB resources: "
-	msg=`$VZCTL set 0 --reset-ub 2>&1`
+	msg=`$VZCTL set 0 --reset_ub 2>&1`
 	if [ $? -eq 0 ]; then
 		print_success
 	else
