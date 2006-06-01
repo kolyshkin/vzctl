@@ -44,11 +44,9 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	vps_param *vps_p)
 {
 	int fd;
-	list_head_t iplist;
 	int err, ret = 0;
 	const char *file;
 
-	list_head_init(&iplist);
 	if (!vps_is_run(h, veid)) {
 		logger(0, 0, "VPS is not running");
 		return VZ_VE_NOT_RUNNING;
@@ -175,14 +173,12 @@ err_out:
 int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	cpt_param *param)
 {
-	list_head_t iplist;
 	int dump_fd = -1;
 	char dumpfile[PATH_LEN];
 	int cpt_fd, pid, ret;
 	int status;
 	char *root = vps_p->res.fs.root;
 
-	list_head_init(&iplist);
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
 		logger(0, 0, "VPS root is not set");
@@ -268,7 +264,6 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		/* Clear VPS network configuration */
 		run_net_script(veid, DEL, &vps_p->res.net.ip, STATE_RUNNING,
 			vps_p->res.net.skip_arpdetect);
-		free_str_param(&iplist);
 		if (cmd == CMD_CHKPNT)
 			vps_umount(h, veid, root, 0);
 	}
