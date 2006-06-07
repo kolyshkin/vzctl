@@ -18,7 +18,7 @@
 
 Summary: Virtual Private Server control utility
 Name: vzctl
-Version: 3.0.9
+Version: 3.0.10
 Release: 1
 License: GPL
 Group: System Environment/Kernel
