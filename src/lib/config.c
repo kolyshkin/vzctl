@@ -115,6 +115,7 @@ static vps_config config[] = {
 {"QUOTATIME",	NULL, PARAM_QUOTATIME},
 {"QUOTAUGIDLIMIT",NULL, PARAM_QUOTAUGIDLIMIT},
 {"MEMINFO",	NULL, PARAM_MEMINFO},
+{"VETH",	NULL, PARAM_VETH_ADD},
 
 {NULL		,NULL, -1}
 };
@@ -185,6 +186,9 @@ static struct option set_opt[] = {
 {"quotatime",	required_argument, NULL, PARAM_QUOTATIME},
 {"quotaugidlimit", required_argument, NULL, PARAM_QUOTAUGIDLIMIT},
 {"meminfo",	required_argument, NULL, PARAM_MEMINFO},
+/*	veth	*/
+{"veth_add",	required_argument, NULL, PARAM_VETH_ADD},
+{"veth_del",	required_argument, NULL, PARAM_VETH_DEL},
 
 {NULL, 0, NULL, 0}
 };
@@ -1208,6 +1212,157 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
+static int parse_hwaddr(const char *str, char *addr)
+{
+	int i;
+	char buf[3];
+	char *endptr;
+
+	for (i = 0; i < ETH_ALEN; i++) {
+		buf[0] = str[3*i];
+		buf[1] = str[3*i+1];
+		buf[2] = '\0';
+		addr[i] = strtol(buf, &endptr, 16);
+		if (*endptr != '\0')
+			return ERR_INVAL;
+	}
+	return 0;
+}
+
+static int parse_veth_str(const char *str, veth_dev *dev, int operation)
+{
+	char *ch, *tmp;
+	int len, err;
+
+	memset(dev, 0, sizeof(*dev));
+
+	if (!operation) {
+		/* Removing veth device */
+		/* Parsing veth device name in VE0 */
+		if ((ch = strchr(str, ',')) != NULL)
+			return ERR_INVAL;
+		len = strlen(str) + 1;
+		if (len > IFNAMSIZE)
+			return ERR_INVAL; 
+		snprintf(dev->dev_name, len, "%s", str);
+		return 0;
+	}
+	/* Creating veth device */
+	/* Parsing veth device name in VE0 */
+	if ((ch = strchr(str, ',')) == NULL)
+		return ERR_INVAL;
+	ch++;
+	len = ch - str;
+	if (len > IFNAMSIZE)
+		return ERR_INVAL;
+	snprintf(dev->dev_name, len, "%s", str);
+	tmp = ch;
+
+	/* Parsing veth MAC address in VE0 */
+	if ((ch = strchr(tmp, ',')) == NULL) 
+		return ERR_INVAL;
+	len = ch - tmp;
+	if (len != 3*ETH_ALEN -1)
+		return ERR_INVAL;
+	dev->addrlen = ETH_ALEN;
+	err = parse_hwaddr(tmp, dev->dev_addr);
+	if (err)
+		return ERR_INVAL;
+	ch++;
+	tmp = ch;
+
+	/* Parsing veth name in VPS */
+	if ((ch = strchr(tmp, ',')) == NULL) 
+		return ERR_INVAL;
+	ch++;
+	len = ch - tmp;
+	if (len > IFNAMSIZE)
+		return ERR_INVAL;
+	snprintf(dev->dev_name_ve, len, "%s", tmp);
+
+	/* Parsing veth MAC address in VPS */
+	len = strlen(ch);
+	if (len != 3*ETH_ALEN -1)
+		return ERR_INVAL;
+	dev->addrlen_ve = ETH_ALEN;
+	err = parse_hwaddr(ch, dev->dev_addr_ve);
+	if (err)
+		return ERR_INVAL;
+
+	return 0;
+}
+
+static int parse_veth(vps_param *vps_p, char *val, int operation)
+{
+	int ret;
+	char *token;
+	veth_dev dev;
+
+	if ((token = strtok(val, " ")) == NULL)
+		return 0;
+	do {
+		if (parse_veth_str(token, &dev, operation))
+			return ERR_INVAL;
+		if (operation)
+			ret = add_veth_param(&vps_p->res.veth, &dev);
+		else
+			ret = add_veth_param(&vps_p->del_res.veth, &dev);
+
+	} while ((token = strtok(NULL, " ")));
+
+	return 0;
+}
+
+static int store_veth(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+        list_head_t *conf_h)
+{
+	char buf[STR_SIZE];
+	veth_dev *dev;
+	int r;
+	char *sp, *ep;
+	veth_param merged;
+
+#define STR2MAC(dev)			\
+	((unsigned char *)dev)[0],	\
+	((unsigned char *)dev)[1],	\
+	((unsigned char *)dev)[2],	\
+	((unsigned char *)dev)[3],	\
+	((unsigned char *)dev)[4],	\
+	((unsigned char *)dev)[5]
+
+	if (conf->id != PARAM_VETH_ADD)
+		return 0;
+	if (list_empty(&vps_p->res.veth.dev) &&
+		list_empty(&vps_p->del_res.veth.dev))
+	{
+		return 0;
+	}
+	list_head_init(&merged.dev);
+	if (merge_veth_list(&old_p->res.veth.dev, &vps_p->res.veth.dev,
+		&vps_p->del_res.veth.dev, &merged))
+	{
+		return ERR_NOMEM;
+	}
+	sp = buf;
+	ep = buf + sizeof(buf) - 1;
+	sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
+	list_for_each(dev, &merged.dev, list) {
+		r = snprintf(sp, ep - sp,
+			"%s,%02X:%02X:%02X:%02X:%02X:%02X,"
+			"%s,%02X:%02X:%02X:%02X:%02X:%02X ",
+			dev->dev_name, STR2MAC(dev->dev_addr),
+			dev->dev_name_ve, STR2MAC(dev->dev_addr_ve));
+		sp += r;
+		if ((r < 0) || (sp >= ep))
+			break;
+	}
+	strcat(buf, "\"");
+	add_str_param(conf_h, buf);
+	free_veth_param(&merged);
+	return 0;
+#undef STR2MAC
+}
+
 static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 {
 	int ret;
@@ -1418,6 +1573,12 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_MEMINFO:
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
 		break;
+	case PARAM_VETH_ADD:
+		ret = parse_veth(vps_p, val, 1);
+		break;
+	case PARAM_VETH_DEL:
+		ret = parse_veth(vps_p, val, 0);
+		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);
 		break;
@@ -1443,6 +1604,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_misc(old_p, vps_p, conf, conf_h);
 		store_cpu(old_p, vps_p, conf, conf_h);
 		store_meminfo(old_p, vps_p, conf, conf_h);
+		store_veth(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }
@@ -1690,6 +1852,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->res.misc.nameserver);
 	list_head_init(&param->res.misc.searchdomain);
 	list_head_init(&param->res.dev.dev);
+	list_head_init(&param->res.veth.dev);
 
 	list_head_init(&param->del_res.net.ip);
 	list_head_init(&param->del_res.net.dev);
@@ -1698,6 +1861,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->del_res.misc.nameserver);
 	list_head_init(&param->del_res.misc.searchdomain);
 	list_head_init(&param->del_res.dev.dev);
+	list_head_init(&param->del_res.veth.dev);
 	param->res.meminfo.mode = -1;
 
 	return param;
@@ -1793,6 +1957,7 @@ static void free_vps_res(vps_res *res)
 	free_cpu(&res->cpu);
 	free_dq(&res->dq);
 	free_cpt(&res->cpt);
+	free_veth_param(&res->veth);
 }
 
 void free_vps_param(vps_param *param)
@@ -1944,6 +2109,14 @@ static void merge_meminfo(meminfo_param *dst, meminfo_param *src)
 	MERGE_INT(val);
 }
 
+static void merge_veth(veth_param *dst, veth_param *src)
+{
+	if (!list_empty(&src->dev)) {
+		free_veth_param(dst);
+		copy_veth_param(dst, src);
+	}
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -1958,6 +2131,7 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_env(&dst->env, &src->env);
 	merge_cpt(&dst->cpt, &src->cpt);
 	merge_meminfo(&dst->meminfo, &src->meminfo);
+	merge_veth(&dst->veth, &src->veth);
 	return 0;
 }
 

@@ -92,6 +92,17 @@ you should do it at once, so use \fB--searchdomain\fR option multiple times
 in one call to \fBvzctl\fR, as all the search domain values set in previous
 calls to \fBvzctl\fR gets overwritten.
 .TP
+\fB--veth_add\fR \fIdev_name\fR,\fIdev_addr\fR,\fIdev_name_vps\fR,\fIdev_addr_vps\fR
+Adds virtual ethernet device to given VPS. Where \fIdev_name\fR is ethernet
+device name in host system, \fIdev_addr\fR its MAC address, \fIdev_name_vps\fR is
+ethernet device name in VPS and \fIdev_addr_vps\fR its MAC address. MAC addresses
+must be entered in XX:XX:XX:XX:XX:XX format. Note that this option is incremental,
+so devices are added to already existing ones.
+.TP
+\fB--veth_del\fR \fIdev_name\fR
+Removes virtual ethernet device from VPS. Where \fIdev_name\fR is ethernet device
+name in host system.
+.TP
 \fBResource limits\fR
 The following options sets barrier and limit for various user beancounters.
 Each option requires one or two arguments. In case of one argument,

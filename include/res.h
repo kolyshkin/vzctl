@@ -29,6 +29,7 @@
 #include "dist.h"
 #include "cpt.h"
 #include "meminfo.h"
+#include "veth.h"
 
 typedef struct {
 	envid_t veid;
@@ -58,6 +59,7 @@ typedef struct {
 	dq_param dq;		/**< disk quota parameters. */
 	cpt_param cpt;		/**< chekpointing parameters */
 	meminfo_param meminfo;
+	veth_param veth;	/**< veth parameters */
 	misc_param misc;	
 } vps_res;
 
