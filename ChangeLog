@@ -1,3 +1,39 @@
+   3.0.10: Wed Jun  7 2006 <igor@openvz.ru>
+	* added virtual ethernet device support (--veth_add, --veth_del)
+	* added  /proc/meminfo virtualization support (--meminfo mode:value)
+	* added VE0 UB setup functionality (--reset-ub)
+   3.0.9: Wed May 24 2006 <igor@openvz.ru>
+	vzctl:
+	* switched to new versioning scheme.
+	* added -z option to /sbin/init
+		(http://bugzilla.openvz.org/show_bug.cgi?id=164)
+	* reset standart file desc [0-2] to /dev/null in case they are closed.
+	* added possibility to set cpulimit in %
+	* added suffixes G,M,K support for --diskspace option
+	* set SIGPIPE handler to SIG_IGN before fist write to stdout/err
+	* added Debian packaging support
+	* changed directory structure.
+		/etc/sysconfig/vz-scripts -> /etc/vz/conf
+		/etc/sysconfig/vz-scripts/dists -> /etc/vz/dists
+		/etc/sysconfig/vz -> /etc/vz/vz.conf
+	* better distribution detection in vz initscript.
+	* added Ubuntu distribution configuration file as copy of debian.
+		(http://bugzilla.openvz.org/show_bug.cgi?id=119)
+	* Increased kmemsize, privmpages, numfiles for x86_64
+		ve-vps.basic.conf-sample.
+		(http://bugzilla.openvz.org/show_bug.cgi?id=69)
+	* changed -p -> --preserve=mode,ownership for 'cp' workaround in
+		case /proc is not mounted.
+	* internal modifications
+		changed dynamic UB structure to static one.
+		moved VPS configure functionality to vps_configure.c
+		moved destroy functionaliny to destroy.c
+	vzmigrate:
+	* move config as veid.migrated to allow backward migration
+		(http://bugzilla.openvz.org/show_bug.cgi?id=152) 
+	* added coping of action scripts.
+		(http://bugzilla.openvz.org/show_bug.cgi?id=157)
+	* fixed --keep-dst option processing. Option behavior was inverted.
    3.0.0-8: Mon Apr 24 2006 <igor@openvz.ru>
 	* UBC parameters > LONG_MAX in VPS conf truncate to LONG_MAX
 	* added installation of vzmigrate.8 man page
