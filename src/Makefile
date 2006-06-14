@@ -102,7 +102,7 @@ check-version:
 	$(CC) -c $(CFLAGS) $(SHAREDLIB_CFLAGS) $(INC) $< -o $@
 
 $(LIB_simfs) : $(OBJ_simfs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_simfs) -shared -o $@
+	$(CC) $(CFLAGS) $(INC) $(OBJ_simfs)  $(LDFLAGS) -shared -o $@
 
 $(LIB_fs): $(LIB_simfs)
 	ln -sf $(LIB_simfs) $(LIB_fs)
@@ -112,16 +112,16 @@ libvzctl.a: $(OBJ_libvzctl)
 	ranlib $@
 
 $(LIB_vzctl) : $(LIB_simfs) $(OBJ_libvzctl)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_libvzctl) $(LD_FLAGS) -shared -o $@
+	$(CC) $(CFLAGS) $(INC) $(OBJ_libvzctl) $(LD_FLAGS) $(LDFLAGS) -shared -o $@
 
 vzctl-static: $(OBJ_vzctl) libvzctl.a
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(OBJ_simfs) libvzctl.a -rdynamic -ldl -lutil -o $@
 
 vzctl: check-version $(LIB_vzctl) $(OBJ_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) $(LIB_fs) -lutil -o $@
+	$(CC) $(CFLAGS) $(INC) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) $(LIB_fs) $(LDFLAGS) -lutil -o $@
 
 vzlist: $(OBJ_vzlist) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
+	$(CC) $(CFLAGS) $(INC) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $(LDFLAGS) -o $@
 
 arpsend: $(OBJ_arp)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
@@ -130,13 +130,13 @@ vzsplit: $(OBJ_split)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 vzmemcheck: $(OBJ_memcheck) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $^ -o $@
+	$(CC) $(CFLAGS) $(INC) $(LD_FLAGS) $(LIB_fs) $(LDFLAGS) $(LIB_vzctl) $^ -o $@
 
 vzcfgvalidate: $(OBJ_cfgvalidate) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
+	$(CC) $(CFLAGS) $(INC) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $(LDFLAGS) -o $@
 
 vzcalc: $(OBJ_calc) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) -o $@
+	$(CC) $(CFLAGS) $(INC) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $(LDFLAGS) -o $@
 
 inst-sbin :$(PROGS)
 	for file in $(PROGS); do \
@@ -205,7 +205,6 @@ inst-dirs:
 	$(INSTALL) -d $(DESTDIR)$(LOGRDIR)
 	$(INSTALL) -d $(DESTDIR)$(CACHEDIR)
 	$(INSTALL) -d $(DESTDIR)$(VEIPDUMPDIR)
-	$(INSTALL) -d $(DESTDIR)$(IPSTATEDIR)
 	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl
 
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
