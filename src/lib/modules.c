@@ -159,7 +159,7 @@ int mod_cleanup(vps_handler *h, envid_t veid, struct mod_action *action,
 	return 0;
 }
 
-int is_mod_action(struct mod_info *info, char *name)
+int is_mod_action(struct mod_info *info, const char *name)
 {
 	char **p;
 

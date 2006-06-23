@@ -62,7 +62,7 @@ struct mod_info {
 	int (*cleanup)(vps_handler *h, envid_t veid, data_param *data,
 		vps_param *param);
 	void (*free_data)(data_param *data);
-	struct option *(*get_opt)(data_param *data, char *action);
+	struct option *(*get_opt)(data_param *data, const char *action);
 	const char *(*get_usage)();
 };
 
@@ -87,6 +87,7 @@ int mod_setup(vps_handler *h, envid_t veid, int vps_state, skipFlags skip,
 	struct mod_action *action, vps_param *param);
 int mod_cleanup(vps_handler *h, envid_t veid, struct mod_action *action,
 	vps_param *param);
+int is_mod_action(struct mod_info *info, const char *name);
 void mod_print_usage(struct mod_action *action);
 
 #endif	/* _MODULES_H_ */

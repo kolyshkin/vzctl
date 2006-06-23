@@ -747,7 +747,7 @@ void update_la(int veid, struct Cla *la)
 
 char *parse_var(char *var)
 {
-	unsigned char *sp, *ep;
+	char *sp, *ep;
 
 	if (var == NULL)
 		return NULL;

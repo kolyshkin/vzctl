@@ -47,7 +47,7 @@ struct mod_action;
 
 /** Data structure for VPS resources.
  */
-typedef struct {
+typedef struct vps_res {
 	fs_param fs;		/**< file system parameters. */
 	tmpl_param tmpl;	/**< template parameters. */
 	env_param env;		/**< environment parameters. */
