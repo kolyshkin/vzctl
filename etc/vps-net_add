@@ -26,6 +26,7 @@
 #                   (several addresses should be divided by space)
 #   VE_STATE      - state of VPS; could be one of:
 #                     starting | stopping | running | stopped
+. /etc/vz/vz.conf
 . /usr/lib/vzctl/scripts/vps-functions
 
 vzcheckvar VEID
