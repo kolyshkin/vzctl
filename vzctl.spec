@@ -148,11 +148,6 @@ fi
 %package lib
 Summary: Virtual Private Servers control API library
 Group: System Environment/Kernel
-%ifarch x86_64 ia64
-Provides: libvzctl-fs.so()(64bit)
-%else
-Provides: libvzctl-fs.so
-%endif
 
 %description lib
 Virtual Private Servers control API library
@@ -161,8 +156,7 @@ Virtual Private Servers control API library
 %defattr(-,root,root)
 %dir %{_libdir}/lib
 %attr(755,root,root) %{_libdir}/lib/libvzctl.so.*
-%attr(755,root,root) %{_libdir}/lib/libvzctl-fs.so
-%attr(755,root,root) %{_libdir}/lib/libvzctl-simfs.so.0.0.2
+%attr(755,root,root) %{_libdir}/lib/libvzctl-simfs.so.*
 %attr(755,root,root) %{_libdir}/scripts/vps-stop
 %attr(755,root,root) %{_libdir}/scripts/vps-functions
 %attr(755,root,root) %{_libdir}/scripts/vps-net_add
