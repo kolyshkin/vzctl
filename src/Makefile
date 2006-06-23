@@ -17,7 +17,7 @@
      INSTALL = install
       PREFIX = /usr
      SBINDIR = $(PREFIX)/sbin
-      LIBDIR = $(PREFIX)/lib/vzctl
+      LIBDIR = $(PREFIX)/lib/vzctl/lib
      CONFDIR = /etc/vz
    GLBCONFIG = $(CONFDIR)/vz.conf
   VPSCONFDIR = /etc/vz/conf
@@ -61,14 +61,14 @@ OBJ = $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_arp) $(OBJ_split) $(OBJ_memcheck) \
 LOBJ = $(OBJ_libvzctl) $(OBJ_simfs)
 LIB_vzctl = libvzctl.so.$(LIB_VER)
 LIB_simfs = libvzctl-simfs.so.$(LIB_VER)
-LIB_fs = libvzctl-fs.so
+LIB_fs = $(LIB_simfs)
 
-LD_FLAGS = -L. -Wl,-rpath=$(LIBDIR)/lib -ldl
+LDFLAGS += -Wl,-rpath=$(LIBDIR)
 LIBSCRIPTS = vps-create vps-postcreate vps-net_add vps-net_del vps-stop \
      vps-functions
 
 PROGS = vzctl vzlist arpsend vzsplit vzcfgvalidate vzmemcheck vzcalc
-LIBS = $(LIB_vzctl) $(LIB_simfs)
+LIBS = $(LIB_vzctl) $(LIB_fs)
 
 INITSCRIPTS = vz
 CRONSCRIPTS = vpsreboot vpsnetclean
@@ -101,27 +101,24 @@ check-version:
 %.lo: %.c
 	$(CC) -c $(CFLAGS) $(SHAREDLIB_CFLAGS) $(INC) $< -o $@
 
-$(LIB_simfs) : $(OBJ_simfs)
-	$(CC) $(CFLAGS) $(INC) $(OBJ_simfs)  $(LDFLAGS) -shared -o $@
+$(LIB_fs) : $(OBJ_simfs) lib/logger.lo 
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -shared -o $@
 
-$(LIB_fs): $(LIB_simfs)
-	ln -sf $(LIB_simfs) $(LIB_fs)
-
-libvzctl.a: $(OBJ_libvzctl)
+libvzctl.a: $(OBJ_libvzctl) $(LIB_fs)
 	ar scq $@ $+
 	ranlib $@
 
-$(LIB_vzctl) : $(LIB_simfs) $(OBJ_libvzctl)
-	$(CC) $(CFLAGS) $(INC) $(OBJ_libvzctl) $(LD_FLAGS) $(LDFLAGS) -shared -o $@
+$(LIB_vzctl) : $(LIB_fs) $(OBJ_libvzctl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) -shared -o $@
 
 vzctl-static: $(OBJ_vzctl) libvzctl.a
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(OBJ_simfs) libvzctl.a -rdynamic -ldl -lutil -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -rdynamic -ldl -lutil -o $@
 
-vzctl: check-version $(LIB_vzctl) $(OBJ_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(OBJ_vzctl) $(LD_FLAGS) $(LIB_vzctl) $(LIB_fs) $(LDFLAGS) -lutil -o $@
+vzctl: check-version $(OBJ_vzctl) $(LIB_vzctl) $(LIB_fs)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LIB_vzctl) $(LIB_fs) -ldl -lutil -o $@
 
 vzlist: $(OBJ_vzlist) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(OBJ_vzlist) $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 arpsend: $(OBJ_arp)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
@@ -129,25 +126,24 @@ arpsend: $(OBJ_arp)
 vzsplit: $(OBJ_split)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
-vzmemcheck: $(OBJ_memcheck) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LD_FLAGS) $(LIB_fs) $(LDFLAGS) $(LIB_vzctl) $^ -o $@
+vzmemcheck: $(OBJ_memcheck) $(LIB_vzctl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
-vzcfgvalidate: $(OBJ_cfgvalidate) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $(LDFLAGS) -o $@
+vzcfgvalidate: $(OBJ_cfgvalidate) $(LIB_vzctl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
-vzcalc: $(OBJ_calc) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $^ $(LD_FLAGS) $(LIB_fs) $(LIB_vzctl) $(LDFLAGS) -o $@
+vzcalc: $(OBJ_calc) $(LIB_vzctl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 inst-sbin :$(PROGS)
 	for file in $(PROGS); do \
 		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
 install-lib: $(LIB_vzctl) $(LIB_fs)
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/lib
+	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
 	$(INSTALL) -d $(DESTDIR)$(LIBSCRIPTSDIR)
-	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/lib/$(LIB_vzctl)
-	$(INSTALL) $(LIB_simfs) $(DESTDIR)$(LIBDIR)/lib/$(LIB_simfs)
-	cp -a $(LIB_fs) $(DESTDIR)$(LIBDIR)/lib/$(LIB_fs)
+	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/$(LIB_vzctl)
+	$(INSTALL) $(LIB_fs) $(DESTDIR)$(LIBDIR)/$(LIB_fs)
 	for file in $(LIBSCRIPTS); do 					\
 		$(INSTALL) -m 755 ../etc/$$file $(DESTDIR)$(LIBSCRIPTSDIR)/$$file; \
 	done
@@ -210,7 +206,7 @@ inst-dirs:
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
 	inst-netscripts inst-configs inst-initd inst-cron 
 clean:
-	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_simfs) .depend
+	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_fs) .depend
 
 .depend:: $(OBJ:.o=.c) $(LOBJ:.lo=.c)
 	$(CC) -M $(FLAGS) $(DEPFLAGS) $(INC) $^ >.depend
@@ -220,7 +216,7 @@ depend:: .depend
 include .depend
 
 
-.PHONY: clean depend install inst-dirs inst-config \
+.PHONY: clean depend install inst-dirs inst-config check-version \
 	inst-initd install-cron all default inst-config inst-lib inst-vzdir
 
 
