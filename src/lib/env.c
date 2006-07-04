@@ -366,7 +366,7 @@ try:
 	}
 	close(h->vzfd);
 	/* Create /fastboot to skip run fsck */
-	fd = open("/fastboot", O_CREAT | O_RDONLY);
+	fd = open("/fastboot", O_CREAT | O_RDONLY, 0644);
 	close(fd);
 
 	mk_reboot_script();
