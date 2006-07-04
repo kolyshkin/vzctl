@@ -87,6 +87,7 @@ struct Ccpu {
 struct Cveinfo {
 	int veid;
 	char *hostname;
+	char *name;
 	char *ip;
 	char *ve_private;
 	char *ve_root;
@@ -105,6 +106,7 @@ struct Cveinfo {
 #define RES_IP          4
 #define RES_LA          5
 #define RES_CPU         6
+#define RES_NAME	7
 
 struct Cfield {
 	char *name;

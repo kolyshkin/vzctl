@@ -502,6 +502,20 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			" restart mode without --save");
 		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
+	if (cmd_p->res.name.name != NULL) {
+		if (!cmd_p->opt.save) {
+			logger(0, 0, "Error: unable to use"
+				 " --name option without --save");
+			ret =  VZ_SET_NAME_ERROR;
+		} else {
+			ret = set_name(veid, cmd_p->res.name.name,
+				vps_p->res.name.name);
+		}
+		if (ret) {
+			cmd_p->opt.save = NO;
+			return ret;
+		}
+	}
 	is_run = vps_is_run(h, veid);
 	if (is_run) {
 		if (cmd_p->res.fs.private_orig != NULL) {

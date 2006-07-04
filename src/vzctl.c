@@ -210,9 +210,12 @@ int main(int argc, char *argv[], char *envp[])
 		goto error;
 	}
 	if (parse_int(argv[2], &veid)) {
-		fprintf(stderr, "Bad VPS id %s\n", argv[2]);
-		ret = VZ_INVALID_PARAMETER_VALUE;
-		goto error;
+		veid = get_veid_by_name(argv[2]);
+		if (veid < 0) {
+			fprintf(stderr, "Bad VPS id %s\n", argv[2]);
+			ret = VZ_INVALID_PARAMETER_VALUE;
+			goto error;
+		}
 	}
 	argc -= 2; argv += 2;
 	/* Read global config file */

@@ -45,6 +45,11 @@ typedef struct {
 
 struct mod_action;
 
+typedef struct name_param {
+	int veid;
+	char *name;
+} name_param;
+
 /** Data structure for VPS resources.
  */
 typedef struct vps_res {
@@ -60,7 +65,8 @@ typedef struct vps_res {
 	cpt_param cpt;		/**< chekpointing parameters */
 	meminfo_param meminfo;
 	veth_param veth;	/**< veth parameters */
-	misc_param misc;	
+	misc_param misc;
+	name_param name;
 } vps_res;
 
 typedef struct {

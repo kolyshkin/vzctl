@@ -20,7 +20,8 @@
       LIBDIR = $(PREFIX)/lib/vzctl/lib
      CONFDIR = /etc/vz
    GLBCONFIG = $(CONFDIR)/vz.conf
-  VPSCONFDIR = /etc/vz/conf
+  VPSCONFDIR = $(CONFDIR)/conf
+    NAMESDIR = $(CONFDIR)/names
 LIBSCRIPTSDIR = /usr/lib/vzctl/scripts/
   SCRIPTSDIR = /usr/share/vzctl/scripts
 NETSCRIPTDIR = /etc/sysconfig/network-scripts
@@ -198,6 +199,7 @@ inst-dirs:
 	$(INSTALL) -d $(DESTDIR)$(INITDDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZLOCKDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZDUMPDIR)
+	$(INSTALL) -d $(DESTDIR)$(NAMESDIR)
 	$(INSTALL) -d $(DESTDIR)$(LOGRDIR)
 	$(INSTALL) -d $(DESTDIR)$(CACHEDIR)
 	$(INSTALL) -d $(DESTDIR)$(VEIPDUMPDIR)

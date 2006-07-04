@@ -42,6 +42,7 @@
 #include "meminfo.h"
 
 static int _page_size;
+static int check_name(char *name);
 
 static vps_config config[] = {
 /*	Op	*/
@@ -116,6 +117,8 @@ static vps_config config[] = {
 {"QUOTAUGIDLIMIT",NULL, PARAM_QUOTAUGIDLIMIT},
 {"MEMINFO",	NULL, PARAM_MEMINFO},
 {"VETH",	NULL, PARAM_VETH_ADD},
+{"VEID",	NULL, PARAM_VEID},
+{"NAME",	NULL, PARAM_NAME},
 
 {NULL		,NULL, -1}
 };
@@ -189,6 +192,8 @@ static struct option set_opt[] = {
 /*	veth	*/
 {"veth_add",	required_argument, NULL, PARAM_VETH_ADD},
 {"veth_del",	required_argument, NULL, PARAM_VETH_DEL},
+/*	name	*/
+{"name",	required_argument, NULL, PARAM_NAME},
 
 {NULL, 0, NULL, 0}
 };
@@ -1363,6 +1368,27 @@ static int store_veth(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 #undef STR2MAC
 }
 
+static int store_name(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+        list_head_t *conf_h)
+{
+	char buf[STR_SIZE];
+
+	switch (conf->id) {
+	case PARAM_VEID:
+		if (vps_p->res.name.veid <= 0)
+			break;
+		snprintf(buf, sizeof(buf), "%s=\"%d\"", conf->name,
+			vps_p->res.name.veid);
+		add_str_param(conf_h, buf);
+		break;
+	case PARAM_NAME:
+		conf_store_str(conf_h, conf->name, vps_p->res.name.name);
+		add_str_param(conf_h, buf);
+		break;
+	}
+	return 0;
+}
+
 static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 {
 	int ret;
@@ -1579,6 +1605,18 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_VETH_DEL:
 		ret = parse_veth(vps_p, val, 0);
 		break;
+	case PARAM_NAME:
+		if (vps_p->res.name.name != NULL)
+			break;
+		if (check_name(val))
+			return ERR_INVAL;
+		ret = conf_parse_str(&vps_p->res.name.name, val, 1);
+		break;
+	case PARAM_VEID:
+		if (parse_int(val, &int_id))
+			return ERR_INVAL;
+		vps_p->res.name.veid = int_id;
+		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);
 		break;
@@ -1605,6 +1643,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_cpu(old_p, vps_p, conf, conf_h);
 		store_meminfo(old_p, vps_p, conf, conf_h);
 		store_veth(old_p, vps_p, conf, conf_h);
+		store_name(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }
@@ -1867,6 +1906,91 @@ vps_param *init_vps_param()
 	return param;
 }
 
+int get_veid_by_name(char *name)
+{
+	char buf[64];
+	char ltoken[64];
+	FILE *fp;
+	char *sp;
+	int veid = -1;
+
+	if (name == NULL)
+		return -1;
+	snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf", name);
+	if (stat_file(buf) != 1)
+		return -1;
+	if ((fp = fopen(buf, "r")) == NULL)
+		return -1;
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		sp = parse_line(buf, ltoken, sizeof(ltoken));
+		if (sp == NULL)
+			continue;
+		if (!strcmp(ltoken, "VEID")) {
+			if (parse_int(sp, &veid))
+				veid = -1;
+			break;
+		}
+	}
+	fclose(fp);
+	return veid;
+}
+
+static int check_name(char *name)
+{
+        char *p;
+
+        for (p = name; *p != '\0'; p++) {
+                if (!isdigit(*p) && !isalpha(*p) && *p != '-' && *p != '_')
+                        return -1;
+	}
+        return 0;
+}
+
+int set_name(int veid, char *new_name, char *old_name)
+{
+	int veid_old = -1;
+	char buf[STR_SIZE];
+	vps_param *conf;
+	int ret;
+
+	if (new_name == NULL)
+		return 0;
+	if (check_name(new_name)) {
+		logger(0, 0, "Error: ivalid name %s", new_name);
+		return VZ_SET_NAME_ERROR;
+	}
+	veid_old = get_veid_by_name(new_name);
+	if (veid_old >= 0 && veid_old != veid) {
+		logger(0, 0, "Conflict: name %s already used by VE %d",
+			new_name, veid_old);
+		return VZ_SET_NAME_ERROR;
+	}
+	if (old_name != NULL &&
+		!strcmp(old_name, new_name) &&
+		veid == veid_old)
+	{
+		return 0;	
+	}
+	conf = init_vps_param();
+	conf->res.name.veid = veid;
+	snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf", new_name);
+	if (vps_save_config(veid, buf, conf, conf, NULL) < 0) {
+		ret = VZ_SET_NAME_ERROR;
+	} else {
+		veid_old = get_veid_by_name(old_name);
+		/* Remove old alias */
+		if (veid_old >= 0 && veid_old == veid) {
+			snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf",
+									old_name);
+			unlink(buf);
+		}
+		logger(0, 0, "Name %s assigned", new_name);
+		ret = 0;
+	}
+	free_vps_param(conf);
+	return ret;
+}
+
 #define FREE_P(x)	if ((x) != NULL) { free(x); x = NULL; }
 
 static void free_opt(vps_opt *opt)
@@ -1944,6 +2068,11 @@ static void free_cpt(cpt_param *cpt)
 	FREE_P(cpt->dumpdir)
 	FREE_P(cpt->dumpfile)
 }
+
+static void free_name(name_param *name)
+{
+	FREE_P(name->name)
+}
 #undef FREE_P
 
 static void free_vps_res(vps_res *res)
@@ -1958,6 +2087,7 @@ static void free_vps_res(vps_res *res)
 	free_dq(&res->dq);
 	free_cpt(&res->cpt);
 	free_veth_param(&res->veth);
+	free_name(&res->name);
 }
 
 void free_vps_param(vps_param *param)
@@ -2117,6 +2247,12 @@ static void merge_veth(veth_param *dst, veth_param *src)
 	}
 }
 
+static void merge_name(name_param *dst, name_param *src)
+{
+	MERGE_STR(name);
+	MERGE_INT(veid);
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -2132,6 +2268,7 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_cpt(&dst->cpt, &src->cpt);
 	merge_meminfo(&dst->meminfo, &src->meminfo);
 	merge_veth(&dst->veth, &src->veth);
+	merge_name(&dst->name, &src->name);
 	return 0;
 }
 

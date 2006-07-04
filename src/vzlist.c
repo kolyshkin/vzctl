@@ -49,10 +49,12 @@ static int n_veinfo = 0;
 static char g_outbuffer[4096] = "";
 static char *p_outbuffer = g_outbuffer;
 static char *host_pattern = NULL;
+static char *name_pattern = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
 struct Cfield_order *last_field = NULL;
 static char *default_field_order = "vpsid,numproc,status,ip,hostname";
+static char *default_nm_field_order = "vpsid,numproc,status,ip,name";
 static int g_sort_field = 0;
 static int *g_ve_list = NULL;
 static int n_ve_list = 0;
@@ -61,6 +63,7 @@ static int sort_rev = 0;
 static int show_hdr = 1;
 static int all_ve = 0;
 static int only_stopped_ve = 0;
+static int with_names = 0;
 
 char logbuf[32];
 char *plogbuf = logbuf;
@@ -81,6 +84,7 @@ static inline int get_run_ve(int update)
 
 
 static void print_hostname(struct Cveinfo *p, int index);
+static void print_name(struct Cveinfo *p, int index);
 static void print_ip(struct Cveinfo *p, int index);
 
 /* Print functions */
@@ -221,6 +225,7 @@ int fn(const void *val1, const void *val2)				\
 }									
 
 SORT_STR_FN(hostnm_sort_fn, hostname)
+SORT_STR_FN(name_sort_fn, name)
 SORT_STR_FN(ip_sort_fn, ip)
 
 #define SORT_UL_RES(fn, type, res, name, index)				\
@@ -370,6 +375,7 @@ struct Cfield field_names[] =
 /* veid should have index 0 */
 {"vpsid" , "VPSID", "%10s",  0, RES_NONE, print_veid, id_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
+{"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"status", "STATUS", "%-7s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
@@ -522,6 +528,22 @@ static void print_hostname(struct Cveinfo *p, int index)
 	p_outbuffer +=  r;
 }
 
+static void print_name(struct Cveinfo *p, int index)
+{
+	int r;
+	char *str = "-";
+
+	if (p->name != NULL)
+		str = p->name;
+	r = sprintf(p_outbuffer, "%-32s", str);
+	if (last_field != NULL &&
+		field_names[last_field->order].res_type != RES_NAME)
+	{
+		r = 32;
+	}
+	p_outbuffer +=  r;
+}
+
 static void print_ip(struct Cveinfo *p, int index)
 {
 	int r;
@@ -567,12 +589,14 @@ void *x_realloc(void *ptr, int size)
 
 void usage()
 {
-	fprintf(stderr, "Usage: vzlist [-a] [-o name[,name...]] [-s {name|-name}] [-h hostname_pattern]\n");
+	fprintf(stderr, "Usage: vzlist [-a] [-o name[,name...]] [-s {name|-name}] [-h <pattern>] [-N <pattern>]\n");
 	fprintf(stderr, "\t\t[-H] [-S] [vpsid [vpsid ...]|-1]\n");
 	fprintf(stderr, "       vzlist -L\n\n");
 	fprintf(stderr, "\t--all -a\t list of all VPS\n");
 	fprintf(stderr, "\t--output -o\t output only specified parameters\n");
 	fprintf(stderr, "\t--hostname -h\t hostname search pattern\n");
+	fprintf(stderr, "\t--name -n\t display VE name\n");
+	fprintf(stderr, "\t--name_filter -N\t name search patter\n");
 	fprintf(stderr, "\t--sort -s\t sort by specified parameter, - sign before parametr\n");
 	fprintf(stderr, "\t\t\t mean sort in reverse order\n");
 	fprintf(stderr, "\t--no-header -H\t supress display header\n");
@@ -609,7 +633,7 @@ void print_hdr()
    1 - match
    0 - do not match
 */
-inline int check_hostname_restr(char *str, char *pat)
+inline int check_pattern(char *str, char *pat)
 {
 	if (pat == NULL)
 		return 1;
@@ -623,7 +647,18 @@ int filter_by_hostname()
 	int i;
 
 	for (i = 0; i < n_veinfo; i++) {
-		if (!check_hostname_restr(veinfo[i].hostname, host_pattern))
+		if (!check_pattern(veinfo[i].hostname, host_pattern))
+			veinfo[i].hide = 1;
+	}
+	return 0;
+}
+
+int filter_by_name()
+{
+	int i;
+
+	for (i = 0; i < n_veinfo; i++) {
+		if (!check_pattern(veinfo[i].name, name_pattern))
 			veinfo[i].hide = 1;
 	}
 	return 0;
@@ -828,6 +863,11 @@ do {								\
 	}
 	if (res->misc.hostname != NULL)
 		ve->hostname = strdup(res->misc.hostname);
+	if (res->name.name != NULL) {
+		int veid_nm = get_veid_by_name(res->name.name);
+		if (veid_nm == ve->veid)
+			ve->name = strdup(res->name.name);
+	}
 	if (res->fs.root != NULL)
 		ve->ve_root = strdup(res->fs.root);
 	if (res->fs.private != NULL)
@@ -1456,6 +1496,8 @@ int collect()
 	get_mounted_status();
 	if (host_pattern != NULL)
 		filter_by_hostname();
+	if (name_pattern != NULL)
+		filter_by_name();
 	return 0;
 }	
 
@@ -1478,6 +1520,8 @@ void free_veinfo()
 			free(veinfo[i].ip);
 		if (veinfo[i].hostname != NULL)
 			free(veinfo[i].hostname);
+		if (veinfo[i].name != NULL)
+			free(veinfo[i].name);
 		if (veinfo[i].ubc != NULL)
 			free(veinfo[i].ubc);
 		if (veinfo[i].quota != NULL)
@@ -1497,6 +1541,8 @@ static struct option list_options[] =
 	{"no-header",	no_argument, NULL, 'H'},
 	{"stopped",	no_argument, NULL, 'S'},
 	{"all",		no_argument, NULL, 'a'},
+	{"name",        no_argument, NULL, 'n'},
+	{"name_filter", required_argument, NULL, 'N'},
 	{"hostname",	required_argument, NULL, 'h'},
 	{"output",	required_argument, NULL, 'o'},
 	{"sort",	required_argument, NULL, 's'},
@@ -1514,7 +1560,7 @@ int main(int argc, char **argv)
 
 	while (1) {
 		int option_index = -1;
-		c = getopt_long(argc, argv, "HSah:o:s:Le1", list_options,
+		c = getopt_long(argc, argv, "HSanN:h:o:s:Le1", list_options,
 				&option_index);
 		if (c == -1)
 			break;
@@ -1552,6 +1598,13 @@ int main(int argc, char **argv)
 		case '1'	:
 			f_order = strdup("veid");
 			veid_only = 1;
+			break;
+		case 'n'	:
+			f_order = strdup(default_nm_field_order);	
+			with_names = 1;
+			break;
+		case 'N'	:
+			name_pattern = strdup(optarg);
 			break;
 		default		:
 			usage();

@@ -50,5 +50,6 @@ int opt_get_by_id(struct option *opt, int id);
 struct option *get_set_opt(void);
 int conf_parse_yesno(int *dst, const char *val, int checkdup);
 int conf_parse_strlist(list_head_t *list, const char *val, int checkdup);
-
+int get_veid_by_name(char *name);
+int set_name(int veid, char *new_name, char *old_name);
 #endif

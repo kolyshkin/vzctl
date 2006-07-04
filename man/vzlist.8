@@ -4,8 +4,9 @@
 vzlist \- VPS listing utility.
 .SH SYNOPSIS
 vzlist [\fB-a\fR] [\fB-o\fR \fIname\fR[,\fIname\fR...]]
- [\fB-s\fR [-]\fIname\fR] [\fB-h\fR \fIhostname_pattern\fR]
- [\fB-H\fR] [\fB-S\fR] [\fIvpsid\fR [\fIvpsid\fR ..] | \fB-1\fR]
+ [\fB-s\fR [\fI-\fR]\fIname\fR] [\fB-h\fR \fIpattern\fR]
+ [\fB-H\fR] [\fB-S\fR] [\fB-n\fR] [\fB-N\fR <\fI-pattern\fR>] 
+ [\fIvpsid\fR [\fIvpsid\fR ..] | \fB-1\fR]
 .PP
 vzlist \fB-L\fR
 .SH DESCRIPTION
@@ -17,11 +18,15 @@ VPS id of \fB-1\fR is used to output VPS IDs only, one per line.
 list of all VPSes.
 .IP "\fB--sort\fR, \fB-s\fR"
 specify sorting order, the '-' before parameter means sort in reverse order
-.IP "\fB--hostname\fR, \fB-h\fR "
-display only VPSes whose hostname matches the \fIhostname_pattern\fR.
+.IP "\fB--hostname\fR, \fB-h\fR  <\fIpattern\fR>"
+display only VPSes whose hostname matches the \fIpattern\fR.
 The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR. 
 Note that wildcard characters should be properly escaped
 to avoid expansion by shell.
+.IP "\fB--name\fR, \fB-n\fR "
+display VPS name.
+.IP "\fB--name_filter\fR, \fB-N\fR  <\fIpattern\fR>"
+display only VPSes whose hostname matches the \fIpattern\fR.
 .IP "\fB--no-header\fR, \fB-H\fR"
 suppress displaying header
 .IP "\fB--stopped -S\fR"
@@ -56,6 +61,7 @@ Fixme1	FixmeToo
 _
 vpsid	VPSID
 hostname	HOSTNAME
+name	NAME
 ip	IP_ADDR
 status	STATUS
 kmemsize	KMEMSIZE

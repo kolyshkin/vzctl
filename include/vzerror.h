@@ -143,6 +143,6 @@
 #define VZ_CUSTOM_REINSTALL_ERROR	128
 #define VZ_SET_MEMINFO_ERROR		129
 #define VZ_VETH_ERROR			130
-
+#define VZ_SET_NAME_ERROR		131
 #endif /* _VZ_ERROR_H_ */
 

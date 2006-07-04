@@ -23,6 +23,7 @@
 #define VPS_CONF_DIR		VZ_DIR"/conf/"
 #define LIB_SCRIPTS_DIR		"/usr/lib/vzctl/scripts/"
 #define DIST_DIR		VZ_DIR"dists"
+#define VENAME_DIR		VZ_DIR "names"
 
 #define VPS_STOP		LIB_SCRIPTS_DIR "vps-stop"
 #define VPS_NET_ADD		LIB_SCRIPTS_DIR "vps-net_add"

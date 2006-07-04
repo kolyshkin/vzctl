@@ -12,6 +12,7 @@
 %define _netdir	/etc/sysconfig/network-scripts
 %define _logrdir /etc/logrotate.d
 %define _distconfdir %{_configdir}/dists
+%define _namesdir %{_configdir}/names 
 %define _distscriptdir %{_distconfdir}/scripts
 # rh macros defines _mandir incrorrectly
 %define _mandir %{_datadir}/man
@@ -72,6 +73,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(755,root,root) %{_cachedir}
 %dir %attr(755,root,root) %{_veipdir}
 %dir %attr(755,root,root) %{_configdir}
+%dir %attr(755,root,root) %{_namesdir}
 %dir %attr(755,root,root) %{_vpsconfdir}
 %dir %attr(755,root,root) %{_distconfdir}
 %dir %attr(755,root,root) %{_distscriptdir}
