@@ -27,6 +27,7 @@ typedef struct {
 	unsigned long *limit;	/**< CPU usage for the VPS in percents. */
 	unsigned long *weight;
 	unsigned long *units;	/**< CPU weight in units for the VPS. */
+	unsigned long *vcpus;	/**< number of CPUs available in the running VPS*/
 } cpu_param;
 
 /**  Apply cpu parameters on running VPS.

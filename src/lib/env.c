@@ -321,6 +321,8 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	memset(&create_param, 0, sizeof(create_param));
 	create_param.iptables_mask = get_ipt_mask(res->env.ipt_mask);
 	logger(3, 0, "Set iptables mask %#10.8x", create_param.iptables_mask);
+	if (res->cpu.vcpus != NULL)
+		create_param.total_vcpus = *res->cpu.vcpus;
 	env_create_data.veid = veid;
 	env_create_data.class_id = 0;
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;

@@ -104,6 +104,7 @@ static vps_config config[] = {
 {"CPUUNITS",	NULL, PARAM_CPUUNITS},
 {"CPUUWEIGHT",	NULL, PARAM_CPUWEIGHT},
 {"CPULIMIT",	NULL, PARAM_CPULIMIT},
+{"CPUS",	NULL, PARAM_VCPUS},
 /* create param	*/
 {"ONBOOT",	NULL, PARAM_ONBOOT},
 {"CONFIGFILE",	NULL, PARAM_CONFIG},
@@ -179,6 +180,7 @@ static struct option set_opt[] = {
 {"cpuunits",	required_argument, NULL, PARAM_CPUUNITS},
 {"cpuweight",	required_argument, NULL, PARAM_CPUWEIGHT},
 {"cpulimit",	required_argument, NULL, PARAM_CPULIMIT},
+{"cpus",	required_argument, NULL, PARAM_VCPUS},
 /*	create param	*/
 {"onboot",	required_argument, NULL, PARAM_ONBOOT},
 {"setmode",	required_argument, NULL, PARAM_SETMODE},
@@ -1213,6 +1215,14 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			conf->name, *cpu->limit);
 		add_str_param(conf_h, buf);
 		break;
+	case PARAM_VCPUS:
+		if (cpu->vcpus == NULL)
+			break;
+		snprintf(buf, sizeof(buf), "%s=\"%lu\"",
+			conf->name, *cpu->vcpus);
+		add_str_param(conf_h, buf);
+		break;
+
 	}
 	return 0;
 }
@@ -1595,6 +1605,16 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			break;
 	        if (parse_cpulimit(&vps_p->res.cpu.limit, val))
         	        return ERR_INVAL;
+		break;
+	case PARAM_VCPUS:
+		if (vps_p->res.cpu.vcpus != NULL)
+			break;
+	        if (parse_ul(val, &uid))
+        	        return ERR_INVAL;
+		vps_p->res.cpu.vcpus = malloc(sizeof(unsigned long));
+		if (vps_p->res.cpu.vcpus == NULL)
+			return ERR_NOMEM;
+		*vps_p->res.cpu.vcpus = uid;
 		break;
 	case PARAM_MEMINFO:
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
@@ -2053,6 +2073,7 @@ static void free_cpu(cpu_param *cpu)
 	FREE_P(cpu->units)
 	FREE_P(cpu->weight)
 	FREE_P(cpu->limit)
+	FREE_P(cpu->vcpus)
 }
 
 static void free_dq(dq_param *dq)
@@ -2166,6 +2187,7 @@ static void merge_cpu(cpu_param *dst, cpu_param *src)
 	MERGE_P(units)
 	MERGE_P(weight)
 	MERGE_P(limit)
+	MERGE_P(vcpus)
 }
 
 #define	MERGE_LIST(x)							\

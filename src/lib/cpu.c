@@ -46,6 +46,17 @@
 #define __NR_fairsched_rate    504
 #endif
 #endif
+#ifndef __NR_fairsched_vcpus
+#ifdef __i386__
+#define __NR_fairsched_vcpus    505
+#elif __x86_64__
+#define __NR_fairsched_vcpus    499
+#elif __ia64__
+#define __NR_fairsched_vcpus    1499
+#else
+#error "no syscall for this arch"
+#endif
+#endif
 
 static inline int fairsched_chwt(unsigned int id, unsigned wght)
 {
@@ -62,6 +73,16 @@ static inline int fairsched_rate(unsigned int id, int op, unsigned rate)
 	int ret;
 
 	ret = syscall(__NR_fairsched_rate, id, op, rate);
+	if (ret && errno == ENOSYS)
+		ret = 0;
+	return ret;
+}
+
+static inline int fairsched_vcpus(unsigned int id, unsigned vcpus)
+{
+	int ret;
+
+	ret = syscall(__NR_fairsched_vcpus, id, vcpus);
 	if (ret && errno == ENOSYS)
 		ret = 0;
 	return ret;
@@ -105,6 +126,24 @@ static int set_cpuunits(envid_t veid, unsigned int cpuunits)
 	return ret;
 }
 
+/** Change number of CPUs available in the running VE.
+ *
+ * @param veid		VE id
+ * @param vcpu		number of cpu
+ */
+int env_set_vcpus(envid_t veid, unsigned int vcpus)
+{
+	int ret;
+
+	logger(0, 0, "Setting CPUs: %d", vcpus);
+	ret = fairsched_vcpus(veid, vcpus);
+	if (ret) 
+		logger(0, errno, "Unable to set cpus");
+
+	return ret;
+}
+
+
 /**  Apply cpu parameters on Host system.
  *
  * @param cpu		cpu parameters.
@@ -130,7 +169,8 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 
 	if (cpu->limit == NULL &&
 		cpu->units == NULL &&
-		cpu->weight == NULL)
+		cpu->weight == NULL &&
+		cpu->vcpus == NULL)
 	{
 		return 0;
 	}
@@ -146,6 +186,11 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 		ret = set_cpuunits(veid, *cpu->units);
 	} else if (cpu->weight != NULL)
 		ret = set_cpuweight(veid, *cpu->weight);
+	if (cpu->vcpus != NULL) {
+		ret = env_set_vcpus(veid, *cpu->vcpus);
+	}
 
 	return ret;
 }
+
+

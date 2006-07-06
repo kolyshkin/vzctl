@@ -47,6 +47,7 @@
 #define PARAM_CPUWEIGHT		14
 #define PARAM_CPULIMIT		15
 #define PARAM_CPUUNITS		16
+#define PARAM_VCPUS		17
 
 #define PARAM_IP_ADD		18
 #define PARAM_IP_DEL		19
