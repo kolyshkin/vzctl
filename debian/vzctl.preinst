@@ -17,6 +17,10 @@ set -e
 
 case "$1" in
     install|upgrade)
+    if [ ! -f /var/lock/subsys ]
+    then
+	install -d /var/lock/subsys
+    fi
     ;;
 
     abort-upgrade)
