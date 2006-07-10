@@ -29,7 +29,7 @@ function randcrontab()
 	[ -f "${file}" ] || return 0
 
 	/bin/cp -fp ${file} ${file}.$$
-	cat ${file} | /bin/awk '
+	cat ${file} | awk '
 BEGIN { srand(); }
 {
 	if ($0 ~ /^[ \t]*#/ || $0 ~ /^[ \t]+*$/) {
