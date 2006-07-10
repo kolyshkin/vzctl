@@ -197,19 +197,17 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			logger(0, errno, "Unable to open " PROC_CPT);
 		return VZ_CHKPNT_ERROR;
 	}
-	if (param->dumpfile == NULL) {
-		if (cmd == CMD_DUMP) {
-			logger(0,  0, "Error: dumpfile is not specified.");
-			goto err;
+	if ((cmd == CMD_CHKPNT || cmd == CMD_DUMP)) {
+		if (param->dumpfile == NULL) {
+			if (cmd == CMD_DUMP) {
+				logger(0,  0, "Error: dumpfile is not"
+					" specified.");
+				goto err;
+			}
+			snprintf(dumpfile, sizeof(dumpfile), "%s/"DEF_DUMPFILE,
+				param->dumpdir != NULL ?
+				param->dumpdir : DEF_DUMPDIR, veid);
 		}
-		snprintf(dumpfile, sizeof(dumpfile), "%s/"DEF_DUMPFILE,
-			param->dumpdir != NULL ? param->dumpdir : DEF_DUMPDIR,
-			veid);
-	}
-	if ((param->dumpfile != NULL || !param->ctx) && 
-		(cmd == CMD_CHKPNT ||
-		 cmd == CMD_DUMP))
-	{
 		dump_fd = open(param->dumpfile ? : dumpfile,
 			O_CREAT|O_TRUNC|O_RDWR, 0600);
 		if (dump_fd < 0) {
@@ -220,9 +218,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	}
 	if (param->ctx || cmd > CMD_SUSPEND) {
 		logger(0, 0, "\tjoin context..");
-		if (ioctl(cpt_fd, CPT_JOIN_CONTEXT,
-			param->ctx ? : veid) < 0)
-		{
+		if (ioctl(cpt_fd, CPT_JOIN_CONTEXT, param->ctx ? : veid) < 0) {
 			logger(0, errno, "cannot join cpt context");
 			goto err;
 		}
@@ -232,7 +228,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			goto err;
 		}
 	}
-	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
+	if (dump_fd != -1) {
 		if (ioctl(cpt_fd, CPT_SET_DUMPFD, dump_fd) < 0) {
 			logger(0, errno, "cannot set dump file");
 			goto err;
@@ -395,7 +391,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			param->dumpdir != NULL ? param->dumpdir : DEF_DUMPDIR,
 			veid);
 	}
-	if (param->dumpfile || !param->ctx) {
+	if (cmd == CMD_RESTORE || cmd == CMD_UNDUMP) {
 		dump_fd = open(param->dumpfile ? : dumpfile, O_RDONLY);
 		if (dump_fd < 0) {
 			logger(0, errno, "Unable to open %s",
@@ -403,9 +399,11 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			goto err;
 		}
 	}
-	if (ioctl(rst_fd, CPT_SET_DUMPFD, dump_fd)) {
-		logger(0, errno, "Can't set dumpfile");
-		goto err;
+	if (dump_fd != -1) {
+		if (ioctl(rst_fd, CPT_SET_DUMPFD, dump_fd)) {
+			logger(0, errno, "Can't set dumpfile");
+			goto err;
+		}
 	}
 	param->rst_fd = rst_fd;
 	param->cmd = cmd;
