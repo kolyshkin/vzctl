@@ -110,7 +110,7 @@ err:
 int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
 	int cmd)
 {
-	int ret, len;
+	int ret, len, len1;
 	char buf[PIPE_BUF];
 	int err_p[2];
 
@@ -161,11 +161,13 @@ int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
 	close(err_p[0]);
 	return 0;
 err_out:
-	if ((len = read(err_p[0], buf, PIPE_BUF)) > 0) {
-		logger(0, 0, "Checkpointing failed");
-		len = write(STDERR_FILENO, buf, len);
-		fflush(stderr);	
+	while ((len = read(err_p[0], buf, PIPE_BUF)) > 0) {
+		do {
+			len1 = write(STDERR_FILENO, buf, len);
+			len -= len1;
+		} while (len > 0 && len1 > 0);
 	}
+	fflush(stderr);	
 	close(err_p[0]);
 	return VZ_CHKPNT_ERROR;
 }
@@ -280,7 +282,7 @@ err:
 static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
-	int status, len;
+	int status, len, len1;
 	cpt_param *param = (cpt_param *) data;
 	char buf[PIPE_BUF];
 	int error_pipe[2];
@@ -344,11 +346,14 @@ err:
 		write(err_p, &status, sizeof(status));
 	return status;
 err_undump:
-	if ((len = read(error_pipe[0], buf, PIPE_BUF)) > 0) {
-		logger(0, 0, "Restoring failed:");
-		len = write(STDERR_FILENO, buf, len);
-		fflush(stderr);	
+	logger(0, 0, "Restoring failed:");
+	while ((len = read(error_pipe[0], buf, PIPE_BUF)) > 0) {
+		do {
+			len1 = write(STDERR_FILENO, buf, len);
+			len -= len1;
+		} while (len > 0 && len1 > 0);
 	}
+	fflush(stderr);	
 	close(error_pipe[0]);
 	write(err_p, &status, sizeof(status));
 	return status;
