@@ -96,6 +96,7 @@ struct vzctl_ve_meminfo {
 #define VE_IP_NAT_FTP_MOD		(1U<<21)
 #define VE_IP_NAT_IRC_MOD		(1U<<22)
 #define VE_IP_TARGET_REDIRECT_MOD	(1U<<23)
+#define VE_IP_MATCH_MAC_MOD		(1U<<24)
 
 /* these masks represent modules with their dependences */
 #define VE_IP_IPTABLES		(VE_IP_IPTABLES_MOD)
@@ -143,6 +144,8 @@ struct vzctl_ve_meminfo {
 					| VE_IP_NAT | VE_IP_CONNTRACK_IRC)
 #define VE_IP_TARGET_REDIRECT	(VE_IP_TARGET_REDIRECT_MOD	\
 					| VE_IP_NAT)
+#define VE_IP_MATCH_MAC		(VE_IP_MATCH_MAC_MOD		\
+					| VE_IP_IPTABLES)
 
 /* safe iptables mask to be used by default */
 #define VE_IP_DEFAULT					\

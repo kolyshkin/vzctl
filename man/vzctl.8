@@ -301,7 +301,7 @@ You can use the following values for \fIname\fR:
 \fIipt_length\fR, \fIip_conntrack\fR, \fIip_conntrack_ftp\fR,
 \fIip_conntrack_irc\fR, \fIipt_conntrack\fR, \fIipt_state\fR,
 \fIipt_helper\fR, \fIiptable_nat\fR, \fIip_nat_ftp\fR, \fIip_nat_irc\fR,
-\fIipt_REDIRECT\fR.
+\fIipt_REDIRECT\fR \fIxt_mac\fR.
 .TP
 \fBNetwork devices control parameters\fR
 .IP "\fB--netdev_add\fR \fIname\fR"
@@ -370,7 +370,7 @@ apply them, if --save option specified save to VPS config file. These parameters
 are not changed (\fBHOSTNAME\fR \fBIP_ADDRESS\fR \fBOSTEMPLATE\fR \fBVE_ROOT\fR \fBVE_PRIVATE\fR)
 .SS Checkpoint/Restore
 .TP
-CPT is an extension of Virtuozzo kernel which allows to save full state of running VPS and to restore it later.
+CPT is an extension of OpenVZ kernel which allows to save full state of running VPS and to restore it later.
 .TP
 \fBchkpnt\fR <\fIvpsid\fR> \fB[--dumpfile <name>]\fR
 This command saves all the state of running VPS to dump file and stop the VPS.

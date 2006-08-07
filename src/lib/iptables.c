@@ -49,6 +49,9 @@ static struct iptables_s iptables[] = {
 #ifdef VE_IP_TARGET_REDIRECT
 	{"ipt_REDIRECT", VE_IP_TARGET_REDIRECT_MOD, VE_IP_TARGET_REDIRECT},
 #endif
+#ifdef VE_IP_MATCH_MAC
+	{"xt_mac", VE_IP_MATCH_MAC_MOD, VE_IP_MATCH_MAC},
+#endif
 #endif /* VZCTL_ENV_CREATE_DATA */
 	{NULL, 0}
 };
