@@ -43,6 +43,9 @@ BEGIN { srand(); }
 	# min
 	if (ar[1] ~ /^[0-9]+$/) {
 		ar[1] = int(rand() * 59);
+	} else if (ar[1] ~/^-\*\/[0-9]+$/) {
+		r = int(rand() * 40) + 15;
+		ar[1] = "-*/" r;
 	}
 	# hour
 	if (ar[2] ~ /^[0-9]+$/) {
