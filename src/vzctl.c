@@ -69,7 +69,7 @@ void usage()
 "vzctl set veid [--save] [--setmode restart|ignore]\n"
 "   [--ipadd <addr>] [--ipdel <addr>|all] [--hostname <name>]\n"
 "   [--nameserver <addr>] [--searchdomain <name>] [--onboot yes|no]\n"
-"   [--userpasswd <user>:<passwd>] [--cpuunits <N>] [--cpulimit <N>]\n"
+"   [--userpasswd <user>:<passwd>] [--cpuunits <N>] [--cpulimit <N>] [--cpus <N>]\n"
 "   [--diskspace <soft>[:<hard>]] [--diskinodes <soft>[:<hard>]]\n"
 "   [--quotatime <N>] [--quotaugidlimit <N>]\n"
 "   [--noatime yes|no] [--capability <name>:on|off ...]\n"
