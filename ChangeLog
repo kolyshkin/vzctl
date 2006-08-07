@@ -1,3 +1,10 @@
+   3.0.11: Mon Aug  7 2006 <igor@openvz.ru>
+	* fixed using VE_ROUTE_SRC_DEV variable
+	* added VPS name support
+	* added change number of CPUs available in the VPS functionality.
+	* fixes in CPT error processing
+	* added upport of xt_mac iptables module
+	* fixed awk expression to be compatible with mawk
    3.0.10: Wed Jun  7 2006 <igor@openvz.ru>
 	* added virtual ethernet device support (--veth_add, --veth_del)
 	* added  /proc/meminfo virtualization support (--meminfo mode:value)
