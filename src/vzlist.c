@@ -1532,7 +1532,8 @@ void free_veinfo()
 			free(veinfo[i].cpu);
 		if (veinfo[i].ve_root != NULL)
 			free(veinfo[i].ve_root);
-
+		if (veinfo[i].ve_private != NULL)
+			free(veinfo[i].ve_private);
 	}
 }
 
