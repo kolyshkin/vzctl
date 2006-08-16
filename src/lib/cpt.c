@@ -187,7 +187,8 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to setup chackpoint, VPS is not running");
+		logger(0, 0, "Unable to setup checkpointing,"
+			" VPS is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	logger(0, 0, "Setup checkpoint...");
@@ -243,14 +244,24 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			goto err;
 		}
 	}
-	if ((ret = vz_setluid(veid)))
-		goto err;
 	if ((pid = fork()) < 0) {
 		logger(0, errno, "Can't fork");
+		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	} else if (pid == 0) {
-		ret = real_chkpnt(cpt_fd, veid, root, param, cmd);
-		exit(ret);
+		if ((ret = vz_setluid(veid)))
+			exit(ret);
+		if ((pid = fork()) < 0) {
+			logger(0, errno, "Can't fork");
+			exit(VZ_RESOURCE_ERROR);
+		} else if (pid == 0) {
+			ret = real_chkpnt(cpt_fd, veid, root, param, cmd);
+			exit(ret);
+		}
+		while ((ret = waitpid(pid, &status, 0)) == -1)
+			if (errno != EINTR)
+				break;
+		exit(WEXITSTATUS(status));
 	}
 	while ((ret = waitpid(pid, &status, 0)) == -1)
 		if (errno != EINTR)
