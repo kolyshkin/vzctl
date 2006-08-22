@@ -22,7 +22,7 @@
 # Required parameters:
 #   IP_ADDR       - IPs to delete, several addresses should be divided by space
 # Optional parameters:
-#   IPDELALL      - deleet all ip addresses
+#   IPDELALL      - delete all ip addresses
 IFCFG=/etc/rc.d/rc.inet1.conf
 
 function del_ip()

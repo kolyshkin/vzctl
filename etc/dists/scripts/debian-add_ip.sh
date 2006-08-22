@@ -25,7 +25,7 @@
 # Optional parameters:
 #   VE_STATE      - state of VE; could be one of:
 #                     starting | stopping | running | stopped
-#   IPDELALL      - deleet all ip addresse
+#   IPDELALL      - deleet all ip addresses
 #
 VENET_DEV=venet0
 LOOPBACK=lo
@@ -82,7 +82,7 @@ d
 wq" | ed ${CFGFILE}.bak >/dev/null 2>&1
 	echo -e "/iface ${iface}\\>
 .,+3d
-wq" | ed ${CFGFILE}.bak >/dev/nul 2>&1
+wq" | ed ${CFGFILE}.bak >/dev/null 2>&1
 } 
 
 function get_all_aliasid()

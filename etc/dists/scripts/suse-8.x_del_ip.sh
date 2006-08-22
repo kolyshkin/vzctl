@@ -22,7 +22,7 @@
 # Required parameters:
 #   IP_ADDR       - IPs to delete, several addresses should be divided by space
 # Optional parameters:
-#   IPDELALL      - deleet all ip addresses
+#   IPDELALL      - delete all ip addresses
 VENET_DEV=venet0
 VENET_DEV_CFG=ifcfg-${VENET_DEV}
 IFCFG_DIR=/etc/sysconfig/network/
