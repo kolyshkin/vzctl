@@ -44,7 +44,6 @@ VZCONF=/etc/vz/vz.conf
 VZCTL=/usr/sbin/vzctl
 VZQUOTA=/usr/sbin/vzquota
 LOCKFILE=/var/lock/subsys/vz_lock
-LICVIEW=/usr/sbin/vzlicview
 PROC_VZVEINFO=/proc/vz/veinfo
 
 [ -x ${VZCTL} ] || exit 0
