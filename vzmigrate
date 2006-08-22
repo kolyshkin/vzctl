@@ -375,7 +375,7 @@ fi
 
 log 1 "Syncing private"
 if ! rsync -aH --progress "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" | \
-		grep "% of" | awk --assign ORS="\r" '{print $10}'; then
+		grep "% of" | awk -v ORS="\r" '{print $10}'; then
 	log 1 "Failed to sync VPS private areas"
 	undo_quota_on
 	exit $MIG_ERR_COPY
