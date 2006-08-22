@@ -349,7 +349,7 @@ static inline int get_vps_ip_ioctl(vps_handler *h, envid_t veid,
 {
 	int ret = -1;
 	struct vzlist_veipv4ctl veip;
-	uint32_t *addr;
+	uint32_t *addr, *tmp;
 	char buf[16];
 	int i;
 
@@ -366,9 +366,12 @@ static inline int get_vps_ip_ioctl(vps_handler *h, envid_t veid,
 		else if (ret <= veip.num)
 			break;
 		veip.num = ret;
-		addr = realloc(addr, veip.num * sizeof(*veip.ip));
-		if (addr == NULL)
-			return -1;
+		tmp = realloc(addr, veip.num * sizeof(*veip.ip));
+		if (tmp == NULL) {
+			ret = -1;
+			goto out;
+		}
+		addr = tmp;
 	}
 	if (ret > 0) {
 		for (i = ret - 1; i >= 0; i--) {

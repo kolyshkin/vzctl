@@ -42,7 +42,7 @@ static char *envp_bash[] = {"HOME=/", "TERM=linux", "PATH=/bin:/sbin:/usr/bin:/u
 int read_script(const char *fname, char *include, char **buf)
 {
 	struct stat st;
-	char *p = NULL;
+	char *tmp, *p = NULL;
 	int  fd, len = 0;
 	char *inc;
 
@@ -74,9 +74,10 @@ int read_script(const char *fname, char *include, char **buf)
 		goto err;
 	}
 	if (*buf != NULL) {
-		*buf = realloc(*buf, st.st_size + len + 2);
-		if (*buf ==  NULL)
+		tmp = realloc(*buf, st.st_size + len + 2);
+		if (tmp ==  NULL)
 			goto err;
+		*buf = tmp;
 		p = *buf + len;
 	} else {
 		*buf = malloc(st.st_size + 2);

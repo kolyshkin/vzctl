@@ -580,11 +580,13 @@ void *x_malloc(int size)
 
 void *x_realloc(void *ptr, int size)
 {
-	if ((ptr = realloc(ptr, size)) == NULL) {
+	void *tmp;
+
+	if ((tmp = realloc(ptr, size)) == NULL) {
 		printf("Error: unable to allocate %d bytes\n", size);
 		exit(1);
 	}
-	return ptr;
+	return tmp;
 }
 
 void usage()
@@ -1637,5 +1639,9 @@ int main(int argc, char **argv)
 		return ret;
 	print_ve();
 	free_veinfo();
+	if (host_pattern != NULL) free(host_pattern);
+	if (name_pattern != NULL) free(name_pattern);
+	if (f_order != NULL) free(f_order);
+
 	return 0;
 }

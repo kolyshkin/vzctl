@@ -24,7 +24,7 @@
 
 char *list2str_c(char *name, char c, list_head_t *head)
 {
-	char *buf = NULL;
+	char *buf = NULL, *tmp;
 	int buf_len, len, r;
 	char *sp, *ep;
 	const int delta = 256;
@@ -61,9 +61,12 @@ char *list2str_c(char *name, char c, list_head_t *head)
 			int cur_len = sp - buf;
 
 			buf_len += delta > len ? delta : len + 1;
-			buf = realloc(buf, buf_len);
-			if (buf == NULL)
+			tmp = realloc(buf, buf_len);
+			if (tmp == NULL) {
+				free(buf);
 				return NULL;
+			}
+			buf = tmp;
 			ep = buf + buf_len;
 			sp = buf + cur_len;
 		}
