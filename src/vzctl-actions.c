@@ -222,7 +222,19 @@ static int create(vps_handler *h, envid_t veid, vps_param *vps_p,
 static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
-	return vps_destroy(h, veid, &g_p->res.fs);
+	int ret, id;
+	char buf[STR_SIZE];
+	char *name = g_p->res.name.name;
+
+	ret = vps_destroy(h, veid, &g_p->res.fs);
+	if (!ret && name != NULL) {
+		id = get_veid_by_name(name);
+		if (id == veid) {
+			snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf", name);
+			unlink(buf);
+		}
+	}
+	return ret;
 }
 
 static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
