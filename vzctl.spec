@@ -158,11 +158,8 @@ Virtual Private Servers control API library
 %defattr(-,root,root)
 %dir %{_libdir}/lib
 %attr(755,root,root) %{_libdir}/lib/libvzctl.so.*
-%attr(755,root,root) %{_libdir}/lib/libvzctl-simfs.so.*
 %attr(755,root,root) %{_libdir}/scripts/vps-stop
 %attr(755,root,root) %{_libdir}/scripts/vps-functions
 %attr(755,root,root) %{_libdir}/scripts/vps-net_add
 %attr(755,root,root) %{_libdir}/scripts/vps-net_del
 %attr(755,root,root) %{_libdir}/scripts/vps-create
-%attr(755,root,root) %{_libdir}/scripts/vps-postcreate
-

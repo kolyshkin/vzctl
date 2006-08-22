@@ -69,7 +69,7 @@ LIBSCRIPTS = vps-create vps-postcreate vps-net_add vps-net_del vps-stop \
      vps-functions
 
 PROGS = vzctl vzlist arpsend vzsplit vzcfgvalidate vzmemcheck vzcalc
-LIBS = $(LIB_vzctl) $(LIB_fs)
+LIBS = $(LIB_vzctl)
 
 INITSCRIPTS = vz
 CRONSCRIPTS = vpsreboot vpsnetclean
@@ -105,20 +105,20 @@ check-version:
 $(LIB_fs) : $(OBJ_simfs) lib/logger.lo 
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -shared -o $@
 
-libvzctl.a: $(OBJ_libvzctl) $(LIB_fs)
+libvzctl.a: $(OBJ_libvzctl) $(OBJ_simfs)
 	ar scq $@ $+
 	ranlib $@
 
-$(LIB_vzctl) : $(LIB_fs) $(OBJ_libvzctl)
+$(LIB_vzctl) : $(OBJ_simfs) $(OBJ_libvzctl)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) -shared -o $@
 
 vzctl-static: $(OBJ_vzctl) libvzctl.a
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -rdynamic -ldl -lutil -o $@
 
-vzctl: check-version $(OBJ_vzctl) $(LIB_vzctl) $(LIB_fs)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LIB_vzctl) $(LIB_fs) -ldl -lutil -o $@
+vzctl: check-version $(OBJ_vzctl) $(LIB_vzctl)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $(OBJ_vzctl) $(LIB_vzctl) -ldl -lutil -o $@
 
-vzlist: $(OBJ_vzlist) $(LIB_vzctl) $(LIB_fs)
+vzlist: $(OBJ_vzlist) $(LIB_vzctl) 
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 arpsend: $(OBJ_arp)
@@ -140,11 +140,10 @@ inst-sbin :$(PROGS)
 	for file in $(PROGS); do \
 		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
-install-lib: $(LIB_vzctl) $(LIB_fs)
+install-lib: $(LIB_vzctl)
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
 	$(INSTALL) -d $(DESTDIR)$(LIBSCRIPTSDIR)
 	$(INSTALL) $(LIB_vzctl) $(DESTDIR)$(LIBDIR)/$(LIB_vzctl)
-	$(INSTALL) $(LIB_fs) $(DESTDIR)$(LIBDIR)/$(LIB_fs)
 	for file in $(LIBSCRIPTS); do 					\
 		$(INSTALL) -m 755 ../etc/$$file $(DESTDIR)$(LIBSCRIPTSDIR)/$$file; \
 	done
