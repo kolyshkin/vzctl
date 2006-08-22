@@ -48,6 +48,7 @@ static int n_veinfo = 0;
 
 static char g_outbuffer[4096] = "";
 static char *p_outbuffer = g_outbuffer;
+static char *e_buf = g_outbuffer + sizeof(g_outbuffer) - 1;
 static char *host_pattern = NULL;
 static char *name_pattern = NULL;
 static int vzctlfd;
@@ -90,29 +91,29 @@ static void print_ip(struct Cveinfo *p, int index);
 /* Print functions */
 static void print_veid(struct Cveinfo *p, int index)
 {
-	p_outbuffer += sprintf(p_outbuffer, "%10d", p->veid);
+	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10d", p->veid);
 }
 
 static void print_status(struct Cveinfo *p, int index)
 {
-	p_outbuffer += sprintf(p_outbuffer, "%-7s", ve_status[p->status]);
+	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-7s", ve_status[p->status]);
 }
 
 static void print_laverage(struct Cveinfo *p, int index)
 {
 	if (p->la == NULL)
-		p_outbuffer += sprintf(p_outbuffer, "%14s", "-");
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%14s", "-");
 	else
-		p_outbuffer += sprintf(p_outbuffer, "%1.2f/%1.2f/%1.2f",
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%1.2f/%1.2f/%1.2f",
 			p->la->la[0], p->la->la[1], p->la->la[2]);
 }
 
 static void print_cpulimit(struct Cveinfo *p, int index)
 {
 	if (p->cpu == NULL)
-		p_outbuffer += sprintf(p_outbuffer, "%7s", "-");
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%7s", "-");
 	else
-		p_outbuffer += sprintf(p_outbuffer, "%7lu",
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%7lu",
 			p->cpu->limit[index]);
 }
 
@@ -122,9 +123,9 @@ static void fn(struct Cveinfo *p, int index)		  		\
 	if (p->res == NULL ||						\
 		(p->status != VE_RUNNING &&				\
 			(index == 0 || index == 1 || index == 4)))	\
-		p_outbuffer += sprintf(p_outbuffer, "%10s", "-");	\
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
 	else								\
-		p_outbuffer += sprintf(p_outbuffer, "%10lu",		\
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
 					p->res->name[index]);		\
 }									\
 
@@ -154,9 +155,9 @@ static void fn(struct Cveinfo *p, int index)		  		\
 {									\
 	if (p->res == NULL ||						\
 		(p->status != VE_RUNNING && (index == 0)))		\
-		p_outbuffer += sprintf(p_outbuffer, "%10s", "-");	\
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
 	else								\
-		p_outbuffer += sprintf(p_outbuffer, "%10lu",		\
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
 					p->res->name[index]);		\
 }									\
 
@@ -519,7 +520,7 @@ static void print_hostname(struct Cveinfo *p, int index)
 
 	if (p->hostname != NULL)
 		str = p->hostname;
-	r = sprintf(p_outbuffer, "%-32s", str);
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
 	if (last_field != NULL && 
 		field_names[last_field->order].res_type != RES_HOSTNAME)
 	{
@@ -535,7 +536,7 @@ static void print_name(struct Cveinfo *p, int index)
 
 	if (p->name != NULL)
 		str = p->name;
-	r = sprintf(p_outbuffer, "%-32s", str);
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
 	if (last_field != NULL &&
 		field_names[last_field->order].res_type != RES_NAME)
 	{
@@ -559,7 +560,7 @@ static void print_ip(struct Cveinfo *p, int index)
 		if ((ch = strchr(str, ' ')) != NULL)
 			*ch = 0;
 	}
-	r = sprintf(p_outbuffer, "%-15s", str);
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
 	if (last_field != NULL && 
 		field_names[last_field->order].res_type != RES_IP)
 	{
