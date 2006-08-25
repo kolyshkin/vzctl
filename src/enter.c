@@ -308,10 +308,10 @@ err:
 		if (errno != EINTR)
 			break;
 	if (WIFSIGNALED(status))
-		logger(0, 0, "got signal %d", WTERMSIG(status));
+		fprintf(stdout, "got signal %d\n", WTERMSIG(status));
 	if (!ret) {
 		raw_off();
-		logger(0, 0, "exited from VPS %d\n", veid);
+		fprintf(stdout, "exited from VPS %d\n", veid);
 	}
 	close(in[1]); close(out[0]);
 	return 0;
