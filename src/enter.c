@@ -231,6 +231,8 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		close(in[1]); close(out[0]); close(st[0]);
 		/* list of skipped fds -1 the end mark */
 		close_fds(1, in[0], out[1], st[1], h->vzfd, -1);
+		dup2(out[1], 1);
+		dup2(out[1], 2);
 		if ((ret = vz_chroot(root)))
 			goto err;
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
@@ -297,7 +299,10 @@ err:
 		raw_on();
 		e_loop(fileno(stdin), in[1], out[0], fileno(stdout));
 	} else {
-		fprintf(stdout, "enter failed\n");
+		fprintf(stdout, "enter into VPS %d failed\n", veid);
+		set_not_blk(out[0]);
+		while (stdredir(out[0], fileno(stdout)) == 0)
+			;
 	}
 	while ((waitpid(pid, &status, 0)) == -1)
 		if (errno != EINTR)
