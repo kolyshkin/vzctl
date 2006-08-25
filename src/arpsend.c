@@ -165,7 +165,8 @@ void parse_options (int argc, char **argv)
 		{"trg-arp", 1, NULL, 'T'},
 		{"src-ip", 1, NULL, 'i'},
 		{"trg-ip", 1, NULL, 'e'},
-		{"at-once", 0, NULL, 'o'}
+		{"at-once", 0, NULL, 'o'},
+		{NULL, 0, NULL, 0}
 	};
 
 	while ((c = getopt_long(argc, argv, short_options, long_options, NULL)) != -1)
