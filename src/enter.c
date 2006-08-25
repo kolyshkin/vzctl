@@ -267,7 +267,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			close(slave);
 			if ((term = getenv("TERM")) != NULL) {
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
-				env[2] = buf;
+				env[3] = buf;
 			}
 			execve("/bin/bash", arg, env);
 			execve("/bin/sh", arg, env);
