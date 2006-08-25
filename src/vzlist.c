@@ -610,7 +610,7 @@ void usage()
 
 int id_search_fn(const void* val1, const void* val2)
 {
-	return ((int)val1 - ((struct Cveinfo*)val2)->veid);
+	return (*(int *)val1 - ((struct Cveinfo*)val2)->veid);
 }
 
 int veid_search_fn(const void* val1, const void* val2)
@@ -711,7 +711,7 @@ void add_elem(struct Cveinfo *ve)
 
 inline struct Cveinfo *find_ve(int veid)
 {
-	return (struct Cveinfo *) bsearch((void*)veid, veinfo, n_veinfo,
+	return (struct Cveinfo *) bsearch(&veid, veinfo, n_veinfo,
 			sizeof(struct Cveinfo), id_search_fn);
 }
 
