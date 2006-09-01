@@ -630,8 +630,7 @@ static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 		logger(0, 0, "VPS is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	do_enter(h, veid, root);
-	return 0;
+	return do_enter(h, veid, root);
 }
 
 static int exec(vps_handler *h, int action, envid_t veid, char *root, int argc,

@@ -314,6 +314,6 @@ err:
 		fprintf(stdout, "exited from VPS %d\n", veid);
 	}
 	close(in[1]); close(out[0]);
-	return 0;
+	return ret ? status : 0;
 }
 
