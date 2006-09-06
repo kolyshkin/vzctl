@@ -360,15 +360,6 @@ function start()
 		print_failure
 		return 1
 	fi
-	if [ ! -e /dev/vzctl ]; then
-		/bin/mknod -m 600 /dev/vzctl c 126 0 > /dev/null 2>&1
-		RETVAL=$?
-		if [ $RETVAL -ne 0 ]; then
-			__echo "creating vzctl device"
-			print_failure
-			return $RETVAL
-		fi
-	fi
 	__echo "Starting OpenVZ: "
 	load_modules "${IPT_MODULES}"
 	for MOD in $PRELOAD_MODULES; do
@@ -385,6 +376,20 @@ function start()
 	done
 	load_modules "${MODULES_OTHER}"
 	print_success "loading OpenVZ modules"
+
+	if [ ! -e /dev/vzctl ]; then
+		# On most modern distros udev will create a device for you,
+		# while on the old distros /dev/vzctl comes with vzctl rpm.
+		# So the below mknod call is probably not needed at all.
+		/bin/mknod -m 600 /dev/vzctl c 126 0 > /dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -ne 0 ]; then
+			__echo "creating vzctl device"
+			print_failure
+			return $RETVAL
+		fi
+	fi
+	
 	setup_net
 	hn_setup
 	ve_start
