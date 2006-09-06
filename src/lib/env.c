@@ -49,6 +49,8 @@
 #define __NR_setluid	1506
 #elif __x86_64__
 #define __NR_setluid	501
+#elif __powerpc__
+#define __NR_setluid    411
 #else
 #define __NR_setluid	511
 #endif

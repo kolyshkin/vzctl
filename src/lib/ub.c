@@ -35,6 +35,8 @@
 #define __NR_setublimit	1507
 #elif __x86_64__
 #define __NR_setublimit	502
+#elif __powerpc__
+#define __NR_setublimit 412
 #else
 #define __NR_setublimit	512
 #endif
