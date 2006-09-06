@@ -111,6 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man5/vps.conf.5.*
 %attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
+%attr(644, root, root) /etc/udev/rules.d/*
 
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf

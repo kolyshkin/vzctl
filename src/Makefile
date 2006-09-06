@@ -27,6 +27,7 @@ LIBSCRIPTSDIR = /usr/lib/vzctl/scripts/
 NETSCRIPTDIR = /etc/sysconfig/network-scripts
     CRONDDIR = /etc/cron.d
     INITDDIR = /etc/init.d
+UDEVRULESDIR = /etc/udev/rules.d
        VZDIR = /vz
     CACHEDIR = $(VZDIR)/template/cache
    VZLOCKDIR = $(VZDIR)/lock
@@ -73,6 +74,7 @@ LIBS = $(LIB_vzctl)
 
 INITSCRIPTS = vz
 CRONSCRIPTS = vpsreboot vpsnetclean
+UDEVRULES = 60-vzctl.rules
 SCRIPTS = vpsreboot vpsnetclean
 NETSCRIPTS = ifcfg-venet0 ifdown-venet ifup-venet
 VE0CONFIG = 0.conf
@@ -188,6 +190,11 @@ inst-cron:
 		$(INSTALL) -m 644 ../etc/cron.d/$$file $(DESTDIR)$(CRONDDIR)/$$file; \
 	done
 
+inst-udev:
+	for file in $(UDEVRULES); do \
+		$(INSTALL) -m 644 ../etc/udev/$$file $(DESTDIR)$(UDEVRULESDIR)/$$file; \
+	done
+
 inst-dirs:
 	$(INSTALL) -d $(DESTDIR)$(CONFDIR)
 	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
@@ -196,6 +203,7 @@ inst-dirs:
 	$(INSTALL) -d $(DESTDIR)$(SCRIPTSDIR)
 	$(INSTALL) -d $(DESTDIR)$(CRONDDIR)
 	$(INSTALL) -d $(DESTDIR)$(INITDDIR)
+	$(INSTALL) -d $(DESTDIR)$(UDEVRULESDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZLOCKDIR)
 	$(INSTALL) -d $(DESTDIR)$(VZDUMPDIR)
 	$(INSTALL) -d $(DESTDIR)$(NAMESDIR)
@@ -205,7 +213,7 @@ inst-dirs:
 	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl
 
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
-	inst-netscripts inst-configs inst-initd inst-cron 
+	inst-netscripts inst-configs inst-initd inst-cron inst-udev
 clean:
 	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_fs) .depend
 
