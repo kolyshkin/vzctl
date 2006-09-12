@@ -25,7 +25,7 @@
 # Optional parameters:
 #   VE_STATE      - state of VE; could be one of:
 #                     starting | stopping | running | stopped
-#   IPDELALL      - deleet all ip addresses
+#   IPDELALL      - delete all ip addresses
 #
 VENET_DEV=venet0
 LOOPBACK=lo
