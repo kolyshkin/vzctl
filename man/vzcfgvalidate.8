@@ -1,7 +1,6 @@
-.\" $Id: vzcfgvalidate.8,v 1.5.10.6 2005/10/17 11:42:42 igor Exp $
-.TH vzcfgvalidate 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.TH vzcfgvalidate 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
 .SH NAME
-vzcfgvalidate \- validate the VPS configuration file
+vzcfgvalidate \- validate a VE configuration file
 .SH SYNOPSIS
 vzcfgvalidate [\fB-r\fR | \fB-i\fR] \fIconfigfile\fR
 .SH OPTIONS
@@ -12,9 +11,9 @@ Repair mode.
 \fB-i\fR
 Interactive repair mode.
 .SH DESCRIPTION
-This utility checks validity of resource control parameters in VPS config file
+This utility checks validity of resource control parameters in VE config file
 \fIconfigfile\fR.  Configurations where resources allowed for Virtual
-Private Server exceeds system capacity are not valid and dangerous
+Environment exceeds system capacity are not valid and dangerous
 from stability point of view.
 
 There are three severity levels in output: Error, Warning, Recommendation.

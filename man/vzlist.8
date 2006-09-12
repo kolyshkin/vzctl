@@ -1,36 +1,35 @@
-.\" $Id: vzlist.8,v 1.4.10.7 2005/09/26 14:58:18 igor Exp $
-.TH vzlist 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.TH vzlist 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
 .SH NAME
-vzlist \- VPS listing utility.
+vzlist \- VE listing utility
 .SH SYNOPSIS
 vzlist [\fB-a\fR] [\fB-o\fR \fIname\fR[,\fIname\fR...]]
  [\fB-s\fR [\fI-\fR]\fIname\fR] [\fB-h\fR \fIpattern\fR]
  [\fB-H\fR] [\fB-S\fR] [\fB-n\fR] [\fB-N\fR <\fI-pattern\fR>] 
- [\fIvpsid\fR [\fIvpsid\fR ..] | \fB-1\fR]
+ [\fIveid\fR [\fIveid\fR ..] | \fB-1\fR]
 .PP
 vzlist \fB-L\fR
 .SH DESCRIPTION
-This utility is used for listing VPS. By default only running VPSes are listed.
-If \fIvpsid\fR is/are specified, only specified VPSes are displayed.
-VPS id of \fB-1\fR is used to output VPS IDs only, one per line.
+This utility is used for listing VEs. By default only running VEs are listed.
+If \fIveid\fR is/are specified, only specified VEs are displayed.
+VE ID of \fB-1\fR is used to output VE IDs only, one per line.
 .SH OPTIONS
 .IP "\fB--all\fR, \fB-a\fR"
-list of all VPSes.
+list all VEs.
 .IP "\fB--sort\fR, \fB-s\fR"
 specify sorting order, the '-' before parameter means sort in reverse order
 .IP "\fB--hostname\fR, \fB-h\fR  <\fIpattern\fR>"
-display only VPSes whose hostname matches the \fIpattern\fR.
+display only VEes whose hostname matches the \fIpattern\fR.
 The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR. 
 Note that wildcard characters should be properly escaped
 to avoid expansion by shell.
 .IP "\fB--name\fR, \fB-n\fR "
-display VPS name.
+display VE name.
 .IP "\fB--name_filter\fR, \fB-N\fR  <\fIpattern\fR>"
-display only VPSes whose hostname matches the \fIpattern\fR.
+display only VEs whose hostname matches the \fIpattern\fR.
 .IP "\fB--no-header\fR, \fB-H\fR"
 suppress displaying header
 .IP "\fB--stopped -S\fR"
-display only stopped VPSs
+display only stopped VEs
 .IP "\fB--list -L\fR"
 list all format specifiers
 
@@ -59,7 +58,7 @@ lB lB
 lI l.
 Fixme1	FixmeToo
 _
-vpsid	VPSID
+veid	VEID
 hostname	HOSTNAME
 name	NAME
 ip	IP_ADDR

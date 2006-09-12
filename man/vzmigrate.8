@@ -1,4 +1,4 @@
-.TH vzmigrate 8 "17 April 2006" "OpenVZ" "Virtual Private Servers"
+.TH vzmigrate 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
 
 .SH NAME
 vzmigrate - utility for virtual environment migration between hardware nodes.
@@ -6,13 +6,13 @@ vzmigrate - utility for virtual environment migration between hardware nodes.
 .SH SYNOPSIS
 .TP
 \fBvzmigrate\fR [\fB-r\fR|\fB--remove-area\fR \fByes\fR|\fBno\fR] [\fB--ssh=\fIssh_options\fR] \
-[\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fIVPSID\fR
+[\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fIveid\fR
 
 .SH DESCRIPTION
-This utility is used to migrate a VPS from one (source) Hardware
-Node (HN) to another (destination) HN. The utility can migrate either stopped or running
-VPS. For stopped VPS, simple VPS private area transfer is performed
-(\fBrsync\fR(1) is used for file transfer). For running VPSs 
+This utility is used to migrate a VE from one (source) Hardware Node (HN)
+to another (destination) HN. The utility can migrate either stopped or running
+VE. For a stopped VE, simple VE private area transfer is performed
+(\fBrsync\fR(1) is used for file transfer). For running VEs,
 migration may be offline (default) or online.
 
 This program uses ssh as a transport layer. You will need to put ssh
@@ -22,7 +22,7 @@ entering password.
 .SH OPTIONS
 .TP
 \fB-r\fR, \fB--remove-area\fR \fByes\fR|\fBno\fR
-Whether to remove VPS on source HN for successfully migrated VPS.
+Whether to remove a VE area on source HN for the successfully migrated VE.
 
 .TP
 \fB--ssh=\fIoptions\fR
@@ -32,14 +32,14 @@ or the like.
 
 .TP
 .B --keep-dst
-Do not clean synced destination VPS private area in case of some
-error. It makes sense to use this option on big VPS migration to avoid
-syncing VPS private area again in case some error (on VPS stop for
+Do not clean synced destination VE private area in case of some
+error. It makes sense to use this option on big VE migration to avoid
+syncing VE private area again in case some error (on VE stop for
 example) occurs during first migration attempt.
  
 .TP
 .B --online
-Perform online (zero-downtime) migration: during the migration the VPS
+Perform online (zero-downtime) migration: during the migration the VE
 hangs for a while and after the migration it continues working as though nothing has
 happened.
 
@@ -48,13 +48,13 @@ happened.
 Verbose mode. Causes \fBvzmigrate\fP to print debugging messages about its progress.
 
 .SH EXAMPLES
-Migration of VPS#101 to \fI192.168.1.130\fR with downtime:
+Migration of VE #101 to \fI192.168.1.130\fR with downtime:
 .br
 \f(CR	vzmigrate 192.168.1.130 101
 \fR
 .br
 
-Online migration of VPS#102 to \fI192.168.1.130\fR:
+Online migration of VE#102 to \fI192.168.1.130\fR:
 .br
 \f(CR	vzmigrate --online 192.168.1.130 102
 \fR
@@ -67,33 +67,33 @@ Command completed successfully.
 .B 1 EXIT_USAGE
 Bad command line options.
 .TP
-.B 2 EXIT_VPS_STOPPED
-VPS is stopped.
+.B 2 EXIT_VE_STOPPED
+VE is stopped.
 .TP
 .B 4 EXIT_CONNECT
 Can't connect to destination (source) HN.
 .TP
 .B 6 EXIT_COPY
-VPS private area copying/moving failed.
+VE private area copying/moving failed.
 .TP
-.B 7 EXIT_VPS_START
-Can't start or restore destination VPS.
+.B 7 EXIT_VE_START
+Can't start or restore destination VE.
 .TP
-.B 8 EXIT_VPS_STOP
-Can't stop or checkpoint source VPS.
+.B 8 EXIT_VE_STOP
+Can't stop or checkpoint source VE.
 .TP
 .B 9 EXIT_EXISTS
-VPS already exists on destination HN.
+VE already exists on destination HN.
 .TP
 .B 10 EXIT_NOTEXIST
-VPS does not exists on source HN.
+VE does not exists on source HN.
 .TP
 .B 12 EXIT_IP_INUSE
-You attempt to migrate VPS which IP address(es) are already in use
+You attempt to migrate VE which IP address(es) are already in use
 on the destination node. 
 .TP
 .B 13 EXIT_QUOTA
-Operation with VPS quota failed.
+Operation with VE quota failed.
 
 
 .SH SEE ALSO

@@ -1,23 +1,22 @@
-.\" $Id: vzcalc.8,v 1.5.10.5 2005/10/17 11:42:41 igor Exp $
-.TH vzcalc 8 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.TH vzcalc 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
 .SH NAME
-vzcalc \- utility to calculate the VPS resources usage.
+vzcalc \- utility to calculate the VE resources usage.
 .SH SYNOPSIS
 vzcalc [\fB-v\fR] <\fBvpsid\fR>
 .SH OPTIONS
 .IP \fB-v\fR 4
 Display additional information.
 .SH DESCRIPTION
-This utility displays the share of the Hardware Node resources a particular Virtual
-Private Sever is using. If the VPS is running, the current usage is
+This utility displays the share of the Hardware Node resources a particular
+Virtual Environment is using. If the VE is running, the current usage is
 displayed. High utilization values (>100%) mean the system is overloaded
-(or the VPS has an invalid configuration).
+(or the VE has an invalid configuration).
 .IP \fBCurrent\fR 4
-shows the amount of the resources consumed by the VPS at a given time.
+shows the amount of the resources consumed by the VE at a given time.
 .IP \fBPromised\fR 4
-shows the resourses soft limit values "promised" for a given VPS.
+shows the resourses soft limit values "promised" for a given VE.
 .IP \fBMax\ \fR 4 
-shows the resourses hard limit values "promised" for a given VPS.
+shows the resourses hard limit values "promised" for a given VE.
 .P
 If the \fB-v\fR option is specified, the additional information is displayed.
 .IP \fBLow\ Mem\fR 4
@@ -27,7 +26,7 @@ whole RAM
 .IP \fBMem+Swap\fR 4
 amount of memory available for applications (both RAM and swap space).
 .IP \fBAlloc\ Mem\fR 4
-standard memory allocations made for applications in a VPS. This is a more "virtual" system resource than RAM or RAM and swap.
+standard memory allocations made for applications in a VE. This is a more "virtual" system resource than RAM or RAM and swap.
 .SH DIAGNOSTICS
 Normally, the exit status is 0. On error, the exit status is 1.
 .SH LICENSE
