@@ -1,3 +1,25 @@
+   3.0.12: FIXME
+	* removed LICVIEW from /etc/init.d/vz (bug #237)
+	* fixed misprints and /dev/nul(l) usage in dist scripts (bug #228)
+	* fixed vzmigrate to work with different awk flavors (bug #231)
+	* years in copyright fixed (bug #232)
+	* increased some UBCs in ve-light.conf-sample (bug #234)
+	* fixed some minor memory leaks while doing realloc()
+	* vzctl destroy: remove VE names on destroy (bug #236)
+	* added --name option description to vzctl(8) man page (bug #232)
+	* merged libvzctl-simfs and libvzctl into a single libvzctl
+	* vzlist: replaced sprintf() with snprintf() to avoid buffer overflows
+	* vzctl enter: forward error messages from child process
+	* vzctl enter: fix off-by-one error which resulted in
+	  uninitialized PATH
+	* arpsend: fixed segfault when parsing long options
+	* vzlist: fixed cast from pointer to integer of different size warnings
+	* vzctl enter: exit with correct error code on enter fail (bug #245)
+	* added udev rules for /dev/vzctl (bug #204)
+	* added syscall numbers for powerpc
+	* /etc/init.d/vz: check for /dev/vzctl only after modprobe (bug #204)
+	* fixed ppc64 compilation
+
    3.0.11: Mon Aug  7 2006 <igor@openvz.ru>
 	* fixed using VE_ROUTE_SRC_DEV variable
 	* added VPS name support
