@@ -19,6 +19,7 @@
 	* added syscall numbers for powerpc
 	* /etc/init.d/vz: check for /dev/vzctl only after modprobe (bug #204)
 	* fixed ppc64 compilation
+	* removed distro-specific stuff from 'make install' (bug #254)
 
    3.0.11: Mon Aug  7 2006 <igor@openvz.ru>
 	* fixed using VE_ROUTE_SRC_DEV variable

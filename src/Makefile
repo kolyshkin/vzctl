@@ -218,7 +218,10 @@ inst-dirs:
 	$(INSTALL) -m 644 ../etc/logrotate.d/vzctl $(DESTDIR)$(LOGRDIR)/vzctl
 
 install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
-	inst-netscripts inst-configs inst-initd inst-cron inst-udev
+	inst-configs inst-cron inst-udev
+
+install-redhat: inst-netscripts inst-initd
+
 clean:
 	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_fs) .depend
 
@@ -231,6 +234,5 @@ include .depend
 
 
 .PHONY: clean depend install inst-dirs inst-config check-version \
-	inst-initd install-cron all default inst-config inst-lib inst-vzdir
-
-
+	inst-initd install-cron all default inst-config inst-lib inst-vzdir \
+	install-redhat

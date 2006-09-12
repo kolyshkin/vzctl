@@ -55,8 +55,8 @@ make CFLAGS="$RPM_OPT_FLAGS" ARCH=%{_arch}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch} \
-	VPSCONFDIR=%{_vpsconfdir}
+make DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch} \
+	VPSCONFDIR=%{_vpsconfdir} install install-redhat
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/etc/vz/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 
