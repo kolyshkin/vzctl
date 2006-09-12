@@ -77,7 +77,8 @@ void usage()
 "   [--devnodes device:r|w|rw|none]\n"
 "   [--veth_add dev_name,dev_addr,dev_name_vps,dev_addr_vps]\n"
 "   [--veth_del dev_name]\n"
-"   [--applyconfig <name>]\n");
+"   [--applyconfig <name>]\n"
+"   [--name <vename>]\n");
  
 	fprintf(stdout, "   [--iptables <name>] [--disabled <yes|no>]\n");
 	fprintf(stdout, "   [UBC parameters]\n"

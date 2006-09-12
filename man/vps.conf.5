@@ -1,13 +1,13 @@
 .\" $Id: vps.conf.5,v 1.1.2.12 2005/10/17 11:42:41 igor Exp $
-.TH vps.conf 5 "10 Aug 2005" "OpenVZ" "Virtual Private Server"
+.TH vps.conf 5 "12 Sep 2006" "OpenVZ" "Virtual Environments"
 .SH NAME
-vps.conf \- configuration file for a Virtual Private Server.
+vps.conf \- configuration file for a Virtual Environment.
 .SH SYNOPSIS
 /etc/vz/conf/XXX.conf
 .SH DESCRIPTION
-This is a configuration file for a VPS. It is stored as
-\fB/etc/vz/conf/\fR\fIXXX\fB.conf\fR, where \fIXXX\fR
-is the ID of the given VPS.
+This is a configuration file for a VE. It is stored as
+\fB/etc/vz/conf/\fR\fIveid\fB.conf\fR, where \fIveid\fR
+is the ID of the given VE.
 .PP
 Configuration file consists of lines in the form
 .PP
@@ -22,9 +22,11 @@ Please note that the file is created/modified by the \fBvzctl(8)\fR command with
 The meaning of each parameter is described in \fBvzctl(8)\fR, so here only
 the appropriate \fBvzctl set\fR option is given.
 .SS Miscellaneous parameters
+.IP \fBNAME\fR="\fIvename\fR"
+Corresponds to the \fB--name\fR option.
 .IP \fBONBOOT\fR="\fByes\fR|\fBno\fR"
-Specifies whether this VPS will be started during system bootup.
-Default is \fBno\fR, meaning VPS will not be started
+Specifies whether this VE will be started during system bootup.
+Default is \fBno\fR, meaning VE will not be started
 if \fBONBOOT\fR parameter is omitted.
 Corresponds to the \fB--onboot\fR option.
 .IP \fBOSTEMPLATE\fR="\fItmpl_name\fR"
@@ -36,9 +38,9 @@ Corresponds to the \fB--private\fR option.
 .IP \fBDISABLED\fR="\fByes\fR|\fBno\fR"
 Corresponds to the \fB--disabled\fR option.
 .IP \fBORIGIN_SAMPLE\fR="\fIname\fR"
-Name of VPS sample config VPS based on.
+Name of VE sample config which the VE is based on.
 .IP \fBCONFIG_CUSTOMIZED\fR="\fByes\fR|\fBno\fR"
-Set to \fByes\fR if VPS config was modified.
+Set to \fByes\fR if the VE config was modified.
 .SS Resource management parameters
 .IP \fBNUMPROC\fR
 Corresponds to the \fB--numproc\fR options.
@@ -94,7 +96,7 @@ Corresponds to the \fB--noatime\fR option.
 Corresponds to the \fB--capability\fR option
 .SS Network related parameters
 .IP \fBIP_ADDRESS\fR="\fIaddress\ [address]\fR"
-Specifies the \fIaddress\fR the VPS will be assigned. Several addresses
+Specifies the \fIaddress\fR the VE will be assigned. Several addresses
 are divided by spaces.
 Corresponds to the \fB--ipadd\fR option.
 .IP \fBHOSTNAME\fR="\fIname\fR"

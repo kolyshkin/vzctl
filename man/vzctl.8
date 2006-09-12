@@ -1,30 +1,31 @@
 .\" $Id: vzctl.8,v 1.131.10.18 2006/04/05 14:26:53 igor Exp $
-.TH vzctl 8 "18 Apr 2006" "OpenVZ" "Virtual Private Server"
+.TH vzctl 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
 .SH NAME
-vzctl \- utility to control Virtual Private Server.
+vzctl \- utility to control a Virtual Environment.
 .SH SYNOPSIS
-vzctl \fB[flags]\fR \fBcreate\fR \fIvpsid\fR
+vzctl \fB[flags]\fR \fBcreate\fR \fIveid\fR
 \fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR]
 [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]
 .PP
-vzctl \fB[flags]\fR \fBset\fR \fIvpsid\fR [\fIparameters\fR] [\fB--save\fR]
+vzctl \fB[flags]\fR \fBset\fR \fIveid\fR [\fIparameters\fR] [\fB--save\fR]
 .PP
 vzctl \fB[flags]\fR \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
 \fBstart\fR | \fBstop\fR | \fBrestart\fR |
-\fBstatus\fR | \fBenter\fR \fIvpsid\fR
+\fBstatus\fR | \fBenter\fR \fIveid\fR
 .PP
-vzctl \fB[flags]\fR \fBexec\fR | \fBexec2\fR \fIvpsid\fR
+vzctl \fB[flags]\fR \fBexec\fR | \fBexec2\fR \fIveid\fR
 \fIcommand\fR [\fIarg\fR ...]
 .PP
-vzctl \fBrunscript\fR \fIve_id\fR <\fBscript\fR>
+vzctl \fBrunscript\fR \fIveid\fR <\fBscript\fR>
 .PP
 vzctl \fB--help\fR | \fB--version\fR
 .SH DESCRIPTION
 Utility \fBvzctl\fR runs on Hardware Node (HN) and performs direct
-manipulations with virtual private server (VPS).
+manipulations with Virtual Environments (VEs).
 .PP
-Virtual Private Servers can be referred to by numeric \fIvpsid\fR. Note
-that VPS ID <= 100 are reserved for OpenVZ internal purposes.
+Virtual Environments can be referred to by either numeric \fIveid\fR or
+by name (see \fB--name\fR option). Note that VE ID <= 100 are reserved for
+OpenVZ internal purposes.
 .SH OPTIONS
 .SS Flags
 These flags can be used with almost any option.
@@ -32,79 +33,82 @@ These flags can be used with almost any option.
 Disables logging to log file and screen.
 .IP \fB--verbose\fR 4
 Sets logging level to maximum value.
-.SS Setting VPS parameters
-.IP "\fBset\fR \fIvpsid\fR [\fIparameters\fR] [\fB--save\fR]" 4 
-This command sets various VPS parameters. If flag \fB--save\fR is given,
-parameters are saved in VPS configuration file \fBvps.conf\fR(5).
-If VPS is currently running, \fBvzctl\fR applies these parameters to VPS.
+.SS Setting VE parameters
+.IP "\fBset\fR \fIveid\fR [\fIparameters\fR] [\fB--save\fR]" 4 
+This command sets various VE parameters. If flag \fB--save\fR is given,
+parameters are saved in VE configuration file \fBvps.conf\fR(5).
+If VE is currently running, \fBvzctl\fR applies these parameters to VE.
 
 The following options can be used with \fBset\fR command.
 .TP
 \fBMiscellaneous parameters\fR
 .TP
 \fB--onboot\fR \fIyes\fR|\fIno\fR
-Sets whether this VPS will be started during system boot up. VPS will not be
+Sets whether this VE will be started during system boot up. VE will not be
 auto-started during system boot up unless this parameter is set to \fIyes\fR.
 .TP
 \fB--root\fR \fIpath\fR
-Sets the path to root directory for this VPS. This is essentially a mount
-point for VPS root. Value must contain string \fI$VEID\fR, which will
-be substituted with numeric VPS ID. Changing this parameter is not
+Sets the path to root directory for this VE. This is essentially a mount
+point for VE root. Value must contain string \fI$VEID\fR, which will
+be substituted with numeric VE ID. Changing this parameter is not
 recommended, better edit \fBvz\fR(5) global configuration file.
 .TP
 \fB--userpasswd\fR \fIuser\fR:\fIpassword\fR
-Sets password for given user in VPS, creating the user if it does not exists.
+Sets password for the given user in VE, creating the user if it does not exists.
 Note that this option is not saved in configuration file at all (so
-\fB--save\fR flag is useless), it is applied to VPS (by modifying its
+\fB--save\fR flag is useless), it is applied to VE (by modifying its
 \fB\f(CR/etc/passwd\fR and \fB\f(CR/etc/shadow\fR files).
 
-In case VPS root is not mounted, it is automatically mounted, then all
+In case VE root is not mounted, it is automatically mounted, then all
 appropriate file changes are applied, then it is unmounted.
 
-Note that VPS area should be created before using this option.
+Note that VE area should be created before using this option.
 .TP
 \fB--disabled\fR \fIyes\fR|\fIno\fR
-Disable VPS start. For force start disabled VPS option \fI--force\fR can be used.
+Disable VE start. To force the start of a disabled VE, use \fBvzctl start\fR
+with \fB-force\fR option.
 .TP
 \fB--name\fR \fIname\fR
-Bind VE with \fIname\fR that name can be used for VE actions insted of \fIveid\fR.
+Add a name for a VE. The \fIname\fR can later be used in subsequent calls to
+\fBvzctl\fR in place of \fIveid\fR.
 .TP
 \fBNetwork related parameters\fR
 .TP
 \fB--ipadd\fR \fIaddr\fR
-Adds IP address to given VPS. Note that this option is incremental, so
+Adds IP address to a given VE. Note that this option is incremental, so
 \fIaddr\fR are added to already existing ones.
 .TP
 \fB--ipdel\fR \fIaddr\fR | \fBall\fR
-Removes IP address \fIaddr\fR from VPS. If you want to remove all addresses,
+Removes IP address \fIaddr\fR from a VE. If you want to remove all addresses,
 use \fB--ipdel all\fR.
 .TP
 \fB--hostname\fR \fIname\fR
-Sets VPS hostname. \fBvzctl\fR writes it to the appropriate file inside a VPS
+Sets VE hostname. \fBvzctl\fR writes it to the appropriate file inside a VE
 (distribution-dependent).
 .TP
 \fB--nameserver\fR \fIaddr\fR
-Sets DNS server IP address for VPS. If you want to set several nameservers,
+Sets DNS server IP address for a VE. If you want to set several nameservers,
 you should do it at once, so use \fB--nameserver\fR option multiple times
 in one call to \fBvzctl\fR, as all the name server values set in previous
 calls to \fBvzctl\fR gets overwritten.
 .TP
 \fB--searchdomain\fR \fIname\fR
-Sets DNS search domains for VPS. If you want to set several search domains,
+Sets DNS search domains for a VE. If you want to set several search domains,
 you should do it at once, so use \fB--searchdomain\fR option multiple times
 in one call to \fBvzctl\fR, as all the search domain values set in previous
 calls to \fBvzctl\fR gets overwritten.
 .TP
-\fB--veth_add\fR \fIdev_name\fR,\fIdev_addr\fR,\fIdev_name_vps\fR,\fIdev_addr_vps\fR
-Adds virtual ethernet device to given VPS. Where \fIdev_name\fR is ethernet
-device name in host system, \fIdev_addr\fR its MAC address, \fIdev_name_vps\fR is
-ethernet device name in VPS and \fIdev_addr_vps\fR its MAC address. MAC addresses
-must be entered in XX:XX:XX:XX:XX:XX format. Note that this option is incremental,
-so devices are added to already existing ones.
+\fB--veth_add\fR \fIdev_name\fR,\fIdev_addr\fR,\fIdev_name_ve\fR,\fIdev_addr_ve\fR
+Adds virtual ethernet device to a given VE. Here \fIdev_name\fR is an Ethernet
+device name in host system, \fIdev_addr\fR is its MAC address,
+\fIdev_name_ve\fR is an Ethernet device name in VE, and
+\fIdev_addr_ve\fR is its MAC address. MAC addresses
+must be entered in XX:XX:XX:XX:XX:XX format. Note that this option is
+incremental, so devices are added to already existing ones.
 .TP
 \fB--veth_del\fR \fIdev_name\fR
-Removes virtual ethernet device from VPS. Where \fIdev_name\fR is ethernet device
-name in host system.
+Removes virtual ethernet device from a VE. Here \fIdev_name\fR is an Ethernet
+device name in the host system.
 .TP
 \fBResource limits\fR
 The following options sets barrier and limit for various user beancounters.
@@ -118,7 +122,7 @@ is architecture-specific, it is 4096 bytes on IA32 platform.
 
 You can also specify different suffixes for \fBset\fR parameters
 (except for the parameters which names start with \fBnum\fR).
-For example, \fBvzctl set\fR \fIVPSID\fR \fB--privvmpages 5M:6M\fR
+For example, \fBvzctl set\fR \fIveid\fR \fB--privvmpages 5M:6M\fR
 should set \fBprivvmpages\fR' barrier to 5 megabytes and its limit
 to 6 megabytes.
 
@@ -154,8 +158,8 @@ the limit to different values does not make practical sense.
 .TP
 \fB--vmguarpages\fR \fIpages\fR[:\fIpages\fR]
 Memory allocation guarantee. This parameter controls how much memory is
-available to VPS. The barrier is the amount
-of memory that VPS's applications are guaranteed to be able to allocate.
+available to a VE. The barrier is the amount
+of memory that VE's applications are guaranteed to be able to allocate.
 The meaning of the limit is currently unspecified; it should be set to
 2,147,483,647.
 .TP
@@ -165,7 +169,7 @@ Maximum amount of kernel memory used. This parameter is related to
 16 KB at leas, 30-50 KB typically. Very large processes may consume
 a bit more. It is important to have a certain safety gap between the
 barrier and the limit of this parameter: equal barrier and limit may
-lead to the situation where the kernel will need to kill VPS applications
+lead to the situation where the kernel will need to kill VE applications
 to keep the \fBkmemsize\fR usage under the limit.
 .TP
 \fB--tcpsndbuf\fR \fIbytes\fR[:\fIbytes\fR]
@@ -181,21 +185,21 @@ barrier and limit should be equal to or more than value of
 \fBnumtcpsock\fR multiplied by 2.5 KB.
 .TP
 \fB--othersockbuf\fR \fIbytes\fR[:\fIbytes\fR]
-Maximum size of other (non-TCP) socket send buffers. If VPS processes needs
+Maximum size of other (non-TCP) socket send buffers. If VE processes needs
 to send very large datagrams, the barrier should be set accordingly.
 Increased limit is necessary for high performance of communications through
 local (UNIX-domain) sockets. 
 .TP
 \fB--dgramrcvbuf\fR \fIbytes\fR[:\fIbytes\fR]
-Maximum size of other (non-TCP) socket receive buffers. If VPS processes
+Maximum size of other (non-TCP) socket receive buffers. If VE processes
 needs to send very large datagrams, the barrier should be set accordingly.
 The difference between the barrier and the limit is not needed.
 .TP
 \fB--oomguarpages\fR \fIpages\fR[:\fIpages\fR]
 Guarantees against OOM kill. Under this beancounter the kernel accounts the
-total amount of memory and swap space used by the VPS processes. The barrier
+total amount of memory and swap space used by the VE processes. The barrier
 of this parameter is the out-of-memory guarantee. If the oomguarpages usage
-is below the barrier, processes of this VPS are guaranteed not to be killed
+is below the barrier, processes of this VE are guaranteed not to be killed
 in out-of-memory situations. The meaning of limit is currently unspecified;
 it should be set to 2,147,483,647.
 .TP
@@ -204,17 +208,17 @@ Maximum number of pages acquired by \fBmlock\fR(2).
 .TP
 \fB--privvmpages\fR \fIpages\fR[:\fIpages\fR]
 Allows controlling the amount of memory allocated by the applications.
-For shared (mapped as \fBMAP_SHARED\fR) pages, each VPS really using a memory
+For shared (mapped as \fBMAP_SHARED\fR) pages, each VE really using a memory
 page is charged for the fraction of the page (depending on the number of
 others using it). For "potentially private" pages (mapped as
-\fBMAP_PRIVATE\fR), VPS is charged either for a fraction of the size or for
+\fBMAP_PRIVATE\fR), VE is charged either for a fraction of the size or for
 the full size if the allocated address space. It the latter case, the physical
 pages associated with the allocated address space may be in memory, in swap
 or not physically allocated yet.
 
 The barrier and the limit of this parameter
 control the upper boundary of the total size of allocated memory. Note that
-this upper boundary does not guarantee that VPS will be able to allocate that
+this upper boundary does not guarantee that VE will be able to allocate that
 much memory. The primary mechanism to control memory allocation is
 the \fB--vmguarpages\fR guarantee.
 .TP
@@ -232,7 +236,7 @@ the limit to different values does not make practical sense.
 Maximum number of file locks. Safety gap should be between barrier and limit.
 .TP
 \fB--numpty\fR \fIitems\fR[:\fIitems\fR]
-Number of pseudo-terminals (PTY). Note that in OpenVZ each VPS can have
+Number of pseudo-terminals (PTY). Note that in OpenVZ each VE can have
 not more than 255 PTYs. Setting the barrier and
 the limit to different values does not make practical sense.
 .TP
@@ -256,46 +260,50 @@ the limit to different values does not make practical sense.
 .TP
 \fB--physpages\fR \fIpages\fR[:\fIpages\fR]
 This is currently an accounting-only parameter. It shows the usage of RAM
-by this VPS. Barrier should be set to 0, and limit should be set to
+by this VE. Barrier should be set to 0, and limit should be set to
 2,147,483,647.
 .TP
 \fBCPU fair scheduler parameters\fR
-These parameters control CPU usage by VPS.
+These parameters control CPU usage by VE.
 .TP
 \fB--cpuunits\fR \fInum\fR
-CPU weight for VPS. Argument is positive non-zero number, which passed to
+CPU weight for a VE. Argument is positive non-zero number, which passed to
 and used in kernel fair scheduler. The larger the number is, the more CPU time
-this VPS get. Maximum value is 500000, minimal is 8. Number is relative to
-weights of all the other running VPSs. If cpuunits not specified default value
+this VE get. Maximum value is 500000, minimal is 8. Number is relative to
+weights of all the other running VEs. If cpuunits not specified default value
 1000 ia used.
 
-You can set CPU weight for VPS0 (hardware node itself) as well
-(use \fBvzctl set 0 --cpuunits \fInum\fR).
+You can set CPU weight for VE0 (hardware node itself) as well
+(use \fBvzctl set 0 --cpuunits \fInum\fR). Usually, OpenVZ initscript
+(/etc/init.d/vz) takes care of setting this.
 .TP
-\fB--cpulimit\fR \fInum\fR[\fI%\fR]
-Limit of CPU usage for the VPS, in per cent.
+\fB--cpulimit\fR \fInum\fR[\fB%\fR]
+Limit of CPU usage for the VE, in per cent.
 Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU
 limit is 0 (no CPU limit).
 \fB--cpus\fR \fInum\fR
-sets number of CPUs available in the VPS.
+sets number of CPUs available in the VE.
 .TP
 \fBMemory output parameters\fR
-This parameter control output of /proc/meminfo inside VPS
-.IP "\fB--meminfo\fR \fInone\fR
+This parameter control output of /proc/meminfo inside a VE
+.IP "\fB--meminfo\fR \fBnone\fR
 No /proc/meminfo virtualization (the same as on host system).
-.IP "\fB--meminfo\fR \fImode\fR:\fIvalue\fR"
-Configure total memory output in VPS. Free memory is evaluated accordingly.
+.IP "\fB--meminfo\fR \fBmode\fR:\fIvalue\fR"
+Configure total memory output in a VE. Free memory is evaluated accordingly
+to the mode being set.
 .br
 You can use the following modes for \fImode\fR:
 .br
-\fIpages\fR:\fIvalue\fR - set total memory in pages
+\fBpages\fR:\fIvalue\fR - sets total memory in pages
 .br
-\fIprivvmpages\fR:\fIvalue\fR - set total memory as expression \fIprivvmpages * value\fR 
+\fBprivvmpages\fR:\fIvalue\fR - sets total memory as
+\fBprivvmpages\fR * \fIvalue\fR 
 .TP
 \fBIptables control parameters\fR
 .TP
 .IP "\fB--iptables\fR \fIname\fR"
-Restrict access to iptable modules inside VPS (by default all iptables modules that loaded in host system are accessible inside VPS)
+Restrict access to iptables modules inside a VE (by default all iptables
+modules that are loaded in the host system are accessible inside a VE).
 
 You can use the following values for \fIname\fR:
 \fIiptable_filter\fR, \fIiptable_mangle\fR, \fIipt_limit\fR,
@@ -308,9 +316,9 @@ You can use the following values for \fIname\fR:
 .TP
 \fBNetwork devices control parameters\fR
 .IP "\fB--netdev_add\fR \fIname\fR"
-move network device from VPS0 to specified VPS
+move network device from VE0 to a specified VE
 .IP "\fB--netdev_del\fR \fIname\fR"
-delete network device from specified VPS
+delete network device from a specified VE
 .TP
 \fBDisk quota parameters\fR
 .TP
@@ -328,12 +336,12 @@ second is hard quota.
 sets soft overusage time limit for disk quota (also known as grace period).
 .TP
 \fB--quotaugidlimit\fR \fInum\fR
-sets maximum number of user/group IDs in VPS for which disk quota in VPS
-will be accounted If this value is set to \fI0\fR, user and group
-quotas will not be accounted inside VPS.
+sets maximum number of user/group IDs in a VE for which disk quota inside
+the VE will be accounted. If this value is set to \fB0\fR, user and group
+quotas will not be accounted inside the VE.
 
-Note that if you have previously set value of this parameter to \fI0\fR,
-changing it while VPS is running will not take effect.
+Note that if you have previously set value of this parameter to \fB0\fR,
+changing it while the VE is running will not take effect.
 .TP
 \fBMount option\fR
 .TP
@@ -343,10 +351,10 @@ Sets noatime flag (do not update inode access times) on file system.
 \fBCapability option\fR
 .TP
 \fB--capability\fR \fIcapname\fR:\fBon\fR|\fBoff\fR
-Sets capability inside VPS. Note that setting capability when VPS is running
-does not take immediate effect; restart VPS in order for changes to take
-effect. VPS has default set of capability, any operations on capability is
-logical and with default capability mask.
+Sets capability inside a VE. Note that setting capability when the VE
+is running does not take immediate effect; restart VE in order for
+changes to take effect. Note a VE has default set of capability, any
+operations on capability is logical and with default capability mask.
 
 You can use the following values for \fIcapname\fR:
 \fBchown\fR, \fBdac_override\fR, \fBdac_read_search\fR, \fBfowner\fR,
@@ -357,91 +365,94 @@ You can use the following values for \fIcapname\fR:
 \fBsys_chroot\fR, \fBsys_ptrace\fR, \fBsys_pacct\fR,
 \fBsys_admin\fR, \fBsys_boot\fR, \fBsys_nice\fR, \fBsys_resource\fR,
 \fBsys_time\fR, \fBsys_tty_config\fR, \fBmknod\fR, \fBlease\fR,
-\fBsetveid\fR, \fBve_admin\fR
+\fBsetveid\fR, \fBve_admin\fR.
 .TP
 \fBDevice access management\fR
 .TP
 \fB--devnodes\fR \fIdevice\fR:\fBr|w|rw|none\fR
-Give access (\fBr\fR - read, \fBw\fR - write, \fBrw\fR - read write, \fBnone\fR - no access) to special file /dev/\fIdevice\fR from VPS.
+Give access (\fBr\fR - read, \fBw\fR - write, \fBrw\fR - read write, \fBnone\fR - no access) to special file /dev/\fIdevice\fR from a VE.
 .TP
 \fBApply config\fR
 .TP
 \fB--applyconfig\fR \fIname\fR
-Read VPS parameters from VPS sample configuration file
+Read VE parameters from the VE sample configuration file
 \f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR, and
-apply them, if --save option specified save to VPS config file. These parameters
-are not changed (\fBHOSTNAME\fR \fBIP_ADDRESS\fR \fBOSTEMPLATE\fR \fBVE_ROOT\fR \fBVE_PRIVATE\fR)
-.SS Checkpoint/Restore
+apply them, if --save option specified save to the VE config file.
+The following parameters are not changed: \fBHOSTNAME\fR, \fBIP_ADDRESS\fR,
+\fBOSTEMPLATE\fR, \fBVE_ROOT\fR, and \fBVE_PRIVATE\fR.
+.SS Checkpointing and restore
 .TP
-CPT is an extension of OpenVZ kernel which allows to save full state of running VPS and to restore it later.
+Checkpointing is a feature of OpenVZ kernel which allows to save a complete
+state of a running VE, and to restore it later.
 .TP
-\fBchkpnt\fR <\fIvpsid\fR> \fB[--dumpfile <name>]\fR
-This command saves all the state of running VPS to dump file and stop the VPS.
-if option \fB--dumpfile\fR is not set default path \fB/vz/dump/Dump.VPSID\fR
-is used.
+\fBchkpnt\fR \fIveid\fR [\fB--dumpfile\fR \fIname\fR]
+This command saves a complete state of a running VE to a dump file,
+and stops the VE. If an option \fB--dumpfile\fR is not set, default
+dump file name \fB/vz/dump/Dump.\fIveid\fR is used.
 .TP
-\fBrestore\fR <\fIvpsid\fR> \fB[--dumpfile <name>]\fR
-This command restore VPS from dump file created by \fBchkpnt\fR command.
-.SS Performing VPS actions
-.IP "\fBcreate\fR \fIvpsid\fR [\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]" 4
-Creates VPS area. This operation should be done once, before the first
-startup of VPS.
+\fBrestore\fR \fIveid\fR [\fB--dumpfile\fR \fIname\fR]
+This command restores a VE from dump file created by the \fBchkpnt\fR command.
+.SS Performing VE actions
+.IP "\fBcreate\fR \fIveid\fR [\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]" 4
+Creates a new VE area. This operation should be done once, before the first
+start of the VE.
 
-If the \fB--config\fR \fIname\fR option is specified, values from
+If the \fB--config\fR option is specified, values from
 example configuration file
 \f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR
-are put into VPS configuration file. If VPS configuration file already exists,
-it will be removed.
+are put into the VE configuration file. If this VE configuration file
+already exists, it will be removed.
 
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
-point for VPS root directory (default is \fBVE_ROOT\fR specified in
+point for the VE root directory (default is \fBVE_ROOT\fR specified in
 \fBvz\fR(5) file). Argument can contain string \fI$VEID\fR, which will
-be substituted with numeric VPS ID. 
+be substituted with numeric VE ID. 
 
 You can use \fB--private\fR \fIpath\fR option to set the path to directory
-in which all the files and directories specific to this very VPS are stored
+in which all the files and directories specific to this very VE are stored
 (default is \fBVE_PRIVATE\fR specified in \fBvz\fR(5) file). Argument can
-contain string \fI$VEID\fR, which will be substituted with numeric VPS ID.
+contain string \fI$VEID\fR, which will be substituted with numeric VE ID.
 
-You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to a VPS.
+You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to a VE.
 Note that this option can be used multiple times.
 
-You can use \fB--hostname\fR \fIname\fR option to set a host name for a VPS.
+You can use \fB--hostname\fR \fIname\fR option to set a host name for a VE.
 
 .IP \fBdestroy\fR 4
-Removes VPS private area by deleting all files, directories and configuration
-file of this VPS.
+Removes a VE private area by deleting all files, directories and configuration
+file of this VE.
 .IP \fBstart\fR 4
-Mounts (if necessary) and starts VPS.
+Mounts (if necessary) and starts a VE.
 .IP \fBstop\fR 4
-Stops and unmounts VPS.
+Stops and unmounts a VE.
 .IP \fBrestart\fR 4
-Restart VPS, stop if running and start.
+Restarts a VE, i.e. stops it if it is running, and starts again.
 .IP \fBstatus\fR 4
-Shows VPS status. Basically this is a line with five words separated by spaces.
-First word is literally \fBVPS\fR. Second word is \fIVPS ID\fR.
-Third word is showing whether VPS exists or not,
-it can be either \fIexist\fR or \fIdeleted\fR.
-Fourth word is showing the status of VPS filesystem,
-it can be either \fImounted\fR or \fIunmounted\fR.
-Fifth word shows if VPS is running,
-it can be either \fIrunning\fR or \fIdown\fR.
+Shows a VE status. Basically this is a line with five words separated by spaces.
+First word is literally \fBVPSID\fR. Second word is the numeric \fIVE ID\fR.
+Third word is showing whether this VE exists or not,
+it can be either \fBexist\fR or \fBdeleted\fR.
+Fourth word is showing the status of the VE filesystem,
+it can be either \fBmounted\fR or \fBunmounted\fR.
+Fifth word shows if the VE is running,
+it can be either \fBrunning\fR or \fBdown\fR.
 
 This command can also be usable from scripts.
 .IP \fBmount\fR 4
-Mounts VPS private area.
+Mounts VE private area.
 .IP \fBumount\fR 4
-Unmounts VPS private area. Note that \fBstop\fR does \fBumount\fR automatically.
-.IP "\fBexec\fR \fIvpsid\fR \fIcommand\fR" 4
-Executes \fIcommand\fR in VPS. Environment variables are not set inside VPS.
-Signal handlers may differ from default settings. If \fIcommand\fR is \fI-\fR,
+Unmounts VE private area. Note that \fBstop\fR does \fBumount\fR automatically.
+.IP "\fBexec\fR \fIveid\fR \fIcommand\fR" 4
+Executes \fIcommand\fR in a VE. Environment variables are not set inside the VE.
+Signal handlers may differ from default settings. If \fIcommand\fR is \fB-\fR,
 commands are read from stdin.
-.IP "\fBexec2\fR \fIvpsid\fR \fIcommand\fR" 4
+.IP "\fBexec2\fR \fIveid\fR \fIcommand\fR" 4
 The same as \fBexec\fR, but return code is that of \fIcommand\fR.
 .IP \fBrunscript\fR 4
-Run specified shell script in VPS, if VPS is not runnning it will be started.
+Run specified shell script in a VE, if the VE is not runnning
+it will be started.
 .IP \fBenter\fR 4
-Enters into VPS. This option is a back-door for host root only.
+Enters into a VE. This option is a back-door for host root only.
 .SS Other options
 .IP \fB--help\fR 4
 Prints help message with a brief list of possible options.
@@ -450,37 +461,38 @@ Prints \fBvzctl\fR version.
 .SH DIAGNOSTICS
 Returns 0 upon success.
 .SH EXAMPLES
-To create and start "basic" VPS with ID 1000 using \fIfedora-3\fR ostemplate, and IP address 192.168.10.200:
+To create and start "basic" VE with ID of 1000, using \fIfedora-core-5\fR
+OS template, and IP address of 192.168.10.200:
 .br
-\f(CR	vzctl create 1000 --ostemplate fedora-3 --config vps.basic
+\f(CR	vzctl create 1000 --ostemplate fedora-core-5 --config vps.basic
 .br
 \f(CR	vzctl set 1000 --ipadd 192.168.10.200 --save
 .br
 \f(CR	vzctl start 1000
 .br
 \fR
-To set number of processes barrier/limit to 80/100 processes and
+To set number of processes barrier/limit to 80/100, and
 PTY barrier/limit to 16/20 PTYs:
 .br
 \f(CR	vzctl set 1000 --numproc 80:100 -t 16:20 --save
 \fR
 .P
-To execute command \fBls -la\fR in this VPS:
+To execute command \fBls -la\fR in this VE:
 .br
 \f(CR	vzctl exec 1000 /bin/ls -la
 \fR
 .P
-To execute command pipe \fBls -l / | sort\fR in this VPS:
+To execute command pipe \fBls -l / | sort\fR in this VE:
 .br
 \f(CR	vzctl exec 1000 'ls -l / | sort'
 \fR
 .P
-To stop this VPS:
+To stop this VE:
 .br
 \f(CR	vzctl stop 1000
 \fR
 .P
-To permanently remove this VPS:
+To permanently remove this VE:
 .br
 \f(CR	vzctl destroy 1000
 \fR
@@ -489,7 +501,7 @@ To permanently remove this VPS:
 \f(CR
 /etc/vz/vz.conf
 .br
-/etc/vz/conf/vpsid.conf
+/etc/vz/conf/veid.conf
 .br
 /proc/vz/veinfo
 .br
