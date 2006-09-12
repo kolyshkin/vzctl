@@ -19,8 +19,10 @@ DIRS=src
 INSTALL = install
 PREFIX = /usr
 SBINDIR = ${PREFIX}/sbin
+BASHCDIR = etc/bash_completion.d
 
 SCRIPTS=vzpid vzcpucheck vzmigrate
+BASHCSCRIPT=${BASHCDIR}/vzctl.sh
 
 all install %::
 	for file in ${DIRS}; do \
@@ -32,6 +34,7 @@ install::
 	for file in $(SCRIPTS); do \
 		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
+	$(INSTALL) -m 644 $(BASHCSCRIPT) /$(BASHCDIR)
 	${MAKE} -C man $@
 	${MAKE} -C etc/dists $@
 
