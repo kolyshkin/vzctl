@@ -33,16 +33,6 @@ check_config() {
 		return 1
 	fi
 
-	# prevent dumb users from failure
-	if [ ! -e /dev/vzctl ]; then
-		eerror "Missing device node /dev/vzctl"
-		einfo
-		einfo "Please create the vzctl device node using the following command:"
-		einfo "   /bin/mknod /dev/vzctl c 126 0"
-		einfo
-		return 1
-	fi
-
 	if [ -z "${VE0CPUUNITS}" ]; then
 		ewarn "VE0CPUUNITS is not set in /etc/conf.d/vz; using default value of 1000"
 		VE0CPUUNITS=1000
@@ -233,6 +223,15 @@ start() {
 		/sbin/modprobe ${mod} >/dev/null 2>&1
 	done
 	eend
+
+	if [ ! -e /dev/vzctl ]; then
+		eerror "Missing device node /dev/vzctl"
+		einfo
+		einfo "Please create the vzctl device node using the following command:"
+		einfo "   /bin/mknod /dev/vzctl c 126 0"
+		einfo
+		return 1
+	fi
 
 	start_net
 
