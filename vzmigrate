@@ -82,6 +82,7 @@ MIG_ERR_QUOTA=13
 MIG_ERR_CHECKPOINT=$MIG_ERR_STOP_SOURCE
 MIG_ERR_MOUNT_VPS=$MIG_ERR_START_VPS
 MIG_ERR_RESTORE_VPS=$MIG_ERR_START_VPS
+MIG_ERR_OVZ_NOT_RUNNING=14
 
 usage() {
 	cat <<EOF
@@ -291,6 +292,13 @@ if ! $SSH "-o BatchMode=yes" "root@$host" "/bin/true"; then
 	echo "Can't connect to destination address using public key"
 	echo "Please put your public key to destination node"
 	exit $MIG_ERR_CANT_CONNECT
+fi
+
+# Check if OpenVZ is running
+if ! $SSH "-o BatchMode=yes" "root@$host" "/etc/init.d/vz status &> $out"; then
+	echo "OpenVZ is not running on the target machine"
+	echo "Can't continue migration"
+	exit $MIG_ERR_OVZ_NOT_RUNNING
 fi
 
 dst_exist=$($SSH "root@$host" "vzctl status $VEID" | awk '{print $3}')
