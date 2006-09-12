@@ -1,6 +1,0 @@
-vzctl (3.0.0.8-1) unstable; urgency=low
-
-  * Initial release, closes: #360869.
-
- -- Ola Lundqvist <opal@debian.org>  Tue, 25 Apr 2006 21:13:14 +0200
-

@@ -1,4 +1,5 @@
    3.0.12: FIXME
+	* removed debian directory from the tarball (bugs #197, #194)
 	* removed LICVIEW from /etc/init.d/vz (bug #237)
 	* fixed misprints and /dev/nul(l) usage in dist scripts (bug #228)
 	* fixed vzmigrate to work with different awk flavors (bug #231)
