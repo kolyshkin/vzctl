@@ -149,7 +149,7 @@ void parse_options (int argc, char **argv)
 		addr##_flag = 1;			\
 	})
 
-	char c;
+	int c;
 	static char short_options[] = "UDQPc:w:s:t:S:T:i:e:ov";
 	static struct option long_options[] =
 	{
