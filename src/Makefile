@@ -222,6 +222,10 @@ install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
 
 install-redhat: inst-netscripts inst-initd
 
+install-gentoo:
+	$(INSTALL) -m 755 ../etc/init.d/vz-gentoo $(DESTDIR)/$(INITDDIR)/vz
+	ln -s $(DESTDIR)/$(CONFDIR)/vz.conf $(DESTDIR)/conf.d/vz
+
 clean:
 	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_fs) .depend
 
@@ -235,4 +239,4 @@ include .depend
 
 .PHONY: clean depend install inst-dirs inst-config check-version \
 	inst-initd install-cron all default inst-config inst-lib inst-vzdir \
-	install-redhat
+	install-redhat install-gentoo
