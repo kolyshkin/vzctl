@@ -692,6 +692,8 @@ void print_ve()
 			f = p->order;
 			field_names[f].print_fn(&veinfo[idx],
 						field_names[f].index);
+			if (p_outbuffer >= e_buf)
+				break;
 			if (p->next != NULL)
 				*p_outbuffer++ = ' ';
 		}
