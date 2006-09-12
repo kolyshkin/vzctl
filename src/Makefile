@@ -43,6 +43,11 @@ SHAREDLIB_CFLAGS = -fPIC
 #VZKERNEL_HEADERS ?= /lib/modules/$(shell uname -r)/build/include
 INC = -I ../include
 ARCH ?= $(shell uname -m)
+# We need -m64 for ppc64 in order to get proper ioctls
+# Do NOT use ARCH since it is always set to ppc from the spec file
+ifeq ($(shell uname -m),ppc64)
+override CFLAGS += -m64
+endif
 
 OBJ_libvzctl = lib/env.lo lib/ub.lo lib/net.lo lib/logger.lo lib/exec.lo \
 	lib/cap.lo lib/cpu.lo lib/res.lo lib/util.lo lib/dist.lo lib/list.lo \
