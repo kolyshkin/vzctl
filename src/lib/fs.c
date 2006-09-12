@@ -192,7 +192,7 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 		}
 	}
 	if (!(ret = fsumount(veid, root)))
-		logger(0, 0, "VE is unmounted")
+		logger(0, 0, "VE is unmounted");
 
 	return 0;
 }
