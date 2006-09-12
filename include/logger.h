@@ -52,7 +52,7 @@ int set_log_file(char *file);
 /** Initialize logging.
  * 
  * @param file		log file.
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param enable	enable/disable logging.
  * @param level		maximum logging level.
  * @param quiet		skip logging to stdout.

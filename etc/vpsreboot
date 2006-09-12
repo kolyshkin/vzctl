@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# Script to start VPS was rebooted
+# Script to start VE was rebooted
 #
 
 VZCONF=/etc/vz/vz.conf
@@ -46,7 +46,7 @@ function check_reboot()
 		return
 	fi
 	if [ -f "${ve_root}/${REBOOT_MARK}" ]; then
-		[ -z "${LOGFILE}" ] || echo "`date --iso-8601=seconds`  vereboot : VPS ${veid} : reboot " >> ${LOGFILE}
+		[ -z "${LOGFILE}" ] || echo "`date --iso-8601=seconds`  vereboot : VE ${veid} : reboot " >> ${LOGFILE}
 		/usr/sbin/vzctl start ${veid} >/dev/null 2>&1
 	fi
 }

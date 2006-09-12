@@ -34,36 +34,36 @@
 /**  Data structure for file system parameter.
  */
 typedef struct {
-	char *private;		/**< VPS private path. */
+	char *private;		/**< VE private path. */
 	char *private_orig;	/**< original not expanded private path. */
-	char *root;		/**< VPS root path. */
+	char *root;		/**< VE root path. */
 	char *root_orig;	/**< original not expanded root path. */
 	char *tmpl;		/**< TEMPLATE path. */
 	int noatime;
 } fs_param;
 
-/** Get VPS mount status.
+/** Get VE mount status.
  *
- * @param root		VPS root.
- * @return		1 - VPS mounted
- *			0 - VPS unmounted.
- *			-1- error
+ * @param root		VE root.
+ * @return		 1 - VE mounted
+ *			 0 - VE unmounted.
+ *			-1 - error
  */
 int vps_is_mounted(char *root);
 
-/** Mount VPS.
+/** Mount VE.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
 int fsmount(envid_t veid, fs_param *fs, dq_param *dq);
 
-/** Mount VPS and run mount action script if exists.
+/** Mount VE and run mount action script if exists.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @param skip		skip mount action scrips
@@ -72,19 +72,19 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq);
 int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	skipFlags skip);
 
-/** Unmount VPS.
+/** Unmount VE.
  *
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @return		0 on success.
  */
 int fsumount(envid_t veid, char *root);
 
-/** Unmount VPS and run unmount action script if exists.
+/** Unmount VE and run unmount action script if exists.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param skip		skip unmount action scrips
  * @return		0 on success.
  */

@@ -1286,7 +1286,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 	ch++;
 	tmp = ch;
 
-	/* Parsing veth name in VPS */
+	/* Parsing veth name in VE */
 	if ((ch = strchr(tmp, ',')) == NULL) 
 		return ERR_INVAL;
 	ch++;
@@ -1295,7 +1295,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 		return ERR_INVAL;
 	snprintf(dev->dev_name_ve, len, "%s", tmp);
 
-	/* Parsing veth MAC address in VPS */
+	/* Parsing veth MAC address in VE */
 	len = strlen(ch);
 	if (len != 3*ETH_ALEN -1)
 		return ERR_INVAL;
@@ -1669,7 +1669,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 }
 
 /********************************************************/
-/*	VPS parse config stuff				*/
+/*	VE parse config stuff				*/
 /********************************************************/
 
 int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
@@ -1739,7 +1739,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 }
 
 /********************************************************/
-/*	VPS save config stuff				*/
+/*	VE save config stuff				*/
 /********************************************************/
 static int read_conf(char *fname, list_head_t *conf_h)
 {

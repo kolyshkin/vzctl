@@ -305,11 +305,11 @@ err:
 	return ret;
 }
 
-/** Execute command inside VPS.
+/** Execute command inside VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param exec_mode	execution mode (MODE_EXEC, MODE_BASH).
  * @param arg		argv array.
  * @param envp		command environment array.
@@ -322,10 +322,10 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 {
 	int pid, ret, status;
 
-	if (check_var(root, "VPS root is not set"))
+	if (check_var(root, "VE root is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is not running");
+		logger(0, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((pid = fork()) < 0) {
@@ -392,10 +392,10 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 {
 	int pid, ret, status;
 
-	if (check_var(root, "VPS root is not set"))
+	if (check_var(root, "VE root is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is not running");
+		logger(0, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((pid = fork()) < 0) {
@@ -422,11 +422,11 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 	return ret;
 }
 
-/** Read script and execute it in VPS.
+/** Read script and execute it in VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param arg		argv array.
  * @param envp		command environment array.
  * @param fname		script file name
@@ -443,7 +443,7 @@ int vps_exec_script(vps_handler *h, envid_t veid, char *root,
 
 	if ((len = read_script(fname, func, &script)) < 0)
 		return -1;
-	logger(1, 0, "Running VPS script: %s", fname);
+	logger(1, 0, "Running VE script: %s", fname);
 	ret = vps_exec(h, veid, root, MODE_BASH, argv, envp, script, timeout);
 	if (script != NULL)
 		free(script);
@@ -472,7 +472,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (check_var(vps_p->res.fs.private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!stat_file(vps_p->res.fs.private)) {
-		logger(0, 0, "VPS private area %s does not exist",
+		logger(0, 0, "VE private area %s does not exist",
 			vps_p->res.fs.private);
                 return VZ_FS_NOPRVT;	
 	}

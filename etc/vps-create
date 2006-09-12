@@ -16,12 +16,12 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script should create VPS private area
+# This script should create VE private area
 # For usage info see vz-create_prvt(5) man page.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VE_PRVT		- path to root of VPS private areas
+#   VE_PRVT		- path to root of VE private areas
 #   PRIVATE_TEMPLATE	- path to private template used as a source for copying
 
 . /usr/lib/vzctl/scripts/vps-functions

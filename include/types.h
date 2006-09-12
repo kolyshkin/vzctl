@@ -43,7 +43,7 @@
 /* Default enviroment variable PATH */
 #define	ENV_PATH	"PATH=/bin:/sbin:/usr/bin:/usr/sbin:"
 
-/* VPS states */
+/* VE states */
 enum {
 	STATE_STARTING = 1,
 	STATE_RUNNING = 2,
@@ -62,7 +62,7 @@ enum {
 #define ERR_INVAL_SKIP	-6
 #define ERR_LONG_TRUNC  -7
 
-/** VPS handler.
+/** VE handler.
  */
 typedef struct {
         int vzfd;	/**< /dev/vzctl file deccriptor. */

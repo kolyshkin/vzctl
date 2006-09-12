@@ -181,7 +181,7 @@ static int destroydir(char *dir)
 		return 0;
 	}
 	if (!S_ISDIR(st.st_mode)) {
-		logger(0, 0, "Warning: VPS private area is not a directory");
+		logger(0, 0, "Warning: VE private area is not a directory");
 		if (unlink(dir)) {
 			logger(0, errno, "Unable to unlink %s", dir);
 			return -1;
@@ -260,15 +260,15 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (vps_is_mounted(fs->root)) {
-		logger(0, 0, "VPS is currently mounted (umount first)");
+		logger(0, 0, "VE is currently mounted (umount first)");
                 return VZ_FS_MOUNTED;
 	}
-	logger(0, 0, "Destroying VPS private area: %s", fs->private);
+	logger(0, 0, "Destroying VE private area: %s", fs->private);
 	if ((ret = vps_destroy_dir(veid, fs->private)))
 		return ret;
 	move_config(veid, BACKUP);
 	rmdir(fs->root);
-	logger(0, 0, "VPS private area was destroyed");
+	logger(0, 0, "VE private area was destroyed");
 
 	return 0;
 }

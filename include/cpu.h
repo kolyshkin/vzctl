@@ -24,16 +24,16 @@
 /** Data structure for cpu parameters.
  */
 typedef struct {
-	unsigned long *limit;	/**< CPU usage for the VPS in percents. */
+	unsigned long *limit;	/**< CPU usage for the VE, in per cent. */
 	unsigned long *weight;
-	unsigned long *units;	/**< CPU weight in units for the VPS. */
-	unsigned long *vcpus;	/**< number of CPUs available in the running VPS*/
+	unsigned long *units;	/**< CPU weight for the VE, in units. */
+	unsigned long *vcpus;	/**< number of CPUs available in the running VE*/
 } cpu_param;
 
-/**  Apply cpu parameters on running VPS.
+/**  Apply cpu parameters on running VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param cpu		cpu parameters.
  * @return		0 on success.
  */

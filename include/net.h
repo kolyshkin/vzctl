@@ -36,23 +36,23 @@ typedef struct str_struct ip_param;
 /** Data structure for network parameters.
  */
 typedef struct {
-	list_head_t ip;		/**< VPS ip adresses list. */
-	list_head_t dev;	/**< VPS network devices list. */
+	list_head_t ip;		/**< VE IP adresses list. */
+	list_head_t dev;	/**< VE network devices list. */
 	int delall;		/**< flag to delete all ip addresses. */
 	int skip_arpdetect;
 	int skip_route_cleanup;
 	
 } net_param;
 
-/** Setup VPS network.
+/** Setup VE network.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param op		operation (ADD|DEL).
  * @param net		network parameters.
  * @param actions	distribution action scripts.
- * @param root		VPS root.
- * @param state		VPS state (STATE_STARTING|STATE_RUNNING).
+ * @param root		VE root.
+ * @param state		VE state (STATE_STARTING|STATE_RUNNING).
  * @retun		0 on success.
  */
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
@@ -60,8 +60,8 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 
 /** Setup access to Host system network devices.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param op		operation (ADD|DEL).
  * @param net		network parameters.
  * @return		0 on success.
@@ -70,11 +70,11 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net);
 
 int find_ip(list_head_t *ip_h,  char *ipaddr);
 
-/** Abtain ip list belong to VPS.
+/** Obtain list of IP addresses belonging to the VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param ip_h		ip list head.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param ip_h		IP list head.
  * @return		0 on success.
  */
 int get_vps_ip(vps_handler *h, envid_t veid, list_head_t *ip_h);

@@ -200,12 +200,12 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	if (parse_int(argv[optind], &veid)) {
-		fprintf(stderr, "Invalid veid: %s\n", argv[optind]);
+		fprintf(stderr, "Invalid VE ID: %s\n", argv[optind]);
 		exit(1);
 	}
 	get_vps_conf_path(veid, path, sizeof(path));
 	if (stat(path, &st)) {
-		fprintf(stderr, "VPS configuration file: %s not found\n", path);
+		fprintf(stderr, "VE configuration file: %s not found\n", path);
 		exit(1);
 	}
 	param = init_vps_param();

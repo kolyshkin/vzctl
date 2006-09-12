@@ -44,34 +44,34 @@ enum {
 	M_KILL,		/**< stop by SIGTERM. */
 };
 
-/** Allocate and inittialize VPS handler.
+/** Allocate and initialize VE handler.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @return		handler or NULL on error.
  */
 vps_handler *vz_open(envid_t veid);
 
-/** Close VPS handler.
+/** Close VE handler.
  *
- * @param h		VPS handler.
+ * @param h		VE handler.
  */
 void vz_close(vps_handler *h);
 
-/** Get VPS status.
+/** Get VE status.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @return		1 - VPS is running
- *			0 - VPS is stopped.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @return		1 - VE is running
+ *			0 - VE is stopped.
  */
 int vps_is_run(vps_handler *h, envid_t veid);
 
-/** Sart VPS.
+/** Start VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param param		VPS resourses.
- * @param skip		flags to skip VPS setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param param		VE resourses.
+ * @param skip		flags to skip VE setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call setup() callback
  * @return		0 on success.
  */
@@ -82,11 +82,11 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *mod,
 	env_create_FN fn, void *data);
 
-/** Stop VPS.
+/** Stop VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param param		VPS resourses.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param param		VE resourses.
  * @param stop_mode	stop mode one of (M_REBOOT M_HALT M_KILL).
  * @param skip		flags to skip run action script (SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call cleanup() callback.
@@ -97,7 +97,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 
 /** Change root to specified directory
  *
- * @param		VPS root
+ * @param		VE root
  * @return		0 on success
  */
 int vz_chroot(char *root);

@@ -30,21 +30,21 @@
 
 int vps_is_run(vps_handler *h, envid_t veid);
 
-/** Get VPS mount status.
+/** Get VE mount status.
  *
- * @param root		VPS root.
- * @return		1 - VPS mounted
- *			0 - VPS unmounted.
- *			-1- error
+ * @param root		VE root.
+ * @return		 1 - VE mounted
+ *			 0 - VE unmounted.
+ *			-1 - error
  */
 int vps_is_mounted(char *root)
 {
 	return vz_fs_is_mounted(root);
 }
 
-/** Mount VPS.
+/** Mount VE.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @return		0 on success.
@@ -91,10 +91,10 @@ static int real_umount(envid_t veid, char *root)
 	return ret;
 }
 
-/** Unmount VPS.
+/** Unmount VE.
  *
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @return		0 on success.
  */
 int fsumount(envid_t veid, char *root)
@@ -108,10 +108,10 @@ int fsumount(envid_t veid, char *root)
 	return ret;
 }
 
-/** Mount VPS and run mount action script if exists.
+/** Mount VE and run mount action script if exists.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @param skip		skip mount action scrips
@@ -128,16 +128,16 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!stat_file(fs->private)) {
-		logger(0, 0, "VPS private area %s does not exist", fs->private);
+		logger(0, 0, "VE private area %s does not exist", fs->private);
 		return VZ_FS_NOPRVT;
 	}
 	if (vps_is_mounted(fs->root)) {
-		logger(0, 0, "VPS is already mounted");
+		logger(0, 0, "VE is already mounted");
 		return 0;
 	}
 	if ((ret = fsmount(veid, fs, dq)))
 		return ret;
-	/* Execute per VPS & global mount scripts */
+	/* Execute per VE & global mount scripts */
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), "%svps.%s", VPS_CONF_DIR,
 			MOUNT_PREFIX);
@@ -152,16 +152,16 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 				veid, MOUNT_PREFIX);
         	}
 	}
-	logger(0, 0, "VPS is mounted");
+	logger(0, 0, "VE is mounted");
 
 	return 0;
 }
 
-/** Unmount VPS and run unmount action script if exists.
+/** Unmount VE and run unmount action script if exists.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param skip		skip unmount action scrips
  * @return		0 on success.
  */
@@ -171,11 +171,11 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 	int ret, i;
 
 	if (!vps_is_mounted(root)) {
-		logger(0, 0, "VPS is not mounted");
+		logger(0, 0, "VE is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is running. Stop VPS first");
+		logger(0, 0, "VE is running. Stop VE first");
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
@@ -192,7 +192,7 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 		}
 	}
 	if (!(ret = fsumount(veid, root)))
-		logger(0, 0, "VPS is unmounted");
+		logger(0, 0, "VE is unmounted")
 
 	return 0;
 }
@@ -206,7 +206,7 @@ int vps_set_fs(fs_param *g_fs, fs_param *fs)
 	if (check_var(g_fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!vps_is_mounted(g_fs->root)) {
-		logger(0, 0, "VPS is not mounted");
+		logger(0, 0, "VE is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
 	g_fs->noatime = fs->noatime;

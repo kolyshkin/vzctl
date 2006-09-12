@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# vzmigrate is used for VPS migration to another node
+# vzmigrate is used for VE migration to another node
 # Copyright (C) 2000-2006 SWsoft. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -20,31 +20,31 @@
 #
 # Usage:
 # vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
-#           destination_address VPSID
+#           destination_address VEID
 # Options:
 #	-r, --remove-area yes|no
-#		Whether to remove VPS on source HN for successfully migrated VPS.
+#		Whether to remove VE on source HN for successfully migrated VE.
 #	--ssh=<ssh options>
 #		Additional options that will be passed to ssh while establishing
 #		connection to destination HN. Please be careful with options
 #		passed, DO NOT pass destination hostname.
 #	--keep-dst
-#		Do not clean synced destination VPS private area in case of some
-#		error. It makes sense to use this option on big VPS migration to
-#		avoid syncing VPS private area again in case some error
-#		(on VPS stop for example) occurs during first migration attempt.
+#		Do not clean synced destination VE private area in case of some
+#		error. It makes sense to use this option on big VE migration to
+#		avoid syncing VE private area again in case some error
+#		(on VE stop for example) occurs during first migration attempt.
 #	--online
 #		Perform online (zero-downtime) migration: during the migration the
-#		VPS hangs for a while and after the migration it continues working
+#		VE hangs for a while and after the migration it continues working
 #		as though nothing has happened.
 #	-v	
 #		Verbose mode. Causes vzmigrate to print debugging messages about
 #		its progress (including some time statistics).
 #
 # Examples:
-#	Online migration of VPS #101 to foo.com:
+#	Online migration of VE #101 to foo.com:
 #		vzmigrate --online foo.com 101
-#	Migration of VPS #102 to foo.com with downtime:
+#	Migration of VE #102 to foo.com with downtime:
 #		vzmigrate foo.com 102
 # NOTE:
 #	This program uses ssh as a transport layer. You need to put ssh
@@ -86,25 +86,25 @@ MIG_ERR_OVZ_NOT_RUNNING=14
 
 usage() {
 	cat <<EOF
-This program is used for VPS migration to another node
+This program is used for VE migration to another node
 Usage:
 vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
-	destination_address VPSID
+	destination_address <VEID>
 Options:
 -r, --remove-area yes|no
-	Whether to remove VPS on source HN for successfully migrated VPS.
+	Whether to remove VE on source HN for successfully migrated VE.
 --ssh=<ssh options>
 	Additional options that will be passed to ssh while establishing
 	connection to destination HN. Please be careful with options
 	passed, DO NOT pass destination hostname.
 --keep-dst
-	Do not clean synced destination VPS private area in case of some
-	error. It makes sense to use this option on big VPS migration to
-	avoid syncing VPS private area again in case some error
-	(on VPS stop for example) occurs during first migration attempt.
+	Do not clean synced destination VE private area in case of some
+	error. It makes sense to use this option on big VE migration to
+	avoid syncing VE private area again in case some error
+	(on VE stop for example) occurs during first migration attempt.
 --online
 	Perform online (zero-downtime) migration: during the migration the
-	VPS hangs for a while and after the migration it continues working
+	VE hangs for a while and after the migration it continues working
 	as though nothing has happened.
 -v	
 	Verbose mode. Causes vzmigrate to print debugging messages about
@@ -271,20 +271,20 @@ fi
 vpsconf="$confdir/$VEID.conf"
 
 if [ ! -r "$vpsconf" -o ! -r "$vpsconf" ]; then
-	echo "Can't read VPS #$VEID config file"
+	echo "Can't read VE #$VEID config file"
 	exit $MIG_ERR_NOEXIST
 fi
 
 get_status $(vzctl status $VEID)
 if [ "$exist" = "deleted" ]; then
-	echo "VPS #$VEID doesn't exist"
+	echo "VE #$VEID doesn't exist"
 	exit $MIG_ERR_NOEXIST
 fi
 
 if [ $online -eq 1 ]; then
-	log 1 "Starting online migration of VPS $VEID on $host"
+	log 1 "Starting online migration of VE $VEID on $host"
 else
-	log 1 "Starting migration of VPS $VEID on $host"
+	log 1 "Starting migration of VE $VEID on $host"
 fi
 
 # Try to connect to destination
@@ -303,12 +303,12 @@ fi
 
 dst_exist=$($SSH "root@$host" "vzctl status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
-	echo "VPS #$VEID already exists on destination node"
+	echo "VE #$VEID already exists on destination node"
 	exit $MIG_ERR_EXISTS
 fi
 
 if [ $online -eq 1 -a "$state" != "running" ]; then
-	echo "Can't perform online migration of stopped VPS"
+	echo "Can't perform online migration of stopped VE"
 	exit $MIG_ERR_VPS_IS_STOPPED
 fi
 
@@ -351,16 +351,16 @@ if [ -n "$act_scripts" ]; then
 	fi
 fi
 
-log 2 "Creating remote VPS root dir"
+log 2 "Creating remote VE root dir"
 if ! $SSH "root@$host" "mkdir -p $VE_ROOT"; then
-	log 1 "Failed to make VPS root"
+	log 1 "Failed to make VE root"
 	undo_act_scripts
 	exit $MIG_ERR_COPY
 fi
 
-log 2 "Creating remote VPS private dir"
+log 2 "Creating remote VE private dir"
 if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE"; then
-	log 1 "Failed to make VPS private area"
+	log 1 "Failed to make VE private area"
 	undo_private
 	exit $MIG_ERR_COPY
 fi
@@ -384,25 +384,25 @@ fi
 log 1 "Syncing private"
 if ! rsync -aH --progress "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" | \
 		grep "% of" | awk -v ORS="\r" '{print $10}'; then
-	log 1 "Failed to sync VPS private areas"
+	log 1 "Failed to sync VE private areas"
 	undo_quota_on
 	exit $MIG_ERR_COPY
 fi
 
 if [ $online -eq 1 ]; then
-	log 1 "Live migrating VPS"
+	log 1 "Live migrating VE"
 
-	log 2 "Suspending VPS"
+	log 2 "Suspending VE"
 	time_suspend=$(date +%s.%N)
 	if ! vzctl chkpnt $VEID --suspend &> $out; then
-		log 1 "Failed to suspend VPS"
+		log 1 "Failed to suspend VE"
 		undo_sync
 		exit $MIG_ERR_CHECKPOINT 
 	fi
 
-	log 2 "Dumping VPS"
+	log 2 "Dumping VE"
 	if ! vzctl chkpnt $VEID --dump --dumpfile $VE_DUMPFILE &> $out; then
-		log 1 "Failed to dump VPS"
+		log 1 "Failed to dump VE"
 		undo_suspend
 		exit $MIG_ERR_CHECKPOINT
 	fi
@@ -416,16 +416,16 @@ if [ $online -eq 1 ]; then
 	fi
 else
 	if [ "$state" = "running" ]; then
-		log 1 "Stopping VPS"
+		log 1 "Stopping VE"
 		if ! vzctl stop $VEID &> $out; then
-			log 1 "Failed to stop VPS"
+			log 1 "Failed to stop VE"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
 	elif [ "$mounted" = "mounted" ]; then
-		log 1 "Unmounting VPS"
+		log 1 "Unmounting VE"
 		if ! vzctl umount $VEID &> $out; then
-			log 1 "Failed to umount VPS"
+			log 1 "Failed to umount VE"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
@@ -436,7 +436,7 @@ if [ "$state" = "running" ]; then
 	log 2 "Syncing private (2nd pass)"
 	time_rsync2=$(date +%s.%N)
 	if ! rsync -aH "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
-		log 1 "Failed to sync VPS private areas"
+		log 1 "Failed to sync VE private areas"
 		undo_source_stage
 		exit $MIG_ERR_COPY
 	fi
@@ -468,18 +468,18 @@ if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T < $VE_QUOTADUMP && \
 fi
 
 if [ $online -eq 1 ]; then
-	log 2 "Undumping VPS"
+	log 2 "Undumping VE"
 	time_undump=$(date +%s.%N)
 	if ! $SSH "root@$host" "vzctl restore $VEID --undump \
 			--dumpfile $VE_DUMPFILE --skip_arpdetect" &> $out; then
-		log 1 "Failed to undump VPS"
+		log 1 "Failed to undump VE"
 		undo_copy_quota
 		exit $MIG_ERR_RESTORE_VPS
 	fi
 
-	log 2 "Resuming VPS"
+	log 2 "Resuming VE"
 	if ! $SSH "root@$host" "vzctl restore $VEID --resume" &> $out; then
-		log 1 "Failed to resume VPS"
+		log 1 "Failed to resume VE"
 		undo_undump
 		exit $MIG_ERR_RESTORE_VPS
 	fi
@@ -494,7 +494,7 @@ if [ $online -eq 1 ]; then
 
 	log 1 "Cleanup"
 
-	log 2 "Killing VPS"
+	log 2 "Killing VE"
 	vzctl chkpnt $VEID --kill &> $out
 	vzctl umount $VEID &> $out
 
@@ -503,16 +503,16 @@ if [ $online -eq 1 ]; then
 	$SSH "root@$host" "rm -f $VE_DUMPFILE"
 else
 	if [ "$state" = "running" ]; then
-		log 1 "Staring VPS"
+		log 1 "Starting VE"
 		if ! $SSH "root@$host" "vzctl start $VEID" &> $out; then
-			log 1 "Failed to start VPS"
+			log 1 "Failed to start VE"
 			undo_copy_quota
 			exit $MIG_ERR_START_VPS
 		fi
 	elif [ "$mounted" = "mounted" ]; then
-		log 1 "Mounting VPS"
+		log 1 "Mounting VE"
 		if ! $SSH "root@$host" "vzctl mount $VEID" &> $out; then
-			log 1 "Failed to mount VPS"
+			log 1 "Failed to mount VE"
 			undo_copy_quota
 			exit $MIG_ERR_MOUNT_VPS
 		fi
@@ -529,7 +529,7 @@ else
 fi
 
 if [ $remove_area -eq 1 ]; then
-	log 2 "Destroying VPS"
+	log 2 "Destroying VE"
 	vzctl destroy $VEID &> $out
 else
 	# Move config as veid.migrated to allow backward migration

@@ -92,11 +92,11 @@ int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
 	return ret;
 }
 
-/** Allow/disallow access to devices on host system from VPS.
+/** Allow/disallow access to devices on host system from VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param dev		devices list.
  * @return		0 on success.
  */
@@ -109,7 +109,7 @@ int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev)
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply devperm: VPS is not running");
+		logger(0, 0, "Unable to apply devperm: VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	logger(0, 0, "Setting devices");

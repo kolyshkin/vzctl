@@ -70,7 +70,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 
 		fprintf(g_log.fp, "%s %s : ", date, g_log.prog);
 		if (g_log.veid)
-			fprintf(g_log.fp, "VPS %d : ", g_log.veid);
+			fprintf(g_log.fp, "VE %d : ", g_log.veid);
 		vfprintf(g_log.fp, format, ap);
 		if (err_no) 
 			fprintf(g_log.fp, ": %s", strerror(err_no));

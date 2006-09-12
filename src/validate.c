@@ -549,7 +549,7 @@ int vps_validate(vps_res *param, int mode)
 
 	if (mode == ACT_NONE)
 		return 0;	
-	logger(0, 0, "Validate VPS:");
+	logger(0, 0, "Validating VE:");
 	ret  = validate(param, mode == ACT_FIX, 0);
 	if (mode == ACT_ERROR && ret)
 		return VZ_VALIDATE_ERROR;

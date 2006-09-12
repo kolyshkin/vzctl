@@ -25,7 +25,7 @@ function usage()
 
 function header()
 {
-	echo "Pid	VPSID	Name"
+	echo "Pid	VEID	Name"
 }
 
 function getveid()

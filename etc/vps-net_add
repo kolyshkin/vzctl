@@ -16,15 +16,15 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script setup routing for given VPS.
+# This script setup routing for given VE.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VEID          - VPS id
+#   VEID          - VE id
 # Optional parameters:
 #   IP_ADDR       - IP address(es) to add
 #                   (several addresses should be divided by space)
-#   VE_STATE      - state of VPS; could be one of:
+#   VE_STATE      - state of VE; could be one of:
 #                     starting | stopping | running | stopped
 . /etc/vz/vz.conf
 . /usr/lib/vzctl/scripts/vps-functions

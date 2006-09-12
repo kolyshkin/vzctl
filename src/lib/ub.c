@@ -204,8 +204,8 @@ if (ub->name != NULL) {							\
 
 /** Apply UBC resources.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param ubc		UBC parameters
  * @return		0 on success
  */
@@ -216,8 +216,8 @@ int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 	if (is_ub_empty(ub))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply UBC parameters,"
-			" VPS is not running");
+		logger(0, 0, "Unable to apply UBC parameters: "
+			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((ret = set_ublimit(h, veid, ub)))
@@ -344,7 +344,7 @@ if ((src->x) != NULL) { 					\
 
 /** Read UBC resources current usage from /proc/user_beancounters
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param ub		UBC parameters.
  * @return		0 on success.
  */

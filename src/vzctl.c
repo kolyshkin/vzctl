@@ -206,14 +206,14 @@ int main(int argc, char *argv[], char *envp[])
 		}
 	}
 	if (argc < 3) {
-		fprintf(stderr, "VPS id is not given\n");
+		fprintf(stderr, "VE id is not given\n");
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	}
 	if (parse_int(argv[2], &veid)) {
 		veid = get_veid_by_name(argv[2]);
 		if (veid < 0) {
-			fprintf(stderr, "Bad VPS id %s\n", argv[2]);
+			fprintf(stderr, "Bad VE id %s\n", argv[2]);
 			ret = VZ_INVALID_PARAMETER_VALUE;
 			goto error;
 		}
@@ -239,7 +239,7 @@ int main(int argc, char *argv[], char *envp[])
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	} else if (veid < 0) {
-		fprintf(stderr, "Bad VPS id %d\n", veid);
+		fprintf(stderr, "Bad VE id %d\n", veid);
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	}
@@ -254,7 +254,7 @@ int main(int argc, char *argv[], char *envp[])
 			action != ACTION_STATUS &&
 			action != ACTION_SET)
 	{
-		logger(0, 0, "VPS config file does not exist");
+		logger(0, 0, "VE config file does not exist");
 		ret = VZ_NOVECONFIG;
 		goto error;
 	}

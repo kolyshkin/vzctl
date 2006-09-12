@@ -21,10 +21,10 @@
 
 /** Setup user password
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param actions	distribution action scripts.
- * @param root		VPS root.
+ * @param root		VE root.
  * @param pw		list of user:password parameters.
  * @return		0 on success.
  */

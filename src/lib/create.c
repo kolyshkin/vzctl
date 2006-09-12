@@ -82,7 +82,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		logger(0, 0, "Cached os template %s not found",	tarball);
 		return VZ_PKGSET_NOT_FOUND;
 	}
-	/* Lock VPS area */
+	/* Lock VE area */
 	if (make_dir(fs->private, 0))
 		return VZ_FS_NEW_VE_PRVT;
 	snprintf(tmp_dir, sizeof(tmp_dir), "%s.tmp", fs->private);
@@ -128,7 +128,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		quota_set(veid, fs->private, dq);
 		quota = 0;
 	}
-	/* Unlock VPS area */
+	/* Unlock VE area */
 	rmdir(fs->private);
 	if (rename(tmp_dir, fs->private)) {
 		logger(0, errno, "Can't rename %s to %s", tmp_dir, fs->private);
@@ -173,15 +173,15 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			return VZ_CP_CONFIG;
 		}
 		if (cfg_exists) {
-			logger(0, 0, "Warning: VPS config file already exists,"
-				" will be rewrited with %s", src);
+			logger(0, 0, "Warning: VE config file already exists,"
+				" will be rewritten with %s", src);
 			unlink(dst);
 		}
 		sample_config = cmd_p->opt.config;
 	} else if (vps_p->opt.config != NULL) {
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			vps_p->opt.config);
-		/* Do not use config if VPS config exists */
+		/* Do not use config if VE config exists */
 		if (!cfg_exists && stat_file(src)) 
 			sample_config = vps_p->opt.config;
 	}
@@ -207,7 +207,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		return VZ_FS_PRVT_AREA_EXIST;
 	}
 	merge_vps_param(vps_p, cmd_p);
-	logger(0, 0, "Creating VPS private area: %s", fs->private);
+	logger(0, 0, "Creating VE private area: %s", fs->private);
 	if (action != NULL && action->mod_count) {
 		ret = mod_setup(h, veid, 0, 0, action, vps_p);
 	} else {
@@ -234,7 +234,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		if (sample_config != NULL)
 			unlink(dst);
 		vps_destroy_dir(veid, fs->private);
-		logger(0, 0, "Creation of VPS private area failed");
+		logger(0, 0, "Creation of VE private area failed");
 		return ret;
 	}
 	vps_postcreate(veid, &vps_p->res.fs, &vps_p->res.tmpl);
@@ -257,7 +257,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		cmd_p->res.tmpl.ostmpl = strdup(tmpl->ostmpl);
 	}
 	vps_save_config(veid, dst, cmd_p, vps_p, action);
-	logger(0, 0, "VPS private area was created");
+	logger(0, 0, "VE private area was created");
 
 	return 0;
 }

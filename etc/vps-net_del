@@ -16,14 +16,14 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script remove routing for given VPS.
+# This script removes routing for given VE.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
 #   IP_ADDR       - IPs to delete, several addresses should be divided by space
-#   VEID          - VPS id
+#   VEID          - VE id
 # Optional parameters:
-#   VE_STATE      - state of VPS; could be one of:
+#   VE_STATE      - state of VE; could be one of:
 #                     starting | stopping | running | stopped
 
 . /usr/lib/vzctl/scripts/vps-functions

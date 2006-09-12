@@ -81,9 +81,9 @@ function clear_ve_net()
 	[ -z "${VEID}" ] && return
 	get_ip_list ${VEID}
 	vzgetnetdev
-	[ -z "${LOGFILE}" ] || echo "`date --iso-8601=seconds`  venetclean : VPS $VEID : VPS died, clear ips: ${IP_ADDR}" >> ${LOGFILE}
+	[ -z "${LOGFILE}" ] || echo "`date --iso-8601=seconds`  venetclean : VE $VEID : VE died, clear IPs: ${IP_ADDR}" >> ${LOGFILE}
 	for ip in ${IP_ADDR}; do
-		# clear ip if not used
+		# clear IP if not used
 		if ! echo -e "${VES_INFO}" | grep -w "${ip}" >/dev/null 2>&1;
 		then
 			vzdelrouting $ip

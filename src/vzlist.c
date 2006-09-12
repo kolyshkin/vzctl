@@ -54,8 +54,8 @@ static char *name_pattern = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
 struct Cfield_order *last_field = NULL;
-static char *default_field_order = "vpsid,numproc,status,ip,hostname";
-static char *default_nm_field_order = "vpsid,numproc,status,ip,name";
+static char *default_field_order = "veid,numproc,status,ip,hostname";
+static char *default_nm_field_order = "veid,numproc,status,ip,name";
 static int g_sort_field = 0;
 static int *g_ve_list = NULL;
 static int n_ve_list = 0;
@@ -374,7 +374,9 @@ SORT_UL_RES(cpuunits_sort_fn, Ccpu, cpu, limit, 1)
 struct Cfield field_names[] = 
 {
 /* veid should have index 0 */
-{"vpsid" , "VPSID", "%10s",  0, RES_NONE, print_veid, id_sort_fn},
+{"veid", "VEID", "%10s", 0,  RES_NONE, print_veid, id_sort_fn},
+/* vpsid is for backward compatibility -- will be removed later */
+{"vpsid" , "VEID", "%10s",  0, RES_NONE, print_veid, id_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
@@ -593,9 +595,9 @@ void *x_realloc(void *ptr, int size)
 void usage()
 {
 	fprintf(stderr, "Usage: vzlist [-a] [-o name[,name...]] [-s {name|-name}] [-h <pattern>] [-N <pattern>]\n");
-	fprintf(stderr, "\t\t[-H] [-S] [vpsid [vpsid ...]|-1]\n");
+	fprintf(stderr, "\t\t[-H] [-S] [veid [veid ...]|-1]\n");
 	fprintf(stderr, "       vzlist -L\n\n");
-	fprintf(stderr, "\t--all -a\t list of all VPS\n");
+	fprintf(stderr, "\t--all -a\t list of all VEs\n");
 	fprintf(stderr, "\t--output -o\t output only specified parameters\n");
 	fprintf(stderr, "\t--hostname -h\t hostname search pattern\n");
 	fprintf(stderr, "\t--name -n\t display VE name\n");
@@ -1487,7 +1489,7 @@ int collect()
 		return ret;
 	/* No VE found, exit with error */
 	if (!n_veinfo) {
-		fprintf(stderr, "VPS not found\n");
+		fprintf(stderr, "VE not found\n");
 		return 1;
 	}
 	if (check_param(RES_QUOTA)) 

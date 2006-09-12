@@ -97,7 +97,7 @@ stop_net() {
 start_ve() {
 	local veid velist msg need_restart=""
 
-	# get all VPSs we should start on boot
+	# get all VEs we should start on boot
 	if ! cd ${VPSCONFDIR}; then
 		eerror $? "Unable to cd to ${VPSCONFDIR}"
 		return 1
@@ -108,7 +108,7 @@ start_ve() {
 	/sbin/sysctl -q -w net.ipv4.route.src_check=0
 
 	for veid in ${velist}; do
-		ebegin "Starting VPS ${veid}"
+		ebegin "Starting VE ${veid}"
 		if [ "${VZFASTBOOT}" = "yes" -a "${DISK_QUOTA}" = "yes" ]; then
 			${VZQUOTA} stat ${veid} >/dev/null 2>&1
 			if [ $? -eq 6 ]; then
@@ -123,16 +123,16 @@ start_ve() {
 	done
 
 	for veid in ${need_restart}; do
-		ebegin "Stopping VPS ${veid}"
+		ebegin "Stopping VE ${veid}"
 		msg=$(${VZCTL} stop ${veid})
 		eend $? "${msg}"
 
-		ebegin "Starting VPS ${veid}"
+		ebegin "Starting VE ${veid}"
 		msg=$($VZCTL start ${veid} 2>&1)
 		eend $? "${msg}"
 	done
 
-	# we're ok even if some VPSs failed to start
+	# we're ok even if some VEs failed to start
 	return 0
 }
 
@@ -146,9 +146,9 @@ stop_ve() {
 			velist=$(awk  '{print $1;}' < ${VZVEINFO} | grep -v "^0$")
 
 			for veid in ${velist}; do
-				ebegin "Shutting down VPS $veid"
+				ebegin "Shutting down VE $veid"
 				# Set fairsched parameters to maximum so
-				# VPS will stop fast
+				# VE will stop fast
 				${VZCTL} set ${veid} --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
 				${VZCTL} --skiplock stop ${veid} >/dev/null 2>&1 &
 				pids="${pids} $!"
@@ -177,7 +177,7 @@ stop_ve() {
 		mounts=$(awk '{if ($3=="simfs") print $2}' /proc/mounts)
 
 		for m in ${mounts}; do
-			ebegin "Unmounting VPS area ${m}"
+			ebegin "Unmounting VE area ${m}"
 			msg=$(umount ${m} 2>&1)
 			eend $? "${msg}"
 			if [ $? -ne 0 ]; then
@@ -193,7 +193,7 @@ stop_ve() {
 	quota=$(awk -F: '/^[0-9]+:/{print $1}' /proc/vz/vzquota 2>/dev/null)
 
 	for m in ${quota}; do
-		ebegin "Turning quota off for VPS ${m}"
+		ebegin "Turning quota off for VE ${m}"
 		msg=$(vzquota off ${m} 2>&1)
 		eend $? "${msg}"
 	done

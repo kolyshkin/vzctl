@@ -186,8 +186,8 @@ static inline cap_t make_cap_mask(cap_t on, cap_t off)
 	return (CAPDEFAULTMASK | on) & ~off;
 }
 
-/** Apply capability mask to VPS.
- * @param veid		VPS id.
+/** Apply capability mask to VE.
+ * @param veid		VE id.
  * @param cap		capability mask.
  * @return		0 on success.
  */

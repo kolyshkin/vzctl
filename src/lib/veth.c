@@ -89,10 +89,10 @@ static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
 	return ret;
 }
 
-/** Create/remove veth devices for VPS.
+/** Create/remove veth devices for VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param dev		devices list.
  * @return		0 on success.
  */
@@ -106,7 +106,7 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to %s veth: VPS is not running",
+		logger(0, 0, "Unable to %s veth: VE is not running",
 			op == ADD ? "create" : "remove");
 		return VZ_VE_NOT_RUNNING;
 	}

@@ -97,7 +97,7 @@ int vz_env_create_data_ioctl(vps_handler *h,
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE_DATA, data);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
 #ifdef  __x86_64__
-	/* Set personality PER_LINUX32 for i386 based VPSes */
+	/* Set personality PER_LINUX32 for i386 based VEs */
 	if (errcode >= 0)
 		set_personality32();
 #endif
@@ -119,7 +119,7 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE, &env_create);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
 #ifdef  __x86_64__
-	/* Set personality PER_LINUX32 for i386 based VPSes */
+	/* Set personality PER_LINUX32 for i386 based VEs */
 	if (errcode >= 0 && (flags & VE_ENTER))
 		set_personality32();
 #endif
@@ -147,9 +147,9 @@ static int reset_std()
 	return stdfd;
 }
 
-/** Allocate and inittialize VPS handler.
+/** Allocate and initialize VE handler.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @return		handler or NULL on error.
  */
 vps_handler *vz_open(envid_t veid)
@@ -189,9 +189,9 @@ err:
 	return NULL;
 }
 
-/** Close VPS handler.
+/** Close VE handler.
  *
- * @param h		VPS handler.
+ * @param h		VE handler.
  */
 void vz_close(vps_handler *h)
 {
@@ -203,12 +203,12 @@ void vz_close(vps_handler *h)
 	free(h);
 }
 
-/** Get VPS status.
+/** Get VE status.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @return		1 - VPS is running
- *			0 - VPS is stopped.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @return		1 - VE is running
+ *			0 - VE is stopped.
  */
 int vps_is_run(vps_handler *h, envid_t veid)
 {
@@ -228,7 +228,7 @@ int vps_is_run(vps_handler *h, envid_t veid)
 
 /** Change root to specified directory
  *
- * @param		VPS root
+ * @param		VE root
  * @return		0 on success
  */
 int vz_chroot(char *root)
@@ -238,7 +238,7 @@ int vz_chroot(char *root)
 	struct sigaction act;
 
 	if (root == NULL) {
-		logger(0, 0, "vz_chroot: VPS root is not specified");	
+		logger(0, 0, "vz_chroot: VE root is not specified");	
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (chdir(root)) {
@@ -269,9 +269,9 @@ int vz_setluid(envid_t veid)
 }
 
 /*
- * Checks if sysfs needs to be enabled for this VPS.
+ * Checks if sysfs needs to be enabled for this VE.
  * Now we do that only for distributions from sysfs_dists.
- * FIXME: priovide a generic way to enable/disable sysfs per VPS
+ * FIXME: provide a generic way to enable/disable sysfs per VE.
 */
 static int sysfs_required(vps_res *res)
 {
@@ -380,7 +380,7 @@ try:
 	 * environment is created.
 	*/
 	close(STDIN_FILENO);
-	/* Now we wait until VPS setup will be done
+	/* Now we wait until VE setup will be done
 	   If no error start init otherwise exit.
 	*/
 	if (read(wait_p, &ret, sizeof(ret)) != 0)
@@ -540,7 +540,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is already running");
+		logger(0, 0, "VE is already running");
 		return VZ_VE_RUNNING;
 	}
 	if ((ret = check_ub(&res->ub)))
@@ -551,9 +551,9 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		free(dist_name);
 	if (ret)
 		return ret;
-	logger(0, 0, "Starting VPS ...");
+	logger(0, 0, "Starting VE ...");
 	if (vps_is_mounted(res->fs.root)) {
-		/* if VPS mounted umount first, to cleanup mount state */
+		/* if VE is mounted -- umount first, to cleanup mount state */
 		vps_umount(h, veid, res->fs.root, skip);
 	}
 	if (!vps_is_mounted(res->fs.root)) {
@@ -606,16 +606,16 @@ err:
 	if (ret) {
 		int err;
 		/* Kill enviroment */
-		logger(0, 0, "VPS start failed");
+		logger(0, 0, "VE start failed");
 		write(wait_p[1], &err, sizeof(err));
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
-                        logger(0, 0, "VPS start in progress...");
+                        logger(0, 0, "VE start in progress...");
 		} else {
 			if (ret == VZ_FS_BAD_TMPL)
 				logger(0, 0, "Unable to start init, probably"
 					" incorrect template");
-                        logger(0, 0, "VPS start failed");
+                        logger(0, 0, "VE start failed");
                 }
 	}
 	if (ret) {
@@ -634,13 +634,13 @@ err:
 	return ret;
 }
 
-/** Sart and configure VPS.
+/** Start and configure VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param res		VPS resourses.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param res		VE resourses.
  * @param d_actions	distribution specific sctions.
- * @param skip		flags to skip VPS setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
+ * @param skip		flags to skip VE setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call setup() callback
  * @return		0 on success.
  */
@@ -663,7 +663,7 @@ static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
 	if ((ret = vz_env_create_ioctl(h, veid, VE_ENTER)) < 0) {
 		if (errno == ESRCH)
 			return 0;
-		logger(0, errno, "VPS enter failed");
+		logger(0, errno, "VE enter failed");
 		return ret;
 	}
 	close(h->vzfd);
@@ -702,7 +702,7 @@ static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode)
 	act.sa_flags = SA_NOCLDSTOP;
         sigaction(SIGCHLD, &act, NULL);
 
-	logger(0, 0, "Stopping VPS ...");
+	logger(0, 0, "Stopping VE ...");
 	if (stop_mode == M_KILL)
 		goto kill_vps;
 	if ((pid = fork()) < 0) {
@@ -741,19 +741,19 @@ kill_vps:
 	}
 out:
 	if (ret)
-		logger(0, 0, "Unable to stop VPS, operation timed out");
+		logger(0, 0, "Unable to stop VE: operation timed out");
 	else
-		logger(0, 0, "VPS was stopped");
+		logger(0, 0, "VE was stopped");
 err:
 	sigaction(SIGCHLD, &actold, NULL);
 	return ret;
 }
 
-/** Stop VPS.
+/** Stop VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param res		VPS resourses.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param res		VE resourses.
  * @param stop_mode	stop mode one of (M_REBOOT M_HALT M_KILL).
  * @param skip		flags to skip run action script (SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call cleanup() callback.
@@ -769,7 +769,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to stop: VPS is not running");
+		logger(0, 0, "Unable to stop: VE is not running");
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
@@ -783,14 +783,14 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 			}
 		}
 	}
-	/* get VPS ip adresses for cleanup */
+	/* get VE IP addresses for cleanup */
 	get_vps_ip(h, veid, &param->del_res.net.ip);
 	if ((ret = env_stop(h, veid, res->fs.root, stop_mode)))
 		return ret;
 	mod_cleanup(h, veid, action, param);
 	vps_cleanup_res(h, veid, param, STATE_STOPPING);
 	ret = vps_umount(h, veid, res->fs.root, skip);
-	/* Clear VPS network configuration*/
+	/* Clear VE network configuration*/
 	ret = run_pre_script(veid, VPS_STOP);
 
 	return ret;
@@ -800,7 +800,7 @@ int vps_restart(vps_handler *h, envid_t veid, vps_param *param)
 {
 	int ret;
 
-	logger(0, 0, "Restarting VPS");
+	logger(0, 0, "Restarting VE");
 	if (vps_is_run(h, veid) &&
 		(ret = vps_stop(h, veid, param, M_REBOOT, SKIP_NONE, NULL)))
 	{

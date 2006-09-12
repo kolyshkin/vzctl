@@ -249,8 +249,8 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)){
-		logger(0, 0, "Unable to setup network devices:"
-			" VPS is not running");
+		logger(0, 0, "Unable to setup network devices: "
+			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	cmd = (op == ADD) ? VE_NETDEV_ADD : VE_NETDEV_DEL;
@@ -271,14 +271,14 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	int ret = 0;
 
 	if (list_empty(ip_h) &&	!net->delall) {
-		/* make initial network setup on VPS start*/
+		/* make initial network setup on VE start*/
 		if (state == STATE_STARTING && op == ADD)
 			goto configure;
 		return 0;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply network parameters: VPS is not"
-			" running");
+		logger(0, 0, "Unable to apply network parameters: "
+			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (op == ADD) {

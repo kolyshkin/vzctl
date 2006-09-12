@@ -36,7 +36,7 @@
 #include "quota.h"
 #include "vps_configure.h"
 
-/** Function called on VPS start to setup resource management
+/** Function called on VE start to setup resource management
  *
  */
 int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
@@ -50,7 +50,7 @@ int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
 	return 0;
 }
 
-/** Function called on VPS stop to cleanup resources
+/** Function called on VE stop to cleanup resources
  *
  */
 int vps_cleanup_res(vps_handler *h, envid_t veid, vps_param *param, int vps_state)
@@ -100,9 +100,9 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 
 	if (vps_state == STATE_RUNNING && vps_is_run(h, veid)) {
 		if (res->cap.on || res->cap.off)
-			logger(0, 0, "Unable to set capability on running VPS");
+			logger(0, 0, "Unable to set capability on running VE");
 		if (res->env.ipt_mask) {
-			logger(0, 0, "Unable to set iptables on running VPS");
+			logger(0, 0, "Unable to set iptables on running VE");
 			return VZ_SET_IPTABLES;
 		}
 	}

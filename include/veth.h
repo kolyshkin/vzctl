@@ -30,9 +30,9 @@ typedef struct {
 	char dev_addr[ETH_ALEN];	/**< device MAC address. */
 	int addrlen;			/**< device MAC address length. */
 	char dev_name[IFNAMSIZE];	/**< device name. */
-	char dev_addr_ve[ETH_ALEN];	/**< device MAC address in VPS. */
-	int addrlen_ve;			/**< VPS device MAC address length. */
-	char dev_name_ve[IFNAMSIZE];	/**< device name in VPS. */
+	char dev_addr_ve[ETH_ALEN];	/**< device MAC address in VE. */
+	int addrlen_ve;			/**< VE device MAC address length. */
+	char dev_name_ve[IFNAMSIZE];	/**< device name in VE. */
 	int flags;
 } veth_dev;
 
@@ -42,10 +42,10 @@ typedef struct {
 	list_head_t dev;
 } veth_param;
 
-/** Create/remove veth devices for VPS.
+/** Create/remove veth devices for VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @return		0 on success.
  */
 struct vps_param;

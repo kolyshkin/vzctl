@@ -40,11 +40,11 @@ typedef struct {
 	list_head_t dev;
 } dev_param;
 
-/** Allow/disallow access to devices on host system from VPS.
+/** Allow/disallow access to devices on host system from VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param dev		devices list.
  * @return		0 on success.
  */

@@ -42,9 +42,9 @@ typedef struct {
  */
 int get_cap_mask(char *name, unsigned long *mask);
 
-/** Apply capability mask to VPS.
+/** Apply capability mask to VE.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param cap		capability mask.
  * @return		0 on success.
  */

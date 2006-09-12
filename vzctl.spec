@@ -17,7 +17,7 @@
 # rh macros defines _mandir incrorrectly
 %define _mandir %{_datadir}/man
 
-Summary: Virtual Private Server control utility
+Summary: Virtual Environments control utility
 Name: vzctl
 Version: 3.0.11
 Release: 3
@@ -45,8 +45,8 @@ Requires: gawk
 Requires: openssh
 
 %description
-This utility allows system administator to control VPS,
-e.g. create, start, shutdown, set various options and limits etc.
+This utility allows system administator to control Virtual Environments,
+i.e. create, start, shutdown, set various options and limits etc.
 
 %prep
 %setup
@@ -149,11 +149,11 @@ if [ $1 = 0 ]; then
 fi
 
 %package lib
-Summary: Virtual Private Servers control API library
+Summary: Virtual Environments control API library
 Group: System Environment/Kernel
 
 %description lib
-Virtual Private Servers control API library
+Virtual Environments control API library
 
 %files lib
 %defattr(-,root,root)

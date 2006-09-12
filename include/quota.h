@@ -46,7 +46,7 @@ typedef struct {
 
 /** Setup disk quota limits.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -54,8 +54,8 @@ int vps_set_quota(envid_t veid, dq_param *dq);
 
 /** Turn disk quota on.
  *
- * @param veid		VPS id.
- * @param private	VPS private area path.
+ * @param veid		VE id.
+ * @param private	VE private area path.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -63,7 +63,7 @@ int vps_quotaon(envid_t veid, char *private, dq_param *dq);
 
 /** Turn disk quota off.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -71,7 +71,7 @@ int vps_quotaoff(envid_t veid, dq_param *dq);
 
 /** Disk quota managment wraper.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param cmd		quota commands (QUOTA_MARKDURTY QUOTA_DROP QUOTA_STAT)
  * @return		0 on success.
  */
@@ -79,7 +79,7 @@ int quota_ctl(envid_t veid, int cmd);
 
 /** Turn quota off.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param force		forcebly turn quota off.
  * @return		0 on success.
  */

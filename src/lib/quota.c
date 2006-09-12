@@ -150,7 +150,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup("-I");
 	snprintf(buf, sizeof(buf), "%lu", param->diskinodes[1]);
 	arg[i++] = strdup(buf);
-	/* VPS private */
+	/* VE private */
 	arg[i++] = strdup("-p");
 	arg[i++] = strdup(private);
 	/* Expiration time */
@@ -181,8 +181,8 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 
 /** Turn disk quota on.
  *
- * @param veid		VPS id.
- * @param private	VPS private area path.
+ * @param veid		VE id.
+ * @param private	VE private area path.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -271,7 +271,7 @@ retry:
 
 /** Turn disk quota off.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -302,7 +302,7 @@ int quota_off(envid_t veid, int force)
 
 /** Disk quota managment wraper.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param cmd		quota commands (QUOTA_MARKDURTY QUOTA_DROP QUOTA_STAT)
  * @return		0 on success.
  */
@@ -368,7 +368,7 @@ int quota_ctl(envid_t veid, int cmd)
 
 /** Setup disk quota limits.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */

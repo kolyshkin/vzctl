@@ -26,7 +26,7 @@
 typedef struct str_struct conf_struct;
 
 typedef struct vps_config {
-	char *name;	/* VPS config parameters name */
+	char *name;	/* VE config parameters name */
 	char *alias;	/* alias name for parameter */
 	int id;		/* command line option id */
 } vps_config;

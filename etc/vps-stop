@@ -16,12 +16,12 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script does clean up after VPS shutdown
+# This script does clean up after VE shutdown
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VEID    - VPS id
-#   IP_ADDR - VPS IP address(es) divided by spaces
+#   VEID    - VE id
+#   IP_ADDR - VE IP address(es) divided by spaces
 
 . /usr/lib/vzctl/scripts/vps-functions
 

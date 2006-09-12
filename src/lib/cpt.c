@@ -48,7 +48,7 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	const char *file;
 
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is not running");
+		logger(0, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (action == CMD_CHKPNT) {
@@ -70,21 +70,21 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 		return err;
 	}
 	if ((ret = ioctl(fd, CPT_JOIN_CONTEXT, param->ctx ? : veid)) < 0) {
-		logger(0, errno, "cannot join cpt context %d", param->ctx);
+		logger(0, errno, "Can not join cpt context %d", param->ctx);
 		goto err;
 	}
 	switch (param->cmd) {
 	case CMD_KILL:
 		logger(0, 0, "Killing...");
 		if ((ret = ioctl(fd, CPT_KILL, 0)) < 0) {
-			logger(0, errno, "cannot kill VPS");
+			logger(0, errno, "Can not kill VE");
 			goto err;
 		}
 		break;
 	case CMD_RESUME:
 		logger(0, 0, "Resuming...");
 		if ((ret = ioctl(fd, CPT_RESUME, 0)) < 0) {
-			logger(0, errno, "cannot resume VPS");
+			logger(0, errno, "Can not resume VE");
 			goto err;
 		}
 		if (action == CMD_CHKPNT) {
@@ -98,7 +98,7 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	if (!param->ctx) {
 		logger(2, 0, "\tput context");
 		if ((ret = ioctl(fd, CPT_PUT_CONTEXT, 0)) < 0) {
-			logger(0, errno, "cannot put context");
+			logger(0, errno, "Can not put context");
 			goto err;
 		}
 	}
@@ -130,24 +130,24 @@ int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
 	if (cmd == CMD_CHKPNT || cmd == CMD_SUSPEND) {
 		logger(0, 0, "\tsuspend...");
 		if (ioctl(cpt_fd, CPT_SUSPEND, 0) < 0) {
-			logger(0, errno, "Can not suspend VPS");
+			logger(0, errno, "Can not suspend VE");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
 		logger(0, 0, "\tdump...");
 		if (ioctl(cpt_fd, CPT_DUMP, 0) < 0) {
-			logger(0, errno, "Can not dump VPS");
+			logger(0, errno, "Can not dump VE");
 			if (cmd == CMD_CHKPNT)
 				if (ioctl(cpt_fd, CPT_RESUME, 0) < 0)
-					logger(0, errno, "Can not resume VPS");
+					logger(0, errno, "Can not resume VE");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_CHKPNT) {
 		logger(0, 0, "\tkill...");
 		if (ioctl(cpt_fd, CPT_KILL, 0) < 0) {
-			logger(0, errno, "Can not kill VPS");
+			logger(0, errno, "Can not kill VE");
 			goto err_out;
 		}
 	}
@@ -183,15 +183,15 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
-		logger(0, 0, "VPS root is not set");
+		logger(0, 0, "VE root is not set");
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to setup checkpointing,"
-			" VPS is not running");
+		logger(0, 0, "Unable to setup checkpointing: "
+			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	logger(0, 0, "Setup checkpoint...");
+	logger(0, 0, "Setting up checkpoint...");
 	if ((cpt_fd = open(PROC_CPT, O_RDWR)) < 0) {
 		if (errno == ENOENT)
 			logger(0, errno, "Error: No checkpointing"
@@ -214,7 +214,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		dump_fd = open(param->dumpfile ? : dumpfile,
 			O_CREAT|O_TRUNC|O_RDWR, 0600);
 		if (dump_fd < 0) {
-			logger(0, errno, "cannot create dump file %s",
+			logger(0, errno, "Can not create dump file %s",
 				param->dumpfile ? : dumpfile);
 			goto err;
 		}
@@ -222,25 +222,25 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	if (param->ctx || cmd > CMD_SUSPEND) {
 		logger(0, 0, "\tjoin context..");
 		if (ioctl(cpt_fd, CPT_JOIN_CONTEXT, param->ctx ? : veid) < 0) {
-			logger(0, errno, "cannot join cpt context");
+			logger(0, errno, "Can not join cpt context");
 			goto err;
 		}
 	} else {
 		if (ioctl(cpt_fd, CPT_SET_VEID, veid) < 0) {
-			logger(0, errno, "cannot set veid");
+			logger(0, errno, "Can not set veid");
 			goto err;
 		}
 	}
 	if (dump_fd != -1) {
 		if (ioctl(cpt_fd, CPT_SET_DUMPFD, dump_fd) < 0) {
-			logger(0, errno, "cannot set dump file");
+			logger(0, errno, "Can not set dump file");
 			goto err;
 		}
 	}
 	if (param->cpu_flags) {
 		logger(0, 0, "\tset cpu flags..");
 		if (ioctl(cpt_fd, CPT_SET_CPU_FLAGS, param->cpu_flags) < 0) {
-			logger(0, errno, "cannot set cpu flags");
+			logger(0, errno, "Can not set cpu flags");
 			goto err;
 		}
 	}
@@ -270,7 +270,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	if (ret)
 		goto err;
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
-		/* Clear VPS network configuration */
+		/* Clear VE network configuration */
 		run_net_script(veid, DEL, &vps_p->res.net.ip, STATE_RUNNING,
 			vps_p->res.net.skip_arpdetect);
 		if (cmd == CMD_CHKPNT)
@@ -335,7 +335,7 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		logger(0, errno, "Error: undump failed");
 		goto err_undump;
 	}
-	/* Now we wait until VPS setup will be done */
+	/* Now we wait until VE setup will be done */
 	read(wait_p, &len, sizeof(len));
 	if (param->cmd == CMD_RESTORE) {
 		logger(0, 0, "\tresume...");
@@ -346,7 +346,7 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	} else if (param->cmd == CMD_UNDUMP && !param->ctx) {
 		logger(0, 0, "\tget context...");
 		if (ioctl(param->rst_fd, CPT_GET_CONTEXT, veid) < 0) {
-			logger(0, 0, "cannot get context");
+			logger(0, 0, "Can not get context");
 			goto err_undump;
 		}
 	}
@@ -378,10 +378,11 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	char dumpfile[PATH_LEN];
 
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to perform restoring VPS already running");
+		logger(0, 0, "Unable to perform restore: "
+			"VE already running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	logger(0, 0, "Restoring VPS ...");
+	logger(0, 0, "Restoring VE ...");
 	ret = VZ_RESTORE_ERROR;
 	if ((rst_fd = open(PROC_RST, O_RDWR)) < 0) {
 		if (errno == ENOENT)
@@ -393,7 +394,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	}
 	if (param->ctx) {
 		if (ioctl(rst_fd, CPT_JOIN_CONTEXT, param->ctx) < 0) {
-			logger(0, errno, "cannot join cpt context");
+			logger(0, errno, "Can not join cpt context");
 			goto err;
 		}
 	}

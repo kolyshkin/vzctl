@@ -127,11 +127,11 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (g_p->opt.start_disabled == YES &&
 		cmd_p->opt.start_force != YES)
 	{
-		logger(0, 0, "VPS start disabled");
+		logger(0, 0, "VE start disabled");
 		return VZ_VE_START_DISABLED;
 	}
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is already running");
+		logger(0, 0, "VE is already running");
 		return VZ_VE_RUNNING;
 	}
 	ret = vps_start(h, veid, g_p,
@@ -389,7 +389,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 
 	/* Check parameters that can't be set on running VE */
 	if (new_res->cap.on || new_res->cap.off) {
-		logger(0, 0, "Unable to set capability on running VPS");
+		logger(0, 0, "Unable to set capability on running VE");
 		if (setmode == SET_RESTART)
 			goto restart_ve;
 		else if (setmode != SET_IGNORE)
@@ -399,7 +399,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		if (!old_res->env.ipt_mask ||
 			new_res->env.ipt_mask != old_res->env.ipt_mask)
 		{
-			logger(0, 0, "Unable to set iptables on running VPS");
+			logger(0, 0, "Unable to set iptables on running VE");
 			if (setmode == SET_RESTART)
 				goto restart_ve;
 			else if (setmode != SET_IGNORE)
@@ -408,7 +408,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	}
 	if (err && setmode == SET_NONE) {
 		logger(0, 0, "WARNING: Some of the parameters"
-			" could not be applied to a running VPS.\n"
+			" could not be applied to a running VE.\n"
 			"\tPlease consider using --setmode option");
 	}
 	return err;
@@ -533,13 +533,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
 			cmd_p->res.fs.private_orig = NULL;
-			logger(0, 0,"Unable to change VE_PRIVATE on runing VPS");
+			logger(0, 0,"Unable to change VE_PRIVATE on runing VE");
 			return VZ_VE_RUNNING;
 		}
 		if (cmd_p->res.fs.root_orig != NULL) {
 			free(cmd_p->res.fs.root_orig);
 			cmd_p->res.fs.root_orig = NULL;
-			logger(0, 0, "Unable to change VE_ROOT on runing VPS");
+			logger(0, 0, "Unable to change VE_ROOT on runing VE");
 			return VZ_VE_RUNNING;
 		}
 	}
@@ -577,7 +577,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			goto err;
 		}
 	}
-	/* Skip apply parameters on stopped VPS */
+	/* Skip applying parameters on stopped VE */
 	if (cmd_p->opt.save && !is_run) {
 		ret = mod_setup(h, veid, STATE_STOPPED, SKIP_NONE, &g_action,
 			cmd_p);
@@ -627,7 +627,7 @@ static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VPS is not running");
+		logger(0, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	return do_enter(h, veid, root);
@@ -704,7 +704,7 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 		exist = 1;
 	mounted = vps_is_mounted(fs->root);
 	run = vps_is_run(h, veid);
-	printf("VPSID %d %s %s %s\n", veid,
+	printf("VEID %d %s %s %s\n", veid,
 		exist ? "exist" : "deleted",
 		mounted ? "mounted" : "unmounted",
 		run ? "running" : "down");
@@ -802,11 +802,11 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		if (skiplock != YES) {
 			lock_id = vps_lock(veid, g_p->opt.lockdir, "");
 			if (lock_id > 0) {
-				logger(0, 0, "VPS already locked");
+				logger(0, 0, "VE already locked");
 				ret = VZ_LOCKED;
 				goto err;
 			} else if (lock_id < 0) {
-				logger(0, 0, "Unable to lock VPS");
+				logger(0, 0, "Unable to lock VE");
 				ret = VZ_SYSTEM_ERROR;
 				goto err;
 			}
@@ -846,7 +846,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->opt.save == YES) {
 			get_vps_conf_path(veid, fname, sizeof(fname));
 			vps_save_config(veid, fname, cmd_p, vps_p, &g_action);
-			logger(0, 0, "Saved parameters for VPS %d", veid);
+			logger(0, 0, "Saved parameters for VE %d", veid);
 		} else if (cmd_p->opt.save != NO) {
 			if (list_empty(&cmd_p->res.misc.userpw)) {
 				logger(0, 0, "WARNING: Settings were not saved"
@@ -891,7 +891,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		break;
 	}
 err:
-	/* Unlock VPS in case lock taken */
+	/* Unlock VE in case lock taken */
 	if (skiplock != YES && !lock_id)
 		vps_unlock(veid, g_p->opt.lockdir);
 	vz_close(h);

@@ -18,7 +18,7 @@
 #ifndef _LOCK_H_
 #define _LOCK_H_
 
-/** Lock VPS.
+/** Lock VE.
  * Create lock file $dir/$veid.lck.
  * @param veid		VPD id.
  * @param dir		lock directory.
@@ -29,9 +29,9 @@
  */
 int vps_lock(envid_t veid, char *dir, char *status);
 
-/** Unlock VPS.
+/** Unlock VE.
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param dir		lock directory.
  */
 void vps_unlock(envid_t veid, char *dir);

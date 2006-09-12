@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script configures quota startup script inside VPS
+# This script configures quota startup script inside VE
 #
 # Parameters are passed in environment variables.
 # Required parameters:

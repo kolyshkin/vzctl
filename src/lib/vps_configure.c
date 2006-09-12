@@ -227,7 +227,7 @@ int need_configure(vps_res *res)
 }
 
 /*
- * Setup (add/delete) ip addreses inside VPS
+ * Setup (add/delete) IP address(es) inside VE
  */
 int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char *root, int op, net_param *net, int state)
@@ -288,7 +288,7 @@ int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (!need_configure(res))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to configure VPS is not running");
+		logger(0, 0, "Unable to configure VE: VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (actions == NULL) {	

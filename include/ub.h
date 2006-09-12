@@ -135,8 +135,8 @@ typedef struct ub_struct ub_param;
 
 /** Apply UBC resources.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param ubc		UBC parameters
  * @return		0 on success
  */
@@ -160,7 +160,7 @@ int add_ub_param(ub_param *ub, ub_res *res);
 
 /** Read UBC resources current usage from /proc/user_beancounters
  *
- * @param veid		VPS id.
+ * @param veid		VE id.
  * @param ub		UBC parameters.
  * @return		0 on success.
  */

@@ -164,10 +164,10 @@ int hn_set_cpu(cpu_param *cpu)
 	return set_cpuunits(2147483647, *cpu->units);
 }
 
-/**  Apply cpu parameters on running VPS.
+/**  Apply cpu parameters on running VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param cpu		cpu parameters.
  * @return		0 on success.
  */
@@ -183,8 +183,8 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 		return 0;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply CPU parameters: VPS is not"
-			" running");
+		logger(0, 0, "Unable to apply CPU parameters: "
+			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (cpu->limit != NULL) {

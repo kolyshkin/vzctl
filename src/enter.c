@@ -295,11 +295,11 @@ err:
 	/* wait for pts allocation */
 	ret = read(st[0], &status, sizeof(status));
 	if (!ret) {
-		fprintf(stdout, "entered into VPS %d\n", veid);
+		fprintf(stdout, "entered into VE %d\n", veid);
 		raw_on();
 		e_loop(fileno(stdin), in[1], out[0], fileno(stdout));
 	} else {
-		fprintf(stdout, "enter into VPS %d failed\n", veid);
+		fprintf(stdout, "enter into VE %d failed\n", veid);
 		set_not_blk(out[0]);
 		while (stdredir(out[0], fileno(stdout)) == 0)
 			;
@@ -311,7 +311,7 @@ err:
 		fprintf(stdout, "got signal %d\n", WTERMSIG(status));
 	if (!ret) {
 		raw_off();
-		fprintf(stdout, "exited from VPS %d\n", veid);
+		fprintf(stdout, "exited from VE %d\n", veid);
 	}
 	close(in[1]); close(out[0]);
 	return ret ? status : 0;

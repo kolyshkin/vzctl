@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	}
 	infile = strdup(argv[optind]);
 	if (stat(infile, &st)) {
-		fprintf(stderr,"VPS configuration file: %s not found\n", infile);
+		fprintf(stderr,"VE configuration file: %s not found\n", infile);
 		free(infile);
 		exit(1);
 	}

@@ -16,80 +16,79 @@
 #
 # This is a distribution configuration file template.
 # This configuration file is meant to run specific actions
-# depending on the Linux version the VPS is running.
+# depending on the Linux version the VE is running.
 #
 # After an action is initiated, it requests vzctl to read the configuration on the basis
-# of the DISTRIBUTION or (if not present) on the OSTEMPLATE variable in the VPS
+# of the DISTRIBUTION or (if not present) on the OSTEMPLATE variable in the VE
 # configuration file. In case an unknown distribution version has been found,
 # the default configuration file is used for this distribution.
 # If no configuration file was found, the default.conf file is used.
 #
 
-# This script is launched inside a VPS on executing the following commands:
-#	vzctl start VPSID
-#	vzctl set VPSID --ip <ip>
-#	vzctl set VPSID --ip <ip> --ipdel all
+# This script is launched inside a VE on executing the following commands:
+#	vzctl start VEID
+#	vzctl set VEID --ipadd <ip>
 #
 # The script is used to configure the network settings
-# on the VPS startup or on the IP address(es) assignment.
+# on the VE startup or on the IP address(es) assignment.
 # The parameters are passed to the corresponding environment variables.
 # Required parameters:
-#   IP_ADDR	- the IP address(es) to be added to the VPS
+#   IP_ADDR	- the IP address(es) to be added to the VE
 #                 (the space is used to separate several IP addresses)
 # Optional parameters:
-#   VE_STATE	- the state of the VPS; can be either "starting" or "running" 
+#   VE_STATE	- the state of the VE; can be either "starting" or "running" 
 #   IPDELALL	- deletes all old interfaces
 #
 ADD_IP=dist-add_ip.sh
 
-# This script is launched inside a VPS on executing the following commands:
-#	vzctl set VPSID --ipdel <ip>
-#	vzctl set VPSID --ipdel <all>
+# This script is launched inside a VE on executing the following commands:
+#	vzctl set VEID --ipdel <ip>
+#	vzctl set VEID --ipdel <all>
 #
 # The script is used to delete an existing IP address(es).
 # The parameters are passed to the corresponding environment variables.
 # Required parameters:
-#   IP_ADDR	- the IP addresses to be deleted from the VPS
+#   IP_ADDR	- the IP addresses to be deleted from the VE
 #		(the space is used to separate several IP addresses)
 # Optional parameters:
 #   IPDELALL	- deletes all existing IP addresses
 #
 DEL_IP=dist-del_ip.sh
 
-# This script is launched inside a VPS on executing the following command:
-#	vzctl set VPSID --hostname <name>
+# This script is launched inside a VE on executing the following command:
+#	vzctl set VEID --hostname <name>
 #
-# The script is used to configure the hostname of the VPS.
+# The script is used to configure the hostname of the VE.
 # The parameters are passed to the corresponding environment variables.
 # Required parameters:
-#   HOSTNM	- the hostname of the VPS
+#   HOSTNM	- the hostname of the VE
 #
 SET_HOSTNAME=dist-set_hostname.sh
 
-# This script is launched inside a VPS on executing the following command:
-#	vzctl set VPSID --searchdomain <domain> --nameserver <ip>
+# This script is launched inside a VE on executing the following command:
+#	vzctl set VEID --searchdomain <domain> --nameserver <ip>
 #
 # The script is used to configure DNS parameters in the /etc/resolv.conf file.
 # The parameters are passed to the corresponding environment variables.
 # Optional parameters:
-#   SEARCHDOMAIN- Sets a search domain(s) for the VPS. Modifies the /etc/resolv.conf file.
-#   NAMESERVER	- Sets a name server(s) for the VPS. Modifies the /etc/resolv.conf file.
+#   SEARCHDOMAIN- Sets a search domain(s) for the VE. Modifies the /etc/resolv.conf file.
+#   NAMESERVER	- Sets a name server(s) for the VE. Modifies the /etc/resolv.conf file.
 #
 SET_DNS=dist-set_dns.sh
 
-# This script is launched inside a VPS on executing the following command:
-#	vzctl set VPSID --userpasswd <user:passwd>
+# This script is launched inside a VE on executing the following command:
+#	vzctl set VEID --userpasswd <user:passwd>
 #
 # The script is used to add a new user or change the current password.
 # The parameters are passed to the corresponding environment variables.
 # Required parameters:
-#   USERPW  - Sets a new password for the VPS user. If the user does not exist,
+#   USERPW  - Sets a new password for the VE user. If the user does not exist,
 # 		the script creates a new user with the specified password.
 #
 SET_USERPASS=dist-set_userpass.sh
 
-# This script is launched inside a VPS on executing the following command:
-#	vzctl set VPSID --quotaugidlimit <num>
+# This script is launched inside a VE on executing the following command:
+#	vzctl set VEID --quotaugidlimit <num>
 #
 # The script is used to set up second level quota.
 # The parameters are passed to the corresponding environment variables.
@@ -98,11 +97,11 @@ SET_USERPASS=dist-set_userpass.sh
 #   MAJOR	- the root device major number
 SET_UGID_QUOTA=dist-set_ugid_quota.sh
 
-# This script is launched on the Hardware Node after the VPS creation:
-#	vzctl create VPSID
+# This script is launched on the Hardware Node after the VE creation:
+#	vzctl create VEID
 #
 # The script is used to perform certain postcreate tasks.
 # The parameters are passed to the corresponding environment variables.
 # Required parameters:
-#   VE_ROOT	- the root path of the VPS
+#   VE_ROOT	- the root path of the VE
 POST_CREATE=dist-postcreate.sh

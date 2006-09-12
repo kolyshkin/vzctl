@@ -32,11 +32,11 @@ enum {
 
 int execvep(const char *path, char *const argv[], char *const envp[]);
 
-/** Execute command inside VPS.
+/** Execute command inside VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param exec_mode	execution mode (MODE_EXEC, MODE_BASH).
  * @param arg		argv array.
  * @param envp		command environment array.
@@ -47,11 +47,11 @@ int execvep(const char *path, char *const argv[], char *const envp[]);
 int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
         char *const argv[], char *const envp[], char *std_in, int timeout);
 
-/** Read script and execute it in VPS.
+/** Read script and execute it in VE.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
- * @param root		VPS root.
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param root		VE root.
  * @param arg		argv array.
  * @param envp		command environment array.
  * @param fname		script file name

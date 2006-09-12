@@ -50,7 +50,7 @@ typedef struct name_param {
 	char *name;
 } name_param;
 
-/** Data structure for VPS resources.
+/** Data structure for VE resources.
  */
 typedef struct vps_res {
 	fs_param fs;		/**< file system parameters. */
@@ -101,14 +101,14 @@ struct vps_param {
 };
 typedef struct vps_param vps_param;
 
-/** Setting VPS resources.
+/** Setting VE resources.
  *
- * @param h		VPS handler.
- * @param veid		VPS id.
+ * @param h		VE handler.
+ * @param veid		VE id.
  * @param actions	distribution action scripts.
- * @param fs		VPS FS parameters
- * @param param		VPS parameters.
- * @param vps_state	VPS state.
+ * @param fs		VE FS parameters
+ * @param param		VE parameters.
+ * @param vps_state	VE state.
  * @param action	external modules.
  * @return		0 on success.
  */

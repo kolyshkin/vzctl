@@ -212,7 +212,7 @@ function ve_start()
 	echo "0" > /proc/sys/net/ipv4/route/src_check
 	for veid in $velist; do
 		[ "${veid}" = "0" ] && continue 
-		__echo "Starting VPS ${veid}: "
+		__echo "Starting VE ${veid}: "
 		if [ "x${VZFASTBOOT}" = "xyes" -a "x${DISK_QUOTA}" = "xyes" ]; 
 		then
 			$VZQUOTA stat ${veid} >/dev/null 2>&1
@@ -231,14 +231,14 @@ function ve_start()
 		fi
 	done
 	for veid in ${need_restart}; do
-		__echo "Stopping VPS ${veid}: "
+		__echo "Stopping VE ${veid}: "
 		$VZCTL stop ${veid} 2>&1 >/dev/null 2>&1
 		if [ $? -eq 0 ]; then
 			print_success
 		else
 			print_failure "$msg"
 		fi
-		__echo "Starting VPS ${veid}: "
+		__echo "Starting VE ${veid}: "
 		msg=`$VZCTL start ${veid} 2>&1`
 		if [ $? -eq 0 ]; then
 			print_success
@@ -266,9 +266,9 @@ function ve_stop()
 			pids=
 			velist=`awk  '{print $1;}' < ${VEINFO} | grep -v "^0$"`
 			for veid in $velist; do
-				echo "Shutting down VPS $veid"
+				echo "Shutting down VE $veid"
 				# Set fairsched parameters to maximum so
-				# VPS will stop fast
+				# VE will stop fast
 				$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
 				$VZCTL --skiplock stop $veid >/dev/null 2>&1 &
 				pids="$pids $!"
@@ -293,7 +293,7 @@ function ve_stop()
 		fail=0
 		mounts=`awk '{if ($3=="simfs") print $2}' /proc/mounts`
 		for m in $mounts; do
-			__echo "Unmounting VPS area "
+			__echo "Unmounting VE area "
 			echo -n $m
 			msg=`umount $m 2>&1`
 			if [ $? -eq 0 ]; then
@@ -309,7 +309,7 @@ function ve_stop()
 	# turn quota off
 	quota=`awk -F: '/^[0-9]+:/{print $1}' /proc/vz/vzquota 2>/dev/null`
 	for m in ${quota}; do
-		__echo "Turn quota off for VPS "
+		__echo "Turn quota off for VE "
 		echo -n $m
 		msg=`vzquota off ${m} 2>&1`
 		if [ $? -eq 0 ]; then

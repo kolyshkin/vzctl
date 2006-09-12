@@ -55,7 +55,7 @@
 #define VZ_NOTENOUGHUBCPARAMS		28
 #define VZ_VE_PKGSET_NOTSET		29
 /*****************************
-    VPS errors
+    VE errors
  *****************************/
 #define VZ_VE_NOT_RUNNING		31
 #define VZ_VE_RUNNING			32
