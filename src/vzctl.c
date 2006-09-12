@@ -75,7 +75,7 @@ void usage()
 "   [--noatime yes|no] [--capability <name>:on|off ...]\n"
 "   [--devices b|c:major:minor|all:r|w|rw]\n"
 "   [--devnodes device:r|w|rw|none]\n"
-"   [--veth_add dev_name,dev_addr,dev_name_vps,dev_addr_vps]\n"
+"   [--veth_add dev_name,dev_addr,dev_name_ve,dev_addr_ve]\n"
 "   [--veth_del dev_name]\n"
 "   [--applyconfig <name>]\n"
 "   [--name <vename>]\n");
