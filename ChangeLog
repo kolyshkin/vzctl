@@ -1,4 +1,6 @@
    3.0.12: FIXME
+	* added bash completion script (bug #212)
+	* added check to vzmigrate if OpenVZ is run on another side (bug #163)
 	* removed debian directory from the tarball (bugs #197, #194)
 	* removed LICVIEW from /etc/init.d/vz (bug #237)
 	* fixed misprints and /dev/nul(l) usage in dist scripts (bug #228)
