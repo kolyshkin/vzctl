@@ -1,19 +1,20 @@
-%define _initddir /etc/init.d
-%define _crondir /etc/cron.d
+%define _initddir %_sysconfdir/init.d
+%define _crondir %_sysconfdir/cron.d
 %define _vzdir /vz
 %define _lockdir %{_vzdir}/lock 
 %define _dumpdir %{_vzdir}/dump 
 %define _cachedir %{_vzdir}/template/cache 
 %define _veipdir /var/lib/vzctl/veip 
 %define _libdir /usr/lib/vzctl
-%define _configdir /etc/vz
-%define _scriptdir /usr/share/vzctl//scripts
-%define _vpsconfdir /etc/sysconfig/vz-scripts
-%define _netdir	/etc/sysconfig/network-scripts
-%define _logrdir /etc/logrotate.d
+%define _configdir %_sysconfdir/vz
+%define _scriptdir /usr/share/vzctl/scripts
+%define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
+%define _netdir	%_sysconfdir/sysconfig/network-scripts
+%define _logrdir %_sysconfdir/logrotate.d
 %define _distconfdir %{_configdir}/dists
 %define _namesdir %{_configdir}/names 
 %define _distscriptdir %{_distconfdir}/scripts
+%define _udevrulesdir %_sysconfdir/udev/rules.d
 
 
 Summary: Virtual Environments control utility
@@ -56,7 +57,7 @@ make CFLAGS="$RPM_OPT_FLAGS" ARCH=%{_arch}
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch} \
 	VPSCONFDIR=%{_vpsconfdir} install install-redhat
-ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/etc/vz/conf
+ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 
 %clean
@@ -110,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man5/vps.conf.5.*
 %attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
-%attr(644, root, root) /etc/udev/rules.d/*
+%attr(644, root, root) %{_udevrulesdir}/*
 
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf
