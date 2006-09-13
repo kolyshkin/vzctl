@@ -14,8 +14,7 @@
 %define _distconfdir %{_configdir}/dists
 %define _namesdir %{_configdir}/names 
 %define _distscriptdir %{_distconfdir}/scripts
-# rh macros defines _mandir incrorrectly
-%define _mandir %{_datadir}/man
+
 
 Summary: Virtual Environments control utility
 Name: vzctl
