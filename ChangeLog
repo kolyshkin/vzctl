@@ -27,6 +27,7 @@
 	* fixed arpsend options parsing for some compilers (bug #261)
 	* man pages cleanup (VPS->VE, etc.)
 	* changed all utilities and man pages to refer to VE not VPS
+	* vzcpucheck: give error if VE0 CPU units not set (bug #249)
 
    3.0.11: Mon Aug  7 2006 <igor@openvz.ru>
 	* fixed using VE_ROUTE_SRC_DEV variable
