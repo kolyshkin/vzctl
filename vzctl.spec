@@ -15,6 +15,7 @@
 %define _namesdir %{_configdir}/names 
 %define _distscriptdir %{_distconfdir}/scripts
 %define _udevrulesdir %_sysconfdir/udev/rules.d
+%define _bashcdir %_sysconfdir/bash_completion.d
 
 
 Summary: Virtual Environments control utility
@@ -112,6 +113,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man5/vps.conf.5.*
 %attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 %attr(644, root, root) %{_udevrulesdir}/*
+%attr(644, root, root) %{_bashcdir}/*
 
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf

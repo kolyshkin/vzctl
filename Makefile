@@ -34,7 +34,8 @@ install::
 	for file in $(SCRIPTS); do \
 		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
-	$(INSTALL) -m 644 $(BASHCSCRIPT) /$(BASHCDIR)
+	$(INSTALL) -d $(DESTDIR)/$(BASHCDIR)
+	$(INSTALL) -m 644 $(BASHCSCRIPT) $(DESTDIR)/$(BASHCDIR)
 	${MAKE} -C man $@
 	${MAKE} -C etc/dists $@
 
