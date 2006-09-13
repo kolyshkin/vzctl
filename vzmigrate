@@ -270,8 +270,8 @@ fi
 
 vpsconf="$confdir/$VEID.conf"
 
-if [ ! -r "$vpsconf" -o ! -r "$vpsconf" ]; then
-	echo "Can't read VE #$VEID config file"
+if [ ! -r "$vzconf" -o ! -r "$vpsconf" ]; then
+	echo "Can't read global config or VE #$VEID config file"
 	exit $MIG_ERR_NOEXIST
 fi
 
