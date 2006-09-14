@@ -92,9 +92,19 @@ function vzcheckvar()
 # You should always call it before calling vzarp
 function vzgetnetdev()
 {
-# Get a list of interfaces, excluding ones with LOOPBACK NOARP or SLAVE flags
-	NETDEVICES=`${IP_CMD} link list | egrep -v -E "LOOPBACK|NOARP|SLAVE" | \
-		awk "/^[0-9].*:/&&/UP/ {print \\$2}" | sed -e "s/:\$//"`
+        # Get a list of interfaces, excluding ones with LOOPBACK,
+	# NOARP, or SLAVE flags
+	local dev_list=`${IP_CMD} link list | grep -w "UP" | \
+		egrep -v -E "LOOPBACK|NOARP|SLAVE" | \
+		sed -e 's/^.*: \(.*\): .*$/\1/'`
+
+	# exclude devices without assigned IP
+	for DEV in ${dev_list}; do
+		${IP_CMD} addr show ${DEV} | grep -q "\<inet\>"
+		if [ $? -eq 0 ]; then
+			NETDEVICES="${NETDEVICES} ${DEV}"
+		fi
+	done           
 }
 
 # Adds/deletes public ARP records for given IP for all interfaces
