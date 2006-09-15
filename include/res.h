@@ -69,6 +69,10 @@ typedef struct vps_res {
 	name_param name;
 } vps_res;
 
+enum {
+	APPCONF_MAP_NAME    = 0x01,
+};
+
 typedef struct {
         int save;
         int fast_kill;
@@ -82,6 +86,7 @@ typedef struct {
         char *origin_sample;
         char *lockdir;
         char *apply_cfg;
+	int apply_cfg_map;
 	int reset_ub;
 } vps_opt;
 

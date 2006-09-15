@@ -116,6 +116,7 @@
 #define PARAM_VETH_DEL		342
 #define PARAM_VEID		343
 #define PARAM_NAME		344
+#define PARAM_APPLYCONFIG_MAP	345
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

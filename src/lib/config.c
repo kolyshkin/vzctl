@@ -127,6 +127,7 @@ static vps_config config[] = {
 static struct option set_opt[] = {
 {"save",	no_argument, NULL, PARAM_SAVE},
 {"applyconfig",	required_argument, NULL, PARAM_APPLYCONFIG},
+{"applyconfig_map",	required_argument, NULL, PARAM_APPLYCONFIG_MAP},
 {"config",	required_argument, NULL, PARAM_CONFIG},
 {"reset_ub",	no_argument, NULL, PARAM_RESET_UB},
 {"iptables",	required_argument, NULL, PARAM_IPTABLES},
@@ -1442,6 +1443,12 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_USERPW:
 		ret = conf_parse_strlist(&vps_p->res.misc.userpw, val, 1);
 		break;
+	case PARAM_APPLYCONFIG_MAP:
+		if (!strcmp(val, "name"))
+			vps_p->opt.apply_cfg_map = APPCONF_MAP_NAME;
+		else
+			ret = ERR_INVAL;	
+		break;
 	case PARAM_APPLYCONFIG:
 		ret = conf_parse_str(&vps_p->opt.apply_cfg, val, 1);
 		break;
@@ -2153,6 +2160,7 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_INT(start_force);
 	MERGE_INT(onboot);
 	MERGE_INT(setmode);
+	MERGE_INT(apply_cfg_map);
 
 	MERGE_STR(config)
 	MERGE_STR(origin_sample)

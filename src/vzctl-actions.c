@@ -502,7 +502,11 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	ret = 0;
 
 	cmd_p->g_param = g_p;
-
+	if (cmd_p->opt.apply_cfg_map == APPCONF_MAP_NAME) {
+		ret = set_name(veid, g_p->res.name.name, g_p->res.name.name);
+		if (ret != 0)
+			return ret;
+	}
 	/* Reset UB parameters from config  */
 	if (cmd_p->opt.reset_ub == YES) {
 		ret = vps_set_ublimit(h, veid, &vps_p->res.ub);
