@@ -1929,30 +1929,26 @@ vps_param *init_vps_param()
 int get_veid_by_name(char *name)
 {
 	char buf[64];
-	char ltoken[64];
-	FILE *fp;
-	char *sp;
-	int veid = -1;
+	char content[256];
+	char *p;
+	int veid, ret;
 
 	if (name == NULL)
 		return -1;
-	snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf", name);
+	snprintf(buf, sizeof(buf), VENAME_DIR "/%s", name);
 	if (stat_file(buf) != 1)
 		return -1;
-	if ((fp = fopen(buf, "r")) == NULL)
+	ret = readlink(buf, content, sizeof(content) - 1);
+	if (ret < 0)
 		return -1;
-	while (fgets(buf, sizeof(buf), fp) != NULL) {
-		sp = parse_line(buf, ltoken, sizeof(ltoken));
-		if (sp == NULL)
-			continue;
-		if (!strcmp(ltoken, "VEID")) {
-			if (parse_int(sp, &veid))
-				veid = -1;
-			break;
-		}
-	}
-	fclose(fp);
-	return veid;
+	content[ret] = 0;
+	if ((p = strrchr(content, '/')) == NULL)
+		p = content;
+	else
+		p++;
+	if (sscanf(p, "%d.conf", &veid) == 1)
+		return veid;
+	return -1;
 }
 
 static int check_name(char *name)
@@ -1970,8 +1966,7 @@ int set_name(int veid, char *new_name, char *old_name)
 {
 	int veid_old = -1;
 	char buf[STR_SIZE];
-	vps_param *conf;
-	int ret;
+	char conf[STR_SIZE];
 
 	if (new_name == NULL)
 		return 0;
@@ -1991,24 +1986,25 @@ int set_name(int veid, char *new_name, char *old_name)
 	{
 		return 0;	
 	}
-	conf = init_vps_param();
-	conf->res.name.veid = veid;
-	snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf", new_name);
-	if (vps_save_config(veid, buf, conf, conf, NULL) < 0) {
-		ret = VZ_SET_NAME_ERROR;
-	} else {
-		veid_old = get_veid_by_name(old_name);
-		/* Remove old alias */
-		if (veid_old >= 0 && veid_old == veid) {
-			snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf",
-									old_name);
-			unlink(buf);
+	if (new_name[0] != 0) {
+		snprintf(buf, sizeof(buf), VENAME_DIR "/%s", new_name);
+		get_vps_conf_path(veid, conf, sizeof(conf));
+		unlink(buf);
+		if (symlink(conf, buf)) {
+			logger(0, errno, "Unable to create link %s", buf);
+			return VZ_SET_NAME_ERROR;
 		}
-		logger(0, 0, "Name %s assigned", new_name);
-		ret = 0;
 	}
-	free_vps_param(conf);
-	return ret;
+	veid_old = get_veid_by_name(old_name);
+	/* Remove old alias */
+	if (veid_old == veid &&
+	    old_name != NULL && strcmp(old_name, new_name))
+	{
+		snprintf(buf, sizeof(buf), VENAME_DIR "/%s", old_name);
+		unlink(buf);
+	}
+	logger(0, 0, "Name %s assigned", new_name);
+	return 0;
 }
 
 #define FREE_P(x)	if ((x) != NULL) { free(x); x = NULL; }

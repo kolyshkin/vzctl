@@ -109,6 +109,7 @@ int main(int argc, char *argv[], char *envp[])
 	vps_param *gparam = NULL, *vps_p = NULL, *cmd_p = NULL;
 	const char *action_nm;
 	struct sigaction act;
+	char *name = NULL;
 
 	_proc_title = argv[0];
 	_proc_title_len = envp[0] - argv[0];
@@ -211,7 +212,8 @@ int main(int argc, char *argv[], char *envp[])
 		goto error;
 	}
 	if (parse_int(argv[2], &veid)) {
-		veid = get_veid_by_name(argv[2]);
+		name = strdup(argv[2]);
+		veid = get_veid_by_name(name);
 		if (veid < 0) {
 			fprintf(stderr, "Bad VE id %s\n", argv[2]);
 			ret = VZ_INVALID_PARAMETER_VALUE;
@@ -248,8 +250,17 @@ int main(int argc, char *argv[], char *envp[])
 		if (vps_parse_config(veid, buf, vps_p, &g_action)) {
 			logger(0, 0, "Error in config file %s",
 				buf);
-	                exit(VZ_NOCONFIG);
+			ret = VZ_NOCONFIG;
+			goto error;
         	}
+		if (name != NULL &&
+		    vps_p->res.name.name != NULL &&
+		    strcmp(name, vps_p->res.name.name))
+		{
+			logger(0, 0, "Unable to find VE by name %s", name);
+			ret = VZ_INVALID_PARAMETER_VALUE;
+			goto error;
+		}
 	} else if (action != ACTION_CREATE &&
 			action != ACTION_STATUS &&
 			action != ACTION_SET)
@@ -269,6 +280,7 @@ error:
 	free_vps_param(vps_p);
 	free_vps_param(cmd_p);
 	free_log();
+	if (name != NULL) free(name);
 
 	return ret;
 }
