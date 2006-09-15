@@ -83,6 +83,7 @@ MIG_ERR_CHECKPOINT=$MIG_ERR_STOP_SOURCE
 MIG_ERR_MOUNT_VPS=$MIG_ERR_START_VPS
 MIG_ERR_RESTORE_VPS=$MIG_ERR_START_VPS
 MIG_ERR_OVZ_NOT_RUNNING=14
+MIG_ERR_APPLY_CONFIG=15
 
 usage() {
 	cat <<EOF
@@ -334,6 +335,14 @@ log 2 "Copying config file"
 if ! $SCP "$vpsconf" "root@$host:$vpsconf" &> $out; then
 	log 1 "Failed to copy config file"
 	exit $MIG_ERR_COPY
+fi
+
+$SSH "root@$host" "vzctl set $VEID --applyconfig_map name" &> $out
+# vzctl return code 20 or 21 in case of unrecognized option
+if [[ $? != 20 && $? != 21 && $? != 0 ]]; then
+	log 1 "Failed to apply config on destination node"
+	undo_conf
+	exit $MIG_ERR_APPLY_CONFIG
 fi
 
 for sfx in $ACT_SCRIPTS_SFX; do
