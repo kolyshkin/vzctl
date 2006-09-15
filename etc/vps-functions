@@ -94,17 +94,17 @@ function vzgetnetdev()
 {
         # Get a list of interfaces, excluding ones with LOOPBACK,
 	# NOARP, or SLAVE flags
-	local dev_list=`${IP_CMD} link list | grep -w "UP" | \
-		egrep -v -E "LOOPBACK|NOARP|SLAVE" | \
-		sed -e 's/^.*: \(.*\): .*$/\1/'`
-
-	# exclude devices without assigned IP
-	for DEV in ${dev_list}; do
-		${IP_CMD} addr show ${DEV} | grep -q "\<inet\>"
-		if [ $? -eq 0 ]; then
-			NETDEVICES="${NETDEVICES} ${DEV}"
-		fi
-	done           
+	NETDEVICES=`${IP_CMD} addr list | awk '
+	/^[[:digit:]]+/ {
+		dev="";
+	}
+	/^[[:digit:]]+/ && /UP/ && !/LOOPBACK/ && !/SLAVE/ && !/NOARP/ {
+	        dev=$2;
+	}
+	/^[[:space:]]+inet\>/ {
+	        if (dev != "") print (dev);
+	        dev="";
+	}' | sed 's/:$//'`
 }
 
 # Adds/deletes public ARP records for given IP for all interfaces
