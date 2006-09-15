@@ -1,4 +1,6 @@
    3.0.12: FIXME
+	* added '--applyconfig_map name' vzctl set option
+	* changed friendly name data structure
 	* fixed vzmigrate to support VE name feature (bug #239)
    	* fixed annoying arp warning (bug #189)
 	* added bash completion script (bug #212)
