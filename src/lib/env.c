@@ -786,13 +786,15 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	/* get VE IP addresses for cleanup */
 	get_vps_ip(h, veid, &param->del_res.net.ip);
 	if ((ret = env_stop(h, veid, res->fs.root, stop_mode)))
-		return ret;
+		goto end;
 	mod_cleanup(h, veid, action, param);
 	vps_cleanup_res(h, veid, param, STATE_STOPPING);
 	ret = vps_umount(h, veid, res->fs.root, skip);
 	/* Clear VE network configuration*/
 	ret = run_pre_script(veid, VPS_STOP);
 
+end:
+	free_str_param(&param->del_res.net.ip);
 	return ret;
 }
 
