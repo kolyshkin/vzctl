@@ -62,7 +62,7 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 	snprintf(file, sizeof(file), "%s/%s/%s", dir, DIST_SCRIPTS, action);
 	if (!stat_file(file)) {
 		logger(0, 0, "Action script %s does not found", file);
-		return VZ_NO_DISTR_ACTION_SCRIPT;
+		return 0;
 	}
 	switch (id) {
 		case ADD_IP:
