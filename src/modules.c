@@ -98,7 +98,7 @@ int add_module(char *fname, struct mod_action *action, const char *name)
 	struct mod_info *mod_info;
 
 	if ((h = open_dlib(fname)) == NULL) {
-		logger(0, 0, "Unable to open %s: %s", fname, dlerror());
+		logger(-1, 0, "Unable to open %s: %s", fname, dlerror());
 		return -1;
 	}
 	if ((fn = find_dsym(h, MOD_INFO_SYM)) != NULL) {

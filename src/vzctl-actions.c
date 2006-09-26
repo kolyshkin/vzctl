@@ -62,20 +62,20 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 			ret == ERR_LONG_TRUNC)
 		{
 			if (option_index < 0) {
-				logger(0, 0, "Bad parameter for"
+				logger(-1, 0, "Bad parameter for"
 					" -%c : %s", c, optarg);
 				return VZ_INVALID_PARAMETER_VALUE;
 			} else {
-				logger(0, 0, "Bad parameter for"
+				logger(-1, 0, "Bad parameter for"
 					" --%s: %s",
 					opt[option_index].name, optarg);
 				return VZ_INVALID_PARAMETER_VALUE;
 			}
 		} else if (ret == ERR_UNK) {
 			if (option_index < 0)
-				logger(0, 0, "Invalid option -%c", c);
+				logger(-1, 0, "Invalid option -%c", c);
 			else
-				logger(0, 0, "Invalid option --%s",
+				logger(-1, 0, "Invalid option --%s",
 					opt[option_index].name);
 			return VZ_INVALID_PARAMETER_SYNTAX;
                 }
@@ -127,11 +127,11 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (g_p->opt.start_disabled == YES &&
 		cmd_p->opt.start_force != YES)
 	{
-		logger(0, 0, "VE start disabled");
+		logger(-1, 0, "VE start disabled");
 		return VZ_VE_START_DISABLED;
 	}
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VE is already running");
+		logger(-1, 0, "VE is already running");
 		return VZ_VE_RUNNING;
 	}
 	ret = vps_start(h, veid, g_p,
@@ -297,9 +297,9 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 			break;
 		default:
 			if (option_index < 0)
-				logger(0, 0, "Invalid option -%c", c);
+				logger(-1, 0, "Invalid option -%c", c);
 			else
-				logger(0, 0, "Invalid option --%s", 
+				logger(-1, 0, "Invalid option --%s", 
 					chkpnt_options[option_index].name);
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
@@ -310,7 +310,7 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 	return 0;
 
 err_syntax:
-	logger(0, 0, "Invalid syntax: only one sub command may be used");
+	logger(-1, 0, "Invalid syntax: only one sub command may be used");
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
@@ -367,9 +367,9 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 			break;
 		default:
 			if (option_index < 0)
-				logger(0, 0, "Invalid option -%c", c);
+				logger(-1, 0, "Invalid option -%c", c);
 			else
-				logger(0, 0, "Invalid option --%s", 
+				logger(-1, 0, "Invalid option --%s", 
 					restore_options[option_index].name);
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
@@ -379,7 +379,7 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 		cpt->cmd = CMD_RESTORE;
 	return 0;
 err_syntax:
-	logger(0, 0, "Invalid syntax: only one sub command may be used");
+	logger(-1, 0, "Invalid syntax: only one sub command may be used");
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
@@ -389,7 +389,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 
 	/* Check parameters that can't be set on running VE */
 	if (new_res->cap.on || new_res->cap.off) {
-		logger(0, 0, "Unable to set capability on running VE");
+		logger(-1, 0, "Unable to set capability on running VE");
 		if (setmode == SET_RESTART)
 			goto restart_ve;
 		else if (setmode != SET_IGNORE)
@@ -399,7 +399,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		if (!old_res->env.ipt_mask ||
 			new_res->env.ipt_mask != old_res->env.ipt_mask)
 		{
-			logger(0, 0, "Unable to set iptables on running VE");
+			logger(-1, 0, "Unable to set iptables on running VE");
 			if (setmode == SET_RESTART)
 				goto restart_ve;
 			else if (setmode != SET_IGNORE)
@@ -407,7 +407,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		}
 	}
 	if (err && setmode == SET_NONE) {
-		logger(0, 0, "WARNING: Some of the parameters"
+		logger(-1, 0, "WARNING: Some of the parameters"
 			" could not be applied to a running VE.\n"
 			"\tPlease consider using --setmode option");
 	}
@@ -442,7 +442,7 @@ static int apply_param_from_cfg(int veid, vps_param *param, char *cfg)
 		return 0;
 	snprintf(conf, sizeof(conf), VPS_CONF_DIR "ve-%s.conf-sample", cfg);
 	if (!stat_file(conf)) {
-		logger(0, 0, "Sample config file does not found: %s", conf);
+		logger(-1, 0, "Sample config file does not found: %s", conf);
                 return VZ_APPLY_CONFIG_ERROR;
 	}
 	new = init_vps_param();
@@ -514,13 +514,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		return ret;
 	}
 	if (cmd_p->opt.setmode == SET_RESTART && !cmd_p->opt.save) {
-		logger(0, 0, "it's impossible to use"
+		logger(-1, 0, "it's impossible to use"
 			" restart mode without --save");
 		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 	if (cmd_p->res.name.name != NULL) {
 		if (!cmd_p->opt.save) {
-			logger(0, 0, "Error: unable to use"
+			logger(-1, 0, "Error: unable to use"
 				 " --name option without --save");
 			ret =  VZ_SET_NAME_ERROR;
 		} else {
@@ -537,13 +537,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
 			cmd_p->res.fs.private_orig = NULL;
-			logger(0, 0,"Unable to change VE_PRIVATE on runing VE");
+			logger(-1, 0,"Unable to change VE_PRIVATE on runing VE");
 			return VZ_VE_RUNNING;
 		}
 		if (cmd_p->res.fs.root_orig != NULL) {
 			free(cmd_p->res.fs.root_orig);
 			cmd_p->res.fs.root_orig = NULL;
-			logger(0, 0, "Unable to change VE_ROOT on runing VE");
+			logger(-1, 0, "Unable to change VE_ROOT on runing VE");
 			return VZ_VE_RUNNING;
 		}
 	}
@@ -631,7 +631,7 @@ static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VE is not running");
+		logger(-1, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	return do_enter(h, veid, root);
@@ -806,11 +806,11 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		if (skiplock != YES) {
 			lock_id = vps_lock(veid, g_p->opt.lockdir, "");
 			if (lock_id > 0) {
-				logger(0, 0, "VE already locked");
+				logger(-1, 0, "VE already locked");
 				ret = VZ_LOCKED;
 				goto err;
 			} else if (lock_id < 0) {
-				logger(0, 0, "Unable to lock VE");
+				logger(-1, 0, "Unable to lock VE");
 				ret = VZ_SYSTEM_ERROR;
 				goto err;
 			}

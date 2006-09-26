@@ -102,7 +102,7 @@ static int set_cpulimit(envid_t veid, unsigned int cpulimit)
 
 	logger(0, 0, "Setting CPU limit: %d", cpulimit);
 	if (fairsched_rate(veid, cpulim1024 ? 0 : 1, cpulim1024) < 0) {
-		logger(0, errno, "fairsched_rate");
+		logger(-1, errno, "fairsched_rate");
 		return VZ_SETFSHD_ERROR;
 	}
 	return 0;
@@ -112,7 +112,7 @@ static int set_cpuweight(envid_t veid, unsigned int cpuweight)
 {
 
 	if (fairsched_chwt(veid, cpuweight)) {
-		logger(0, errno, "fairsched_chwt");
+		logger(-1, errno, "fairsched_chwt");
 		return VZ_SETFSHD_ERROR;
 	}
 	return 0;
@@ -123,7 +123,7 @@ static int set_cpuunits(envid_t veid, unsigned int cpuunits)
 	int cpuweight, ret;
 
 	if (cpuunits < MINCPUUNITS || cpuunits > MAXCPUUNITS) {
-		logger(0, 0, "Invalid value for cpuunits: %d"
+		logger(-1, 0, "Invalid value for cpuunits: %d"
 			" allowed range is %d-%d",
 			cpuunits, MINCPUUNITS, MAXCPUUNITS);
 		return VZ_SETFSHD_ERROR;
@@ -146,7 +146,7 @@ int env_set_vcpus(envid_t veid, unsigned int vcpus)
 	logger(0, 0, "Setting CPUs: %d", vcpus);
 	ret = fairsched_vcpus(veid, vcpus);
 	if (ret) 
-		logger(0, errno, "Unable to set cpus");
+		logger(-1, errno, "Unable to set cpus");
 
 	return ret;
 }
@@ -183,7 +183,7 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 		return 0;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply CPU parameters: "
+		logger(-1, 0, "Unable to apply CPU parameters: "
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}

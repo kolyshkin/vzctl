@@ -50,14 +50,14 @@ static char *get_ostemplate_name(char *ostmpl)
 
 	snprintf(buf, sizeof(buf), VZOSTEMPLATE " %s", ostmpl);
 	if ((fd = popen(buf, "r")) == NULL) {
-		logger(0, errno, "Error in popen(%s)", buf);
+		logger(-1, errno, "Error in popen(%s)", buf);
 		return NULL;
 	}
 	*buf = 0;
 	while((p = fgets(buf, sizeof(buf), fd)) != NULL);
 	status = pclose(fd);
 	if (WEXITSTATUS(status) || *buf == 0) {
-		logger(0, 0, "Unable to get full ostemplate name for %s",
+		logger(-1, 0, "Unable to get full ostemplate name for %s",
 			ostmpl);
 		return NULL;
 	}
@@ -79,7 +79,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 	
 	snprintf(tarball, sizeof(tarball), "%s/%s.tar.gz", fs->tmpl, tar_nm);
 	if (!stat_file(tarball)) {
-		logger(0, 0, "Cached os template %s not found",	tarball);
+		logger(-1, 0, "Cached os template %s not found",	tarball);
 		return VZ_PKGSET_NOT_FOUND;
 	}
 	/* Lock VE area */
@@ -87,7 +87,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		return VZ_FS_NEW_VE_PRVT;
 	snprintf(tmp_dir, sizeof(tmp_dir), "%s.tmp", fs->private);
 	if (stat_file(tmp_dir)) {
-		logger(0, 0, "Warning: Temp dir %s already exists, deleting",
+		logger(-1, 0, "Warning: Temp dir %s already exists, deleting",
 			tmp_dir);
 		if (del_dir(tmp_dir)) {
 			ret = VZ_FS_NEW_VE_PRVT;
@@ -95,7 +95,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		}
 	}
 	if (make_dir(tmp_dir, 1)) {
-		logger(0, errno, "Unable to create directory %s", tmp_dir);
+		logger(-1, errno, "Unable to create directory %s", tmp_dir);
 		ret = VZ_FS_NEW_VE_PRVT;
 		goto err;
 	}
@@ -131,7 +131,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 	/* Unlock VE area */
 	rmdir(fs->private);
 	if (rename(tmp_dir, fs->private)) {
-		logger(0, errno, "Can't rename %s to %s", tmp_dir, fs->private);
+		logger(-1, errno, "Can't rename %s to %s", tmp_dir, fs->private);
 		ret = VZ_FS_NEW_VE_PRVT;
 	}
 
@@ -169,11 +169,11 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			cmd_p->opt.config);
 		if (!stat_file(src)) {
-			logger(0, 0, "File %s is not found", src);
+			logger(-1, 0, "File %s is not found", src);
 			return VZ_CP_CONFIG;
 		}
 		if (cfg_exists) {
-			logger(0, 0, "Warning: VE config file already exists,"
+			logger(-1, 0, "Warning: VE config file already exists,"
 				" will be rewritten with %s", src);
 			unlink(dst);
 		}
@@ -203,7 +203,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (stat_file(fs->private)) {
-		logger(0, 0, "Private area already exists in %s", fs->private);
+		logger(-1, 0, "Private area already exists in %s", fs->private);
 		return VZ_FS_PRVT_AREA_EXIST;
 	}
 	merge_vps_param(vps_p, cmd_p);
@@ -234,7 +234,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		if (sample_config != NULL)
 			unlink(dst);
 		vps_destroy_dir(veid, fs->private);
-		logger(0, 0, "Creation of VE private area failed");
+		logger(-1, 0, "Creation of VE private area failed");
 		return ret;
 	}
 	vps_postcreate(veid, &vps_p->res.fs, &vps_p->res.tmpl);

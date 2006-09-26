@@ -116,7 +116,7 @@ char *maketmpdir(const char *dir)
 
         snprintf(buf, sizeof(buf), "%s/XXXXXXX", dir);
 	if ((tmp = mkdtemp(buf)) == NULL) {
-		logger(0, errno, "Error in mkdtemp(%s)", buf);
+		logger(-1, errno, "Error in mkdtemp(%s)", buf);
 		return NULL;
 	}
 	len = strlen(dir);
@@ -175,41 +175,41 @@ static int destroydir(char *dir)
 
 	if (stat(dir, &st)) {
 		if (errno != ENOENT) {
-			logger(0, errno, "Unable to stat %s", dir);
+			logger(-1, errno, "Unable to stat %s", dir);
 			return -1;
 		}
 		return 0;
 	}
 	if (!S_ISDIR(st.st_mode)) {
-		logger(0, 0, "Warning: VE private area is not a directory");
+		logger(-1, 0, "Warning: VE private area is not a directory");
 		if (unlink(dir)) {
-			logger(0, errno, "Unable to unlink %s", dir);
+			logger(-1, errno, "Unable to unlink %s", dir);
 			return -1;
 		}
 		return 0;
 	}
 	root = get_destroy_root(dir);
 	if (root == NULL) {
-		logger(0, 0, "Unable to get root for %s", dir);
+		logger(-1, 0, "Unable to get root for %s", dir);
 		return -1;
 	}
 	snprintf(tmp, sizeof(buf), "%s/tmp", root);
 	free(root);
 	if (!stat_file(tmp)) {
 		if (mkdir(tmp, 0755)) {
-			logger(0, errno, "Can't create tmp dir %s", tmp);
+			logger(-1, errno, "Can't create tmp dir %s", tmp);
 			return VZ_FS_DEL_PRVT;
 		}
 	}
 	/* First move to del */
 	if ((tmp_nm = maketmpdir(tmp)) == NULL)	{
-		logger(0, 0, "Unable to generate temporary name in %s", tmp);
+		logger(-1, 0, "Unable to generate temporary name in %s", tmp);
 		return VZ_FS_DEL_PRVT;
 	}
 	snprintf(buf, sizeof(tmp), "%s/%s", tmp, tmp_nm);
 	free(tmp_nm);
 	if (rename(dir, buf)) {
-		logger(0, errno, "Can't move %s -> %s", dir, buf);
+		logger(-1, errno, "Can't move %s -> %s", dir, buf);
 		rmdir(buf);
 		return VZ_FS_DEL_PRVT;
 	}
@@ -243,7 +243,7 @@ static int destroydir(char *dir)
 		_unlock(fd_lock, buf);
 		exit(0);
 	} else if (pid < 0)  {
-		logger(0, errno, "destroydir: Unable to fork");
+		logger(-1, errno, "destroydir: Unable to fork");
 		ret = VZ_RESOURCE_ERROR;
 	}
 	sleep(1);

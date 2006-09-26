@@ -56,12 +56,12 @@ static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
 	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
 	if (ret) {
 		if (errno == ENOTTY) {
-			logger(0, 0, "Warning: veth feature is"
+			logger(-1, 0, "Warning: veth feature is"
 				" not supported by kernel, skipped"
 				" veth configure");
 			ret = 0;
 		} else {
-			logger(0, errno, "Unable to create veth");
+			logger(-1, errno, "Unable to create veth");
 			ret = VZ_VETH_ERROR;
 		}
 	}
@@ -81,7 +81,7 @@ static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
 	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
 	if (ret) {
 		if (errno != ENODEV) {
-			logger(0, errno, "Unable to remove veth");
+			logger(-1, errno, "Unable to remove veth");
 			ret = VZ_VETH_ERROR;
 		} else
 			ret = 0;
@@ -106,7 +106,7 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to %s veth: VE is not running",
+		logger(-1, 0, "Unable to %s veth: VE is not running",
 			op == ADD ? "create" : "remove");
 		return VZ_VE_NOT_RUNNING;
 	}

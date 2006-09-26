@@ -48,7 +48,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 	FILE *out;
 	char date[64];
 
-	if (!log_level)
+	if (log_level < 0)
 		out = stderr;
 	else
 		out = stdout;

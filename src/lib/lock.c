@@ -88,11 +88,11 @@ int vps_lock(envid_t veid, char *dir, char *status)
 	snprintf(tmp_file, sizeof(tmp_file), "%sXXXXXX", lockfile);
 	if ((fd = mkstemp(tmp_file)) < 0) {
 		if (errno == EROFS)
-			logger(0, errno, "Unable to create"
+			logger(-1, errno, "Unable to create"
 				" lock file %s, use --skiplock option",
 				tmp_file);	
 		else
-			logger(0, errno, "Unable to create"
+			logger(-1, errno, "Unable to create"
 				" temporary lock file: %s", tmp_file);
 		return -1;
 	}
@@ -121,7 +121,7 @@ int vps_lock(envid_t veid, char *dir, char *status)
 				ret = 1;
 				break;
 			} else {
-				logger(0, 0, "Removing stale lock"
+				logger(-1, 0, "Removing stale lock"
 						" file %s", lockfile);
 				unlink(lockfile);
 			}
@@ -154,7 +154,7 @@ int _lock(char *lockfile, int blk)
 	if ((fd = open(lockfile, O_CREAT | O_RDWR,
 			S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) == -1)
 	{
-		logger(0, errno, "Unable to create lock file %s", lockfile);
+		logger(-1, errno, "Unable to create lock file %s", lockfile);
 		return -1;
 	}
 	if (flock(fd, op)) {
@@ -162,7 +162,7 @@ int _lock(char *lockfile, int blk)
 			close(fd);
 			return -2;
 		} else {
-			logger(0, errno, "Error in flock()");
+			logger(-1, errno, "Error in flock()");
 			close(fd);
 			return -1;
 		}
@@ -176,6 +176,6 @@ void _unlock(int fd, char *lockfile)
 		return;
 	unlink(lockfile);
 	if (flock(fd, LOCK_UN))
-		logger(0, errno, "Error in flock(LOCK_UN)");
+		logger(-1, errno, "Error in flock(LOCK_UN)");
 	close(fd);
 }

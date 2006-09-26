@@ -248,7 +248,7 @@ int main(int argc, char *argv[], char *envp[])
 	get_vps_conf_path(veid, buf, sizeof(buf));
 	if (stat_file(buf)) {
 		if (vps_parse_config(veid, buf, vps_p, &g_action)) {
-			logger(0, 0, "Error in config file %s",
+			logger(-1, 0, "Error in config file %s",
 				buf);
 			ret = VZ_NOCONFIG;
 			goto error;
@@ -257,7 +257,7 @@ int main(int argc, char *argv[], char *envp[])
 		    vps_p->res.name.name != NULL &&
 		    strcmp(name, vps_p->res.name.name))
 		{
-			logger(0, 0, "Unable to find VE by name %s", name);
+			logger(-1, 0, "Unable to find VE by name %s", name);
 			ret = VZ_INVALID_PARAMETER_VALUE;
 			goto error;
 		}
@@ -265,7 +265,7 @@ int main(int argc, char *argv[], char *envp[])
 			action != ACTION_STATUS &&
 			action != ACTION_SET)
 	{
-		logger(0, 0, "VE config file does not exist");
+		logger(-1, 0, "VE config file does not exist");
 		ret = VZ_NOVECONFIG;
 		goto error;
 	}

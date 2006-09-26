@@ -55,7 +55,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 
 	/* Create VE_ROOT mount point if not exist */
 	if (make_dir(fs->root, 1)) {
-		logger(0, 0, "Can't create mount point %s", fs->root);
+		logger(-1, 0, "Can't create mount point %s", fs->root);
 		return VZ_FS_MPOINTCREATE;
 	}
 	if ((ret = vps_quotaon(veid, fs->private, dq)))
@@ -85,7 +85,7 @@ static int real_umount(envid_t veid, char *root)
 		sleep(1);
 	}
 	if (ret) {
-		logger(0, errno, "Can't umount: %s", root);
+		logger(-1, errno, "Can't umount: %s", root);
 		ret = VZ_FS_CANTUMOUNT;
 	}
 	return ret;
@@ -128,11 +128,11 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!stat_file(fs->private)) {
-		logger(0, 0, "VE private area %s does not exist", fs->private);
+		logger(-1, 0, "VE private area %s does not exist", fs->private);
 		return VZ_FS_NOPRVT;
 	}
 	if (vps_is_mounted(fs->root)) {
-		logger(0, 0, "VE is already mounted");
+		logger(-1, 0, "VE is already mounted");
 		return 0;
 	}
 	if ((ret = fsmount(veid, fs, dq)))
@@ -143,7 +143,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 			MOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
-				logger(0, 0, "Error executing mount script %s",
+				logger(-1, 0, "Error executing mount script %s",
 					buf);
 				fsumount(veid, fs->root);
 				return VZ_ACTIONSCRIPT_ERROR;
@@ -171,11 +171,11 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 	int ret, i;
 
 	if (!vps_is_mounted(root)) {
-		logger(0, 0, "VE is not mounted");
+		logger(-1, 0, "VE is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VE is running. Stop VE first");
+		logger(-1, 0, "VE is running. Stop VE first");
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
@@ -183,7 +183,7 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 			UMOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
-				logger(0, 0, "Error executing umount script %s",
+				logger(-1, 0, "Error executing umount script %s",
 					buf);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
@@ -206,7 +206,7 @@ int vps_set_fs(fs_param *g_fs, fs_param *fs)
 	if (check_var(g_fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!vps_is_mounted(g_fs->root)) {
-		logger(0, 0, "VE is not mounted");
+		logger(-1, 0, "VE is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
 	g_fs->noatime = fs->noatime;

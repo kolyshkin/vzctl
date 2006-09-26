@@ -50,27 +50,27 @@ static int dev_create(char *root, dev_res *dev)
 	snprintf(buf1, sizeof(buf1), "%s/dev/%s", root, dev->name);
 	ret = lstat(buf1, &st);
 	if (ret && errno != ENOENT) {
-		logger(0, errno, "Unable to stat device %s", buf1);
+		logger(-1, errno, "Unable to stat device %s", buf1);
 		return VZ_SET_DEVICES;
 	} else if (!ret)
 		return 0;
 	snprintf(buf2, sizeof(buf2), "/dev/%s", dev->name);
 	if (lstat(buf2, &st)) {
 		if (errno == ENOENT)
-			logger(0, 0, "Incorrect name or no such device %s",
+			logger(-1, 0, "Incorrect name or no such device %s",
 				buf2);
 		else
-			logger(0, errno, "Unable to stat  device %s", buf2);
+			logger(-1, errno, "Unable to stat  device %s", buf2);
 		return VZ_SET_DEVICES;
 	}
 	if (!S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode)) {
-		logger(0, 0, "The %s is not block or character device", buf2);
+		logger(-1, 0, "The %s is not block or character device", buf2);
 		return VZ_SET_DEVICES;
 	}
 	if (make_dir(buf1, 0))
 		return VZ_SET_DEVICES;
 	if (mknod(buf1, st.st_mode, st.st_rdev)) {
-		logger(0, errno, "Unable to create device %s", buf1);
+		logger(-1, errno, "Unable to create device %s", buf1);
 		return VZ_SET_DEVICES;
 	}
 	return 0;
@@ -87,7 +87,7 @@ int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
 	devperms.type = dev->type;
 
 	if ((ret = ioctl(h->vzfd, VZCTL_SETDEVPERMS, &devperms)))
-		logger(0, errno, "Unable to set devperms");
+		logger(-1, errno, "Unable to set devperms");
 
 	return ret;
 }
@@ -109,7 +109,7 @@ int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev)
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply devperm: VE is not running");
+		logger(-1, 0, "Unable to apply devperm: VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	logger(0, 0, "Setting devices");

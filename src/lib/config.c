@@ -642,7 +642,7 @@ static int parse_cap(char *str, cap_param *cap)
                 return 0;
 	do {
 		if ((p = strrchr(token, ':')) == NULL) {
-			logger(0, 0, "Invalid syntaxes in %s:"
+			logger(-1, 0, "Invalid syntaxes in %s:"
 				" capname:on|off", token);
 			return ERR_INVAL;
 		}
@@ -651,7 +651,7 @@ static int parse_cap(char *str, cap_param *cap)
 		else if (!strcmp(p + 1, "on"))
 			mask = &cap->on;
 		else {
-                        logger(0, 0, "Invalid syntaxes in %s:"
+                        logger(-1, 0, "Invalid syntaxes in %s:"
 				" capname:on|off", token);
 			return ERR_INVAL;
 		}
@@ -660,7 +660,7 @@ static int parse_cap(char *str, cap_param *cap)
 			len < sizeof(cap_nm) ? len : sizeof(cap_nm));
 		cap_nm[len] = 0;
 		if (get_cap_mask(cap_nm, mask)) {
-			logger(0, 0, "Capability %s is unknown", cap_nm);
+			logger(-1, 0, "Capability %s is unknown", cap_nm);
 			return ERR_INVAL;
 		}
         } while ((token = strtok(NULL, " ")));
@@ -1058,7 +1058,7 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
         snprintf(dev->name, len, "%s", str);
 	snprintf(buf, sizeof(buf), "/dev/%s", dev->name);
 	if (stat(buf, &st)) {
-		logger(0, errno, "Incorrect device name %s", buf);
+		logger(-1, errno, "Incorrect device name %s", buf);
 		return ERR_INVAL;
 	}
 	if (S_ISCHR(st.st_mode))
@@ -1066,7 +1066,7 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
 	else if (S_ISBLK(st.st_mode))
 		dev->type = S_IFBLK;
 	else {
-		logger(0, 0, "The %s is not block or character device", buf);
+		logger(-1, 0, "The %s is not block or character device", buf);
 		return ERR_INVAL;
 	}
 	dev->dev = st.st_rdev;
@@ -1694,7 +1694,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 	const vps_config *conf;
 
 	if ((fp = fopen(path, "r")) == NULL) {
-		logger(0, errno, "Unable to open %s", path);
+		logger(-1, errno, "Unable to open %s", path);
                 return 1;
 	}
 	if (!stat(path, &st))
@@ -1720,22 +1720,22 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 		} else if (ret == ERR_INVAL_SKIP) {
 			continue;
 		} else if (ret == ERR_LONG_TRUNC) {
-			logger(0, 0, "Warning: too large value for %s=%s"
+			logger(-1, 0, "Warning: too large value for %s=%s"
 				" was truncated", ltoken, rtoken);
 		} else if (ret == ERR_DUP) {
-			logger(0, 0, "Warning: dup for %s=%s in line %d"
+			logger(-1, 0, "Warning: dup for %s=%s in line %d"
 				" is ignored", ltoken, rtoken, line);
 		} else if (ret == ERR_INVAL) {
-			logger(0, 0, "Invalid value for %s=%s, skipped",
+			logger(-1, 0, "Invalid value for %s=%s, skipped",
 				ltoken, rtoken);
 		} else if (ret == ERR_UNK) {
-			logger(0, 0, "Unknown parameter %s, skipped", ltoken);
+			logger(-1, 0, "Unknown parameter %s, skipped", ltoken);
 		} else if (ret == ERR_NOMEM) {
-			logger(0, 0, "Not enough memory");
+			logger(-1, 0, "Not enough memory");
 			err = VZ_RESOURCE_ERROR;
 			break;
 		} else {
-			logger(0, 0, "Unknown exit code %d on parse %s",
+			logger(-1, 0, "Unknown exit code %d on parse %s",
 				ret, ltoken);
 		}
 	}
@@ -1775,7 +1775,7 @@ static int write_conf(char *fname, list_head_t *head)
 	if (fname != NULL) {
 		snprintf(buf, sizeof(buf), "%s.tmp", fname);
 		if ((fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0644)) < 0) {
-			logger(0, errno, "Unable to create configuration"
+			logger(-1, errno, "Unable to create configuration"
 				" file %s", buf);
 	                return 1;
         	}
@@ -1786,7 +1786,7 @@ static int write_conf(char *fname, list_head_t *head)
 		len = strlen(conf->val);
 		ret = write(fd, conf->val, len);
 		if (ret < 0) {
-			logger(0, errno, "Unable to write %d bytes to %s",
+			logger(-1, errno, "Unable to write %d bytes to %s",
 					len, buf);
 			unlink(buf);
 			close(fd);
@@ -1798,7 +1798,7 @@ static int write_conf(char *fname, list_head_t *head)
 	if (fname != NULL) {
 		close(fd);
 		if (rename(buf, fname)) {
-			logger(0, errno, "Unable to move %s -> %s",
+			logger(-1, errno, "Unable to move %s -> %s",
 				buf, fname);
 			return 1;
 		}
@@ -1978,12 +1978,12 @@ int set_name(int veid, char *new_name, char *old_name)
 	if (new_name == NULL)
 		return 0;
 	if (check_name(new_name)) {
-		logger(0, 0, "Error: ivalid name %s", new_name);
+		logger(-1, 0, "Error: ivalid name %s", new_name);
 		return VZ_SET_NAME_ERROR;
 	}
 	veid_old = get_veid_by_name(new_name);
 	if (veid_old >= 0 && veid_old != veid) {
-		logger(0, 0, "Conflict: name %s already used by VE %d",
+		logger(-1, 0, "Conflict: name %s already used by VE %d",
 			new_name, veid_old);
 		return VZ_SET_NAME_ERROR;
 	}
@@ -1998,7 +1998,7 @@ int set_name(int veid, char *new_name, char *old_name)
 		get_vps_conf_path(veid, conf, sizeof(conf));
 		unlink(buf);
 		if (symlink(conf, buf)) {
-			logger(0, errno, "Unable to create link %s", buf);
+			logger(-1, errno, "Unable to create link %s", buf);
 			return VZ_SET_NAME_ERROR;
 		}
 	}

@@ -175,7 +175,7 @@ static int set_cap(envid_t veid, cap_t mask, int pid)
 	data.inheritable = mask;
 
 	if (capset(&header, &data) < 0)	{
-		logger(0, errno, "Unable to set capability");
+		logger(-1, errno, "Unable to set capability");
 		return VZ_SET_CAP;
 	}
 	return 0;

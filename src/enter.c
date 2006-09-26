@@ -50,11 +50,11 @@ static int pty_alloc(int *master, int *slave, struct termios *tios,
 	char *name;
 
 	if (openpty(master, slave, NULL, tios, ws) < 0) {
-		logger(0, errno, "Unable to open pty");
+		logger(-1, errno, "Unable to open pty");
 		return -1;
 	}
 	if ((name = ttyname(*slave)) == NULL) {
-		logger(0, errno, "Unable to get tty name");
+		logger(-1, errno, "Unable to get tty name");
 	} else {
 		logger(2, 0, "Open %s", name);
 	} 
@@ -70,16 +70,16 @@ static void set_ctty(int ttyfd)
 		close(fd);
 	}
 	if (setsid() < 0)
-		logger(0, errno, "setsid");
+		logger(-1, errno, "setsid");
 	if (ioctl(ttyfd, TIOCSCTTY, NULL) < 0)
-		logger(0, errno, "Failed to connect to controlling tty");
+		logger(-1, errno, "Failed to connect to controlling tty");
 	setpgrp();
 }
 
 static void raw_off(void)
 {
         if (tcsetattr(0, TCSADRAIN, &s_tios) == -1)
-		logger(0, errno, "Unable to restore term attr");
+		logger(-1, errno, "Unable to restore term attr");
 }
 
 static void raw_on(void)
@@ -87,13 +87,13 @@ static void raw_on(void)
 	struct termios tios;
 
 	if (tcgetattr(0, &tios) == -1) {
-		logger(0, errno, "Unable to get term attr");
+		logger(-1, errno, "Unable to get term attr");
 		return;
 	}
 	memcpy(&s_tios, &tios, sizeof(struct termios));
 	cfmakeraw(&tios);
 	if (tcsetattr(0, TCSADRAIN, &tios) == -1) 
-		logger(0, errno, "Unable to set raw mode");
+		logger(-1, errno, "Unable to set raw mode");
 }
 
 static void child_handler(int sig)
@@ -175,7 +175,7 @@ static void e_loop(int r_in, int w_in,  int r_out, int w_out)
 				}	
 		} else if (n < 0 && errno != EINTR) {
 			close(r_out);
-			logger(0, errno, "Error in select()");
+			logger(-1, errno, "Error in select()");
 			break;
 		}
 	}
@@ -200,7 +200,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 	struct sigaction act;
 
 	if (pipe(in) < 0 || pipe(out) < 0 || pipe(st) < 0) {
-		logger(0, errno, "Unable to create pipe");
+		logger(-1, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	if ((ret = vz_setluid(veid)))
@@ -217,7 +217,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 	sigaction(SIGPIPE, &act, NULL);
 
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Unable to fork");
+		logger(-1, errno, "Unable to fork");
 		ret = VZ_RESOURCE_ERROR;
 		return ret;
 	} else if (pid == 0) {
@@ -271,10 +271,10 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			}
 			execve("/bin/bash", arg, env);
 			execve("/bin/sh", arg, env);
-			logger(0, errno, "enter failed: unable to exec bash");
+			logger(-1, errno, "enter failed: unable to exec bash");
 			exit(1);
 		} else if (pid < 0) {
-			logger(0, errno, "Unable to fork");
+			logger(-1, errno, "Unable to fork");
 			ret = VZ_RESOURCE_ERROR;
 			write(st[1], &ret, sizeof(ret));
 			exit(ret);

@@ -87,7 +87,7 @@ int check_ub(ub_param *ub)
 
 #define CHECK_UB(name)							\
 if (ub->name == NULL) {							\
-	logger(0, 0, "UB parameter " #name " not set");			\
+	logger(-1, 0, "UB parameter " #name " not set");			\
 	ret = VZ_NOTENOUGHUBCPARAMS;					\
 }
 
@@ -171,7 +171,7 @@ int set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 #define SET_UB_LIMIT(name, id)						\
 if (ub->name != NULL) {							\
 	if (setublimit(veid, id, ub->name)) {				\
-		logger(0, errno, "setublimit %s %lu:%lu failed",	\
+		logger(-1, errno, "setublimit %s %lu:%lu failed",	\
 			get_ub_name(id), ub->name[0], ub->name[1]);	\
 		return VZ_SETUBC_ERROR;					\
 	}								\
@@ -216,13 +216,13 @@ int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 	if (is_ub_empty(ub))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply UBC parameters: "
+		logger(-1, 0, "Unable to apply UBC parameters: "
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((ret = set_ublimit(h, veid, ub)))
 		return ret;
-	logger(0, 0, "UB limits were set successefully");
+	logger(-1, 0, "UB limits were set successefully");
 	return 0;
 }
 
@@ -360,7 +360,7 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 
 	fd = fopen(PROCUBC, "r");
 	if (fd == NULL) {
-		logger(0, errno, "Unable to open " PROCUBC);
+		logger(-1, errno, "Unable to open " PROCUBC);
 		return -1;
 	}
 	found = 0;

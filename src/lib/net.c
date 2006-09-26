@@ -95,7 +95,7 @@ int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
 				ret = VZ_CANT_ADDIP;
 				break;
 		}
-		logger(0, errno, "Unable to %s IP %s",
+		logger(-1, errno, "Unable to %s IP %s",
 			op == VE_IP_ADD ? "add" : "del", ip);
 	}
 	return ret;
@@ -249,14 +249,14 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)){
-		logger(0, 0, "Unable to setup network devices: "
+		logger(-1, 0, "Unable to setup network devices: "
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	cmd = (op == ADD) ? VE_NETDEV_ADD : VE_NETDEV_DEL;
 	list_for_each(dev, dev_h, list) {
 		if ((ret = netdev_ctl(h, veid, cmd, dev->val))) {
-			logger(0, errno, "Unable to %s netdev %s",
+			logger(-1, errno, "Unable to %s netdev %s",
 				(op == ADD) ? "add": "del", dev->val);
 			break;
 		}
@@ -277,7 +277,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 		return 0;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to apply network parameters: "
+		logger(-1, 0, "Unable to apply network parameters: "
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
@@ -304,7 +304,7 @@ static inline int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 	int id, cnt = 0;
 
 	if ((fd = fopen(PROC_VEINFO, "r")) == NULL) {
-		logger(0, errno, "Unable to open %s", PROC_VEINFO);
+		logger(-1, errno, "Unable to open %s", PROC_VEINFO);
 		return -1;
 	}
 	while (!feof(fd)) {

@@ -100,7 +100,7 @@ int quota_set(envid_t veid, char *private, dq_param *param)
 	}
 	arg[i] = NULL;
 	if ((ret = run_script(VZQUOTA, arg, NULL, 0))) {
-		logger(0, 0, "vzquota setlimit failed [%d]", ret);
+		logger(-1, 0, "vzquota setlimit failed [%d]", ret);
 		ret = VZ_DQ_SET;
 	}
 	free_arg(arg);
@@ -171,7 +171,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 		arg[i++] = strdup("0");
 	arg[i] = NULL;
 	if ((ret = run_script(VZQUOTA, arg, NULL, 0))) {
-		logger(0, 0, "vzquota init failed [%d]", ret);
+		logger(-1, 0, "vzquota init failed [%d]", ret);
 		ret = VZ_DQ_INIT;
 	}
 	free_arg(arg);
@@ -260,7 +260,7 @@ retry:
 			break;
 		}
 		if (ret) {
-			logger(0, 0, "vzquota on failed [%d]", ret);
+			logger(-1, 0, "vzquota on failed [%d]", ret);
 			ret = VZ_DQ_SET;
 		}
 	}
@@ -291,7 +291,7 @@ int quota_off(envid_t veid, int force)
 	arg[i] = NULL;
 	if ((ret = run_script(VZQUOTA, arg, NULL, 0))) {
 		if (ret != EXITCODE_QUOTANOTRUN) {
-			logger(0, 0, "vzquota off failed [%d]", ret);
+			logger(-1, 0, "vzquota off failed [%d]", ret);
 			ret = VZ_DQ_OFF;
 		}
 	}
@@ -353,7 +353,7 @@ int quota_ctl(envid_t veid, int cmd)
 		quiet = 1;
 		break;
 	default	:
-		logger(0, 0, "quota_ctl: Unknown action %d", cmd);
+		logger(-1, 0, "quota_ctl: Unknown action %d", cmd);
 		return VZ_SYSTEM_ERROR;
 	}
 	arg[i] = NULL;
@@ -387,20 +387,20 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 		return 0;
 	}
 	if (quota_ctl(veid, QUOTA_STAT)) {
-		logger(0, 0, "Error: Unable to apply new quota values"
+		logger(-1, 0, "Error: Unable to apply new quota values"
 			" quota not running");
 		return -1;
 	}
 	if (dq->ugidlimit != NULL) {
 		ret = quota_ctl(veid, QUOTA_STAT2);
 		if (ret && *dq->ugidlimit) {
-			logger(0, 0, "Unable to apply new quota values:"
+			logger(-1, 0, "Unable to apply new quota values:"
 				" ugid quota not initialized");
 			return VZ_DQ_UGID_NOTINITIALIZED;
 //			tmp_ugidlimit = dq->ugidlimit;
 //			dq->ugidlimit = NULL;
 		} else if (!ret && !*dq->ugidlimit) {
-			logger(0, 0, "WARNING: Unable to turn ugid quota"
+			logger(-1, 0, "WARNING: Unable to turn ugid quota"
 				" off. new parameters will be applyed"
 				" on next start");
 			tmp_ugidlimit = dq->ugidlimit;

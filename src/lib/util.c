@@ -123,7 +123,7 @@ int make_dir(char *path, int full)
 		ps = p + 1;
 		if (!stat_file(buf)) {
 			if (mkdir(buf, 0755)) {
-				logger(0, errno, "Can't create directory %s",
+				logger(-1, errno, "Can't create directory %s",
 					buf);
 				return 1;
 			}
@@ -133,7 +133,7 @@ int make_dir(char *path, int full)
 		return 0;
 	if (!stat_file(path)) {
 		if (mkdir(path, 0755)) {
-			logger(0, errno, "Can't create directory %s", path);
+			logger(-1, errno, "Can't create directory %s", path);
 			return 1;
 		}
 	}
@@ -180,7 +180,7 @@ int check_var(const void *val, const char *message)
 {
         if (val != NULL)
                 return 0;
-        logger(0, 0, "%s", message);
+        logger(-1, 0, "%s", message);
 
         return 1;
 }
@@ -192,16 +192,16 @@ int cp_file(char *dst, char *src)
 	char buf[4096];
 
 	if (stat(src, &st) < 0) {
-		logger(0, errno, "Unable to stat %s", src);
+		logger(-1, errno, "Unable to stat %s", src);
 		return -1;
 	}
 	len = st.st_size;
 	if ((fd_src = open(src, O_RDONLY)) < 0) {
-		logger(0, errno, "Unable to open %s", src);
+		logger(-1, errno, "Unable to open %s", src);
 		return -1;
 	}
 	if ((fd_dst = open(dst, O_CREAT|O_RDWR, st.st_mode)) < 0) {
-		logger(0, errno, "Unable to open %s", dst);
+		logger(-1, errno, "Unable to open %s", dst);
 		close(fd_src);
 		return -1;
 	}
@@ -210,12 +210,12 @@ int cp_file(char *dst, char *src)
 		if (!ret)
 			break;
 		else if (ret < 0) {
-			logger(0, errno, "Unable to read from %s", src);
+			logger(-1, errno, "Unable to read from %s", src);
 			ret = -1;
 			break;
 		}
 		if (write(fd_dst, buf, len) < 0) {
-			logger(0, errno, "Unable write to %s", dst);
+			logger(-1, errno, "Unable write to %s", dst);
 			ret = -1;
 			break;
 		}
@@ -357,7 +357,7 @@ int get_mem(unsigned long long *mem)
 {
 	long pagesize;
 	if ((*mem = sysconf(_SC_PHYS_PAGES)) == -1) {
-		logger(0, errno, "Unable to get total phys pages");
+		logger(-1, errno, "Unable to get total phys pages");
 		return -1;
 	}
 	if ((pagesize = get_pagesize()) < 0)
@@ -374,7 +374,7 @@ int get_thrmax(int *thrmax)
 	if (thrmax == NULL)
 		return 1;
 	if ((fd = fopen(PROCTHR, "r")) == NULL) {
-		logger(0, errno, "Unable to open " PROCTHR);
+		logger(-1, errno, "Unable to open " PROCTHR);
 		return 1;
 	}
 	if (fgets(str, sizeof(str), fd) == NULL) {
@@ -393,7 +393,7 @@ int get_swap(unsigned long long *swap)
 	char str[128];
 
 	if ((fd = fopen(PROCMEM, "r")) == NULL)	{
-		logger(0, errno, "Cannot open " PROCMEM);
+		logger(-1, errno, "Cannot open " PROCMEM);
 		return -1;
 	}
 	while (fgets(str, sizeof(str), fd)) {
@@ -403,7 +403,7 @@ int get_swap(unsigned long long *swap)
 			return 0;
 		}
 	}
-	logger(0, errno, "Swap: is not found in " PROCMEM );
+	logger(-1, errno, "Swap: is not found in " PROCMEM );
 	fclose(fd);
 
 	return -1;
@@ -416,7 +416,7 @@ int get_num_cpu()
 	int ncpu = 0;
 
 	if ((fd = fopen("/proc/cpuinfo", "r")) == NULL)	{
-		logger(0, errno, "Cannot open /proc/cpuinfo");
+		logger(-1, errno, "Cannot open /proc/cpuinfo");
 		return 1;
 	}
 	while (fgets(str, sizeof(str), fd)) {
@@ -433,7 +433,7 @@ int get_lowmem(unsigned long long *mem)
 	char str[128];
 
 	if ((fd = fopen(PROCMEM, "r")) == NULL)	{
-		logger(0, errno, "Cannot open " PROCMEM);
+		logger(-1, errno, "Cannot open " PROCMEM);
 		return -1;
 	}
 	while (fgets(str, sizeof(str), fd)) {
@@ -443,7 +443,7 @@ int get_lowmem(unsigned long long *mem)
 			return 0;
 		}
 	}
-	logger(0, errno, "LowTotal: is not found in" PROCMEM);
+	logger(-1, errno, "LowTotal: is not found in" PROCMEM);
 	fclose(fd);
 	return -1;
 }

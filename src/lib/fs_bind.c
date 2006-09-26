@@ -42,7 +42,7 @@ int vz_fs_is_mounted(char *root)
 	int ret = 0; 
 
 	if ((fp = fopen("/proc/mounts", "r")) == NULL) {
-		logger(0, errno,  "unable to open /proc/mounts");
+		logger(-1, errno,  "unable to open /proc/mounts");
 		return -1;
 	}
 	while (!feof(fp)) {
@@ -71,7 +71,7 @@ int vz_mount(fs_param *fs, int remount)
 
         if (mount(fs->private, fs->root, "none", mntopt, NULL) < 0)
 	{
-                logger(0, errno, "Can't mount: %s %s",
+                logger(-1, errno, "Can't mount: %s %s",
 			fs->private, fs->root);
                 return VZ_FS_CANTMOUNT;
         }

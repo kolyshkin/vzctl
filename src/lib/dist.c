@@ -61,7 +61,7 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 		return 0;
 	snprintf(file, sizeof(file), "%s/%s/%s", dir, DIST_SCRIPTS, action);
 	if (!stat_file(file)) {
-		logger(0, 0, "Action script %s does not found", file);
+		logger(-1, 0, "Action script %s does not found", file);
 		return 0;
 	}
 	switch (id) {
@@ -140,16 +140,16 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 			*ep = 0;
 		} while (ep > buf);
 		snprintf(file, len, "%s/%s", dir, DIST_CONF_DEF);
-		logger(0, 0, "Warning: configuration file"
+		logger(-1, 0, "Warning: configuration file"
 			" for distribution %s not found default used",
 			dist_name);
 	} else {
 		snprintf(file, len, "%s/%s", dir, DIST_CONF_DEF);
-		logger(0, 0, "Warning: distribution not specified"
+		logger(-1, 0, "Warning: distribution not specified"
 			" default used %s", file);
 	}
 	if (!stat_file(file)) {
-		logger(0, 0, "Distribution configuration not found %s", file);
+		logger(-1, 0, "Distribution configuration not found %s", file);
 		return VZ_NO_DISTR_CONF;
 	}
 	return 0;
@@ -175,7 +175,7 @@ int read_dist_actions(char *dist_name, char *dir, dist_actions *actions)
 	if ((ret = get_dist_conf_name(dist_name, dir, file, sizeof(file))))
 		return ret;
 	if ((fp = fopen(file, "r")) == NULL) {
-		logger(0, errno, "unable to open %s", file);
+		logger(-1, errno, "unable to open %s", file);
 		return VZ_NO_DISTR_CONF;
 	}
 	while (!feof(fp)) { 

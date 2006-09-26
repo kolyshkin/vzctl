@@ -100,9 +100,9 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 
 	if (vps_state == STATE_RUNNING && vps_is_run(h, veid)) {
 		if (res->cap.on || res->cap.off)
-			logger(0, 0, "Unable to set capability on running VE");
+			logger(-1, 0, "Unable to set capability on running VE");
 		if (res->env.ipt_mask) {
-			logger(0, 0, "Unable to set iptables on running VE");
+			logger(-1, 0, "Unable to set iptables on running VE");
 			return VZ_SET_IPTABLES;
 		}
 	}

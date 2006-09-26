@@ -58,33 +58,33 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 		file = PROC_RST;
 		err = VZ_RESTORE_ERROR;
 	} else {
-		logger(0, 0, "cpt_cmd: Unsupported cmd");
+		logger(-1, 0, "cpt_cmd: Unsupported cmd");
 		return -1;
 	}
 	if ((fd = open(file, O_RDWR)) < 0) {
 		if (errno == ENOENT)
-			logger(0, errno, "Error: No checkpointing"
+			logger(-1, errno, "Error: No checkpointing"
 				" support, unable to open %s", file);
 		else
-			logger(0, errno, "Unable to open %s", file);
+			logger(-1, errno, "Unable to open %s", file);
 		return err;
 	}
 	if ((ret = ioctl(fd, CPT_JOIN_CONTEXT, param->ctx ? : veid)) < 0) {
-		logger(0, errno, "Can not join cpt context %d", param->ctx);
+		logger(-1, errno, "Can not join cpt context %d", param->ctx);
 		goto err;
 	}
 	switch (param->cmd) {
 	case CMD_KILL:
 		logger(0, 0, "Killing...");
 		if ((ret = ioctl(fd, CPT_KILL, 0)) < 0) {
-			logger(0, errno, "Can not kill VE");
+			logger(-1, errno, "Can not kill VE");
 			goto err;
 		}
 		break;
 	case CMD_RESUME:
 		logger(0, 0, "Resuming...");
 		if ((ret = ioctl(fd, CPT_RESUME, 0)) < 0) {
-			logger(0, errno, "Can not resume VE");
+			logger(-1, errno, "Can not resume VE");
 			goto err;
 		}
 		if (action == CMD_CHKPNT) {
@@ -98,7 +98,7 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	if (!param->ctx) {
 		logger(2, 0, "\tput context");
 		if ((ret = ioctl(fd, CPT_PUT_CONTEXT, 0)) < 0) {
-			logger(0, errno, "Can not put context");
+			logger(-1, errno, "Can not put context");
 			goto err;
 		}
 	}
@@ -117,44 +117,44 @@ int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
 	if ((ret = vz_chroot(root)))
 		return VZ_CHKPNT_ERROR;
 	if (pipe(err_p) < 0) {
-		logger(0, errno, "Can't create pipe");
+		logger(-1, errno, "Can't create pipe");
 		return VZ_CHKPNT_ERROR;
 	}
 	fcntl(err_p[0], F_SETFL, O_NONBLOCK);
 	fcntl(err_p[1], F_SETFL, O_NONBLOCK);
 	if (ioctl(cpt_fd, CPT_SET_ERRORFD, err_p[1]) < 0) {
-		logger(0, errno, "Can't set errorfd");
+		logger(-1, errno, "Can't set errorfd");
 		return VZ_CHKPNT_ERROR;
 	}
 	close(err_p[1]);
 	if (cmd == CMD_CHKPNT || cmd == CMD_SUSPEND) {
 		logger(0, 0, "\tsuspend...");
 		if (ioctl(cpt_fd, CPT_SUSPEND, 0) < 0) {
-			logger(0, errno, "Can not suspend VE");
+			logger(-1, errno, "Can not suspend VE");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
 		logger(0, 0, "\tdump...");
 		if (ioctl(cpt_fd, CPT_DUMP, 0) < 0) {
-			logger(0, errno, "Can not dump VE");
+			logger(-1, errno, "Can not dump VE");
 			if (cmd == CMD_CHKPNT)
 				if (ioctl(cpt_fd, CPT_RESUME, 0) < 0)
-					logger(0, errno, "Can not resume VE");
+					logger(-1, errno, "Can not resume VE");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_CHKPNT) {
 		logger(0, 0, "\tkill...");
 		if (ioctl(cpt_fd, CPT_KILL, 0) < 0) {
-			logger(0, errno, "Can not kill VE");
+			logger(-1, errno, "Can not kill VE");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_SUSPEND && !param->ctx) {
 		logger(0, 0, "\tget context...");
 		if (ioctl(cpt_fd, CPT_GET_CONTEXT, veid) < 0) {
-			logger(0, errno, "Can not get context");
+			logger(-1, errno, "Can not get context");
 			goto err_out;
 		}
 	}
@@ -183,27 +183,27 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
-		logger(0, 0, "VE root is not set");
+		logger(-1, 0, "VE root is not set");
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to setup checkpointing: "
+		logger(-1, 0, "Unable to setup checkpointing: "
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	logger(0, 0, "Setting up checkpoint...");
 	if ((cpt_fd = open(PROC_CPT, O_RDWR)) < 0) {
 		if (errno == ENOENT)
-			logger(0, errno, "Error: No checkpointing"
+			logger(-1, errno, "Error: No checkpointing"
 				" support, unable to open " PROC_CPT);
 		else
-			logger(0, errno, "Unable to open " PROC_CPT);
+			logger(-1, errno, "Unable to open " PROC_CPT);
 		return VZ_CHKPNT_ERROR;
 	}
 	if ((cmd == CMD_CHKPNT || cmd == CMD_DUMP)) {
 		if (param->dumpfile == NULL) {
 			if (cmd == CMD_DUMP) {
-				logger(0,  0, "Error: dumpfile is not"
+				logger(-1,  0, "Error: dumpfile is not"
 					" specified.");
 				goto err;
 			}
@@ -214,7 +214,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		dump_fd = open(param->dumpfile ? : dumpfile,
 			O_CREAT|O_TRUNC|O_RDWR, 0600);
 		if (dump_fd < 0) {
-			logger(0, errno, "Can not create dump file %s",
+			logger(-1, errno, "Can not create dump file %s",
 				param->dumpfile ? : dumpfile);
 			goto err;
 		}
@@ -222,7 +222,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	if (param->ctx || cmd > CMD_SUSPEND) {
 		logger(0, 0, "\tjoin context..");
 		if (ioctl(cpt_fd, CPT_JOIN_CONTEXT, param->ctx ? : veid) < 0) {
-			logger(0, errno, "Can not join cpt context");
+			logger(-1, errno, "Can not join cpt context");
 			goto err;
 		}
 	} else {
@@ -233,26 +233,26 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	}
 	if (dump_fd != -1) {
 		if (ioctl(cpt_fd, CPT_SET_DUMPFD, dump_fd) < 0) {
-			logger(0, errno, "Can not set dump file");
+			logger(-1, errno, "Can not set dump file");
 			goto err;
 		}
 	}
 	if (param->cpu_flags) {
 		logger(0, 0, "\tset cpu flags..");
 		if (ioctl(cpt_fd, CPT_SET_CPU_FLAGS, param->cpu_flags) < 0) {
-			logger(0, errno, "Can not set cpu flags");
+			logger(-1, errno, "Can not set cpu flags");
 			goto err;
 		}
 	}
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Can't fork");
+		logger(-1, errno, "Can't fork");
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	} else if (pid == 0) {
 		if ((ret = vz_setluid(veid)))
 			exit(ret);
 		if ((pid = fork()) < 0) {
-			logger(0, errno, "Can't fork");
+			logger(-1, errno, "Can't fork");
 			exit(VZ_RESOURCE_ERROR);
 		} else if (pid == 0) {
 			ret = real_chkpnt(cpt_fd, veid, root, param, cmd);
@@ -281,7 +281,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 err:
 	if (ret) {
 		ret = VZ_CHKPNT_ERROR;
-		logger(0, 0, "Checkpointing failed");
+		logger(-1, 0, "Checkpointing failed");
 	}
 	if (dump_fd != -1)
 		close(dump_fd);
@@ -304,26 +304,26 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	/* Close all fds */
 	close_fds(0, wait_p, err_p, h->vzfd, param->rst_fd, -1);
 	if (ioctl(param->rst_fd, CPT_SET_VEID, veid) < 0) {
-		logger(0, errno, "Can't set VEID %d", param->rst_fd);
+		logger(-1, errno, "Can't set VEID %d", param->rst_fd);
 		goto err;
 	}
 	if (pipe(error_pipe) < 0 ) {
-		logger(0, errno, "Can't create pipe");
+		logger(-1, errno, "Can't create pipe");
 		goto err;
 	}
 	fcntl(error_pipe[0], F_SETFL, O_NONBLOCK);
 	fcntl(error_pipe[1], F_SETFL, O_NONBLOCK);
 	if (ioctl(param->rst_fd, CPT_SET_ERRORFD, error_pipe[1]) < 0) {
-		logger(0, errno, "Can't set errorfd");
+		logger(-1, errno, "Can't set errorfd");
 		goto err;
 	}
 	close(error_pipe[1]);
 	if (ioctl(param->rst_fd, CPT_SET_LOCKFD, wait_p) < 0) {
-		logger(0, errno, "Can't set lockfd");
+		logger(-1, errno, "Can't set lockfd");
 		goto err;
 	}
 	if (ioctl(param->rst_fd, CPT_SET_STATUSFD, STDIN_FILENO) < 0) {
-		logger(0, errno, "Can't set statusfd");
+		logger(-1, errno, "Can't set statusfd");
 		goto err;
 	}
         /* Close status descriptor to report that
@@ -332,7 +332,7 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	close(STDIN_FILENO);
 	logger(0, 0, "\tundump...");
 	if (ioctl(param->rst_fd, CPT_UNDUMP, 0) < 0) {
-		logger(0, errno, "Error: undump failed");
+		logger(-1, errno, "Error: undump failed");
 		goto err_undump;
 	}
 	/* Now we wait until VE setup will be done */
@@ -340,13 +340,13 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	if (param->cmd == CMD_RESTORE) {
 		logger(0, 0, "\tresume...");
 		if (ioctl(param->rst_fd, CPT_RESUME, 0)) {
-			logger(0, errno, "Error: resume failed");
+			logger(-1, errno, "Error: resume failed");
 			goto err_undump;
 		}
 	} else if (param->cmd == CMD_UNDUMP && !param->ctx) {
 		logger(0, 0, "\tget context...");
 		if (ioctl(param->rst_fd, CPT_GET_CONTEXT, veid) < 0) {
-			logger(0, 0, "Can not get context");
+			logger(-1, 0, "Can not get context");
 			goto err_undump;
 		}
 	}
@@ -357,7 +357,7 @@ err:
 		write(err_p, &status, sizeof(status));
 	return status;
 err_undump:
-	logger(0, 0, "Restoring failed:");
+	logger(-1, 0, "Restoring failed:");
 	while ((len = read(error_pipe[0], buf, PIPE_BUF)) > 0) {
 		do {
 			len1 = write(STDERR_FILENO, buf, len);
@@ -378,7 +378,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	char dumpfile[PATH_LEN];
 
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to perform restore: "
+		logger(-1, 0, "Unable to perform restore: "
 			"VE already running");
 		return VZ_VE_NOT_RUNNING;
 	}
@@ -386,21 +386,21 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	ret = VZ_RESTORE_ERROR;
 	if ((rst_fd = open(PROC_RST, O_RDWR)) < 0) {
 		if (errno == ENOENT)
-			logger(0, errno, "Error: No checkpointing"
+			logger(-1, errno, "Error: No checkpointing"
 				" support, unable to open " PROC_RST);
 		else
-			logger(0, errno, "Unable to open " PROC_RST);
+			logger(-1, errno, "Unable to open " PROC_RST);
 		return VZ_RESTORE_ERROR;
 	}
 	if (param->ctx) {
 		if (ioctl(rst_fd, CPT_JOIN_CONTEXT, param->ctx) < 0) {
-			logger(0, errno, "Can not join cpt context");
+			logger(-1, errno, "Can not join cpt context");
 			goto err;
 		}
 	}
 	if (param->dumpfile == NULL) {
 		if (cmd == CMD_UNDUMP) {
-			logger(0, 0, "Error: dumpfile is not specified");
+			logger(-1, 0, "Error: dumpfile is not specified");
 			goto err;
 		}
 
@@ -412,14 +412,14 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	if (cmd == CMD_RESTORE || cmd == CMD_UNDUMP) {
 		dump_fd = open(param->dumpfile ? : dumpfile, O_RDONLY);
 		if (dump_fd < 0) {
-			logger(0, errno, "Unable to open %s",
+			logger(-1, errno, "Unable to open %s",
 				param->dumpfile ? : dumpfile);
 			goto err;
 		}
 	}
 	if (dump_fd != -1) {
 		if (ioctl(rst_fd, CPT_SET_DUMPFD, dump_fd)) {
-			logger(0, errno, "Can't set dumpfile");
+			logger(-1, errno, "Can't set dumpfile");
 			goto err;
 		}
 	}
@@ -437,7 +437,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		if (vps_execFn(h, veid, vps_p->res.fs.root, mk_quota_link, NULL,
 			VE_SKIPLOCK))
 		{
-			logger(0, 0, "Warning: restore 2level quota links"
+			logger(-1, 0, "Warning: restore 2level quota links"
 				" failed");
 		}
 	}

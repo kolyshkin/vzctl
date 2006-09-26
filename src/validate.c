@@ -82,7 +82,7 @@ static int check_param(struct ub_struct *param, int log)
 #define CHECKPARAM(name) 						\
 	if (param->name == NULL) {					\
 		if (log)						\
-			logger(0, 0, "Error: parameter " #name		\
+			logger(-1, 0, "Error: parameter " #name		\
 				" not found");				\
 		ret = 1;						\
 	}								\
@@ -121,7 +121,7 @@ int validate(vps_res *param, int recover, int ask)
 #define CHECK_BL(x, name) 						\
 if (x != NULL) { 							\
 	if (x[0] > x[1]) {						\
-		logger(0, 0, "Error: barrier should be <= limit for " 	\
+		logger(-1, 0, "Error: barrier should be <= limit for " 	\
 			#name " (currently, %lu:%lu)",			\
 			x[0], x[1]);					\
 		if (ask || recover) {					\
@@ -137,14 +137,14 @@ if (x != NULL) { 							\
 		if (!recover) ret = 1;					\
 	}								\
 } else {								\
-	logger(0, 0, "Error: parameter "  #name " not found");		\
+	logger(-1, 0, "Error: parameter "  #name " not found");		\
 	ret = 1;							\
 }
 
 #define CHECK_B(name)							\
 if (ub->name != NULL) {							\
 	if ((ub->name[0] != ub->name[1])) {				\
-		logger(0, 0, "Error: barrier should be equal limit for " \
+		logger(-1, 0, "Error: barrier should be equal limit for " \
 			#name " (currently, %lu:%lu)",			\
 			ub->name[0], ub->name[1]);			\
 		if (ask || recover) {					\
@@ -161,7 +161,7 @@ if (ub->name != NULL) {							\
 		if (!recover) ret = 1;					\
 	}								\
 } else {								\
-	logger(0, 0, "Error: parameter "  #name " not found");		\
+	logger(-1, 0, "Error: parameter "  #name " not found");		\
 	ret = 1;							\
 }
 
@@ -181,7 +181,7 @@ if (ub->name != NULL) {							\
 	CHECK_B(numothersock)
 	if (ub->vmguarpages != NULL) {
 		if (ub->vmguarpages[1] != LONG_MAX) {
-			logger(0, 0, "Error: limit should be = %lu for"
+			logger(-1, 0, "Error: limit should be = %lu for"
 			       " vmguarpages (currently, %lu)", LONG_MAX,
 				ub->vmguarpages[1]);
 			if (ask || recover) {
@@ -197,7 +197,7 @@ if (ub->name != NULL) {							\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 	} else {
-		logger(0, 0, "Error: parameter vmguarpages not found");
+		logger(-1, 0, "Error: parameter vmguarpages not found");
 		ret = 1;
 	}
 	/* Secondary */
@@ -208,7 +208,7 @@ if (ub->name != NULL) {							\
 	CHECK_BL(ub->dgramrcvbuf, dgramrcvbuf)
 	if (ub->oomguarpages != NULL) {
 		if (ub->oomguarpages[1] != LONG_MAX) {
-			logger(0, 0, "Error: limit should be = %lu for"
+			logger(-1, 0, "Error: limit should be = %lu for"
 			       " oomguarpages (currently, %lu)", LONG_MAX,
 				ub->oomguarpages[1]);
 			if (ask || recover) {
@@ -224,7 +224,7 @@ if (ub->name != NULL) {							\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 	} else {
-		logger(0, 0, "Error: parameter oomguarpages not found");
+		logger(-1, 0, "Error: parameter oomguarpages not found");
 		ret = 1;
 	}
 	CHECK_BL(ub->privvmpages, privvmpages)
@@ -233,7 +233,7 @@ if (ub->name != NULL) {							\
 	CHECK_B(shmpages)
 	if (ub->physpages != NULL) {
 		if (ub->physpages[0] != 0) {
-			logger(0, 0, "Error: barrier should be = 0 for"
+			logger(-1, 0, "Error: barrier should be = 0 for"
 			       " physpages (currently, %lu)",
 				ub->physpages[0]);
 			if (ask || recover) {
@@ -249,7 +249,7 @@ if (ub->name != NULL) {							\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 		if (ub->physpages[1] != LONG_MAX) {
-			logger(0, 0, "Error: limit should be = %lu for"
+			logger(-1, 0, "Error: limit should be = %lu for"
 			       " physpages (currently, %lu)", LONG_MAX,
 				ub->physpages[1]);
 			if (ask || recover) {
@@ -265,7 +265,7 @@ if (ub->name != NULL) {							\
 //			if (!ask) fprintf(stderr, "\n");
 		}
 	} else {
-		logger(0, 0, "Error: parameter physpages not found");
+		logger(-1, 0, "Error: parameter physpages not found");
 		ret = 1;
 	}
 	CHECK_B(numfile)
@@ -281,7 +281,7 @@ if (ub->name != NULL) {							\
 	val = (40 * 1024 * avnumproc) + ub->dcachesize[1];
 	val &= LONG_MAX;
 	if (ub->kmemsize[0] < val) {
-		logger(0, 0, "Error: kmemsize.bar should be > %lu"
+		logger(-1, 0, "Error: kmemsize.bar should be > %lu"
 				" (currently, %lu)", val, ub->kmemsize[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->kmemsize[1] + val - ub->kmemsize[0];
@@ -299,7 +299,7 @@ if (ub->name != NULL) {							\
 //		if (!ask) fprintf(stderr, "\n");
 	}
 	if (ub->privvmpages[0] < ub->vmguarpages[0]) {
-		logger(0, 0, "Warning: privvmpages.bar should be > %lu"
+		logger(-1, 0, "Warning: privvmpages.bar should be > %lu"
 				" (currently, %lu)", ub->vmguarpages[0],
 				ub->privvmpages[0]);
 		if (ask || recover) {
@@ -321,7 +321,7 @@ if (ub->name != NULL) {							\
 	val = 2.5 * 1024 * ub->numtcpsock[0];
 	val &= LONG_MAX;
 	if (ub->tcpsndbuf[1] - ub->tcpsndbuf[0] < val) {
-		logger(0, 0, "Error: tcpsndbuf.lim-tcpsndbuf.bar"
+		logger(-1, 0, "Error: tcpsndbuf.lim-tcpsndbuf.bar"
 				" should be > %lu (currently, %lu)", val,
 				ub->tcpsndbuf[1]-ub->tcpsndbuf[0]);
 		if (ask || recover) {
@@ -341,7 +341,7 @@ if (ub->name != NULL) {							\
 	val = 2.5 * 1024 * ub->numothersock[0];
 	val &= LONG_MAX;
 	if (ub->othersockbuf[1] - ub->othersockbuf[0] < val) {
-		logger(0, 0, "Error: othersockbuf.lim-othersockbuf.bar"
+		logger(-1, 0, "Error: othersockbuf.lim-othersockbuf.bar"
 			       " should be > %lu (currently, %lu)", val,
 				ub->othersockbuf[1]-ub->othersockbuf[0]);
 		if (ask || recover) {
@@ -361,7 +361,7 @@ if (ub->name != NULL) {							\
 	val =  2.5 * 1024 * ub->numtcpsock[0];
 	val &= LONG_MAX;
 	if (ub->tcprcvbuf[1] - ub->tcprcvbuf[0] < val) {
-		logger(0, 0, "Warning: tcprcvbuf.lim-tcprcvbuf.bar"
+		logger(-1, 0, "Warning: tcprcvbuf.lim-tcprcvbuf.bar"
 			       " should be > %lu (currently, %lu)", val,
 				ub->tcprcvbuf[1] - ub->tcprcvbuf[0]);
 		if (ask || recover) {
@@ -380,7 +380,7 @@ if (ub->name != NULL) {							\
 	}
 	val = 64 * 1024;
 	if (ub->tcprcvbuf[0] < val) {
-		logger(0, 0, "Warning: tcprcvbuf.bar should be > %lu"
+		logger(-1, 0, "Warning: tcprcvbuf.bar should be > %lu"
 				" (currently, %lu)", val,
 				ub->tcprcvbuf[0]);
 		if (ask || recover) {
@@ -400,7 +400,7 @@ if (ub->name != NULL) {							\
 	}
 	val = 64 * 1024;
 	if (ub->tcpsndbuf[0] <  val) {
-		logger(0, 0, "Warning: tcpsndbuf.bar should be > %lu"
+		logger(-1, 0, "Warning: tcpsndbuf.bar should be > %lu"
 				" (currently, %lu)", val,
 				ub->tcpsndbuf[0]);
 		if (ask || recover) {
@@ -421,7 +421,7 @@ if (ub->name != NULL) {							\
 	val = 32 * 1024;
 	val1 = 129 * 1024;
 	if (ub->dgramrcvbuf[0] < val) {
-		logger(0, 0, "Warning: dgramrcvbuf.bar should be >"
+		logger(-1, 0, "Warning: dgramrcvbuf.bar should be >"
 				" %lu (currently, %lu)", val,
 				ub->dgramrcvbuf[0]);
 		if (ask || recover) {
@@ -440,7 +440,7 @@ if (ub->name != NULL) {							\
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	} else if (ub->dgramrcvbuf[0] < val1) {
-		logger(0, 0, "Recommendation: dgramrcvbuf.bar should be >"
+		logger(-1, 0, "Recommendation: dgramrcvbuf.bar should be >"
 				" %lu (currently, %lu)", val1,
 				ub->dgramrcvbuf[0]);
 		if (ask || recover) {
@@ -461,7 +461,7 @@ if (ub->name != NULL) {							\
 	val =  32 * 1024;
 	val1 = 129 * 1024;
 	if (ub->othersockbuf[0] < val) {
-		logger(0, 0, "Warning: othersockbuf.bar should be >"
+		logger(-1, 0, "Warning: othersockbuf.bar should be >"
 				" %lu (currently, %lu)", val, 
 				ub->othersockbuf[0]);
 		if (ask || recover) {
@@ -480,7 +480,7 @@ if (ub->name != NULL) {							\
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	} else if (ub->othersockbuf[0] < val1) {
-		logger(0, 0,"Recommendation: othersockbuf.bar should be >"
+		logger(-1, 0,"Recommendation: othersockbuf.bar should be >"
 				" %lu (currently, %lu)", val1, 
 				ub->othersockbuf[0]);
 		if (ask || recover) {
@@ -504,7 +504,7 @@ if (ub->name != NULL) {							\
 		val = val1;
 	val &= LONG_MAX;
 	if (ub->numfile[0] < val) {
-		logger(0, 0, "Warning: numfile should be > %lu"
+		logger(-1, 0, "Warning: numfile should be > %lu"
 				" (currently, %lu)", val, ub->numfile[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->numfile[1] + val - ub->numfile[0];
@@ -524,7 +524,7 @@ if (ub->name != NULL) {							\
 	val = ub->numfile[0] * 384;
 	val &= LONG_MAX;
 	if (ub->dcachesize[1] < val) {
-		logger(0, 0, "Warning: dcachesize.lim should be > %lu"
+		logger(-1, 0, "Warning: dcachesize.lim should be > %lu"
 				" (currently, %lu)", val,
 				ub->dcachesize[1]);
 		if (ask || recover) {
@@ -706,7 +706,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 	struct mem_struct mem;
 	
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		logger(0, errno, "Unable open " PROCUBC);
+		logger(-1, errno, "Unable open " PROCUBC);
 		return -1;
 	}
 	if (ru_comm != NULL)

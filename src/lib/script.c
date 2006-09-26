@@ -47,7 +47,7 @@ int read_script(const char *fname, char *include, char **buf)
 	char *inc;
 
 	if (!fname) {
-		logger(0, 0, "read_script: file name not specified");
+		logger(-1, 0, "read_script: file name not specified");
 		return -1;
 	}
 	/* Read include file first */
@@ -66,11 +66,11 @@ int read_script(const char *fname, char *include, char **buf)
 			return -1;
 	}
 	if (stat(fname, &st)) {
-		logger(0, 0, "file %s not found", fname);
+		logger(-1, 0, "file %s not found", fname);
 		return -1;
 	}
 	if ((fd = open(fname, O_RDONLY)) < 0) {
-		logger(0, errno, "Unable to open %s", fname);
+		logger(-1, errno, "Unable to open %s", fname);
 		goto err;
 	}
 	if (*buf != NULL) {
@@ -86,7 +86,7 @@ int read_script(const char *fname, char *include, char **buf)
 		p = *buf;
 	}
 	if ((len =  read(fd, p, st.st_size)) < 0) {
-		logger(0, errno, "Error reading %s", fname);
+		logger(-1, errno, "Error reading %s", fname);
 		goto err;
 	}
 	p += len;
@@ -113,7 +113,7 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet)
 	int out[2];
 
 	if (!stat_file(f)) {
-		logger(0, 0, "File %s not found", f);
+		logger(-1, 0, "File %s not found", f);
 		return VZ_NOSCRIPT;
 	}
 	sigaction(SIGCHLD, NULL, &actold);
@@ -128,7 +128,7 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet)
 		free(cmd);
 	}
 	if (quiet && pipe(out) < 0) {
-		logger(0, errno, "run_script: unable to create pipe");
+		logger(-1, errno, "run_script: unable to create pipe");
 		return -1;
 	}
 	if ((child = fork()) == 0) {
@@ -150,10 +150,10 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet)
 */
 		}
 		execve(f, argv, envp != NULL ? envp : envp_bash);
-		logger(0, errno, "Error exec %s", f);
+		logger(-1, errno, "Error exec %s", f);
 		exit(1);
 	} else if(child == -1) {
-		logger(0, errno, "Unable to fork");
+		logger(-1, errno, "Unable to fork");
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	}
@@ -165,10 +165,10 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet)
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
-			logger(0, 0, "Received signal:"
+			logger(-1, 0, "Received signal:"
 					"  %d in %s", WTERMSIG(status), f);
 	} else {
-		logger(0, errno, "Error in waitpid");
+		logger(-1, errno, "Error in waitpid");
 	}
 err:
 	sigaction(SIGCHLD, &actold, NULL);
@@ -229,7 +229,7 @@ int mk_reboot_script()
 		return 1;
 	sprintf(buf, "%s/" VZREBOOT, rc);
 	if ((fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0755)) < 0) {
-		logger(0, errno, "Unable to create %s", buf);
+		logger(-1, errno, "Unable to create %s", buf);
 		return 1;
 	}
 	write(fd, REBOOT_SCRIPT, sizeof(REBOOT_SCRIPT));
@@ -248,7 +248,7 @@ int mk_quota_link()
 	char buf[64];
 
 	if (stat("/", &st)) {
-		logger(0, errno, "Unable to stat /");
+		logger(-1, errno, "Unable to stat /");
 		return -1;
 	}
 	fs = vz_fs_get_name();
@@ -257,16 +257,16 @@ int mk_quota_link()
 	unlink(buf);
 	logger(3, 0, "Setup quota dev %s", buf);
 	if (mknod(buf, S_IFBLK | S_IXGRP, st.st_dev))
-		logger(0, errno, "Unable to create %s", buf);
+		logger(-1, errno, "Unable to create %s", buf);
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
 		(unsigned long)st.st_dev);
 	unlink(QUOTA_U);
 	if (symlink(buf, QUOTA_U)) 
-		logger(0, errno, "Unable to create symlink %s", buf); 
+		logger(-1, errno, "Unable to create symlink %s", buf); 
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_G,
 		(unsigned long)st.st_dev);
 	unlink(QUOTA_G);	
 	if (symlink(buf, QUOTA_G))
-		logger(0, errno, "Unable to create symlink %s", buf); 
+		logger(-1, errno, "Unable to create symlink %s", buf); 
 	return 0;
 }

@@ -159,8 +159,8 @@ vps_handler *vz_open(envid_t veid)
 
 	stdfd = reset_std();
         if ((vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
-                logger(0, errno, "Unable to open %s", VZCTLDEV);
-                logger(0, 0, "Please check that vzdev kernel module is loaded"
+                logger(-1, errno, "Unable to open %s", VZCTLDEV);
+                logger(-1, 0, "Please check that vzdev kernel module is loaded"
                         " and you have sufficient permissions"
                         " to access the file.");
 		goto err;
@@ -173,7 +173,7 @@ vps_handler *vz_open(envid_t veid)
         if (vz_env_create_ioctl(h, 0, 0) < 0 &&
 		(errno == ENOSYS || errno == EPERM))
         {
-                logger(0, 0, "Your kernel lacks support for virtual"
+                logger(-1, 0, "Your kernel lacks support for virtual"
                                 " environments or modules not loaded");
 		goto err;
 	}
@@ -222,7 +222,7 @@ int vps_is_run(vps_handler *h, envid_t veid)
 	if (ret < 0 && (errno == ESRCH || errno == ENOTTY))
 		return 0;
 	else if (ret < 0)
-		logger(0, errno, "error on vz_env_create_ioctl(VE_TEST)");
+		logger(-1, errno, "error on vz_env_create_ioctl(VE_TEST)");
         return 1;
 }
 
@@ -238,16 +238,16 @@ int vz_chroot(char *root)
 	struct sigaction act;
 
 	if (root == NULL) {
-		logger(0, 0, "vz_chroot: VE root is not specified");	
+		logger(-1, 0, "vz_chroot: VE root is not specified");	
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (chdir(root)) {
-		logger(0, errno, "unable to change dir to %s",
+		logger(-1, errno, "unable to change dir to %s",
 			root);
 		return VZ_RESOURCE_ERROR;
 	}
 	if (chroot(root)) {
-		logger(0, errno, "chroot %s failed", root);
+		logger(-1, errno, "chroot %s failed", root);
 		return VZ_RESOURCE_ERROR;
 	}
 	setsid();
@@ -362,7 +362,7 @@ try:
 				ret = VZ_BAD_KERNEL;
 				break;
 			default:
-				logger(0, errno, "env_create error");
+				logger(-1, errno, "env_create error");
 				ret = VZ_ENVCREATE_ERROR;
 				break;
 		}
@@ -409,7 +409,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		return ret;
 	/* Create another process to proper resource accounting */
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Unable to fork");
+		logger(-1, errno, "Unable to fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
 		if ((ret = vps_set_cap(veid, &res->cap)))
@@ -437,7 +437,7 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (pipe(status_p) < 0) {
-		logger(0, errno, "Can not create pipe");
+		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	sigaction(SIGCHLD, NULL, &actold);
@@ -447,7 +447,7 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
         sigaction(SIGCHLD, &act, NULL);
 
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Can not fork");
+		logger(-1, errno, "Can not fork");
 		ret =  VZ_RESOURCE_ERROR;
 		goto err;
 	} else if (pid == 0) {
@@ -475,17 +475,17 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		ret = errcode;
 		switch(ret) {
 		case VZ_NO_ACCES:
-			logger(0,0, "Permission denied");
+			logger(-1, 0, "Permission denied");
 			break;
 		case VZ_BAD_KERNEL:
-			logger(0, 0, "Invalid kernel, or some kernel"
+			logger(-1, 0, "Invalid kernel, or some kernel"
 				" modules are not loaded");
 			break;
 		case VZ_SET_CAP:
-			logger(0, 0, "Unable to set capability");
+			logger(-1, 0, "Unable to set capability");
 			break;
 		case VZ_RESOURCE_ERROR:
-			logger(0, 0, "Not enough resources"
+			logger(-1, 0, "Not enough resources"
 				" to start environment");
 			break;
 		}
@@ -506,7 +506,7 @@ static void fix_numiptent(ub_param *ub)
 		return;
 	min_ipt = min_ul(ub->numiptent[0], ub->numiptent[1]);
 	if (min_ipt < MIN_NUMIPTENT) {
-		logger(0, 0, "Warning: NUMIPTENT %d:%d is less"
+		logger(-1, 0, "Warning: NUMIPTENT %d:%d is less"
 			" than minimally allowable value, set to %d:%d",
 			ub->numiptent[0], ub->numiptent[1],
 			MIN_NUMIPTENT, MIN_NUMIPTENT);
@@ -540,7 +540,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VE is already running");
+		logger(-1, 0, "VE is already running");
 		return VZ_VE_RUNNING;
 	}
 	if ((ret = check_ub(&res->ub)))
@@ -564,13 +564,13 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		quouta_inc(&res->dq, -100);
 	}
 	if (pipe(wait_p) < 0) {
-		logger(0, errno, "Can not create pipe");
+		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	if (pipe(err_p) < 0) {
 		close(wait_p[0]);
 		close(wait_p[1]);
-		logger(0, errno, "Can not create pipe");
+		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	sigemptyset(&act.sa_mask);
@@ -600,22 +600,22 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	/* Close fd to start /sbin/init */
 	if (close(wait_p[1]))
-		logger(0, errno, "Unable to close fd to start init");
+		logger(-1, errno, "Unable to close fd to start init");
 err:
 	free_dist_actions(&actions);
 	if (ret) {
 		int err;
 		/* Kill enviroment */
-		logger(0, 0, "VE start failed");
+		logger(-1, 0, "VE start failed");
 		write(wait_p[1], &err, sizeof(err));
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
                         logger(0, 0, "VE start in progress...");
 		} else {
 			if (ret == VZ_FS_BAD_TMPL)
-				logger(0, 0, "Unable to start init, probably"
+				logger(-1, 0, "Unable to start init, probably"
 					" incorrect template");
-                        logger(0, 0, "VE start failed");
+                        logger(-1, 0, "VE start failed");
                 }
 	}
 	if (ret) {
@@ -663,7 +663,7 @@ static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
 	if ((ret = vz_env_create_ioctl(h, veid, VE_ENTER)) < 0) {
 		if (errno == ESRCH)
 			return 0;
-		logger(0, errno, "VE enter failed");
+		logger(-1, errno, "VE enter failed");
 		return ret;
 	}
 	close(h->vzfd);
@@ -706,7 +706,7 @@ static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode)
 	if (stop_mode == M_KILL)
 		goto kill_vps;
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Can not fork");
+		logger(-1, errno, "Can not fork");
 		ret = VZ_RESOURCE_ERROR;
 		goto out;
 	} else if (pid == 0) {
@@ -724,7 +724,7 @@ static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode)
 kill_vps:
         if ((pid = fork()) < 0) {
 		ret = VZ_RESOURCE_ERROR;
-		logger(0, errno, "Can not fork");
+		logger(-1, errno, "Can not fork");
 		goto err;
 	
 	} else if (pid == 0) {
@@ -741,7 +741,7 @@ kill_vps:
 	}
 out:
 	if (ret)
-		logger(0, 0, "Unable to stop VE: operation timed out");
+		logger(-1, 0, "Unable to stop VE: operation timed out");
 	else
 		logger(0, 0, "VE was stopped");
 err:
@@ -769,7 +769,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to stop: VE is not running");
+		logger(-1, 0, "Unable to stop: VE is not running");
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {

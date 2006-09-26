@@ -140,7 +140,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		pipe(err) < 0 ||
 		pipe(st) < 0)
 	{
-		logger(0, errno, "Unable to create pipe");
+		logger(-1, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	/* Set non block mode */
@@ -168,7 +168,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 	if ((ret = vz_setluid(veid)))
 		return ret;
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Unable to fork");
+		logger(-1, errno, "Unable to fork");
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	} else if (pid == 0) {
@@ -230,7 +230,7 @@ env_err:
 		fd_set rd_set;
 
 		if (timeout && alarm_flag) {
-			logger(0, 0, "Execution timeout expired");
+			logger(-1, 0, "Execution timeout expired");
 			kill(pid, SIGTERM);
 			alarm(0);
 			break;
@@ -265,7 +265,7 @@ env_err:
 					close(in[1]);
 				}	
 		} else if (n < 0 && errno != EINTR) {
-			logger(0, errno, "Error in select()");
+			logger(-1, errno, "Error in select()");
 			close(out[0]);
 			close(err[0]);
 			break;
@@ -286,14 +286,14 @@ env_err:
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status)) {
-			logger(0, 0, "Got signal %d",
+			logger(-1, 0, "Got signal %d",
 				WTERMSIG(status));
 			if (timeout && alarm_flag)
 				ret = VZ_EXEC_TIMEOUT;
 		}
 	} else if (pid == -1 && errno != EINTR) {
 		ret = VZ_SYSTEM_ERROR;
-		logger(0, errno, "Error in waitpid()");
+		logger(-1, errno, "Error in waitpid()");
 	}
 
 err:
@@ -325,11 +325,11 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 	if (check_var(root, "VE root is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VE is not running");
+		logger(-1, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Can not fork");
+		logger(-1, errno, "Can not fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
 		ret = vps_real_exec(h, veid, root, exec_mode, argv, envp,
@@ -344,11 +344,11 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status)) {
-			logger(0, 0, "Got signal %d", WTERMSIG(status));
+			logger(-1, 0, "Got signal %d", WTERMSIG(status));
 		}
 	} else if (pid < 0) {
 		ret = VZ_SYSTEM_ERROR;
-		logger(0, errno, "Error in waitpid()");
+		logger(-1, errno, "Error in waitpid()");
 	}
 	return ret;
 }
@@ -361,7 +361,7 @@ int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data
 	if ((ret = vz_setluid(veid)))
 		return ret;
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Unable to fork");
+		logger(-1, errno, "Unable to fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
 		if ((ret = vz_chroot(root)))
@@ -395,11 +395,11 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 	if (check_var(root, "VE root is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VE is not running");
+		logger(-1, 0, "VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((pid = fork()) < 0) {
-		logger(0, errno, "Can not fork");
+		logger(-1, errno, "Can not fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
 		ret = _real_execFn(h, veid, root, fn, data, flags);
@@ -413,11 +413,11 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status)) {
-			logger(0, 0, "Got signal %d", WTERMSIG(status));
+			logger(-1, 0, "Got signal %d", WTERMSIG(status));
 		}
 	} else if (pid < 0) {
 		ret = VZ_SYSTEM_ERROR;
-		logger(0, errno, "Error in waitpid()");
+		logger(-1, errno, "Error in waitpid()");
 	}
 	return ret;
 }
@@ -460,11 +460,11 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	char *root = vps_p->res.fs.root;
 
 	if (!stat_file(script))	{
-		logger(0, 0, "Script not found: %s", script);
+		logger(-1, 0, "Script not found: %s", script);
 		return VZ_NOSCRIPT;
 	}
 	if (pipe(rd_p) || pipe(wr_p)) {
-		logger(0, errno, "Unable to create pipe");
+		logger(-1, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	if (check_var(root, "VE_ROOT is not set"))
@@ -472,7 +472,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (check_var(vps_p->res.fs.private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!stat_file(vps_p->res.fs.private)) {
-		logger(0, 0, "VE private area %s does not exist",
+		logger(-1, 0, "VE private area %s does not exist",
 			vps_p->res.fs.private);
                 return VZ_FS_NOPRVT;	
 	}
