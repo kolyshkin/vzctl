@@ -39,22 +39,27 @@ int vz_fs_is_mounted(char *root)
 	FILE *fp;
 	char buf[512];
 	char mnt[512];
-	int ret = 0; 
+	char *path;
+	int ret = 0;
 
 	if ((fp = fopen("/proc/mounts", "r")) == NULL) {
 		logger(0, errno,  "unable to open /proc/mounts");
 		return -1;
 	}
+	path = realpath(root, NULL);
+	if (path == NULL)
+		path = strdup(root);
 	while (!feof(fp)) {
 		if (fgets(buf, sizeof(buf), fp) == NULL)
 			break;
 		if (sscanf(buf, "%*[^ ] %s ", mnt) != 1)
 			continue;
-		if (!strcmp(mnt, root)) {
+		if (!strcmp(mnt, path)) {
 			ret = 1;	
 			break;
 		}
 	}
+	free(path);
 	fclose(fp);
 	return ret;
 }
