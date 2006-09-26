@@ -208,8 +208,8 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 				goto err;
 			}
 			snprintf(dumpfile, sizeof(dumpfile), "%s/"DEF_DUMPFILE,
-				param->dumpdir != NULL ?
-				param->dumpdir : DEF_DUMPDIR, veid);
+				vps_p->res.cpt.dumpdir != NULL ?
+				vps_p->res.cpt.dumpdir : DEF_DUMPDIR, veid);
 		}
 		dump_fd = open(param->dumpfile ? : dumpfile,
 			O_CREAT|O_TRUNC|O_RDWR, 0600);
@@ -405,7 +405,8 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		}
 
 		snprintf(dumpfile, sizeof(dumpfile), "%s/"DEF_DUMPFILE,
-			param->dumpdir != NULL ? param->dumpdir : DEF_DUMPDIR,
+			vps_p->res.cpt.dumpdir != NULL ?
+			vps_p->res.cpt.dumpdir : DEF_DUMPDIR,
 			veid);
 	}
 	if (cmd == CMD_RESTORE || cmd == CMD_UNDUMP) {
