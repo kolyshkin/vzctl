@@ -37,6 +37,7 @@
 #include "lock.h"
 #include "modules.h"
 #include "create.h"
+#include "env.h"
 
 #define BACKUP		0
 #define DESTR		1
@@ -259,6 +260,11 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 		return VZ_VE_PRIVATE_NOTSET;
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
+	if (vps_is_run(h, veid)) {
+		logger(0, 0, "VE is currently runing."
+			" Stop it before proceeding.");
+		return VZ_VE_RUNNING;
+	}
 	if (vps_is_mounted(fs->root)) {
 		logger(0, 0, "VE is currently mounted (umount first)");
                 return VZ_FS_MOUNTED;
