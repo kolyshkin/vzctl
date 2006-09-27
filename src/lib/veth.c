@@ -92,11 +92,11 @@ static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
 static int run_vznetcfg(envid_t veid, veth_dev *dev)
 {
 	int ret;
-	char *argv[4] = {VZNETCFG, "init", NULL, NULL};
+	char *argv[] = {VZNETCFG, "init", "veth", NULL, NULL};
 
 	if (stat_file(VZNETCFG) != 1)
 		return 0;
-	argv[2] = dev->dev_name;
+	argv[3] = dev->dev_name;
 	if ((ret = run_script(VZNETCFG, argv, NULL, 0))) {
 		logger(0, 0, VZNETCFG " exited with error");
 		ret = VZ_VETH_ERROR;
