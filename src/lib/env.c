@@ -263,8 +263,13 @@ int vz_chroot(char *root)
 
 int vz_setluid(envid_t veid)
 {
-        if (setluid(veid) == -1) 
+        if (setluid(veid) == -1) {
+		if (errno == ENOSYS)
+			logger(-1, 0, "Error: kernel does not support"
+				" user resources. Please, rebuild with"
+				" CONFIG_USER_RESOURCE=y");
                 return VZ_SETLUID_ERROR;
+	}
         return 0;
 }
 

@@ -1,4 +1,5 @@
    3.0.12: FIXME
+	* fixed error message in case kernel compiled without USER_RESOURCES
 	* added '--applyconfig_map name' vzctl set option
 	* changed friendly name data structure
 	* fixed vzmigrate to support VE name feature (bug #239)
