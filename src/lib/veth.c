@@ -89,6 +89,21 @@ static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
 	return ret;
 }
 
+static int run_vznetcfg(envid_t veid, veth_dev *dev)
+{
+	int ret;
+	char *argv[4] = {VZNETCFG, "init", NULL, NULL};
+
+	if (stat_file(VZNETCFG) != 1)
+		return 0;
+	argv[2] = dev->dev_name;
+	if ((ret = run_script(VZNETCFG, argv, NULL, 0))) {
+		logger(0, 0, VZNETCFG " exited with error");
+		ret = VZ_VETH_ERROR;
+	}
+	return ret;
+}
+
 /** Create/remove veth devices for VE.
  *
  * @param h		VE handler.
@@ -100,6 +115,8 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	int rollback)
 {
 	int ret = 0;
+	char buf[256];
+	char *p, *ep;
 	veth_dev *tmp;
 	list_head_t *dev_h = &list->dev;
 
@@ -110,16 +127,27 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 			op == ADD ? "create" : "remove");
 		return VZ_VE_NOT_RUNNING;
 	}
-	logger(0, 0, "Processing veth devices");
+	buf[0] = 0;
+	p = buf;
+	ep = buf + sizeof(buf) - 1;
+	list_for_each(tmp, dev_h, list) {
+		p += snprintf(p, ep - p, "%s ", tmp->dev_name);
+		if (p >= ep)
+			break;
+	}
+	logger(0, 0, "%s veth devices: %s",
+		op == ADD ? "Configure" : "Deleting", buf);
 	list_for_each(tmp, dev_h, list) {
 		if (op == ADD) {
 			if ((ret = veth_dev_create(h, veid, tmp)))
+				break;
+			tmp->flags = 1;
+			if ((ret = run_vznetcfg(veid, tmp)))
 				break;
 		} else {
 			if ((ret = veth_dev_remove(h, veid, tmp))) 
 				break;
 		}
-		tmp->flags = 1;
 	}
 	/* If operation failed remove added devices. 
 	 * Remove devices from list to skip saving.

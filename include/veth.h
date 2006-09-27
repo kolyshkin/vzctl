@@ -22,6 +22,7 @@
 
 #define IFNAMSIZE	16
 #define ETH_ALEN	6
+#define VZNETCFG	"/sbin/vznetcfg"
 
 /** Data structure for devices.
  */
