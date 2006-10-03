@@ -1,0 +1,53 @@
+#!/bin/bash
+#  Copyright (C) 2000-2006 SWsoft. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+VZNETCFG=/etc/vz/vznet.conf
+
+[ -f ${VZNETCFG} ] && source ${VZNETCFG}
+
+function usage()
+{
+	echo "vznetcfg init veth <dev>"
+}
+
+function init_veth()
+{
+	local dev=$1
+
+	/sbin/ifconfig ${dev} up
+}
+
+if test $# -le 2; then
+    usage
+    exit 0
+fi
+
+CMD=$1
+case "${CMD}$2" in
+	initveth)
+		if test $# -ne 3; then
+			usage
+			exit 1
+		fi
+		init_veth $3
+		;;
+	*)
+		echo "invalid action"
+		exit 1
+		;;
+esac
+exit 0

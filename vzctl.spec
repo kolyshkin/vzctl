@@ -85,6 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/vzlist
 %attr(755,root,root) %{_sbindir}/vzmemcheck
 %attr(755,root,root) %{_sbindir}/vzcpucheck
+%attr(755,root,root) /sbin/vznetcfg
 %attr(755,root,root) %{_sbindir}/vzcalc
 %attr(755,root,root) %{_sbindir}/vzpid
 %attr(755,root,root) %{_sbindir}/vzcfgvalidate

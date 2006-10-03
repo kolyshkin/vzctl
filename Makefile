@@ -31,9 +31,11 @@ all install %::
 
 install::
 	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -d $(DESTDIR)/sbin
 	for file in $(SCRIPTS); do \
 		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
+	$(INSTALL) -m 755 vznetcfg $(DESTDIR)/sbin/vznetcfg; \
 	$(INSTALL) -d $(DESTDIR)/$(BASHCDIR)
 	$(INSTALL) -m 644 $(BASHCSCRIPT) $(DESTDIR)/$(BASHCDIR)
 	${MAKE} -C man $@
