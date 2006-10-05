@@ -41,6 +41,7 @@ typedef struct {
 	list_head_t nameserver;
 	list_head_t searchdomain;
 	char *hostname;
+	int wait;
 } misc_param;
 
 struct mod_action;

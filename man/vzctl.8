@@ -424,8 +424,9 @@ You can use \fB--hostname\fR \fIname\fR option to set a host name for a VE.
 .IP \fBdestroy\fR 4
 Removes a VE private area by deleting all files, directories and configuration
 file of this VE.
-.IP \fBstart\fR 4
-Mounts (if necessary) and starts a VE.
+.IP "\fBstart\fR [\fB---wait\fR]" 4
+Mounts (if necessary) and starts a VE. if \fB--wait\fR
+option specified wait until default runlevel is entered.
 .IP \fBstop\fR 4
 Stops and unmounts a VE.
 .IP \fBrestart\fR 4

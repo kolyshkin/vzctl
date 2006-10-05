@@ -144,5 +144,6 @@
 #define VZ_SET_MEMINFO_ERROR		129
 #define VZ_VETH_ERROR			130
 #define VZ_SET_NAME_ERROR		131
+#define VZ_WAIT_FAILED			133
 #endif /* _VZ_ERROR_H_ */
 

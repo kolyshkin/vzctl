@@ -381,6 +381,12 @@ try:
 	mk_reboot_script();
 	if (res->dq.ugidlimit != NULL)
 		mk_quota_link();
+	if (res->misc.wait == YES) {
+		if (add_reach_runlevel_mark()) {
+			ret = VZ_WAIT_FAILED;
+			goto env_err;
+		}
+	}
 	/* Close status descriptor to report that
 	 * environment is created.
 	*/
@@ -493,6 +499,10 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 			logger(-1, 0, "Not enough resources"
 				" to start environment");
 			break;
+		case VZ_WAIT_FAILED:
+			logger(0, 0, "Unable to set"
+				" wait functionality");
+			break;
 		}
         }
 err:
@@ -534,7 +544,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 {
 	int wait_p[2];
 	int err_p[2];
-	int ret;
+	int ret, err;
 	char buf[64];
 	char *dist_name;
 	struct sigaction act;
@@ -609,13 +619,28 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 err:
 	free_dist_actions(&actions);
 	if (ret) {
-		int err;
 		/* Kill enviroment */
 		logger(-1, 0, "VE start failed");
 		write(wait_p[1], &err, sizeof(err));
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
-                        logger(0, 0, "VE start in progress...");
+			if (res->misc.wait == YES) {
+				logger(0, 0, "VE start in progress"
+					" waiting ...");
+				err = vps_execFn(h, veid, res->fs.root,
+					wait_on_fifo, NULL, 0);
+				if (err) {
+					logger(0, 0, "VE wait failed %s",
+						err == VZ_EXEC_TIMEOUT ? \
+						"timeout expired" : "");
+					ret = VZ_WAIT_FAILED;
+				} else {
+					logger(0, 0, "VE started"
+						" successfully");
+				}
+			} else {
+	                        logger(0, 0, "VE start in progress...");
+			}
 		} else {
 			if (ret == VZ_FS_BAD_TMPL)
 				logger(-1, 0, "Unable to start init, probably"

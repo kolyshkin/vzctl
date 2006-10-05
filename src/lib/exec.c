@@ -383,7 +383,11 @@ env_err:
 	while ((ret = waitpid(pid, &status, 0)) == -1)
 		if (errno != EINTR)
 			break;
-	ret = WEXITSTATUS(status);
+	ret = VZ_SYSTEM_ERROR;
+	if (WIFEXITED(status))
+		ret = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		logger(-1, 0, "Got signal %d", WTERMSIG(status));
 	return ret;
 }
 

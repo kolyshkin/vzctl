@@ -90,12 +90,13 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 	return 0;
 }
 
-static int parse_start_opt(int argc, char **argv, vps_opt *opt)
+static int parse_start_opt(int argc, char **argv, vps_param *param)
 {
 	int c, ret = 0;
 	struct option start_options[] = {
 	{"force", no_argument, NULL, PARAM_FORCE},
-	{"skip_ve_setup",no_argument, NULL, PARAM_SKIP_VE_SETUP},
+	{"skip_ve_setup", no_argument, NULL, PARAM_SKIP_VE_SETUP},
+	{"wait", no_argument, NULL, PARAM_WAIT},
 
 	{ NULL, 0, NULL, 0 }
 };
@@ -106,10 +107,13 @@ static int parse_start_opt(int argc, char **argv, vps_opt *opt)
 			break;
 		switch (c) {
 		case PARAM_FORCE:
-			opt->start_force = YES;
+			param->opt.start_force = YES;
 			break;
 		case PARAM_SKIP_VE_SETUP:
-			opt->skip_setup = YES;
+			param->opt.skip_setup = YES;
+			break;
+		case PARAM_WAIT:
+			param->res.misc.wait = YES;
 			break;
 		default:
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
@@ -134,6 +138,7 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 		logger(-1, 0, "VE is already running");
 		return VZ_VE_RUNNING;
 	}
+	g_p->res.misc.wait = cmd_p->res.misc.wait;
 	ret = vps_start(h, veid, g_p,
 		cmd_p->opt.skip_setup == YES ? SKIP_SETUP : 0, &g_action);
 	return ret;
@@ -746,7 +751,7 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 		ret = parse_stop_opt(argc, argv, &param->opt);
 		break;
 	case ACTION_START:
-		ret = parse_start_opt(argc, argv, &param->opt);
+		ret = parse_start_opt(argc, argv, param);
 		break;
 	case ACTION_DESTROY:
 		break;

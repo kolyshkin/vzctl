@@ -23,5 +23,7 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet);
 int run_pre_script(int veid, char *script);
 int mk_reboot_script();
 int mk_quota_link();
+int add_reach_runlevel_mark();
+int wait_on_fifo(void *data);
 
 #endif /* _SCRIPT_H_ */

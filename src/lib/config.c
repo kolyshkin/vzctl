@@ -2214,6 +2214,7 @@ static void merge_misc(misc_param *dst, misc_param *src)
 	MERGE_LIST(searchdomain)
 	MERGE_LIST(userpw)
 	MERGE_STR(hostname)
+	MERGE_INT(wait);
 }
 
 static void merge_dq(dq_param *dst, dq_param *src)

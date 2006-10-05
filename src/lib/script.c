@@ -37,6 +37,7 @@
 #include "script.h"
 #include "fs.h"
 
+volatile sig_atomic_t alarm_flag;
 static char *envp_bash[] = {"HOME=/", "TERM=linux", "PATH=/bin:/sbin:/usr/bin:/usr/sbin:", NULL};
 
 int read_script(const char *fname, char *include, char **buf)
@@ -270,3 +271,93 @@ int mk_quota_link()
 		logger(-1, errno, "Unable to create symlink %s", buf); 
 	return 0;
 }
+
+#define INITTAB_FILE		"/etc/inittab"
+#define INITTAB_VZID		"vz:"
+#define INITTAB_ACTION		INITTAB_VZID "2345:once:sh -c 'if [ -p "VZFIFO_FILE" ]; then echo done > " VZFIFO_FILE "; fi'\n"
+#define MAX_WAIT_TIMEOUT	 60 * 60
+
+int add_reach_runlevel_mark()
+{
+	int fd, found, len, ret;
+	char buf[4096];
+
+	unlink(VZFIFO_FILE);
+	if (mkfifo(VZFIFO_FILE, 0644)) {
+		fprintf(stderr, "Unable to create " VZFIFO_FILE " %s\n",
+			strerror(errno));
+		return -1;
+	}
+	if ((fd = open(INITTAB_FILE, O_RDWR | O_APPEND)) == -1) {
+		fprintf(stderr, "Unable to open " INITTAB_FILE " %s\n",
+			strerror(errno));
+		return -1;
+	}
+	ret = 0;
+	found = 0;
+	while (1) { 
+		len = read(fd, buf, sizeof(buf));
+		if (len == 0)
+			break;
+		if (len < 0) {
+			fprintf(stderr, "Unable to read from " INITTAB_FILE
+				" %s\n",
+				strerror(errno));
+			ret = -1;
+			break;
+		}
+		buf[len] = 0;
+		if (strstr(buf, "\n" INITTAB_VZID) != NULL) {
+			found = 1;
+			break;
+		}
+	}
+	if (!found) {
+		if (write(fd, INITTAB_ACTION, sizeof(INITTAB_ACTION) - 1) == -1)
+		{
+			fprintf(stderr, "Unable to write to " INITTAB_FILE
+				" %s\n",
+				strerror(errno));
+			ret = -1;
+		}
+	}
+	close(fd);
+	return ret;
+}
+
+static void alarm_handler(int sig)
+{
+	alarm_flag = 1;
+}
+
+int wait_on_fifo(void *data)
+{
+	int fd, buf, ret;
+	struct sigaction act, actold;
+
+	ret = 0;
+	alarm_flag = 0;
+	act.sa_flags = 0;
+	act.sa_handler = alarm_handler;
+	sigemptyset(&act.sa_mask);
+	sigaction(SIGALRM, &act, &actold);
+
+	alarm(MAX_WAIT_TIMEOUT);
+	fd = open(VZFIFO_FILE, O_RDONLY);
+	if (fd == -1) {
+		fprintf(stderr, "Unable to open " VZFIFO_FILE " %s\n",
+			strerror(errno));
+		ret = -1;
+		goto err;
+	}
+	if (read(fd, &buf, sizeof(buf)) == -1)
+		ret = -1;
+err:
+	if (alarm_flag)
+		ret = VZ_EXEC_TIMEOUT;
+	alarm(0);
+	sigaction(SIGALRM, &actold, NULL);
+	unlink(VZFIFO_FILE);
+	return ret;
+}
+

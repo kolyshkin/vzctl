@@ -61,7 +61,7 @@ void usage()
 "vzctl destroy | mount | umount | stop | status | enter <veid>\n"
 "vzctl create <veid> {--ostemplate <name>] [--config <name>]\n"
 "   [--private <path>] [--root <path>] [--ipadd <addr>] | [--hostname <name>]\n"
-"vzctl start <veid> [--force]\n"
+"vzctl start <veid> [--force] [--wait]\n"
 "vzctl exec | exec2 <veid> <command> [arg ...]\n"
 "vzctl runscript <veid> <script>\n"
 "vzctl chkpnt <veid> [--dumpfile <name>]\n"
