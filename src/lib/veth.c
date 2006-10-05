@@ -33,6 +33,7 @@
 #include "veth.h"
 #include "env.h"
 #include "logger.h"
+#include "script.h"
 
 static void free_veth(list_head_t *head);
 
