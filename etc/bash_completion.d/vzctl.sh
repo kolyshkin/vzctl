@@ -105,7 +105,7 @@ _vzctl()
 			case $prev in
 			--ostemplate)
 				# FIXME: get /vz/template from /etc/sysconfig/vz
-, 				COMPREPLY=( $( compgen -W \
+ 				COMPREPLY=( $( compgen -W \
 					"$(ls -1 /vz/template/cache/*.tar.gz | \
 					sed s/.tar.gz$//)" -- $cur ) )
 				;;
