@@ -104,14 +104,16 @@ err:
 	return -1;
 }
 
-int run_script(const char *f, char *argv[], char *envp[], int quiet)
+#define ENV_SIZE	256
+int run_script(const char *f, char *argv[], char *env[], int quiet)
 {
 	int child, pid, fd;
 	int status;
-	int ret;
+	int ret, i;
 	char *cmd;
 	struct sigaction act, actold;
 	int out[2];
+	char *envp[ENV_SIZE];
 
 	if (!stat_file(f)) {
 		logger(-1, 0, "File %s not found", f);
@@ -132,6 +134,14 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet)
 		logger(-1, errno, "run_script: unable to create pipe");
 		return -1;
 	}
+	i = 0;
+	if (env != NULL) {
+		for (i = 0; i < ENV_SIZE - 1 && env[i] != NULL; i++)
+			envp[i] = env[i];
+	}
+	for (; i < ENV_SIZE - 1 && envp_bash[i] != NULL; i++)
+		envp[i] = envp_bash[i];
+	envp[i] = NULL;
 	if ((child = fork()) == 0) {
 		fd = open("/dev/null", O_WRONLY);
 		if (fd < 0)
@@ -150,7 +160,7 @@ int run_script(const char *f, char *argv[], char *envp[], int quiet)
 			close(out[1]);
 */
 		}
-		execve(f, argv, envp != NULL ? envp : envp_bash);
+		execve(f, argv, envp);
 		logger(-1, errno, "Error exec %s", f);
 		exit(1);
 	} else if(child == -1) {

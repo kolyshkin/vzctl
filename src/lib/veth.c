@@ -93,12 +93,17 @@ static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
 static int run_vznetcfg(envid_t veid, veth_dev *dev)
 {
 	int ret;
+	char buf[11];
 	char *argv[] = {VZNETCFG, "init", "veth", NULL, NULL};
+	char *env[2];
 
 	if (stat_file(VZNETCFG) != 1)
 		return 0;
 	argv[3] = dev->dev_name;
-	if ((ret = run_script(VZNETCFG, argv, NULL, 0))) {
+	snprintf(buf, sizeof(buf), "VEID=%d", veid);
+	env[0] = buf;
+	env[1] = NULL;
+	if ((ret = run_script(VZNETCFG, argv, env, 0))) {
 		logger(0, 0, VZNETCFG " exited with error");
 		ret = VZ_VETH_ERROR;
 	}
