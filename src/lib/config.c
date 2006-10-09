@@ -1978,7 +1978,7 @@ int set_name(int veid, char *new_name, char *old_name)
 	if (new_name == NULL)
 		return 0;
 	if (check_name(new_name)) {
-		logger(-1, 0, "Error: ivalid name %s", new_name);
+		logger(-1, 0, "Error: invalid name %s", new_name);
 		return VZ_SET_NAME_ERROR;
 	}
 	veid_old = get_veid_by_name(new_name);
