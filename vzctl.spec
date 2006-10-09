@@ -20,8 +20,8 @@
 
 Summary: Virtual Environments control utility
 Name: vzctl
-Version: 3.0.11
-Release: 3
+Version: 3.0.12
+Release: 1
 License: GPL
 Group: System Environment/Kernel
 Source: vzctl-%{version}.tar.bz2

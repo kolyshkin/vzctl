@@ -1,5 +1,6 @@
-   3.0.12: FIXME
+   3.0.12: Thu Oct 5 2006 <igor@openvz.org>
 	* vzctl start: added --wait cmdline option
+	* added vznetcfg script for veth setup
 	* fixed error message in case kernel compiled without USER_RESOURCES
 	* added '--applyconfig_map name' vzctl set option
 	* changed friendly name data structure
@@ -35,18 +36,18 @@
 	* changed all utilities and man pages to refer to VE not VPS
 	* vzcpucheck: give error if VE0 CPU units not set (bug #249)
 
-   3.0.11: Mon Aug  7 2006 <igor@openvz.ru>
+   3.0.11: Mon Aug  7 2006 <igor@openvz.org>
 	* fixed using VE_ROUTE_SRC_DEV variable
 	* added VPS name support
 	* added change number of CPUs available in the VPS functionality.
 	* fixes in CPT error processing
 	* added upport of xt_mac iptables module
 	* fixed awk expression to be compatible with mawk
-   3.0.10: Wed Jun  7 2006 <igor@openvz.ru>
+   3.0.10: Wed Jun  7 2006 <igor@openvz.org>
 	* added virtual ethernet device support (--veth_add, --veth_del)
 	* added  /proc/meminfo virtualization support (--meminfo mode:value)
 	* added VE0 UB setup functionality (--reset-ub)
-   3.0.9: Wed May 24 2006 <igor@openvz.ru>
+   3.0.9: Wed May 24 2006 <igor@openvz.org>
 	vzctl:
 	* switched to new versioning scheme.
 	* added -z option to /sbin/init
@@ -78,7 +79,7 @@
 	* added coping of action scripts.
 		(http://bugzilla.openvz.org/show_bug.cgi?id=157)
 	* fixed --keep-dst option processing. Option behavior was inverted.
-   3.0.0-8: Mon Apr 24 2006 <igor@openvz.ru>
+   3.0.0-8: Mon Apr 24 2006 <igor@openvz.org>
 	* UBC parameters > LONG_MAX in VPS conf truncate to LONG_MAX
 	* added installation of vzmigrate.8 man page
 	* use 'uname -m' for arch selection	
