@@ -228,7 +228,7 @@ int cp_file(char *dst, char *src)
 
 void get_vps_conf_path(envid_t veid, char *buf, int len)
 {
-	snprintf(buf, len, VPS_CONF_DIR "/%d.conf", veid);
+	snprintf(buf, len, VPS_CONF_DIR "%d.conf", veid);
 }
 
 char *arg2str(char **arg)

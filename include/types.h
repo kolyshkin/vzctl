@@ -20,7 +20,7 @@
 
 #define VZ_DIR			"/etc/vz/"
 #define GLOBAL_CFG		VZ_DIR"vz.conf"
-#define VPS_CONF_DIR		VZ_DIR"/conf/"
+#define VPS_CONF_DIR		VZ_DIR"conf/"
 #define LIB_SCRIPTS_DIR		"/usr/lib/vzctl/scripts/"
 #define DIST_DIR		VZ_DIR"dists"
 #define VENAME_DIR		VZ_DIR "names"
