@@ -77,7 +77,7 @@ void usage()
 "   [--devnodes device:r|w|rw|none]\n"
 "   [--veth_add dev_name,dev_addr,dev_name_ve,dev_addr_ve]\n"
 "   [--veth_del dev_name]\n"
-"   [--applyconfig <name>]\n"
+"   [--applyconfig <name>] [--applyconfig_map <name>]\n"
 "   [--name <vename>]\n");
  
 	fprintf(stdout, "   [--iptables <name>] [--disabled <yes|no>]\n");
