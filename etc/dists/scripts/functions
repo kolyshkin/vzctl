@@ -76,6 +76,65 @@ function put_param()
 	fi
 }
 
+# Adds value to variable NAME
+# in config file. If NAME is found, value gets added,
+# otherwise it is added to the end of file.
+# Parameters:
+# $1 - config file
+# $2 - NAME
+# $3 - value
+function add_param()
+{
+	local file=$1
+	local name=$2
+	local value=$3
+	local path
+	
+	path=${file%/*}
+	if [ ! -d "${path}" ]; then
+		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
+	fi
+	if grep -qe "^$name=" $file >/dev/null 2>&1; then
+		${CP} ${file} ${file}.$$ || \
+			error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		/bin/sed -e "s|^$name=\"\(.*\)\"|$name=\"\1 $value \"|" < ${file} > ${file}.$$
+		if [ $? -ne 0 ]; then
+			rm -f ${file}.$$ 2>/dev/null 
+			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		fi
+		mv -f ${file}.$$ ${file}
+	else
+		echo "$name=\"$value\"" >> $file || error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+	fi
+}
+
+function del_param()
+{
+	local file=$1
+	local name=$2
+	local value=$3
+	local path
+	
+	path=${file%/*}
+	if [ ! -d "${path}" ]; then
+		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
+	fi
+	if grep -qe "^$name=" $file >/dev/null 2>&1; then
+		${CP} ${file} ${file}.$$ || \
+			error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
+		if [ -z "${value}" ]; then
+			/bin/sed -e "/^${name}=.*/d" < ${file} > ${file}.$$
+		else
+			sed -e "s|^${name}=\(.*\)${value}\(.*\)|${name}=\1\2|" <${file} > ${file}.$$
+		fi
+		if [ $? -ne 0 ]; then
+			rm -f ${file}.$$ 2>/dev/null 
+			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
+		fi
+		mv -f ${file}.$$ ${file}
+	fi
+}
+
 # Puts line
 # NAME value
 # to config file. If NAME is found, line gets replaced,

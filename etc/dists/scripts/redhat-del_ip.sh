@@ -26,6 +26,7 @@
 VENET_DEV=venet0
 VENET_DEV_CFG=ifcfg-${VENET_DEV}
 IFCFG_DIR=/etc/sysconfig/network-scripts/
+IFCFG=${IFCFG_DIR}${VENET_DEV_CFG}
 
 # Function to delete IP address for RedHat like systems
 function del_ip()
@@ -40,10 +41,16 @@ function del_ip()
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		ifdown ${VENET_DEV}
 		rm -rf ${VENET_DEV_CFG}:* >/dev/null 2>&1
+		del_param ${IFCFG} IPV6ADDR_SECONDARIES ""
 		ifup ${VENET_DEV}
 		return 0;
 	fi
 	for ip in ${IP_ADDR}; do
+		# IPV6 processing
+		if [ "${ip#*:}" != "${ip}" ]; then
+			del_param ${IFCFG} IPV6ADDR_SECONDARIES "${ip}\\/128"
+			continue
+		fi
 		# find and delete a file with this alias
 		filetodel=`grep -l "IPADDR=${ip}$" \
 			${VENET_DEV_CFG}:* 2>/dev/null`

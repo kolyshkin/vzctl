@@ -81,6 +81,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(755,root,root) %{_vzdir}
 %attr(755,root,root) %{_sbindir}/vzctl
 %attr(755,root,root) %{_sbindir}/arpsend
+%attr(755,root,root) %{_sbindir}/ndsend
 %attr(755,root,root) %{_sbindir}/vzsplit
 %attr(755,root,root) %{_sbindir}/vzlist
 %attr(755,root,root) %{_sbindir}/vzmemcheck

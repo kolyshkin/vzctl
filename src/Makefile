@@ -59,12 +59,13 @@ OBJ_simfs=lib/fs_simfs.lo
 OBJ_vzctl = vzctl.o vzctl-actions.o modules.o enter.o
 OBJ_vzlist = vzlist.o
 OBJ_arp = arpsend.o
+OBJ_nd = ndsend.o
 OBJ_split = vzsplit.o
 OBJ_memcheck = vzmemcheck.o validate.o
 OBJ_cfgvalidate = vzcfgvalidate.o validate.o
 OBJ_calc = vzcalc.o
 OBJ = $(OBJ_vzctl) $(OBJ_vzlist) $(OBJ_arp) $(OBJ_split) $(OBJ_memcheck) \
-	$(OBJ_cfgvalidate) $(OBJ_calc)
+	$(OBJ_cfgvalidate) $(OBJ_calc) ${OBJ_nd}
 LOBJ = $(OBJ_libvzctl) $(OBJ_simfs)
 LIB_vzctl = libvzctl.so.$(LIB_VER)
 LIB_simfs = libvzctl-simfs.so.$(LIB_VER)
@@ -73,7 +74,7 @@ LIB_fs = $(LIB_simfs)
 LDFLAGS += -Wl,-rpath=$(LIBDIR)
 LIBSCRIPTS = vps-create vps-net_add vps-net_del vps-stop vps-functions
 
-PROGS = vzctl vzlist arpsend vzsplit vzcfgvalidate vzmemcheck vzcalc
+PROGS = vzctl vzlist arpsend vzsplit vzcfgvalidate vzmemcheck vzcalc ndsend
 LIBS = $(LIB_vzctl)
 
 INITSCRIPTS = vz
@@ -128,6 +129,9 @@ vzlist: $(OBJ_vzlist) $(LIB_vzctl)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 arpsend: $(OBJ_arp)
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
+
+ndsend: $(OBJ_nd)
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -o $@
 
 vzsplit: $(OBJ_split)

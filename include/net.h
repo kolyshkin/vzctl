@@ -41,6 +41,7 @@ typedef struct {
 	int delall;		/**< flag to delete all ip addresses. */
 	int skip_arpdetect;
 	int skip_route_cleanup;
+	int ipv6_net;
 	
 } net_param;
 

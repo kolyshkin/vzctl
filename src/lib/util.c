@@ -281,23 +281,23 @@ int yesno2id(const char *str)
 	return -1;
 }
 
-int get_ipaddr(const char *ip_str, unsigned int *ip)
+int get_netaddr(const char *ip_str, unsigned int *ip)
 {
-        struct in_addr addr;
-
-        if (!inet_aton(ip_str, &addr))
-                return -1;
-        *ip = addr.s_addr;
-
-        return 0;
+	if (strchr(ip_str, ':')) {
+		if (inet_pton(AF_INET6, ip_str, ip) <= 0)
+			return -1;
+		return AF_INET6;
+	}
+	if (inet_pton(AF_INET, ip_str, ip) <= 0)
+		return -1;
+	return AF_INET;
 }
 
-char *get_ipname(unsigned int ip)
+const char *get_netname(unsigned int *ip, int family)
 {
-	struct in_addr addr;
+	static char buf[64];
 
-	addr.s_addr = ip;
-	return inet_ntoa(addr);
+	return inet_ntop(family, ip, buf, sizeof(buf) - 1);
 }
 
 char *subst_VEID(envid_t veid, char *src)

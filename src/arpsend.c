@@ -88,6 +88,8 @@ char* iface = NULL;
 int timeout = 1;
 int count = -1;
 
+char *ip6_addr;
+
 /* source MAC address in Ethernet header */
 unsigned char src_hwaddr[ETH_ALEN];
 int src_hwaddr_flag = 0;
@@ -214,9 +216,19 @@ void parse_options (int argc, char **argv)
 			read_hw(trg_arp_hwaddr);
 			break;
 		case 'i':
+			if (strchr(optarg, ':')) {
+				ip6_addr = optarg;
+				src_ipaddr_flag = 1;
+				break;
+			}
 			read_ip(src_ipaddr);
 			break;
 		case 'e':
+			if (strchr(optarg, ':')) {
+				trg_ipaddr_flag = 1;
+				ip6_addr = optarg;
+				break;
+			}
 			if (trg_ipaddr_count >= MAX_IPADDR_NUMBER)
 				usage();
 			if (read_ip_addr(&trg_ipaddr[trg_ipaddr_count++], optarg) < 0)
@@ -469,6 +481,12 @@ int main(int argc,char** argv)
 {
 	programm_name = argv[0];
 	parse_options (argc, argv);
+
+	if (ip6_addr) {
+		if (cmd == AR_UPDATE)
+			execlp("/usr/sbin/ndsend", "ndsend", ip6_addr, iface, NULL);
+		exit(0);
+	}
 
 	sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
 	if (sock < 0)

@@ -53,19 +53,31 @@ int find_ip(list_head_t *ip_h, char *ipaddr)
 }
 
 static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
-	unsigned int ip)
+			  unsigned int *ip, int family)
 {
-	struct sockaddr_in addr;
 	struct vzctl_ve_ip_map ip_map;
+	union {
+		struct sockaddr_in  a4;
+		struct sockaddr_in6 a6;
+	} addr;
 
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = ip;
-	addr.sin_port = 0;
+	if (family == AF_INET) {
+		addr.a4.sin_family = AF_INET;
+		addr.a4.sin_addr.s_addr = ip[0];
+		addr.a4.sin_port = 0;
+		ip_map.addrlen = sizeof(addr.a4);
+	} else if (family == AF_INET6) {
+		addr.a6.sin6_family = AF_INET6;
+		memcpy(&addr.a6.sin6_addr, ip, 16);
+		addr.a6.sin6_port = 0;
+		ip_map.addrlen = sizeof(addr.a6);
+	} else {
+		return -EAFNOSUPPORT;
+	}
 
 	ip_map.veid = veid;
 	ip_map.op = op;
 	ip_map.addr = (struct sockaddr*) &addr;
-	ip_map.addrlen = sizeof(addr);
 
 	return ioctl(h->vzfd, VENETCTL_VE_IP_MAP, &ip_map);
 }
@@ -73,11 +85,12 @@ static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
 int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
 {
 	int ret;
-	unsigned int ipaddr;
+	int family;
+	unsigned int ipaddr[4];
 
-	if ((ret = get_ipaddr(ip, &ipaddr)))
+	if ((family = get_netaddr(ip, ipaddr)) < 0)
 		return 0;
-	ret = _ip_ctl(h, veid, op, ipaddr);
+	ret = _ip_ctl(h, veid, op, ipaddr, family);
 	if (ret) {
 		switch (errno) {
 			case EADDRINUSE	:
@@ -264,6 +277,24 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
 	return ret;
 }
 
+static int remove_ipv6_addr(net_param *net)
+{
+	list_head_t *head = &net->ip;
+	ip_param *ip, *tmp;
+	int cnt;
+
+	cnt = 0;
+	list_for_each_safe(ip, tmp, head, list) {
+		if (strchr(ip->val, ':')) {
+			free(ip->val);
+			list_del(&ip->list);
+			free(ip);
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	dist_actions *actions, char *root, int state, int skip)
 {
@@ -281,6 +312,9 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
+	if (net->ipv6_net != YES)
+		if (remove_ipv6_addr(net))
+			logger(0, 0, "Warning: ipv6 support disabled");
 	if (op == ADD) {
 		if (net->delall == YES)
 			ret = vps_set_ip(h, veid, net, state);
@@ -300,6 +334,7 @@ static inline int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 {
 	FILE *fd;
 	char str[16384];
+	char data[16];
 	char *token;
 	int id, cnt = 0;
 
@@ -322,6 +357,10 @@ static inline int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 		if (token == NULL)
 			break;
 		while ((token = strtok(NULL, " \t\n")) != NULL) {
+			if (strchr(token, ':') &&
+			    inet_pton(AF_INET6, token, data) > 0 &&
+			    !inet_ntop(AF_INET6, data, token, strlen(token)+1))
+				break;
 			if (add_str_param(ip_h, token)) {
 				free_str_param(ip_h);
 				cnt = -1;
@@ -350,7 +389,7 @@ static inline int get_vps_ip_ioctl(vps_handler *h, envid_t veid,
 	int ret = -1;
 	struct vzlist_veipv4ctl veip;
 	uint32_t *addr, *tmp;
-	char buf[16];
+	char buf[64];
 	int i;
 
 	veip.veid = veid;

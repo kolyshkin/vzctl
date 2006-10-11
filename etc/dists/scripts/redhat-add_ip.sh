@@ -39,6 +39,7 @@ IFCFG_DIR=/etc/sysconfig/network-scripts
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
 NETFILE=/etc/sysconfig/network
 HOSTFILE=/etc/hosts
+NETWORKRESTART=
 
 function fix_ifup()
 {
@@ -69,6 +70,13 @@ IPADDR=127.0.0.1
 NETMASK=255.255.255.255
 BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
 
+	if [ "${IPV6}" = "yes" ]; then
+		echo "IPV6INIT=yes
+IPV6ADDR=::1/128" >> $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
+
+		put_param ${NETFILE} NETWORKING_IPV6 yes
+		put_param ${NETFILE} IPV6_DEFAULTDEV ${VENET_DEV}
+	fi
 	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${routefile} 2>/dev/null; then
 		echo "${FAKEGATEWAYNET}/24 dev ${VENET_DEV} scope host
 default via ${FAKEGATEWAY}" >> ${routefile} || error "Can't create ${routefile}" ${VZ_FS_NO_DISK_SPACE}
@@ -94,6 +102,15 @@ ONBOOT=yes
 IPADDR=${ip}
 NETMASK=255.255.255.255" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} || \
 	error "Unable to create interface config file" ${VZ_FS_NO_DISK_SPACE}
+}
+
+function add_ip6()
+{
+	[ "${IPV6}" != "yes" ] && return
+	if ! grep -qw "$1" ${IFCFG} 2>/dev/null; then
+		add_param ${IFCFG} IPV6ADDR_SECONDARIES "$1/128"
+		NETWORKRESTART=yes
+	fi
 }
 
 function get_all_aliasid()
@@ -176,13 +193,25 @@ function add_ip()
 		done
 	fi
 	for ip in ${new_ips}; do
-		get_free_aliasid
-		create_config "${ip}" "${IFNUM}"
+		if [ "${ip#*:}" = "${ip}" ]; then
+			get_free_aliasid
+			create_config "${ip}" "${IFNUM}"
+		else
+			if [ "x${IPDELALL}" = "xyes" ]; then
+				del_param ${IFCFG} IPV6ADDR_SECONDARIES ""
+			fi
+			add_ip6 "${ip}"
+		fi
 	done
 	move_configs
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		# synchronyze config files & interfaces
-		cd /etc/sysconfig/network-scripts && ./ifup-aliases ${VENET_DEV}
+		if [ "${NETWORKRESTART}" = "yes" ]; then 
+			/etc/init.d/network restart
+		else
+			cd /etc/sysconfig/network-scripts && \
+				./ifup-aliases ${VENET_DEV}
+		fi
 	fi
 }
 

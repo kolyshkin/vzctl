@@ -158,25 +158,43 @@ function vzarpipset()
 	done	
 }
 
+function vzaddrouting4
+{
+	local src_addr
+	local device=
+
+	if [ -n "${VE_ROUTE_SRC_DEV}" ]; then
+		device="dev ${VE_ROUTE_SRC_DEV}"
+	fi
+	src_addr=`ip route list table local ${device} | grep '^local'|\
+		cut -d' ' -f2 | grep -v '^127\.' | head -n 1`
+	if [ -z "${src_addr}" ]; then
+		vzerror "Unable to get source ip [${device}]" $VZ_CANT_ADDIP
+	fi
+	${IP_CMD} route add $1 dev venet0 src ${src_addr} || \
+		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 src ${src_addr}" $VZ_CANT_ADDIP
+
+}
+
+function vzaddrouting6
+{
+	${IP_CMD} route add $1 dev venet0 || \
+		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0" $VZ_CANT_ADDIP
+}
+
 # Sets VE0 source routing for given IP
 # Parameters:
 #   $1 - IP address
 function vzaddrouting()
 {
-	local src_addr
-	local device=
-	if ! ${IP_CMD} route list $1 | grep "$1 dev venet0" > /dev/null 2>&1;
+
+	if ! ${IP_CMD} route list table all $1 | grep "$1 dev venet0" > /dev/null 2>&1;
 	then
-		if [ -n "${VE_ROUTE_SRC_DEV}" ]; then
-			device="dev ${VE_ROUTE_SRC_DEV}"
+		if [ "${1#*:}" = "${1}" ]; then
+			vzaddrouting4 $1
+		else
+			vzaddrouting6 $1
 		fi
-		src_addr=`ip route list table local ${device} | grep '^local'|\
-			cut -d' ' -f2 | grep -v '^127\.' | head -n 1`
-		if [ -z "${src_addr}" ]; then
-			vzerror "Unable to get source ip [${device}]" $VZ_CANT_ADDIP
-		fi
-		${IP_CMD} route add $1 dev venet0 src ${src_addr} || \
-			vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 src ${src_addr}" $VZ_CANT_ADDIP
 	fi
 }
 

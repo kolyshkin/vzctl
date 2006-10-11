@@ -232,11 +232,12 @@ int need_configure(vps_res *res)
 int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char *root, int op, net_param *net, int state)
 {
-	char *envp[5];
+	char *envp[6];
 	char *str;
 	const char *script = NULL;
 	int ret, i;
 	char vps_state[32];
+	char *ipv6_net = "IPV6=yes";
 	const char *str_state;
 	const char *delall = "IPDELALL=yes";
 
@@ -271,6 +272,8 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		envp[i++] = str;
 	if (net->delall)
 		envp[i++] = (char *) delall;
+	if (net->ipv6_net == YES)
+		envp[i++] = ipv6_net;
 	envp[i++] = ENV_PATH;
 	envp[i] = NULL;
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,

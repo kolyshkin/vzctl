@@ -87,6 +87,7 @@ static vps_config config[] = {
 {"",		NULL, PARAM_NETDEV_DEL},
 {"HOSTNAME",	NULL, PARAM_HOSTNAME},
 {"NAMESERVER",	NULL, PARAM_NAMESERVER},
+{"IPV6",	NULL, PARAM_IPV6NET},
 {"SEARCHDOMAIN",NULL, PARAM_SEARCHDOMAIN},
 {"",		NULL, PARAM_USERPW},
 /*	Devices	*/
@@ -709,7 +710,7 @@ int check_ip_dot(char *ip)
 static int parse_ip(vps_param *vps_p, char *val, int id)
 {
 	char *token;
-	unsigned int ip;
+	unsigned int ip[16];
 	net_param *net;
 
 	if (id == PARAM_IP_ADD)
@@ -728,9 +729,15 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 		}
 		if (!strcmp(token, "0.0.0.0"))
 			continue;
-		if (check_ip_dot(token))
-			return ERR_INVAL;
-		if (get_ipaddr(token, &ip))
+		if (!strcmp(token, "::"))
+			continue;
+		if (!strcmp(token, "::0"))
+			continue;
+		if (!strchr(token, ':')) {
+			if (check_ip_dot(token))
+				return ERR_INVAL;
+		}
+		if (get_netaddr(token, ip) < 0)
 			return ERR_INVAL;
 		if (!find_ip(&net->ip, token)) 
 			add_str_param(&net->ip, token);
@@ -1511,6 +1518,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_SKIPARPDETECT:
 		vps_p->res.net.skip_arpdetect = YES;
+		break;
+	case PARAM_IPV6NET:
+		ret = conf_parse_yesno(&vps_p->res.net.ipv6_net, val, 1);
 		break;
 	case PARAM_NETDEV_ADD:
 		ret = add_netdev(&vps_p->res.net, val);
@@ -2310,5 +2320,6 @@ int merge_vps_param(vps_param *dst, vps_param *src)
 int merge_global_param(vps_param *dst, vps_param *src)
 {
 	MERGE_INT(res.dq.enable);
+	MERGE_INT(res.net.ipv6_net);
 	return 0;
 }
