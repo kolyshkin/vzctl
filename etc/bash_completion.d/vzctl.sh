@@ -17,7 +17,7 @@ _get_ves()
 			/usr/sbin/vzlist -H -S -ovpsid
                         /usr/sbin/vzlist -H -S -oname | sed s/-//g
 			;;
-		stop|enter)
+		stop|enter|exec*)
 			# running VEs
 			/usr/sbin/vzlist -H -ovpsid
                         /usr/sbin/vzlist -H -oname | sed s/-//g
