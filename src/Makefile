@@ -230,7 +230,7 @@ install-gentoo:
 	# Gentoo-specific configuration directory
 	$(INSTALL) -d $(DESTDIR)/etc/conf.d
 	# /etc/conf.d/vz is used by vz initscript
-	ln -s $(DESTDIR)/$(CONFDIR)/vz.conf $(DESTDIR)/etc/conf.d/vz
+	ln -s $(CONFDIR)/vz.conf $(DESTDIR)/etc/conf.d/vz
 
 clean:
 	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_fs) .depend
