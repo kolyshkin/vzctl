@@ -226,8 +226,11 @@ install: $(PROGS) inst-dirs install-lib inst-sbin inst-scripts \
 install-redhat: inst-netscripts inst-initd
 
 install-gentoo:
-	$(INSTALL) -m 755 ../etc/init.d/vz-gentoo $(DESTDIR)/$(INITDDIR)/vz
-	ln -s $(DESTDIR)/$(CONFDIR)/vz.conf $(DESTDIR)/conf.d/vz
+	$(INSTALL) -m 755 ../etc/init.d/vz-gentoo $(DESTDIR)$(INITDDIR)/vz
+	# Gentoo-specific configuration directory
+	$(INSTALL) -d $(DESTDIR)/etc/conf.d
+	# /etc/conf.d/vz is used by vz initscript
+	ln -s $(DESTDIR)/$(CONFDIR)/vz.conf $(DESTDIR)/etc/conf.d/vz
 
 clean:
 	rm -f *.o lib/*.lo $(PROGS) $(LIB_vzctl) $(LIB_fs) $(LIB_fs) .depend
