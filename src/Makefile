@@ -71,8 +71,7 @@ LIB_simfs = libvzctl-simfs.so.$(LIB_VER)
 LIB_fs = $(LIB_simfs)
 
 LDFLAGS += -Wl,-rpath=$(LIBDIR)
-LIBSCRIPTS = vps-create vps-postcreate vps-net_add vps-net_del vps-stop \
-     vps-functions
+LIBSCRIPTS = vps-create vps-net_add vps-net_del vps-stop vps-functions
 
 PROGS = vzctl vzlist arpsend vzsplit vzcfgvalidate vzmemcheck vzcalc
 LIBS = $(LIB_vzctl)
