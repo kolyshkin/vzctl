@@ -1,3 +1,12 @@
+Since after 3.0.12 release, this file is obsoleted. Complete change log
+can be obtained from OpenVZ git repository.
+
+	http://git.openvz.org/?p=vzctl;a=shortlog
+	http://git.openvz.org/?p=vzctl;a=log
+
+Below is a change log for old vzctl releases.
+
+
    3.0.12: Thu Oct 5 2006 <igor@openvz.org>
 	* vzctl start: added --wait cmdline option
 	* added vznetcfg script for veth setup
