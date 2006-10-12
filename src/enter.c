@@ -256,8 +256,11 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			char buf[64];
 			char *term;
 		        char *arg[] = {"-bash", NULL};
-			char *env[] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin:", "HISTFILE=/dev/null",
-				"USER=root", "HOME=/root", "LOGNAME=root", NULL, NULL};
+			char *env[] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin:",
+				"HISTFILE=/dev/null",
+				"USER=root", "HOME=/root", "LOGNAME=root",
+				NULL, /* for TERM */
+				NULL};
 			close(master);
 			set_ctty(slave);
 			dup2(slave, 0);
@@ -267,7 +270,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			close(slave);
 			if ((term = getenv("TERM")) != NULL) {
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
-				env[3] = buf;
+				env[sizeof(env)/sizeof(env[0]) - 2] = buf;
 			}
 			execve("/bin/bash", arg, env);
 			execve("/bin/sh", arg, env);
