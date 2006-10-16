@@ -110,14 +110,14 @@ check-version:
 	$(CC) -c $(CFLAGS) $(SHAREDLIB_CFLAGS) $(INC) $< -o $@
 
 $(LIB_fs) : $(OBJ_simfs) lib/logger.lo 
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -shared -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) -shared --Wl,-soname,$@ -o $@ $^
 
 libvzctl.a: $(OBJ_libvzctl) $(OBJ_simfs)
 	ar scq $@ $+
 	ranlib $@
 
 $(LIB_vzctl) : $(OBJ_simfs) $(OBJ_libvzctl)
-	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) -shared -o $@
+	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ $(LD_FLAGS) -shared -Wl,-soname,$@ -o $@
 
 vzctl-static: $(OBJ_vzctl) libvzctl.a
 	$(CC) $(CFLAGS) $(INC) $(LDFLAGS) $^ -rdynamic -ldl -lutil -o $@
