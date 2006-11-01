@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
@@ -40,21 +39,10 @@
 #include "script.h"
 #include "iptables.h"
 #include "readelf.h"
+#include "vzsyscalls.h"
 
 #define ENVRETRY	3
 #define VZCTLDEV	"/dev/vzctl"
-
-#ifndef __NR_setluid
-#ifdef __ia64__
-#define __NR_setluid	1506
-#elif __x86_64__
-#define __NR_setluid	501
-#elif __powerpc__
-#define __NR_setluid    411
-#else
-#define __NR_setluid	511
-#endif
-#endif
 
 static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode);
 

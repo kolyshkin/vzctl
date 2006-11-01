@@ -91,9 +91,7 @@ static char *cap_names[] = {
 "SYS_TTY_CONFIG",	/*	26	*/
 "MKNOD",		/*	27	*/
 "LEASE",		/*	28	*/
-#ifdef CONFIG_VE
 "CAP_SETVEID",		/*	29	*/
-#endif
 "VE_ADMIN",		/*	30	*/
 
 "FS_MASK"		/*	0x1f	*/

@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>

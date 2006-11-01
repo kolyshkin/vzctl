@@ -18,13 +18,8 @@
 #ifndef	_NET_H_
 #define	_NET_H_
 
-#include <linux/config.h>
-#if defined(CONFIG_VZ_LIST) || defined(CONFIG_VZ_LIST_MODULE)
-#include <linux/vzlist.h>
-#if defined(VZCTL_GET_VEIDS) && defined(VZCTL_GET_VEIPS)
-#define HAVE_VZLIST_IOCTL 1
-#endif
-#endif
+/* #include <linux/vzlist.h> */
+#define HAVE_VZLIST_IOCTL 0
 
 #include "list.h"
 #include "types.h"

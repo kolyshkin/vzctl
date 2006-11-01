@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/syscall.h>
 #include <linux/vzcalluser.h>
 #include <errno.h>
 
@@ -27,44 +26,7 @@
 #include "env.h"
 #include "vzerror.h"
 #include "logger.h"
-
-#ifndef __NR_fairsched_chwt
-#ifdef __ia64__
-#define __NR_fairsched_chwt    1502
-#elif __x86_64__
-#define __NR_fairsched_chwt    506
-#elif __powerpc__
-#define __NR_fairsched_chwt    402
-#else
-#define __NR_fairsched_chwt    502
-#endif
-#endif
-
-#ifndef __NR_fairsched_rate
-#ifdef __ia64__
-#define __NR_fairsched_rate    1504
-#elif __x86_64__
-#define __NR_fairsched_rate    508
-#elif __powerpc__
-#define __NR_fairsched_rate    404
-#else
-#define __NR_fairsched_rate    504
-#endif
-#endif
-
-#ifndef __NR_fairsched_vcpus
-#ifdef __i386__
-#define __NR_fairsched_vcpus    505
-#elif __x86_64__
-#define __NR_fairsched_vcpus    499
-#elif __ia64__
-#define __NR_fairsched_vcpus    1499
-#elif __powerpc__
-#define __NR_fairsched_vcpus    405
-#else
-#error "no syscall for this arch"
-#endif
-#endif
+#include "vzsyscalls.h"
 
 static inline int fairsched_chwt(unsigned int id, unsigned wght)
 {
