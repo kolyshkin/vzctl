@@ -284,8 +284,8 @@ int mk_quota_link()
 
 #define INITTAB_FILE		"/etc/inittab"
 #define INITTAB_VZID		"vz:"
-#define INITTAB_ACTION		INITTAB_VZID "2345:once:sh -c 'if [ -p "VZFIFO_FILE" ]; then echo done > " VZFIFO_FILE "; fi'\n"
-#define MAX_WAIT_TIMEOUT	 60 * 60
+#define INITTAB_ACTION		INITTAB_VZID "35:once:touch " VZFIFO_FILE "\n"
+#define MAX_WAIT_TIMEOUT	60 * 60
 
 int add_reach_runlevel_mark()
 {
