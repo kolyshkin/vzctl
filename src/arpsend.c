@@ -479,6 +479,7 @@ void set_signal(int signo, void (*handler)(void))
 
 int main(int argc,char** argv)
 {
+	sigset_t block_alarm;
 	programm_name = argv[0];
 	parse_options (argc, argv);
 
@@ -500,11 +501,12 @@ int main(int argc,char** argv)
 
 	create_arp_packet(&pkt);
 	set_signal(SIGALRM, sender);
+	sigemptyset(&block_alarm);
+	sigaddset(&block_alarm, SIGALRM);
 	sender();
 
 	while(1)
 	{
-		sigset_t sset, osset;
 		u_char packet[4096];
 		struct sockaddr_ll from;
 		socklen_t alen = sizeof(from);
@@ -516,13 +518,9 @@ int main(int argc,char** argv)
 			logger(LOG_ERROR, "recvfrom : %m");
 			continue;
 		}
-
-		sigemptyset(&sset);
-		sigaddset(&sset, SIGALRM);
-		/* sigaddset(&sset, SIGINT); */
-		sigprocmask(SIG_BLOCK, &sset, &osset);
+		sigprocmask (SIG_BLOCK, &block_alarm, NULL);
 		recv_pack(packet, cc, &from);
-		sigprocmask(SIG_SETMASK, &osset, NULL);
+		sigprocmask (SIG_UNBLOCK, &block_alarm, NULL);
 	}
 
 	exit(EXC_OK);
