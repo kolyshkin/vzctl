@@ -877,7 +877,7 @@ static int parse_dq(unsigned long **param, const char *val, int sfx)
 	if (tmp == NULL)
 		return ERR_NOMEM;
 	if (sfx)
-		ret = parse_twoul_sfx(val, tmp, 1);
+		ret = parse_twoul_sfx(val, tmp, 1024);
 	else
 		ret = parse_twoul(val, tmp);
 	if (ret && ret != ERR_LONG_TRUNC) {
