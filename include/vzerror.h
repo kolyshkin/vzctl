@@ -130,8 +130,7 @@
 #define	VZ_IP_NA			89
 
 /* Template Error */
-#define VZ_PKGSET_NOT_FOUND		90
-#define VZ_GET_LAST_VERSION		91
+#define VZ_PKGSET_NOT_FOUND		91
 
 #define VZ_GET_IP_ERROR			100
 #define VZ_NETDEV_ERROR			104
