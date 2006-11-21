@@ -196,6 +196,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			cmd_p->opt.origin_sample = strdup(sample_config);
 		free_vps_param(conf_p);
 	}
+	merge_vps_param(vps_p, cmd_p);
 	if (check_var(fs->tmpl, "TEMPLATE is not set"))
 		return VZ_VE_TMPL_NOTSET;
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
@@ -206,8 +207,6 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		logger(-1, 0, "Private area already exists in %s", fs->private);
 		return VZ_FS_PRVT_AREA_EXIST;
 	}
-	merge_vps_param(vps_p, cmd_p);
-	logger(0, 0, "Creating VE private area: %s", fs->private);
 	if (action != NULL && action->mod_count) {
 		ret = mod_setup(h, veid, 0, 0, action, vps_p);
 	} else {
@@ -228,6 +227,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			}
 		}
 		snprintf(tar_nm, sizeof(tar_nm), "cache/%s", tmpl->ostmpl);
+		logger(0, 0, "Creating VE private area (%s)", tmpl->ostmpl);
 		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, tar_nm);
 	}
 	if (ret) {
