@@ -120,5 +120,7 @@
 #define PARAM_WAIT		346
 #define PARAM_IPV6NET		347
 
+#define PARAM_FEATURES		350
+
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

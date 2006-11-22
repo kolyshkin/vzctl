@@ -29,6 +29,10 @@ typedef unsigned envid_t;
 #define __ENVID_T_DEFINED__
 #endif
 
+#ifndef __KERNEL__
+#define __user
+#endif
+
 /*
  * VE management ioctls
  */
@@ -64,7 +68,7 @@ struct vzctl_ve_netdev {
 	int op;
 #define VE_NETDEV_ADD  1
 #define VE_NETDEV_DEL  2
-	char *dev_name;
+	char __user *dev_name;
 };
 
 struct vzctl_ve_meminfo {
@@ -96,7 +100,8 @@ struct vzctl_ve_meminfo {
 #define VE_IP_NAT_FTP_MOD		(1U<<21)
 #define VE_IP_NAT_IRC_MOD		(1U<<22)
 #define VE_IP_TARGET_REDIRECT_MOD	(1U<<23)
-#define VE_IP_MATCH_MAC_MOD		(1U<<24)
+#define VE_IP_MATCH_OWNER_MOD		(1U<<24)
+#define VE_IP_MATCH_MAC_MOD		(1U<<25)
 
 /* these masks represent modules with their dependences */
 #define VE_IP_IPTABLES		(VE_IP_IPTABLES_MOD)
@@ -144,7 +149,9 @@ struct vzctl_ve_meminfo {
 					| VE_IP_NAT | VE_IP_CONNTRACK_IRC)
 #define VE_IP_TARGET_REDIRECT	(VE_IP_TARGET_REDIRECT_MOD	\
 					| VE_IP_NAT)
-#define VE_IP_MATCH_MAC		(VE_IP_MATCH_MAC_MOD		\
+#define VE_IP_MATCH_MAC		(VE_IP_MATCH_MAC_MOD	\
+					| VE_IP_IPTABLES)
+#define VE_IP_MATCH_OWNER	(VE_IP_MATCH_OWNER_MOD	\
 					| VE_IP_IPTABLES)
 
 /* safe iptables mask to be used by default */
@@ -179,18 +186,33 @@ struct env_create_param {
 struct env_create_param2 {
 	__u64 iptables_mask;
 	__u64 feature_mask;
-#define VE_FEATURE_SYSFS	(1ULL << 0)
 	__u32 total_vcpus;	/* 0 - don't care, same as in host */
 };
-#define VZCTL_ENV_CREATE_DATA_MAXLEN	sizeof(struct env_create_param2)
 
-typedef struct env_create_param2 env_create_param_t;
+struct env_create_param3 {
+	__u64 iptables_mask;
+	__u64 feature_mask;
+	__u32 total_vcpus;
+	__u32 pad;
+	__u64 known_features;
+};
+
+#define VE_FEATURE_SYSFS	(1ULL << 0)
+#define VE_FEATURE_NFS		(1ULL << 1)
+#define VE_FEATURE_DEF_PERMS	(1ULL << 2)
+
+#define VE_FEATURES_OLD		(VE_FEATURE_SYSFS)
+#define VE_FEATURES_DEF		(VE_FEATURE_SYSFS | \
+				 VE_FEATURE_DEF_PERMS)
+
+typedef struct env_create_param3 env_create_param_t;
+#define VZCTL_ENV_CREATE_DATA_MAXLEN	sizeof(env_create_param_t)
 
 struct vzctl_env_create_data {
 	envid_t veid;
 	unsigned flags;
 	__u32 class_id;
-	env_create_param_t *data;
+	env_create_param_t __user *data;
 	int datalen;
 };
 
@@ -212,7 +234,7 @@ struct vz_cpu_stat {
 
 struct vzctl_cpustatctl {
 	envid_t veid;
-	struct vz_cpu_stat *cpustat;
+	struct vz_cpu_stat __user *cpustat;
 };
 
 #define VZCTLTYPE '.'
@@ -232,7 +254,38 @@ struct vzctl_cpustatctl {
 					struct vzctl_env_create_data)
 #define VZCTL_VE_NETDEV		_IOW(VZCTLTYPE, 11,			\
 					struct vzctl_ve_netdev)
-#define VZCTL_VE_MEMINFO	_IOW(VZCTLTYPE, 13,			\
+#define VZCTL_VE_MEMINFO	_IOW(VZCTLTYPE, 13,                     \
 					struct vzctl_ve_meminfo)
+
+#ifdef __KERNEL__
+#include <linux/compat.h>
+#ifdef CONFIG_COMPAT
+struct compat_vzctl_ve_netdev {
+	envid_t veid;
+	int op;
+	compat_uptr_t dev_name;
+};
+
+struct compat_vzctl_ve_meminfo {
+	envid_t veid;
+	compat_ulong_t val;
+};
+
+struct compat_vzctl_env_create_data {
+	envid_t veid;
+	unsigned flags;
+	__u32 class_id;
+	compat_uptr_t data;
+	int datalen;
+};
+
+#define VZCTL_COMPAT_ENV_CREATE_DATA _IOW(VZCTLTYPE, 10,		\
+					struct compat_vzctl_env_create_data)
+#define VZCTL_COMPAT_VE_NETDEV	_IOW(VZCTLTYPE, 11,			\
+					struct compat_vzctl_ve_netdev)
+#define VZCTL_COMPAT_VE_MEMINFO	_IOW(VZCTLTYPE, 13,                     \
+					struct compat_vzctl_ve_meminfo)
+#endif
+#endif
 
 #endif

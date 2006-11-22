@@ -290,27 +290,15 @@ static int sysfs_required(vps_res *res)
 	return 0;
 }
 
-
-
-#ifdef VE_FEATURE_SYSFS
-/* Kernel understands new style env. create struct - with features etc. */
-#define KERNEL_HAVE_ENV_CREATE_PARAM2
-#endif
-
 static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
 	struct vzctl_env_create_data env_create_data;
-#ifdef KERNEL_HAVE_ENV_CREATE_PARAM2
-	struct env_create_param2 create_param;
-#else
-	struct env_create_param create_param;
-#endif
+	struct env_create_param3 create_param;
 	int fd, ret;
 	vps_res *res;
 	char *argv[] = {"init", "-z", "      ", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
-	int retry = 0;
 
 	res = (vps_res *) data;
 	memset(&create_param, 0, sizeof(create_param));
@@ -323,10 +311,17 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
 	env_create_data.data = &create_param;
 	env_create_data.datalen = sizeof(create_param);
-#ifdef VE_FEATURE_SYSFS
-	if (sysfs_required(res))
-		create_param.feature_mask = VE_FEATURE_SYSFS;
-#endif
+
+	create_param.feature_mask = res->env.features_mask;
+	create_param.known_features = res->env.features_known;
+	if (!(res->env.features_known & VE_FEATURE_SYSFS) &&
+			sysfs_required(res)) {
+		create_param.feature_mask |= VE_FEATURE_SYSFS;
+		create_param.known_features |= VE_FEATURE_SYSFS;
+	}
+	logger(3, 0, "Set features maks %016Lx/%016Lx",
+			create_param.feature_mask,
+			create_param.known_features);
 	/* Close all fds  except std */
 	close_fds(0, wait_p, err_p, h->vzfd, -1);
 try:
@@ -335,16 +330,20 @@ try:
 		switch(errno) {
 			case EINVAL:
 				ret = VZ_ENVCREATE_ERROR;
-#ifdef KERNEL_HAVE_ENV_CREATE_PARAM2
-				/* Run-time kernel did not understand
-				 * env_create_param2 -- so retry with
-				 * the old env_create_param struct.
+				/* Run-time kernel did not understand the
+				 * latest create_parem -- so retry with
+				 * the old env_create_param structs.
 				 */
-				env_create_data.datalen =
-					sizeof(struct env_create_param);
-				if (!retry++)
+				switch (env_create_data.datalen) {
+				case sizeof(struct env_create_param3):
+					env_create_data.datalen =
+						sizeof(struct env_create_param2);
 					goto try;
-#endif
+				case sizeof(struct env_create_param2):
+					env_create_data.datalen =
+						sizeof(struct env_create_param);
+					goto try;
+				}
 				break;
 			case EACCES:
 			/* License is not loaded */

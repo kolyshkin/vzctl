@@ -34,6 +34,16 @@
 typedef struct {
 	envid_t veid;
 	unsigned long ipt_mask;
+
+	/*
+	 * features_known is the set of features that are present
+	 * in config file. this make vzctl work with new kernel
+	 * that supports features vzctl still doesn't know yet.
+	 * features that kernel support and that are not present
+	 * in this mask kernel sets to default values.
+	 */
+	unsigned long long features_mask;
+        unsigned long long features_known;
 } env_param;
 
 typedef struct {

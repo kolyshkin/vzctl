@@ -78,8 +78,8 @@ void usage()
 "   [--veth_add dev_name,dev_addr,dev_name_ve,dev_addr_ve]\n"
 "   [--veth_del dev_name]\n"
 "   [--applyconfig <name>] [--applyconfig_map <name>]\n"
-"   [--name <vename>]\n");
- 
+"   [--features <name:on|off>] [--name <vename>]\n");
+
 	fprintf(stdout, "   [--iptables <name>] [--disabled <yes|no>]\n");
 	fprintf(stdout, "   [UBC parameters]\n"
 "UBC parameters (N - items, P - pages, B - bytes):\n"

@@ -40,6 +40,7 @@
 #include "res.h"
 #include "iptables.h"
 #include "meminfo.h"
+#include "vzfeatures.h"
 
 static int _page_size;
 static int check_name(char *name);
@@ -122,6 +123,7 @@ static vps_config config[] = {
 {"VEID",	NULL, PARAM_VEID},
 {"NAME",	NULL, PARAM_NAME},
 
+{"FEATURES",	NULL, PARAM_FEATURES},
 {NULL		,NULL, -1}
 };
 
@@ -198,6 +200,7 @@ static struct option set_opt[] = {
 {"veth_del",	required_argument, NULL, PARAM_VETH_DEL},
 /*	name	*/
 {"name",	required_argument, NULL, PARAM_NAME},
+{"features",	required_argument, NULL, PARAM_FEATURES},
 
 {NULL, 0, NULL, 0}
 };
@@ -355,6 +358,44 @@ int conf_store_yesno(list_head_t *conf, char *name, int val)
 	return 0;
 }
 
+/******************** Features *************************/
+static int parse_features(env_param *env, char *val)
+{
+	int ret;
+	char *token;
+	struct feature_s *feat;
+
+	if ((token = strtok(val, "\t ")) == NULL)
+		return 0;
+
+	ret = 0;
+	do {
+		feat = find_feature(token);
+		if (feat == NULL) {
+			logger(0, 0, "Warning: Unknown feature: %s", token);
+			ret = ERR_INVAL_SKIP;
+			continue;
+		}
+
+		if (feat->on)
+			env->features_mask |= feat->mask;
+		env->features_known |= feat->mask;
+	} while ((token = strtok(NULL, "\t ")) != NULL);
+	return ret;
+}
+
+static void store_features(unsigned long long mask, unsigned long long known,
+		vps_config *conf, list_head_t *conf_h)
+{
+	char buf[2 * STR_SIZE];
+	int r;
+
+	r = snprintf(buf, sizeof(buf) - 1, "%s=\"", conf->name);
+	features_mask2str(mask, known, buf + r, sizeof(buf) - r - 2);
+	strcat(buf, "\"");
+	add_str_param(conf_h, buf);
+}
+
 /******************** Iptables *************************/
 static int parse_iptables(env_param *env, char *val)
 {
@@ -399,6 +440,13 @@ static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		if (!env->ipt_mask)
 			break;
 		store_iptables(env->ipt_mask, conf, conf_h);
+		break;
+	case PARAM_FEATURES:
+		if (!env->features_known)
+			break;
+		store_features(env->features_mask,
+			old_p->res.env.features_known | env->features_known,
+			conf, conf_h);
 		break;
 	}
 	return 0;
@@ -1654,6 +1702,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			return ERR_INVAL;
 		vps_p->res.name.veid = int_id;
 		break;
+	case PARAM_FEATURES:
+		ret = parse_features(&vps_p->res.env, val);
+		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);
 		break;
@@ -2259,6 +2310,8 @@ static void merge_env(env_param *dst, env_param *src)
 {
 	MERGE_INT(veid);
 	MERGE_INT(ipt_mask);
+	MERGE_INT(features_mask);
+	MERGE_INT(features_known);
 }
 
 static void merge_cpt(cpt_param *dst, cpt_param *src)

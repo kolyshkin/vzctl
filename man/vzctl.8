@@ -371,6 +371,12 @@ You can use the following values for \fIcapname\fR:
 \fB--devnodes\fR \fIdevice\fR:\fBr|w|rw|none\fR
 Give access (\fBr\fR - read, \fBw\fR - write, \fBrw\fR - read write, \fBnone\fR - no access) to special file /dev/\fIdevice\fR from a VE.
 .TP
+.TP
+\fBFeatures management\fR
+.TP
+\fB--features\fR \fIname\fR:\fBon|off\fR
+Enable disable specific VE feature. Known features are: \fIsysfs\fR, \fInfs\fR.
+
 \fBApply config\fR
 .TP
 \fB--applyconfig\fR \fIname\fR

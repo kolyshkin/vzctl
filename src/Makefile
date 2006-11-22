@@ -54,7 +54,8 @@ OBJ_libvzctl = lib/env.lo lib/ub.lo lib/net.lo lib/logger.lo lib/exec.lo \
 	lib/script.lo lib/dev.lo lib/config.lo lib/lock.lo lib/quota.lo \
 	lib/modules.lo lib/iptables.lo lib/fs.lo lib/create.lo lib/readelf.lo \
 	lib/cpt.lo lib/destroy.lo lib/vps_configure.lo lib/meminfo.lo \
-	lib/veth.lo
+	lib/veth.lo lib/vzfeatures.lo
+
 OBJ_simfs=lib/fs_simfs.lo
 OBJ_vzctl = vzctl.o vzctl-actions.o modules.o enter.o
 OBJ_vzlist = vzlist.o
