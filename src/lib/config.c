@@ -444,7 +444,8 @@ static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	case PARAM_FEATURES:
 		if (!env->features_known)
 			break;
-		store_features(env->features_mask,
+		store_features((env->features_mask & env->features_known) |
+			(old_p->res.env.features_mask & ~env->features_known),
 			old_p->res.env.features_known | env->features_known,
 			conf, conf_h);
 		break;
