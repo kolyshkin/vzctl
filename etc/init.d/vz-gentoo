@@ -4,8 +4,7 @@
 # $Header: /var/www/viewcvs.gentoo.org/raw_cvs/gentoo-x86/sys-cluster/vzctl/files/vz-3.0.10.initd,v 1.2 2006/07/09 10:29:24 phreak Exp $
 
 depend() {
-	need net
-	before iptables
+	after net
 }
 
 check_config() {
