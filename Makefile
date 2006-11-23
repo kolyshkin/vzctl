@@ -31,7 +31,6 @@ all install %::
 
 install::
 	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
-	$(INSTALL) -d $(DESTDIR)/sbin
 	for file in $(SCRIPTS); do \
 		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
