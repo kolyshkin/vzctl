@@ -127,7 +127,6 @@ void init_modules(struct mod_action *action, const char *name)
 
 	dir = opendir(MOD_DIR);
 	if (!dir) {
-		logger(2, errno, "Unable to open " MOD_DIR);
 		return;
 	}
 	while ((ent = readdir(dir)) != NULL)  {
