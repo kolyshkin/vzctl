@@ -179,16 +179,16 @@ int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
-		snprintf(buf, sizeof(buf), "%svps.%s", VPS_CONF_DIR,
-			UMOUNT_PREFIX);
+		snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
+			veid, UMOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
 				logger(-1, 0, "Error executing umount script %s",
 					buf);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
-			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
-				veid, UMOUNT_PREFIX);
+			snprintf(buf, sizeof(buf), "%svps.%s", VPS_CONF_DIR,
+				UMOUNT_PREFIX);
 		}
 	}
 	if (!(ret = fsumount(veid, root)))
