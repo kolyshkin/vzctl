@@ -30,6 +30,11 @@ function init_veth()
 
 	/sbin/ifconfig ${dev} up
 }
+# Call the external script if defined
+if [ -n "${EXTERNAL_SCRIPT}" -a -x "${EXTERNAL_SCRIPT}" ]; then
+	export VEID
+	exec ${EXTERNAL_SCRIPT} $@
+fi
 
 if test $# -le 2; then
     usage
