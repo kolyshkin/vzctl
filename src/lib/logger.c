@@ -105,7 +105,7 @@ void free_log()
 
 void set_log_level(int level)
 {
-	 g_log.level = level;
+	g_log.level = level;
 }
 
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
