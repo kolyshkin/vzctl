@@ -57,14 +57,12 @@ static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
 	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
 	if (ret) {
 		if (errno == ENOTTY) {
-			logger(-1, 0, "Warning: veth feature is"
-				" not supported by kernel, skipped"
-				" veth configure");
-			ret = 0;
+			logger(-1, 0, "Error: veth feature is"
+				" not supported by kernel");
 		} else {
 			logger(-1, errno, "Unable to create veth");
-			ret = VZ_VETH_ERROR;
 		}
+		ret = VZ_VETH_ERROR;
 	}
 	return ret;
 }
