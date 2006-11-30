@@ -59,7 +59,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *param,
 				vps_p->g_param->res.ub.privvmpages : NULL; 
 		}
 		if (privvmpages == NULL) {
-			logger(-1, 0, "Warning: privvmpages is not set"
+			logger(0, 0, "Warning: privvmpages is not set"
 				" configure meminfo skipped");
 			return 0;
 		}
@@ -68,7 +68,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *param,
 			 ULONG_MAX : privvmpages[0] * param->val;
 		break;
 	default:
-		logger(-1, 0, "Warning: unrecognized mode"
+		logger(0, 0, "Warning: unrecognized mode"
 			" to set meminfo parameter");
 		return 0;
 	}
@@ -79,7 +79,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *param,
 	ret = ioctl(h->vzfd, VZCTL_VE_MEMINFO, &meminfo);
 	if (ret < 0) {
 		if (errno == ENOTTY) {
-			logger(-1, 0, "Warning: meminfo feature is not supported"
+			logger(0, 0, "Warning: meminfo feature is not supported"
 				" by kernel. skipped meminfo configure");
 		} else {
 			logger(-1, errno, "Unable to set meminfo");	

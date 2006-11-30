@@ -180,7 +180,7 @@ int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		return 0;
 	}
 	if (stat(root, &st)) {
-		logger(0, errno, "Unable to stat %s", root);
+		logger(-1, errno, "Unable to stat %s", root);
 		return -1;
 	}
 	memset(&dev, 0, sizeof(dev));

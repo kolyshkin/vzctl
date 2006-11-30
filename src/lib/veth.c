@@ -102,7 +102,7 @@ static int run_vznetcfg(envid_t veid, veth_dev *dev)
 	env[0] = buf;
 	env[1] = NULL;
 	if ((ret = run_script(VZNETCFG, argv, env, 0))) {
-		logger(0, 0, VZNETCFG " exited with error");
+		logger(-1, 0, VZNETCFG " exited with error");
 		ret = VZ_VETH_ERROR;
 	}
 	return ret;

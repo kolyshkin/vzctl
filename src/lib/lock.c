@@ -121,7 +121,7 @@ int vps_lock(envid_t veid, char *dir, char *status)
 				ret = 1;
 				break;
 			} else {
-				logger(-1, 0, "Removing stale lock"
+				logger(0, 0, "Removing stale lock"
 						" file %s", lockfile);
 				unlink(lockfile);
 			}
