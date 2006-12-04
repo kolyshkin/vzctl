@@ -111,8 +111,11 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	/* Setup quota limits after configure steps */
 	if ((ret = vps_set_quota(veid, &res->dq)))
 		return ret;
-	if ((ret = vps_setup_veth(h, veid, param)))
+	if ((ret = vps_setup_veth(h, veid, actions,  fs->root, &res->veth,
+			&param->del_res.veth, vps_state, skip)))
+	{
 		return ret;
+	}
 	ret = mod_setup(h, veid, vps_state, skip, action, param);
 
 	return ret;

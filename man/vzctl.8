@@ -97,17 +97,27 @@ you should do it at once, so use \fB--searchdomain\fR option multiple times
 in one call to \fBvzctl\fR, as all the search domain values set in previous
 calls to \fBvzctl\fR gets overwritten.
 .TP
-\fB--veth_add\fR \fIdev_name\fR,\fIdev_addr\fR,\fIdev_name_ve\fR,\fIdev_addr_ve\fR
-Adds virtual ethernet device to a given VE. Here \fIdev_name\fR is an Ethernet
-device name in host system, \fIdev_addr\fR is its MAC address,
-\fIdev_name_ve\fR is an Ethernet device name in VE, and
-\fIdev_addr_ve\fR is its MAC address. MAC addresses
-must be entered in XX:XX:XX:XX:XX:XX format. Note that this option is
-incremental, so devices are added to already existing ones.
+\fB--netif_add\fR \fIifname[\fR,\fImac\fR,\fIhost_ifname\fR,\fIhost_mac]\fR
+Adds virtual ethernet device to given VE. Where \fIifname\fR is ethernet
+device name in the VE, \fImac\fR its MAC address, \fIhost_ifname\fR is
+ethernet device name on the host and \fIhost_mac\fR its MAC address.
+MAC addresses has format like XX:XX:XX:XX:XX:XX. All parameters except
+\fIifname\fR are option and automatically generated if not specified.
+
+Per-interface configuration.
+.br
+To select the interface will be configured the \fB--ifname\fR \fIname\fR option used.
+.br
+\fB--mac\fR \fIXX:XX:XX:XX:XX:XX\fR - MAC address of interface inside VE,
+.br
+\fB--host_ifname\fR \finame\fR - interface name for virtual interface in VE0
+.br
+\fB--host_mac\fR \fIXX:XX:XX:XX:XX:XX\fR - MAC address of interface iin VE0
+.br
 .TP
-\fB--veth_del\fR \fIdev_name\fR
-Removes virtual ethernet device from a VE. Here \fIdev_name\fR is an Ethernet
-device name in the host system.
+\fB--netif_del\fR \fIdev_name|all\fR
+Removes virtual ethernet device from VE. If you want to remove all devices,
+use \fBall\fR.
 .TP
 \fBResource limits\fR
 The following options sets barrier and limit for various user beancounters.

@@ -505,6 +505,17 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	char *dist_name;
 
 	ret = 0;
+	
+	if (!list_empty(&cmd_p->res.veth.dev) ||
+	    !list_empty(&cmd_p->del_res.veth.dev))
+	{
+		ret = check_veth_param(veid, &vps_p->res.veth, &cmd_p->res.veth,
+			&cmd_p->del_res.veth);
+		if (ret) {
+			cmd_p->opt.save = NO;
+			return ret;
+		}
+	}
 
 	cmd_p->g_param = g_p;
 	if (cmd_p->opt.apply_cfg_map == APPCONF_MAP_NAME) {

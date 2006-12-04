@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <string.h>
+#include <time.h>
 
 #include <linux/vzcalluser.h>
 #include <linux/vzctl_veth.h>
@@ -34,8 +35,6 @@
 #include "env.h"
 #include "logger.h"
 #include "script.h"
-
-static void free_veth(list_head_t *head);
 
 static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
 {
@@ -143,12 +142,16 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 		op == ADD ? "Configure" : "Deleting", buf);
 	list_for_each(tmp, dev_h, list) {
 		if (op == ADD) {
-			if ((ret = veth_dev_create(h, veid, tmp)))
-				break;
+			if (!tmp->active) {
+				if ((ret = veth_dev_create(h, veid, tmp)))
+					break;
+			}
 			tmp->flags = 1;
 			if ((ret = run_vznetcfg(veid, tmp)))
 				break;
 		} else {
+			if (!tmp->active)
+				continue;
 			if ((ret = veth_dev_remove(h, veid, tmp))) 
 				break;
 		}
@@ -166,28 +169,63 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	return ret;
 }
 
-int vps_setup_veth(vps_handler *h, envid_t veid, vps_param *param)
+int parse_hwaddr(const char *str, char *addr)
 {
-	int ret;
+	int i;
+	char buf[3];
+	char *endptr;
 
-        if ((ret = veth_ctl(h, veid, DEL, &param->del_res.veth, 0)))
-                return ret;
-        if ((ret = veth_ctl(h, veid, ADD, &param->res.veth, 1)))
-                return ret;
+	for (i = 0; i < ETH_ALEN; i++) {
+		buf[0] = str[3*i];
+		buf[1] = str[3*i+1];
+		buf[2] = '\0';
+		addr[i] = strtol(buf, &endptr, 16);
+		if (*endptr != '\0')
+			return ERR_INVAL;
+	}
 	return 0;
 }
 
-int add_veth_param(veth_param *list, veth_dev *dev)
+void generate_mac(int veid, char *dev_name, char *mac)
+{
+	int len, i;
+	unsigned int hash, tmp;
+	char data[128];
+
+	snprintf(data, sizeof(data), "%s:%d:%ld ", dev_name, veid, time(NULL));
+	hash = veid;
+	len = strlen(data) - 1;
+	for (i = 0; i < len; i++) {
+		hash += data[i];
+		tmp = (data[i + 1] << 11) ^ hash;
+		hash = (hash << 16) ^ tmp;
+		hash += hash >> 11;
+	}
+	hash ^= hash << 3;
+	hash += hash >> 5;
+	hash ^= hash << 4;
+	hash += hash >> 17;
+	hash ^= hash << 25;
+	hash += hash >> 6;
+	mac[0] = (char) (SW_OUI >> 0xf);
+	mac[1] = (char) (SW_OUI >> 0x8);
+	mac[2] = (char) SW_OUI;
+	mac[3] = (char) hash;
+	mac[4] = (char) (hash >> 0x8);
+	mac[5] = (char) (hash >> 0xf);
+}
+
+int add_veth_param(veth_param *veth, veth_dev *dev)
 {
 	veth_dev *tmp;
 
-	if (list_is_init(&list->dev))
-		list_head_init(&list->dev);
+	if (list_is_init(&veth->dev))
+		list_head_init(&veth->dev);
 	tmp = malloc(sizeof(*tmp));
 	if (tmp == NULL)
 		return -1;
 	memcpy(tmp, dev, sizeof(*tmp));
-	list_add_tail(&tmp->list, &list->dev);
+	list_add_tail(&tmp->list, &veth->dev);
 
 	return 0;
 }
@@ -205,40 +243,20 @@ veth_dev *find_veth(list_head_t *head, veth_dev *dev)
 	return NULL;
 }
 
-int merge_veth_list(list_head_t *old, list_head_t *add, list_head_t *del,
-	veth_param *merged)
+void free_veth_dev(veth_dev *dev)
 {
-	veth_dev *dev;
-
-	list_for_each(dev, old, list) {
-		/* Skip old devices that was added or deleted */
-		if (find_veth(del, dev) != NULL ||
-			find_veth(add, dev) != NULL)
-		{
-			continue;
-		}
-		/* Add old devices */
-		if (add_veth_param(merged, dev))
-			return 1;
-	}
-	list_for_each(dev, add, list) {
-		/* Add new devices */
-		if (add_veth_param(merged, dev))
-			return 1;
-	}
-	return 0;
 }
 
-static void free_veth(list_head_t *head)
+void free_veth(list_head_t *head)
 {
-	veth_dev *cur;
+	veth_dev *tmp, *dev_t;
 
-	while (!list_empty(head)) {
-		list_for_each(cur, head, list) {
-			list_del(&cur->list);
-			free(cur);
-			break;
-		}
+	if (list_empty(head))
+		return;
+	list_for_each_safe(dev_t, tmp, head, list) {
+		free_veth_dev(dev_t);
+		list_del(&dev_t->list);
+		free(dev_t);
 	}
 	list_head_init(head);
 }
@@ -248,6 +266,118 @@ void free_veth_param(veth_param *dev)
 	free_veth(&dev->dev);
 }
 
+veth_dev *find_veth_by_ifname(list_head_t *head, char *name)
+{
+	veth_dev *dev_t;
+
+	if (list_empty(head))
+		return NULL;
+	list_for_each(dev_t, head, list) {
+		if (!strcmp(dev_t->dev_name, name))
+			return dev_t;
+	}
+	return NULL;
+}
+
+veth_dev *find_veth_by_ifname_ve(list_head_t *head, char *name)
+{
+	veth_dev *dev_t;
+
+	if (list_empty(head))
+		return NULL;
+	list_for_each(dev_t, head, list) {
+		if (!strcmp(dev_t->dev_name_ve, name))
+			return dev_t;
+	}
+	return NULL;
+}
+
+veth_dev *find_veth_configure(list_head_t *head)
+{
+	veth_dev *dev_t;
+
+	if (list_empty(head))
+		return NULL;
+	list_for_each(dev_t, head, list) {
+		if (dev_t->configure)
+			return dev_t;
+	}
+	return NULL;
+}
+
+void fill_veth_dev(veth_dev *dst, veth_dev *src)
+{
+	if (src->dev_name[0] != 0)
+		strcpy(dst->dev_name, src->dev_name);
+	if (src->addrlen != 0) {
+		memcpy(dst->dev_addr, src->dev_addr, sizeof(dst->dev_addr));
+		dst->addrlen = src->addrlen;
+	}
+	if (src->dev_name_ve[0] != 0)
+		strcpy(dst->dev_name_ve, src->dev_name_ve);
+	if (src->addrlen_ve != 0) {
+		memcpy(dst->dev_addr_ve, src->dev_addr_ve, sizeof(dst->dev_addr));
+		dst->addrlen_ve = src->addrlen_ve;
+	}
+}
+
+int merge_veth_dev(veth_dev *old, veth_dev *new, veth_dev *merged)
+{
+	memset(merged, 0, sizeof(veth_dev));
+
+	if (old != NULL)
+		fill_veth_dev(merged, old);
+	fill_veth_dev(merged, new);
+	return 0;
+}
+
+int merge_veth_list(list_head_t *old, list_head_t *add, list_head_t *del,
+	veth_param *merged)
+{
+	veth_dev *dev_t;
+	veth_dev dev;
+	list_head_t empty;
+
+	list_head_init(&empty);
+	if (old == NULL)
+		old = &empty;
+	if (list_is_init(old))
+		list_head_init(old);
+	if (add == NULL)
+		add = &empty;
+	if (list_is_init(add))
+		list_head_init(add);
+	if (del == NULL)
+		del = &empty;
+	if (list_is_init(del))
+		list_head_init(del);
+
+	list_for_each(dev_t, old, list) {
+		veth_dev *tmp;
+		/* Skip old devices that was deleted */
+		if (find_veth_by_ifname_ve(del, dev_t->dev_name_ve) != NULL)
+			continue;
+		tmp = find_veth_by_ifname_ve(add, dev_t->dev_name_ve);
+		if (tmp != NULL) {
+			merge_veth_dev(dev_t, tmp, &dev);
+			if (add_veth_param(merged, &dev))
+				return 1;
+			free_veth_dev(&dev);
+			continue;
+		}
+		/* Add old devices */
+		if (add_veth_param(merged, dev_t))
+			return 1;
+	}
+	list_for_each(dev_t, add, list) {
+		if (find_veth_by_ifname_ve(old, dev_t->dev_name_ve) == NULL) {
+			if (add_veth_param(merged, dev_t))
+				return 1;
+		}
+	}
+	return 0;
+}
+
 int copy_veth_param(veth_param *dst, veth_param *src)
 {
 	veth_dev *dev;
@@ -255,6 +385,150 @@ int copy_veth_param(veth_param *dst, veth_param *src)
 	list_for_each(dev, &src->dev, list) {
 		if (add_veth_param(dst, dev))
 			return 1;
+	}
+	return 0;
+}
+
+int read_proc_veth(envid_t veid, veth_param *veth)
+{
+	FILE *fp;
+	char buf[256];
+	char mac[MAC_SIZE + 1];
+	char mac_ve[MAC_SIZE + 1];
+	char dev_name[IFNAMSIZE + 1];
+	char dev_name_ve[IFNAMSIZE + 1];
+	int id;
+	veth_dev dev;
+
+	fp = fopen(PROC_VETH, "r");
+	if (fp == NULL)
+		return -1;
+	memset(&dev, 0, sizeof(dev));
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		if (sscanf(buf, "%17s %15s %17s %15s %d",
+			mac, dev_name, mac_ve, dev_name_ve, &id) != 5)
+		{
+			continue;
+		}
+		if (veid != id)
+			continue;
+		parse_hwaddr(mac, dev.dev_addr);
+		parse_hwaddr(mac_ve, dev.dev_addr_ve);
+		strncpy(dev.dev_name, dev_name, IFNAMSIZE);
+		dev.dev_name[IFNAMSIZE] = 0;
+		strncpy(dev.dev_name_ve, dev_name_ve, IFNAMSIZE);
+		dev.dev_name_ve[IFNAMSIZE] = 0;
+		dev.active = 1;
+		add_veth_param(veth, &dev);
+	}
+	fclose(fp);
+	return 0;
+}
+
+int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
+	char *root, veth_param *veth_add, veth_param *veth_del, int state,
+	int skip)
+{
+	int ret, dev_num;
+	veth_param veth_old;
+	veth_dev *dev_t, *dev;
+
+	if (list_empty(&veth_add->dev) &&
+		list_empty(&veth_del->dev) &&
+		veth_add->delall != YES)
+	{
+		return 0;
+	}
+	ret = 0;
+	memset(&veth_old, 0, sizeof(veth_old));
+	list_head_init(&veth_old.dev);
+	if (state != STATE_STARTING)
+		read_proc_veth(veid, &veth_old);
+	if (veth_add->delall == YES) {
+		veth_ctl(h, veid, DEL, &veth_old, 0);
+		if (!list_empty(&veth_old.dev))
+			free_veth_param(&veth_old);
+	} else if (!list_empty(&veth_del->dev)) {
+		dev_num = 0;
+		/* find host veth name by VE veth name */
+		list_for_each(dev_t, &veth_del->dev, list) {
+			dev = find_veth_by_ifname_ve(&veth_old.dev,
+				dev_t->dev_name_ve);
+			if (dev != NULL) {
+				dev_t->active = 1;
+				strcpy(dev_t->dev_name, dev->dev_name);
+				dev_num++;
+			} else {
+				logger(-1, 0, "VE does not have configured"
+					" veth: %s, skipped",
+					dev_t->dev_name_ve);
+			}
+		}
+		if (dev_num != 0) 
+			veth_ctl(h, veid, DEL, veth_del, 0);
+	}
+	if (veth_add != NULL) {
+		if (!list_empty(&veth_old.dev)) {
+			list_for_each(dev_t, &veth_add->dev, list) {
+				dev = find_veth_by_ifname_ve(&veth_old.dev,
+					dev_t->dev_name_ve);
+				if (dev != NULL)
+					dev_t->active = 1;
+			}
+		}
+        	ret = veth_ctl(h, veid, ADD, veth_add, 1);
+	}
+	if (!list_empty(&veth_old.dev))
+		free_veth_param(&veth_old);
+	return ret;
+}
+
+int check_veth_param(envid_t veid, veth_param *veth_old, veth_param *veth_new,
+	veth_param *veth_del)
+{
+	int merge;
+	veth_dev *dev_t, *dev;
+
+	/* merge data for --veth_del */
+	list_for_each(dev, &veth_del->dev, list) {
+		if (dev->dev_name[0] == 0)
+			continue;
+		dev_t = find_veth_by_ifname(&veth_old->dev, dev->dev_name);
+		if (dev_t != NULL)
+			fill_veth_dev(dev, dev_t);
+	}
+
+	dev_t = find_veth_configure(&veth_new->dev);
+	if (dev_t == NULL)
+		return 0;
+	if (dev_t->dev_name_ve[0] == 0) {
+		logger(-1, 0, "Invalid usage.  Option --ifname not specified");
+		return -1;
+	}
+	/* merge --netif_add & --ifname */
+	merge = 0;
+	list_for_each(dev, &veth_new->dev, list) {
+		if (dev != dev_t && 
+		    !strcmp(dev->dev_name_ve, dev_t->dev_name_ve))
+		{
+			fill_veth_dev(dev_t, dev);
+			dev_t->configure = 0;
+			list_del(&dev->list);
+			free_veth_dev(dev);
+			free(dev);
+			merge = 1;
+			break;
+		}
+	}
+	/* Is corresponding device configured for --ifname <iface> */
+	if (!merge &&
+	    (veth_old == NULL ||
+	    find_veth_by_ifname_ve(&veth_old->dev, dev_t->dev_name_ve) == NULL))
+	{
+		logger(-1, 0, "Invalid usage: veth device %s is"
+			" not configured, use --netif_add option first",
+			dev_t->dev_name_ve);
+		return -1;
 	}
 	return 0;
 }

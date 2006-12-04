@@ -75,8 +75,7 @@ void usage()
 "   [--noatime yes|no] [--capability <name>:on|off ...]\n"
 "   [--devices b|c:major:minor|all:r|w|rw]\n"
 "   [--devnodes device:r|w|rw|none]\n"
-"   [--veth_add dev_name,dev_addr,dev_name_ve,dev_addr_ve]\n"
-"   [--veth_del dev_name]\n"
+"   [--netif_add <ifname[,mac,host_ifname,host_mac]]>] [--netif_del <ifname>]\n"
 "   [--applyconfig <name>] [--applyconfig_map <name>]\n"
 "   [--features <name:on|off>] [--name <vename>]\n");
 

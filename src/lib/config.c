@@ -120,6 +120,7 @@ static vps_config config[] = {
 {"QUOTAUGIDLIMIT",NULL, PARAM_QUOTAUGIDLIMIT},
 {"MEMINFO",	NULL, PARAM_MEMINFO},
 {"VETH",	NULL, PARAM_VETH_ADD},
+{"NETIF",	NULL, PARAM_NETIF_ADD},
 {"VEID",	NULL, PARAM_VEID},
 {"NAME",	NULL, PARAM_NAME},
 
@@ -196,8 +197,17 @@ static struct option set_opt[] = {
 {"quotaugidlimit", required_argument, NULL, PARAM_QUOTAUGIDLIMIT},
 {"meminfo",	required_argument, NULL, PARAM_MEMINFO},
 /*	veth	*/
-{"veth_add",	required_argument, NULL, PARAM_VETH_ADD},
-{"veth_del",	required_argument, NULL, PARAM_VETH_DEL},
+{"veth_add",	required_argument, NULL, PARAM_VETH_ADD_CMD},
+{"veth_del",	required_argument, NULL, PARAM_VETH_DEL_CMD},
+/*	netif	*/
+{"netif_add",	required_argument, NULL, PARAM_NETIF_ADD_CMD},
+{"netif_del",	required_argument, NULL, PARAM_NETIF_DEL_CMD},
+
+{"mac",		required_argument, NULL, PARAM_NETIF_MAC},
+{"ifname",	required_argument, NULL, PARAM_NETIF_IFNAME},
+{"host_mac",	required_argument, NULL, PARAM_NETIF_HOST_MAC},
+{"host_ifname",	required_argument, NULL, PARAM_NETIF_HOST_IFNAME},
+
 /*	name	*/
 {"name",	required_argument, NULL, PARAM_NAME},
 {"features",	required_argument, NULL, PARAM_FEATURES},
@@ -1284,30 +1294,13 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
-static int parse_hwaddr(const char *str, char *addr)
-{
-	int i;
-	char buf[3];
-	char *endptr;
-
-	for (i = 0; i < ETH_ALEN; i++) {
-		buf[0] = str[3*i];
-		buf[1] = str[3*i+1];
-		buf[2] = '\0';
-		addr[i] = strtol(buf, &endptr, 16);
-		if (*endptr != '\0')
-			return ERR_INVAL;
-	}
-	return 0;
-}
-
+/******************** VETH *********************************/
 static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 {
 	char *ch, *tmp;
 	int len, err;
 
 	memset(dev, 0, sizeof(*dev));
-
 	if (!operation) {
 		/* Removing veth device */
 		/* Parsing veth device name in VE0 */
@@ -1385,14 +1378,163 @@ static int parse_veth(vps_param *vps_p, char *val, int operation)
 	return 0;
 }
 
-static int store_veth(vps_param *old_p, vps_param *vps_p, vps_config *conf,
-        list_head_t *conf_h)
+/********************* NETIF **********************************/
+void generate_veth_name(int veid, char *dev_name_ve,  char *dev_name, int len)
 {
-	char buf[STR_SIZE];
+	char *name;
+	int id = 0;
+
+	name = subst_VEID(veid, DEF_VETHNAME);
+	sscanf(dev_name_ve, "%*[^0-9]%d", &id);
+	snprintf(dev_name, len, "%s.%d", name, id);	
+	free(name);
+}
+
+static int add_netif_param(veth_param *veth, int opt, char *str)
+{
 	veth_dev *dev;
-	int r;
-	char *sp, *ep;
+	int len;
+
+	dev = NULL;
+	dev = find_veth_configure(&veth->dev);
+	if (dev == NULL) {
+		dev = calloc(1, sizeof(veth_dev));
+		dev->configure = 1;
+		list_add_tail(&dev->list, &veth->dev);
+	}
+	len = strlen(str);
+	switch (opt) {
+	case PARAM_NETIF_IFNAME:
+		if (dev->dev_name_ve[0] != 0) {
+			logger(-1, 0,"Multiple use of"
+				" --ifname option not allowed");
+			return ERR_INVAL;
+		}
+		if (len > IFNAMSIZE)
+			return ERR_INVAL;
+		strcpy(dev->dev_name_ve, str);	
+		break;
+	case PARAM_NETIF_MAC:
+		if (parse_hwaddr(str, dev->dev_addr_ve))
+			return ERR_INVAL;
+		dev->addrlen_ve = ETH_ALEN;
+		break;
+	case PARAM_NETIF_HOST_IFNAME:
+		if (len > IFNAMSIZE)
+			return ERR_INVAL;
+		strcpy(dev->dev_name, str);
+		break;
+	case PARAM_NETIF_HOST_MAC:
+		if (parse_hwaddr(str, dev->dev_addr))
+			return ERR_INVAL;
+		dev->addrlen = ETH_ALEN;
+		break;
+	}
+	return 0;
+}
+
+static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
+{
+	const char *p, *next, *ep;
+	int len, err;
+	char tmp[256];
+
+	memset(dev, 0, sizeof(*dev));
+	next = p = str;
+	ep = p + strlen(str);
+	do {
+		while (*next != '\0' && *next != ',') next++;
+		if (!strncmp("ifname=", p, 7)) {
+			p += 7;
+			len = next - p;
+			if (len > IFNAMSIZE)
+				return ERR_INVAL;
+			if (dev->dev_name_ve[0] == '\0') 
+				strncpy(dev->dev_name_ve, p, len);
+		} else if (!strncmp("host_ifname=", p, 12)) {
+			p += 12;
+			len = next - p;
+			if (len > IFNAMSIZE)
+				return ERR_INVAL;
+			if (dev->dev_name[0] == '\0')
+				strncpy(dev->dev_name, p, len);
+		} else if (!strncmp("mac=", p, 4)) {
+			p += 4;
+			len = next - p;
+			if (len >= sizeof(tmp))
+				return ERR_INVAL;
+			strncpy(tmp, p, len);
+			tmp[len] = 0;
+			err = parse_hwaddr(tmp, dev->dev_addr_ve);
+			if (err)
+				return err;
+			dev->addrlen_ve = ETH_ALEN;
+		} else if (!strncmp("host_mac=", p, 9)) {
+			p += 9;
+			len = next - p;
+			if (len >= sizeof(tmp))
+				return ERR_INVAL;
+			strncpy(tmp, p, len);
+			tmp[len] = 0;
+			err = parse_hwaddr(tmp, dev->dev_addr);
+			if (err)
+				return err;
+			dev->addrlen = ETH_ALEN;
+		}
+		p = ++next;
+	} while (p < ep);
+	if (dev->dev_name_ve[0] == 0)
+		return ERR_INVAL;
+	if (dev->dev_name[0] == 0)
+		generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
+			sizeof(dev->dev_name));
+	if (dev->addrlen_ve == 0) {
+		generate_mac(veid, dev->dev_name, dev->dev_addr_ve);
+		dev->addrlen_ve = ETH_ALEN;
+	}
+	if (dev->addrlen == 0) {
+		memcpy(dev->dev_addr, dev->dev_addr_ve, sizeof(dev->dev_addr));
+		dev->addrlen = ETH_ALEN;
+	}
+	return 0;
+}
+
+
+static int parse_netif(envid_t veid, veth_param *veth, char *val)
+{
+	int ret;
+	char *token;
+	veth_dev dev;
+
+	if ((token = strtok(val, ";")) == NULL)
+		return 0;
+	do {
+		if (parse_netif_str(veid, token, &dev)) {
+			free_veth_dev(&dev);
+			continue;
+		}
+		if (find_veth_by_ifname_ve(&veth->dev,
+				dev.dev_name_ve) == NULL)
+		{
+			ret = add_veth_param(veth, &dev);
+		}
+		free_veth_dev(&dev);
+
+	} while ((token = strtok(NULL, ";")));
+
+	return 0;
+}
+
+static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+	list_head_t *conf_h)
+{
+	char buf[STR_SIZE * 10];
+	veth_dev *dev;
+	char *sp, *ep, *prev;
 	veth_param merged;
+	veth_param *veth_add = &vps_p->res.veth;
+	veth_param *veth_del = &vps_p->del_res.veth;
+
 
 #define STR2MAC(dev)			\
 	((unsigned char *)dev)[0],	\
@@ -1401,38 +1543,174 @@ static int store_veth(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	((unsigned char *)dev)[3],	\
 	((unsigned char *)dev)[4],	\
 	((unsigned char *)dev)[5]
-
-	if (conf->id != PARAM_VETH_ADD)
+	if (conf->id != PARAM_NETIF_ADD)
 		return 0;
-	if (list_empty(&vps_p->res.veth.dev) &&
-		list_empty(&vps_p->del_res.veth.dev))
+	if (list_empty(&veth_add->dev) && list_empty(&veth_del->dev) &&
+		!veth_add->delall)
 	{
 		return 0;
 	}
+	memset(&merged, 0, sizeof(merged));
 	list_head_init(&merged.dev);
-	if (merge_veth_list(&old_p->res.veth.dev, &vps_p->res.veth.dev,
-		&vps_p->del_res.veth.dev, &merged))
-	{
-		return ERR_NOMEM;
+	if (old_p != NULL) {
+		if (merge_veth_list(veth_add->delall == YES ? NULL :
+							&old_p->res.veth.dev,
+				&veth_add->dev, &veth_del->dev, &merged))
+		{
+			return 0;
+		}
+	} else {
+		copy_veth_param(&merged, veth_add);
 	}
+	*buf = 0;
 	sp = buf;
-	ep = buf + sizeof(buf) - 1;
+	ep = buf + sizeof(buf) - 2;
 	sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
+	prev = sp;
 	list_for_each(dev, &merged.dev, list) {
-		r = snprintf(sp, ep - sp,
-			"%s,%02X:%02X:%02X:%02X:%02X:%02X,"
-			"%s,%02X:%02X:%02X:%02X:%02X:%02X ",
-			dev->dev_name, STR2MAC(dev->dev_addr),
-			dev->dev_name_ve, STR2MAC(dev->dev_addr_ve));
-		sp += r;
-		if ((r < 0) || (sp >= ep))
+		if (prev != sp)
+			*(sp-1) = ';';
+		prev = sp;
+		if (dev->dev_name_ve[0] != 0) {
+			sp += snprintf(sp, ep - sp, "ifname=%s,",
+				dev->dev_name_ve);
+			if (sp >= ep)
+				break;
+		}
+		if (dev->addrlen_ve != 0) {
+			sp += snprintf(sp, ep - sp,
+				"mac=%02X:%02X:%02X:%02X:%02X:%02X,",
+				STR2MAC(dev->dev_addr_ve));
+			if (sp >= ep)
+				break;
+		}
+		if (dev->dev_name[0] != 0) {
+			sp += snprintf(sp, ep - sp, "host_ifname=%s,",
+				dev->dev_name);
+			if (sp >= ep)
+				break;
+		}
+		if (dev->addrlen != 0) {
+			sp += snprintf(sp, ep - sp,
+				"host_mac=%02X:%02X:%02X:%02X:%02X:%02X,",
+				STR2MAC(dev->dev_addr));
+			if (sp >= ep)
+				break;
+		}
+		if (prev != sp)
+			*(sp-1) = 0;
+		if (sp >= ep)
 			break;
 	}
+	free_veth_param(&merged);
 	strcat(buf, "\"");
 	add_str_param(conf_h, buf);
-	free_veth_param(&merged);
 	return 0;
 #undef STR2MAC
+}
+
+static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
+{
+	const char *ch, *tmp, *ep;
+	int len, err;
+
+	memset(dev, 0, sizeof(*dev));
+	ep = str + strlen(str);
+	/* Creating veth device */
+	/* Parsing veth device name in VE */
+	if ((ch = strchr(str, ',')) == NULL) {
+		ch = ep;
+		len = ep - str;
+	} else {
+		len = ch - str;
+		ch++;
+	}
+	if (len > IFNAMSIZE)
+		return ERR_INVAL;
+	snprintf(dev->dev_name_ve, len + 1, "%s", str);
+	tmp = ch;
+	if (ch == ep) {
+		generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
+			sizeof(dev->dev_name));
+		generate_mac(veid, dev->dev_name, dev->dev_addr);
+		dev->addrlen_ve = ETH_ALEN;
+		generate_mac(veid, dev->dev_name_ve, dev->dev_addr_ve);
+		dev->addrlen = ETH_ALEN;
+		return 0;
+	}
+	/* Parsing veth MAC address in VE */
+	if ((ch = strchr(tmp, ',')) == NULL) {
+		ch = ep;
+		len = ch - tmp;
+	} else {
+		len = ch - tmp;
+		ch++;
+	}
+	if (len != MAC_SIZE) {
+		logger(-1, 0, "Invalid VE MAC address length");
+		return ERR_INVAL;
+	}
+	err = parse_hwaddr(tmp, dev->dev_addr_ve);
+	if (err) {
+		logger(-1, 0, "Invalid VE MAC address format");
+		return ERR_INVAL;
+	}
+	dev->addrlen = ETH_ALEN;
+	tmp = ch;
+	if (ch == ep) {
+		generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
+			sizeof(dev->dev_name));
+		memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
+		dev->addrlen = ETH_ALEN;
+		return 0;
+	}
+	/* Parsing veth name in VE0 */
+	if ((ch = strchr(tmp, ',')) == NULL) {
+		ch = ep;
+		len = ch - tmp;
+	} else {
+		len = ch - tmp;
+		ch++;
+	}
+	if (len > IFNAMSIZE)
+		return ERR_INVAL;
+	snprintf(dev->dev_name, len + 1, "%s", tmp);
+	if (ch == ep) {
+		memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
+		dev->addrlen = ETH_ALEN;
+		return 0;	
+	}
+	/* Parsing veth MAC address in VE */
+	len = strlen(ch);
+	if (len != MAC_SIZE) {
+		logger(-1, 0, "Invalid host MAC address");
+		return ERR_INVAL;
+	}
+	err = parse_hwaddr(ch, dev->dev_addr);
+	if (err) {
+		logger(-1, 0, "Invalid host MAC address");
+		return ERR_INVAL;
+	}
+	dev->addrlen_ve = ETH_ALEN;
+	return 0;
+}
+
+static int parse_netif_cmd(envid_t veid, veth_param *veth, char *val)
+{
+	int ret;
+	char *token;
+	veth_dev dev;
+
+	if ((token = strtok(val, " ")) == NULL)
+		return 0;
+	do {
+		if (parse_netif_str_cmd(veid, token, &dev))
+			return ERR_INVAL;
+		ret = add_veth_param(veth, &dev);
+
+	} while ((token = strtok(NULL, " ")));
+
+	return 0;
 }
 
 static int store_name(vps_param *old_p, vps_param *vps_p, vps_config *conf,
@@ -1686,10 +1964,57 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
 		break;
 	case PARAM_VETH_ADD:
+		if (!list_empty(&vps_p->res.veth.dev))
+			break;
+		ret = parse_veth(vps_p, val, 1);
+		vps_p->res.veth.version = 1;
+		break;
+	case PARAM_VETH_ADD_CMD:
+		logger(0, 0, "Warning: --veth_add option is outdated use"
+			" --netif_add instead");
 		ret = parse_veth(vps_p, val, 1);
 		break;
-	case PARAM_VETH_DEL:
+	case PARAM_VETH_DEL_CMD:
+		logger(0, 0, "Warning: --veth_del option is outdated use"
+			" --netif_del instead");
 		ret = parse_veth(vps_p, val, 0);
+		break;
+	case PARAM_NETIF_ADD:
+		/* Skip VETH parameter if NETIF exists */
+		if (vps_p->res.veth.version)
+			free_veth_param(&vps_p->res.veth);
+		if (!list_empty(&vps_p->res.veth.dev))
+			break;
+		ret = parse_netif(veid, &vps_p->res.veth, val);
+		vps_p->res.veth.version = 0;
+		break;
+	case PARAM_NETIF_ADD_CMD:
+		ret = parse_netif_cmd(veid, &vps_p->res.veth, val);
+		break;
+	case PARAM_NETIF_DEL_CMD: {
+		veth_dev dev;
+
+		memset(&dev, 0, sizeof(dev));
+		if (strlen(val) > IFNAMSIZE) {
+			ret = ERR_INVAL;
+			break;
+		}
+		if (!strcmp(val, "all")) {
+			vps_p->res.veth.delall = YES;
+			break;
+		}
+		if (find_veth_by_ifname_ve(&vps_p->del_res.veth.dev, val) != NULL)
+			break;
+		strcpy(dev.dev_name_ve, val);
+		add_veth_param(&vps_p->del_res.veth, &dev);
+	
+		break;
+	}
+	case PARAM_NETIF_IFNAME:
+	case PARAM_NETIF_MAC:
+	case PARAM_NETIF_HOST_IFNAME:
+	case PARAM_NETIF_HOST_MAC:
+		ret = add_netif_param(&vps_p->res.veth, id, val);
 		break;
 	case PARAM_NAME:
 		if (vps_p->res.name.name != NULL)
@@ -1731,7 +2056,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_misc(old_p, vps_p, conf, conf_h);
 		store_cpu(old_p, vps_p, conf, conf_h);
 		store_meminfo(old_p, vps_p, conf, conf_h);
-		store_veth(old_p, vps_p, conf, conf_h);
+		store_netif(old_p, vps_p, conf, conf_h);
 		store_name(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
