@@ -298,23 +298,19 @@ static int remove_ipv6_addr(net_param *net)
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	dist_actions *actions, char *root, int state, int skip)
 {
-	list_head_t *ip_h = &net->ip;
 	int ret = 0;
 
-	if (list_empty(ip_h) &&	!net->delall) {
-		/* make initial network setup on VE start*/
-		if (state == STATE_STARTING && op == ADD)
-			goto configure;
+	if (list_empty(&net->ip) && !net->delall)
 		return 0;
-	}
 	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to apply network parameters: "
 			"VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	if (net->ipv6_net != YES)
+	if (net->ipv6_net != YES) {
 		if (remove_ipv6_addr(net))
 			logger(0, 0, "Warning: ipv6 support disabled");
+	}
 	if (op == ADD) {
 		if (net->delall == YES)
 			ret = vps_set_ip(h, veid, net, state);
@@ -323,7 +319,6 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	} else if (op == DEL) {
 		ret = vps_del_ip(h, veid, net, state);
 	}
-configure:
 	if (!ret && !(skip & SKIP_CONFIGURE))
 		vps_ip_configure(h, veid, actions, root, op, net, state);
 	return ret;

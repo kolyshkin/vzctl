@@ -39,10 +39,9 @@ function del_ip()
 	[ -d ${IFCFG_DIR} ] || return 0
 	cd ${IFCFG_DIR} || return 0
 	if [ "x${IPDELALL}" = "xyes" ]; then
-		ifdown ${VENET_DEV}
-		rm -rf ${VENET_DEV_CFG}:* >/dev/null 2>&1
+		ifdown ${VENET_DEV} >/dev/null 2>&1
+		rm -f ${VENET_DEV_CFG} ${VENET_DEV_CFG}:* 2>/dev/null
 		del_param ${IFCFG} IPV6ADDR_SECONDARIES ""
-		ifup ${VENET_DEV}
 		return 0;
 	fi
 	for ip in ${IP_ADDR}; do
@@ -58,7 +57,7 @@ function del_ip()
 			rm -f "${file}"
 			aliasid=`echo ${file} | sed s/.*://g`
 			if [ -n "${aliasid}" ]; then
-				ifconfig  ${VENET_DEV}:${aliasid} down >/dev/null 2>&1
+				ifconfig ${VENET_DEV}:${aliasid} down >/dev/null 2>&1
 			fi
 		done
 	done

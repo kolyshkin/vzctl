@@ -39,6 +39,7 @@ IFCFG_DIR=/etc/sysconfig/network-scripts
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
 NETFILE=/etc/sysconfig/network
 HOSTFILE=/etc/hosts
+ROUTE=${IFCFG_DIR}/route-${VENET_DEV}
 NETWORKRESTART=
 
 function fix_ifup()
@@ -59,8 +60,6 @@ function fix_ifup()
 
 function setup_network()
 {
-	local routefile=/etc/sysconfig/network-scripts/route-${VENET_DEV}
-
 	# Set up venet0 main interface as 127.0.0.1
 	mkdir -p ${IFCFG_DIR}
 	echo "DEVICE=${VENET_DEV}
@@ -77,9 +76,9 @@ IPV6ADDR=::1/128" >> $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK
 		put_param ${NETFILE} NETWORKING_IPV6 yes
 		put_param ${NETFILE} IPV6_DEFAULTDEV ${VENET_DEV}
 	fi
-	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${routefile} 2>/dev/null; then
+	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${ROUTE} 2>/dev/null; then
 		echo "${FAKEGATEWAYNET}/24 dev ${VENET_DEV} scope host
-default via ${FAKEGATEWAY}" >> ${routefile} || error "Can't create ${routefile}" ${VZ_FS_NO_DISK_SPACE}
+default via ${FAKEGATEWAY}" >> ${ROUTE} || error "Can't create ${ROUTE}" ${VZ_FS_NO_DISK_SPACE}
 	fi
 	# Set /etc/sysconfig/network
 	put_param $NETFILE NETWORKING yes
@@ -171,12 +170,16 @@ function add_ip()
 {
 	local ip
 	local new_ips 
+	local if_restart=
 
 	# In case we are starting VE
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		# Remove all VENET config files
-		rm -f ${IFCFG_DIR}/${VENET_DEV_CFG}:* >/dev/null 2>&1
+		rm -f ${IFCFG} ${IFCFG}:* >/dev/null 2>&1
+	fi
+	if [ ! -f "${IFCFG}" ]; then
 		setup_network
+		if_restart=1
 	fi
 	backup_configs ${IPDELALL}
 	new_ips="${IP_ADDR}"
@@ -208,6 +211,8 @@ function add_ip()
 		# synchronyze config files & interfaces
 		if [ "${NETWORKRESTART}" = "yes" ]; then 
 			/etc/init.d/network restart
+		elif [ -n "${if_restart}" ]; then
+			ifup ${VENET_DEV}
 		else
 			cd /etc/sysconfig/network-scripts && \
 				./ifup-aliases ${VENET_DEV}

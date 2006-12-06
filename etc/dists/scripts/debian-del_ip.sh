@@ -35,13 +35,11 @@ function del_ip()
 	local ip
 
 	for ip in ${IP_ADDR}; do
-		ifname=`grep -B 1 -e "\\<${ip}\\>" ${CFGFILE} | \
+		ifname=`grep -B 1 -w "${ip}" ${CFGFILE} | \
 			grep "${VENET_DEV}:" | cut -d' ' -f2`
 		if [ -n "${ifname}" ]; then
-			ifdown ${ifname}
-			echo "/\\<${ip}\\>
--2,+2d
-wq" | ed ${CFGFILE} >/dev/null 2>&1 
+			ifdown "${ifname}" 2>/dev/null
+			remove_debian_interface "${ifname}" ${CFGFILE}
 		fi
 	done
 }

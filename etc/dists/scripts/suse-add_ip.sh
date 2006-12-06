@@ -54,13 +54,13 @@ NETMASK=255.255.255.255
 IPADDR=127.0.0.1" > ${IFCFG} || \
 	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
 
-	if ! grep -q -E "${FAKEGATEWAYNET}[[:space:]]0.0.0.0[[:space:]]255.255.255.0[[:space:]]${VENET_DEV}" ${ROUTES};
+	if ! grep -q -E "${FAKEGATEWAYNET}[[:space:]]0.0.0.0[[:space:]]255.255.255.0[[:space:]]${VENET_DEV}" ${ROUTES} 2>/dev/null;
 	then
-		echo "${FAKEGATEWAYNET} 0.0.0.0 255.255.255.0   ${VENET_DEV}" >> ${ROUTES}
+		echo "${FAKEGATEWAYNET}	0.0.0.0 255.255.255.0	${VENET_DEV}" >> ${ROUTES}
 	fi
-	if ! grep -q -E "default[[:space:]]${FAKEGATEWAY}[[:space:]]0.0.0.0[[:space:]]${VENET_DEV}" ${ROUTES};
+	if ! grep -q -E "default[[:space:]]${FAKEGATEWAY}[[:space:]]0.0.0.0[[:space:]]${VENET_DEV}" ${ROUTES} 2>/dev/null;
 	then
-		echo "default ${FAKEGATEWAY}    0.0.0.0 ${VENET_DEV}" >> ${ROUTES}
+		echo "default ${FAKEGATEWAY}	0.0.0.0	${VENET_DEV}" >> ${ROUTES}
 	fi
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
@@ -84,6 +84,9 @@ function add_ip()
 	local ifnum=-1
 
 	if [ "x${IPDELALL}" = "xyes" -o "x${VE_STATE}" = "xstarting" ]; then
+		rm -f ${IFCFG} 2>/dev/null
+	fi
+	if [ ! -f "${IFCFG}" ]; then
 		init
 	fi
 	get_aliases

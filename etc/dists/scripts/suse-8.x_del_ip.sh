@@ -38,8 +38,7 @@ function del_ip()
 	cd ${IFCFG_DIR} || return 0
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		ifdown ${VENET_DEV}
-		rm -rf ${VENET_DEV_CFG}:* >/dev/null 2>&1
-		ifup ${VENET_DEV}
+		rm -f ${VENET_DEV_CFG} ${VENET_DEV_CFG}:* >/dev/null 2>&1
 		return 0;
 	fi
 	for ip in ${IP_ADDR}; do

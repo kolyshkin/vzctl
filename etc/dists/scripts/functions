@@ -263,3 +263,21 @@ function del_param3() {
 	fi
 }
 
+function remove_debian_interface()
+{
+	local dev="$1"
+	local cfg="$2"
+	
+	${CP} ${cfg} ${cfg}.$$ || \
+		error "Can't copy file ${cfg}" $VZ_FS_NO_DISK_SPACE
+
+	awk '
+		NF == 0 {next}
+		$1 == "auto" && $2 ~/'${dev}'$/ {next}
+		$1 == "iface" && $2 ~/'${dev}'$/ {skip = 1; next}
+		/^\t/ && skip {next}
+		{skip = 0; print}
+	' < ${cfg} > ${cfg}.$$ && mv -f ${cfg}.$$ ${cfg}
+
+	rm -f ${cfg}.$$ 2>/dev/null
+}

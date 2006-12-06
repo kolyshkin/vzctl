@@ -121,12 +121,16 @@ function add_ip()
 {
 	local ip
 	local new_ips 
+	local if_restart=
 
 	# In case we are starting VE
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		# Remove all VENET config files
-		rm -f ${IFCFG_DIR}/${VENET_DEV_CFG}:* >/dev/null 2>&1
+		rm -f ${IFCFG} ${IFCFG}:* >/dev/null 2>&1
+	fi
+	if [ ! -f "${IFCFG}" ]; then
 		setup_network
+		if_restart=1
 	fi
 	backup_configs ${IPDELALL}
 	new_ips="${IP_ADDR}"
@@ -148,10 +152,8 @@ function add_ip()
 	done
 	move_configs
 	if [ "x${VE_STATE}" = "xrunning" ]; then
-		if [ -n "${IPDELALL}" ]; then
-			ifdown ${VENET_DEV} >/dev/null 2>&1
-		fi 
-		ifup ${VENET_DEV} -o doalias >/dev/null 2>&1
+		ifdown ${VENET_DEV} >/dev/null 2>&1
+		ifup ${VENET_DEV} >/dev/null 2>&1
 	fi
 }
 

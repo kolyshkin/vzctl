@@ -73,18 +73,6 @@ iface ${VENET_DEV}:${ifnum} inet static
 	broadcast 0.0.0.0" >> ${CFGFILE}.bak
 }
 
-function remove_interface()
-{
-	local iface=$1
-
-	echo -e "/auto ${iface}\\>
-d
-wq" | ed ${CFGFILE}.bak >/dev/null 2>&1
-	echo -e "/iface ${iface}\\>
-.,+3d
-wq" | ed ${CFGFILE}.bak >/dev/null 2>&1
-} 
-
 function get_all_aliasid()
 {
 	IFNUM=-1
@@ -111,11 +99,15 @@ function add_ip()
 	local add
 	local iface
 
-	if [ "x${VE_STATE}" = "xstarting" -o  "${IPDELALL}" = "yes" ]; then
-		if [ "${IPDELALL}" = "yes" ]; then
-			ifdown -a --force >/dev/null 2>&1
-		fi
+	if [ "x${VE_STATE}" = "xstarting" ]; then
+		rm -f "${CFGFILE}" 2>/dev/null
+	fi
+	if ! grep -qe "auto ${VENET_DEV}$" ${CFGFILE} 2>/dev/null; then
 		setup_network
+	fi
+	if [ "${IPDELALL}" = "yes" ]; then
+		ifdown ${VENET_DEV} >/dev/null 2>&1
+		remove_debian_interface "${VENET_DEV}:[0-9]*" ${CFGFILE}
 	fi
 	cp -f ${CFGFILE} ${CFGFILE}.bak
 	for ip in ${IP_ADDR}; do

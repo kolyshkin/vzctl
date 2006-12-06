@@ -33,14 +33,20 @@ function del_ip()
 {
 	local ip ids id
 
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		ifdown ${VENET_DEV} 2>/dev/null
+		rm -f ${IFCFG} 2>/dev/null
+		return
+	fi
 	for ip in ${IP_ADDR}; do
-		ids=`grep -E "^IPADDR_.*=${ip}$" ${IFCFG_DIR}ifcfg-venet0 | sed 's/^IPADDR_\(.*\)=.*/\1/'`
+		ids=`grep -E "^IPADDR_.*=${ip}$" ${IFCFG} 2>/dev/null | \
+			sed 's/^IPADDR_\(.*\)=.*/\1/'`
 		for id in ${ids}; do
 			sed -e "/^IPADDR_${id}=/{
 				N
 				/$/d
 }" < ${IFCFG} > ${IFCFG}.bak && mv -f ${IFCFG}.bak ${IFCFG}
-			ifconfig  ${VENET_DEV}:${id} down 2>/dev/null
+			ifconfig ${VENET_DEV}:${id} down 2>/dev/null
 		done
 	done
 }
