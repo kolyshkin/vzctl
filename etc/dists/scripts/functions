@@ -19,7 +19,7 @@
 
 # Set the sane umask
 umask 022
-CP='/bin/cp -f --preserve=mode,ownership'
+CP='/bin/cp -fp'
 
 # Error codes
 VZ_INVALID_PARAMETER_SYNTAX=20

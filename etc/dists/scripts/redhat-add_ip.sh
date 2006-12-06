@@ -27,7 +27,6 @@
 #                     starting | stopping | running | stopped
 #   IPDELALL	  - delete all old interfaces
 #
-CP='/bin/cp -f --preserve=mode,ownership'
 
 VENET_DEV=venet0
 VENET_DEV_CFG=ifcfg-$VENET_DEV
@@ -41,6 +40,9 @@ NETFILE=/etc/sysconfig/network
 HOSTFILE=/etc/hosts
 ROUTE=${IFCFG_DIR}/route-${VENET_DEV}
 NETWORKRESTART=
+
+# overwrite copy argumets for workaround for FC5 bug #190601. (ovz bug #297)
+[ -f /etc/fedora-release ] && CP='/bin/cp -f --preserve=mode,ownership'
 
 function fix_ifup()
 {
