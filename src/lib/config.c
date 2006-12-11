@@ -53,6 +53,7 @@ static vps_config config[] = {
 {"LOGGING",	NULL, PARAM_LOGGING},
 {"LOG_LEVEL",	NULL, PARAM_LOGLEVEL},
 {"LOGFILE",	NULL, PARAM_LOGFILE},
+{"VERBOSE",	NULL, PARAM_VERBOSE},
 
 {"IPTABLES",	NULL, PARAM_IPTABLES},
 /*	UB	*/
@@ -1806,6 +1807,16 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			break;
 		vps_p->log.level = int_id;
 		break;
+	case PARAM_VERBOSE:
+		if (vps_p->log.verbose != NULL)
+			break;
+		if (parse_int(val, &int_id))
+			break;
+		vps_p->log.verbose = malloc(sizeof(*vps_p->log.verbose));
+		if (vps_p->log.verbose == NULL)
+			return VZ_RESOURCE_ERROR;
+		*vps_p->log.verbose = int_id;
+		break;
 	case PARAM_IPTABLES:
 		ret = parse_iptables(&vps_p->res.env, val);
 		break;
@@ -2414,6 +2425,7 @@ static void free_opt(vps_opt *opt)
 static void free_log_s(struct log_s *log)
 {
 	FREE_P(log->log_file)
+	FREE_P(log->verbose)
 }
 
 static void free_fs(fs_param *fs)

@@ -102,9 +102,10 @@ typedef struct {
 } vps_opt;
 
 struct log_s {
-        char *log_file;
-        int level;
-        int enable;
+	char *log_file;
+	int level;
+	int enable;
+	int *verbose;
 };
 
 struct vps_param {

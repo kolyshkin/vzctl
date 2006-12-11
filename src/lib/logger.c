@@ -53,7 +53,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 	else
 		out = stdout;
 	va_start(ap, format);
-	if (!g_log.quiet && g_log.level >= log_level) {
+	if (!g_log.quiet && g_log.verbose >= log_level) {
 		va_list ap_save;
 		
 		va_copy(ap_save, ap);
@@ -108,6 +108,11 @@ void set_log_level(int level)
 	g_log.level = level;
 }
 
+void set_log_verbose(int level)
+{
+	g_log.verbose = level;
+}
+
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 	char *progname)
 {
@@ -118,6 +123,7 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 		return ret;
 	g_log.enable = enable;
 	set_log_level(level);
+	set_log_verbose(level);
 	g_log.veid = veid;
 	g_log.quiet = quiet;
 	if (progname != NULL)

@@ -102,13 +102,15 @@ int main(int argc, char *argv[], char *envp[])
 {
 	int action = 0;
 	int verbose = 0;
+	int verbose_tmp;
+	int verbose_custom = 0;
 	int quiet = 0;
 	int veid, ret, skiplock = 0;
 	char buf[256];
 	vps_param *gparam = NULL, *vps_p = NULL, *cmd_p = NULL;
 	const char *action_nm;
 	struct sigaction act;
-	char *name = NULL;
+	char *name = NULL, *opt;
 
 	_proc_title = argv[0];
 	_proc_title_len = envp[0] - argv[0];
@@ -123,14 +125,32 @@ int main(int argc, char *argv[], char *envp[])
 	sigaction(SIGPIPE, &act, NULL);
 
 	while (argc > 1) {
-		if (!strcmp(argv[1], "--verbose")) {
-			verbose = 2;
-		} else if (!strcmp(argv[1], "--quiet"))
+		opt = argv[1];
+
+		if (!strcmp(opt, "--verbose")) {
+			if (argc > 2 &&
+			    !parse_int(argv[2], &verbose_tmp))
+			{
+				verbose += verbose_tmp;
+				argc--; argv++;
+			} else {
+				verbose++;
+			}
+			verbose_custom = 1;
+		} else if (!strncmp(opt, "--verbose=", 10)) {
+			if (parse_int(opt + 10, &verbose_tmp)) {
+				fprintf(stderr, "Invalid value for"
+					" --verbose\n");
+				exit(VZ_INVALID_PARAMETER_VALUE);
+			}
+			verbose += verbose_tmp;
+			verbose_custom = 1;
+		} else if (!strcmp(opt, "--quiet"))
 			quiet = 1;
-		else if (!strcmp(argv[1], "--version")) {
+		else if (!strcmp(opt, "--version")) {
 			version();
 			exit(0);
-		} else if (!strcmp(argv[1], "--skiplock"))
+		} else if (!strcmp(opt, "--skiplock"))
 			skiplock = YES;
 		else
 			break;
@@ -228,8 +248,18 @@ int main(int argc, char *argv[], char *envp[])
 		goto error;
 	}
 	init_log(gparam->log.log_file, veid, gparam->log.enable != NO,
-		verbose ? gparam->log.level + 2 : gparam->log.level,
-		quiet, "vzctl");
+		gparam->log.level, quiet, "vzctl");
+	/* Set verbose level from global config if not overwriten
+	   by --verbose 
+	*/
+	if (!verbose_custom && gparam->log.verbose != NULL) {
+		verbose = *gparam->log.verbose;
+		verbose_custom = 1;
+	}
+	if (verbose < -1)
+		verbose = -1;
+	if (verbose_custom)
+		set_log_verbose(verbose);
 	if ((ret = parse_action_opt(veid, action, argc, argv, cmd_p,
 		action_nm)))
 	{

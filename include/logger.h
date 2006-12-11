@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "types.h"
 
-#define	LOG_DATA	log_param g_log = {NULL, 0, 1, 0, "", 0};
+#define	LOG_DATA	log_param g_log = {NULL, 0, 1, 0, 0, "", 0};
 
 /** Data structure for logging.
  */
@@ -30,6 +30,7 @@ typedef struct {
 	int level;		/**< maximum logging level. */
 	int enable;		/**< enable/disable logging. */
 	int quiet;		/**< skip logging to stdout. */
+	int verbose;		/**< Console verbosity. */
 	char prog[32];		/**< program name. */
 	envid_t veid;
 } log_param;
@@ -66,5 +67,6 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 void free_log();
 
 void set_log_level(int level);
+void set_log_verbose(int level);
 
 #endif
