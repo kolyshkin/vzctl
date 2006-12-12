@@ -21,7 +21,7 @@
 
 VZCONF=/etc/vz/vz.conf
 CONF_DIR=/etc/vz/conf
-VE_INFO=/proc/vz/veinfo
+VESTAT=/proc/vz/vestat
 REBOOT_MARK='reboot'
 LOCKFILE='/var/lock/vereboot.lock'
 
@@ -75,18 +75,18 @@ function lockfile()
 
 # If VZ is not running -- do nothing
 # Fix for OpenVZ bug #107
-test -f ${VE_INFO} || exit 0
+test -f ${VESTAT} || exit 0
 lockfile
 
 cd ${CONF_DIR} 2>/dev/null || exit 0 
 VE_TOTAL=`ls -1 *.conf 2>/dev/null | sed s/.conf//`
-VE_RUN=`cat ${VE_INFO} | awk '{
-	if ($1 != 0) {
+VE_RUN=`awk '
+	$1 != "VEID" && $1 != "Version:" {
 		if (i++)
 			 printf("|");
 		 printf("^%s$", $1);
 	}
-}'`
+' ${VESTAT}`
 
 if [ -z "${VE_RUN}" ]; then
 	VE_STOPPED="${VE_TOTAL}"

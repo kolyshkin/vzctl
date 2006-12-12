@@ -17,7 +17,6 @@
 #
 VERBOSE=0
 CPUINFO=/proc/cpuinfo
-VEINFO=/proc/vz/veinfo
 FRSHD=/proc/fairsched
 
 function usage()

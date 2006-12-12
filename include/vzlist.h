@@ -24,7 +24,6 @@
 #define PROCVEINFO	"/proc/vz/veinfo"
 #define PROCUBC		"/proc/user_beancounters"
 #define PROCQUOTA	"/proc/vz/vzquota"
-#define PROCVEINFO	"/proc/vz/veinfo"
 #define PROCFSHED	"/proc/fairsched"
 
 #define VZQUOTA		"/usr/sbin/vzquota"

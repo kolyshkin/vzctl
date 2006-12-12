@@ -15,6 +15,7 @@ check_config() {
 	: ${VZCTL:=/usr/sbin/vzctl}
 	: ${VZQUOTA:=/usr/sbin/vzquota}
 	: ${VZVEINFO:=/proc/vz/veinfo}
+	: ${VESTAT:=/proc/vz/vestat}
 	: ${VPSCONFDIR:=/etc/vz}
 	: ${PRELOAD_MODULES:="af_packet"}
 	: ${MODULES:="vzmon vzdquota vzdev"}
@@ -65,6 +66,10 @@ start_net() {
 	for mod in ${NET_MODULES}; do
 		/sbin/modprobe ${mod} 2>/dev/null
 	done
+
+	if [ ! -f ${VZVEINFO} ]; then
+		return 0
+	fi
 
 	# configure the device
 	ebegin "Bringing up interface ${VZDEV}"
@@ -138,12 +143,11 @@ start_ve() {
 stop_ve() {
 	local veid velist msg m mounts fail i iter pid pids quota
 
-	if [ -f ${VZVEINFO} ]; then
+	if [ -f ${VESTAT} ]; then
 		for ((i = 0; i <= 2; i++)); do
 			iter=0
 			pids=
-			velist=$(awk  '{print $1;}' < ${VZVEINFO} | grep -v "^0$")
-
+			velist=$(awk '$1 != "VEID" && $1 != "Version:" {print $1}' ${VESTAT})
 			for veid in ${velist}; do
 				ebegin "Shutting down VE $veid"
 				# Set fairsched parameters to maximum so

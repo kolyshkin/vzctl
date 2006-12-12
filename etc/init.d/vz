@@ -44,7 +44,7 @@ VZCONF=/etc/vz/vz.conf
 VZCTL=/usr/sbin/vzctl
 VZQUOTA=/usr/sbin/vzquota
 LOCKFILE=/var/lock/subsys/vz_lock
-PROC_VZVEINFO=/proc/vz/veinfo
+VESTAT=/proc/vz/vestat
 
 [ -x ${VZCTL} ] || exit 0
 
@@ -96,7 +96,7 @@ get_veinfo()
 		VEINFO=/proc/vz/veinfo
 	elif [ -f /proc/veinfo ]; then
 		VEINFO=/proc/veinfo
-	else
+	elif [ ! -f $VESTAT ]; then
 		return 1
 	fi
 	return 0
@@ -153,6 +153,10 @@ function setup_net()
 	for mod in ${NET_MODULES}; do
         	modprobe ${mod} 2>/dev/null
 	done
+	get_veinfo
+	if [ -z "$VEINFO" ]; then
+		return 0
+	fi
 	__echo "Bringing up interface $VZDEV: " 
 	ip link set $VZDEV up 
 	if [ $? -eq 0 ] ; then
@@ -274,7 +278,7 @@ function ve_stop()
 		for ((i = 0; i <= 2; i++)); do
 			iter=0;
 			pids=
-			velist=`awk  '{print $1;}' < ${VEINFO} | grep -v "^0$"`
+			velist=`awk '$1 != "VEID" && $1 != "Version:" {print $1}' ${VESTAT}`
 			for veid in $velist; do
 				echo "Shutting down VE $veid"
 				# Set fairsched parameters to maximum so
