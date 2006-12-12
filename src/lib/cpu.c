@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <linux/vzcalluser.h>
+#include <linux/fairsched.h>
 #include <errno.h>
 
 #include "types.h"
@@ -61,9 +62,10 @@ static inline int fairsched_vcpus(unsigned int id, unsigned vcpus)
 static int set_cpulimit(envid_t veid, unsigned int cpulimit)
 {
 	unsigned cpulim1024 = (float)cpulimit * 1024 / 100;
+	int op = cpulim1024 ? FAIRSCHED_SET_RATE : FAIRSCHED_DROP_RATE;
 
 	logger(0, 0, "Setting CPU limit: %d", cpulimit);
-	if (fairsched_rate(veid, cpulim1024 ? 0 : 1, cpulim1024) < 0) {
+	if (fairsched_rate(veid, op, cpulim1024) < 0) {
 		logger(-1, errno, "fairsched_rate");
 		return VZ_SETFSHD_ERROR;
 	}
