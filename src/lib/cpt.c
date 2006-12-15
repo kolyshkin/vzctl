@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include <unistd.h>
-#include <sys/wait.h>
 
 #include "cpt.h"
 #include "env.h"
@@ -178,7 +177,6 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	int dump_fd = -1;
 	char dumpfile[PATH_LEN];
 	int cpt_fd, pid, ret;
-	int status;
 	char *root = vps_p->res.fs.root;
 
 	ret = VZ_CHKPNT_ERROR;
@@ -258,15 +256,10 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			ret = real_chkpnt(cpt_fd, veid, root, param, cmd);
 			exit(ret);
 		}
-		while ((ret = waitpid(pid, &status, 0)) == -1)
-			if (errno != EINTR)
-				break;
-		exit(WEXITSTATUS(status));
+		ret = env_wait(pid);
+		exit(ret);
 	}
-	while ((ret = waitpid(pid, &status, 0)) == -1)
-		if (errno != EINTR)
-			break;
-	ret = WEXITSTATUS(status);
+	ret = env_wait(pid);
 	if (ret)
 		goto err;
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {

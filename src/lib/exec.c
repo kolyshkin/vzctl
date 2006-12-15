@@ -125,11 +125,32 @@ static void alarm_handler(int sig)
 	return;
 }
 
+int env_wait(int pid)
+{
+	int ret, status;
+
+	while ((ret = waitpid(pid, &status, 0)) == -1)
+		if (errno != EINTR)
+			break;
+	if (ret == pid) {
+		ret = VZ_SYSTEM_ERROR;
+		if (WIFEXITED(status))
+			ret = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status)) {
+			logger(-1, 0, "Got signal %d", WTERMSIG(status));
+		}
+	} else {
+		ret = VZ_SYSTEM_ERROR;
+		logger(-1, errno, "Error in waitpid(%d)", ret);
+	}
+	return ret;
+}
+
 static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 	int exec_mode, char *const argv[], char *const envp[], char *std_in,
 	int timeout)
 {
-	int ret, pid, status;
+	int ret, pid;
 	int in[2], out[2], err[2], st[2];
 	int fl = 0;
 	struct sigaction act;	
@@ -277,23 +298,9 @@ env_err:
 	if (!(fl & 2)) {
 		while (stdredir(err[0], STDERR_FILENO) == 0);
 	}
-	while ((ret = waitpid(pid, &status, 0)) == -1)
-		if (errno != EINTR)
-			break;
-	if (ret == pid) {
-		ret = VZ_SYSTEM_ERROR;
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status)) {
-			logger(-1, 0, "Got signal %d",
-				WTERMSIG(status));
-			if (timeout && alarm_flag)
-				ret = VZ_EXEC_TIMEOUT;
-		}
-	} else if (pid == -1 && errno != EINTR) {
-		ret = VZ_SYSTEM_ERROR;
-		logger(-1, errno, "Error in waitpid()");
-	}
+	ret = env_wait(pid);
+	if (ret && timeout && alarm_flag)
+		ret = VZ_EXEC_TIMEOUT;
 
 err:
 	close(st[0]); close(st[1]);
@@ -319,7 +326,7 @@ err:
 int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode, 
 	char *const argv[], char *const envp[], char *std_in, int timeout)
 {
-	int pid, ret, status;
+	int pid, ret;
 
 	if (check_var(root, "VE root is not set"))
 		return VZ_VE_ROOT_NOTSET;
@@ -335,27 +342,15 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 			std_in, timeout);
 		exit(ret);
 	}
-	while ((ret = waitpid(pid, &status, 0)) == -1)
-		if (errno != EINTR)
-			break;
-	if (ret == pid) {
-		ret = VZ_SYSTEM_ERROR;
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status)) {
-			logger(-1, 0, "Got signal %d", WTERMSIG(status));
-		}
-	} else if (pid < 0) {
-		ret = VZ_SYSTEM_ERROR;
-		logger(-1, errno, "Error in waitpid()");
-	}
+	ret = env_wait(pid);
+
 	return ret;
 }
 
 int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 	int flags)
 {
-	int ret, pid, status;
+	int ret, pid;
 
 	if ((ret = vz_setluid(veid)))
 		return ret;
@@ -379,21 +374,14 @@ int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data
 env_err:
 		exit(ret);
 	}
-	while ((ret = waitpid(pid, &status, 0)) == -1)
-		if (errno != EINTR)
-			break;
-	ret = VZ_SYSTEM_ERROR;
-	if (WIFEXITED(status))
-		ret = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		logger(-1, 0, "Got signal %d", WTERMSIG(status));
+	ret = env_wait(pid);
 	return ret;
 }
 
 int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 	int flags) 
 {
-	int pid, ret, status;
+	int pid, ret;
 
 	if (check_var(root, "VE root is not set"))
 		return VZ_VE_ROOT_NOTSET;
@@ -408,20 +396,7 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 		ret = _real_execFn(h, veid, root, fn, data, flags);
 		exit(ret);
 	}
-	while ((ret = waitpid(pid, &status, 0)) == -1)
-		if (errno != EINTR)
-			break;
-	if (ret == pid) {
-		ret = VZ_SYSTEM_ERROR;
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status)) {
-			logger(-1, 0, "Got signal %d", WTERMSIG(status));
-		}
-	} else if (pid < 0) {
-		ret = VZ_SYSTEM_ERROR;
-		logger(-1, errno, "Error in waitpid()");
-	}
+	ret = env_wait(pid);
 	return ret;
 }
 

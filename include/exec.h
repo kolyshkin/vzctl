@@ -66,6 +66,8 @@ int vps_exec_script(vps_handler *h, envid_t veid, char *root,
 int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 	int flags);
 
+int env_wait(int pid);
+
 struct vps_param;
 int vps_run_script(vps_handler *h, envid_t veid, char *script,
 	struct vps_param *vps_p);
