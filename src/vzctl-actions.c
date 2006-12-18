@@ -663,6 +663,8 @@ static int exec(vps_handler *h, int action, envid_t veid, char *root, int argc,
 	int i, ret;
 	int len, totallen = 0;
 
+	/* disable logging on terminal  */
+	set_log_verbose(0);
 	mode = MODE_BASH;
 	if (action == ACTION_EXEC3) {
 		arg = argv;
