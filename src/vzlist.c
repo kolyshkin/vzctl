@@ -1073,6 +1073,39 @@ char *invert_ip(char *ips)
 	return tmp;
 }
 
+static int get_run_ve_proc2(int update)
+{
+	FILE *fp;
+	struct Cveinfo ve;
+	char buf[16384];
+	int res, veid;
+
+	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
+		fprintf(stderr, "Unable to open %s\n", PROCVEINFO);
+		return 1;
+	}
+	while (!feof(fp)) {
+		if (fgets(buf, sizeof(buf), fp) == NULL)
+			break;
+		res = sscanf(buf, "%d", &veid);
+		if (res != 1 || veid == 0)
+			continue;
+		if (!check_veid_restr(veid))
+			continue;
+		memset(&ve, 0, sizeof(struct Cveinfo));
+		ve.veid = veid;
+		ve.status = VE_RUNNING;
+		if (update)
+			update_ve(veid, ve.ip, ve.status);
+		else
+			add_elem(&ve);
+	}
+	if (!update)
+		qsort(veinfo, n_veinfo, sizeof(struct Cveinfo), id_sort_fn);
+	fclose(fp);
+	return 0;
+}
+
 static int get_run_ve_proc(int update)
 {
 	FILE *fp;
@@ -1082,8 +1115,7 @@ static int get_run_ve_proc(int update)
 	int res, veid, classid, nproc;
 
 	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
-		fprintf(stderr, "Unable to open %s\n", PROCVEINFO);
-		return 1;
+		return get_run_ve_proc2(update);
 	}
 	memset(&ve, 0, sizeof(struct Cveinfo));
 	while (!feof(fp)) {
