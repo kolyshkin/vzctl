@@ -45,20 +45,26 @@ VZCTL=/usr/sbin/vzctl
 VZQUOTA=/usr/sbin/vzquota
 LOCKFILE=/var/lock/subsys/vz_lock
 VESTAT=/proc/vz/vestat
+MODULES=
+MODULES_OTHER=
+NET_MODULES=
 
 [ -x ${VZCTL} ] || exit 0
 
 VZDEV=venet0
 PRELOAD_MODULES="af_packet"
-MODULES="vzmon vzdquota vzdev"
-CPT_MODULES="vzcpt vzrst"
-VETH_MODULES="vzethdev"
-MODULES_OTHER="vzcompat ${CPT_MODULES} ${VETH_MODULES}"
-NET_MODULES="vznetdev vznet"
-IPT_MODULES="ip_tables ${IPTABLES}"
-if [ "${VZWDOG}" = "yes" ]; then
-	MODULES="${MODULES} vzwdog"
+if [ "${MODULES_DISABLED}" != "yes" ]; then
+	MODULES="vzmon vzdquota vzdev"
+	CPT_MODULES="vzcpt vzrst"
+	VETH_MODULES="vzethdev"
+	MODULES_OTHER="vzcompat ${CPT_MODULES} ${VETH_MODULES}"
+	NET_MODULES="vznetdev vznet"
+	if [ "${VZWDOG}" = "yes" ]; then
+		MODULES="${MODULES} vzwdog"
+	fi
 fi
+IPT_MODULES="ip_tables ${IPTABLES}"
+
 CONFIG_DIR=/etc/vz/conf
 
 rc_done='..done'
