@@ -63,7 +63,7 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 		MODULES="${MODULES} vzwdog"
 	fi
 fi
-IPT_MODULES="ip_tables ${IPTABLES}"
+IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
 
 CONFIG_DIR=/etc/vz/conf
 
@@ -86,6 +86,14 @@ VEINFO=""
 RETVAL=0
 PARALLEL=4
 cd /
+
+function get_kern_ver()
+{
+	local ver=$1
+
+	set -- $(IFS='.-'; echo ${ver})
+	echo $(((($1 * 256) + $2) * 256 + $3))
+}
 
 check_is_root()
 {
