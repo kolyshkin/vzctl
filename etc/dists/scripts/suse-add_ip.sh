@@ -28,8 +28,6 @@
 #
 # this should set up networking for SuSE-based VE
 VENET_DEV=venet0
-FAKEGATEWAYNET=191.255.255.0
-FAKEGATEWAY=191.255.255.1
 IFCFG_DIR=/etc/sysconfig/network/
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
 ROUTES=${IFCFG_DIR}/ifroute-${VENET_DEV}
@@ -54,6 +52,7 @@ NETMASK=255.255.255.255
 IPADDR=127.0.0.1" > ${IFCFG} || \
 	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
 
+	remove_fake_old_route ${ROUTES}
 	if ! grep -q -E "${FAKEGATEWAYNET}[[:space:]]0.0.0.0[[:space:]]255.255.255.0[[:space:]]${VENET_DEV}" ${ROUTES} 2>/dev/null;
 	then
 		echo "${FAKEGATEWAYNET}	0.0.0.0 255.255.255.0	${VENET_DEV}" >> ${ROUTES}

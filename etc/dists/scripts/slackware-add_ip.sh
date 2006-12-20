@@ -30,8 +30,6 @@
 #
 VENET_DEV=venet0
 
-FAKEGATEWAY=191.255.255.1
-FAKEGATEWAYNET=191.255.255.0
 
 IFCFG_DIR=/etc/rc.d
 IFCFG=${IFCFG_DIR}/rc.inet1.conf
@@ -43,7 +41,7 @@ function fix_rcinet1()
 
 	[ -f "${file}" ] || return 0
 	cp -fp ${file} ${file}.$$ || error "unable to create ${file}" ${VZ_FS_NO_DISK_SPACE}
-	sed -e 's/eth/venet/g' -e 's/^[\ \t]*\/sbin\/route add default gw .*/\t\/sbin\/route add -net 191.255.255.0\/24 dev venet0; \/sbin\/route add default gw \${GATEWAY} dev venet0/' < ${file} > ${file}.$$ && mv -f ${file}.$$ ${file}
+	sed -e 's/eth/venet/g' -e 's/^[\ \t]*\/sbin\/route add default gw .*/\t\/sbin\/route add -net '${FAKEGATEWAYNET}'\/24 dev venet0; \/sbin\/route add default gw \${GATEWAY} dev venet0/' < ${file} > ${file}.$$ && mv -f ${file}.$$ ${file}
 	rm -f ${file}.$$ >/dev/null 2>&1
 }
 

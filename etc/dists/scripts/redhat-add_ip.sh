@@ -31,8 +31,6 @@
 VENET_DEV=venet0
 VENET_DEV_CFG=ifcfg-$VENET_DEV
 
-FAKEGATEWAY=191.255.255.1
-FAKEGATEWAYNET=191.255.255.0
 
 IFCFG_DIR=/etc/sysconfig/network-scripts
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
@@ -78,6 +76,8 @@ IPV6ADDR=::1/128" >> $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK
 		put_param ${NETFILE} NETWORKING_IPV6 yes
 		put_param ${NETFILE} IPV6_DEFAULTDEV ${VENET_DEV}
 	fi
+
+	remove_fake_old_route ${ROUTE}
 	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${ROUTE} 2>/dev/null; then
 		echo "${FAKEGATEWAYNET}/24 dev ${VENET_DEV} scope host
 default via ${FAKEGATEWAY}" >> ${ROUTE} || error "Can't create ${ROUTE}" ${VZ_FS_NO_DISK_SPACE}

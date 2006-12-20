@@ -26,8 +26,6 @@
 #   VE_STATE      - state of VE; could be one of:
 #                     starting | stopping | running | stopped
 VENET_DEV=venet0
-FAKEGATEWAY=191.255.255.1
-FAKEGATEWAYNET=191.255.255.0
 CFGFILE=/etc/rc.config
 
 function setup_network()
