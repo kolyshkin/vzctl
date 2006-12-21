@@ -18,8 +18,6 @@
 #ifndef _VZCTL_H_
 #define _VZCTL_H_
 
-#define	VERSION			"3.0.13"
-
 /* Action numeration should begin with 1. Value 0 is reserved. */
 #define ACTION_CREATE		1
 #define ST_CREATE		"creating"
