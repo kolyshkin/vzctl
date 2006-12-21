@@ -32,7 +32,7 @@ all install %::
 install::
 	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
 	for file in $(SCRIPTS); do \
-		$(INSTALL) -m 755 $$file $(DESTDIR)$(SBINDIR)/$$file; \
+		$(INSTALL) -m 755 bin/$$file $(DESTDIR)$(SBINDIR)/$$file; \
 	done
 	$(INSTALL) -d $(DESTDIR)/$(BASHCDIR)
 	$(INSTALL) -m 644 $(BASHCSCRIPT) $(DESTDIR)/$(BASHCDIR)
