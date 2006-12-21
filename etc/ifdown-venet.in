@@ -15,44 +15,22 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-VZNETCFG=/etc/vz/vznet.conf
 
-[ -f ${VZNETCFG} ] && source ${VZNETCFG}
+test -f @PKGCONFDIR@/vz.conf || exit 1
+test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
+test -f /etc/init.d/functions && . /etc/init.d/functions
 
-function usage()
-{
-	echo "vznetcfg init veth <dev>"
-}
-
-function init_veth()
-{
-	local dev=$1
-
-	/sbin/ifconfig ${dev} up
-}
-# Call the external script if defined
-if [ -n "${EXTERNAL_SCRIPT}" -a -x "${EXTERNAL_SCRIPT}" ]; then
-	export VEID
-	exec ${EXTERNAL_SCRIPT} $@
-fi
-
-if test $# -le 2; then
-    usage
-    exit 0
-fi
-
-CMD=$1
-case "${CMD}$2" in
-	initveth)
-		if test $# -ne 3; then
-			usage
-			exit 1
-		fi
-		init_veth $3
-		;;
-	*)
-		echo "invalid action"
+## SuSE distro
+if [ -f /etc/sysconfig/network/scripts/functions ]; then
+	vznet=$1
+else
+	CONFIG=${1}
+	if ! . "$CONFIG"; then
+		echo "can't source interface config $CONFIG" >&2
 		exit 1
-		;;
-esac
-exit 0
+	fi
+	vznet=$DEVICE
+fi
+
+echo "Shutting down interface $vznet: " 
+ip link set $vznet down

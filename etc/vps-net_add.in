@@ -16,21 +16,39 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script does clean up after VE shutdown
+# This script setup routing for given VE.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VEID    - VE id
-#   IP_ADDR - VE IP address(es) divided by spaces
+#   VEID          - VE id
+# Optional parameters:
+#   IP_ADDR       - IP address(es) to add
+#                   (several addresses should be divided by space)
+#   VE_STATE      - state of VE; could be one of:
+#                     starting | stopping | running | stopped
+. @PKGCONFDIR@/vz.conf
+. @PKGLIBDIR@/scripts/vps-functions
 
-. /usr/lib/vzctl/scripts/vps-functions
+vzcheckvar VEID
 
-# get list of network devices for vzarp
+######## Common stuff - route, ARP, iptables ###########
+# Set routing, iptables, ARP...
 vzgetnetdev
 
+vzarpipdetect "$IP_ADDR"
 for IP in $IP_ADDR; do
-	vzdelrouting $IP
-	vzarp del $IP
+	vzaddrouting $IP
+	vzarp add $IP
 done
+vzarpipset "$IP_ADDR"
+# Save ip address information
+mkdir -p ${VE_STATE_DIR} >/dev/null 2>&1
+if [ "${VE_STATE}" == "starting" ]; then
+  echo -n  "${IP_ADDR} " > ${VE_STATE_DIR}/${VEID}
+elif [ "${VE_STATE}" == "running" ]; then
+  echo -n "${IP_ADDR} " >> ${VE_STATE_DIR}/${VEID}
+fi
+
 exit 0
 # end of script
+

@@ -24,7 +24,7 @@
 #   VE_PRVT		- path to root of VE private areas
 #   PRIVATE_TEMPLATE	- path to private template used as a source for copying
 
-. /usr/lib/vzctl/scripts/vps-functions
+. @PKGLIBDIR@/scripts/vps-functions
 
 vzcheckvar VE_PRVT PRIVATE_TEMPLATE
 

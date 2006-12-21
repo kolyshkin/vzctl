@@ -35,14 +35,14 @@
 
 # This line is needed to cheat /etc/init.d/rc who expects action word
 
-VZCONF=/etc/vz/vz.conf
+VZCONF=@PKGCONFDIR@/vz.conf
 
 [ -f ${VZCONF}   ] || exit 0
 . ${VZCONF}
 [ "${VIRTUOZZO}" = "no" ] && exit 0
 
-VZCTL=/usr/sbin/vzctl
-VZQUOTA=/usr/sbin/vzquota
+VZCTL=@SBINDIR@/vzctl
+VZQUOTA=@SBINDIR@/vzquota
 LOCKFILE=/var/lock/subsys/vz_lock
 VESTAT=/proc/vz/vestat
 MODULES=
@@ -65,7 +65,7 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 fi
 IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
 
-CONFIG_DIR=/etc/vz/conf
+CONFIG_DIR=@PKGCONFDIR@/conf
 
 rc_done='..done'
 rc_failed='..failed'

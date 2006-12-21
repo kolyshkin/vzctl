@@ -14,8 +14,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# Start VEs marked as rebooted.
-# If vzagent not installed you can enable reboot functionality by
-# commented out the line below.
+# Clean VEs network rules (arp,route,iptables)
+#
 
-*/5 * * * * root /usr/share/vzctl/scripts/vpsreboot
+*/5 * * * * root @PKGDATADIR@/scripts/vpsnetclean

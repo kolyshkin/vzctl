@@ -15,32 +15,44 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-#
-# This script removes routing for given VE.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IPs to delete, several addresses should be divided by space
-#   VEID          - VE id
-# Optional parameters:
-#   VE_STATE      - state of VE; could be one of:
-#                     starting | stopping | running | stopped
+VZNETCFG=@PKGCONFDIR@/vznet.conf
 
-. /usr/lib/vzctl/scripts/vps-functions
+[ -f ${VZNETCFG} ] && source ${VZNETCFG}
 
-vzcheckvar IP_ADDR VEID
+function usage()
+{
+	echo "vznetcfg init veth <dev>"
+}
 
-vzgetnetdev
+function init_veth()
+{
+	local dev=$1
 
-for IP in $IP_ADDR; do
-	vzdelrouting $IP
-	vzarp del $IP
-	# Update ip address information
-	if [ "${VE_STATE}" = "running" -a -f "${VE_STATE_DIR}/${VEID}" ]; then
-		cat ${VE_STATE_DIR}/${VEID} | tr ' ' '\n' | \
-		grep -w -v "${IP}" | tr '\n' ' ' > ${VE_STATE_DIR}/${VEID}
-	fi		
-done
+	/sbin/ifconfig ${dev} up
+}
+# Call the external script if defined
+if [ -n "${EXTERNAL_SCRIPT}" -a -x "${EXTERNAL_SCRIPT}" ]; then
+	export VEID
+	exec ${EXTERNAL_SCRIPT} $@
+fi
 
+if test $# -le 2; then
+    usage
+    exit 0
+fi
+
+CMD=$1
+case "${CMD}$2" in
+	initveth)
+		if test $# -ne 3; then
+			usage
+			exit 1
+		fi
+		init_veth $3
+		;;
+	*)
+		echo "invalid action"
+		exit 1
+		;;
+esac
 exit 0
-# end of script

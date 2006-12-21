@@ -63,8 +63,8 @@ remove_area=1
 keep_dst=0
 debug=0
 out="&> /dev/null"
-confdir="/etc/vz/conf"
-vzconf="/etc/vz/vz.conf"
+confdir="@PKGCONFDIR@/conf"
+vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
 act_scripts=
 

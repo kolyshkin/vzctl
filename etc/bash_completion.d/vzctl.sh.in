@@ -8,24 +8,24 @@ _get_ves()
 	case $cmd in
 		create)
 			# create a new VEID, by increasing the last one
-			local veids=`/usr/sbin/vzlist -H -a -ovpsid | tail -1`
+			local veids=`@SBINDIR@/vzlist -H -a -ovpsid | tail -1`
 			[ -n "$veids" ] || veids=100
 			echo $((veids+1))
 			;;
 		start|mount|umount|destroy)
 			# stopped VEs
-			/usr/sbin/vzlist -H -S -ovpsid
-                        /usr/sbin/vzlist -H -S -oname | sed s/-//g
+			@SBINDIR@/vzlist -H -S -ovpsid
+			@SBINDIR@/vzlist -H -S -oname | sed s/-//g
 			;;
 		stop|enter|exec*)
 			# running VEs
-			/usr/sbin/vzlist -H -ovpsid
-                        /usr/sbin/vzlist -H -oname | sed s/-//g
+			@SBINDIR@/vzlist -H -ovpsid
+			@SBINDIR@/vzlist -H -oname | sed s/-//g
 			;;
 		*)
 			# All VEs
-			/usr/sbin/vzlist -H -a -ovpsid
-                        /usr/sbin/vzlist -H -a -oname | sed s/-//g
+			@SBINDIR@/vzlist -H -a -ovpsid
+			@SBINDIR@/vzlist -H -a -oname | sed s/-//g
 			;;
 	esac
 }
@@ -108,7 +108,7 @@ _vzctl()
 			case $prev in
 			--ostemplate)
 				# get the template path from the vz.conf
-				local vztmpl=`grep ^TEMPLATE /etc/vz/vz.conf | cut -d "=" -f 2`
+				local vztmpl=`grep ^TEMPLATE @PKGCONFDIR@/vz.conf | cut -d "=" -f 2`
 				COMPREPLY=( $( compgen -W "$(ls -1 $vztmpl/cache/*.tar.gz | \
 						    sed -e "s#^$vztmpl/cache/##" -e 's#.tar.gz$##')" -- $cur ) )
 
@@ -117,7 +117,7 @@ _vzctl()
 				COMPREPLY=( $( compgen -W "yes no" -- $cur ) )
 				;;
 			--config|--applyconfig)
-				local configs=$(ls -1 /etc/vz/conf/*.conf-sample | \
+				local configs=$(ls -1 @PKGCONFDIR@/conf/*.conf-sample | \
 						    cut -d "-" -f 2- | sed -e 's#.conf-sample$##')
 
 				configs=${configs/.conf-sample/}
@@ -161,7 +161,7 @@ _vzctl()
 				fi
 				# VENAME or VEID ?
 				LIST_OPT=`echo $ve | awk '/[a-zA-Z]/ {print "-N"}'`
-				local ips="`/usr/sbin/vzlist -H -o ip $LIST_OPT $ve | grep -vi -`"
+				local ips="`@SBINDIR@/vzlist -H -o ip $LIST_OPT $ve | grep -vi -`"
 				COMPREPLY=( $( compgen -W "$ips all" -- $cur ) )
 				;;
 			--private|--root)

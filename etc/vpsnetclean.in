@@ -17,7 +17,7 @@
 #
 #
 
-VZCONF=/etc/vz/vz.conf
+VZCONF=@PKGCONFDIR@/vz.conf
 VEINFO=/proc/vz/veinfo
 PROC_PROXY_TR=/proc/proxy/targets
 VES_INFO=
@@ -25,9 +25,9 @@ VE_RUN=
 VE_PREV=
 
 test -f ${VZCONF} || exit 1
-test -f /usr/lib/vzctl/scripts/vps-functions || exit 1
+test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
 
-. /usr/lib/vzctl/scripts/vps-functions
+. @PKGLIBDIR@/scripts/vps-functions
 . ${VZCONF}
 
 #

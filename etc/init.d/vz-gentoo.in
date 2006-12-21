@@ -12,11 +12,11 @@ check_config() {
 	[ "${VIRTUOZZO}" = "yes" ] || return 1
 
 	# set default values
-	: ${VZCTL:=/usr/sbin/vzctl}
-	: ${VZQUOTA:=/usr/sbin/vzquota}
+	: ${VZCTL:=@SBINDIR@/vzctl}
+	: ${VZQUOTA:=@SBINDIR@/vzquota}
 	: ${VZVEINFO:=/proc/vz/veinfo}
 	: ${VESTAT:=/proc/vz/vestat}
-	: ${VPSCONFDIR:=/etc/vz}
+	: ${VPSCONFDIR:=@PKGCONFDIR@}
 	: ${PRELOAD_MODULES:="af_packet"}
 	: ${MODULES:="vzmon vzdquota vzdev"}
 	: ${MIGRATE_MODULES:="vzcpt vzrst"}

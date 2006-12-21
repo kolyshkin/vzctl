@@ -34,7 +34,7 @@ VZ_IP_INUSE=78
 
 # iptables parameters
 VE_STATE_DIR="/var/lib/vzctl/veip/"
-CONF_DIR="/etc/vz/conf/"
+CONF_DIR="@PKGCONFDIR@/conf/"
 
 ARPSEND_CMD="arpsend -c 1 -w 1"
 IP_CMD=/sbin/ip
