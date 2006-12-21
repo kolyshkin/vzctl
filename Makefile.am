@@ -46,3 +46,9 @@ ETC_TARGETS = install-bashcomp \
 
 $(ETC_TARGETS):
 	$(MAKE) $(AM_MAKEFLAGS) -C etc $@
+
+rpms: dist
+	cp $(distdir).tar.bz2 `rpm --eval %_sourcedir`
+	rpmbuild -ba vzctl.spec
+
+.PHONY: rpms
