@@ -61,8 +61,8 @@ LOGRSCRIPTS  = vzctl
 NETSCRIPTS   = ifcfg-venet0 ifdown-venet ifup-venet
 UDEVRULES    = 60-vzctl.rules
 
-EXTRA_DIST = $(pkglibscripts_SCRIPTS) \
-             $(pkgdata_SCRIPTS) \
+EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
+             $(pkgdata_SCRIPTS:%=%.in) \
              $(BASHCSCRIPTS:%=bash_completion.d/%.in) \
              $(CRONSCRIPTS:%=cron.d/%.in) \
              $(INITSCRIPTS:%=init.d/%.in) \
