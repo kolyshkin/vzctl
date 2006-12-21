@@ -100,13 +100,13 @@ install-data-local:
 install-bashcomp: $(BASHCSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(bashcdir)
 	for file in $(BASHCSCRIPTS); do \
-		$(INSTALL_DATA) $(builddir)/$$file $(DESTDIR)$(bashcdir)/$$file; \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(bashcdir)/$$file; \
 	done
 
 install-cron: $(CRONSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(cronddir)
 	for file in $(CRONSCRIPTS); do \
-		$(INSTALL_SCRIPT) $(builddir)/$$file $(DESTDIR)$(cronddir)/$$file; \
+		$(INSTALL_SCRIPT) $$file $(DESTDIR)$(cronddir)/$$file; \
 	done
 
 install-logrotate:
@@ -126,7 +126,7 @@ install-redhat: init.d/vz $(NETSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sysconfig/network-scripts
 	$(INSTALL_SCRIPT) init.d/vz  $(DESTDIR)$(initddir)/vz
 	for file in $(NETSCRIPTS); do \
-		$(INSTALL_SCRIPT) $(builddir)/$$file \
+		$(INSTALL_SCRIPT) $$file \
 			$(DESTDIR)$(sysconfdir)/sysconfig/network-scripts/$$file; \
 	done
 
