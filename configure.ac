@@ -85,6 +85,17 @@ AC_ARG_ENABLE([cron],
               [enable_cron=true])
 AM_CONDITIONAL(ENABLE_CRON, test x$enable_cron = xtrue)
 
+AC_ARG_ENABLE([logrotate],
+              [AC_HELP_STRING([--enable-logrotate],
+                              [Enable logrotate support])],
+              [case "${enableval}" in
+                yes) enable_logrotate=true;;
+                no)  enable_logrotate=false;;
+                *)   AC_MSG_ERROR(bad value ${enableval} for --enable-logrotate);;
+              esac],
+              [enable_logrotate=false])
+AM_CONDITIONAL(ENABLE_LOGROTATE, test x$enable_logrotate = xtrue)
+
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
@@ -103,6 +114,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/conf/Makefile
                  etc/cron.d/Makefile
                  etc/init.d/Makefile
+                 etc/logrotate.d/Makefile
                  etc/bash_completion.d/Makefile
                  etc/Makefile
                  man/Makefile
