@@ -78,6 +78,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 # Output
 AC_CONFIG_FILES([bin/Makefile
                  etc/dists/Makefile
+                 etc/conf/Makefile
                  etc/Makefile
                  man/Makefile
                  src/lib/Makefile
