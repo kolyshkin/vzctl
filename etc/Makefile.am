@@ -39,7 +39,6 @@ pkglibscripts_SCRIPTS = vps-create \
 pkgdata_SCRIPTS = vpsnetclean \
                   vpsreboot
 
-INITSCRIPTS  = vz vz-gentoo
 NETSCRIPTS   = ifcfg-venet0 ifdown-venet ifup-venet
 
 pkgconf_DATA = vz.conf
