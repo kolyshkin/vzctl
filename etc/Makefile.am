@@ -28,7 +28,6 @@ SUBDIRS = \
 pkgconfdir = $(sysconfdir)/vz
 namesdir   = $(pkgconfdir)/names
 
-
 pkglibscriptsdir = $(pkglibdir)/scripts
 
 pkglibscripts_SCRIPTS = vps-create \

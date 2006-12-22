@@ -15,9 +15,9 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-logrdir  = $(sysconfdir)/logrotate.d
+logrdir = $(sysconfdir)/logrotate.d
 
-LOGRSCRIPTS  = vzctl
+LOGRSCRIPTS = vzctl
 
 EXTRA_DIST = $(LOGRSCRIPTS)
 

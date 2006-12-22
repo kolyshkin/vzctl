@@ -122,13 +122,13 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
 # Output
 AC_CONFIG_FILES([bin/Makefile
-                 etc/dists/Makefile
+                 etc/bash_completion.d/Makefile
                  etc/conf/Makefile
                  etc/cron.d/Makefile
+                 etc/dists/Makefile
                  etc/init.d/Makefile
                  etc/logrotate.d/Makefile
                  etc/network-scripts/Makefile
-                 etc/bash_completion.d/Makefile
                  etc/udev/Makefile
                  etc/Makefile
                  man/Makefile
