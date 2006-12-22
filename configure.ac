@@ -63,6 +63,18 @@ fi
 AM_CONDITIONAL(ARCH_IA64,   test x$build_cpu = xia64)
 AM_CONDITIONAL(ARCH_X86_64, test x$build_cpu = xx86_64)
 
+AC_ARG_ENABLE([bashcomp],
+              [AC_HELP_STRING([--enable-bashcomp],
+                              [Enable bashcompletion support])],
+              [case "${enableval}" in
+                yes) enable_bashcomp=true;;
+                no)  enable_bashcomp=false;;
+                *)   AC_MSG_ERROR(bad value ${enableval} for --enable-bashcomp);;
+              esac],
+              [enable_bashcomp=false])
+AM_CONDITIONAL(ENABLE_BASHCOMP, test x$enable_bashcomp = xtrue)
+
+
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
@@ -80,6 +92,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/dists/Makefile
                  etc/conf/Makefile
                  etc/init.d/Makefile
+                 etc/bash_completion.d/Makefile
                  etc/Makefile
                  man/Makefile
                  src/lib/Makefile

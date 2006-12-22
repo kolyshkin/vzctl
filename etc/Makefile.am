@@ -16,14 +16,14 @@
 #
 
 SUBDIRS = \
-	dists \
+	bash_completion.d \
 	conf \
+	dists \
 	init.d
 
 pkgconfdir = $(sysconfdir)/vz
 namesdir   = $(pkgconfdir)/names
 
-bashcdir   = $(sysconfdir)/bash_completion.d
 cronddir   = $(sysconfdir)/cron.d
 logrdir    = $(sysconfdir)/logrotate.d
 udevdir    = $(sysconfdir)/udev/rules.d
@@ -39,7 +39,6 @@ pkglibscripts_SCRIPTS = vps-create \
 pkgdata_SCRIPTS = vpsnetclean \
                   vpsreboot
 
-BASHCSCRIPTS = bash_completion.d/vzctl.sh
 CRONSCRIPTS  = vpsreboot \
                vpsnetclean
 INITSCRIPTS  = vz vz-gentoo
@@ -51,7 +50,6 @@ pkgconf_DATA = vz.conf
 
 EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
-             $(BASHCSCRIPTS:%=%.in) \
              $(CRONSCRIPTS:%=cron.d/%.in) \
              $(LOGRSCRIPTS:%=logrotate.d/%) \
              $(NETSCRIPTS:%=%.in) \
@@ -62,12 +60,6 @@ include $(top_srcdir)/pathsubst.am
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
-
-install-bashcomp: $(BASHCSCRIPTS)
-	$(mkinstalldirs) $(DESTDIR)$(bashcdir)
-	for file in $(BASHCSCRIPTS); do \
-		$(INSTALL_DATA) $$file $(DESTDIR)$(bashcdir)/; \
-	done
 
 install-cron: $(CRONSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(cronddir)
