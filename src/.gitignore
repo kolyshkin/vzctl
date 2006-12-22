@@ -1,0 +1,13 @@
+.libs
+.deps
+*.o
+Makefile
+Makefile.in
+arpsend
+ndsend
+vzcalc
+vzcfgvalidate
+vzctl
+vzlist
+vzmemcheck
+vzsplit
