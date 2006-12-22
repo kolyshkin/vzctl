@@ -132,6 +132,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/udev/Makefile
                  etc/Makefile
                  man/Makefile
+                 scripts/Makefile
                  src/lib/Makefile
                  src/Makefile
                  Makefile])

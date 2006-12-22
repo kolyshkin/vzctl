@@ -15,31 +15,22 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-SUBDIRS = \
-	bash_completion.d \
-	conf \
-	cron.d \
-	dists \
-	init.d \
-	logrotate.d \
-	network-scripts \
-	udev
+vzlibdir  = $(pkglibdir)/scripts
+vzcrondir = $(pkgdatadir)/scripts
 
-pkgconfdir = $(sysconfdir)/vz
-namesdir   = $(pkgconfdir)/names
+vzlib_SCRIPTS = \
+	vps-create \
+	vps-functions \
+	vps-net_add \
+	vps-net_del \
+	vps-stop
 
-pkgconf_DATA = vz.conf
+vzcron_SCRIPTS = \
+	vpsnetclean \
+	vpsreboot
 
-EXTRA_DIST = $(pkgconf_DATA)
+EXTRA_DIST = \
+	$(vzlib_SCRIPTS:%=%.in) \
+	$(vzcron_SCRIPTS:%=%.in)
 
-install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(namesdir)
-
-install-redhat:
-	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
-	$(MAKE) $(AM_MAKEFLAGS) -C network-scripts $@
-
-install-gentoo:
-	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
-	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/conf.d
-	$(LN_S) $(pkgconfdir)/vz.conf $(DESTDIR)$(sysconfdir)/conf.d/vz
+include $(top_srcdir)/pathsubst.am

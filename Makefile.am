@@ -18,6 +18,7 @@
 SUBDIRS = bin \
           etc \
           man \
+          scripts \
           src
 
 noinst_HEADERS = $(wildcard include/*.h) \
