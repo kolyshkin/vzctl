@@ -16,9 +16,9 @@
 #
 
 sbin_SCRIPTS = vzcpucheck \
-            vzmigrate \
-            vznetcfg \
-            vzpid
+               vzmigrate \
+               vznetcfg \
+               vzpid
 
 EXTRA_DIST=$(sbin_SCRIPTS:%=%.in)
 
