@@ -67,57 +67,57 @@ AC_ARG_ENABLE([bashcomp],
               [AC_HELP_STRING([--enable-bashcomp],
                               [Enable bashcompletion support])],
               [case "${enableval}" in
-                yes) enable_bashcomp=true;;
-                no)  enable_bashcomp=false;;
+                yes) enable_bashcomp="+bashcomp";;
+                no)  enable_bashcomp="-bashcomp";;
                 *)   AC_MSG_ERROR(bad value ${enableval} for --enable-bashcomp);;
               esac],
-              [enable_bashcomp=false])
-AM_CONDITIONAL(ENABLE_BASHCOMP, test x$enable_bashcomp = xtrue)
+              [enable_bashcomp="-bashcomp"])
+AM_CONDITIONAL(ENABLE_BASHCOMP, test "x$enable_bashcomp" = "x+bashcomp")
 
 AC_ARG_ENABLE([cron],
               [AC_HELP_STRING([--disable-cron],
                               [Disable cron support])],
               [case "${enableval}" in
-                yes) enable_cron=true;;
-                no)  enable_cron=false;;
+                yes) enable_cron="+cron";;
+                no)  enable_cron="-cron";;
                 *)   AC_MSG_ERROR(bad value ${enableval} for --enable-cron);;
               esac],
-              [enable_cron=true])
-AM_CONDITIONAL(ENABLE_CRON, test x$enable_cron = xtrue)
+              [enable_cron="+cron"])
+AM_CONDITIONAL(ENABLE_CRON, test "x$enable_cron" = "x+cron")
 
 AC_ARG_ENABLE([logrotate],
               [AC_HELP_STRING([--enable-logrotate],
                               [Enable logrotate support])],
               [case "${enableval}" in
-                yes) enable_logrotate=true;;
-                no)  enable_logrotate=false;;
+                yes) enable_logrotate="+logrotate";;
+                no)  enable_logrotate="-logrotate";;
                 *)   AC_MSG_ERROR(bad value ${enableval} for --enable-logrotate);;
               esac],
-              [enable_logrotate=false])
-AM_CONDITIONAL(ENABLE_LOGROTATE, test x$enable_logrotate = xtrue)
+              [enable_logrotate="-logrotate"])
+AM_CONDITIONAL(ENABLE_LOGROTATE, test "x$enable_logrotate" = "x+logrotate")
 
 AC_ARG_ENABLE([udev],
               [AC_HELP_STRING([--disable-udev],
                               [Disable udev support])],
               [case "${enableval}" in
-                yes) enable_udev=true;;
-                no)  enable_udev=false;;
+                yes) enable_udev="+udev";;
+                no)  enable_udev="-udev";;
                 *)   AC_MSG_ERROR(bad value ${enableval} for --enable-udev);;
               esac],
-              [enable_udev=true])
-AM_CONDITIONAL(ENABLE_UDEV, test x$enable_udev = xtrue)
+              [enable_udev="+udev"])
+AM_CONDITIONAL(ENABLE_UDEV, test "x$enable_udev" = "x+udev")
 
 
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
-                       CC: $CC ($($CC --version | head -n1))
-                   CFLAGS: '$CFLAGS'
-                    build: $build
-                     host: $host
-                   target: $target
-
-                   prefix: $prefix
+         CC: $CC ($($CC --version | head -n1))
+     CFLAGS: '$CFLAGS'
+      build: $build
+       host: $host
+     target: $target
+     prefix: $prefix
+   features: $enable_bashcomp $enable_cron $enable_logrotate $enable_udev
 "])
 
 # Output
