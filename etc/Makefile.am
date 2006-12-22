@@ -17,14 +17,14 @@
 
 SUBDIRS = \
 	dists \
-	conf
+	conf \
+	init.d
 
 pkgconfdir = $(sysconfdir)/vz
 namesdir   = $(pkgconfdir)/names
 
 bashcdir   = $(sysconfdir)/bash_completion.d
 cronddir   = $(sysconfdir)/cron.d
-initddir   = $(sysconfdir)/init.d
 logrdir    = $(sysconfdir)/logrotate.d
 udevdir    = $(sysconfdir)/udev/rules.d
 
@@ -51,7 +51,6 @@ EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
              $(BASHCSCRIPTS:%=%.in) \
              $(CRONSCRIPTS:%=cron.d/%.in) \
-             $(INITSCRIPTS:%=init.d/%.in) \
              $(LOGRSCRIPTS:%=logrotate.d/%) \
              $(NETSCRIPTS:%=%.in) \
              $(UDEVRULES:%=udev/%) \
@@ -88,17 +87,16 @@ install-udev:
 		$(INSTALL_DATA) $(srcdir)/udev/$$file $(DESTDIR)$(udevdir)/$$file; \
 	done
 
-install-redhat: init.d/vz $(NETSCRIPTS) install-logrotate install-udev install-cron
-	$(mkinstalldirs) $(DESTDIR)$(initddir)
+install-redhat: $(NETSCRIPTS) install-logrotate install-udev install-cron
+	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sysconfig/network-scripts
-	$(INSTALL_SCRIPT) init.d/vz  $(DESTDIR)$(initddir)/vz
 	for file in $(NETSCRIPTS); do \
 		$(INSTALL_SCRIPT) $$file \
 			$(DESTDIR)$(sysconfdir)/sysconfig/network-scripts/$$file; \
 	done
 
-install-gentoo: init.d/vz-gentoo
-	$(mkinstalldirs) $(DESTDIR)$(initddir)
+install-gentoo:
+	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
+	# Gentoo-specific symlink for global config file
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/conf.d
-	$(INSTALL_SCRIPT) init.d/vz-gentoo $(DESTDIR)$(initddir)/vz
 	$(LN_S) $(pkgconfdir)/vz.conf $(DESTDIR)$(sysconfdir)/conf.d/vz
