@@ -121,7 +121,7 @@ install-udev:
 		$(INSTALL_DATA) $(srcdir)/udev/$$file $(DESTDIR)$(udevdir)/$$file; \
 	done
 
-install-redhat: init.d/vz $(NETSCRIPTS)
+install-redhat: init.d/vz $(NETSCRIPTS) install-logrotate install-udev install-cron
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sysconfig/network-scripts
 	$(INSTALL_SCRIPT) init.d/vz  $(DESTDIR)$(initddir)/vz
