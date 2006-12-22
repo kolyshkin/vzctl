@@ -53,7 +53,7 @@ endif
 endif
 
 
-BASHCSCRIPTS = vzctl.sh
+BASHCSCRIPTS = bash_completion.d/vzctl.sh
 CRONSCRIPTS  = vpsreboot \
                vpsnetclean
 INITSCRIPTS  = vz vz-gentoo
@@ -63,7 +63,7 @@ UDEVRULES    = 60-vzctl.rules
 
 EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
-             $(BASHCSCRIPTS:%=bash_completion.d/%.in) \
+             $(BASHCSCRIPTS:%=%.in) \
              $(CRONSCRIPTS:%=cron.d/%.in) \
              $(INITSCRIPTS:%=init.d/%.in) \
              $(LOGRSCRIPTS:%=logrotate.d/%) \
@@ -100,7 +100,7 @@ install-data-local:
 install-bashcomp: $(BASHCSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(bashcdir)
 	for file in $(BASHCSCRIPTS); do \
-		$(INSTALL_DATA) $$file $(DESTDIR)$(bashcdir)/$$file; \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(bashcdir)/; \
 	done
 
 install-cron: $(CRONSCRIPTS)
