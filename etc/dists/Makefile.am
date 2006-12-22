@@ -19,55 +19,18 @@ pkgconfdir        = $(sysconfdir)/vz
 distconfdir       = $(pkgconfdir)/dists
 distconfscriptdir = $(distconfdir)/scripts
 
-distconfscript_SCRIPTS = scripts/debian-add_ip.sh \
-                   scripts/debian-del_ip.sh \
-                   scripts/debian-set_hostname.sh \
-                   scripts/functions \
-                   scripts/gentoo-add_ip.sh \
-                   scripts/gentoo-del_ip.sh \
-                   scripts/gentoo-set_hostname.sh \
-                   scripts/gentoo-set_ugid_quota.sh \
-                   scripts/postcreate.sh \
-                   scripts/redhat-7.x_add_ip.sh \
-                   scripts/redhat-add_ip.sh \
-                   scripts/redhat-del_ip.sh \
-                   scripts/redhat-set_hostname.sh \
-                   scripts/set_dns.sh \
-                   scripts/set_ugid_quota.sh \
-                   scripts/set_userpass.sh \
-                   scripts/slackware-9.x_add_ip.sh \
-                   scripts/slackware-9.x_del_ip.sh \
-                   scripts/slackware-add_ip.sh \
-                   scripts/slackware-del_ip.sh \
-                   scripts/slackware-set_hostname.sh \
-                   scripts/slackware-set_ugid_quota.sh \
-                   scripts/suse-7.x_add_ip.sh \
-                   scripts/suse-8.x_add_ip.sh \
-                   scripts/suse-8.x_del_ip.sh \
-                   scripts/suse-add_ip.sh \
-                   scripts/suse-del_ip.sh \
-                   scripts/suse-set_hostname.sh
+nobase_distconfscript_SCRIPTS = \
+	$(wildcard scripts/*.sh) \
+	scripts/functions
 
-distconf_DATA =    default \
-                   distribution.conf-template
+distconf_DATA = \
+	default \
+	distribution.conf-template
 
-EXTRA_DIST = $(distconfscript_SCRIPTS) \
-             $(distconf_DATA) \
-             centos.conf \
-             debian.conf \
-             fedora-core.conf \
-             gentoo.conf \
-             mandrake.conf \
-             opensuse.conf \
-             redhat-7.3.conf \
-             redhat.conf \
-             rhel-3.conf \
-             slackware-9.0.conf \
-             slackware.conf \
-             sles.conf \
-             suse-7.3.conf \
-             suse-8.0.conf \
-             suse.conf
+EXTRA_DIST = \
+	$(nobase_distconfscript_SCRIPTS) \
+	$(distconf_DATA) \
+	$(wildcard *.conf)
 
 CENTOS_VER    = 3 4
 DEBIAN_VER    = 3.0 3.1
