@@ -38,13 +38,11 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(veipdumpdir)
 	$(mkinstalldirs) $(DESTDIR)$(modulesdir)
 
-ETC_TARGETS = install-bashcomp \
-              install-logrotate \
-              install-udev \
-              install-redhat \
-              install-gentoo
+DISTRO_TARGETS = \
+	install-redhat \
+	install-gentoo
 
-$(ETC_TARGETS):
+$(DISTRO_TARGETS):
 	$(MAKE) $(AM_MAKEFLAGS) -C etc $@
 
 rpms: dist
