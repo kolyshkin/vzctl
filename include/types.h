@@ -18,10 +18,10 @@
 #ifndef	_TYPES_H_
 #define	_TYPES_H_
 
-#define VZ_DIR			"/etc/vz/"
+#define VZ_DIR			PKGCONFDIR "/"
 #define GLOBAL_CFG		VZ_DIR "vz.conf"
 #define VPS_CONF_DIR		VZ_DIR "conf/"
-#define LIB_SCRIPTS_DIR		"/usr/lib/vzctl/scripts/"
+#define LIB_SCRIPTS_DIR		PKGLIBDIR "/scripts/"
 #define DIST_DIR		VZ_DIR "dists"
 #define VENAME_DIR		VZ_DIR "names"
 

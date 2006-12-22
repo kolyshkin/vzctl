@@ -24,7 +24,7 @@
 #define	TYPE_CMD	0
 #define	TYPE_CONF	1
 
-#define MOD_DIR		"/usr/lib/vzctl/modules/"
+#define MOD_DIR		PKGLIBDIR "/modules/"
 
 #define MOD_INFO_SYM    "vz_get_mod_info"
 
