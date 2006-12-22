@@ -21,12 +21,12 @@ SUBDIRS = \
 	cron.d \
 	dists \
 	init.d \
-	logrotate.d
+	logrotate.d \
+	udev
 
 pkgconfdir = $(sysconfdir)/vz
 namesdir   = $(pkgconfdir)/names
 
-udevdir    = $(sysconfdir)/udev/rules.d
 
 pkglibscriptsdir = $(pkglibdir)/scripts
 
@@ -41,14 +41,12 @@ pkgdata_SCRIPTS = vpsnetclean \
 
 INITSCRIPTS  = vz vz-gentoo
 NETSCRIPTS   = ifcfg-venet0 ifdown-venet ifup-venet
-UDEVRULES    = 60-vzctl.rules
 
 pkgconf_DATA = vz.conf
 
 EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
              $(NETSCRIPTS:%=%.in) \
-             $(UDEVRULES:%=udev/%) \
              $(PKGCONF_DATA)
 
 include $(top_srcdir)/pathsubst.am
@@ -56,13 +54,7 @@ include $(top_srcdir)/pathsubst.am
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
 
-install-udev:
-	$(mkinstalldirs) $(DESTDIR)$(udevdir)
-	for file in $(UDEVRULES); do \
-		$(INSTALL_DATA) $(srcdir)/udev/$$file $(DESTDIR)$(udevdir)/$$file; \
-	done
-
-install-redhat: $(NETSCRIPTS) install-udev
+install-redhat: $(NETSCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sysconfig/network-scripts
 	for file in $(NETSCRIPTS); do \

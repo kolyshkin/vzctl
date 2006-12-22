@@ -96,6 +96,18 @@ AC_ARG_ENABLE([logrotate],
               [enable_logrotate=false])
 AM_CONDITIONAL(ENABLE_LOGROTATE, test x$enable_logrotate = xtrue)
 
+AC_ARG_ENABLE([udev],
+              [AC_HELP_STRING([--disable-udev],
+                              [Disable udev support])],
+              [case "${enableval}" in
+                yes) enable_udev=true;;
+                no)  enable_udev=false;;
+                *)   AC_MSG_ERROR(bad value ${enableval} for --enable-udev);;
+              esac],
+              [enable_udev=true])
+AM_CONDITIONAL(ENABLE_UDEV, test x$enable_udev = xtrue)
+
+
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
@@ -116,6 +128,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/init.d/Makefile
                  etc/logrotate.d/Makefile
                  etc/bash_completion.d/Makefile
+                 etc/udev/Makefile
                  etc/Makefile
                  man/Makefile
                  src/lib/Makefile
