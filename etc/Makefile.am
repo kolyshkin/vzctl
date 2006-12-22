@@ -18,13 +18,13 @@
 SUBDIRS = \
 	bash_completion.d \
 	conf \
+	cron.d \
 	dists \
 	init.d
 
 pkgconfdir = $(sysconfdir)/vz
 namesdir   = $(pkgconfdir)/names
 
-cronddir   = $(sysconfdir)/cron.d
 logrdir    = $(sysconfdir)/logrotate.d
 udevdir    = $(sysconfdir)/udev/rules.d
 
@@ -50,7 +50,6 @@ pkgconf_DATA = vz.conf
 
 EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
-             $(CRONSCRIPTS:%=cron.d/%.in) \
              $(LOGRSCRIPTS:%=logrotate.d/%) \
              $(NETSCRIPTS:%=%.in) \
              $(UDEVRULES:%=udev/%) \
@@ -60,12 +59,6 @@ include $(top_srcdir)/pathsubst.am
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
-
-install-cron: $(CRONSCRIPTS)
-	$(mkinstalldirs) $(DESTDIR)$(cronddir)
-	for file in $(CRONSCRIPTS); do \
-		$(INSTALL_SCRIPT) $$file $(DESTDIR)$(cronddir)/$$file; \
-	done
 
 install-logrotate:
 	$(mkinstalldirs) $(DESTDIR)$(logrdir)

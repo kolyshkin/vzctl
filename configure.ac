@@ -74,6 +74,16 @@ AC_ARG_ENABLE([bashcomp],
               [enable_bashcomp=false])
 AM_CONDITIONAL(ENABLE_BASHCOMP, test x$enable_bashcomp = xtrue)
 
+AC_ARG_ENABLE([cron],
+              [AC_HELP_STRING([--disable-cron],
+                              [Disable cron support])],
+              [case "${enableval}" in
+                yes) enable_cron=true;;
+                no)  enable_cron=false;;
+                *)   AC_MSG_ERROR(bad value ${enableval} for --enable-cron);;
+              esac],
+              [enable_cron=true])
+AM_CONDITIONAL(ENABLE_CRON, test x$enable_cron = xtrue)
 
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
@@ -91,6 +101,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 AC_CONFIG_FILES([bin/Makefile
                  etc/dists/Makefile
                  etc/conf/Makefile
+                 etc/cron.d/Makefile
                  etc/init.d/Makefile
                  etc/bash_completion.d/Makefile
                  etc/Makefile
