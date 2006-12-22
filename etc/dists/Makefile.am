@@ -15,10 +15,11 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-pkgconfdir  = $(sysconfdir)/vz
-distconfdir = $(pkgconfdir)/dists
+pkgconfdir        = $(sysconfdir)/vz
+distconfdir       = $(pkgconfdir)/dists
+distconfscriptdir = $(distconfdir)/scripts
 
-distconf_SCRIPTS = scripts/debian-add_ip.sh \
+distconfscript_SCRIPTS = scripts/debian-add_ip.sh \
                    scripts/debian-del_ip.sh \
                    scripts/debian-set_hostname.sh \
                    scripts/functions \
@@ -45,11 +46,13 @@ distconf_SCRIPTS = scripts/debian-add_ip.sh \
                    scripts/suse-8.x_del_ip.sh \
                    scripts/suse-add_ip.sh \
                    scripts/suse-del_ip.sh \
-                   scripts/suse-set_hostname.sh \
-                   default \
+                   scripts/suse-set_hostname.sh
+
+distconf_DATA =    default \
                    distribution.conf-template
 
-EXTRA_DIST = $(distconf_SCRIPTS) \
+EXTRA_DIST = $(distconfscript_SCRIPTS) \
+             $(distconf_DATA) \
              centos.conf \
              debian.conf \
              fedora-core.conf \

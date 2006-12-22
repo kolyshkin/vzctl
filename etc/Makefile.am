@@ -15,10 +15,11 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-SUBDIRS = dists
+SUBDIRS = \
+	dists \
+	conf
 
 pkgconfdir = $(sysconfdir)/vz
-vpsconfdir = $(pkgconfdir)/conf
 namesdir   = $(pkgconfdir)/names
 
 bashcdir   = $(sysconfdir)/bash_completion.d
@@ -38,21 +39,6 @@ pkglibscripts_SCRIPTS = vps-create \
 pkgdata_SCRIPTS = vpsnetclean \
                   vpsreboot
 
-VE0CONFIG = 0.conf
-
-VECONFIG = ve-light.conf-sample ve-vps.basic.conf-sample
-
-if ARCH_IA64
-	VECONFIG_EXT = .ia64
-else
-if ARCH_X86_64
-	VECONFIG_EXT = .x86_64
-else
-	VECONFIG_EXT =
-endif
-endif
-
-
 BASHCSCRIPTS = bash_completion.d/vzctl.sh
 CRONSCRIPTS  = vpsreboot \
                vpsnetclean
@@ -69,25 +55,14 @@ EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(LOGRSCRIPTS:%=logrotate.d/%) \
              $(NETSCRIPTS:%=%.in) \
              $(UDEVRULES:%=udev/%) \
-             $(VE0CONFIG) \
-             $(VE0CONFIG:%=%.ia64) \
-             $(VE0CONFIG:%=%.x86_64) \
-             $(VECONFIG) \
-             $(VECONFIG:%=%.ia64) \
-             $(VECONFIG:%=%.x86_64) \
              vz.conf
 
 include $(top_srcdir)/pathsubst.am
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(pkgconfdir)
-	$(mkinstalldirs) $(DESTDIR)$(vpsconfdir)
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
 	$(INSTALL_DATA) $(srcdir)/vz.conf $(DESTDIR)$(pkgconfdir)/vz.conf
-	for file in $(VECONFIG); do \
-		$(INSTALL_DATA) $(srcdir)/$$file$(VECONFIG_EXT) $(DESTDIR)$(vpsconfdir)/$$file; \
-	done
-	$(INSTALL_DATA) $(srcdir)/$(VE0CONFIG)$(VECONFIG_EXT) $(DESTDIR)$(vpsconfdir)/$(VE0CONFIG)
 
 install-bashcomp: $(BASHCSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(bashcdir)
