@@ -57,6 +57,5 @@ install-redhat:
 
 install-gentoo:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
-	# Gentoo-specific symlink for global config file
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/conf.d
 	$(LN_S) $(pkgconfdir)/vz.conf $(DESTDIR)$(sysconfdir)/conf.d/vz
