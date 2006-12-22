@@ -47,6 +47,8 @@ LOGRSCRIPTS  = vzctl
 NETSCRIPTS   = ifcfg-venet0 ifdown-venet ifup-venet
 UDEVRULES    = 60-vzctl.rules
 
+pkgconf_DATA = vz.conf
+
 EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
              $(BASHCSCRIPTS:%=%.in) \
@@ -54,14 +56,12 @@ EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(LOGRSCRIPTS:%=logrotate.d/%) \
              $(NETSCRIPTS:%=%.in) \
              $(UDEVRULES:%=udev/%) \
-             vz.conf
+             $(PKGCONF_DATA)
 
 include $(top_srcdir)/pathsubst.am
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(pkgconfdir)
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
-	$(INSTALL_DATA) $(srcdir)/vz.conf $(DESTDIR)$(pkgconfdir)/vz.conf
 
 install-bashcomp: $(BASHCSCRIPTS)
 	$(mkinstalldirs) $(DESTDIR)$(bashcdir)
