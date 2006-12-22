@@ -77,15 +77,7 @@ EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(VECONFIG:%=%.x86_64) \
              vz.conf
 
-pathsubst_RULES = s!@'SBINDIR'@!$(sbindir)!g; \
-                  s!@'PKGCONFDIR'@!$(pkgconfdir)!g; \
-                  s!@'PKGDATADIR'@!$(pkgdatadir)!g; \
-                  s!@'PKGLIBDIR'@!$(pkglibdir)!g;
-
-pathsubst = sed -e '$(pathsubst_RULES)'
-
-%: %.in
-	$(pathsubst) $< > $@
+include $(top_srcdir)/pathsubst.am
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(pkgconfdir)
