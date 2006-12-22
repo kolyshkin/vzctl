@@ -23,7 +23,7 @@ netsdir = $(sysconfdir)/sysconfig/network-scripts
 
 NETSSCRIPTS = ifdown-venet ifup-venet
 NETSDATA    = ifcfg-venet0
-NETSFILES   = NETSSCRIPTS NETSDATA
+NETSFILES   = $(NETSSCRIPTS) $(NETSDATA)
 
 EXTRA_DIST = $(NETSFILES:%=%.in)
 
