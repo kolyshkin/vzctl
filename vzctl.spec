@@ -5,7 +5,7 @@
 %define _dumpdir %{_vzdir}/dump 
 %define _cachedir %{_vzdir}/template/cache 
 %define _veipdir /var/lib/vzctl/veip 
-%define _libdir /usr/lib/vzctl
+%define _pkglibdir /usr/lib/vzctl
 %define _configdir %_sysconfdir/vz
 %define _scriptdir /usr/share/vzctl/scripts
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
@@ -52,12 +52,12 @@ i.e. create, start, shutdown, set various options and limits etc.
 %prep
 %setup
 %build
-make CFLAGS="$RPM_OPT_FLAGS" ARCH=%{_arch}
+%configure
+make CFLAGS="$RPM_OPT_FLAGS"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir} ARCH=%{_arch} \
-	VPSCONFDIR=%{_vpsconfdir} install install-redhat
+make DESTDIR=$RPM_BUILD_ROOT VPSCONFDIR=%{_vpsconfdir} install install-redhat
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 
@@ -161,10 +161,11 @@ Virtual Environments control API library
 
 %files lib
 %defattr(-,root,root)
-%dir %{_libdir}/lib
-%attr(755,root,root) %{_libdir}/lib/libvzctl.so.*
-%attr(755,root,root) %{_libdir}/scripts/vps-stop
-%attr(755,root,root) %{_libdir}/scripts/vps-functions
-%attr(755,root,root) %{_libdir}/scripts/vps-net_add
-%attr(755,root,root) %{_libdir}/scripts/vps-net_del
-%attr(755,root,root) %{_libdir}/scripts/vps-create
+%attr(755,root,root) %{_libdir}/libvzctl.so.*
+%dir %{_pkglibdir}
+%dir %{_pkglibdir}/scripts
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-stop
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-functions
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-net_add
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-net_del
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-create
