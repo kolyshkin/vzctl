@@ -22,12 +22,5 @@ UDEVRULES = 60-vzctl.rules
 EXTRA_DIST = $(UDEVRULES)
 
 if ENABLE_UDEV
-
-install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(udevdir)
-	for file in $(UDEVRULES); do \
-		$(INSTALL_DATA) $(srcdir)/$$file \
-		                $(DESTDIR)$(udevdir)/$$file; \
-	done
-
+udev_DATA = $(UDEVRULES)
 endif

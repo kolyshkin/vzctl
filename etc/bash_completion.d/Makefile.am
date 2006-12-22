@@ -18,18 +18,11 @@
 
 bashcdir = $(sysconfdir)/bash_completion.d
 
-BASHCSCRIPTS = vzctl.sh
+BASHC = vzctl.sh
 
-EXTRA_DIST = $(BASHCSCRIPTS:%=%.in)
+EXTRA_DIST = $(BASHC:%=%.in)
 
 if ENABLE_BASHCOMP
-
 include $(top_srcdir)/pathsubst.am
-
-install-data-local: $(BASHCSCRIPTS)
-	$(mkinstalldirs) $(DESTDIR)$(bashcdir)
-	for file in $(BASHCSCRIPTS); do \
-		$(INSTALL_DATA) $$file $(DESTDIR)$(bashcdir)/$$file; \
-	done
-
+bashc_DATA = $(BASHC)
 endif

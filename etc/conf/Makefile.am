@@ -39,11 +39,6 @@ EXTRA_DIST = $(VE0CONFIG) \
              $(VECONFIG:%=%.ia64) \
              $(VECONFIG:%=%.x86_64)
 
-install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(vpsconfdir)
-	for file in $(VECONFIG); do \
-		$(INSTALL_DATA) $(srcdir)/$$file$(VECONFIG_EXT) \
-			$(DESTDIR)$(vpsconfdir)/$$file; \
-	done
-	$(INSTALL_DATA) $(srcdir)/$(VE0CONFIG)$(VECONFIG_EXT) \
-		$(DESTDIR)$(vpsconfdir)/$(VE0CONFIG)
+vpsconf_DATA = \
+	$(VE0CONFIG:%=%$(VE0CONFIG_EXT)) \
+	$(VECONFIG:%=%$(VECONFIG_EXT))

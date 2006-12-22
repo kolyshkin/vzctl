@@ -24,13 +24,6 @@ CRONSCRIPTS = \
 EXTRA_DIST = $(CRONSCRIPTS:%=%.in)
 
 if ENABLE_CRON
-
 include $(top_srcdir)/pathsubst.am
-
-install-data-local: $(CRONSCRIPTS)
-	$(mkinstalldirs) $(DESTDIR)$(cronddir)
-	for file in $(CRONSCRIPTS); do \
-		$(INSTALL_SCRIPT) $$file $(DESTDIR)$(cronddir)/$$file; \
-	done
-
+crond_SCRIPTS = $(CRONSCRIPTS)
 endif

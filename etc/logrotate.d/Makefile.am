@@ -22,11 +22,5 @@ LOGRSCRIPTS = vzctl
 EXTRA_DIST = $(LOGRSCRIPTS)
 
 if ENABLE_LOGROTATE
-
-install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(logrdir)
-	for file in $(LOGRSCRIPTS); do \
-		$(INSTALL_DATA) $(srcdir)/$$file $(DESTDIR)$(logrdir)/$$file; \
-	done
-
+logr_DATA = $(LOGRSCRIPTS)
 endif
