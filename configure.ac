@@ -127,6 +127,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/cron.d/Makefile
                  etc/init.d/Makefile
                  etc/logrotate.d/Makefile
+                 etc/network-scripts/Makefile
                  etc/bash_completion.d/Makefile
                  etc/udev/Makefile
                  etc/Makefile

@@ -22,6 +22,7 @@ SUBDIRS = \
 	dists \
 	init.d \
 	logrotate.d \
+	network-scripts \
 	udev
 
 pkgconfdir = $(sysconfdir)/vz
@@ -39,13 +40,10 @@ pkglibscripts_SCRIPTS = vps-create \
 pkgdata_SCRIPTS = vpsnetclean \
                   vpsreboot
 
-NETSCRIPTS   = ifcfg-venet0 ifdown-venet ifup-venet
-
 pkgconf_DATA = vz.conf
 
 EXTRA_DIST = $(pkglibscripts_SCRIPTS:%=%.in) \
              $(pkgdata_SCRIPTS:%=%.in) \
-             $(NETSCRIPTS:%=%.in) \
              $(PKGCONF_DATA)
 
 include $(top_srcdir)/pathsubst.am
@@ -53,13 +51,9 @@ include $(top_srcdir)/pathsubst.am
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
 
-install-redhat: $(NETSCRIPTS)
+install-redhat:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
-	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sysconfig/network-scripts
-	for file in $(NETSCRIPTS); do \
-		$(INSTALL_SCRIPT) $$file \
-			$(DESTDIR)$(sysconfdir)/sysconfig/network-scripts/$$file; \
-	done
+	$(MAKE) $(AM_MAKEFLAGS) -C network-scripts $@
 
 install-gentoo:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@

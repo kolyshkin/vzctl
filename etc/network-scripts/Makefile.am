@@ -1,0 +1,39 @@
+#  Copyright (C) 2000-2006 SWsoft. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+# RH/FC specific networking files for venet0
+# FIXME: Add a comment why they are needed. I guess in order for
+#        /etc/init.d/network start|stop|restart to work properly.
+
+netsdir = $(sysconfdir)/sysconfig/network-scripts
+
+NETS_SCRIPTS = ifdown-venet ifup-venet
+NETS_DATA    = ifcfg-venet0
+NETS_FILES   = NETS_SCRIPTS NETS_DATA
+
+EXTRA_DIST = $(NETS_FILES:%=%.in)
+
+include $(top_srcdir)/pathsubst.am
+
+install-redhat: $(NETSCRIPTS)
+	$(mkinstalldirs) $(DESTDIR)$(netsdir)
+	for file in $(NETS_SCRIPTS); do \
+		$(INSTALL_SCRIPT) $$file $(DESTDIR)$(netsdir)/$$file; \
+	done
+	for file in $(NETS_DATA); do \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(netsdir)/$$file; \
+	done
