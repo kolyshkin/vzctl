@@ -51,15 +51,21 @@ i.e. create, start, shutdown, set various options and limits etc.
 
 %prep
 %setup
+
 %build
-%configure
-make CFLAGS="$RPM_OPT_FLAGS"
+CFLAGS="$RPM_OPT_FLAGS" %configure \
+	--enable-bashcomp \
+	--enable-logrotate \
+	--disable-static
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT VPSCONFDIR=%{_vpsconfdir} install install-redhat
+make DESTDIR=$RPM_BUILD_ROOT vpsconfdir=%{_vpsconfdir} install install-redhat
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
+# This could go to vzctl-lib-devel, but since we don't have it...
+rm -f  $RPM_BUILD_ROOT/%_libdir/libvzctl.{la,so}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -161,7 +167,7 @@ Virtual Environments control API library
 
 %files lib
 %defattr(-,root,root)
-%attr(755,root,root) %{_libdir}/libvzctl.so.*
+%attr(755,root,root) %{_libdir}/libvzctl-*.so
 %dir %{_pkglibdir}
 %dir %{_pkglibdir}/scripts
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-stop
