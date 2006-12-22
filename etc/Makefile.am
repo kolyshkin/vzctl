@@ -39,8 +39,6 @@ pkglibscripts_SCRIPTS = vps-create \
 pkgdata_SCRIPTS = vpsnetclean \
                   vpsreboot
 
-CRONSCRIPTS  = vpsreboot \
-               vpsnetclean
 INITSCRIPTS  = vz vz-gentoo
 LOGRSCRIPTS  = vzctl
 NETSCRIPTS   = ifcfg-venet0 ifdown-venet ifup-venet
@@ -72,7 +70,7 @@ install-udev:
 		$(INSTALL_DATA) $(srcdir)/udev/$$file $(DESTDIR)$(udevdir)/$$file; \
 	done
 
-install-redhat: $(NETSCRIPTS) install-logrotate install-udev install-cron
+install-redhat: $(NETSCRIPTS) install-logrotate install-udev
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/sysconfig/network-scripts
 	for file in $(NETSCRIPTS); do \
