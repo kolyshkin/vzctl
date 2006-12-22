@@ -27,7 +27,7 @@ vzdir       = /vz
 vzcachedir  = $(vzdir)/template/cache
 vzlockdir   = $(vzdir)/lock
 vzdumpdir   = $(vzdir)/dump
-veipdumpdir = $(localstatedir)/vzctl/veip
+veipdumpdir = $(localstatedir)/lib/vzctl/veip
 modulesdir  = $(pkglibdir)/modules
 
 install-data-local:
