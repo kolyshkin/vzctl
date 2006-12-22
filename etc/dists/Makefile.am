@@ -15,8 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-pkgconfdir        = $(sysconfdir)/vz
-distconfdir       = $(pkgconfdir)/dists
+include $(top_srcdir)/paths.am
 
 nobase_distconf_SCRIPTS = \
 	$(wildcard scripts/*.sh) \

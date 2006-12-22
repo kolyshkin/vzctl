@@ -15,7 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-cronddir = $(sysconfdir)/cron.d
+include $(top_srcdir)/pathsubst.am
 
 CRONSCRIPTS = \
 	vpsreboot \
@@ -24,7 +24,6 @@ CRONSCRIPTS = \
 EXTRA_DIST = $(CRONSCRIPTS:%=%.in)
 
 if ENABLE_CRON
-include $(top_srcdir)/pathsubst.am
 crond_SCRIPTS = $(CRONSCRIPTS)
 CLEANFILES = $(crond_SCRIPTS)
 endif

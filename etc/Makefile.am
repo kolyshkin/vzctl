@@ -15,6 +15,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+include $(top_srcdir)/paths.am
+
 SUBDIRS = \
 	bash_completion.d \
 	conf \
@@ -24,9 +26,6 @@ SUBDIRS = \
 	logrotate.d \
 	network-scripts \
 	udev
-
-pkgconfdir = $(sysconfdir)/vz
-namesdir   = $(pkgconfdir)/names
 
 pkgconf_DATA = vz.conf
 

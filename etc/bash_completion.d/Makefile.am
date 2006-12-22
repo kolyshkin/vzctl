@@ -15,15 +15,13 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-
-bashcdir = $(sysconfdir)/bash_completion.d
+include $(top_srcdir)/pathsubst.am
 
 BASHC = vzctl.sh
 
 EXTRA_DIST = $(BASHC:%=%.in)
 
 if ENABLE_BASHCOMP
-include $(top_srcdir)/pathsubst.am
 bashc_DATA = $(BASHC)
 CLEANFILES = $(bashc_DATA)
 endif

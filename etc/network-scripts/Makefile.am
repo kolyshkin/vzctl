@@ -19,8 +19,6 @@
 # FIXME: Add a comment why they are needed. I guess in order for
 #        /etc/init.d/network start|stop|restart to work properly.
 
-netsdir = $(sysconfdir)/sysconfig/network-scripts
-
 NETSSCRIPTS = ifdown-venet ifup-venet
 NETSDATA    = ifcfg-venet0
 

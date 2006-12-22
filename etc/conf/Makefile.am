@@ -15,8 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-pkgconfdir = $(sysconfdir)/vz
-vpsconfdir = $(pkgconfdir)/conf
+include $(top_srcdir)/paths.am
 
 VE0CONFIG = 0.conf
 VECONFIG  = ve-light.conf-sample ve-vps.basic.conf-sample

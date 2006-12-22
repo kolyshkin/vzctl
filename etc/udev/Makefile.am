@@ -15,7 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-udevdir = $(sysconfdir)/udev/rules.d
+include $(top_srcdir)/paths.am
 
 UDEVRULES = 60-vzctl.rules
 

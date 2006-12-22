@@ -15,8 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-vzlibdir  = $(pkglibdir)/scripts
-vzcrondir = $(pkgdatadir)/scripts
+include $(top_srcdir)/pathsubst.am
 
 vzlib_SCRIPTS = \
 	vps-create \
@@ -36,5 +35,3 @@ EXTRA_DIST = \
 CLEANFILES = \
 	$(vzlib_SCRIPTS) \
 	$(vzcron_SCRIPTS)
-
-include $(top_srcdir)/pathsubst.am
