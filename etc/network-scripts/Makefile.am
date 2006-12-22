@@ -21,19 +21,19 @@
 
 netsdir = $(sysconfdir)/sysconfig/network-scripts
 
-NETS_SCRIPTS = ifdown-venet ifup-venet
-NETS_DATA    = ifcfg-venet0
-NETS_FILES   = NETS_SCRIPTS NETS_DATA
+NETSSCRIPTS = ifdown-venet ifup-venet
+NETSDATA    = ifcfg-venet0
+NETSFILES   = NETSSCRIPTS NETSDATA
 
-EXTRA_DIST = $(NETS_FILES:%=%.in)
+EXTRA_DIST = $(NETSFILES:%=%.in)
 
 include $(top_srcdir)/pathsubst.am
 
-install-redhat: $(NETSCRIPTS)
+install-redhat: $(NETSFILES)
 	$(mkinstalldirs) $(DESTDIR)$(netsdir)
-	for file in $(NETS_SCRIPTS); do \
+	for file in $(NETSSCRIPTS); do \
 		$(INSTALL_SCRIPT) $$file $(DESTDIR)$(netsdir)/$$file; \
 	done
-	for file in $(NETS_DATA); do \
+	for file in $(NETSDATA); do \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(netsdir)/$$file; \
 	done
