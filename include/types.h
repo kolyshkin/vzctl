@@ -19,10 +19,10 @@
 #define	_TYPES_H_
 
 #define VZ_DIR			"/etc/vz/"
-#define GLOBAL_CFG		VZ_DIR"vz.conf"
-#define VPS_CONF_DIR		VZ_DIR"conf/"
+#define GLOBAL_CFG		VZ_DIR "vz.conf"
+#define VPS_CONF_DIR		VZ_DIR "conf/"
 #define LIB_SCRIPTS_DIR		"/usr/lib/vzctl/scripts/"
-#define DIST_DIR		VZ_DIR"dists"
+#define DIST_DIR		VZ_DIR "dists"
 #define VENAME_DIR		VZ_DIR "names"
 
 #define VZFIFO_FILE		"/.vzfifo"
@@ -42,7 +42,7 @@
 #define ADD     	0
 #define DEL     	1
 
-/* Default enviroment variable PATH */
+/* Default environment variable PATH */
 #define	ENV_PATH	"PATH=/bin:/sbin:/usr/bin:/usr/sbin:"
 
 /* VE states */
@@ -55,7 +55,7 @@ enum {
 	STATE_CHECKPOINTING = 6,
 };
 
-/* Parse errro codes */
+/* Parse error codes */
 #define ERR_DUP		-1
 #define ERR_INVAL	-2
 #define ERR_UNK		-3
@@ -67,7 +67,7 @@ enum {
 /** VE handler.
  */
 typedef struct {
-        int vzfd;	/**< /dev/vzctl file deccriptor. */
+        int vzfd;	/**< /dev/vzctl file descriptor. */
 	int stdfd;
 } vps_handler;
 
@@ -81,4 +81,3 @@ typedef enum {
 typedef int (* execFn)(void *data);
 
 #endif
-
