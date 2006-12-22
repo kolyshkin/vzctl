@@ -21,6 +21,8 @@ INITSCRIPTS = vz vz-gentoo
 
 EXTRA_DIST = $(INITSCRIPTS:%=%.in)
 
+CLEANFILES = $(INITSCRIPTS)
+
 include $(top_srcdir)/pathsubst.am
 
 install-redhat: vz

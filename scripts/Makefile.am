@@ -33,4 +33,8 @@ EXTRA_DIST = \
 	$(vzlib_SCRIPTS:%=%.in) \
 	$(vzcron_SCRIPTS:%=%.in)
 
+CLEANFILES = \
+	$(vzlib_SCRIPTS) \
+	$(vzcron_SCRIPTS)
+
 include $(top_srcdir)/pathsubst.am

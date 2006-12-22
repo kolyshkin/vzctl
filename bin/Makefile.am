@@ -22,4 +22,6 @@ sbin_SCRIPTS = vzcpucheck \
 
 EXTRA_DIST=$(sbin_SCRIPTS:%=%.in)
 
+CLEANFILES = $(sbin_SCRIPTS)
+
 include $(top_srcdir)/pathsubst.am

@@ -25,4 +25,5 @@ EXTRA_DIST = $(BASHC:%=%.in)
 if ENABLE_BASHCOMP
 include $(top_srcdir)/pathsubst.am
 bashc_DATA = $(BASHC)
+CLEANFILES = $(bashc_DATA)
 endif

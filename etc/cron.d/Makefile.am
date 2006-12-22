@@ -26,4 +26,5 @@ EXTRA_DIST = $(CRONSCRIPTS:%=%.in)
 if ENABLE_CRON
 include $(top_srcdir)/pathsubst.am
 crond_SCRIPTS = $(CRONSCRIPTS)
+CLEANFILES = $(crond_SCRIPTS)
 endif
