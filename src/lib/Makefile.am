@@ -23,8 +23,7 @@ AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
 
 LIB_VER = 0.0.2
 
-lib_LTLIBRARIES = libvzctl.la \
-                  libvzctl-simfs.la
+lib_LTLIBRARIES = libvzctl.la
 
 libvzctl_la_SOURCES = cap.c \
                       config.c \
@@ -55,8 +54,4 @@ libvzctl_la_SOURCES = cap.c \
                       vps_configure.c \
                       vzfeatures.c
 
-libvzctl_simfs_la_SOURCES = fs_simfs.c \
-                            logger.c
-
 libvzctl_la_LDFLAGS = -release $(LIB_VER)
-libvzctl_simfs_la_LDFLAGS = -release $(LIB_VER)
