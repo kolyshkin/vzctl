@@ -17,9 +17,8 @@
 
 pkgconfdir        = $(sysconfdir)/vz
 distconfdir       = $(pkgconfdir)/dists
-distconfscriptdir = $(distconfdir)/scripts
 
-nobase_distconfscript_SCRIPTS = \
+nobase_distconf_SCRIPTS = \
 	$(wildcard scripts/*.sh) \
 	scripts/functions
 
@@ -28,7 +27,7 @@ distconf_DATA = \
 	distribution.conf-template
 
 EXTRA_DIST = \
-	$(nobase_distconfscript_SCRIPTS) \
+	$(nobase_distconf_SCRIPTS) \
 	$(distconf_DATA) \
 	$(wildcard *.conf)
 
