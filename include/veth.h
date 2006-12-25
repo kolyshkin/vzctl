@@ -24,7 +24,7 @@
 #define IFNAMSIZE	16
 #define ETH_ALEN	6
 #define MAC_SIZE	3*ETH_ALEN - 1
-#define VZNETCFG	"/usr/sbin/vznetcfg"
+#define VZNETCFG	SBIN_DIR "vznetcfg"
 
 #define PROC_VETH	"/proc/vz/veth"
 
