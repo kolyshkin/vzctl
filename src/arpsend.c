@@ -485,7 +485,7 @@ int main(int argc,char** argv)
 
 	if (ip6_addr) {
 		if (cmd == AR_UPDATE)
-			execlp("/usr/sbin/ndsend", "ndsend", ip6_addr, iface, NULL);
+			execlp(SBINDIR "/ndsend", "ndsend", ip6_addr, iface, NULL);
 		exit(0);
 	}
 
