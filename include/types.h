@@ -25,6 +25,8 @@
 #define DIST_DIR		VZ_DIR "dists"
 #define VENAME_DIR		VZ_DIR "names"
 
+#define VZCTLDEV		"/dev/vzctl"
+
 #define VZFIFO_FILE		"/.vzfifo"
 
 #define VPS_STOP		LIB_SCRIPTS_DIR "vps-stop"

@@ -1191,7 +1191,7 @@ static int get_run_ve_ioctl(int update)
 	void *buf = NULL;
 	int i; 
 
-	vzctlfd = open("/dev/vzctl", O_RDWR);
+	vzctlfd = open(VZCTLDEV, O_RDWR);
 	if (vzctlfd < 0) 
 		goto error;
 	veid.num = 256;

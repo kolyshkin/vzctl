@@ -42,7 +42,6 @@
 #include "vzsyscalls.h"
 
 #define ENVRETRY	3
-#define VZCTLDEV	"/dev/vzctl"
 
 static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode);
 
