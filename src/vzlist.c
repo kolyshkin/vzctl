@@ -1355,7 +1355,7 @@ int get_ves_la()
 {
 	int i;
 	
-	if ((vzctlfd = open("/dev/vzctl", O_RDWR)) < 0)
+	if ((vzctlfd = open(VZCTLDEV, O_RDWR)) < 0)
 		return 1;
 	for (i = 0; i < n_veinfo; i++) {
 		if (veinfo[i].hide)
