@@ -359,7 +359,7 @@ if ! logexec 2 $SCP $vpsconf root@$host:$vpsconf ; then
 	exit $MIG_ERR_COPY
 fi
 
-logexec 2 $SSH root@$host vzctl set $VEID --applyconfig_map name
+logexec 2 $SSH root@$host vzctl set $VEID --applyconfig_map name --save
 # vzctl return code 20 or 21 in case of unrecognized option
 if [[ $? != 20 && $? != 21 && $? != 0 ]]; then
 	log 0 "Failed to apply config on destination node"
