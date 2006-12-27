@@ -113,8 +113,16 @@ EOF
 	exit $MIG_ERR_USAGE
 }
 
+# Logs message
+# There are 3 types of messages:
+# 0 - error messages (print to stderr)
+# 1 - normal messages (print to stdout)
+# 2 - debug messages (print to stdout if in verbose mode)
 log () {
-	if [ $1 -eq 1 ]; then
+	if [ $1 -eq 0 ]; then
+		shift
+		echo -e "Error: " $@ >&2
+	elif [ $1 -eq 1 ]; then
 		shift
 		echo -e $@
 	elif [ $verbose -eq 1 ]; then
@@ -123,11 +131,13 @@ log () {
 	fi
 }
 
+# Executes command and returns result of execution
+# There are 2 types of execution:
+# 1 - normal execution (all output will be printed)
+# 2 - debug execution (output will be printed if verbose mode is set,
+#     in other case stdout and stderr redirected to /dev/null)
 logexec () {
-	if [ $1 -eq 1 ]; then
-		shift
-		$@
-	elif [ $verbose -eq 1 ]; then
+	if [ $1 -eq 1 -o $verbose -eq 1 ]; then
 		shift
 		$@
 	else
@@ -176,7 +186,7 @@ undo_sync () {
 }
 
 undo_suspend () {
-	logexec 0 vzctl chkpnt $VEID --resume
+	logexec 2 vzctl chkpnt $VEID --resume
 	undo_sync
 }
 
@@ -220,7 +230,7 @@ undo_copy_quota () {
 }
 
 undo_undump () {
-	logexec 0 $SSH root@$host vzctl restore $VEID --kill
+	logexec 2 $SSH root@$host vzctl restore $VEID --kill
 	undo_copy_quota
 }
 
@@ -284,13 +294,13 @@ fi
 vpsconf="$confdir/$VEID.conf"
 
 if [ ! -r "$vzconf" -o ! -r "$vpsconf" ]; then
-	log 1 "Can't read global config or VE #$VEID config file"
+	log 0 "Can't read global config or VE #$VEID config file"
 	exit $MIG_ERR_NOEXIST
 fi
 
 get_status $(vzctl status $VEID)
 if [ "$exist" = "deleted" ]; then
-	log 1 "VE #$VEID doesn't exist"
+	log 0 "VE #$VEID doesn't exist"
 	exit $MIG_ERR_NOEXIST
 fi
 
@@ -301,27 +311,27 @@ else
 fi
 
 # Try to connect to destination
-if ! logexec 0 $SSH -o BatchMode=yes root@$host /bin/true; then
-	log 1 "Can't connect to destination address using public key"
-	log 1 "Please put your public key to destination node"
+if ! logexec 2 $SSH -o BatchMode=yes root@$host /bin/true; then
+	log 0 "Can't connect to destination address using public key"
+	log 0 "Please put your public key to destination node"
 	exit $MIG_ERR_CANT_CONNECT
 fi
 
 # Check if OpenVZ is running
-if ! logexec 0 $SSH -o BatchMode=yes root@$host /etc/init.d/vz status ; then
-	log 1 "OpenVZ is not running on the target machine"
-	log 1 "Can't continue migration"
+if ! logexec 2 $SSH -o BatchMode=yes root@$host /etc/init.d/vz status ; then
+	log 0 "OpenVZ is not running on the target machine"
+	log 0 "Can't continue migration"
 	exit $MIG_ERR_OVZ_NOT_RUNNING
 fi
 
 dst_exist=$($SSH "root@$host" "vzctl status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
-	log 1 "VE #$VEID already exists on destination node"
+	log 0 "VE #$VEID already exists on destination node"
 	exit $MIG_ERR_EXISTS
 fi
 
 if [ $online -eq 1 -a "$state" != "running" ]; then
-	log 1 "Can't perform online migration of stopped VE"
+	log 0 "Can't perform online migration of stopped VE"
 	exit $MIG_ERR_VPS_IS_STOPPED
 fi
 
@@ -336,7 +346,7 @@ log 2 "Check IPs on destination node: $IP_ADDRESS"
 for IP in $IP_ADDRESS; do
 	if [ $($SSH "root@$host" "grep -c \" $IP \" /proc/vz/veip") -gt 0 ];
 	then
-		log 1 "IP address $IP already in use on destination node"
+		log 0 "IP address $IP already in use on destination node"
 		exit $MIG_ERR_IP_IN_USE
 	fi
 done
@@ -344,15 +354,15 @@ done
 log 1 "Preparing remote node"
 
 log 2 "Copying config file"
-if ! logexec 0 $SCP $vpsconf root@$host:$vpsconf ; then
-	log 1 "Failed to copy config file"
+if ! logexec 2 $SCP $vpsconf root@$host:$vpsconf ; then
+	log 0 "Failed to copy config file"
 	exit $MIG_ERR_COPY
 fi
 
-logexec 0 $SSH root@$host vzctl set $VEID --applyconfig_map name
+logexec 2 $SSH root@$host vzctl set $VEID --applyconfig_map name
 # vzctl return code 20 or 21 in case of unrecognized option
 if [[ $? != 20 && $? != 21 && $? != 0 ]]; then
-	log 1 "Failed to apply config on destination node"
+	log 0 "Failed to apply config on destination node"
 	undo_conf
 	exit $MIG_ERR_APPLY_CONFIG
 fi
@@ -365,8 +375,8 @@ for sfx in $ACT_SCRIPTS_SFX; do
 done
 if [ -n "$act_scripts" ]; then
 	log 2 "Copying action scripts"
-	if ! logexec 0 $SCP $act_scripts root@$host:$confdir ; then
-		log 1 "Failed to copy action scripts"
+	if ! logexec 2 $SCP $act_scripts root@$host:$confdir ; then
+		log 0 "Failed to copy action scripts"
 		undo_conf
 		exit $MIG_ERR_COPY
 	fi
@@ -374,14 +384,14 @@ fi
 
 log 2 "Creating remote VE root dir"
 if ! $SSH "root@$host" "mkdir -p $VE_ROOT"; then
-	log 1 "Failed to make VE root"
+	log 0 "Failed to make VE root"
 	undo_act_scripts
 	exit $MIG_ERR_COPY
 fi
 
 log 2 "Creating remote VE private dir"
 if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE"; then
-	log 1 "Failed to make VE private area"
+	log 0 "Failed to make VE private area"
 	undo_private
 	exit $MIG_ERR_COPY
 fi
@@ -390,14 +400,14 @@ log 1 "Initializing remote quota"
 
 log 2 "Quota init"
 if ! $SSH "root@$host" "vzctl quotainit $VEID"; then
-	log 1 "Failed to initialize quota"
+	log 0 "Failed to initialize quota"
 	undo_root
 	exit $MIG_ERR_QUOTA
 fi
 
 log 2 "Turning remote quota on"
 if ! $SSH "root@$host" "vzctl quotaon $VEID"; then
-	log 1 "Failed to turn quota on"
+	log 0 "Failed to turn quota on"
 	undo_quota_init
 	exit $MIG_ERR_QUOTA
 fi
@@ -405,7 +415,7 @@ fi
 log 1 "Syncing private"
 if ! rsync -aH --progress "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" | \
 		grep "% of" | awk -v ORS="\r" '{print $10}'; then
-	log 1 "Failed to sync VE private areas"
+	log 0 "Failed to sync VE private areas"
 	undo_quota_on
 	exit $MIG_ERR_COPY
 fi
@@ -415,38 +425,38 @@ if [ $online -eq 1 ]; then
 
 	log 2 "Suspending VE"
 	time_suspend=$(date +%s.%N)
-	if ! logexec 0 vzctl chkpnt $VEID --suspend ; then
-		log 1 "Failed to suspend VE"
+	if ! logexec 2 vzctl chkpnt $VEID --suspend ; then
+		log 0 "Failed to suspend VE"
 		undo_sync
 		exit $MIG_ERR_CHECKPOINT 
 	fi
 
 	log 2 "Dumping VE"
-	if ! logexec 0 vzctl chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
-		log 1 "Failed to dump VE"
+	if ! logexec 2 vzctl chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
+		log 0 "Failed to dump VE"
 		undo_suspend
 		exit $MIG_ERR_CHECKPOINT
 	fi
 
 	log 2 "Copying dumpfile"
 	time_copy_dump=$(date +%s.%N)
-	if ! logexec 0 $SCP $VE_DUMPFILE root@$host:$VE_DUMPFILE ; then
-		log 1 "Failed to copy dump"
+	if ! logexec 2 $SCP $VE_DUMPFILE root@$host:$VE_DUMPFILE ; then
+		log 0 "Failed to copy dump"
 		undo_dump
 		exit $MIG_ERR_COPY
 	fi
 else
 	if [ "$state" = "running" ]; then
 		log 1 "Stopping VE"
-		if ! logexec 0 vzctl stop $VEID ; then
-			log 1 "Failed to stop VE"
+		if ! logexec 2 vzctl stop $VEID ; then
+			log 0 "Failed to stop VE"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
 	elif [ "$mounted" = "mounted" ]; then
 		log 1 "Unmounting VE"
-		if ! logexec 0 vzctl umount $VEID ; then
-			log 1 "Failed to umount VE"
+		if ! logexec 2 vzctl umount $VEID ; then
+			log 0 "Failed to umount VE"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
@@ -457,7 +467,7 @@ if [ "$state" = "running" ]; then
 	log 2 "Syncing private (2nd pass)"
 	time_rsync2=$(date +%s.%N)
 	if ! rsync -aH "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
-		log 1 "Failed to sync VE private areas"
+		log 0 "Failed to sync VE private areas"
 		undo_source_stage
 		exit $MIG_ERR_COPY
 	fi
@@ -468,14 +478,14 @@ log 1 "Syncing 2nd level quota"
 log 2 "Dumping 2nd level quota"
 time_quota=$(date +%s.%N)
 if ! vzdqdump $VEID -U -G -T > "$VE_QUOTADUMP"; then
-	log 2 "Failed to dump 2nd level quota"
+	log 0 "Failed to dump 2nd level quota"
 	undo_quota_dump
 	exit $MIG_ERR_QUOTA
 fi
 
 log 2 "Copying 2nd level quota"
-if ! logexec 0 $SCP $VE_QUOTADUMP root@$host:$VE_QUOTADUMP ; then
-	log 2 "Failed to copy 2nd level quota dump"
+if ! logexec 2 $SCP $VE_QUOTADUMP root@$host:$VE_QUOTADUMP ; then
+	log 0 "Failed to copy 2nd level quota dump"
 	undo_quota_dump
 	exit $MIG_ERR_COPY
 fi
@@ -483,7 +493,7 @@ fi
 log 2 "Load 2nd level quota"
 if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T < $VE_QUOTADUMP && \
 		vzquota reload2 $VEID)"; then
-	log 2 "Failed to load 2nd level quota"
+	log 0 "Failed to load 2nd level quota"
 	undo_copy_quota
 	exit $MIG_ERR_QUOTA
 fi
@@ -491,16 +501,16 @@ fi
 if [ $online -eq 1 ]; then
 	log 2 "Undumping VE"
 	time_undump=$(date +%s.%N)
-	if ! logexec 0 $SSH root@$host vzctl restore $VEID --undump \
+	if ! logexec 2 $SSH root@$host vzctl restore $VEID --undump \
 			--dumpfile $VE_DUMPFILE --skip_arpdetect ; then
-		log 1 "Failed to undump VE"
+		log 0 "Failed to undump VE"
 		undo_copy_quota
 		exit $MIG_ERR_RESTORE_VPS
 	fi
 
 	log 2 "Resuming VE"
-	if ! logexec 0 $SSH root@$host vzctl restore $VEID --resume ; then
-		log 1 "Failed to resume VE"
+	if ! logexec 2 $SSH root@$host vzctl restore $VEID --resume ; then
+		log 0 "Failed to resume VE"
 		undo_undump
 		exit $MIG_ERR_RESTORE_VPS
 	fi
@@ -516,8 +526,8 @@ if [ $online -eq 1 ]; then
 	log 1 "Cleanup"
 
 	log 2 "Killing VE"
-	logexec 0 vzctl chkpnt $VEID --kill
-	logexec 0 vzctl umount $VEID
+	logexec 2 vzctl chkpnt $VEID --kill
+	logexec 2 vzctl umount $VEID
 
 	log 2 "Removing dumpfiles"
 	rm -f "$VE_DUMPFILE"
@@ -525,22 +535,22 @@ if [ $online -eq 1 ]; then
 else
 	if [ "$state" = "running" ]; then
 		log 1 "Starting VE"
-		if ! logexec 0 $SSH root@$host vzctl start $VEID ; then
-			log 1 "Failed to start VE"
+		if ! logexec 2 $SSH root@$host vzctl start $VEID ; then
+			log 0 "Failed to start VE"
 			undo_copy_quota
 			exit $MIG_ERR_START_VPS
 		fi
 	elif [ "$mounted" = "mounted" ]; then
 		log 1 "Mounting VE"
-		if ! logexec 0 $SSH root@$host vzctl mount $VEID ; then
-			log 1 "Failed to mount VE"
+		if ! logexec 2 $SSH root@$host vzctl mount $VEID ; then
+			log 0 "Failed to mount VE"
 			undo_copy_quota
 			exit $MIG_ERR_MOUNT_VPS
 		fi
 	else
 		log 1 "Turning quota off"
-		if ! logexec 0 $SSH root@$host vzquota off $VEID ; then
-			log 1 "failed to turn quota off"
+		if ! logexec 2 $SSH root@$host vzquota off $VEID ; then
+			log 0 "failed to turn quota off"
 			undo_copy_quota
 			exit $MIG_ERR_QUOTA
 		fi
@@ -551,7 +561,7 @@ fi
 
 if [ $remove_area -eq 1 ]; then
 	log 2 "Destroying VE"
-	logexec 0 vzctl destroy $VEID
+	logexec 2 vzctl destroy $VEID
 else
 	# Move config as veid.migrated to allow backward migration
 	mv -f $vpsconf $vpsconf.migrated 
