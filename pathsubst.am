@@ -20,6 +20,7 @@ include $(top_srcdir)/paths.am
 pathsubst_RULES = \
 	s!@'SBINDIR'@!$(sbindir)!g; \
 	s!@'PKGCONFDIR'@!$(pkgconfdir)!g; \
+	s!@'VPSCONFDIR'@!$(vpsconfdir)!g; \
 	s!@'PKGDATADIR'@!$(pkgdatadir)!g; \
 	s!@'PKGLIBDIR'@!$(pkglibdir)!g;
 

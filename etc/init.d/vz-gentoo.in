@@ -16,7 +16,7 @@ check_config() {
 	: ${VZQUOTA:=@SBINDIR@/vzquota}
 	: ${VZVEINFO:=/proc/vz/veinfo}
 	: ${VESTAT:=/proc/vz/vestat}
-	: ${VPSCONFDIR:=@PKGCONFDIR@}
+	: ${VPSCONFDIR:=@VPSCONFDIR@}
 	: ${PRELOAD_MODULES:="af_packet"}
 	: ${MODULES:="vzmon vzdquota vzdev"}
 	: ${MIGRATE_MODULES:="vzcpt vzrst"}
