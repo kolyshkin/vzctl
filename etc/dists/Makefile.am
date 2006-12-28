@@ -31,7 +31,7 @@ EXTRA_DIST = \
 	$(wildcard *.conf)
 
 CENTOS_VER    = 3 4
-DEBIAN_VER    = 3.0 3.1
+DEBIAN_VER    = 3.0 3.1 4.0
 FC_VER        = 1 2 3 4
 REDHAT_7x_VER = 7.0 7.1 7.2 7.3
 REDHAT_VER    = 8.0 9
