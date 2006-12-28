@@ -15,7 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-INITSCRIPTS = vz vz-gentoo
+INITSCRIPTS = vz-redhat vz-gentoo
 
 EXTRA_DIST = $(INITSCRIPTS:%=%.in)
 
@@ -23,9 +23,9 @@ CLEANFILES = $(INITSCRIPTS)
 
 include $(top_srcdir)/pathsubst.am
 
-install-redhat: vz
+install-redhat: vz-redhat
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
-	$(INSTALL_SCRIPT) vz $(DESTDIR)$(initddir)/vz
+	$(INSTALL_SCRIPT) vz-redhat $(DESTDIR)$(initddir)/vz
 
 install-gentoo: vz-gentoo
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
