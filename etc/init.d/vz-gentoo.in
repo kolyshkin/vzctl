@@ -22,7 +22,6 @@ check_config() {
 	: ${MIGRATE_MODULES:="vzcpt vzrst"}
 	: ${NET_MODULES="vznetdev vznet"}
 	: ${VZDEV:=venet0}
-	: ${PARALLEL:=4}
 
 	# check if you should load vzwdog module
 	[ "${VZWDOG}" = "yes" ] && MODULES="${MODULES} vzwdog"
@@ -140,10 +139,20 @@ start_ve() {
 	return 0
 }
 
+get_parallel()
+{
+	[ -n "${PARALLEL}" ] && return
+	PARALLEL=`awk '
+BEGIN { num=0; }
+$1 == "processor" { num++; }
+END { print num * 4; }' /proc/cpuinfo`
+}
+
 stop_ve() {
 	local veid velist msg m mounts fail i iter pid pids quota
 
 	if [ -f ${VESTAT} ]; then
+		get_parallel
 		for ((i = 0; i <= 2; i++)); do
 			iter=0
 			pids=
@@ -156,7 +165,6 @@ stop_ve() {
 				${VZCTL} --skiplock stop ${veid} >/dev/null 2>&1 &
 				pids="${pids} $!"
 				let iter++
-				sleep 1
 				if [ ${iter} -gt ${PARALLEL} ]; then
 					for pid in ${pids}; do
 						wait ${pid}

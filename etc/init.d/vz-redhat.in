@@ -84,7 +84,9 @@ fi
 
 VEINFO=""
 RETVAL=0
-PARALLEL=4
+# Number of the parallel VEs on stop.
+# In case empty value the number of parallel VEs calculated as 'num_cpu * 4'
+PARALLEL=
 cd /
 
 function get_kern_ver()
@@ -93,6 +95,15 @@ function get_kern_ver()
 
 	set -- $(IFS='.-'; echo ${ver})
 	echo $(((($1 * 256) + $2) * 256 + $3))
+}
+
+function get_parallel()
+{
+	[ -n "${PARALLEL}" ] && return
+	PARALLEL=`awk '
+BEGIN { num=0; }
+$1 == "processor" { num++; }
+END { print num * 4; }' /proc/cpuinfo`
 }
 
 check_is_root()
@@ -289,6 +300,7 @@ function ve_stop()
 	local pids
 
 	if get_veinfo; then
+		get_parallel
 		for ((i = 0; i <= 2; i++)); do
 			iter=0;
 			pids=
@@ -301,7 +313,6 @@ function ve_stop()
 				$VZCTL --skiplock stop $veid >/dev/null 2>&1 &
 				pids="$pids $!"
 				let iter++
-				sleep 1
 				if [ ${iter} -gt ${PARALLEL} ]; then
 					for pid in ${pids}; do
 						wait ${pid}
