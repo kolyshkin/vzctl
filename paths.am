@@ -15,12 +15,24 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+if ENABLE_BASHCOMP
 bashcdir    = $(sysconfdir)/bash_completion.d
+endif
+
+if ENABLE_CRON
 cronddir    = $(sysconfdir)/cron.d
-initddir    = $(sysconfdir)/init.d
+endif
+
+if ENABLE_LOGROTATE
 logrdir     = $(sysconfdir)/logrotate.d
-netsdir     = $(sysconfdir)/sysconfig/network-scripts
+endif
+
+if ENABLE_UDEV
 udevdir     = $(sysconfdir)/udev/rules.d
+endif
+
+initddir    = $(sysconfdir)/init.d
+netsdir     = $(sysconfdir)/sysconfig/network-scripts
 
 pkgconfdir  = $(sysconfdir)/vz
 vpsconfdir  = $(pkgconfdir)/conf
