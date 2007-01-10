@@ -20,24 +20,28 @@ include $(top_srcdir)/paths.am
 VE0CONFIG = 0.conf
 VECONFIG  = ve-light.conf-sample ve-vps.basic.conf-sample
 
+VECONFIG_EXT = .x86
 if ARCH_IA64
 	VECONFIG_EXT = .ia64
 else
 if ARCH_X86_64
 	VECONFIG_EXT = .x86_64
-else
-	VECONFIG_EXT =
 endif
 endif
 
 
-EXTRA_DIST = $(VE0CONFIG) \
+EXTRA_DIST = $(VE0CONFIG:%=%.x86) \
              $(VE0CONFIG:%=%.ia64) \
              $(VE0CONFIG:%=%.x86_64) \
-             $(VECONFIG) \
+             $(VECONFIG:%=%.x86) \
              $(VECONFIG:%=%.ia64) \
              $(VECONFIG:%=%.x86_64)
 
+%: %$(VECONFIG_EXT)
+	$(INSTALL) $< $@
+
 vpsconf_DATA = \
-	$(VE0CONFIG:%=%$(VE0CONFIG_EXT)) \
-	$(VECONFIG:%=%$(VECONFIG_EXT))
+	$(VE0CONFIG) \
+	$(VECONFIG)
+
+CLEANFILES = $(VE0CONFIG) $(VECONFIG)
