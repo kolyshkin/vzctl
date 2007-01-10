@@ -27,4 +27,4 @@ pathsubst_RULES = \
 pathsubst = sed -e '$(pathsubst_RULES)'
 
 %: %.in
-	$(pathsubst) $(srcdir)/$< > $@
+	$(pathsubst) $< > $@
