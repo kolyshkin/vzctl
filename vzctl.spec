@@ -5,7 +5,7 @@
 %define _dumpdir %{_vzdir}/dump 
 %define _cachedir %{_vzdir}/template/cache 
 %define _veipdir /var/lib/vzctl/veip 
-%define _pkglibdir /usr/lib/vzctl
+%define _pkglibdir %_libdir/vzctl
 %define _configdir %_sysconfdir/vz
 %define _scriptdir /usr/share/vzctl/scripts
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
