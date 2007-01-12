@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2006 SWsoft. All rights reserved.
+ * Copyright (C) 2000-2007 SWsoft. All rights reserved.
  *
  * This code is public domain.
  *

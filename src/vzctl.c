@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2006 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ void usage()
 	struct mod_action mod;
 
 	version();
-	fprintf(stdout, "Copyright (C) 2000-2006 SWsoft.\n");
+	fprintf(stdout, "Copyright (C) 2000-2007 SWsoft.\n");
 	fprintf(stdout, "This program may be distributed under the terms of the GNU GPL License.\n\n");
 	fprintf(stdout, "Usage: vzctl [options] <command> <veid> [parameters]\n"
 "vzctl destroy | mount | umount | stop | status | enter <veid>\n"

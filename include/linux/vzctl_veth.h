@@ -1,7 +1,7 @@
 /*
  *  include/linux/vzctl_veth.h
  *
- *  Copyright (C) 2006  SWsoft
+ *  Copyright (C) 2006-2007 SWsoft
  *  All rights reserved.
  *  
  *  Licensing governed by "linux/COPYING.SWsoft" file.
