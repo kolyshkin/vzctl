@@ -1,4 +1,4 @@
-.TH vzctl 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
+.TH vzctl 8 "12 Jan 2007" "OpenVZ" "Virtual Environments"
 .SH NAME
 vzctl \- utility to control a Virtual Environment.
 .SH SYNOPSIS
@@ -98,24 +98,26 @@ in one call to \fBvzctl\fR, as all the search domain values set in previous
 calls to \fBvzctl\fR gets overwritten.
 .TP
 \fB--netif_add\fR \fIifname[\fR,\fImac\fR,\fIhost_ifname\fR,\fIhost_mac]\fR
-Adds virtual ethernet device to given VE. Where \fIifname\fR is ethernet
-device name in the VE, \fImac\fR its MAC address, \fIhost_ifname\fR is
-ethernet device name on the host and \fIhost_mac\fR its MAC address.
-MAC addresses has format like XX:XX:XX:XX:XX:XX. All parameters except
-\fIifname\fR are option and automatically generated if not specified.
+Adds a virtual ethernet device (veth) to a given VE. Here \fIifname\fR is
+the ethernet device name in the VE, \fImac\fR is its MAC address,
+\fIhost_ifname\fR is the ethernet device name on the host, and
+\fIhost_mac\fR is its MAC address. MAC addresses should be in the format
+like XX:XX:XX:XX:XX:XX. All parameters except \fIifname\fR are optional
+and are automatically generated if not specified.
 
-Per-interface configuration.
-.br
-To select the interface will be configured the \fB--ifname\fR \fIname\fR option used.
-.br
+\fBInterface configuration.\fR
+
+The following options can be used to reconfigure the already-created virtual
+ethernet interface. To select the interface to configure, use
+\fB--ifname\fR \fIname\fR option.
+
 \fB--mac\fR \fIXX:XX:XX:XX:XX:XX\fR - MAC address of interface inside VE,
-.br
+
 \fB--host_ifname\fR \finame\fR - interface name for virtual interface in VE0
-.br
+
 \fB--host_mac\fR \fIXX:XX:XX:XX:XX:XX\fR - MAC address of interface iin VE0
-.br
 .TP
-\fB--netif_del\fR \fIdev_name|all\fR
+\fB--netif_del\fR \fIdev_name\fR|\fBall\fR
 Removes virtual ethernet device from VE. If you want to remove all devices,
 use \fBall\fR.
 .TP
