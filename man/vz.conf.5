@@ -32,6 +32,11 @@ Set the logging level. The more \fInumber\fR is, the more information will be
 logged.
 .IP "\fBVERBOSE\fR=\fInumber\fR"
 Set the output verbosity. Default is 0.
+.IP "\fBMODULES_DISABLED\fR=\fByes\fR|\fBno\fR
+If the value of this parameter is set to \fByes\fR, no attempt to load
+OpenVZ kernel modules is made in vz initscript. This is helpful on systems
+which have OpenVZ-specific stuff compiled into the kernel (i. e. not
+as modules).
 .SS Disk quota parameters
 .IP \fBDISK_QUOTA\fR=\fByes\fR|\fBno\fR
 In case the value of this parameter is set to \fBno\fR, all disk

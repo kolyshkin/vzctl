@@ -17,14 +17,17 @@ check_config() {
 	: ${VZVEINFO:=/proc/vz/veinfo}
 	: ${VESTAT:=/proc/vz/vestat}
 	: ${VPSCONFDIR:=@VPSCONFDIR@}
-	: ${PRELOAD_MODULES:="af_packet"}
-	: ${MODULES:="vzmon vzdquota vzdev"}
-	: ${MIGRATE_MODULES:="vzcpt vzrst"}
-	: ${NET_MODULES="vznetdev vznet"}
 	: ${VZDEV:=venet0}
 
-	# check if you should load vzwdog module
-	[ "${VZWDOG}" = "yes" ] && MODULES="${MODULES} vzwdog"
+	if [ "${MODULES_DISABLED}" != "yes" ]; then
+		: ${PRELOAD_MODULES:="af_packet"}
+		: ${MODULES:="vzmon vzdquota vzdev"}
+		: ${MIGRATE_MODULES:="vzcpt vzrst"}
+		: ${NET_MODULES="vznetdev vznet"}
+
+		# check if you should load vzwdog module
+		[ "${VZWDOG}" = "yes" ] && MODULES="${MODULES} vzwdog"
+	fi
 
 	# we need a working vzctl
 	if [ ! -x "${VZCTL}" ]; then
