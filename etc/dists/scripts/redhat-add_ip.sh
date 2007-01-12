@@ -39,9 +39,6 @@ HOSTFILE=/etc/hosts
 ROUTE=${IFCFG_DIR}/route-${VENET_DEV}
 NETWORKRESTART=
 
-# overwrite copy argumets for workaround for FC5 bug #190601. (ovz bug #297)
-[ -f /etc/fedora-release ] && CP='/bin/cp -f --preserve=mode,ownership'
-
 function fix_ifup()
 {
 	file="/sbin/ifup"
