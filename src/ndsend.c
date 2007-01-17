@@ -17,6 +17,7 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <linux/types.h>
 #include <linux/if.h>
 #include <netinet/icmp6.h>
 
