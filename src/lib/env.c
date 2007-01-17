@@ -114,7 +114,7 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 }
 
 /*
- * Reset standart file descriptord to /dev/null in case they are closed.
+ * Reset standard file descriptors to /dev/null in case they are closed.
  */
 static int reset_std()
 {
@@ -318,7 +318,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		create_param.feature_mask |= VE_FEATURE_SYSFS;
 		create_param.known_features |= VE_FEATURE_SYSFS;
 	}
-	logger(3, 0, "Set features maks %016Lx/%016Lx",
+	logger(3, 0, "Set features mask %016Lx/%016Lx",
 			create_param.feature_mask,
 			create_param.known_features);
 	/* Close all fds  except std */
@@ -378,7 +378,7 @@ try:
 	*/
 	close(STDIN_FILENO);
 	/* Now we wait until VE setup will be done
-	   If no error start init otherwise exit.
+	   If no error, then start init, otherwise exit.
 	*/
 	if (read(wait_p, &ret, sizeof(ret)) != 0)
 		return 0;
@@ -404,7 +404,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		return ret;
 	if ((ret = setup_resource_management(h, veid, res)))
 		return ret;
-	/* Create another process to proper resource accounting */
+	/* Create another process for proper resource accounting */
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Unable to fork");
 		return VZ_RESOURCE_ERROR;
@@ -463,7 +463,7 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 			write(STDIN_FILENO, &ret, sizeof(ret));
 		exit(ret);
 	}
-	/* Wait for enviroment created */
+	/* Wait for environment created */
 	close(status_p[1]);
 	close(wait_p[0]);
 	close(err_p[1]);
@@ -605,20 +605,20 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 err:
 	free_dist_actions(&actions);
 	if (ret) {
-		/* Kill enviroment */
+		/* Kill environment */
 		logger(-1, 0, "VE start failed");
 		write(wait_p[1], &err, sizeof(err));
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
 			if (res->misc.wait == YES) {
 				logger(0, 0, "VE start in progress"
-					" waiting ...");
+					", waiting ...");
 				err = vps_execFn(h, veid, res->fs.root,
 					wait_on_fifo, NULL, 0);
 				if (err) {
 					logger(0, 0, "VE wait failed %s",
 						err == VZ_EXEC_TIMEOUT ? \
-						"timeout expired" : "");
+						"- timeout expired" : "");
 					ret = VZ_WAIT_FAILED;
 				} else {
 					logger(0, 0, "VE started"
@@ -655,7 +655,7 @@ err:
  * @param h		VE handler.
  * @param veid		VE id.
  * @param res		VE resourses.
- * @param d_actions	distribution specific sctions.
+ * @param d_actions	distribution specific actions.
  * @param skip		flags to skip VE setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call setup() callback
  * @return		0 on success.
@@ -770,8 +770,8 @@ err:
  * @param h		VE handler.
  * @param veid		VE id.
  * @param res		VE resourses.
- * @param stop_mode	stop mode one of (M_REBOOT M_HALT M_KILL).
- * @param skip		flags to skip run action script (SKIP_ACTION_SCRIPT)
+ * @param stop_mode	stop mode, one of (M_REBOOT M_HALT M_KILL).
+ * @param skip		flag to skip run action script (SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call cleanup() callback.
  * @return		0 on success.
  */
@@ -806,7 +806,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	mod_cleanup(h, veid, action, param);
 	vps_cleanup_res(h, veid, param, STATE_STOPPING);
 	ret = vps_umount(h, veid, res->fs.root, skip);
-	/* Clear VE network configuration*/
+	/* Clear VE network configuration */
 	ret = run_pre_script(veid, VPS_STOP);
 
 end:
