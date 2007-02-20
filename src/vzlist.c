@@ -184,8 +184,8 @@ int none_sort_fn(const void *val1, const void *val2)
 
 int laverage_sort_fn(const void *val1, const void *val2)
 {
-	struct Cla *la1 = ((struct Cveinfo *)val1)->la;
-	struct Cla *la2 = ((struct Cveinfo *)val2)->la;
+	struct Cla *la1 = ((const struct Cveinfo *)val1)->la;
+	struct Cla *la2 = ((const struct Cveinfo *)val2)->la;
 	int res;
 
 	if ((res = check_empty_param(la1, la2)) == 2)
@@ -202,14 +202,17 @@ int laverage_sort_fn(const void *val1, const void *val2)
 int id_sort_fn(const void *val1, const void *val2)
 {
 	int ret;
-	ret = (((struct Cveinfo*)val1)->veid > ((struct Cveinfo*)val2)->veid);
+	ret = (((const struct Cveinfo*)val1)->veid > 
+		((const struct Cveinfo*)val2)->veid);
 	return ret;
 }
 
 int status_sort_fn(const void *val1, const void *val2)
 {
 	int res;
-	res = ((struct Cveinfo*)val1)->status - ((struct Cveinfo*)val2)->status;	if (!res)
+	res = ((const struct Cveinfo*)val1)->status - 
+		((const struct Cveinfo*)val2)->status;
+	if (!res)
 		res = id_sort_fn(val1, val2);
 	return res;
 }
@@ -217,8 +220,8 @@ int status_sort_fn(const void *val1, const void *val2)
 #define SORT_STR_FN(fn, name)	 					\
 int fn(const void *val1, const void *val2)				\
 {									\
-	const char *h1 = ((struct Cveinfo*)val1)->name;			\
-	const char *h2 = ((struct Cveinfo*)val2)->name;			\
+	const char *h1 = ((const struct Cveinfo*)val1)->name;		\
+	const char *h2 = ((const struct Cveinfo*)val2)->name;		\
 	int ret;							\
 	if ((ret = check_empty_param(h1, h2)) == 2)			\
 		ret = strcmp(h1, h2);					\
@@ -232,8 +235,8 @@ SORT_STR_FN(ip_sort_fn, ip)
 #define SORT_UL_RES(fn, type, res, name, index)				\
 int fn(const void *val1, const void *val2)				\
 {									\
-	struct type *r1 = ((struct Cveinfo *)val1)->res;		\
-	struct type *r2 = ((struct Cveinfo *)val2)->res;		\
+	struct type *r1 = ((const struct Cveinfo *)val1)->res;		\
+	struct type *r2 = ((const struct Cveinfo *)val2)->res;		\
 	int ret;							\
 	if ((ret = check_empty_param(r1, r2)) == 2)			\
 		ret = r1->name[index] > r2->name[index];		\
@@ -612,12 +615,12 @@ void usage()
 
 int id_search_fn(const void* val1, const void* val2)
 {
-	return (*(int *)val1 - ((struct Cveinfo*)val2)->veid);
+	return (*(const int *)val1 - ((const struct Cveinfo*)val2)->veid);
 }
 
 int veid_search_fn(const void* val1, const void* val2)
 {
-	return (*(int *)val1 - *(int *)val2);
+	return (*(const int *)val1 - *(const int *)val2);
 }
 
 void print_hdr()
