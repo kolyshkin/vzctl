@@ -239,7 +239,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char vps_state[32];
 	char *ipv6_net = "IPV6=yes";
 	const char *str_state;
-	const char *delall = "IPDELALL=yes";
+	char *delall = "IPDELALL=yes";
 
 	if (list_empty(&net->ip) && !net->delall && state != STATE_STARTING) 
 		return 0;
@@ -271,7 +271,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (str != NULL)
 		envp[i++] = str;
 	if (net->delall)
-		envp[i++] = (char *) delall;
+		envp[i++] = delall;
 	if (net->ipv6_net == YES)
 		envp[i++] = ipv6_net;
 	envp[i++] = ENV_PATH;
