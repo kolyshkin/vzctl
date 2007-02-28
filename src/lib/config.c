@@ -277,7 +277,7 @@ static conf_struct *find_conf_line(list_head_t *head, char *name,
 	return NULL;
 }
 
-static int parse_setmode(vps_param *vps_p, char *val)
+static int parse_setmode(vps_param *vps_p, const char *val)
 {
 	if (!strcmp(val, "ignore"))
 		vps_p->opt.setmode = SET_IGNORE;
@@ -335,7 +335,7 @@ int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val)
 	return 0;
 }
 
-int conf_store_str(list_head_t *conf, char *name, char *val)
+int conf_store_str(list_head_t *conf, char *name, const char *val)
 {
 	char *buf;
 	int len;
@@ -579,7 +579,7 @@ int parse_twoul(const char *str, unsigned long *val)
 	return ret;
 }
 /******************** totalmem *************************/
-int parse_meminfo(meminfo_param *param, char *val)
+int parse_meminfo(meminfo_param *param, const char *val)
 {
 	int mode;
 	char mode_nm[32];
@@ -628,7 +628,7 @@ static int store_meminfo(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
-int parse_ub(vps_param *vps_p, char *val, int id, int divisor)
+int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 {
 	int ret;
 	ub_res res;
@@ -2285,7 +2285,7 @@ int vps_remove_cfg_param(envid_t veid, char *path, char *name)
 }
 
 /********************************************************************/
-int vps_parse_opt(envid_t veid, vps_param *param, int opt, const char *rval,
+int vps_parse_opt(envid_t veid, vps_param *param, int opt, char *rval,
 	struct mod_action *action)
 {
 	int id, ret = 0;
@@ -2293,7 +2293,7 @@ int vps_parse_opt(envid_t veid, vps_param *param, int opt, const char *rval,
 	if (param == NULL)
 		return -1;
 	if ((id = opt_get_by_id(set_opt, opt)) != -1) {
-		ret = parse(veid, param, (char *)rval, id);
+		ret = parse(veid, param, rval, id);
 	} else if (action != NULL) {
 		ret = mod_parse(veid, action, NULL, opt, rval);
 	}

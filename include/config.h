@@ -34,7 +34,7 @@ typedef struct vps_config {
 int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 	struct mod_action *action);
 int vps_parse_opt(envid_t veid, vps_param *param, int opt,
-	const char *rval, struct mod_action *action);
+	char *rval, struct mod_action *action);
 int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 	vps_param *old_p, struct mod_action *action);
 
