@@ -45,15 +45,17 @@ VZCTL=@SBINDIR@/vzctl
 VZQUOTA=@SBINDIR@/vzquota
 LOCKFILE=/var/lock/subsys/vz_lock
 VESTAT=/proc/vz/vestat
+PRELOAD_MODULES=
 MODULES=
 MODULES_OTHER=
 NET_MODULES=
+IPT_MODULES=
 
 [ -x ${VZCTL} ] || exit 0
 
 VZDEV=venet0
-PRELOAD_MODULES="af_packet"
 if [ "${MODULES_DISABLED}" != "yes" ]; then
+	PRELOAD_MODULES="af_packet"
 	MODULES="vzmon vzdquota vzdev"
 	CPT_MODULES="vzcpt vzrst"
 	VETH_MODULES="vzethdev"
@@ -62,8 +64,8 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 	if [ "${VZWDOG}" = "yes" ]; then
 		MODULES="${MODULES} vzwdog"
 	fi
+	IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
 fi
-IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
 
 CONFIG_DIR=@PKGCONFDIR@/conf
 
