@@ -139,6 +139,7 @@ print_success()
 
 print_failure()
 {
+	echo -n "$1"
 	if [ "$DISTR" = "redhat" ]; then
 		failure $"$1"
 	else
@@ -409,7 +410,7 @@ function start()
 		/sbin/modprobe $MOD >/dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
-			print_failure "Loading module ${MOD}"
+			print_failure "failed to load module ${MOD}"
 			return $RETVAL
 		fi
 	done
