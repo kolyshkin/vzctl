@@ -121,7 +121,6 @@ function remove_cron()
 # Master copy is $SRC_CRONSCRIPT_DIR/vz.
 # Consult that file for documentation.
 EOF
-       done
 }
 
 function get_kern_ver()
