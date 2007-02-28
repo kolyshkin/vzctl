@@ -26,6 +26,9 @@ AC_CANONICAL_TARGET
 # Automake
 AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2])
 
+# Disable build of static libraries by default.
+AC_DISABLE_STATIC
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
