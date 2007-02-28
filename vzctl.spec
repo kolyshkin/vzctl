@@ -1,5 +1,5 @@
 %define _initddir %_sysconfdir/init.d
-%define _crondir %_sysconfdir/cron.d
+%define _crondir /usr/share/vzctl/cron
 %define _vzdir /vz
 %define _lockdir %{_vzdir}/lock 
 %define _dumpdir %{_vzdir}/dump 
@@ -66,6 +66,9 @@ ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 # This could go to vzctl-lib-devel, but since we don't have it...
 rm -f  $RPM_BUILD_ROOT/%_libdir/libvzctl.{la,so}
+# Needed for ghost in files section below
+mkdir $RPM_BUILD_ROOT/etc/cron.d/
+touch $RPM_BUILD_ROOT/etc/cron.d/vz
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -74,6 +77,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
 %attr(644,root,root) %config(noreplace) %{_crondir}/vz
+%ghost /etc/cron.d/vz
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
 %dir %attr(755,root,root) %{_cachedir}

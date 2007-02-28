@@ -20,7 +20,8 @@ bashcdir    = $(sysconfdir)/bash_completion.d
 endif
 
 if ENABLE_CRON
-cronddir    = $(sysconfdir)/cron.d
+cronddir    = $(pkgdatadir)/cron
+dst_cronddir= $(sysconfdir)/cron.d
 endif
 
 if ENABLE_LOGROTATE
