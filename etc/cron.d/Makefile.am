@@ -17,10 +17,7 @@
 
 include $(top_srcdir)/pathsubst.am
 
-CRONSCRIPTS = \
-	vpsreboot \
-	vpsnetclean
-
+CRONSCRIPTS = vz
 EXTRA_DIST = $(CRONSCRIPTS:%=%.in)
 
 if ENABLE_CRON

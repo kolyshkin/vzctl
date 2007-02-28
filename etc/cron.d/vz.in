@@ -1,0 +1,7 @@
+# Cron jobs needed for OpenVZ
+
+# Clean VEs network rules (arp,route,iptables)
+*/5 * * * * root @PKGDATADIR@/scripts/vpsnetclean
+
+# Start VEs marked as rebooted.
+*/5 * * * * root @PKGDATADIR@/scripts/vpsreboot

@@ -73,8 +73,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
-%attr(644,root,root) %config(noreplace) %{_crondir}/vpsreboot
-%attr(644,root,root) %{_crondir}/vpsnetclean
+%attr(644,root,root) %config(noreplace) %{_crondir}/vz
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
 %dir %attr(755,root,root) %{_cachedir}
