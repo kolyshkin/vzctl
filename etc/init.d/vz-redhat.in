@@ -142,15 +142,6 @@ $1 == "processor" { num++; }
 END { print num * 4; }' /proc/cpuinfo`
 }
 
-check_is_root()
-{
-        ID=`id -u`
-        if [ ! $ID -eq 0 ]; then 
-                echo "You need to be root to run this command."
-                exit 1
-        fi
-}
-
 get_veinfo()
 {
 	if [ -f /proc/vz/veinfo ]; then
