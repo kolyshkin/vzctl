@@ -145,23 +145,23 @@ vps_handler *vz_open(envid_t veid)
 	vps_handler *h = NULL;
 
 	stdfd = reset_std();
-        if ((vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
-                logger(-1, errno, "Unable to open %s", VZCTLDEV);
-                logger(-1, 0, "Please check that vzdev kernel module is loaded"
-                        " and you have sufficient permissions"
-                        " to access the file.");
+	if ((vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
+		logger(-1, errno, "Unable to open %s", VZCTLDEV);
+		logger(-1, 0, "Please check that vzdev kernel module is loaded"
+			" and you have sufficient permissions"
+			" to access the file.");
 		goto err;
-        }
+	}
 	h = calloc(1, sizeof(*h));
 	if (h == NULL) 
 		goto err;
 	h->vzfd = vzfd;
 	h->stdfd = stdfd;
-        if (vz_env_create_ioctl(h, 0, 0) < 0 &&
+	if (vz_env_create_ioctl(h, 0, 0) < 0 &&
 		(errno == ENOSYS || errno == EPERM))
-        {
-                logger(-1, 0, "Your kernel lacks support for virtual"
-                                " environments or modules not loaded");
+	{
+		logger(-1, 0, "Your kernel lacks support for virtual"
+			" environments or modules not loaded");
 		goto err;
 	}
 	return h;
@@ -210,7 +210,7 @@ int vps_is_run(vps_handler *h, envid_t veid)
 		return 0;
 	else if (ret < 0)
 		logger(-1, errno, "error on vz_env_create_ioctl(VE_TEST)");
-        return 1;
+	return 1;
 }
 
 /** Change root to specified directory
@@ -250,14 +250,14 @@ int vz_chroot(char *root)
 
 int vz_setluid(envid_t veid)
 {
-        if (setluid(veid) == -1) {
+	if (setluid(veid) == -1) {
 		if (errno == ENOSYS)
 			logger(-1, 0, "Error: kernel does not support"
 				" user resources. Please, rebuild with"
 				" CONFIG_USER_RESOURCE=y");
-                return VZ_SETLUID_ERROR;
+		return VZ_SETLUID_ERROR;
 	}
-        return 0;
+	return 0;
 }
 
 /*
@@ -438,10 +438,10 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		return VZ_RESOURCE_ERROR;
 	}
 	sigaction(SIGCHLD, NULL, &actold);
-       	sigemptyset(&act.sa_mask);
-        act.sa_handler = SIG_IGN;
-       	act.sa_flags = SA_NOCLDSTOP;
-        sigaction(SIGCHLD, &act, NULL);
+	sigemptyset(&act.sa_mask);
+	act.sa_handler = SIG_IGN;
+	act.sa_flags = SA_NOCLDSTOP;
+	sigaction(SIGCHLD, &act, NULL);
 
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Can not fork");
@@ -490,7 +490,7 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 				" wait functionality");
 			break;
 		}
-        }
+	}
 err:
 	close(status_p[1]);
 	close(status_p[0]);
@@ -625,14 +625,14 @@ err:
 						" successfully");
 				}
 			} else {
-	                        logger(0, 0, "VE start in progress...");
+				logger(0, 0, "VE start in progress...");
 			}
 		} else {
 			if (ret == VZ_FS_BAD_TMPL)
 				logger(-1, 0, "Unable to start init, probably"
 					" incorrect template");
-                        logger(-1, 0, "VE start failed");
-                }
+			logger(-1, 0, "VE start failed");
+		}
 	}
 	if (ret) {
 		if (vps_is_run(h, veid))
@@ -700,7 +700,7 @@ static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
 		{
 			kill(-1, SIGTERM);
 			sleep(1);
-                        kill(1, SIGKILL);
+			kill(1, SIGKILL);
 			break;
 		}
 	}
@@ -716,7 +716,7 @@ static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode)
 	sigemptyset(&act.sa_mask);
 	act.sa_handler = SIG_IGN;
 	act.sa_flags = SA_NOCLDSTOP;
-        sigaction(SIGCHLD, &act, NULL);
+	sigaction(SIGCHLD, &act, NULL);
 
 	logger(0, 0, "Stopping VE ...");
 	if (stop_mode == M_KILL)
@@ -738,7 +738,7 @@ static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode)
 	}
 
 kill_vps:
-        if ((pid = fork()) < 0) {
+	if ((pid = fork()) < 0) {
 		ret = VZ_RESOURCE_ERROR;
 		logger(-1, errno, "Can not fork");
 		goto err;

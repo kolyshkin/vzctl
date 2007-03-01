@@ -98,7 +98,7 @@ int calculate(int veid, ub_param *ub, int verbose)
 				kmem_net_cur) /	(ram + swap);
 		/*	Allocated	*/
 		al_cur = ((double)ub_cur.privvmpages[0] * page +
-			       kmem_net_cur) / (ram + swap);
+				kmem_net_cur) / (ram + swap);
 		/*	Numproc		*/
 		np_cur = (double)ub_cur.numproc[0] / thrmax;	
 	}
@@ -108,13 +108,13 @@ int calculate(int veid, ub_param *ub, int verbose)
 		(double)ub->dgramrcvbuf[1] +
 		(double)ub->othersockbuf[1];
 	
-	/*      Low memory      */
+	/*	Low memory	*/
 	lm_max = kmem_net_max / lowmem;
 	lm_prm = lm_max;
-	/*      Mem + Swap      */
+	/*	Mem + Swap	*/
 	ms_prm = ((double)ub->oomguarpages[0] * page + kmem_net_max) /
 			(ram + swap);
-	/*      Allocated       */
+	/*	Allocated	*/
 	al_prm = ((double)ub->vmguarpages[0] * page + kmem_net_max) / 
 			(ram + swap);
 	al_max = ((double)ub->privvmpages[1] * page + kmem_net_max) /

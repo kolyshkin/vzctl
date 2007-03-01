@@ -194,7 +194,7 @@ int add_str2list(list_head_t *head, const char *val)
 		return 0;
 	}
 	do {
-                if (find_str(head, token))
+		if (find_str(head, token))
 			continue;
 		if ((ret = add_str_param(head, token)))
 			break;

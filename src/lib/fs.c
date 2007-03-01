@@ -150,7 +150,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 			}
 			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
 				veid, MOUNT_PREFIX);
-        	}
+		}
 	}
 	logger(0, 0, "VE is mounted");
 
@@ -167,7 +167,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
  */
 int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
 {
-        char buf[PATH_LEN];
+	char buf[PATH_LEN];
 	int ret, i;
 
 	if (!vps_is_mounted(root)) {

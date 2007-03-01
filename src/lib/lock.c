@@ -64,9 +64,9 @@ static int getlockpid(char *file)
  * @param veid		VPD id.
  * @param dir		lock directory.
  * @param status	transition status.
- * @return		0 - success
- *                      1 - locked
- *                      -1- error.
+ * @return		 0 - success
+ *			 1 - locked
+ *			-1 - error.
  */
 int vps_lock(envid_t veid, char *dir, char *status)
 {

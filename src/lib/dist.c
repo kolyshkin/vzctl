@@ -27,8 +27,8 @@
 #include "vzerror.h"
 
 static struct distr_conf {
-        char *name;
-        int id;
+	char *name;
+	int id;
 } action2id[] = {
 	{"ADD_IP", ADD_IP},
 	{"DEL_IP", DEL_IP},

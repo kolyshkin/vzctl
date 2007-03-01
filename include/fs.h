@@ -21,15 +21,15 @@
 #include "types.h"
 #include "quota.h"
 
-#define MNT_DETACH              0x00000002
+#define MNT_DETACH		0x00000002
 /** Action script prefixes.
  */
-#define MOUNT_PREFIX            "mount"
-#define UMOUNT_PREFIX           "umount"
-#define START_PREFIX            "start"
-#define STOP_PREFIX             "stop"
+#define MOUNT_PREFIX		"mount"
+#define UMOUNT_PREFIX		"umount"
+#define START_PREFIX		"start"
+#define STOP_PREFIX		"stop"
 
-#define DESTR_PREFIX            "destroyed"
+#define DESTR_PREFIX		"destroyed"
 
 /**  Data structure for file system parameter.
  */

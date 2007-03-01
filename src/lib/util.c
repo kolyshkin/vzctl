@@ -54,7 +54,7 @@ char *unescapestr(char *src)
 			p2++;
 		} else {
 			*p1 = *p2;
-	                p1++; p2++;
+			p1++; p2++;
 			fl = 0;
 		}
 	}
@@ -164,25 +164,25 @@ int parse_ul(const char *str, unsigned long *val)
 
 void str_tolower(const char *from, char *to)
 {
-        if (from == NULL || to == NULL)
-                return;
-        while ((*to++ = tolower(*from++)));
+	if (from == NULL || to == NULL)
+		return;
+	while ((*to++ = tolower(*from++)));
 }
 
 void str_toupper(const char *from, char *to)
 {
-        if (from == NULL || to == NULL)
-                return;
-        while ((*to++ = toupper(*from++)));
+	if (from == NULL || to == NULL)
+		return;
+	while ((*to++ = toupper(*from++)));
 }
 
 int check_var(const void *val, const char *message)
 {
-        if (val != NULL)
-                return 0;
-        logger(-1, 0, "%s", message);
+	if (val != NULL)
+		return 0;
+	logger(-1, 0, "%s", message);
 
-        return 1;
+	return 1;
 }
 
 int cp_file(char *dst, char *src)
@@ -233,23 +233,23 @@ void get_vps_conf_path(envid_t veid, char *buf, int len)
 
 char *arg2str(char **arg)
 {
-        char **p;
-        char *str, *sp;
-        int len = 0;
+	char **p;
+	char *str, *sp;
+	int len = 0;
 
 	if (arg == NULL)
 		return NULL;
-        p = arg;
-        while (*p)
-                len += strlen(*p++) + 1;
-        if ((str = (char *)malloc(len + 1)) == NULL)
-                return NULL;
-        p = arg;
-        sp = str;
-        while (*p)
-                sp += sprintf(sp, "%s ", *p++);
+	p = arg;
+	while (*p)
+		len += strlen(*p++) + 1;
+	if ((str = (char *)malloc(len + 1)) == NULL)
+		return NULL;
+	p = arg;
+	sp = str;
+	while (*p)
+		sp += sprintf(sp, "%s ", *p++);
 
-        return str;
+	return str;
 }
 
 void free_arg(char **arg)

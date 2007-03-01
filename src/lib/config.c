@@ -218,7 +218,7 @@ static struct option set_opt[] = {
 
 struct option *get_set_opt(void)
 {
-        return set_opt;
+	return set_opt;
 }
 
 const vps_config *conf_get_by_name(const vps_config *conf, const char *name)
@@ -699,8 +699,8 @@ static int parse_cap(char *str, cap_param *cap)
 	char cap_nm[128];
 	unsigned long *mask;
 
-        if ((token = strtok(str, "\t ")) == NULL)
-                return 0;
+	if ((token = strtok(str, "\t ")) == NULL)
+		return 0;
 	do {
 		if ((p = strrchr(token, ':')) == NULL) {
 			logger(-1, 0, "Invalid syntaxes in %s:"
@@ -712,7 +712,7 @@ static int parse_cap(char *str, cap_param *cap)
 		else if (!strcmp(p + 1, "on"))
 			mask = &cap->on;
 		else {
-                        logger(-1, 0, "Invalid syntaxes in %s:"
+			logger(-1, 0, "Invalid syntaxes in %s:"
 				" capname:on|off", token);
 			return ERR_INVAL;
 		}
@@ -724,9 +724,9 @@ static int parse_cap(char *str, cap_param *cap)
 			logger(-1, 0, "Capability %s is unknown", cap_nm);
 			return ERR_INVAL;
 		}
-        } while ((token = strtok(NULL, " ")));
+	} while ((token = strtok(NULL, " ")));
 
-        return 0;
+	return 0;
 }
 
 static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
@@ -753,18 +753,18 @@ static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 
 int check_ip_dot(char *ip)
 {
-        int i;
-        char *str = ip;
+	int i;
+	char *str = ip;
 	char *p;
 
-        for (i = 0; i < 5; i++) {
-                if ((p = strchr(str, '.')) == NULL)
-                        break;
-                str = p + 1;
-        }
-        if (i != 3)
-                return VZ_BADIP;
-        return 0;
+	for (i = 0; i < 5; i++) {
+		if ((p = strchr(str, '.')) == NULL)
+			break;
+		str = p + 1;
+	}
+	if (i != 3)
+		return VZ_BADIP;
+	return 0;
 }
 
 static int parse_ip(vps_param *vps_p, char *val, int id)
@@ -835,17 +835,17 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 
 static int check_netdev(const char *devname)
 {
-        int i, len;
+	int i, len;
 	const char *name;
 	static char *netdev_strict[] = {"venet", "tun", "tap", "lo", NULL};
 
-        for (i = 0; netdev_strict[i] != NULL; i++) {
+	for (i = 0; netdev_strict[i] != NULL; i++) {
 		name = netdev_strict[i];
 		len = strlen(name);
-                if (!strncmp(name, devname, len))
-                        return 1;
+		if (!strncmp(name, devname, len))
+			return 1;
 	}
-        return 0;
+	return 0;
 }
 
 int add_netdev(net_param *net, char *val)
@@ -1115,16 +1115,16 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
 	char buf[64];
 	struct stat st;
 
-        if ((ch = strchr(str, ':')) == NULL)
-                return ERR_INVAL;
+	if ((ch = strchr(str, ':')) == NULL)
+		return ERR_INVAL;
 	ch++;
 	len = ch - str;
 	if (len > sizeof(dev->name))
 		return ERR_INVAL;
 	memset(dev, 0, sizeof(*dev));
-        snprintf(dev->name, len, "%s", str);
+	snprintf(dev->name, len, "%s", str);
 	snprintf(buf, sizeof(buf), "/dev/%s", dev->name);
-	if (stat(buf, &st)) {
+	if (lstat(buf, &st)) {
 		logger(-1, errno, "Incorrect device name %s", buf);
 		return ERR_INVAL;
 	}
@@ -1206,7 +1206,7 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	int ret;
 	
 	ret = 0;
-        switch (conf->id) {
+	switch (conf->id) {
 	case PARAM_ONBOOT:
 		ret = conf_store_yesno(conf_h, conf->name, vps_p->opt.onboot);
 		break;
@@ -1715,7 +1715,7 @@ static int parse_netif_cmd(envid_t veid, veth_param *veth, char *val)
 }
 
 static int store_name(vps_param *old_p, vps_param *vps_p, vps_config *conf,
-        list_head_t *conf_h)
+		list_head_t *conf_h)
 {
 	char buf[STR_SIZE];
 
@@ -1936,8 +1936,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_CPUUNITS:
 		if (vps_p->res.cpu.units != NULL)
 			break;
-	        if (parse_ul(val, &uid))
-        	        return ERR_INVAL;
+		if (parse_ul(val, &uid))
+			return ERR_INVAL;
 		if (uid < MINCPUUNITS || uid > MAXCPUUNITS) 
 			return ERR_INVAL;
 		vps_p->res.cpu.units = malloc(sizeof(unsigned long));
@@ -1948,8 +1948,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_CPUWEIGHT:
 		if (vps_p->res.cpu.weight != NULL)
 			break;
-	        if (parse_ul(val, &uid))
-        	        return ERR_INVAL;
+		if (parse_ul(val, &uid))
+			return ERR_INVAL;
 		vps_p->res.cpu.weight = malloc(sizeof(unsigned long));
 		if (vps_p->res.cpu.weight == NULL)
 			return ERR_NOMEM;
@@ -1958,14 +1958,14 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_CPULIMIT:
 		if (vps_p->res.cpu.limit != NULL)
 			break;
-	        if (parse_cpulimit(&vps_p->res.cpu.limit, val))
-        	        return ERR_INVAL;
+		if (parse_cpulimit(&vps_p->res.cpu.limit, val))
+			return ERR_INVAL;
 		break;
 	case PARAM_VCPUS:
 		if (vps_p->res.cpu.vcpus != NULL)
 			break;
-	        if (parse_ul(val, &uid))
-        	        return ERR_INVAL;
+		if (parse_ul(val, &uid))
+			return ERR_INVAL;
 		vps_p->res.cpu.vcpus = malloc(sizeof(unsigned long));
 		if (vps_p->res.cpu.vcpus == NULL)
 			return ERR_NOMEM;
@@ -2093,7 +2093,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 
 	if ((fp = fopen(path, "r")) == NULL) {
 		logger(-1, errno, "Unable to open %s", path);
-                return 1;
+		return 1;
 	}
 	if (!stat(path, &st))
 		len = st.st_size;
@@ -2154,7 +2154,7 @@ static int read_conf(char *fname, list_head_t *conf_h)
 	if (!stat_file(fname))
 		return 0;
 	if (!(fp = fopen(fname, "r"))) 
-                return -1;
+		return -1;
 	while (fgets(str, sizeof(str), fp)) {
 		add_str_param(conf_h, str);
 	}
@@ -2175,8 +2175,8 @@ static int write_conf(char *fname, list_head_t *head)
 		if ((fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0644)) < 0) {
 			logger(-1, errno, "Unable to create configuration"
 				" file %s", buf);
-	                return 1;
-        	}
+			return 1;
+		}
 	}
 	list_for_each(conf, head, list) {
 		if (conf->val == NULL)
@@ -2213,7 +2213,7 @@ static int vps_merge_conf(list_head_t *dst, list_head_t *src)
 
 	if (list_empty(src))
 		return 0;
-        list_for_each(conf, src, list) {
+	list_for_each(conf, src, list) {
 		if ((p = strchr(conf->val, '=')) == NULL)
 			 continue;
 		len = p - conf->val + 1;
@@ -2358,13 +2358,13 @@ int get_veid_by_name(char *name)
 
 static int check_name(char *name)
 {
-        char *p;
+	char *p;
 
-        for (p = name; *p != '\0'; p++) {
-                if (!isdigit(*p) && !isalpha(*p) && *p != '-' && *p != '_')
-                        return -1;
+	for (p = name; *p != '\0'; p++) {
+		if (!isdigit(*p) && !isalpha(*p) && *p != '-' && *p != '_')
+			return -1;
 	}
-        return 0;
+	return 0;
 }
 
 int set_name(int veid, char *new_name, char *old_name)
@@ -2705,7 +2705,7 @@ int merge_vps_param(vps_param *dst, vps_param *src)
 	merge_opt(&dst->opt, &src->opt);
 	merge_res(&dst->res, &src->res);
 
-        return 0;
+	return 0;
 }
 
 int merge_global_param(vps_param *dst, vps_param *src)

@@ -37,7 +37,7 @@
 #define VZ_NOSCRIPT			11
 #define VZ_NO_ACCES			12
 #define VZ_SET_CAP			13
-#define VZ_NOVECONFIG                   14
+#define VZ_NOVECONFIG			14
 #define VZ_EXEC_TIMEOUT			15
 #define VZ_CHKPNT_ERROR			16
 #define VZ_RESTORE_ERROR		17
@@ -96,9 +96,9 @@
    Disk quota errors
  *********************************/
 /* disk quota not supported */
-#define VZ_DQ_ON		        60
-#define VZ_DQ_INIT		        61
-#define VZ_DQ_SET		        62
+#define VZ_DQ_ON			60
+#define VZ_DQ_INIT			61
+#define VZ_DQ_SET			62
 #define VZ_DISKSPACE_NOT_SET		63
 #define VZ_DISKINODES_NOT_SET		64
 #define VZ_ERROR_SET_USER_QUOTA		65

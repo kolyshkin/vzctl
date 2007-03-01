@@ -46,9 +46,9 @@ struct nd_packet {
 	__u16		icmp6_cksum;
 
 	__u32		reserved:5,
-	                override:1,
-                        solicited:1,
-                        router:1,
+			override:1,
+			solicited:1,
+			router:1,
 			reserved2:24;
 	struct in6_addr target;
 	__u8		otype;

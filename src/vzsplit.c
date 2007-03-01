@@ -288,8 +288,8 @@ int calculate_values()
 
 	if (osl == MAX_SL) {
 		sl = osl - 1;
-                numproc = k_nproc[sl] * proc_calc / num_ve;
-                low_pve = low_total * 0.4 * K_KMEM_MAX / num_ve;
+		numproc = k_nproc[sl] * proc_calc / num_ve;
+		low_pve = low_total * 0.4 * K_KMEM_MAX / num_ve;
 		guarpg = (tot_pve - low_pve) / pagesize;
 		if  (guarpg < MIN_GUARPG) {
 			guarpg = MIN_GUARPG;
@@ -297,8 +297,8 @@ int calculate_values()
 		}
 		do {
 			numproc /= 2;
-                	if (numproc < MINPROC)
-                	        numproc = MINPROC;
+			if (numproc < MINPROC)
+				numproc = MINPROC;
 			avnproc = numproc / 2;
 			delta = MINSOCKBUF * numproc;
 			sockbuf = 2 * (MINDGRAMBUF + MINTCPBUF + delta);
@@ -426,7 +426,7 @@ int main(int argc, char **argv)
 		switch(opt) {
 		case 'f':
 			len = strlen(optarg) + strlen(VPS_CONF_DIR) +
-			       strlen("ve-.conf-sample");
+				strlen("ve-.conf-sample");
 			name = (char*)malloc(len + 1);
 			sprintf(name, VPS_CONF_DIR "ve-%s.conf-sample", optarg);
 			if (!stat(name, &st)) {
@@ -511,7 +511,7 @@ int main(int argc, char **argv)
 				"%d VEs can not be allocated\n", 
 				(mem_total + swap_total) >> 20, num_ve);
 		ve_allowed = (mem_total + swap_total - SYSRSRV) / MEMPERVE;
-                retval = 1;
+		retval = 1;
 	}
 
 	if (((low_total - SYSRSRV)/ ve_allowed) < LOWPERVE) {
@@ -580,9 +580,9 @@ int main(int argc, char **argv)
 		}
 		if (retval == 1) {
 			fprintf(stderr, "WARNING: /vz partition do not have space "
-				        "required for %d VEs\n"
-				       	"The maximum allowed value is %d\n",
-				       	num_ve, ve_allowed);
+					"required for %d VEs\n"
+					"The maximum allowed value is %d\n",
+					num_ve, ve_allowed);
 			fprintf(stderr, "Default disc space values will be used\n\n");
 			ds_total = 0; di_total = 0;
 		/*	exit(retval);*/

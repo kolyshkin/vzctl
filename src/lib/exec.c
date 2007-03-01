@@ -173,17 +173,17 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		sigemptyset(&act.sa_mask);
 		act.sa_handler = alarm_handler;
 		sigaction(SIGALRM, &act, NULL);
-                alarm(timeout);
-        }
+		alarm(timeout);
+	}
 	child_exited = 0;
-        sigemptyset(&act.sa_mask);
-        act.sa_flags = SA_NOCLDSTOP;
-        act.sa_handler = exec_handler;
-        sigaction(SIGCHLD, &act, NULL);
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = SA_NOCLDSTOP;
+	act.sa_handler = exec_handler;
+	sigaction(SIGCHLD, &act, NULL);
 
-        act.sa_handler = SIG_IGN;
+	act.sa_handler = SIG_IGN;
 	act.sa_flags = 0;
-        sigaction(SIGPIPE, &act, NULL);
+	sigaction(SIGPIPE, &act, NULL);
 
 	if ((ret = vz_setluid(veid)))
 		return ret;
@@ -207,7 +207,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
 		if (ret < 0) {
 			if (errno == ESRCH) 
-	                        ret = VZ_VE_NOT_RUNNING;
+				ret = VZ_VE_NOT_RUNNING;
 			else
 				ret = VZ_ENVCREATE_ERROR;
 			goto env_err;
@@ -364,7 +364,7 @@ int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER | flags);
 		if (ret < 0) {
 			if (errno == ESRCH) 
-	                        ret = VZ_VE_NOT_RUNNING;
+				ret = VZ_VE_NOT_RUNNING;
 			else
 				ret = VZ_ENVCREATE_ERROR;
 			goto env_err;
@@ -452,7 +452,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (!stat_file(vps_p->res.fs.private)) {
 		logger(-1, 0, "VE private area %s does not exist",
 			vps_p->res.fs.private);
-                return VZ_FS_NOPRVT;	
+		return VZ_FS_NOPRVT;	
 	}
 	if (!(is_run = vps_is_run(h, veid))) {
 		if (!vps_is_mounted(root)) {

@@ -74,16 +74,16 @@ int vz_mount(fs_param *fs, int remount)
 {
 	int mntopt = 0;
 
-        if (fs->noatime == YES)
-                mntopt |= MS_NOATIME;
-        if (remount)
+	if (fs->noatime == YES)
+		mntopt |= MS_NOATIME;
+	if (remount)
 		mntopt |= MS_REMOUNT;
-        logger(2, 0,  "Mounting root: %s %s", fs->root, fs->private);
-        if (mount(fs->private, fs->root, "simfs", mntopt,
+	logger(2, 0,  "Mounting root: %s %s", fs->root, fs->private);
+	if (mount(fs->private, fs->root, "simfs", mntopt,
 			remount ? "" : fs->private) < 0)
 	{
-                logger(-1, errno, "Can't mount: %s %s", fs->root, fs->private);
-                return VZ_FS_CANTMOUNT;
-        }
+		logger(-1, errno, "Can't mount: %s %s", fs->root, fs->private);
+		return VZ_FS_CANTMOUNT;
+	}
 	return 0;
 }

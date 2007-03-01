@@ -131,7 +131,7 @@ if (x != NULL) { 							\
 			if (ask) recover = read_yn();			\
 			if (recover) {					\
 				x[1] = tmp_val1;			\
-			       	changed++;				\
+				changed++;				\
 			}						\
 		}							\
 		if (!recover) ret = 1;					\
@@ -182,7 +182,7 @@ if (ub->name != NULL) {							\
 	if (ub->vmguarpages != NULL) {
 		if (ub->vmguarpages[1] != LONG_MAX) {
 			logger(-1, 0, "Error: limit should be = %lu for"
-			       " vmguarpages (currently, %lu)", LONG_MAX,
+				" vmguarpages (currently, %lu)", LONG_MAX,
 				ub->vmguarpages[1]);
 			if (ask || recover) {
 				SET_MES((unsigned long) LONG_MAX);
@@ -209,7 +209,7 @@ if (ub->name != NULL) {							\
 	if (ub->oomguarpages != NULL) {
 		if (ub->oomguarpages[1] != LONG_MAX) {
 			logger(-1, 0, "Error: limit should be = %lu for"
-			       " oomguarpages (currently, %lu)", LONG_MAX,
+				" oomguarpages (currently, %lu)", LONG_MAX,
 				ub->oomguarpages[1]);
 			if (ask || recover) {
 				SET_MES((unsigned long) LONG_MAX);
@@ -234,7 +234,7 @@ if (ub->name != NULL) {							\
 	if (ub->physpages != NULL) {
 		if (ub->physpages[0] != 0) {
 			logger(-1, 0, "Error: barrier should be = 0 for"
-			       " physpages (currently, %lu)",
+				" physpages (currently, %lu)",
 				ub->physpages[0]);
 			if (ask || recover) {
 				SET_MES((unsigned long) 0);
@@ -250,7 +250,7 @@ if (ub->name != NULL) {							\
 		}
 		if (ub->physpages[1] != LONG_MAX) {
 			logger(-1, 0, "Error: limit should be = %lu for"
-			       " physpages (currently, %lu)", LONG_MAX,
+				" physpages (currently, %lu)", LONG_MAX,
 				ub->physpages[1]);
 			if (ask || recover) {
 				SET_MES((unsigned long) LONG_MAX);
@@ -342,7 +342,7 @@ if (ub->name != NULL) {							\
 	val &= LONG_MAX;
 	if (ub->othersockbuf[1] - ub->othersockbuf[0] < val) {
 		logger(-1, 0, "Error: othersockbuf.lim-othersockbuf.bar"
-			       " should be > %lu (currently, %lu)", val,
+				" should be > %lu (currently, %lu)", val,
 				ub->othersockbuf[1]-ub->othersockbuf[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->othersockbuf[0] + val;
@@ -362,7 +362,7 @@ if (ub->name != NULL) {							\
 	val &= LONG_MAX;
 	if (ub->tcprcvbuf[1] - ub->tcprcvbuf[0] < val) {
 		logger(-1, 0, "Warning: tcprcvbuf.lim-tcprcvbuf.bar"
-			       " should be > %lu (currently, %lu)", val,
+				" should be > %lu (currently, %lu)", val,
 				ub->tcprcvbuf[1] - ub->tcprcvbuf[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->tcprcvbuf[0] + val;
@@ -797,7 +797,7 @@ int check_hn_overcommitment(int veid, struct ub_struct *param,
 		logger(0, 0, "%s: node is overcommited.",
 				actid == ACT_ERROR ? "Error" : "Warning");
 		logger(0, 0, "\tLow Memory commitment level (%.3f%%)"
-			       " exceeds configured (%.3f%%)",
+				" exceeds configured (%.3f%%)",
 				ru_comm.low_mem, *ovrc->level_low_mem);
 		ret = 1;
 	}

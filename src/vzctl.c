@@ -43,7 +43,7 @@ void free_modules(struct mod_action *action);
 int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 	vps_param *param, const char *name);
 int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
-        vps_param *cmd_p, int argc, char **argv, int skiplock);
+	vps_param *cmd_p, int argc, char **argv, int skiplock);
 
 void version()
 {
@@ -281,7 +281,7 @@ int main(int argc, char *argv[], char *envp[])
 				buf);
 			ret = VZ_NOCONFIG;
 			goto error;
-        	}
+		}
 		if (name != NULL &&
 		    vps_p->res.name.name != NULL &&
 		    strcmp(name, vps_p->res.name.name))

@@ -39,10 +39,10 @@
 #define EXC_NORECV	4
 
 /* log facility */
-#define LOG_ERROR       0x01
+#define LOG_ERROR	0x01
 #define LOG_WARNING	0x02
-#define LOG_INFO        0x03
-#define LOG_DEBUG       0x04
+#define LOG_INFO	0x03
+#define LOG_DEBUG	0x04
 
 #define LOGGER_NAME "arpsend: "
 int debug_level = LOG_INFO;
@@ -232,7 +232,7 @@ void parse_options (int argc, char **argv)
 			if (trg_ipaddr_count >= MAX_IPADDR_NUMBER)
 				usage();
 			if (read_ip_addr(&trg_ipaddr[trg_ipaddr_count++], optarg) < 0)
-				usage();		       
+				usage();
 			trg_ipaddr_flag = 1;
 			break;
 		case 'o':

@@ -319,9 +319,9 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		logger(-1, errno, "Can't set statusfd");
 		goto err;
 	}
-        /* Close status descriptor to report that
-         * environment is created.
-         */
+	/* Close status descriptor to report that
+	* environment is created.
+	*/
 	close(STDIN_FILENO);
 	logger(0, 0, "\tundump...");
 	if (ioctl(param->rst_fd, CPT_UNDUMP, 0) < 0) {

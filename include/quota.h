@@ -20,11 +20,11 @@
 
 /** Disk quota commands.
  */
-#define QUOTA_DROP              1
-#define QUOTA_STAT              2
-#define QUOTA_STAT2             3
-#define QUOTA_MARKDURTY         9
-#define QUOTA_SHOW              5
+#define QUOTA_DROP		1
+#define QUOTA_STAT		2
+#define QUOTA_STAT2		3
+#define QUOTA_MARKDURTY		9
+#define QUOTA_SHOW		5
 
 #define QUOTA_EXPTIME		259200
 

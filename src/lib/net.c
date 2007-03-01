@@ -93,11 +93,11 @@ int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
 	ret = _ip_ctl(h, veid, op, ipaddr, family);
 	if (ret) {
 		switch (errno) {
-			case EADDRINUSE	:
+			case EADDRINUSE:
 				ret = VZ_IP_INUSE;
 				break;
-			case ESRCH	:
-	                        ret = VZ_VE_NOT_RUNNING;
+			case ESRCH:
+				ret = VZ_VE_NOT_RUNNING;
 				break;
 			case EADDRNOTAVAIL:
 				if (op == VE_IP_DEL)

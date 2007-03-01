@@ -60,7 +60,7 @@ int del_dir(char *dir)
 
 int vps_destroy_dir(envid_t veid, char *dir)
 {
-        int ret;
+	int ret;
 
 	if (!quota_ctl(veid, QUOTA_STAT)) {
 		if ((ret = quota_off(veid, 0)))
@@ -70,7 +70,7 @@ int vps_destroy_dir(envid_t veid, char *dir)
 	quota_ctl(veid, QUOTA_DROP);	
 	if ((ret = destroydir(dir)))
 		return ret;
-        return 0;
+	return 0;
 }
 
 static char *get_destroy_root(char *dir)
@@ -110,23 +110,23 @@ static char *get_destroy_root(char *dir)
 
 char *maketmpdir(const char *dir)
 {
-        char buf[STR_SIZE];
-        char *tmp;
-        char *tmp_dir;
+	char buf[STR_SIZE];
+	char *tmp;
+	char *tmp_dir;
 	int len;
 
-        snprintf(buf, sizeof(buf), "%s/XXXXXXX", dir);
+	snprintf(buf, sizeof(buf), "%s/XXXXXXX", dir);
 	if ((tmp = mkdtemp(buf)) == NULL) {
 		logger(-1, errno, "Error in mkdtemp(%s)", buf);
 		return NULL;
 	}
 	len = strlen(dir);
-        tmp_dir = (char *)malloc(strlen(tmp) - len);
+	tmp_dir = (char *)malloc(strlen(tmp) - len);
 	if (tmp_dir == NULL)
 		return NULL;
-        strcpy(tmp_dir, tmp + len + 1);
+	strcpy(tmp_dir, tmp + len + 1);
 
-        return tmp_dir;
+	return tmp_dir;
 }
 
 static void _destroydir(char *root)
@@ -150,7 +150,7 @@ static void _destroydir(char *root)
 			snprintf(buf, sizeof(buf), "%s/%s", root, ep->d_name);
 			if (stat(buf, &st)) 
 				continue;
-                	if (!S_ISDIR(st.st_mode))
+			if (!S_ISDIR(st.st_mode))
 				continue;
 			snprintf(buf, sizeof(buf), "rm -rf %s/%s",
 				root, ep->d_name);
@@ -267,7 +267,7 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 	}
 	if (vps_is_mounted(fs->root)) {
 		logger(0, 0, "VE is currently mounted (umount first)");
-                return VZ_FS_MOUNTED;
+		return VZ_FS_MOUNTED;
 	}
 	logger(0, 0, "Destroying VE private area: %s", fs->private);
 	if ((ret = vps_destroy_dir(veid, fs->private)))

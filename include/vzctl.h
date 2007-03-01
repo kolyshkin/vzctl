@@ -50,15 +50,15 @@
 #define ACTION_QUOTAINIT	20
 
 /* default cpu units values */
-#define LHTCPUUNITS             250
-#define UNLCPUUNITS             1000
-#define HNCPUUNITS              1000
+#define LHTCPUUNITS		250
+#define UNLCPUUNITS		1000
+#define HNCPUUNITS		1000
 
 /* setmode flags */
 enum {
-        SET_NONE = 0,
-        SET_IGNORE,
-        SET_RESTART,
+	SET_NONE = 0,
+	SET_IGNORE,
+	SET_RESTART,
 };
 
 #endif

@@ -43,7 +43,7 @@ typedef struct {
 	 * in this mask kernel sets to default values.
 	 */
 	unsigned long long features_mask;
-        unsigned long long features_known;
+	unsigned long long features_known;
 } env_param;
 
 typedef struct {
@@ -81,22 +81,22 @@ typedef struct vps_res {
 } vps_res;
 
 enum {
-	APPCONF_MAP_NAME    = 0x01,
+	APPCONF_MAP_NAME = 0x01,
 };
 
 typedef struct {
-        int save;
-        int fast_kill;
-        int skip_lock;
-        int skip_setup;
-        int start_disabled;
-        int start_force;
-        int setmode;
-        int onboot;
-        char *config;
-        char *origin_sample;
-        char *lockdir;
-        char *apply_cfg;
+	int save;
+	int fast_kill;
+	int skip_lock;
+	int skip_setup;
+	int start_disabled;
+	int start_force;
+	int setmode;
+	int onboot;
+	char *config;
+	char *origin_sample;
+	char *lockdir;
+	char *apply_cfg;
 	int apply_cfg_map;
 	int reset_ub;
 } vps_opt;

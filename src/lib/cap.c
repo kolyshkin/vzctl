@@ -99,7 +99,7 @@ static char *cap_names[] = {
 
 static inline int capset(cap_user_header_t header, cap_user_data_t data)
 {
-        return syscall(__NR_capset, header, data);
+	return syscall(__NR_capset, header, data);
 }
 
 /** Add capability name to capability mask.

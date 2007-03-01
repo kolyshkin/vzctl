@@ -45,7 +45,7 @@ int execvep(const char *path, char *const argv[], char *const envp[]);
  * @return		0 on success.
  */
 int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
-        char *const argv[], char *const envp[], char *std_in, int timeout);
+	char *const argv[], char *const envp[], char *std_in, int timeout);
 
 /** Read script and execute it in VE.
  *

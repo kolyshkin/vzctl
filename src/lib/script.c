@@ -76,7 +76,7 @@ int read_script(const char *fname, char *include, char **buf)
 	}
 	if (*buf != NULL) {
 		tmp = realloc(*buf, st.st_size + len + 2);
-		if (tmp ==  NULL)
+		if (tmp == NULL)
 			goto err;
 		*buf = tmp;
 		p = *buf + len;
@@ -86,7 +86,7 @@ int read_script(const char *fname, char *include, char **buf)
 			goto err;
 		p = *buf;
 	}
-	if ((len =  read(fd, p, st.st_size)) < 0) {
+	if ((len = read(fd, p, st.st_size)) < 0) {
 		logger(-1, errno, "Error reading %s", fname);
 		goto err;
 	}
@@ -207,15 +207,15 @@ int run_pre_script(int veid, char *script)
 	env[2] = strdup(ENV_PATH);
 	env[3] = NULL;
 /*
-        if ((dist = get_ostmpl(gparam)) != NULL) {
-                snprintf(buf,  sizeof(buf), "DIST=%s", dist);
-                env = ListAddElem(env, buf, NULL, NULL);
-        }
+	if ((dist = get_ostmpl(gparam)) != NULL) {
+		snprintf(buf, sizeof(buf), "DIST=%s", dist);
+		env = ListAddElem(env, buf, NULL, NULL);
+	}
 */
-        if ((ret = run_script(script, arg, env, 0)))
-                ret = VZ_ACTIONSCRIPT_ERROR;
+	if ((ret = run_script(script, arg, env, 0)))
+		ret = VZ_ACTIONSCRIPT_ERROR;
 	free_arg(env);
-        return ret;
+	return ret;
 }
 
 int mk_reboot_script()
@@ -229,7 +229,7 @@ int mk_reboot_script()
 #define RC2		"/etc/rc6.d"
 #define REBOOT_SCRIPT	"#!/bin/bash\n>/" REBOOT_MARK
 
-	/* remove reboot flag  */
+	/* remove reboot flag */
 	unlink(REBOOT_MARK);
 	rc = NULL;
 	if (stat_file(RC1))

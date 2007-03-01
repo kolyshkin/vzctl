@@ -81,7 +81,7 @@ static inline void list_del_init(list_elem_t *el)
 
 static inline int list_is_init(list_head_t *h)
 {
-        return h->next == NULL;
+	return h->next == NULL;
 }
 
 static inline int list_empty(list_head_t *h)
@@ -124,7 +124,7 @@ static inline void list_moveall(list_head_t *src, list_head_t *dst)
 		tmp = list_entry(entry->field.next, typeof(*entry), field); \
 	     &entry->field != (list_elem_t*)(head);			\
 	     entry = tmp,						\
-	        tmp = list_entry(tmp->field.next, typeof(*tmp), field))
+	     tmp = list_entry(tmp->field.next, typeof(*tmp), field))
 
 
 char *list2str_c(char *name, char c, list_head_t *head);
@@ -137,6 +137,6 @@ void free_str_param(list_head_t *head);
 int copy_str_param(list_head_t *dst, list_head_t *src);
 char *find_str(list_head_t *head, const char *val);
 int merge_str_list(int delall, list_head_t *old, list_head_t *add,
-        list_head_t *del, list_head_t *merged);
+	list_head_t *del, list_head_t *merged);
 int list_size(list_head_t *head);
 #endif /* _LIST_H_ */

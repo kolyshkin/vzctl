@@ -102,8 +102,8 @@
 /** Data structure for UBC parameter.
  */
 typedef struct {
-        int res_id;		/**< UBC resource id. */
-        unsigned long limit[2];	/**< UBC resource barrier:limit. */
+	int res_id;		/**< UBC resource id. */
+	unsigned long limit[2];	/**< UBC resource barrier:limit. */
 } ub_res;
 
 /** Data structure for UBC parameters. 

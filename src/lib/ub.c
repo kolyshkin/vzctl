@@ -31,7 +31,7 @@
 #include "vzsyscalls.h"
 
 static inline int setublimit(uid_t uid, unsigned long resource,
-        unsigned long *rlim)
+	unsigned long *rlim)
 {
 	return syscall(__NR_setublimit, uid, resource, rlim);
 }
@@ -140,7 +140,7 @@ int get_ub_resid(char *name)
 	for (i = 0; ubname2id[i].name != NULL; i++)
 		if (!strcasecmp(name, ubname2id[i].name))
 			return ubname2id[i].id;
-        return -1;
+	return -1;
 }
 
 const char *get_ub_name(int res_id)
@@ -150,7 +150,7 @@ const char *get_ub_name(int res_id)
 	for (i = 0; ubname2id[i].name != NULL; i++)
 		if (ubname2id[i].id == res_id)
 			return ubname2id[i].name;
-        return NULL;
+	return NULL;
 }
 
 int set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
@@ -277,9 +277,9 @@ if (res_id == id) {						\
 
 /** Add UBC resource in ub_res format to UBC struct
  *
- * @param ub            UBC parameters.
- * @param res           UBC resource in ub_res format.
- * @return              0 on success.
+ * @param ub		UBC parameters.
+ * @param res		UBC resource in ub_res format.
+ * @return		0 on success.
  */
 int add_ub_param(ub_param *ub, ub_res *res)
 {

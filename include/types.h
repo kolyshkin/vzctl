@@ -41,8 +41,8 @@
 #define YES		1
 #define NO		2
 
-#define ADD     	0
-#define DEL     	1
+#define ADD		0
+#define DEL		1
 
 /* Default environment variable PATH */
 #define	ENV_PATH	"PATH=/bin:/sbin:/usr/bin:/usr/sbin:"
@@ -69,7 +69,7 @@ enum {
 /** VE handler.
  */
 typedef struct {
-        int vzfd;	/**< /dev/vzctl file descriptor. */
+	int vzfd;	/**< /dev/vzctl file descriptor. */
 	int stdfd;
 } vps_handler;
 

@@ -77,7 +77,7 @@ static void set_ctty(int ttyfd)
 
 static void raw_off(void)
 {
-        if (tcsetattr(0, TCSADRAIN, &s_tios) == -1)
+	if (tcsetattr(0, TCSADRAIN, &s_tios) == -1)
 		logger(-1, errno, "Unable to restore term attr");
 }
 
@@ -206,10 +206,10 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		return ret;
 	preload_lib();
 	child_term = 0;
-        sigemptyset(&act.sa_mask);
-        act.sa_flags = SA_NOCLDSTOP;
-       	act.sa_handler = child_handler;
-        sigaction(SIGCHLD, &act, NULL);
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = SA_NOCLDSTOP;
+	act.sa_handler = child_handler;
+	sigaction(SIGCHLD, &act, NULL);
 
 	act.sa_handler = SIG_IGN;
 	act.sa_flags = 0;
@@ -237,7 +237,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
 		if (ret < 0) {
 			if (errno == ESRCH) 
-	                        ret = VZ_VE_NOT_RUNNING;
+				ret = VZ_VE_NOT_RUNNING;
 			else
 				ret = VZ_ENVCREATE_ERROR;
 			goto err;
@@ -247,14 +247,14 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			goto err;
 		set_proc_title(ttyname(slave));
 		child_term = 0;
-	        sigemptyset(&act.sa_mask);
-	        act.sa_flags = SA_NOCLDSTOP;
-	       	act.sa_handler = child_handler;
-	        sigaction(SIGCHLD, &act, NULL);
+		sigemptyset(&act.sa_mask);
+		act.sa_flags = SA_NOCLDSTOP;
+		act.sa_handler = child_handler;
+		sigaction(SIGCHLD, &act, NULL);
 		if ((pid = fork()) == 0) {
 			char buf[64];
 			char *term;
-		        char *arg[] = {"-bash", NULL};
+			char *arg[] = {"-bash", NULL};
 			char *env[] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin:",
 				"HISTFILE=/dev/null",
 				"USER=root", "HOME=/root", "LOGNAME=root",

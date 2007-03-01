@@ -599,7 +599,7 @@ void usage()
 {
 	fprintf(stderr, "Usage: vzlist [-a] [-o name[,name...]] [-s {name|-name}] [-h <pattern>] [-N <pattern>]\n");
 	fprintf(stderr, "\t\t[-H] [-S] [veid [veid ...]|-1]\n");
-	fprintf(stderr, "       vzlist -L\n\n");
+	fprintf(stderr, "	vzlist -L\n\n");
 	fprintf(stderr, "\t--all -a\t list of all VEs\n");
 	fprintf(stderr, "\t--output -o\t output only specified parameters\n");
 	fprintf(stderr, "\t--hostname -h\t hostname search pattern\n");
@@ -807,7 +807,7 @@ char *parse_var(char *var)
 #define MERGE_QUOTA(name, quota, dq)				\
 do {								\
 	if (dq.name != NULL) {					\
-		quota->name[1] = dq.name[0];     		\
+		quota->name[1] = dq.name[0];			\
 		quota->name[2] = dq.name[1];			\
 	}							\
 } while(0);							
@@ -821,7 +821,7 @@ void merge_conf(struct Cveinfo *ve, vps_res *res)
 do {								\
 	if (res == NULL || res->ub.name == NULL) 		\
 		break;						\
-	ubc->name[2] = res->ub.name[0];     			\
+	ubc->name[2] = res->ub.name[0];				\
 	ubc->name[3] = res->ub.name[1];				\
 } while(0);							
 
@@ -935,10 +935,10 @@ int check_veid_restr(int veid)
 do {						\
 	if (!strcmp(str, #name)) {		\
 		ubc->name[0] = held;		\
-		ubc->name[1] = maxheld;     	\
-		ubc->name[2] = barrier;     	\
-		ubc->name[3] = limit;     	\
-		ubc->name[4] = failcnt;     	\
+		ubc->name[1] = maxheld;		\
+		ubc->name[2] = barrier;		\
+		ubc->name[3] = limit;		\
+		ubc->name[4] = failcnt;		\
 	}					\
 } while(0);					\
 
@@ -1346,9 +1346,9 @@ int get_ve_la(int veid)
 	statctl.cpustat = &stat;
 	if (ioctl(vzctlfd, VZCTL_GET_CPU_STAT, &statctl) != 0)
 		return 1;
-        la.la[0] = stat.avenrun[0].val_int + (stat.avenrun[0].val_frac * 0.01);
-        la.la[1] = stat.avenrun[1].val_int + (stat.avenrun[1].val_frac * 0.01);
-        la.la[2] = stat.avenrun[2].val_int + (stat.avenrun[2].val_frac * 0.01);
+	la.la[0] = stat.avenrun[0].val_int + (stat.avenrun[0].val_frac * 0.01);
+	la.la[1] = stat.avenrun[1].val_int + (stat.avenrun[1].val_frac * 0.01);
+	la.la[2] = stat.avenrun[2].val_int + (stat.avenrun[2].val_frac * 0.01);
 
 	update_la(veid, &la);
 	return 0;
@@ -1584,7 +1584,7 @@ static struct option list_options[] =
 	{"no-header",	no_argument, NULL, 'H'},
 	{"stopped",	no_argument, NULL, 'S'},
 	{"all",		no_argument, NULL, 'a'},
-	{"name",        no_argument, NULL, 'n'},
+	{"name",	no_argument, NULL, 'n'},
 	{"name_filter", required_argument, NULL, 'N'},
 	{"hostname",	required_argument, NULL, 'h'},
 	{"output",	required_argument, NULL, 'o'},
@@ -1609,7 +1609,7 @@ int main(int argc, char **argv)
 			break;
 		
 		switch(c) {
-		case 'S'        :
+		case 'S'	:
 			only_stopped_ve = 1;
 			break;
 		case 'H'	:
@@ -1618,7 +1618,7 @@ int main(int argc, char **argv)
 		case 'L'	:
 			print_names();
 			return 0;
-		case 'a'        :
+		case 'a'	:
 			all_ve = 1;
 			break;
 		case 'h'	:
@@ -1652,7 +1652,7 @@ int main(int argc, char **argv)
 		default		:
 			usage();
 			return 1;
-                }
+		}
 	}
 	if (optind < argc) {
 		while (optind < argc) {
@@ -1672,7 +1672,7 @@ int main(int argc, char **argv)
 	if (build_field_order(f_order)) 
 		return 1;
 	if (getuid()) {
-	        fprintf(stderr, "This program can only be run under root.\n");
+		fprintf(stderr, "This program can only be run under root.\n");
 		return 1;
 	}
 	if ((ret = collect()))

@@ -158,7 +158,7 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	}
 	/* If operation failed remove added devices. 
 	 * Remove devices from list to skip saving.
-         */
+	 */
 	if (ret && rollback) {
 		list_for_each(tmp, dev_h, list) {
 			if (op == ADD && tmp->flags == 1)
@@ -476,7 +476,7 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 					dev_t->active = 1;
 			}
 		}
-        	ret = veth_ctl(h, veid, ADD, veth_add, 1);
+		ret = veth_ctl(h, veid, ADD, veth_add, 1);
 	}
 	if (!list_empty(&veth_old.dev))
 		free_veth_param(&veth_old);

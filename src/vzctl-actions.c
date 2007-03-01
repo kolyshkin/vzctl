@@ -78,7 +78,7 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 				logger(-1, 0, "Invalid option --%s",
 					opt[option_index].name);
 			return VZ_INVALID_PARAMETER_SYNTAX;
-                }
+		}
 	}
 	if (optind < argc) {
 		printf ("non-option ARGV-elements: ");
@@ -86,7 +86,7 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 			printf ("%s ", argv[optind++]);
 		printf ("\n");
 		return VZ_INVALID_PARAMETER_SYNTAX;
-        }
+	}
 	return 0;
 }
 
@@ -195,8 +195,8 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	struct option *opt;
 	struct option create_options[] = {
 	{"ostemplate",	required_argument, NULL, PARAM_OSTEMPLATE},
-	{"pkgver",      required_argument, NULL, PARAM_PKGVER},
-	{"pkgset",      required_argument, NULL, PARAM_PKGSET},
+	{"pkgver",	required_argument, NULL, PARAM_PKGVER},
+	{"pkgset",	required_argument, NULL, PARAM_PKGSET},
 	{"config",	required_argument, NULL, PARAM_CONFIG},
 	{"private",	required_argument, NULL, PARAM_PRIVATE},
 	{"root",	required_argument, NULL, PARAM_ROOT},
@@ -251,8 +251,8 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 	/*	sub commands	*/
 	{"dump",	no_argument, NULL, PARAM_DUMP},
 	{"suspend",	no_argument, NULL, PARAM_SUSPEND},
-	{"resume",      no_argument, NULL, PARAM_RESUME},
-	{"kill",        no_argument, NULL, PARAM_KILL},
+	{"resume",	no_argument, NULL, PARAM_RESUME},
+	{"kill",	no_argument, NULL, PARAM_KILL},
 	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
 	/*	flags		*/
 	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
@@ -327,8 +327,8 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 	static struct option restore_options[] = {
 	/*	sub commands	*/
 	{"undump",	no_argument, NULL, PARAM_UNDUMP},
-	{"kill",        no_argument, NULL, PARAM_KILL},
-	{"resume",      no_argument, NULL, PARAM_RESUME},
+	{"kill",	no_argument, NULL, PARAM_KILL},
+	{"resume",	no_argument, NULL, PARAM_RESUME},
 	/*	flags		*/
 	{"dumpfile",	required_argument, NULL, PARAM_DUMPFILE},
 	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
@@ -433,8 +433,8 @@ static void merge_apply_param(vps_param *old, vps_param *new, char *cfg)
 	FREE_STR(new->res.misc.hostname)
 #undef FREE_STR
 	free_str_param(&new->res.net.ip);
-        if (new->opt.origin_sample == NULL)
-                new->opt.origin_sample = strdup(cfg);
+	if (new->opt.origin_sample == NULL)
+		new->opt.origin_sample = strdup(cfg);
 	merge_vps_param(old, new);
 }
 
@@ -448,7 +448,7 @@ static int apply_param_from_cfg(int veid, vps_param *param, char *cfg)
 	snprintf(conf, sizeof(conf), VPS_CONF_DIR "ve-%s.conf-sample", cfg);
 	if (!stat_file(conf)) {
 		logger(-1, 0, "Sample config file does not found: %s", conf);
-                return VZ_APPLY_CONFIG_ERROR;
+		return VZ_APPLY_CONFIG_ERROR;
 	}
 	new = init_vps_param();
 	vps_parse_config(veid, conf, new, &g_action);
@@ -570,7 +570,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		actions = malloc(sizeof(*actions));
 		dist_name = get_dist_name(&g_p->res.tmpl);
 		if ((ret = read_dist_actions(dist_name, DIST_DIR, actions)))
-                	return ret;
+			return ret;
 		if (dist_name != NULL)
 			free(dist_name);
 	}
@@ -670,20 +670,20 @@ static int exec(vps_handler *h, int action, envid_t veid, char *root, int argc,
 		arg = argv;
 		mode = MODE_EXEC;
 	} else if (argc && strcmp(argv[0], "-")) {
-                for (i = 0; i < argc; i++) {
-                        len = strlen(argv[i]);
-                        if (len) {
-                                buf = (char*)realloc(buf, totallen + len + 2);
-                                sprintf(buf + totallen, "%s ", argv[i]);
-                        } else {
-                                /* set empty argument */
-                                len = 2;
-                                buf = (char*)realloc(buf, totallen + len + 2);
-                                sprintf(buf + totallen, "\'\' ");
-                        }
-                        totallen += len + 1;
-                        buf[totallen] = 0;
-                }
+		for (i = 0; i < argc; i++) {
+			len = strlen(argv[i]);
+			if (len) {
+				buf = (char*)realloc(buf, totallen + len + 2);
+				sprintf(buf + totallen, "%s ", argv[i]);
+			} else {
+				/* set empty argument */
+				len = 2;
+				buf = (char*)realloc(buf, totallen + len + 2);
+				sprintf(buf + totallen, "\'\' ");
+			}
+			totallen += len + 1;
+			buf[totallen] = 0;
+		}
 		argv_bash[2] = buf;
 		arg = argv_bash;
 	}
@@ -773,13 +773,13 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 	case ACTION_EXEC:
 	case ACTION_EXEC2:
 	case ACTION_EXEC3:
-    		if (argc < 2) {
+		if (argc < 2) {
 			fprintf(stderr, "No command line given for exec\n");
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
 		}
 		break;
 	case ACTION_RUNSCRIPT:
-    		if (argc < 2) {
+		if (argc < 2) {
 			fprintf(stderr, "Script does not specified\n");
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
 		}
@@ -795,12 +795,13 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 		break;
 	default :
 		if ((argc - 1) > 0) {
-   	                fprintf (stderr, "Invalid options: ");
-		        while (--argc) fprintf(stderr, "%s ", *(++argv));
-    			fprintf (stderr, "\n");
-	        	ret = VZ_INVALID_PARAMETER_SYNTAX;
+			fprintf (stderr, "Invalid options: ");
+			while (--argc)
+				fprintf(stderr, "%s ", *(++argv));
+			fprintf (stderr, "\n");
+			ret = VZ_INVALID_PARAMETER_SYNTAX;
 		}
-    	}
+	}
 	return ret;
 }
 
@@ -838,7 +839,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		act.sa_flags = 0;
 		sigaction(SIGINT, &act, NULL);
 	}
-        switch (action) {
+	switch (action) {
 	case ACTION_CREATE:
 		ret = create(h, veid, g_p, cmd_p);
 		break;

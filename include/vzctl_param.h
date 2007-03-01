@@ -75,8 +75,8 @@
 #define PARAM_CAP		45
 #define PARAM_CONFIG		47
 #define PARAM_SHARED		48
-#define PARAM_CFGVER            50
-#define PARAM_DEVICES           51
+#define PARAM_CFGVER		50
+#define PARAM_DEVICES		51
 #define PARAM_AVNUMPROC		52
 #define PARAM_TEMPLATES		93
 #define PARAM_DEVNODES		94 
