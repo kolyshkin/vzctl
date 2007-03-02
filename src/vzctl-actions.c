@@ -227,18 +227,11 @@ static int create(vps_handler *h, envid_t veid, vps_param *vps_p,
 static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
-	int ret, id;
-	char buf[STR_SIZE];
-	char *name = g_p->res.name.name;
+	int ret;
 
 	ret = vps_destroy(h, veid, &g_p->res.fs);
-	if (!ret && name != NULL) {
-		id = get_veid_by_name(name);
-		if (id == veid) {
-			snprintf(buf, sizeof(buf), VENAME_DIR "/%s.conf", name);
-			unlink(buf);
-		}
-	}
+	if (!ret)
+		remove_names(veid);
 	return ret;
 }
 

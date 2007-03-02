@@ -29,6 +29,7 @@
 #include <arpa/inet.h>
 #include <stdarg.h>
 #include <linux/limits.h>
+#include <dirent.h>
 
 #include "util.h"
 #include "logger.h"
@@ -574,4 +575,34 @@ int move_config(int veid, int action)
 	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
 
 	return 0;
+}
+
+void remove_names(envid_t veid)
+{
+	char buf[STR_SIZE];
+	char content[STR_SIZE];
+	struct stat st;
+	struct dirent *ep;
+	DIR *dp;
+	char *p;
+	int id;
+
+	if (!(dp = opendir(VENAME_DIR)))
+		return;
+	while ((ep = readdir(dp))) {
+		snprintf(buf, sizeof(buf), VENAME_DIR "%s", ep->d_name);
+		if (lstat(buf, &st))
+			continue;
+		if (!S_ISLNK(st.st_mode))
+			continue;
+		id = readlink(buf, content, sizeof(content) - 1);
+		if (id < 0)
+			continue;
+        	content[id] = 0;
+		if ((p = strrchr(content, '/')) != NULL)
+			p++;
+		if (sscanf(p, "%d.conf", &id) == 1 && veid == id)
+			unlink(buf);
+	}
+	closedir(dp);
 }

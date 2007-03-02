@@ -53,4 +53,5 @@ const char *get_vps_state_str(int vps_state);
 int set_not_blk(int fd);
 void close_fds(int close_std, ...);
 int move_config(int veid, int action);
+void remove_names(envid_t veid);
 #endif
