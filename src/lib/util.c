@@ -590,7 +590,7 @@ void remove_names(envid_t veid)
 	if (!(dp = opendir(VENAME_DIR)))
 		return;
 	while ((ep = readdir(dp))) {
-		snprintf(buf, sizeof(buf), VENAME_DIR "%s", ep->d_name);
+		snprintf(buf, sizeof(buf), VENAME_DIR "/%s", ep->d_name);
 		if (lstat(buf, &st))
 			continue;
 		if (!S_ISLNK(st.st_mode))
@@ -598,7 +598,7 @@ void remove_names(envid_t veid)
 		id = readlink(buf, content, sizeof(content) - 1);
 		if (id < 0)
 			continue;
-        	content[id] = 0;
+		content[id] = 0;
 		if ((p = strrchr(content, '/')) != NULL)
 			p++;
 		if (sscanf(p, "%d.conf", &id) == 1 && veid == id)
