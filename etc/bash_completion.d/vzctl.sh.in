@@ -5,6 +5,7 @@
 _get_ves()
 {
 	local cmd=$1
+	local rm_empty='sed s/^-[[:space:]]*//'
 	case $cmd in
 		create)
 			# create a new VEID, by increasing the last one
@@ -15,17 +16,17 @@ _get_ves()
 		start|mount|umount|destroy)
 			# stopped VEs
 			@SBINDIR@/vzlist -H -S -oveid
-			@SBINDIR@/vzlist -H -S -oname | sed s/-//g
+			@SBINDIR@/vzlist -H -S -oname | $rm_empty
 			;;
 		stop|enter|exec*)
 			# running VEs
 			@SBINDIR@/vzlist -H -oveid
-			@SBINDIR@/vzlist -H -oname | sed s/-//g
+			@SBINDIR@/vzlist -H -oname | $rm_emtpy
 			;;
 		*)
 			# All VEs
 			@SBINDIR@/vzlist -H -a -oveid
-			@SBINDIR@/vzlist -H -a -oname | sed s/-//g
+			@SBINDIR@/vzlist -H -a -oname | $rm_empty
 			;;
 	esac
 }
