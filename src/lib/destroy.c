@@ -194,7 +194,7 @@ static int destroydir(char *dir)
 		logger(-1, 0, "Unable to get root for %s", dir);
 		return -1;
 	}
-	snprintf(tmp, sizeof(buf), "%s/tmp", root);
+	snprintf(tmp, sizeof(tmp), "%s/tmp", root);
 	free(root);
 	if (!stat_file(tmp)) {
 		if (mkdir(tmp, 0755)) {
@@ -207,7 +207,7 @@ static int destroydir(char *dir)
 		logger(-1, 0, "Unable to generate temporary name in %s", tmp);
 		return VZ_FS_DEL_PRVT;
 	}
-	snprintf(buf, sizeof(tmp), "%s/%s", tmp, tmp_nm);
+	snprintf(buf, sizeof(buf), "%s/%s", tmp, tmp_nm);
 	free(tmp_nm);
 	if (rename(dir, buf)) {
 		logger(-1, errno, "Can't move %s -> %s", dir, buf);
