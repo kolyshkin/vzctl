@@ -42,6 +42,8 @@
 #define BACKUP		0
 #define DESTR		1
 
+const char destroy_dir_magic[]="vzctl-rm-me.";
+
 static int destroydir(char *dir);
 
 int del_dir(char *dir)
@@ -115,7 +117,7 @@ char *maketmpdir(const char *dir)
 	char *tmp_dir;
 	int len;
 
-	snprintf(buf, sizeof(buf), "%s/XXXXXXX", dir);
+	snprintf(buf, sizeof(buf), "%s/%sXXXXXXX", dir, destroy_dir_magic);
 	if ((tmp = mkdtemp(buf)) == NULL) {
 		logger(-1, errno, "Error in mkdtemp(%s)", buf);
 		return NULL;
@@ -129,6 +131,9 @@ char *maketmpdir(const char *dir)
 	return tmp_dir;
 }
 
+/* Removes all the directories under 'root'
+ * those names start with 'destroy_dir_magic'
+ */
 static void _destroydir(char *root)
 {
 	char buf[STR_SIZE];
@@ -142,8 +147,8 @@ static void _destroydir(char *root)
 			return;
 		del = 0;
 		while ((ep = readdir(dp))) {
-			if (!strcmp(ep->d_name, ".") ||
-				!strcmp(ep->d_name, ".."))
+			if (strncmp(ep->d_name, destroy_dir_magic,
+					sizeof(destroy_dir_magic) - 1))
 			{
 				continue;
 			}
