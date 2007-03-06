@@ -54,6 +54,7 @@ libvzctl_la_SOURCES = cap.c \
                       util.c \
                       veth.c \
                       vps_configure.c \
-                      vzfeatures.c
+                      vzfeatures.c \
+                      io.c
 
 libvzctl_la_LDFLAGS = -release $(LIB_VER)

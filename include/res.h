@@ -56,6 +56,10 @@ typedef struct {
 
 struct mod_action;
 
+typedef struct {
+	int ioprio;
+} io_param;
+
 typedef struct name_param {
 	int veid;
 	char *name;
@@ -78,6 +82,7 @@ typedef struct vps_res {
 	veth_param veth;	/**< veth parameters */
 	misc_param misc;
 	name_param name;
+	io_param io;
 } vps_res;
 
 enum {

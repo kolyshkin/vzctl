@@ -35,6 +35,7 @@
 #include "util.h"
 #include "quota.h"
 #include "vps_configure.h"
+#include "io.h"
 
 /** Function called on VE start to setup resource management
  *
@@ -96,6 +97,8 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if ((ret = vps_set_fs(fs, &res->fs)))
 		return ret;
 	if((ret = vps_meminfo_set(h, veid, &res->meminfo, param)))
+		return ret;
+	if ((ret = ve_ioprio_set(h, veid, &res->io, param)))
 		return ret;
 
 	if (vps_state == STATE_RUNNING && vps_is_run(h, veid)) {

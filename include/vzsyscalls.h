@@ -26,24 +26,32 @@
 #define __NR_fairsched_rate	1504
 #define __NR_setluid		1506
 #define __NR_setublimit		1507
+#define __NR_ioprio_set		1274
 #elif __x86_64__
 #define __NR_fairsched_vcpus	499
 #define __NR_setluid		501
 #define __NR_setublimit		502
 #define __NR_fairsched_chwt	506
 #define __NR_fairsched_rate	508
+#define __NR_ioprio_set		251
 #elif __powerpc__
 #define __NR_fairsched_chwt	402
 #define __NR_fairsched_rate	404
 #define __NR_fairsched_vcpus	405
 #define __NR_setluid		411
 #define __NR_setublimit		412
+#define __NR_ioprio_set		273
 #elif defined(__i386__) || defined(__sparc__)
 #define __NR_fairsched_chwt	502
 #define __NR_fairsched_rate	504
 #define __NR_fairsched_vcpus	505
 #define __NR_setluid		511
 #define __NR_setublimit		512
+#ifdef __sparc__
+#define __NR_ioprio_set		196
+#else
+#define __NR_ioprio_set		289
+#endif
 #else
 #error "no syscall for this arch"
 #endif

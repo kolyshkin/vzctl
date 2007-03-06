@@ -130,6 +130,7 @@
 #define PARAM_NETIF_HOST_MAC	356
 #define PARAM_NETIF_HOST_IFNAME	357
 #define PARAM_VERBOSE		358
+#define PARAM_IOPRIO		359
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

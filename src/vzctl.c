@@ -77,7 +77,9 @@ void usage()
 "   [--devnodes device:r|w|rw|none]\n"
 "   [--netif_add <ifname[,mac,host_ifname,host_mac]]>] [--netif_del <ifname>]\n"
 "   [--applyconfig <name>] [--applyconfig_map <name>]\n"
-"   [--features <name:on|off>] [--name <vename>]\n");
+"   [--features <name:on|off>] [--name <vename>]\n"
+"   [--ioprio <N>]\n");
+
 
 	fprintf(stdout, "   [--iptables <name>] [--disabled <yes|no>]\n");
 	fprintf(stdout, "   [UBC parameters]\n"

@@ -41,6 +41,7 @@
 #include "iptables.h"
 #include "meminfo.h"
 #include "vzfeatures.h"
+#include "io.h"
 
 static int _page_size;
 static int check_name(char *name);
@@ -126,6 +127,7 @@ static vps_config config[] = {
 {"NAME",	NULL, PARAM_NAME},
 
 {"FEATURES",	NULL, PARAM_FEATURES},
+{"IOPRIO",	NULL, PARAM_IOPRIO},
 {NULL		,NULL, -1}
 };
 
@@ -212,6 +214,7 @@ static struct option set_opt[] = {
 /*	name	*/
 {"name",	required_argument, NULL, PARAM_NAME},
 {"features",	required_argument, NULL, PARAM_FEATURES},
+{"ioprio",	required_argument, NULL, PARAM_IOPRIO},
 
 {NULL, 0, NULL, 0}
 };
@@ -405,6 +408,32 @@ static void store_features(unsigned long long mask, unsigned long long known,
 	features_mask2str(mask, known, buf + r, sizeof(buf) - r - 2);
 	strcat(buf, "\"");
 	add_str_param(conf_h, buf);
+}
+
+int parse_ioprio(int id, io_param *io, char *val)
+{
+	if (parse_int(val, &io->ioprio))
+		return ERR_INVAL;
+	if (io->ioprio < VE_IOPRIO_MIN || io->ioprio > VE_IOPRIO_MAX)
+		return ERR_INVAL;
+	return 0;
+}
+
+static int store_ioprio(vps_param *old_p, vps_param *vps_p,
+				 vps_config *conf, list_head_t *conf_h)
+{
+	io_param *io_param;
+	char buf[20];
+
+	io_param = &vps_p->res.io;
+
+	if (conf->id != PARAM_IOPRIO || io_param->ioprio < 0)
+		return 0;
+
+	snprintf(buf, sizeof(buf), "%s=\"%d\"", conf->name, io_param->ioprio);
+	add_str_param(conf_h, buf);
+
+	return 0;
 }
 
 /******************** Iptables *************************/
@@ -2042,6 +2071,10 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_FEATURES:
 		ret = parse_features(&vps_p->res.env, val);
 		break;
+	case PARAM_IOPRIO:
+		if (parse_ioprio(id, &vps_p->res.io, val))
+			return ERR_INVAL;
+		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);
 		break;
@@ -2069,6 +2102,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_meminfo(old_p, vps_p, conf, conf_h);
 		store_netif(old_p, vps_p, conf, conf_h);
 		store_name(old_p, vps_p, conf, conf_h);
+		store_ioprio(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }
@@ -2327,6 +2361,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->del_res.dev.dev);
 	list_head_init(&param->del_res.veth.dev);
 	param->res.meminfo.mode = -1;
+	param->res.io.ioprio = -1;
 
 	return param;
 }
@@ -2681,6 +2716,10 @@ static void merge_name(name_param *dst, name_param *src)
 	MERGE_INT(veid);
 }
 
+static void merge_io(io_param *dst, io_param *src) {
+	MERGE_INT(ioprio);
+}
+
 static int merge_res(vps_res *dst, vps_res *src)
 {
 	merge_fs(&dst->fs, &src->fs);
@@ -2697,6 +2736,7 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_meminfo(&dst->meminfo, &src->meminfo);
 	merge_veth(&dst->veth, &src->veth);
 	merge_name(&dst->name, &src->name);
+	merge_io(&dst->io, &src->io);
 	return 0;
 }
 
