@@ -17,7 +17,7 @@
 
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(vzctl, 3.0.14, devel@openvz.org)
+AC_INIT(vzctl, 3.0.15, devel@openvz.org)
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
