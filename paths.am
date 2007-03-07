@@ -20,7 +20,7 @@ bashcdir    = $(sysconfdir)/bash_completion.d
 endif
 
 if ENABLE_CRON
-cronddir    = $(pkgdatadir)/cron
+cronddir    = $(pkgconfdir)/cron
 dst_cronddir= $(sysconfdir)/cron.d
 endif
 

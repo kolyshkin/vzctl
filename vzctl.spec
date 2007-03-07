@@ -1,5 +1,4 @@
 %define _initddir %_sysconfdir/init.d
-%define _crondir /usr/share/vzctl/cron
 %define _vzdir /vz
 %define _lockdir %{_vzdir}/lock 
 %define _dumpdir %{_vzdir}/dump 
@@ -11,6 +10,7 @@
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
 %define _netdir	%_sysconfdir/sysconfig/network-scripts
 %define _logrdir %_sysconfdir/logrotate.d
+%define _crondir %{_configdir}/cron
 %define _distconfdir %{_configdir}/dists
 %define _namesdir %{_configdir}/names 
 %define _distscriptdir %{_distconfdir}/scripts
@@ -76,13 +76,13 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
-%attr(644,root,root) %config(noreplace) %{_crondir}/vz
 %ghost /etc/cron.d/vz
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
 %dir %attr(755,root,root) %{_cachedir}
 %dir %attr(755,root,root) %{_veipdir}
 %dir %attr(755,root,root) %{_configdir}
+%dir %attr(755,root,root) %{_crondir}
 %dir %attr(755,root,root) %{_namesdir}
 %dir %attr(755,root,root) %{_vpsconfdir}
 %dir %attr(755,root,root) %{_distconfdir}
@@ -128,6 +128,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf
+%attr(644,root,root) %config(noreplace) %{_crondir}/vz
 %config %{_vpsconfdir}/ve-vps.basic.conf-sample
 %config %{_vpsconfdir}/ve-light.conf-sample
 %config %{_vpsconfdir}/0.conf
