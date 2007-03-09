@@ -20,14 +20,11 @@
 #define _LIST_H_
 
 
-struct list_elem;
-typedef struct {
-	struct list_elem *prev, *next;
-} list_head_t;
-
-typedef struct list_elem {
-	struct list_elem *prev, *next;
-} list_elem_t;
+struct list_head {
+	struct list_head *prev, *next;
+};
+typedef struct list_head list_head_t;
+typedef struct list_head list_elem_t;
 
 struct str_struct {
 	list_elem_t list;
