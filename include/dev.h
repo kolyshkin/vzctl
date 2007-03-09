@@ -26,7 +26,7 @@
 /** Data structure for devices.
  */
 typedef struct {
-	list_elem_t list;		/**< next element. */
+	list_elem_t list;		/**< prev/next elements. */
 	char name[32];			/**< device name. */
 	unsigned int dev;		/**< device number. */
 	unsigned int type;		/**< S_IFBLK | S_IFCHR. */

@@ -35,7 +35,7 @@
 /** Data structure for devices.
  */
 typedef struct {
-	list_elem_t list;		/**< next element. */
+	list_elem_t list;		/**< prev/next element. */
 	char dev_addr[ETH_ALEN];	/**< device MAC address. */
 	int addrlen;			/**< device MAC address length. */
 	char dev_name[IFNAMSIZE];	/**< device name. */
