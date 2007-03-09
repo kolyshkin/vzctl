@@ -35,8 +35,8 @@ typedef struct str_struct str_param;
 
 static inline void list_head_init(list_head_t *head)
 {
-	head->next = (list_elem_t *)head;
-	head->prev = (list_elem_t *)head;
+	head->next = head;
+	head->prev = head;
 }
 
 static inline void list_elem_init(list_elem_t *entry)
@@ -48,14 +48,14 @@ static inline void list_elem_init(list_elem_t *entry)
 static inline void list_add(list_elem_t *new, list_head_t *list)
 {
 	new->next = list->next;
-	new->prev = (list_elem_t *)list;
+	new->prev = list;
 	list->next->prev = new;
 	list->next = new;
 }
 
 static inline void list_add_tail(list_elem_t *new, list_head_t *list)
 {
-	new->next = (list_elem_t *)list;
+	new->next = list;
 	new->prev = list->prev;
 	list->prev->next = new;
 	list->prev = new;
@@ -85,7 +85,7 @@ static inline int list_empty(list_head_t *h)
 {
 	if (list_is_init(h))
 		return 1;
-	return h->next == (list_elem_t *)h;
+	return h->next == h;
 }
 
 static inline int list_elem_inserted(list_elem_t *el)
@@ -95,8 +95,8 @@ static inline int list_elem_inserted(list_elem_t *el)
 
 static inline void list_moveall(list_head_t *src, list_head_t *dst)
 {
-	list_add((list_elem_t *)dst, src);
-	list_del((list_elem_t *)src);
+	list_add(dst, src);
+	list_del(src);
 	list_head_init(src);
 }
 
@@ -108,18 +108,18 @@ static inline void list_moveall(list_head_t *src, list_head_t *dst)
 
 #define list_for_each(entry, head, field)				\
 	for (entry = list_entry((head)->next, typeof(*entry), field);\
-	     &entry->field != (list_elem_t*)(head);			\
+	     &entry->field != (head);					\
 	     entry = list_entry(entry->field.next, typeof(*entry), field))
 
 #define list_for_each_prev(entry, head, field)				\
 	for (entry = list_entry((head)->prev, typeof(*entry), field);\
-	     &entry->field != (list_elem_t*)(head);			\
+	     &entry->field != (head);					\
 	     entry = list_entry(entry->field.prev, typeof(*entry), field))
 
 #define list_for_each_safe(entry, tmp, head, field)			\
 	for (entry = list_entry((head)->next, typeof(*entry), field),\
 		tmp = list_entry(entry->field.next, typeof(*entry), field); \
-	     &entry->field != (list_elem_t*)(head);			\
+	     &entry->field != (head);					\
 	     entry = tmp,						\
 	     tmp = list_entry(tmp->field.next, typeof(*tmp), field))
 
