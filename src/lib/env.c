@@ -321,7 +321,9 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	logger(3, 0, "Set features mask %016Lx/%016Lx",
 			create_param.feature_mask,
 			create_param.known_features);
-	/* Close all fds  except std */
+
+	/* Close all fds except stdin. stdin is status pipe */
+	close(STDERR_FILENO); close(STDOUT_FILENO);
 	close_fds(0, wait_p, err_p, h->vzfd, -1);
 try:
 	ret = vz_env_create_data_ioctl(h, &env_create_data);
