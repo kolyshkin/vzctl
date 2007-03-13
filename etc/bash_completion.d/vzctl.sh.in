@@ -60,7 +60,8 @@ _vzctl()
 		--dcachesize --numiptent --physpages --cpuunits --cpulimit \
 		--iptables --netdev_add --netdev_del --veth_add --veth_del \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
-		--noatime --capability --devnodes --applyconfig --name"
+		--noatime --capability --devnodes --applyconfig --name \
+		--ioprio"
 
 	iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
