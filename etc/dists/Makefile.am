@@ -43,6 +43,7 @@ SUSE_7x_VER   = 7.3
 SUSE_8x_VER   = 8.0 8.1 8.2
 SUSE_VER      = 9.0 9.1 9.2 9.3
 UBUNTU_VER    = 5.1
+ARCH_VER      = 0.7 0.8
 
 centos:
 	$(INSTALL_DATA) $(srcdir)/centos.conf $(DESTDIR)$(distconfdir)/centos.conf
@@ -129,6 +130,13 @@ ubuntu:
 	done
 	$(INSTALL_DATA) $(srcdir)/debian.conf $(DESTDIR)$(distconfdir)/ubuntu.conf
 
+arch:
+	$(INSTALL_DATA) $(srcdir)/arch.conf $(DESTDIR)$(distconfdir)/arch.conf
+	for ver in $(ARCH_VER); do \
+		$(INSTALL_DATA) $(srcdir)/arch.conf \
+		    $(DESTDIR)$(distconfdir)/arch-$$ver.conf; \
+	done
+
 install-data-hook: centos \
                    debian \
                    fc \
@@ -139,4 +147,5 @@ install-data-hook: centos \
                    slack \
                    sles \
                    suse \
-                   ubuntu
+                   ubuntu \
+                   arch
