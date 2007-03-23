@@ -181,8 +181,11 @@ void header(FILE *fp)
 		"# on HN with total amount of physical mem %llu Mb\n"
 		"# low memory %llu Mb, swap size %llu Mb, Max treads %lu\n"
 		"# Resourse commit level %d:\n# %s\n",
-		 num_ve, (mem_total >> 20), (low_total >> 20), (swap_total >> 20),
-		 proc_calc, osl, level_string[osl]);
+		num_ve,
+		(mem_total >> 20),
+		(low_total >> 20), (swap_total >> 20), proc_calc,
+		osl, level_string[osl]
+		);
 	return;
 }
 
@@ -438,8 +441,8 @@ int main(int argc, char **argv)
 		case 'n':
 			num_ve = strtol(optarg, &tail, 10);
 			if (*tail != '\0') {
-				fprintf(stderr, "Invalid argument for -n: %s\n",
-					optarg);
+				fprintf(stderr, "Invalid argument "
+						"for -n: %s\n",	optarg);
 				exit(1);
 			}
 			break;
@@ -452,8 +455,8 @@ int main(int argc, char **argv)
 			swap_total = strtoll(optarg, &tail, 10);
 			swap_total <<= 10;
 			if (*tail != '\0') {
-				fprintf(stderr, "Invalid argument for -s: %s\n",
-						optarg);
+				fprintf(stderr, "Invalid argument "
+						"for -s: %s\n",	optarg);
 				exit(1);
 			}
 			break;
@@ -527,7 +530,8 @@ int main(int argc, char **argv)
 	}
 
 	if (retval != 0) {
-		fprintf(stderr, "The maximum allowed value is %d\n", ve_allowed);
+		fprintf(stderr, "The maximum allowed value is %d\n",
+				ve_allowed);
 		exit(retval);
 	}
 
@@ -541,8 +545,8 @@ int main(int argc, char **argv)
 	fclose(fd);
 
 	if (statfs ("/vz", &statfs_buf) < 0) {
-		fprintf(stderr, "WARNING: statfs /vz return error\n");
-		fprintf(stderr, "Therefore default disk values will be used\n\n");
+		fprintf(stderr, "WARNING: statfs /vz returned an error.\n"
+			"Therefore default disk values will be used.\n\n");
 		ds_total = 0; di_total = 0;
 	} else {
 		long ve_ds, ve_di; 
@@ -579,11 +583,12 @@ int main(int argc, char **argv)
 				ve_allowed = ve_di;
 		}
 		if (retval == 1) {
-			fprintf(stderr, "WARNING: /vz partition do not have space "
-					"required for %d VEs\n"
+			fprintf(stderr, "WARNING: /vz partition do not "
+					"have space required for %d VEs\n"
 					"The maximum allowed value is %d\n",
 					num_ve, ve_allowed);
-			fprintf(stderr, "Default disk space values will be used\n\n");
+			fprintf(stderr, "Default disk space values "
+					"will be used\n\n");
 			ds_total = 0; di_total = 0;
 		/*	exit(retval);*/
 		}
