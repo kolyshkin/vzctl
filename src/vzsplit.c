@@ -60,7 +60,7 @@
 #define FLOCK_PVE	1000
 #define PTY_PVE		512
 
-/* default discspace values */
+/* default diskspace values */
 #define HOST_DS		10737418240ULL /* 10 GB */
 #define DEF_DS		225280
 #define HOST_DI		100000
@@ -583,7 +583,7 @@ int main(int argc, char **argv)
 					"required for %d VEs\n"
 					"The maximum allowed value is %d\n",
 					num_ve, ve_allowed);
-			fprintf(stderr, "Default disc space values will be used\n\n");
+			fprintf(stderr, "Default disk space values will be used\n\n");
 			ds_total = 0; di_total = 0;
 		/*	exit(retval);*/
 		}
