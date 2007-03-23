@@ -563,7 +563,7 @@ int main(int argc, char **argv)
 		} else
 			di_total -= HOST_DI;
 		if (rec)
-			fprintf(stderr, "WARNING: Recommended minimal size"
+			fprintf(stderr, "WARNING: Recommended minimal size "
 					"of /vz partition is 20Gb!\n");
 
 		ve_ds = ds_total / (DEF_DS);
