@@ -19,7 +19,6 @@
 
 VZCONF=@PKGCONFDIR@/vz.conf
 VEINFO=/proc/vz/veinfo
-PROC_PROXY_TR=/proc/proxy/targets
 VES_INFO=
 VE_RUN=
 VE_PREV=
