@@ -58,10 +58,10 @@ _vzctl()
 		--dgramrcvbuf --oomguarpages --lockedpages --privvmpages \
 		--shmpages --numfile --numflock --numpty --numsiginfo \
 		--dcachesize --numiptent --physpages --cpuunits --cpulimit \
-		--iptables --netdev_add --netdev_del --veth_add --veth_del \
+		--iptables --netdev_add --netdev_del --netif_add --netif_del \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
-		--noatime --capability --devnodes --applyconfig --name \
-		--ioprio"
+		--noatime --capability --devnodes --devices --applyconfig \
+		--name --ioprio --setmode --meminfo"
 
 	iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
@@ -118,6 +118,9 @@ _vzctl()
 			--onboot|--disabled|--noatime)
 				COMPREPLY=( $( compgen -W "yes no" -- $cur ) )
 				;;
+			--setmode)
+				COMPREPLY=( $( compgen -W "restart ignore" -- $cur ) )
+				;;
 			--config|--applyconfig)
 				local configs=$(ls -1 @PKGCONFDIR@/conf/*.conf-sample | \
 						    cut -d "-" -f 2- | sed -e 's#.conf-sample$##')
@@ -133,6 +136,15 @@ _vzctl()
 						    { print $2 }' | sed s/://`
 
 				COMPREPLY=( $( compgen -W "$devs" -- $cur ) )
+				;;
+			--meminfo)
+				local meminfo="none privvmpages:1"
+				COMPREPLY=( $( compgen -W "$meminfo" -- $cur ) )
+				;;
+			--ioprio)
+				# ioprio range: 0 - 7 (default : 4)
+				local ioprio='0 1 2 3 4 5 6 7'
+				COMPREPLY=( $( compgen -W "$ioprio" -- $cur ) )
 				;;
 			--capability)
 				# capname:on|off
@@ -154,6 +166,11 @@ _vzctl()
 				local devs=''
 				COMPREPLY=( $( compgen -W "$devs" -- $cur ) )
 				;;
+			--devices)
+				# FIXME: b|c:major:minor|all:r|w|rw
+				local devices=''
+				COMPREPLY=( $( compgen -W "$devices" -- $cur ) )
+				;;
 			--ipdel)
 				# Get VEID
 				local ve=${COMP_WORDS[2]}
@@ -165,6 +182,22 @@ _vzctl()
 				LIST_OPT=`echo $ve | awk '/[a-zA-Z]/ {print "-N"}'`
 				local ips="`@SBINDIR@/vzlist -H -o ip $LIST_OPT $ve | grep -vi -`"
 				COMPREPLY=( $( compgen -W "$ips all" -- $cur ) )
+				;;
+			--netif_del)
+				local netif
+				if [ -f /proc/vz/veth ]; then
+					local ve=${COMP_WORDS[2]}
+					if [[ ! ${ve} != '^[1-9][0-9]*$' ]] ; then
+						# --verbose or --quiet used
+						ve=${COMP_WORDS[3]}
+					fi
+					# get veth(ernet) device of VE, proc and config
+					local netif_proc="`awk "/${ve}/ { print \\$4 }" /proc/vz/veth`"
+					local netif_conf="`grep ^NETIF /etc/vz/conf/${ve}.conf | \
+						sed -e 's/"/\n/g' -e 's/;/\n/g' -e 's/,/\n/g' -e 's/=/ /g' | awk '/^ifname/ {print \$2}'`"
+					netif="$netif_proc $netif_conf"
+				fi
+				COMPREPLY=( $( compgen -W "$netif" -- $cur ) )
 				;;
 			--private|--root)
 				# FIXME
