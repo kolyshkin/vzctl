@@ -295,6 +295,10 @@ stop() {
 	remove_cron
 	stop_net
 
+	for mod in ${MIGRATE_MODULES}; do
+		/sbin/modprobe -r ${mod} > /dev/null 2>&1
+	done
+
 	for mod in ${MODULES}; do
 		/sbin/modprobe -r ${mod} > /dev/null 2>&1
 	done
