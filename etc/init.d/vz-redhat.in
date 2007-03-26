@@ -180,7 +180,7 @@ __echo()
 status()
 {
 	local base=${0##*/}
-	if get_veinfo; then
+	if get_veinfo && [ -f $SUBSYS_VZ ]; then
 		echo "OpenVZ is running..."
 		return 0
 	else
