@@ -105,7 +105,7 @@ cd /
 SRC_CRONSCRIPT_DIR=@CRONDDIR@
 DST_CRONSCRIPT_DIR=@DST_CRONDDIR@
 
-function setup_cron()
+setup_cron()
 {
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
@@ -113,7 +113,7 @@ function setup_cron()
 		$DST_CRONSCRIPT_DIR
 }
 
-function remove_cron()
+remove_cron()
 {
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
@@ -126,7 +126,7 @@ function remove_cron()
 EOF
 }
 
-function get_kern_ver()
+get_kern_ver()
 {
 	local ver=$1
 
@@ -134,7 +134,7 @@ function get_kern_ver()
 	echo $(((($1 * 256) + $2) * 256 + $3))
 }
 
-function get_parallel()
+get_parallel()
 {
 	[ -n "${PARALLEL}" ] && return
 	PARALLEL=`awk '
@@ -197,7 +197,7 @@ status()
 	fi
 }
 
-function setup_net()
+setup_net()
 {
 	local mod
 
@@ -238,7 +238,7 @@ function setup_net()
 	fi
 }
 
-function hn_setup()
+hn_setup()
 {
 	if test -z "${VE0CPUUNITS}"; then
 		echo "Warning: VE0CPUUNITS is not set in ${VZCONF}; using value of 1000"
@@ -265,7 +265,7 @@ function hn_setup()
 	fi
 }
 
-function ve_start()
+ve_start()
 {
 	local veid
 	local velist
@@ -316,7 +316,7 @@ function ve_start()
 	done
 }
 
-function ve_stop()
+ve_stop()
 {
 	local veid
 	local velist
@@ -388,7 +388,7 @@ function ve_stop()
 	done
 }
 
-function lockfile()
+lockfile()
 {
         local TEMPFILE="${1}.$$"
         local LOCKFILE="${1}"
@@ -412,7 +412,7 @@ function lockfile()
 	return 0
 }
 
-function start()
+start()
 {
 	local veid
 	local velist
@@ -467,7 +467,7 @@ function start()
 	touch $SUBSYS_VZ
 }
 
-function stop()
+stop()
 {
 	if ! lockfile $LOCKFILE; then
 		__echo "OpenVZ is locked"
@@ -491,7 +491,7 @@ function stop()
 	rm -f $SUBSYS_VZ
 }
 
-function load_modules()
+load_modules()
 {
 	local modules=$1
 	local mod
