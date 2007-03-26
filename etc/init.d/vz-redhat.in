@@ -44,6 +44,7 @@ VZCONF=@PKGCONFDIR@/vz.conf
 VZCTL=@SBINDIR@/vzctl
 VZQUOTA=@SBINDIR@/vzquota
 LOCKFILE=/var/lock/subsys/vz_lock
+SUBSYS_VZ=/var/lock/subsys/vz
 VESTAT=/proc/vz/vestat
 PRELOAD_MODULES=
 MODULES=
@@ -422,7 +423,7 @@ function start()
 		print_failure
 		return 1
 	fi
-	if [ -f /var/lock/subsys/vz ]; then
+	if [ -f ${SUBSYS_VZ} ]; then
 		__echo "OpenVZ already running"
 		print_failure
 		return 1
@@ -463,7 +464,7 @@ function start()
 	ve_start
 	
 	rm -f $LOCKFILE
-	touch /var/lock/subsys/vz
+	touch $SUBSYS_VZ
 }
 
 function stop()
@@ -487,7 +488,7 @@ function stop()
 	done
 	print_success
 	rm -f $LOCKFILE
-	rm -f /var/lock/subsys/vz
+	rm -f $SUBSYS_VZ
 }
 
 function load_modules()
