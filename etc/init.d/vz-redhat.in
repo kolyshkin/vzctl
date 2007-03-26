@@ -126,14 +126,6 @@ remove_cron()
 EOF
 }
 
-get_kern_ver()
-{
-	local ver=$1
-
-	set -- $(IFS='.-'; echo ${ver})
-	echo $(((($1 * 256) + $2) * 256 + $3))
-}
-
 get_parallel()
 {
 	[ -n "${PARALLEL}" ] && return
