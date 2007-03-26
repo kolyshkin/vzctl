@@ -385,6 +385,8 @@ lockfile()
         local TEMPFILE="${1}.$$"
         local LOCKFILE="${1}"
 
+	trap -- "rm -f ${LOCKFILE} ${TEMPFILE}" EXIT
+
         echo $$ > ${TEMPFILE} 2> /dev/null || {
 		echo "Can't write to ${TEMPFILE}"
         }
