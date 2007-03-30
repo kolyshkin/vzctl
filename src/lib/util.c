@@ -215,8 +215,8 @@ int cp_file(char *dst, char *src)
 			ret = -1;
 			break;
 		}
-		if (write(fd_dst, buf, len) < 0) {
-			logger(-1, errno, "Unable write to %s", dst);
+		if (write(fd_dst, buf, ret) < 0) {
+			logger(-1, errno, "Unable to write to %s", dst);
 			ret = -1;
 			break;
 		}
