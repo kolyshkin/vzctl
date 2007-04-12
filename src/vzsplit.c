@@ -23,9 +23,15 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
+#include <linux/magic.h>
 #include <unistd.h>
 
 #include "types.h"
+#include "config.h"
+
+/* The below two lines are needed to link vzsplit with libvzctl */
+#include <logger.h>
+LOG_DATA
 
 #define SYSRSRV		52428800
 #define MEMPERVE	5542912
@@ -145,7 +151,7 @@ struct par_limits params[NUMUBC];
 /* Global variables */
 unsigned long long mem_total, low_total, swap_total, ds_total, di_total; 
 long pagesize, proc_calc;
-int num_ve, osl;
+int num_ve, ve_allowed, osl;
 
 float	k_kmem[MAX_SL]		= {1, 1.2, 1.8};
 float	k_nproc[MAX_SL]		= {1, 1.5, 2};
@@ -407,6 +413,117 @@ int calculate_values()
 	return 0;
 }
 
+char * get_ve_private()
+{
+	vps_param *param;
+	char *ve_private, *veidp, *ret;
+
+	param = init_vps_param();
+	/* Parse global config file */
+	vps_parse_config(0, GLOBAL_CFG, param, NULL);
+	ve_private = param->res.fs.private_orig;
+
+	if (ve_private == NULL)
+	{
+		free_vps_param(param);
+		return NULL;
+	}
+
+	/* Remove $VEID and beyond from the string */
+	veidp = strstr(ve_private, "$VEID");
+	if (veidp == NULL)
+		veidp = strstr(ve_private, "${VEID}");
+	if (veidp != NULL)
+		*veidp = '\0';
+
+	ret = strdup(ve_private);
+	free_vps_param(param);
+	return ret;
+}
+
+int check_disk_space() {
+	char * ve_private;
+	int nofs = 0, noinodes = 0;
+	long ve_ds, ve_di;
+	int rec = 0, retval = 0;
+	struct statfs statfs_buf;
+
+	ve_private = get_ve_private();
+	if (ve_private == NULL) {
+		fprintf(stderr, "WARNING: unable to get VE_PRIVATE value "
+				"from " GLOBAL_CFG ".\n");
+		nofs = 1;
+	}
+	else {
+		if (statfs (ve_private, &statfs_buf) < 0) {
+			fprintf(stderr, "WARNING: statfs on %s failed: %s.\n",
+				ve_private, strerror(errno));
+			nofs = 1;
+		}
+	}
+
+	if (nofs == 1) {
+		fprintf(stderr, "Default disk space values to be used.\n\n");
+		ds_total = 0; di_total = 0;
+		return retval;
+	}
+
+	ds_total = statfs_buf.f_blocks;
+	di_total = statfs_buf.f_files;
+
+	if (statfs_buf.f_type == REISERFS_SUPER_MAGIC) {
+		/* reiserfs does not have inodes, thus
+		 * no limit on number of files */
+		noinodes = 1;
+	}
+
+	if (ds_total / 2 < HOST_DS / statfs_buf.f_bsize) {
+		rec = 1;
+		ds_total /= 2;
+	} else
+		ds_total -= HOST_DS / statfs_buf.f_bsize;
+
+	if (noinodes != 1) {
+		if (di_total / 2 < HOST_DI) {
+			rec = 1;
+			di_total /= 2;
+		} else
+			di_total -= HOST_DI;
+	}
+	if (rec)
+		fprintf(stderr, "WARNING: Recommended minimal size "
+				"of partition holding %s is 20Gb!\n",
+				ve_private);
+
+	ve_ds = ds_total / (DEF_DS);
+	ve_di = di_total / (DEF_DI);
+
+	if (ve_ds < num_ve) {
+		retval = 1;
+		ve_allowed = ve_ds;
+	}
+
+	if ((noinodes != 1) && (ve_di < num_ve) ) {
+		retval = 1;
+		if (ve_di < ve_ds)
+			ve_allowed = ve_di;
+	}
+	if (retval == 1) {
+		fprintf(stderr, "WARNING: partition holding %s do not "
+				"have space required for %d VEs\n"
+				"The maximum allowed value is %d\n",
+				ve_private, num_ve, ve_allowed);
+		fprintf(stderr, "Default disk space values "
+				"will be used\n\n");
+		ds_total = 0; di_total = 0;
+	}
+
+	free(ve_private);
+	return retval;
+}
+
+
+
 int main(int argc, char **argv)
 {
 	int len, opt, swp;
@@ -416,8 +533,7 @@ int main(int argc, char **argv)
 	FILE *fd;
 	char str[1024];
 	unsigned long long val;
-	struct statfs statfs_buf;
-	int retval, ve_allowed;
+	int retval;
 
 	num_ve = -1;
 	swp = 0;
@@ -544,55 +660,8 @@ int main(int argc, char **argv)
 			proc_calc = val;
 	fclose(fd);
 
-	if (statfs ("/vz", &statfs_buf) < 0) {
-		fprintf(stderr, "WARNING: statfs /vz returned an error.\n"
-			"Therefore default disk values will be used.\n\n");
-		ds_total = 0; di_total = 0;
-	} else {
-		long ve_ds, ve_di; 
-		long rec;
+	retval = check_disk_space();
 
-		ds_total = statfs_buf.f_blocks; 
-		di_total = statfs_buf.f_files; 
-
-		rec = 0;
-		if (ds_total / 2 < HOST_DS / statfs_buf.f_bsize) {
-			rec = 1;
-			ds_total /= 2;
-		} else
-			ds_total -= HOST_DS / statfs_buf.f_bsize;
-		if (di_total / 2 < HOST_DI) {
-			rec = 1;
-			di_total /= 2;
-		} else
-			di_total -= HOST_DI;
-		if (rec)
-			fprintf(stderr, "WARNING: Recommended minimal size "
-					"of /vz partition is 20Gb!\n");
-
-		ve_ds = ds_total / (DEF_DS);
-		ve_di = di_total / (DEF_DI);
-		
-		if (ve_ds < num_ve) {
-			retval = 1;
-			ve_allowed = ve_ds;
-		}
-		if (ve_di < num_ve) {
-			retval = 1;
-			if (ve_di < ve_ds)
-				ve_allowed = ve_di;
-		}
-		if (retval == 1) {
-			fprintf(stderr, "WARNING: /vz partition do not "
-					"have space required for %d VEs\n"
-					"The maximum allowed value is %d\n",
-					num_ve, ve_allowed);
-			fprintf(stderr, "Default disk space values "
-					"will be used\n\n");
-			ds_total = 0; di_total = 0;
-		/*	exit(retval);*/
-		}
-	}
 	if ((pagesize = sysconf(_SC_PAGE_SIZE)) == -1)
 		pagesize = 4096;
 	

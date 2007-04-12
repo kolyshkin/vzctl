@@ -61,3 +61,4 @@ vzmemcheck_SOURCES = validate.c \
 vzmemcheck_LDADD = $(VZCTL_LIBS)
 
 vzsplit_SOURCES = vzsplit.c
+vzsplit_LDADD   = $(VZCTL_LIBS)
