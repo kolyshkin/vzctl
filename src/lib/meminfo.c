@@ -36,15 +36,21 @@ static struct {
 	{"privvmpages",	VE_MEMINFO_PRIVVMPAGES},
 };
 
-int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *param,
+int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 	vps_param *vps_p)
 {
 	int ret;
 	unsigned long *privvmpages;
 	struct vzctl_ve_meminfo meminfo;
+	meminfo_param *param;
+	meminfo_param default_param = {
+		VE_MEMINFO_PRIVVMPAGES, 1
+	};
 
-	if (param->mode < 0)
-		return 0;
+	if (gparam->mode < 0)
+		param = &default_param;
+	else
+		param = gparam;
 
 	meminfo.veid = veid;
 	switch (param->mode) {
