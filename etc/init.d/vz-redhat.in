@@ -42,33 +42,35 @@ VZCONF=@PKGCONFDIR@/vz.conf
 [ "${VIRTUOZZO}" = "no" ] && exit 0
 
 VZCTL=@SBINDIR@/vzctl
+[ -x ${VZCTL} ] || exit 0
+
 VZQUOTA=@SBINDIR@/vzquota
+CONFIG_DIR=@PKGCONFDIR@/conf
 LOCKFILE=/var/lock/subsys/vz_lock
 SUBSYS_VZ=/var/lock/subsys/vz
 VESTAT=/proc/vz/vestat
+VZDEV=venet0
 PRELOAD_MODULES=
 MODULES=
 MODULES_OTHER=
 NET_MODULES=
 IPT_MODULES=
 
-[ -x ${VZCTL} ] || exit 0
-
-VZDEV=venet0
 if [ "${MODULES_DISABLED}" != "yes" ]; then
 	PRELOAD_MODULES="af_packet"
 	MODULES="vzmon vzdquota vzdev"
 	CPT_MODULES="vzcpt vzrst"
+	MODULES_OTHER="vzcompat ${CPT_MODULES}"
+	VNET_MODULES="vznetdev vznet"
 	VETH_MODULES="vzethdev"
-	MODULES_OTHER="vzcompat ${CPT_MODULES} ${VETH_MODULES}"
-	NET_MODULES="vznetdev vznet"
+	NET_MODULES="${VNET_MODULES} ${VETH_MODULES}"
 	if [ "${VZWDOG}" = "yes" ]; then
 		MODULES="${MODULES} vzwdog"
 	fi
 	IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
+	VZFS_MODULES="simfs"
 fi
 
-CONFIG_DIR=@PKGCONFDIR@/conf
 
 rc_done='..done'
 rc_failed='..failed'
@@ -189,13 +191,14 @@ status()
 	fi
 }
 
-setup_net()
+start_net()
 {
 	local mod
 
 	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
 		return 0
 	fi
+	# load all kernel modules needed for VE networking
 	for mod in ${NET_MODULES}; do
         	modprobe ${mod} 2>/dev/null
 	done
@@ -212,7 +215,7 @@ setup_net()
 	fi
 	ip addr add 0.0.0.0/0 dev $VZDEV
 	__echo "Configuring interface $VZDEV: "
-	sysctl -w net.ipv4.conf.$VZDEV.send_redirects=0 >/dev/null
+	sysctl -q -w net.ipv4.conf.$VZDEV.send_redirects=0
 	if [ $? -eq 0 ] ; then
 		print_success
 	else
@@ -230,7 +233,25 @@ setup_net()
 	fi
 }
 
-hn_setup()
+stop_net()
+{
+	local mod
+
+	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
+		__echo "Bringing down interface $VZDEV: " 
+		ip link set $VZDEV down 
+		if [ $? -eq 0 ] ; then
+			print_success
+		else
+			print_failure
+		fi
+	fi
+	for mod in ${NET_MODULES}; do
+		/sbin/modprobe -r ${mod} > /dev/null 2>&1
+	done
+}
+
+setup_ve0()
 {
 	if test -z "${VE0CPUUNITS}"; then
 		echo "Warning: VE0CPUUNITS is not set in ${VZCONF}; using value of 1000"
@@ -257,7 +278,7 @@ hn_setup()
 	fi
 }
 
-ve_start()
+start_ves()
 {
 	local veid
 	local velist
@@ -269,7 +290,7 @@ ve_start()
 	velist=`grep -l '^ONBOOT=yes\|^ONBOOT=\"yes\"' [0-9]*.conf 2>/dev/null | \
 		sed -e 's/.conf//g' | sort -n`
 	cd - >/dev/null
-	echo "0" > /proc/sys/net/ipv4/route/src_check
+	sysctl -q -w net.ipv4.route.src_check=0
 	for veid in $velist; do
 		[ "${veid}" = "0" ] && continue 
 		__echo "Starting VE ${veid}: "
@@ -308,7 +329,7 @@ ve_start()
 	done
 }
 
-ve_stop()
+stop_ves()
 {
 	local veid
 	local velist
@@ -411,6 +432,7 @@ start()
 	local veid
 	local velist
 	local msg
+	local mod
 
 	if ! lockfile $LOCKFILE; then
 		__echo "OpenVZ is locked"
@@ -424,19 +446,19 @@ start()
 	fi
 	__echo "Starting OpenVZ: "
 	load_modules "${IPT_MODULES}"
-	for MOD in $PRELOAD_MODULES; do
-		/sbin/modprobe -r $MOD >/dev/null 2>&1
-		/sbin/modprobe $MOD >/dev/null 2>&1
+	for mod in $PRELOAD_MODULES; do
+		/sbin/modprobe -r $mod >/dev/null 2>&1
+		/sbin/modprobe $mod >/dev/null 2>&1
 	done
-	for MOD in $MODULES; do
-		/sbin/modprobe $MOD >/dev/null 2>&1
+	for mod in $MODULES; do
+		/sbin/modprobe $mod >/dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
-			print_failure "failed to load module ${MOD}"
+			print_failure "failed to load module ${mod}"
 			return $RETVAL
 		fi
 	done
-	load_modules "${MODULES_OTHER}"
+	load_modules "${MODULES_OTHER} ${VZFS_MODULES}"
 	print_success "loading OpenVZ modules"
 
 	if [ ! -e /dev/vzctl ]; then
@@ -446,16 +468,15 @@ start()
 		/bin/mknod -m 600 /dev/vzctl c 126 0 > /dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
-			__echo "creating vzctl device"
-			print_failure
+			print_failure "creating /dev/vzctl"
 			return $RETVAL
 		fi
 	fi
 	
-	setup_net
-	hn_setup
+	start_net
+	setup_ve0
 	setup_cron
-	ve_start
+	start_ves
 	
 	rm -f $LOCKFILE
 	touch $SUBSYS_VZ
@@ -463,6 +484,8 @@ start()
 
 stop()
 {
+	local mod
+
 	if ! lockfile $LOCKFILE; then
 		__echo "OpenVZ is locked"
 		print_failure
@@ -470,19 +493,16 @@ stop()
 		return 1
 	fi
 
-	ve_stop
+	stop_ves
 	remove_cron
+	stop_net
 	__echo "Stopping OpenVZ: "
-	ip link set ${VZDEV} down 2>/dev/null
-	for MOD in $MODULES; do
-		/sbin/modprobe -r $MOD > /dev/null 2>&1
+	for mod in ${MODULES_OTHER} ${PRELOAD_MODULES} ${IPT_MODULES} ${VZFS_MODULES}; do
+		/sbin/modprobe -r ${mod} > /dev/null 2>&1
 	done
-	for MOD in $PRELOAD_MODULES ${IPT_MODULES2} ${NET_MODULES}; do
-		/sbin/modprobe -r $MOD > /dev/null 2>&1
-	done
-	print_success
 	rm -f $LOCKFILE
 	rm -f $SUBSYS_VZ
+	print_success
 }
 
 load_modules()
@@ -494,7 +514,7 @@ load_modules()
 		if /sbin/lsmod | grep -qw ${mod}; then
 			continue
 		fi
-		/sbin/modprobe $mod >/dev/null 2>&1
+		/sbin/modprobe ${mod} >/dev/null 2>&1
 	done
 }
 
@@ -520,4 +540,3 @@ case "$1" in
 esac
 
 exit $RETVAL
-
