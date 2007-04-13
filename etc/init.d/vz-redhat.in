@@ -107,8 +107,18 @@ cd /
 SRC_CRONSCRIPT_DIR=@CRONDDIR@
 DST_CRONSCRIPT_DIR=@DST_CRONDDIR@
 
+check_old_cron_files()
+{
+	# avoid double OpenVZ cron settings
+	local f
+	for f in vpsreboot vpsnetclean; do
+		[ -f $DST_CRONSCRIPT_DIR/$f ] && rm -f $DST_CRONSCRIPT_DIR/$f
+	done
+}
+
 setup_cron()
 {
+	check_old_cron_files
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
 	install -m644 -o root -g root $SRC_CRONSCRIPT_DIR/vz \
@@ -117,6 +127,7 @@ setup_cron()
 
 remove_cron()
 {
+	check_old_cron_files
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
 	cat > $DST_CRONSCRIPT_DIR/vz <<EOF
