@@ -38,6 +38,9 @@ install-redhat:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(MAKE) $(AM_MAKEFLAGS) -C network-scripts $@
 
+install-suse:
+	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
+
 install-gentoo:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/conf.d
