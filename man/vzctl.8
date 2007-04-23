@@ -368,8 +368,8 @@ Sets noatime flag (do not update inode access times) on file system.
 \fB--capability\fR \fIcapname\fR:\fBon\fR|\fBoff\fR
 Sets capability inside a VE. Note that setting capability when the VE
 is running does not take immediate effect; restart VE in order for
-changes to take effect. Note a VE has default set of capability, any
-operations on capability is logical and with default capability mask.
+changes to take effect. Note a VE has default set of capabilities, thus any
+operation on capabilities is "logical and" with the default capability mask.
 
 You can use the following values for \fIcapname\fR:
 \fBchown\fR, \fBdac_override\fR, \fBdac_read_search\fR, \fBfowner\fR,
@@ -381,6 +381,10 @@ You can use the following values for \fIcapname\fR:
 \fBsys_admin\fR, \fBsys_boot\fR, \fBsys_nice\fR, \fBsys_resource\fR,
 \fBsys_time\fR, \fBsys_tty_config\fR, \fBmknod\fR, \fBlease\fR,
 \fBsetveid\fR, \fBve_admin\fR.
+.TP
+WARNING: setting some of those capabilities may have far reaching security
+implications, so do not do it unless you know what you are doing. Also note
+that setting \fBsetpcap:on\fR will most probably lead to inability to start it.
 .TP
 \fBDevice access management\fR
 .TP
