@@ -199,7 +199,7 @@ static int destroydir(char *dir)
 		logger(-1, 0, "Unable to get root for %s", dir);
 		return -1;
 	}
-	snprintf(tmp, sizeof(tmp), "%s/tmp", root);
+	snprintf(tmp, sizeof(tmp), "%s/vztmp", root);
 	free(root);
 	if (!stat_file(tmp)) {
 		if (mkdir(tmp, 0755)) {
@@ -207,7 +207,7 @@ static int destroydir(char *dir)
 			return VZ_FS_DEL_PRVT;
 		}
 	}
-	/* First move to del */
+	/* Fast/async removal -- first move to tmp dir */
 	if ((tmp_nm = maketmpdir(tmp)) == NULL)	{
 		logger(-1, 0, "Unable to generate temporary name in %s", tmp);
 		return VZ_FS_DEL_PRVT;
@@ -215,9 +215,20 @@ static int destroydir(char *dir)
 	snprintf(buf, sizeof(buf), "%s/%s", tmp, tmp_nm);
 	free(tmp_nm);
 	if (rename(dir, buf)) {
-		logger(-1, errno, "Can't move %s -> %s", dir, buf);
 		rmdir(buf);
-		return VZ_FS_DEL_PRVT;
+		if (errno == EXDEV) {
+			/* See http://bugzilla.openvz.org/457 */
+			logger(0, 0, "Warning: directory %s is not on the same"
+					" filesystem as %s - doing slow/sync"
+					" removal", dir, tmp);
+			if (del_dir(dir))
+				return VZ_FS_DEL_PRVT;
+			else
+				return 0;
+		} else {
+			logger(-1, errno, "Can't move %s -> %s", dir, buf);
+			return VZ_FS_DEL_PRVT;
+		}
 	}
 	snprintf(buf, sizeof(buf), "%s/rm.lck", tmp);
 	if ((fd_lock = _lock(buf, 0)) == -2) {
