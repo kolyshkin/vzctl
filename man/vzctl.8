@@ -2,20 +2,20 @@
 .SH NAME
 vzctl \- utility to control a Virtual Environment.
 .SH SYNOPSIS
-vzctl \fB[flags]\fR \fBcreate\fR \fIveid\fR
+vzctl [\fIflags\fR] \fBcreate\fR \fIveid\fR
 \fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR]
 [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]
 .PP
-vzctl \fB[flags]\fR \fBset\fR \fIveid\fR [\fIparameters\fR] [\fB--save\fR]
+vzctl [\fIflags\fR] \fBset\fR \fIveid\fR [\fIparameters\fR] [\fB--save\fR]
 .PP
-vzctl \fB[flags]\fR \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
+vzctl [\fIflags\fR] \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
 \fBstart\fR | \fBstop\fR | \fBrestart\fR |
 \fBstatus\fR | \fBenter\fR \fIveid\fR
 .PP
-vzctl \fB[flags]\fR \fBexec\fR | \fBexec2\fR \fIveid\fR
+vzctl [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fIveid\fR
 \fIcommand\fR [\fIarg\fR ...]
 .PP
-vzctl \fBrunscript\fR \fIveid\fR <\fBscript\fR>
+vzctl \fBrunscript\fR \fIveid\fR \fIscript\fR
 .PP
 vzctl \fB--help\fR | \fB--version\fR
 .SH DESCRIPTION
@@ -65,7 +65,7 @@ Note that VE area should be created before using this option.
 .TP
 \fB--disabled\fR \fIyes\fR|\fIno\fR
 Disable VE start. To force the start of a disabled VE, use \fBvzctl start\fR
-with \fB-force\fR option.
+with \fB--force\fR option.
 .TP
 \fB--name\fR \fIname\fR
 Add a name for a VE. The \fIname\fR can later be used in subsequent calls to
@@ -108,8 +108,8 @@ the ethernet device name in the VE, \fImac\fR is its MAC address,
 \fIhost_mac\fR is its MAC address. MAC addresses should be in the format
 like XX:XX:XX:XX:XX:XX. All parameters except \fIifname\fR are optional
 and are automatically generated if not specified.
-
-\fBInterface configuration.\fR
+.TP
+\fBInterface configuration\fR
 
 The following options can be used to reconfigure the already-created virtual
 ethernet interface. To select the interface to configure, use
@@ -124,6 +124,7 @@ Removes virtual ethernet device from VE. If you want to remove all devices,
 use \fBall\fR.
 .TP
 \fBResource limits\fR
+
 The following options sets barrier and limit for various user beancounters.
 Each option requires one or two arguments. In case of one argument,
 \fBvzctl\fR sets barrier and limit to the same value. In case of
@@ -277,6 +278,7 @@ by this VE. Barrier should be set to 0, and limit should be set to
 2,147,483,647.
 .TP
 \fBCPU fair scheduler parameters\fR
+
 These parameters control CPU usage by VE.
 .TP
 \fB--cpuunits\fR \fInum\fR
@@ -298,6 +300,7 @@ limit is 0 (no CPU limit).
 sets number of CPUs available in the VE.
 .TP
 \fBMemory output parameters\fR
+
 This parameter control output of /proc/meminfo inside a VE
 .IP "\fB--meminfo\fR \fBnone\fR
 No /proc/meminfo virtualization (the same as on host system).
@@ -381,10 +384,11 @@ You can use the following values for \fIcapname\fR:
 \fBsys_admin\fR, \fBsys_boot\fR, \fBsys_nice\fR, \fBsys_resource\fR,
 \fBsys_time\fR, \fBsys_tty_config\fR, \fBmknod\fR, \fBlease\fR,
 \fBsetveid\fR, \fBve_admin\fR.
-.TP
-WARNING: setting some of those capabilities may have far reaching security
+
+\fBWARNING\fR: setting some of those capabilities may have far reaching security
 implications, so do not do it unless you know what you are doing. Also note
-that setting \fBsetpcap:on\fR will most probably lead to inability to start it.
+that setting \fBsetpcap:on\fR for a VE will most probably lead to inability
+to start it.
 .TP
 \fBDevice access management\fR
 .TP
@@ -398,8 +402,9 @@ designated by its \fImajor\fR and \fIminor\fR numbers. Device file have to be cr
 \fBFeatures management\fR
 .TP
 \fB--features\fR \fIname\fR:\fBon|off\fR
-Enable disable specific VE feature. Known features are: \fIsysfs\fR, \fInfs\fR.
-
+Enable or disable a specific VE feature.
+Known features are: \fIsysfs\fR, \fInfs\fR.
+.TP
 \fBApply config\fR
 .TP
 \fB--applyconfig\fR \fIname\fR
@@ -419,16 +424,17 @@ supported. Restore VE name based on NAME variable in VE configuration file.
 Assigns I/O priority to VE. \fIPriority\fR range is \fB0-7\fR.
 The greater \fIpriority\fR is, the more time for I/O activity VE has.
 By default each VE has \fIpriority\fR of \fB4\fR.
+
 .SS Checkpointing and restore
-.TP
+
 Checkpointing is a feature of OpenVZ kernel which allows to save a complete
 state of a running VE, and to restore it later.
-.TP
+.TP 4
 \fBchkpnt\fR \fIveid\fR [\fB--dumpfile\fR \fIname\fR]
 This command saves a complete state of a running VE to a dump file,
 and stops the VE. If an option \fB--dumpfile\fR is not set, default
 dump file name \fB/vz/dump/Dump.\fIveid\fR is used.
-.TP
+.TP 4
 \fBrestore\fR \fIveid\fR [\fB--dumpfile\fR \fIname\fR]
 This command restores a VE from dump file created by the \fBchkpnt\fR command.
 .SS Performing VE actions
@@ -460,9 +466,13 @@ You can use \fB--hostname\fR \fIname\fR option to set a host name for a VE.
 .IP \fBdestroy\fR 4
 Removes a VE private area by deleting all files, directories and configuration
 file of this VE.
-.IP "\fBstart\fR [\fB---wait\fR]" 4
-Mounts (if necessary) and starts a VE. if \fB--wait\fR
-option specified wait until default runlevel is entered.
+.IP "\fBstart\fR [\fB--wait\fR] [\fB--force\fR]" 4
+Mounts (if necessary) and starts a VE. Unless \fB--wait\fR option
+is specified, \fBvzctl\fR will return immediately; otherwise an attempt to
+wait till the default runlevel is reached will be made by vzctl.
+
+Specify \fB--force\fR if you want to start a VE which is disabled
+(see \fB--disabled\fR).
 .IP \fBstop\fR 4
 Stops and unmounts a VE.
 .IP \fBrestart\fR 4
