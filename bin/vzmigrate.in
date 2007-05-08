@@ -324,6 +324,21 @@ if ! logexec 2 $SSH -o BatchMode=yes root@$host /etc/init.d/vz status ; then
 	exit $MIG_ERR_OVZ_NOT_RUNNING
 fi
 
+# Check if CPT modules are loaded for online migration
+if [ $online -eq 1 ]; then
+	if ! lsmod | grep -q vzcpt; then
+		log 0 "vzcpt module is not loaded on the source node"
+		log 0 "Can't continue online migration"
+		exit $MIG_ERR_OVZ_NOT_RUNNING
+	fi
+	if ! logexec 2 $SSH -o BatchMode=yes root@$host "lsmod | grep -q vzrst";
+	then
+		log 0 "vzrst module is not loaded on the destination node"
+		log 0 "Can't continue online migration"
+		exit $MIG_ERR_OVZ_NOT_RUNNING
+	fi
+fi
+
 dst_exist=$($SSH "root@$host" "vzctl status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
 	log 0 "VE #$VEID already exists on destination node"
