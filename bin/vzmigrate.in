@@ -428,7 +428,7 @@ if ! $SSH "root@$host" "vzctl quotaon $VEID"; then
 fi
 
 log 1 "Syncing private"
-if ! rsync -aH --delete --progress \
+if ! rsync -aH --delete --progress --numeric-ids \
 		"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" | \
 		grep "% of" | awk -v ORS="\r" '{print $10}'; then
 	log 0 "Failed to sync VE private areas"
@@ -482,7 +482,7 @@ fi
 if [ "$state" = "running" ]; then
 	log 2 "Syncing private (2nd pass)"
 	time_rsync2=$(date +%s.%N)
-	if ! rsync -aH --delete \
+	if ! rsync -aH --delete --numeric-ids \
 			"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
 		log 0 "Failed to sync VE private areas"
 		undo_source_stage
