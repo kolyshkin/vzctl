@@ -156,15 +156,15 @@ check_kernel_config()
 #	local opt_rec="SCHED_VCPU FAIRSCHED VZ_QUOTA VZ_QUOTA_UGID VE_NETDEV VE_ETHDEV
 #			VE_IPTABLES VZ_CHECKPOINT VZ_WDOG"
 
-	conf=$(zcat /proc/config.gz 2>/dev/null | grep -E -v '^#|^$') || return 0
+	conf="`zcat /proc/config.gz 2>/dev/null | grep -E -v '^#|^$'`"
 
-	for opt in opt_must; do
-		if ! echo "$conf" | grep -q "${opt}="; then
+	for opt in $opt_must; do
+		if ! echo "$conf" | grep -q "$opt="; then
 			__echo "Missing kernel config option: CONFIG_$opt"
 			err=1
 		fi
 	done
-	if [ err != 0 ]; then
+	if [ $err != 0 ]; then
 		print_failure "Please recompile your kernel."
 		exit 1
 	fi
