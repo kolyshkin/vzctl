@@ -68,7 +68,8 @@ function create_config()
 iface ${VENET_DEV}:${ifnum} inet static
 	address ${ip}
 	netmask 255.255.255.255
-	broadcast 0.0.0.0" >> ${CFGFILE}.bak
+	broadcast 0.0.0.0
+" >> ${CFGFILE}.bak
 }
 
 function get_all_aliasid()
@@ -100,7 +101,7 @@ function add_ip()
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		rm -f "${CFGFILE}" 2>/dev/null
 	fi
-	if ! grep -qe "auto ${VENET_DEV}$" ${CFGFILE} 2>/dev/null; then
+	if ! grep -qe "^auto ${VENET_DEV} " ${CFGFILE} 2>/dev/null; then
 		setup_network
 	fi
 	if [ "${IPDELALL}" = "yes" ]; then
