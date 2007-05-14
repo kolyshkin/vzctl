@@ -1153,7 +1153,7 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
 	memset(dev, 0, sizeof(*dev));
 	snprintf(dev->name, len, "%s", str);
 	snprintf(buf, sizeof(buf), "/dev/%s", dev->name);
-	if (lstat(buf, &st)) {
+	if (stat(buf, &st)) {
 		logger(-1, errno, "Incorrect device name %s", buf);
 		return ERR_INVAL;
 	}

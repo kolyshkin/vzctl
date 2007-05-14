@@ -55,12 +55,12 @@ static int dev_create(char *root, dev_res *dev)
 	} else if (!ret)
 		return 0;
 	snprintf(buf2, sizeof(buf2), "/dev/%s", dev->name);
-	if (lstat(buf2, &st)) {
+	if (stat(buf2, &st)) {
 		if (errno == ENOENT)
 			logger(-1, 0, "Incorrect name or no such device %s",
 				buf2);
 		else
-			logger(-1, errno, "Unable to stat  device %s", buf2);
+			logger(-1, errno, "Unable to stat device %s", buf2);
 		return VZ_SET_DEVICES;
 	}
 	if (!S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode)) {
