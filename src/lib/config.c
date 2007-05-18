@@ -1758,7 +1758,6 @@ static int store_name(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		break;
 	case PARAM_NAME:
 		conf_store_str(conf_h, conf->name, vps_p->res.name.name);
-		add_str_param(conf_h, buf);
 		break;
 	}
 	return 0;
