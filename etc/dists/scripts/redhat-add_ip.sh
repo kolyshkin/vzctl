@@ -66,13 +66,6 @@ IPADDR=127.0.0.1
 NETMASK=255.255.255.255
 BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
 
-	if [ "${IPV6}" = "yes" ]; then
-		echo "IPV6INIT=yes
-IPV6ADDR=::1/128" >> $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
-
-		put_param ${NETFILE} NETWORKING_IPV6 yes
-		put_param ${NETFILE} IPV6_DEFAULTDEV ${VENET_DEV}
-	fi
 
 	remove_fake_old_route ${ROUTE}
 	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${ROUTE} 2>/dev/null; then
@@ -83,11 +76,28 @@ default via ${FAKEGATEWAY}" >> ${ROUTE} || error "Can't create ${ROUTE}" ${VZ_FS
 	put_param $NETFILE NETWORKING yes
 	put_param $NETFILE GATEWAY ${FAKEGATEWAY}
 
+	# setup ipv6
+	setup6_network
+
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
 	fi
 	fix_ifup
+}
+
+function setup6_network()
+{
+	[ "${IPV6}" != "yes" ] && return 0
+
+	if ! grep -q 'IPV6INIT="yes"' ${IFCFG}; then
+		put_param ${IFCFG} IPV6INIT yes
+	fi
+	if ! grep -q 'NETWORKING_IPV6="yes"' ${NETFILE}; then
+		put_param ${NETFILE} NETWORKING_IPV6 yes
+		put_param ${NETFILE} IPV6_DEFAULTDEV ${VENET_DEV}
+		NETWORKRESTART=yes
+	fi
 }
 
 function create_config()
@@ -106,8 +116,9 @@ function add_ip6()
 {
 	[ "${IPV6}" != "yes" ] && return
 	if ! grep -qw "$1" ${IFCFG} 2>/dev/null; then
+		setup6_network
 		add_param ${IFCFG} IPV6ADDR_SECONDARIES "$1/128"
-		NETWORKRESTART=yes
+		ifconfig ${VENET_DEV} add "$1/128"
 	fi
 }
 
