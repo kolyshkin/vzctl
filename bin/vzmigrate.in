@@ -326,12 +326,12 @@ fi
 
 # Check if CPT modules are loaded for online migration
 if [ $online -eq 1 ]; then
-	if ! lsmod | grep -q vzcpt; then
+	if [ ! -f /proc/cpt ]; then
 		log 0 "vzcpt module is not loaded on the source node"
 		log 0 "Can't continue online migration"
 		exit $MIG_ERR_OVZ_NOT_RUNNING
 	fi
-	if ! logexec 2 $SSH -o BatchMode=yes root@$host "lsmod | grep -q vzrst";
+	if ! logexec 2 $SSH -o BatchMode=yes root@$host "test -f /proc/rst";
 	then
 		log 0 "vzrst module is not loaded on the destination node"
 		log 0 "Can't continue online migration"
