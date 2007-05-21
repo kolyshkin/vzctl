@@ -1887,6 +1887,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_IPV6NET:
 		ret = conf_parse_yesno(&vps_p->res.net.ipv6_net, val, 1);
+		vps_p->del_res.net.ipv6_net = vps_p->res.net.ipv6_net;
 		break;
 	case PARAM_NETDEV_ADD:
 		ret = add_netdev(&vps_p->res.net, val);
@@ -2751,5 +2752,6 @@ int merge_global_param(vps_param *dst, vps_param *src)
 {
 	MERGE_INT(res.dq.enable);
 	MERGE_INT(res.net.ipv6_net);
+	MERGE_INT(del_res.net.ipv6_net);
 	return 0;
 }
