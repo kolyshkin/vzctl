@@ -48,6 +48,7 @@ function del_ip()
 		# IPV6 processing
 		if [ "${ip#*:}" != "${ip}" ]; then
 			del_param ${IFCFG} IPV6ADDR_SECONDARIES "${ip}\\/128"
+			ifconfig ${VENET_DEV} del ${ip}/128
 			continue
 		fi
 		# find and delete a file with this alias
