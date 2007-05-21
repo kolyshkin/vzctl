@@ -46,7 +46,7 @@ fi
 
 CPUUTL=`cat  ${CPUINFO} | awk '
 {
-	if ($1 == "bogomips" || $1 = "BogoMIPS") {
+	if ($1 == "bogomips" || $1 == "BogoMIPS") {
 		sum += $3;
 	}
 }
