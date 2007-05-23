@@ -144,8 +144,8 @@ if (x != NULL) { 							\
 #define CHECK_B(name)							\
 if (ub->name != NULL) {							\
 	if ((ub->name[0] != ub->name[1])) {				\
-		logger(-1, 0, "Error: barrier should be equal limit for " \
-			#name " (currently, %lu:%lu)",			\
+		logger(-1, 0, "Error: barrier should be equal to limit" \
+			" for " #name " (currently, %lu:%lu)",		\
 			ub->name[0], ub->name[1]);			\
 		if (ask || recover) {					\
 			tmp_val0 = max_ul(ub->name[0], ub->name[1]); 	\
