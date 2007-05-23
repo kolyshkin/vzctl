@@ -58,7 +58,7 @@ AC_C_INLINE
 CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline"
 CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
 
-if test x$build_cpu = xppc64; then
+if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
 	CFLAGS="${CFLAGS} -m64"
 fi
 
