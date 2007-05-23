@@ -202,7 +202,7 @@ function vzaddrouting()
 #   $1 - IP address
 function vzdelrouting()
 {
-if ${IP_CMD} route list $1 | grep  "$1 dev venet0" >/dev/null 2>&1; then
+if ${IP_CMD} route list table all $1 | grep  "$1 dev venet0" >/dev/null 2>&1; then
 	${IP_CMD} route del $1 dev venet0 || \
 		vzwarning "Unable to del route ${IP_CMD} route del $1 dev venet0"
 fi
