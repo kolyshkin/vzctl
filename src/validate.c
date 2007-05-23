@@ -278,6 +278,25 @@ if (ub->name != NULL) {							\
 	CHECK_BL(param->dq.diskinodes, diskinodes)
 
 /*	2 Check formulas			*/
+	val = ub->numfile[0] * 384;
+	val &= LONG_MAX;
+	if (ub->dcachesize[1] < val) {
+		logger(-1, 0, "Warning: dcachesize.lim should be > %lu"
+				" (currently, %lu)", val,
+				ub->dcachesize[1]);
+		if (ask || recover) {
+			SET_MES(val);
+			if (ask)
+				recover = read_yn();
+			if (recover) {
+				ub->dcachesize[1] = val;
+				changed++;
+			}
+		}
+		if (!recover) ret = 1;
+//		if (!ask) fprintf(stderr, "\n");
+	}
+
 	val = (40 * 1024 * avnumproc) + ub->dcachesize[1];
 	val &= LONG_MAX;
 	if (ub->kmemsize[0] < val) {
@@ -515,24 +534,6 @@ if (ub->name != NULL) {							\
 			if (recover) {
 				ub->numfile[1] = tmp_val1;
 				ub->numfile[0] = tmp_val0;
-				changed++;
-			}
-		}
-		if (!recover) ret = 1;
-//		if (!ask) fprintf(stderr, "\n");
-	}
-	val = ub->numfile[0] * 384;
-	val &= LONG_MAX;
-	if (ub->dcachesize[1] < val) {
-		logger(-1, 0, "Warning: dcachesize.lim should be > %lu"
-				" (currently, %lu)", val,
-				ub->dcachesize[1]);
-		if (ask || recover) {
-			SET_MES(val);
-			if (ask)
-				recover = read_yn();
-			if (recover) {
-				ub->dcachesize[1] = val;
 				changed++;
 			}
 		}
