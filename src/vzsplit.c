@@ -23,7 +23,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
-#include <linux/magic.h>
 #include <unistd.h>
 
 #include "types.h"
@@ -32,6 +31,12 @@
 /* The below two lines are needed to link vzsplit with libvzctl */
 #include <logger.h>
 LOG_DATA
+
+/* #include <linux/magic.h>
+ * Instead of including a file which is not present in all environments,
+ * we copy-paste reiserfs magic from it
+ */
+#define REISERFS_SUPER_MAGIC    0x52654973
 
 #define SYSRSRV		52428800
 #define MEMPERVE	5542912
