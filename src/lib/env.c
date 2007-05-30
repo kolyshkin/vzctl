@@ -28,6 +28,7 @@
 #include <sys/ioctl.h>
 #include <linux/vzcalluser.h>
 #include <sys/personality.h>
+#include <linux/reboot.h>
 
 #include "vzerror.h"
 #include "res.h"
@@ -700,9 +701,9 @@ static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
 		}
 		case M_KILL:
 		{
-			kill(-1, SIGTERM);
-			sleep(1);
-			kill(1, SIGKILL);
+			syscall(__NR_reboot, LINUX_REBOOT_MAGIC1,
+					LINUX_REBOOT_MAGIC2,
+					LINUX_REBOOT_CMD_POWER_OFF, NULL);
 			break;
 		}
 	}
