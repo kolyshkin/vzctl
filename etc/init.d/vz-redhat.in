@@ -37,7 +37,7 @@
 
 VZCONF=@PKGCONFDIR@/vz.conf
 
-[ -f ${VZCONF}   ] || exit 0
+[ -f ${VZCONF} ] || exit 0
 . ${VZCONF}
 [ "${VIRTUOZZO}" = "no" ] && exit 0
 
@@ -243,14 +243,14 @@ start_net()
 	fi
 	# load all kernel modules needed for VE networking
 	for mod in ${NET_MODULES}; do
-        	modprobe ${mod} 2>/dev/null
+		modprobe ${mod} 2>/dev/null
 	done
 	get_veinfo
 	if [ -z "$VEINFO" ]; then
 		return 0
 	fi
-	__echo "Bringing up interface $VZDEV: " 
-	ip link set $VZDEV up 
+	__echo "Bringing up interface $VZDEV: "
+	ip link set $VZDEV up
 	if [ $? -eq 0 ] ; then
 		print_success
 	else
@@ -281,8 +281,8 @@ stop_net()
 	local mod
 
 	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
-		__echo "Bringing down interface $VZDEV: " 
-		ip link set $VZDEV down 
+		__echo "Bringing down interface $VZDEV: "
+		ip link set $VZDEV down
 		if [ $? -eq 0 ] ; then
 			print_success
 		else
@@ -335,9 +335,9 @@ start_ves()
 	cd - >/dev/null
 	sysctl -q -w net.ipv4.route.src_check=0
 	for veid in $velist; do
-		[ "${veid}" = "0" ] && continue 
+		[ "${veid}" = "0" ] && continue
 		__echo "Starting VE ${veid}: "
-		if [ "x${VZFASTBOOT}" = "xyes" -a "x${DISK_QUOTA}" = "xyes" ]; 
+		if [ "x${VZFASTBOOT}" = "xyes" -a "x${DISK_QUOTA}" = "xyes" ];
 		then
 			$VZQUOTA stat ${veid} >/dev/null 2>&1
 			if [ $? -eq 6 ]; then
@@ -446,27 +446,27 @@ stop_ves()
 
 lockfile()
 {
-        local TEMPFILE="${1}.$$"
-        local LOCKFILE="${1}"
+	local TEMPFILE="${1}.$$"
+	local LOCKFILE="${1}"
 
 	trap -- "rm -f ${LOCKFILE} ${TEMPFILE}" EXIT
 
-        echo $$ > ${TEMPFILE} 2> /dev/null || {
+	echo $$ > ${TEMPFILE} 2> /dev/null || {
 		echo "Can't write to ${TEMPFILE}"
-        }
-    	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
-            	rm -f ${TEMPFILE};
-            	return 0;
-    	}
+	}
+	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
+		rm -f ${TEMPFILE};
+		return 0;
+	}
 	kill -0 `cat $LOCKFILE` >/dev/null 2>&1 && {
 		return 1;
-    	}
-    	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
-            	rm -f ${TEMPFILE};
-            	return 0;
-    	}
+	}
+	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
+		rm -f ${TEMPFILE};
+		return 0;
+	}
 	rm -f ${LOCKFILE}
-        echo $$ > ${LOCKFILE}
+	echo $$ > ${LOCKFILE}
 	return 0
 }
 
@@ -518,12 +518,12 @@ start()
 			return $RETVAL
 		fi
 	fi
-	
+
 	start_net
 	setup_ve0
 	setup_cron
 	start_ves
-	
+
 	rm -f $LOCKFILE
 	touch $SUBSYS_VZ
 }
@@ -567,7 +567,7 @@ load_modules()
 # See how we were called.
 case "$1" in
   start)
-  	start
+	start
 	;;
   stop)
 	stop
@@ -577,11 +577,11 @@ case "$1" in
 	start
 	;;
   status)
-  	status
+	status
 	RETVAL=$?
 	;;
   *)
-  	echo "Usage: $0 {start|stop|status|restart}"
+	echo "Usage: $0 {start|stop|status|restart}"
 	exit 1
 esac
 
