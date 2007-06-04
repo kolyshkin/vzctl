@@ -11,7 +11,8 @@
 # restarts.
 #
 # To make changes, edit the master copy @CRONDDIR@/vz
-# and then copy the file to @DST_CRONDDIR@/ (or restart vz service).
+# (or add your own @CRONDDIR@/vz* files)
+# and run /etc/init.d/vz update-cron.
 #
 # The reason this is done this way is because the OpenVZ cron job
 # should only be invoked if the vz service is enabled and not
