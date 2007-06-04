@@ -386,7 +386,7 @@ stop_ves()
 
 	if get_veinfo; then
 		get_parallel
-		for ((i = 0; i <= 2; i++)); do
+		for i in 0 1 2; do
 			iter=0;
 			pids=
 			velist=`awk '$1 != "VEID" && $1 != "Version:" {print $1}' ${VESTAT}`
@@ -397,7 +397,7 @@ stop_ves()
 				$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
 				$VZCTL --skiplock stop $veid >/dev/null 2>&1 &
 				pids="$pids $!"
-				let iter++
+				iter=$(($iter+1))
 				if [ ${iter} -gt ${PARALLEL} ]; then
 					for pid in ${pids}; do
 						wait ${pid}
@@ -428,7 +428,7 @@ stop_ves()
 				fuser -k -m ${m} > /dev/null 2>&1
 			fi
 		done
-		iter=$((iter+1))
+		iter=$(($iter+1))
 	done
 	# turn quota off
 	quota=`awk -F: '/^[0-9]+:/{print $1}' /proc/vz/vzquota 2>/dev/null`
