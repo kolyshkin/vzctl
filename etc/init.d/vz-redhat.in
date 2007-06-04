@@ -212,6 +212,17 @@ print_failure()
 	echo
 }
 
+# Calls either print_success or print_failure, depending on $?
+# Optional argument $1 -- an error string passed to print_failure.
+print_result()
+{
+	if [ $? -eq 0 ] ; then
+		print_success
+	else
+		print_failure "$1"
+	fi
+}
+
 __echo()
 {
 	if [ "$DISTR" = "redhat" ]; then
@@ -257,28 +268,16 @@ start_net()
 	fi
 	__echo "Bringing up interface $VZDEV: "
 	ip link set $VZDEV up
-	if [ $? -eq 0 ] ; then
-		print_success
-	else
-		print_failure
-	fi
+	print_result
 	ip addr add 0.0.0.0/0 dev $VZDEV
 	__echo "Configuring interface $VZDEV: "
 	sysctl -q -w net.ipv4.conf.$VZDEV.send_redirects=0
-	if [ $? -eq 0 ] ; then
-		print_success
-	else
-		print_failure
-	fi
+	print_result
 	if [ "${IPV6}" = "yes" ]; then
 		__echo "Configuring ipv6 $VZDEV: "
 		# Fix me: ip addres should be generated
 		ip -6 addr add fe80::1/128 dev $VZDEV
-		if [ $? -eq 0 ] ; then
-			print_success
-		else
-			print_failure
-		fi
+		print_result
 	fi
 }
 
@@ -289,11 +288,7 @@ stop_net()
 	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
 		__echo "Bringing down interface $VZDEV: "
 		ip link set $VZDEV down
-		if [ $? -eq 0 ] ; then
-			print_success
-		else
-			print_failure
-		fi
+		print_result
 	fi
 	for mod in ${NET_MODULES}; do
 		/sbin/modprobe -r ${mod} > /dev/null 2>&1
@@ -320,11 +315,7 @@ setup_ve0()
 	fi
 	__echo "Configure node UB resources: "
 	msg=`$VZCTL set 0 --reset_ub 2>&1`
-	if [ $? -eq 0 ]; then
-		print_success
-	else
-		print_failure "$msg"
-	fi
+	print_result "$msg"
 }
 
 start_ves()
@@ -354,27 +345,15 @@ start_ves()
 			fi
 		fi
 		msg=`$VZCTL start ${veid} 2>&1`
-		if [ $? -eq 0 ]; then
-			print_success
-		else
-			print_failure "$msg"
-		fi
+		print_result "$msg"
 	done
 	for veid in ${need_restart}; do
 		__echo "Stopping VE ${veid}: "
 		$VZCTL stop ${veid} 2>&1 >/dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			print_success
-		else
-			print_failure "$msg"
-		fi
+		print_result "$msg"
 		__echo "Starting VE ${veid}: "
 		msg=`$VZCTL start ${veid} 2>&1`
-		if [ $? -eq 0 ]; then
-			print_success
-		else
-			print_failure "$msg"
-		fi
+		print_result "$msg"
 	done
 }
 
@@ -442,11 +421,7 @@ stop_ves()
 		__echo "Turn quota off for VE "
 		echo -n $m
 		msg=`vzquota off ${m} 2>&1`
-		if [ $? -eq 0 ]; then
-			print_success
-		else
-			print_failure "$msg"
-		fi
+		print_result "$msg"
 	done
 }
 
