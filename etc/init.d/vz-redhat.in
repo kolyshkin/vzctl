@@ -139,6 +139,20 @@ remove_cron()
 EOF
 }
 
+# Actualize OpenVZ cron entry:
+# if OpenVZ is running, add it, otherwise remove.
+update_cron()
+{
+	if is_running; then
+		__echo "Adding OpenVZ cron entries"
+		setup_cron
+	else
+		__echo "Removing OpenVZ cron entries"
+		remove_cron
+	fi
+	print_result
+}
+
 check_kernel()
 {
 	if ! test -d /proc/vz ; then
@@ -561,8 +575,12 @@ case "$1" in
 	status
 	RETVAL=$?
 	;;
+  update-cron
+	update_cron
+	RETVAL=0
+	;;
   *)
-	echo "Usage: $0 {start|stop|status|restart}"
+	echo "Usage: $0 {start|stop|status|restart|update-cron}"
 	exit 1
 esac
 
