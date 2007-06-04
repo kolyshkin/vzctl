@@ -221,11 +221,17 @@ __echo()
 	fi
 }
 
+is_running()
+{
+	get_veinfo || return 1
+	[ -f $SUBSYS_VZ ] || return 1
+}
+
 status()
 {
 	check_kernel
 
-	if get_veinfo && [ -f $SUBSYS_VZ ]; then
+	if is_running; then
 		echo "OpenVZ is running..."
 		return 0
 	else
