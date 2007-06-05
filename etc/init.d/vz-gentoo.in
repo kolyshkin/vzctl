@@ -93,7 +93,7 @@ start_net() {
 	local mod
 
 	# we don't operate on a running interface
-	if /sbin/ip addr ls | grep -q "venet0:.*UP" 2>/dev/null; then
+	if /sbin/ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
 		return 0
 	fi
 
@@ -121,7 +121,7 @@ start_net() {
 stop_net() {
 	local mod
 
-	if /sbin/ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
+	if /sbin/ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
 		ebegin "Bringing down interface ${VZDEV}"
 			/sbin/ip link set ${VZDEV} down 2>/dev/null
 		eend $?
