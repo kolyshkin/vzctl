@@ -97,9 +97,9 @@ test -f ${VEINFO} || exit 0
 
 VES_INFO=`cat ${VEINFO} 2>/dev/null` || exit
 get_stopped_ve
-for ve in ${VE_STOPPED}
-{
+for ve in ${VE_STOPPED}; do
 	clear_ve_net ${ve}
 	rm -f ${VE_STATE_DIR}/${ve} >/dev/null 2>&1
-}
+done
 
+exit 0
