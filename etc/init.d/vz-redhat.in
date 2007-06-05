@@ -272,7 +272,7 @@ start_net()
 {
 	local mod
 
-	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
+	if ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
 		return 0
 	fi
 	# load all kernel modules needed for VE networking
@@ -302,7 +302,7 @@ stop_net()
 {
 	local mod
 
-	if ip a l | grep -q "venet0:.*UP" 2>/dev/null; then
+	if ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
 		__echo "Bringing down interface $VZDEV: "
 		ip link set $VZDEV down
 		print_result
