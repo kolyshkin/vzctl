@@ -83,8 +83,8 @@ BEGIN {
 		exit
 	}
 	if (verbose) {
-		print("vpsid\t\tunits");
-		print("-----------------------");
+		print("VEID\t\tCPUUNITS");
+		print("-------------------------");
 	}
 }
 {
