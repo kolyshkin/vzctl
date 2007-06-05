@@ -43,12 +43,10 @@ done
 vzarpipset "$IP_ADDR"
 # Save ip address information
 mkdir -p ${VE_STATE_DIR} >/dev/null 2>&1
-if [ "${VE_STATE}" == "starting" ]; then
-  echo -n  "${IP_ADDR} " > ${VE_STATE_DIR}/${VEID}
-elif [ "${VE_STATE}" == "running" ]; then
-  echo -n "${IP_ADDR} " >> ${VE_STATE_DIR}/${VEID}
+if [ "${VE_STATE}" = "starting" ]; then
+	echo -n  "${IP_ADDR} " > ${VE_STATE_DIR}/${VEID}
+elif [ "${VE_STATE}" = "running" ]; then
+	echo -n "${IP_ADDR} " >> ${VE_STATE_DIR}/${VEID}
 fi
 
 exit 0
-# end of script
-
