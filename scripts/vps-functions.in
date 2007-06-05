@@ -158,7 +158,7 @@ function vzarpipset()
 	done	
 }
 
-function vzaddrouting4
+function vzaddrouting4()
 {
 	local src_addr=
 
@@ -175,7 +175,7 @@ function vzaddrouting4
 		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 ${src_addr}" $VZ_CANT_ADDIP
 }
 
-function vzaddrouting6
+function vzaddrouting6()
 {
 	${IP_CMD} route add $1 dev venet0 || \
 		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0" $VZ_CANT_ADDIP
@@ -202,8 +202,8 @@ function vzaddrouting()
 #   $1 - IP address
 function vzdelrouting()
 {
-if ${IP_CMD} route list table all $1 | grep  "$1 dev venet0" >/dev/null 2>&1; then
-	${IP_CMD} route del $1 dev venet0 || \
-		vzwarning "Unable to del route ${IP_CMD} route del $1 dev venet0"
-fi
+	if ${IP_CMD} route list table all $1 | grep  "$1 dev venet0" >/dev/null 2>&1; then
+		${IP_CMD} route del $1 dev venet0 || \
+			vzwarning "Unable to del route ${IP_CMD} route del $1 dev venet0"
+	fi
 }
