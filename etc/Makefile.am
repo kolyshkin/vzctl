@@ -41,6 +41,9 @@ install-redhat:
 install-suse:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 
+install-debian:
+	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
+
 install-gentoo:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/conf.d
