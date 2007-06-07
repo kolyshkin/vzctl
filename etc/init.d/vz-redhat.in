@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# OpenVZ startup script
+# OpenVZ startup script, used for redhat and debian related distributions.
 
 ###
 # chkconfig: 2345 96 88
@@ -29,6 +29,7 @@
 # required-stop:
 # Default-Start: 2 3 5
 # Default-Stop:
+# Short-Description: OpenVZ startup script
 # Description: OpenVZ startup script.
 ### END INIT INFO
 
@@ -88,6 +89,10 @@ elif [ -r /etc/rc.status ]; then
 	if [ -r /etc/SuSE-release ]; then
 		DISTR=suse
 	fi
+elif [ -r /etc/debian_version ]; then
+	DISTR=debian
+	LOCKFILE=/var/lock/vz_lock
+	SUBSYS_VZ=/var/lock/vz
 fi
 
 VEINFO=""
@@ -570,7 +575,7 @@ case "$1" in
   stop)
 	stop
 	;;
-  restart)
+  restart|force-reload)
 	stop
 	start
 	;;
@@ -583,7 +588,7 @@ case "$1" in
 	RETVAL=0
 	;;
   *)
-	echo "Usage: $0 {start|stop|status|restart|update-cron}"
+	echo "Usage: $0 {start|stop|status|restart|force-reload|update-cron}"
 	exit 1
 esac
 
