@@ -546,7 +546,7 @@ stop()
 	remove_cron
 	stop_net
 	__echo "Stopping OpenVZ: "
-	for mod in ${MODULES_OTHER} ${PRELOAD_MODULES} ${IPT_MODULES} ${VZFS_MODULES}; do
+	for mod in ${MODULES_OTHER} ${MODULES} ${PRELOAD_MODULES} ${IPT_MODULES} ${VZFS_MODULES}; do
 		/sbin/modprobe -r ${mod} > /dev/null 2>&1
 	done
 	rm -f $LOCKFILE
