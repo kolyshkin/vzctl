@@ -66,7 +66,7 @@ void usage()
 "vzctl runscript <veid> <script>\n"
 "vzctl chkpnt <veid> [--dumpfile <name>]\n"
 "vzctl restore <veid> [--dumpfile <name>]\n"
-"vzctl set veid [--save] [--setmode restart|ignore]\n"
+"vzctl set <veid> [--save] [--setmode restart|ignore]\n"
 "   [--ipadd <addr>] [--ipdel <addr>|all] [--hostname <name>]\n"
 "   [--nameserver <addr>] [--searchdomain <name>] [--onboot yes|no]\n"
 "   [--userpasswd <user>:<passwd>] [--cpuunits <N>] [--cpulimit <N>] [--cpus <N>]\n"
