@@ -90,7 +90,7 @@ static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
 static int run_vznetcfg(envid_t veid, veth_dev *dev)
 {
 	int ret;
-	char buf[11];
+	char buf[16];
 	char *argv[] = {VZNETCFG, "init", "veth", NULL, NULL};
 	char *env[2];
 
