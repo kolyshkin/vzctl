@@ -1056,22 +1056,37 @@ char *remove_sp(char *str)
 char *invert_ip(char *ips)
 {
 	char *tmp, *p, *ep, *tp;
-	int len;
+	int len, rc;
+	unsigned int ip[4];
+	int family;
+	char ip_str[64];
+
 	if (ips == NULL)
 		return NULL;
 	len = strlen(ips);
 	tp = tmp = x_malloc(len + 2);
 	tmp[0] = 0;
-	p = ep = ips + len - 1;
-	while (p > ips) {
+	p = ep = ips + len;
+	/* Iterate in reverse order */
+	while (p-- > ips) {
 		/* Skip spaces */
 		while (p > ips && isspace(*p)) {--p;}
 		ep = p;
 		/* find the string begin from */
 		while (p > ips && !isspace(*(p - 1))) { --p;}
-		snprintf(tp, ep - p + 3, "%s ", p);
-		tp += ep - p + 2;
-		--p;
+		len = ep - p + 1;
+		if (len >= sizeof(ip_str))
+			continue;
+		strncpy(ip_str, p, len);
+		ip_str[len] = 0;
+		if ((family = get_netaddr(ip_str, ip)) == -1)
+                	continue;;
+	        if ((inet_ntop(family, ip, ip_str, sizeof(ip_str) - 1)) == -1)
+			continue;
+		rc = sprintf(tp, "%s ", ip_str);
+		if (rc == -1)
+			break;
+		tp += rc;
 	}
 	return tmp;
 }
