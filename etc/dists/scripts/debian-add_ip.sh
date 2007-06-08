@@ -43,19 +43,34 @@ function setup_network()
 		cat ${CFGFILE}.template >> ${CFGFILE}
 	fi
 	echo -e "
-# Auto generated venet0 interfaces
-auto ${VENET_DEV} ${LOOPBACK}
+# Auto generated interfaces
+auto ${LOOPBACK}
+iface ${LOOPBACK} inet loopback
+
+auto ${VENET_DEV} 
 iface ${VENET_DEV} inet static
 	address 127.0.0.1
 	netmask 255.255.255.255
 	broadcast 0.0.0.0
 	up route add -net ${FAKEGATEWAY} netmask 255.255.255.255 dev ${VENET_DEV}
-	up route add default gw ${FAKEGATEWAY}
-iface ${LOOPBACK} inet loopback
+	up route add default gw ${FAKEGATEWAY}" >> ${CFGFILE}
+
+	if [ "${IPV6}" = "yes" ]; then
+		echo -e "
+iface venet0 inet6 static
+	address ::1
+	netmask 128
 " >> ${CFGFILE}
+
+	fi
+
 	# Set up /etc/hosts
 	if [ ! -f $HOSTFILE ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
+
+		if [ "${IPV6}" = "yes" ]; then
+			echo "::1 localhost.localdomain localhost" >> $HOSTFILE
+		fi
 	fi
 }
 
@@ -63,19 +78,24 @@ function create_config()
 {
 	local ip=$1
 	local ifnum=$2
-
-	echo -e "auto ${VENET_DEV}:${ifnum}
+	
+	if [ "${ip#*:}" = "${ip}" ]; then
+	    echo -e "auto ${VENET_DEV}:${ifnum}
 iface ${VENET_DEV}:${ifnum} inet static
 	address ${ip}
 	netmask 255.255.255.255
 	broadcast 0.0.0.0
 " >> ${CFGFILE}.bak
+
+	else
+	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}/" ${CFGFILE}.bak
+	fi
+	
 }
 
 function get_all_aliasid()
 {
 	IFNUM=-1
-
         IFNUMLIST=`grep -e "^auto ${VENET_DEV}:.*$" 2> /dev/null ${CFGFILE}.bak | sed "s/.*${VENET_DEV}://"`
 }
 
@@ -107,6 +127,8 @@ function add_ip()
 	if [ "${IPDELALL}" = "yes" ]; then
 		ifdown ${VENET_DEV} >/dev/null 2>&1
 		remove_debian_interface "${VENET_DEV}:[0-9]*" ${CFGFILE}
+		grep -v "up ifconfig venet0 add" /etc/network/interfaces > ${CFGFILE}.bak
+		mv ${CFGFILE}.bak ${CFGFILE}
 	fi
 	cp -f ${CFGFILE} ${CFGFILE}.bak
 	for ip in ${IP_ADDR}; do
@@ -119,7 +141,11 @@ function add_ip()
 	done
 	mv -f ${CFGFILE}.bak ${CFGFILE}
 	if [ "x${VE_STATE}" = "xrunning" ]; then
-		/sbin/ifup -a --force 2>/dev/null
+		if [ "${ip#*:}" = "${ip}" ]; then
+			/sbin/ifup -a --force 2>/dev/null
+		else
+			/etc/init.d/networking restart > /dev/null 2>&1
+		fi
 	fi
 }
 
