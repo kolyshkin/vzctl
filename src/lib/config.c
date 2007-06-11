@@ -799,7 +799,9 @@ int check_ip_dot(char *ip)
 static int parse_ip(vps_param *vps_p, char *val, int id)
 {
 	char *token;
+	char dst[64];
 	unsigned int ip[16];
+	int family;
 	net_param *net;
 
 	if (id == PARAM_IP_ADD)
@@ -826,10 +828,12 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 			if (check_ip_dot(token))
 				return ERR_INVAL;
 		}
-		if (get_netaddr(token, ip) < 0)
+		if ((family = get_netaddr(token, ip)) < 0)
 			return ERR_INVAL;
-		if (!find_ip(&net->ip, token)) 
-			add_str_param(&net->ip, token);
+		if (inet_ntop(family, ip, dst, sizeof(dst)) == NULL)
+			return ERR_INVAL;
+		if (!find_ip(&net->ip, dst)) 
+			add_str_param(&net->ip, dst);
 	} while ((token = strtok(NULL, " ")));
 
 	return 0;
