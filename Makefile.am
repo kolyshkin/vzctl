@@ -44,7 +44,8 @@ install-data-local:
 DISTRO_TARGETS = \
 	install-redhat \
 	install-gentoo \
-	install-suse
+	install-suse \
+	install-debian
 
 $(DISTRO_TARGETS):
 	$(MAKE) $(AM_MAKEFLAGS) -C etc $@

@@ -29,6 +29,8 @@ install-redhat: vz-redhat
 
 install-suse: install-redhat
 
+install-debian: install-redhat
+
 install-gentoo: vz-gentoo
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
 	$(INSTALL_SCRIPT) vz-gentoo $(DESTDIR)$(initddir)/vz
