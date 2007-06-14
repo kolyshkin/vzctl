@@ -1,0 +1,83 @@
+This document tells how to install vzctl from source. Note that the preferred
+method of installation is from packages provided by either your distro or
+directly by OpenVZ project.
+
+
+== Quick instructions: for the impatient ==
+
+Compile with:
+
+$ ./configure --enable-bashcomp --enable-logrotate
+$ make
+
+Install with (as root):
+
+# make install
+# make install-<distro>
+
+Here <distro> can be one of: redhat, suse, gentoo, debian.
+
+
+== Complete instructions ==
+
+=== Configuration ===
+
+Run ./configure script with the options you want (see
+the full list of available options by running ./configure --help).
+
+Some useful options are:
+
+	--prefix=/some/path
+
+Installation root. By default this is /usr/local, you might want to change it
+to /usr by providing --prefix=/usr to ./configure
+
+	--enable-bashcomp
+
+Enable bash-completion support for vzctl command line arguments. You want
+this if you use bash completion on your system.
+
+	--enable-logrotate
+
+Enable logrotate support for vzctl log file. You want this if you use
+logrotate scripts on your system.
+
+	--disable-udev
+
+Disables installation of udev file describing vzctl device (/dev/vzctl).
+This is enabled by default since all the modern Linux distributions use udev.
+Supply this option in case you do not use udev on your system.
+
+	--disable-cron
+
+Disables installation of cron files required by vzctl. Those are used to run
+periodical jobs required by OpenVZ, such as restarting VEs and cleaning up
+host system routing table. Supply this option if you do not use cron daemon
+on your system.
+
+You can also supply environment variables like CC and CFLAGS to configure,
+for example:
+
+	CC=gcc4 CFLAGS="-O0 -g -Wall" ./configure [options]
+
+=== Compilation ===
+
+Just run
+
+	make
+
+=== Installation ===
+
+This step is usually have to be done as root.
+
+First, run
+
+	make install
+
+In addition, you should install some distribution-specific parts of vzctl.
+To that effect, run one of the following:
+
+	make install-gentoo	# for Gentoo
+	make install-redhat	# for Red Hat, CentOS, and Fedora
+	make install-suse	# for openSUSE and SLES
+	make install-debian	# for Debian and Ubuntu
