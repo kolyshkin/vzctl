@@ -32,7 +32,6 @@ function init_veth()
 }
 # Call the external script if defined
 if [ -n "${EXTERNAL_SCRIPT}" -a -x "${EXTERNAL_SCRIPT}" ]; then
-	VEID=`awk "/$3/ {print \\$5}" /proc/vz/veth`
 	export VEID
 	exec ${EXTERNAL_SCRIPT} $@
 fi
