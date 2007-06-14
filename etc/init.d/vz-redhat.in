@@ -583,7 +583,7 @@ case "$1" in
 	status
 	RETVAL=$?
 	;;
-  update-cron
+  update-cron)
 	update_cron
 	RETVAL=0
 	;;
