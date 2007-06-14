@@ -19,6 +19,18 @@
 AC_PREREQ(2.59)
 AC_INIT(vzctl, 3.0.16, devel@openvz.org)
 
+# Change sysconfdir default since otherwise some important files
+# (an initscript, files for logrotate, cron, and udev) will be installed
+# to some nonsence/non-working place like under /usr/local/etc/
+#
+# NOTE: this changes expected configure behavior: if you specify --prefix
+#        it will not change sysconfdir, instead now one have to specify
+#        --sysconfdir explicitly. To make it more clear we print
+#        current sysconfdir value at the end of configure run.
+#
+# FIXME: dirty hack, may not work with some autoconf versions.
+test $sysconfdir = '${prefix}/etc' && sysconfdir=/etc
+
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -120,6 +132,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
        host: $host
      target: $target
      prefix: $prefix
+ sysconfdir: $sysconfdir
    features: $enable_bashcomp $enable_cron $enable_logrotate $enable_udev
 "])
 
