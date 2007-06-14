@@ -27,6 +27,7 @@
 #include <sys/wait.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <arpa/inet.h>
 
 #include <getopt.h>
 #include <fnmatch.h>
@@ -1081,7 +1082,7 @@ char *invert_ip(char *ips)
 		ip_str[len] = 0;
 		if ((family = get_netaddr(ip_str, ip)) == -1)
                 	continue;;
-	        if ((inet_ntop(family, ip, ip_str, sizeof(ip_str) - 1)) == -1)
+	        if ((inet_ntop(family, ip, ip_str, sizeof(ip_str) - 1)) == NULL)
 			continue;
 		rc = sprintf(tp, "%s ", ip_str);
 		if (rc == -1)
