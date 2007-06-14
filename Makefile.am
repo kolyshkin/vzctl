@@ -50,6 +50,18 @@ DISTRO_TARGETS = \
 $(DISTRO_TARGETS):
 	$(MAKE) $(AM_MAKEFLAGS) -C etc $@
 
+install-data-hook:
+	@echo
+	@echo "	*********************************************************"
+	@echo "	If you haven't done it yet, now it's time to install some"
+	@echo "	distribution-specific scripts. The following make targets"
+	@echo "	are available:"
+	@echo
+	@echo "	$(DISTRO_TARGETS)"
+	@echo
+	@echo "	Please invoke make with the target for your distribution!"
+	@echo "	*********************************************************"
+
 rpms: dist
 	cp $(distdir).tar.bz2 `rpm --eval %_sourcedir`
 	rpmbuild -ba vzctl.spec
