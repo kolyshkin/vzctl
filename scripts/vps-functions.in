@@ -93,7 +93,7 @@ function vzcheckvar()
 function vzgetnetdev()
 {
 	# Get a list of interfaces, excluding ones with LOOPBACK,
-	# NOARP, SLAVE flags, or with names like eth0.5@eth0
+	# NOARP, or SLAVE flags
 	NETDEVICES=`${IP_CMD} addr list | awk '
 	/^[0-9]+/ {
 		dev="";
@@ -104,7 +104,7 @@ function vzgetnetdev()
 	/^[\ \t]+inet / {
 		if (dev != "") print (dev);
 		dev="";
-	}' | grep -Fv '@' | sed 's/:$//'`
+	}' | sed -e 's/:$//' -e 's/@.*$//'`
 }
 
 # Adds/deletes public ARP records for given IP for all interfaces
