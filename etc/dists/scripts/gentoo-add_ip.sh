@@ -84,7 +84,7 @@ function add_ip()
 	fi
 
 	for ip in ${IP_ADDR}; do
-		grep -qw "${ip}" ${IFCFG} || \
+		grep -qw "config_${VENET_DEV}=\(.*\"${ip}[\"\/].*\)" ${IFCFG} || \
 			add_param3 "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
 	done
 
