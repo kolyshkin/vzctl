@@ -310,7 +310,7 @@ int quota_ctl(envid_t veid, int cmd)
 {
 	int i, ret;
 	char buf[64];
-	char *arg[5];
+	char *arg[6];
 	int quiet = 0;
 	int errcode = 0;
 
