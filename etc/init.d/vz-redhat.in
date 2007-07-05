@@ -169,12 +169,28 @@ check_kernel()
 	fi
 }
 
+get_kernel_version()
+{
+	[ ! -z "$KERNEL_MAJOR" ] && return
+
+	local ver=$(uname -r)
+	local kernel=$(echo $ver | sed s/-.*//)
+	KERNEL_MAJOR=$(echo $kernel | awk -F . '{print $1}')
+	KERNEL_MINOR=$(echo $kernel | awk -F . '{print $2}')
+	KERNEL_PATCHLEVEL=$(echo $kernel | awk -F . '{print $3}')
+}
+
 check_kernel_config()
 {
 	test -r /proc/config.gz || return 0
 
 	local conf opt err=0
-	local opt_must="SIM_FS VE VE_CALLS VZ_GENCALLS VZ_DEV"
+	local opt_must="SIM_FS VE VE_CALLS VZ_GENCALLS"
+	get_kernel_version
+	# For kernels >= 2.6.9 VZ_DEV must be set.
+	test "${KERNEL_MINOR}" -ge 6 && \
+		test "${KERNEL_PATCHLEVEL}" -gt 9 && \
+			opt_must="${opt_must} VZ_DEV"
 #	local opt_rec="SCHED_VCPU FAIRSCHED VZ_QUOTA VZ_QUOTA_UGID VE_NETDEV VE_ETHDEV
 #			VE_IPTABLES VZ_CHECKPOINT VZ_WDOG"
 
@@ -182,7 +198,7 @@ check_kernel_config()
 
 	for opt in $opt_must; do
 		if ! echo "$conf" | grep -q "$opt="; then
-			__echo "Missing kernel config option: CONFIG_$opt"
+			echo "ERROR: Missing kernel config option: CONFIG_$opt"
 			err=1
 		fi
 	done
