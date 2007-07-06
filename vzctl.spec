@@ -21,13 +21,14 @@
 Summary: Virtual Environments control utility
 Name: vzctl
 Version: 3.0.17
-Release: 1
+Release: 1%{?dist}
 License: GPL
 Group: System Environment/Kernel
-Source: vzctl-%{version}.tar.bz2
+Source: http://download.openvz.org/utils/%{name}/%{version}/src/%{name}-%{version}.tar.bz2
 ExclusiveOS: Linux
-BuildRoot: %{_tmppath}/%{name}-%{version}-root
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: vzkernel
+URL: http://openvz.org/
 # these reqs are for vz helper scripts
 Requires: bash
 Requires: gawk
@@ -179,3 +180,11 @@ Virtual Environments control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_add
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_del
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-create
+
+%changelog
+* Wed Jun 13 2007 Andy Shevchenko <andriy@asplinux.com.ua> - 3.0.17-1
+- fixed according to Fedora Packaging Guidelines:
+  - use dist tag
+  - added URL tag
+  - use full url for source
+  - changed BuildRoot tag
