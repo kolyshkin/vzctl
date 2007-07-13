@@ -28,7 +28,7 @@ typedef struct {
 
 struct vps_param;
 int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *param,
-	struct vps_param *vps_p);
+	struct vps_param *vps_p, int state);
 int get_meminfo_mode(char *name);
 const char *get_meminfo_mode_nm(int id);
 #endif /* _MEMINFO_H_ */

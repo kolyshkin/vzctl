@@ -37,7 +37,7 @@ static struct {
 };
 
 int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
-	vps_param *vps_p)
+	vps_param *vps_p, int state)
 {
 	int ret;
 	unsigned long *privvmpages;
@@ -47,9 +47,17 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 		VE_MEMINFO_PRIVVMPAGES, 1
 	};
 
-	if (gparam->mode < 0)
+	if (gparam->mode < 0) {
+		/* If mode not specified use privvmpages on
+		   VE start and privvmpages change
+		*/
+		if (state != STATE_STARTING &&
+		    vps_p->res.ub.privvmpages == NULL)
+		{
+			return 0;
+		}
 		param = &default_param;
-	else
+	} else
 		param = gparam;
 
 	meminfo.veid = veid;
