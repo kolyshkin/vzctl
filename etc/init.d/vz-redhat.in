@@ -293,13 +293,15 @@ start_net()
 {
 	local mod
 
-	if ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
-		return 0
-	fi
 	# load all kernel modules needed for VE networking
 	for mod in ${NET_MODULES}; do
 		modprobe ${mod} 2>/dev/null
 	done
+
+	if ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
+		return 0
+	fi
+
 	get_veinfo
 	if [ -z "$VEINFO" ]; then
 		return 0
