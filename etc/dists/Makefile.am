@@ -32,7 +32,8 @@ EXTRA_DIST = \
 
 CENTOS_VER    = 3 4
 DEBIAN_VER    = 3.0 3.1 4.0
-FC_VER        = 1 2 3 4
+FC_VER        = 1 2 3 4 5 6 7
+FEDORA_VER    = 7
 REDHAT_7x_VER = 7.0 7.1 7.2 7.3
 REDHAT_VER    = 8.0 9
 RHEL_VER      = 3 4
@@ -64,6 +65,12 @@ fc:
 	for ver in $(FC_VER); do \
 		$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
 		    $(DESTDIR)$(distconfdir)/fedora-core-$$ver.conf; \
+	done
+
+fedora:
+	for ver in $(FEDORA_VER); do \
+		$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
+			$(DESTDIR)$(distconfdir)/fedora-$$ver.conf; \
 	done
 
 gentoo:
@@ -140,6 +147,7 @@ arch:
 install-data-hook: centos \
                    debian \
                    fc \
+                   fedora \
                    gentoo \
                    mandrake \
                    redhat \
