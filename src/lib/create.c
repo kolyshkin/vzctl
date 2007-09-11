@@ -149,7 +149,7 @@ err:
 int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	struct mod_action *action)
 {
-	int ret;
+	int ret = 0;
 	char tar_nm[256];
 	char src[STR_SIZE];
 	char dst[STR_SIZE];
@@ -198,15 +198,23 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	}
 	merge_vps_param(vps_p, cmd_p);
 	if (check_var(fs->tmpl, "TEMPLATE is not set"))
-		return VZ_VE_TMPL_NOTSET;
-	if (check_var(fs->private, "VE_PRIVATE is not set"))
-		return VZ_VE_PRIVATE_NOTSET;
-	if (check_var(fs->root, "VE_ROOT is not set"))
-		return VZ_VE_ROOT_NOTSET;
-	if (stat_file(fs->private)) {
+		ret = VZ_VE_TMPL_NOTSET;
+	else if (check_var(fs->private, "VE_PRIVATE is not set"))
+		ret = VZ_VE_PRIVATE_NOTSET;
+	else if (check_var(fs->root, "VE_ROOT is not set"))
+		ret = VZ_VE_ROOT_NOTSET;
+	else if (stat_file(fs->private)) {
 		logger(-1, 0, "Private area already exists in %s", fs->private);
-		return VZ_FS_PRVT_AREA_EXIST;
+		ret = VZ_FS_PRVT_AREA_EXIST;
 	}
+
+	/* Error? Clean up and exit */
+	if (ret != 0) {
+		if (sample_config != NULL)
+			unlink(dst);
+		return ret;
+	}
+
 	if (action != NULL && action->mod_count) {
 		ret = mod_setup(h, veid, 0, 0, action, vps_p);
 	} else {
