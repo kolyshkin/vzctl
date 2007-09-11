@@ -546,13 +546,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
 			cmd_p->res.fs.private_orig = NULL;
-			logger(-1, 0,"Unable to change VE_PRIVATE on runing VE");
+			logger(-1, 0,"Unable to change VE_PRIVATE on a running VE");
 			return VZ_VE_RUNNING;
 		}
 		if (cmd_p->res.fs.root_orig != NULL) {
 			free(cmd_p->res.fs.root_orig);
 			cmd_p->res.fs.root_orig = NULL;
-			logger(-1, 0, "Unable to change VE_ROOT on runing VE");
+			logger(-1, 0, "Unable to change VE_ROOT on a running VE");
 			return VZ_VE_RUNNING;
 		}
 	}
