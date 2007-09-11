@@ -208,6 +208,10 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		ret = VZ_FS_PRVT_AREA_EXIST;
 	}
 
+	if ((ret == 0) && (cmd_p->res.name.name)) {
+		ret = set_name(veid, cmd_p->res.name.name, cmd_p->res.name.name);
+	}
+
 	/* Error? Clean up and exit */
 	if (ret != 0) {
 		if (sample_config != NULL)

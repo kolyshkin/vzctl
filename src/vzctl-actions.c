@@ -202,6 +202,7 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	{"root",	required_argument, NULL, PARAM_ROOT},
 	{"ipadd",	required_argument, NULL, PARAM_IP_ADD},
 	{"hostname",	required_argument, NULL, PARAM_HOSTNAME},
+	{"name",	required_argument, NULL, PARAM_NAME},
 	{ NULL, 0, NULL, 0 }
 };
 	
