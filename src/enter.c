@@ -39,6 +39,7 @@
 #define DEV_TTY		"/dev/tty"
 
 static volatile sig_atomic_t child_term;
+static volatile sig_atomic_t win_changed;
 static struct termios s_tios;
 extern char *_proc_title;
 extern int _proc_title_len;
@@ -95,9 +96,28 @@ static void raw_on(void)
 		logger(-1, errno, "Unable to set raw mode");
 }
 
+static int winchange(int info, int ptyfd)
+{
+	int ret;
+	struct winsize ws;
+
+	ret = read(info, &ws, sizeof(ws));
+	if (ret < 0)
+		return -1;
+	else if (ret != sizeof(ws))
+		return 0;
+	ioctl(ptyfd, TIOCSWINSZ, &ws);
+	return 0;
+}
+
 static void child_handler(int sig)
 {
 	child_term = 1;
+}
+
+static void winchange_handler(int sig)
+{
+	win_changed = 1;
 }
 
 void set_proc_title(char *tty)
@@ -145,19 +165,31 @@ static int stdredir(int rdfd, int wrfd)
 	return 0;
 }
 
-static void e_loop(int r_in, int w_in,  int r_out, int w_out)
+static void e_loop(int r_in, int w_in,  int r_out, int w_out, int info)
 {
 	int n, fl = 0;
 	fd_set rd_set;
 
 	set_not_blk(r_in);
 	set_not_blk(r_out);
-	while(!child_term) {
+	while (!child_term) {
+		/* Process SIGWINCH
+		 * read winsize from stdin and send annonce to the other end.
+		 */
+		if (win_changed) {
+			struct winsize ws;
+
+			if (!ioctl(r_in, TIOCGWINSZ, &ws))
+				write(info, &ws, sizeof(ws));
+			win_changed = 0;
+		}
 		FD_ZERO(&rd_set);
 		if (!(fl & 1))
 			FD_SET(r_in, &rd_set);
 		if (!(fl & 2))
 			FD_SET(r_out, &rd_set);
+		if (!(fl & 4))
+			FD_SET(info, &rd_set);
 
 		n = select(FD_SETSIZE, &rd_set, NULL, NULL, NULL);
 		if (n > 0) {
@@ -172,6 +204,10 @@ static void e_loop(int r_in, int w_in,  int r_out, int w_out)
 					fl |= 2;
 					break;
 				}	
+			if (FD_ISSET(info, &rd_set)) {
+				if (winchange(info, w_in) < 0)
+					fl |= 4;
+			}
 		} else if (n < 0 && errno != EINTR) {
 			close(r_out);
 			logger(-1, errno, "Error in select()");
@@ -195,10 +231,10 @@ static void preload_lib()
 int do_enter(vps_handler *h, envid_t veid, char *root)
 {
 	int pid, ret, status;
-	int in[2], out[2], st[2];
+	int in[2], out[2], st[2], info[2];
 	struct sigaction act;
 
-	if (pipe(in) < 0 || pipe(out) < 0 || pipe(st) < 0) {
+	if (pipe(in) < 0 || pipe(out) < 0 || pipe(st) < 0 || pipe(info) < 0) {
 		logger(-1, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
@@ -215,6 +251,9 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 	act.sa_flags = 0;
 	sigaction(SIGPIPE, &act, NULL);
 
+	act.sa_handler = winchange_handler;
+	sigaction(SIGWINCH, &act, NULL);
+
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Unable to fork");
 		ret = VZ_RESOURCE_ERROR;
@@ -227,9 +266,9 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		/* get terminal settings from 0 */
 		ioctl(0, TIOCGWINSZ, &ws);
 		tcgetattr(0, &tios);
-		close(in[1]); close(out[0]); close(st[0]);
+		close(in[1]); close(out[0]); close(st[0]); close(info[1]);
 		/* list of skipped fds -1 the end mark */
-		close_fds(1, in[0], out[1], st[1], h->vzfd, -1);
+		close_fds(1, in[0], out[1], st[1], h->vzfd, info[0], -1);
 		dup2(out[1], 1);
 		dup2(out[1], 2);
 		if ((ret = vz_chroot(root)))
@@ -283,7 +322,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		}
 		close(slave);
 		close(st[1]);
-		e_loop(in[0], master, master, out[1]);
+		e_loop(in[0], master, master, out[1], info[0]);
 		while ((ret = waitpid(pid, &status, 0)) == -1)
 			if (errno != EINTR)
 				break;
@@ -293,13 +332,13 @@ err:
 		write(st[1], &ret, sizeof(ret));
 		exit(ret);
 	}
-	close(in[0]); close(out[1]); close(st[1]);
+	close(in[0]); close(out[1]); close(st[1]); close(info[0]);
 	/* wait for pts allocation */
 	ret = read(st[0], &status, sizeof(status));
 	if (!ret) {
 		fprintf(stdout, "entered into VE %d\n", veid);
 		raw_on();
-		e_loop(fileno(stdin), in[1], out[0], fileno(stdout));
+		e_loop(fileno(stdin), in[1], out[0], fileno(stdout), info[1]);
 	} else {
 		fprintf(stdout, "enter into VE %d failed\n", veid);
 		set_not_blk(out[0]);
