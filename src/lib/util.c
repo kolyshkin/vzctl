@@ -437,16 +437,21 @@ int get_lowmem(unsigned long long *mem)
 		logger(-1, errno, "Cannot open " PROCMEM);
 		return -1;
 	}
+	*mem = 0;
 	while (fgets(str, sizeof(str), fd)) {
-		if (sscanf(str, "LowTotal: %llu", mem) == 1) {
-			fclose(fd);
-			*mem *= 1024;
-			return 0;
-		}
+		if (sscanf(str, "LowTotal: %llu", mem) == 1)
+			break;
+		/* Use MemTotal in case LowTotal not found */
+		sscanf(str, "MemTotal: %llu", mem);
 	}
-	logger(-1, errno, "LowTotal: is not found in" PROCMEM);
 	fclose(fd);
-	return -1;
+	if (*mem == 0) {
+		fprintf(stderr, "Neither LowTotal nor MemTotal found in the "
+				PROCMEM "\n");
+		return -1;
+	}
+	*mem *= 1024;
+	return 0;
 }
 
 char *get_file_name(char *str)
