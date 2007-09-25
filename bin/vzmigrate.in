@@ -1,6 +1,4 @@
 #!/bin/bash
-#
-# vzmigrate is used for VE migration to another node
 # Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -17,6 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
+#
+# vzmigrate is used for VE migration to another node
 #
 # Usage:
 # vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
@@ -55,7 +55,10 @@
 ACT_SCRIPTS_SFX="start stop mount umount"
 SSH_OPTIONS=""
 SSH="ssh $SSH_OPTIONS"
-SCP="scp $SSH_OPTIONS"
+SCP_OPTIONS=""
+SCP="scp $SCP_OPTIONS"
+RSYNC_OPTIONS="-aH --delete --numeric-ids"
+RSYNC="rsync $RSYNC_OPTIONS"
 
 online=0
 verbose=0
@@ -273,7 +276,8 @@ while [ ! -z "$1" ]; do
 	--ssh=*)
 		SSH_OPTIONS="$SSH_OPTIONS $(echo $1 | cut -c7-)"
 		SSH="ssh $SSH_OPTIONS"
-		SCP="scp $SSH_OPTIONS"
+		SCP_OPTIONS="`echo $SSH_OPTIONS | sed 's/-p/-P/1'`"
+		SCP="scp $SCP_OPTIONS"
 		;;
 	*)
 		break
@@ -432,7 +436,7 @@ else
 fi
 
 log 1 "Syncing private"
-if ! rsync -aH --delete --progress --numeric-ids \
+if ! $RSYNC --progress \
 		"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" | \
 		grep "% of" | awk -v ORS="\r" '{print $10}'; then
 	log 0 "Failed to sync VE private areas"
@@ -486,7 +490,7 @@ fi
 if [ "$state" = "running" ]; then
 	log 2 "Syncing private (2nd pass)"
 	time_rsync2=$(date +%s.%N)
-	if ! rsync -aH --delete --numeric-ids \
+	if ! $RSYNC \
 			"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
 		log 0 "Failed to sync VE private areas"
 		undo_source_stage
