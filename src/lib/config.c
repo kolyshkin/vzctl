@@ -453,7 +453,7 @@ static int parse_iptables(env_param *env, char *val)
 			ret = ERR_INVAL_SKIP;
 			continue;
 		}
-		env->ipt_mask |= ipt->id;
+		env->ipt_mask |= (unsigned long) ipt->mask;
 	} while ((token = strtok(NULL, "\t ")));
 	return ret;
 }
