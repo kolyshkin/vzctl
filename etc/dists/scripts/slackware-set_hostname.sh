@@ -21,24 +21,6 @@
 # Some parameters are passed in environment variables.
 # Required parameters:
 #   HOSTNM  - Sets host name for this VE. Modifies /etc/hosts 
-function set_host()
-{
-	local cfgfile="$1"
-	local var=$2
-	local val=$3
-	local host=
-
-	[ -z "${val}" ] && return 0
-        if grep -q -E "[[:space:]]${val}" ${cfgfile} 2>/dev/null; then
-                return;
-        fi
-	if echo "${val}" | grep "\." >/dev/null 2>&1; then
-		host=${val%%.*}
-	fi
-	host=" ${val} ${host}"
-	put_param2 "${cfgfile}" "${var}" "${host} localhost localhost.localdomain"
-}
-
 function set_hostname()
 {
 	local cfgfile="$1"
@@ -50,7 +32,7 @@ function set_hostname()
 	hostname ${hostname}
 }
 
-set_host /etc/hosts "127.0.0.1" ${HOSTNM}
+change_hostname /etc/hosts "${HOSTNM}" "${IP_ADDR}"
 set_hostname /etc/HOSTNAME "${HOSTNM}"
 
 exit 0

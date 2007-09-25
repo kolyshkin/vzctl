@@ -32,6 +32,7 @@
 #include "util.h"
 #include "env.h"
 #include "vps_configure.h"
+#include "list.h"
 
 
 static struct vps_state{
@@ -56,15 +57,33 @@ const char *state2str(int state)
 	return NULL;		
 }
 
-int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, char *hostname, int state)
+static const char *get_local_ip(vps_param *param)
 {
-	char *envp[4];
+	list_head_t *h = &param->res.net.ip;
+	ip_param *ip;
+
+	/* Use first ip in the VE config */
+	if (param->g_param != NULL && !param->res.net.delall)
+		h = &param->g_param->res.net.ip;
+	if (list_empty(h))
+		h = &param->res.net.ip;
+	if (!list_empty(h)) {
+		ip = list_first_entry(h, ip_param, list);
+		return ip->val;
+	}
+	return NULL;
+}
+
+int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
+	char *root, char *hostname, const char *ip, int state)
+{
+	char *envp[5];
 	const char *script;
 	int ret;
 	char vps_state[32];
 	char hostnm[STR_SIZE];
 	const char *str_state;
+	char ipnm[STR_SIZE];
 
 	if (hostname == NULL)
 		return 0;	
@@ -81,6 +100,11 @@ int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	envp[1] = hostnm;
 	envp[2] = ENV_PATH;
 	envp[3] = NULL;
+	if (ip != NULL) {
+		snprintf(ipnm, sizeof(ipnm), "IP_ADDR=%s", ip);
+		envp[3] = ipnm;
+	}
+	envp[4] = NULL;
 	logger(0, 0, "Set hostname: %s", hostname);
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
@@ -283,10 +307,13 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	return ret;
 }
 
+
+
 int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, int op, vps_res *res, int state)
+	char *root, int op, vps_param *param, int state)
 {
 	int ret;
+	vps_res *res = &param->res;
 
 	if (!need_configure(res))
 		return 0;
@@ -299,7 +326,7 @@ int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		return -1;
 	}
 	if ((ret = vps_hostnm_configure(h, veid, actions, root,
-		res->misc.hostname, state)))
+		res->misc.hostname, get_local_ip(param), state)))
 	{
 		return ret;
 	}
