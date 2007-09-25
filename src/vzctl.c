@@ -268,7 +268,7 @@ int main(int argc, char *argv[], char *envp[])
 		goto error;
 	}
 	if (veid == 0 && action != ACTION_SET) {
-		fprintf(stderr, "Only set actions allowed for VE0");
+		fprintf(stderr, "Only set actions are allowed for VE0\n");
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	} else if (veid < 0) {
