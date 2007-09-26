@@ -40,25 +40,27 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 	vps_param *vps_p, int state)
 {
 	int ret;
-	unsigned long *privvmpages;
+	unsigned long *privvmpages = vps_p->res.ub.privvmpages;
 	struct vzctl_ve_meminfo meminfo;
-	meminfo_param *param;
+	meminfo_param *param = gparam;
 	meminfo_param default_param = {
 		VE_MEMINFO_PRIVVMPAGES, 1
 	};
 
-	if (gparam->mode < 0) {
-		/* If mode not specified use privvmpages on
-		   VE start and privvmpages change
-		*/
-		if (state != STATE_STARTING &&
-		    vps_p->res.ub.privvmpages == NULL)
-		{
+	if (state != STATE_STARTING) {
+		/* update meminfo on --privvmpages, --meminfo */
+		if (param->mode < 0 && privvmpages == NULL)
 			return 0;
+		if (gparam->mode < 0 && vps_p->g_param != NULL) {
+			param = &vps_p->g_param->res.meminfo;
+			if (param->mode != VE_MEMINFO_PRIVVMPAGES)
+				return 0;
 		}
+		if (privvmpages == NULL && vps_p->g_param != NULL)
+			privvmpages = vps_p->g_param->res.ub.privvmpages;
+	}
+	if (param->mode < 0)
 		param = &default_param;
-	} else
-		param = gparam;
 
 	meminfo.veid = veid;
 	switch (param->mode) {
@@ -68,10 +70,6 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 		meminfo.val = param->val;
 		break;
 	case VE_MEMINFO_PRIVVMPAGES:
-		if ((privvmpages = vps_p->res.ub.privvmpages) == NULL) {
-			privvmpages = vps_p->g_param != NULL ?
-				vps_p->g_param->res.ub.privvmpages : NULL; 
-		}
 		if (privvmpages == NULL) {
 			logger(0, 0, "Warning: privvmpages is not set"
 				" configure meminfo skipped");
