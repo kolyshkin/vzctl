@@ -165,6 +165,11 @@ err_out:
 			len1 = write(STDERR_FILENO, buf, len);
 			len -= len1;
 		} while (len > 0 && len1 > 0);
+		if (cmd == CMD_SUSPEND && param->ctx) {
+			/* destroy context */
+			if (ioctl(cpt_fd, CPT_PUT_CONTEXT, veid) < 0)
+				logger(-1, errno, "Can't put context");		
+		}
 	}
 	fflush(stderr);	
 	close(err_p[0]);
