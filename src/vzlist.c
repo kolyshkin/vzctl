@@ -1150,8 +1150,7 @@ static int get_run_ve_proc(int update)
 		if (res == 4) {
 			ve.ip = invert_ip(ips);
 			
-		} else if (res == 3)
-			ve.ip = strdup("");
+		}
 		ve.veid = veid;
 		ve.status = VE_RUNNING;
 		if (update)
