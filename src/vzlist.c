@@ -1134,7 +1134,8 @@ static int get_run_ve_proc(int update)
 	int res, veid, classid, nproc;
 
 	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
-		return get_run_ve_proc2(update);
+		fprintf(stderr, "Unable to open %s\n", PROCVEINFO);
+		return 1;
 	}
 	memset(&ve, 0, sizeof(struct Cveinfo));
 	while (!feof(fp)) {
