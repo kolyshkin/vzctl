@@ -617,6 +617,8 @@ int main(int argc, char **argv)
 			swap_total = val << 10;
 
 	fclose(fd);
+	if (low_total == 0)
+		low_total = mem_total;
 	if (mem_total < SYSRSRV) {
 		fprintf(stderr, "At least 128 Mb of RAM should be "
 				"installed on Hardware Node\n");
