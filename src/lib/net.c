@@ -309,7 +309,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 	}
 	if (net->ipv6_net != YES) {
 		if (remove_ipv6_addr(net))
-			logger(0, 0, "Warning: ipv6 support disabled");
+			logger(0, 0, "WARNING: IPv6 support is disabled");
 	}
 	if (op == ADD) {
 		if (net->delall == YES)
