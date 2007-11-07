@@ -129,7 +129,8 @@ The following options sets barrier and limit for various user beancounters.
 Each option requires one or two arguments. In case of one argument,
 \fBvzctl\fR sets barrier and limit to the same value. In case of
 two colon-separated arguments, the first is a barrier,
-and the second is a limit.
+and the second is a limit. Each argument is either a number, a number
+with a suffix, or a special value \fBunlimited\fR.
 
 Arguments are in items, pages or bytes. Note that page size
 is architecture-specific, it is 4096 bytes on IA32 platform.
@@ -150,6 +151,10 @@ Available suffixes are:
 .br
 \fBp\fR, \fBP\fR -- pages (page is 4096 bytes on x86 architecture,
 other architectures may differ).
+
+You can also specify the literal word \fBunlimited\fR in place of a number.
+In that case the corresponding value would be set to LONG_MAX, i. e.
+the maximum possible value.
 
 .TP
 \fB--numproc\fR \fIitems\fR[:\fIitems\fR]
@@ -175,7 +180,7 @@ Memory allocation guarantee. This parameter controls how much memory is
 available to a VE. The barrier is the amount
 of memory that VE's applications are guaranteed to be able to allocate.
 The meaning of the limit is currently unspecified; it should be set to
-2,147,483,647.
+\fBunlimited\fR.
 .TP
 \fB--kmemsize\fR \fIbytes\fR[:\fIbytes\fR]
 Maximum amount of kernel memory used. This parameter is related to
@@ -215,7 +220,7 @@ total amount of memory and swap space used by the VE processes. The barrier
 of this parameter is the out-of-memory guarantee. If the oomguarpages usage
 is below the barrier, processes of this VE are guaranteed not to be killed
 in out-of-memory situations. The meaning of limit is currently unspecified;
-it should be set to 2,147,483,647.
+it should be set to \fBunlimited\fR.
 .TP
 \fB--lockedpages\fR \fIpages\fR[:\fIpages\fR]
 Maximum number of pages acquired by \fBmlock\fR(2).
@@ -275,7 +280,7 @@ the limit to different values does not make practical sense.
 \fB--physpages\fR \fIpages\fR[:\fIpages\fR]
 This is currently an accounting-only parameter. It shows the usage of RAM
 by this VE. Barrier should be set to 0, and limit should be set to
-2,147,483,647.
+\fBunlimited\fR.
 .TP
 \fBCPU fair scheduler parameters\fR
 
