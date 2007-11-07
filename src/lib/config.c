@@ -532,7 +532,10 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 	tmp = strtoull(str, &tail, 10);
 	if (errno == ERANGE)
 		return ERR_INVAL;
-	if (*tail != ':' && *tail != '\0') {
+	if (!strncmp(str, "unlimited", 9)) {
+		tmp = LONG_MAX;
+		tail = (char *)str + 9;
+	} else if (*tail != ':' && *tail != '\0') {
 		if ((n = get_mul(*tail)) < 0)
 			return ERR_INVAL;
 		tmp = tmp * n / divisor;
@@ -550,11 +553,15 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 		if (errno == ERANGE)
 			return ERR_INVAL;
 		if (*tail != '\0') {
-			if (*(tail + 1) != '\0')
-				return ERR_INVAL;
-			if ((n = get_mul(*tail)) < 0)
-				return ERR_INVAL;
-			tmp = tmp * n / divisor;
+			if (!strncmp(tail, "unlimited", 9))
+				tmp = LONG_MAX;
+			else {
+				if (*(tail + 1) != '\0')
+					return ERR_INVAL;
+				if ((n = get_mul(*tail)) < 0)
+					return ERR_INVAL;
+				tmp = tmp * n / divisor;
+			}
 		}
 		if (tmp > LONG_MAX) {
 			tmp = LONG_MAX;

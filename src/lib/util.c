@@ -155,6 +155,11 @@ int parse_int(const char *str, int *val)
 int parse_ul(const char *str, unsigned long *val)
 {
 	char *tail;
+	
+	if (!strcmp(str, "unlimited")) {
+		*val = LONG_MAX;
+		return 0;
+	}
 
 	errno = 0;
 	*val = (int)strtoul(str, (char **)&tail, 10);
