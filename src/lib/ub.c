@@ -341,7 +341,7 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 	FILE *fd;
 	char str[STR_SIZE];
 	char name[64];
-	const char *fmt;
+	const char *fmt = NULL; /* make gcc happy */
 	int ret, found, id;
 	unsigned long held, maxheld, barrier, limit;
 	ub_res res;

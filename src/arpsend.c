@@ -403,7 +403,7 @@ void finish()
 	}
 }
 
-int recv_pack(unsigned char *buf, int len, struct sockaddr_ll *from)
+int recv_pack(void *buf, int len, struct sockaddr_ll *from)
 {
 	int rc = -1;
 	int i;

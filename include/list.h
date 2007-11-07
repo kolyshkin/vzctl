@@ -101,7 +101,7 @@ static inline void list_moveall(list_head_t *src, list_head_t *dst)
 }
 
 #define list_entry(ptr, type, field)					\
-	((type *)((char *)(ptr)-(unsigned long)(&((type *)0)->field)))
+	((type *)(void *)((char *)(ptr)-(unsigned long)(&((type *)0)->field)))
 
 #define list_first_entry(head, type, field)				\
 	list_entry((head)->next, type, field)

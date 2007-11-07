@@ -31,7 +31,7 @@ static struct feature_s features[] = {
 struct feature_s *find_feature(const char *name)
 {
 	struct feature_s *feat;
-	int len;
+	int len = 0; /* make gcc happy */
 
 	for (feat = features; feat->name != NULL; feat++) {
 		len = strlen(feat->name);

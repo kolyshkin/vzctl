@@ -119,7 +119,7 @@ int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state,
 {
 	char *argv[3];
 	char *envp[10];
-	const char *script;
+	char *script;
 	int ret;
 	char buf[STR_SIZE];
 	int i = 0;
@@ -146,7 +146,7 @@ int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state,
 		default:
 			return 0;
 	}
-	argv[0] = (char *)script;
+	argv[0] = script;
 	argv[1] = NULL;
 	ret = run_script(script, argv, envp, 0);
 	free_arg(envp);
