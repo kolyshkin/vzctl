@@ -385,6 +385,11 @@ try:
 	*/
 	if (read(wait_p, &ret, sizeof(ret)) != 0)
 		return 0;
+	if ((fd = open("/dev/null", O_RDWR)) != -1) {
+		dup2(fd, 0);
+		dup2(fd, 1);
+		dup2(fd, 2);
+	}
 	logger(10, 0, "Starting init");
 	execve("/sbin/init", argv, envp);
 	execve("/etc/init", argv, envp);
