@@ -33,7 +33,7 @@ Disables logging to log file and screen.
 .IP \fB--verbose\fR 4
 Sets logging level to maximum value.
 .SS Setting VE parameters
-.IP "\fBset\fR \fIveid\fR [\fIparameters\fR] [\fB--save\fR]" 4 
+.IP "\fBset\fR \fIveid\fR [\fIparameters\fR] [\fB--save\fR]" 4
 This command sets various VE parameters. If flag \fB--save\fR is given,
 parameters are saved in VE configuration file \fBvps.conf\fR(5).
 If VE is currently running, \fBvzctl\fR applies these parameters to VE.
@@ -165,7 +165,7 @@ the limit to different values does not make practical sense.
 \fB--numtcpsock\fR \fIitems\fR[:\fIitems\fR]
 Maximum number of TCP sockets. This parameter limits the number of TCP
 connections and, thus, the number of clients the server application can
-handle in parallel. 
+handle in parallel.
 Setting the barrier and
 the limit to different values does not make practical sense.
 .TP
@@ -207,7 +207,7 @@ barrier and limit should be equal to or more than value of
 Maximum size of other (non-TCP) socket send buffers. If VE processes needs
 to send very large datagrams, the barrier should be set accordingly.
 Increased limit is necessary for high performance of communications through
-local (UNIX-domain) sockets. 
+local (UNIX-domain) sockets.
 .TP
 \fB--dgramrcvbuf\fR \fIbytes\fR[:\fIbytes\fR]
 Maximum size of other (non-TCP) socket receive buffers. If VE processes
@@ -247,7 +247,7 @@ Setting the barrier and
 the limit to different values does not make practical sense.
 .TP
 \fB--numfile\fR \fIitems\fR[:\fIitems\fR]
-Maximum number of open files. 
+Maximum number of open files.
 Setting the barrier and
 the limit to different values does not make practical sense.
 .TP
@@ -456,7 +456,7 @@ already exists, it will be removed.
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
 point for the VE root directory (default is \fBVE_ROOT\fR specified in
 \fBvz\fR(5) file). Argument can contain string \fI$VEID\fR, which will
-be substituted with numeric VE ID. 
+be substituted with numeric VE ID.
 
 You can use \fB--private\fR \fIpath\fR option to set the path to directory
 in which all the files and directories specific to this very VE are stored

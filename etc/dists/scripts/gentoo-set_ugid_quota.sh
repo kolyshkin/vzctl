@@ -20,7 +20,7 @@
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   MINOR	- root device minor number 
+#   MINOR	- root device minor number
 #   MAJOR	- root device major number
 SCRIPTANAME='/etc/init.d/vzquota'
 DEFAULT="/etc/runlevels/default/vzquota"

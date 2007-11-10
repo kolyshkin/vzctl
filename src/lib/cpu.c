@@ -109,7 +109,7 @@ int env_set_vcpus(envid_t veid, unsigned int vcpus)
 
 	logger(0, 0, "Setting CPUs: %d", vcpus);
 	ret = fairsched_vcpus(veid, vcpus);
-	if (ret) 
+	if (ret)
 		logger(-1, errno, "Unable to set cpus");
 
 	return ret;

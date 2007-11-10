@@ -3,7 +3,7 @@
 #include <getopt.h>
 #include <limits.h>
 #include <string.h>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #include <errno.h>
 
 #include "vzcfgscale.h"
@@ -90,7 +90,7 @@ do { \
 		val1 = LONG_MAX; \
 	param->name[0] = val0; \
 	param->name[1] = val1; \
-} while(0); 
+} while(0);
 
 #define SCALE_PARAM(name, k) \
 do { \
@@ -102,7 +102,7 @@ do { \
 		param->name[0] = LONG_MAX; \
 	if (param->name[1] > LONG_MAX) \
 		param->name[1] = LONG_MAX; \
-} while(0); 
+} while(0);
 
 	if (ubc_k)
 	{
@@ -174,7 +174,7 @@ int get_id(char *in_file)
 	char buf[STR_SIZE];
 	char *p;
 	int id;
-	
+
 	if (in_file == NULL)
 		return 0;
 	if ((p = strrchr(in_file, '/')) != NULL)
@@ -290,7 +290,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Unknown option %s\n", optarg);
 				exit(1);
 		}
-			
+
 	}
 	if (optind == argc - 1)
 	{
@@ -323,7 +323,7 @@ int main(int argc, char **argv)
 	}
 	if (ParseConfig(0, in_file, &param, 0))
 	{
-		fprintf(stderr, "Unable open %s\n", in_file);	
+		fprintf(stderr, "Unable open %s\n", in_file);
 		return 1;
 	}
 	scale(ubc_k, cpu_k, disk_k, net_k, &param);

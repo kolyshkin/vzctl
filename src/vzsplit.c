@@ -53,7 +53,7 @@ LOG_DATA
 
 /* maximal per system values */
 #define MAX_TOTAL_PIDS	8000
-#define MAXIPTENT	2000 
+#define MAXIPTENT	2000
 
 /* minimal per VE values */
 #define MINPROC		30
@@ -154,7 +154,7 @@ struct par_limits {
 struct par_limits params[NUMUBC];
 
 /* Global variables */
-unsigned long long mem_total, low_total, swap_total, ds_total, di_total; 
+unsigned long long mem_total, low_total, swap_total, ds_total, di_total;
 long pagesize, proc_calc;
 int num_ve, ve_allowed, osl;
 
@@ -205,7 +205,7 @@ int get_cpupower(int *cpuunits)
 	FILE *fd;
 	char str[1024];
 	int val, total = 0;
-	
+
 	*cpuunits = DEF_CPUUNITS;
 	if ((fd = fopen(PROCCPU, "r")) == NULL) {
 		fprintf(stderr, "Cannot open " PROCCPU "\n");
@@ -226,7 +226,7 @@ int lconv(char *name)
 {
 	int i, cpuunits;
 	FILE *fp;
-	
+
 	if (name != NULL) {
 		if ((fp = fopen(name, "w")) == NULL) {
 			fprintf(stderr, "Unable to create %s: %s\n", name,
@@ -283,7 +283,7 @@ int calculate_values()
 		avnproc = kmem / k_kpp[osl];
 		if (avnproc < MINPROC / 2)
 			continue;
-		
+
 		if (numproc <  avnproc)
 			numproc = avnproc;
 		if ((numproc < 2 * avnproc) && (osl < MAX_SL))
@@ -334,14 +334,14 @@ int calculate_values()
 		if (rest > delta) {
 			params[TCPRCV].lim = MINTCPBUF + delta;
 			kmem += rest - delta;
-		} else 
+		} else
 			params[TCPRCV].lim = MINTCPBUF + rest;
 	} else {
 		delta = k_sock2[sl] * numproc;
 		rest = tcpbuf - delta;
 		params[TCPSND].lim = params[TCPRCV].lim = CHECK_LIMIT(tcpbuf);
 		params[TCPSND].bar = params[TCPRCV].bar = CHECK_LIMIT(rest);
-		params[DGRAM].lim = params[DGRAM].bar = 
+		params[DGRAM].lim = params[DGRAM].bar =
 			params[SOCKOTH].bar = CHECK_LIMIT(rest / 2);
 		params[SOCKOTH].lim = CHECK_LIMIT(rest / 2 + delta);
 	}
@@ -365,7 +365,7 @@ int calculate_values()
 	params[NFILE].lim = params[NFILE].bar = CHECK_LIMIT(numfile);
 
 	dcache = numfile * k_dcache[sl];
-	params[DCACHE].lim = CHECK_LIMIT(dcache); 
+	params[DCACHE].lim = CHECK_LIMIT(dcache);
 	params[DCACHE].bar = CHECK_LIMIT(dcache / DCACHE_DELTA);
 
 	numflock = numfile * NFLOCK_NFILE;
@@ -378,15 +378,15 @@ int calculate_values()
 	if (lockedpages < MIN_PGLOCK)
 		lockedpages = MIN_PGLOCK;
 	params[LOCKPG].lim = params[LOCKPG].bar = CHECK_LIMIT(lockedpages);
-	
+
 	numpty = numproc * PTY_PROC;
 	if (numpty < MIN_PTY)
 		numpty = MIN_PTY;
 	if (numpty > PTY_PVE)
 		numpty = PTY_PVE;
-	
+
 	params[NPTY].lim = params[NPTY].bar = numpty;
-	
+
 	params[NSIGINFO].lim = params[NSIGINFO].bar = numsiginfo[sl];
 	params[NPHYPG].bar = 0; params[NPHYPG].lim = MAXVAL;
 
@@ -602,7 +602,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Incorrect value for number of VEs.\n");
 		exit(1);
 	}
-	
+
 	if ((fd = fopen(PROCMEM, "r")) == NULL) {
 		fprintf(stderr, "Cannot open " PROCMEM"\n");
 		exit(1);
@@ -627,14 +627,14 @@ int main(int argc, char **argv)
 
 	if (swap_total > 2 * mem_total)
 		fprintf(stderr, "The optimal swap space size is %llu Mb, "
-				"twice bigger than the RAM size\n\n", 
+				"twice bigger than the RAM size\n\n",
 				(2 * mem_total) >> 20);
 	ve_allowed = num_ve;
 	retval = 0;
-	
+
 	if (((mem_total + swap_total - SYSRSRV) / num_ve) < MEMPERVE) {
 		fprintf(stderr, "On node with %llu Mb of memory (RAM + swap) "
-				"%d VEs can not be allocated\n", 
+				"%d VEs can not be allocated\n",
 				(mem_total + swap_total) >> 20, num_ve);
 		ve_allowed = (mem_total + swap_total - SYSRSRV) / MEMPERVE;
 		retval = 1;
@@ -642,11 +642,11 @@ int main(int argc, char **argv)
 
 	if (((low_total - SYSRSRV)/ ve_allowed) < LOWPERVE) {
 		int ve_low;
-		
+
 		fprintf(stderr, "On node with %llu Mb of Low Memory "
-				"%d VEs can not be allocated\n", 
+				"%d VEs can not be allocated\n",
 				low_total >> 20, num_ve);
-		ve_low = (low_total - SYSRSRV) / LOWPERVE; 
+		ve_low = (low_total - SYSRSRV) / LOWPERVE;
 		if (ve_low < ve_allowed)
 			ve_allowed = ve_low;
 		retval = 1;
@@ -671,12 +671,12 @@ int main(int argc, char **argv)
 
 	if ((pagesize = sysconf(_SC_PAGE_SIZE)) == -1)
 		pagesize = 4096;
-	
+
 	if (low_total > 2 << 30) {
 		if (proc_calc > 2 * MAX_TOTAL_PIDS)
 			proc_calc = 2 * MAX_TOTAL_PIDS;
 	} else if (proc_calc > MAX_TOTAL_PIDS)
-			proc_calc = MAX_TOTAL_PIDS; 
+			proc_calc = MAX_TOTAL_PIDS;
 
 	if (calculate_values())
 		exit(1);

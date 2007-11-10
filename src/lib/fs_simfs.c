@@ -31,7 +31,7 @@
 
 /*  Check is fs mounted
  *  return: 1 - yes
- *	    0 - no	
+ *	    0 - no
  *	  < 0 - error
  */
 int vz_fs_is_mounted(char *root)
@@ -55,7 +55,7 @@ int vz_fs_is_mounted(char *root)
 		if (sscanf(buf, "%*[^ ] %s ", mnt) != 1)
 			continue;
 		if (!strcmp(mnt, path)) {
-			ret = 1;	
+			ret = 1;
 			break;
 		}
 	}

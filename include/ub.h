@@ -106,7 +106,7 @@ typedef struct {
 	unsigned long limit[2];	/**< UBC resource barrier:limit. */
 } ub_res;
 
-/** Data structure for UBC parameters. 
+/** Data structure for UBC parameters.
  */
 struct ub_struct {
 	unsigned long *kmemsize;

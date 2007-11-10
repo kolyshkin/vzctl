@@ -18,7 +18,7 @@
 #ifndef _VZERROR_H_
 #define _VZERROR_H_
 
-/***************************** 
+/*****************************
     System errors
 ******************************/
 #define VZ_SETUBC_ERROR			1
@@ -47,7 +47,7 @@
     Argument errors
  ****************************/
 #define VZ_INVALID_PARAMETER_SYNTAX	20
-#define VZ_INVALID_PARAMETER_VALUE	21 
+#define VZ_INVALID_PARAMETER_VALUE	21
 #define VZ_VE_ROOT_NOTSET		22
 #define VZ_VE_PRIVATE_NOTSET		23
 #define VZ_VE_TMPL_NOTSET		24
@@ -70,7 +70,7 @@
 /* private area is not mounted */
 #define VZ_FS_NOT_MOUNTED		40
 /* private area is already mounted */
-#define VZ_FS_MOUNTED			41  
+#define VZ_FS_MOUNTED			41
 /* no private area with this id */
 #define VZ_FS_NOPRVT			43
 /* private area with this id already exists */

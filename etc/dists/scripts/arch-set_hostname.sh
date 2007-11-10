@@ -22,7 +22,7 @@
 # Required parameters:
 # Optional parameters:
 #   HOSTNM
-#       Sets host name for this VE. Modifies /etc/hosts and /etc/rc.conf 
+#       Sets host name for this VE. Modifies /etc/hosts and /etc/rc.conf
 
 function set_host()
 {
@@ -48,7 +48,7 @@ function set_hostname()
 	local hostname=$2
 
 	[ -z "${hostname}" ] && return 0
-	
+
 	# update /etc/rc.conf
 	put_param ${cfgfile} HOSTNAME ${hostname}
 	hostname ${hostname}

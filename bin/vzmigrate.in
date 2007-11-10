@@ -5,12 +5,12 @@
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,7 +37,7 @@
 #		Perform online (zero-downtime) migration: during the migration the
 #		VE hangs for a while and after the migration it continues working
 #		as though nothing has happened.
-#	-v	
+#	-v
 #		Verbose mode. Causes vzmigrate to print debugging messages about
 #		its progress (including some time statistics).
 #
@@ -109,7 +109,7 @@ Options:
 	Perform online (zero-downtime) migration: during the migration the
 	VE hangs for a while and after the migration it continues working
 	as though nothing has happened.
--v	
+-v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics).
 EOF
@@ -452,7 +452,7 @@ if [ $online -eq 1 ]; then
 	if ! logexec 2 vzctl chkpnt $VEID --suspend ; then
 		log 0 "Failed to suspend VE"
 		undo_sync
-		exit $MIG_ERR_CHECKPOINT 
+		exit $MIG_ERR_CHECKPOINT
 	fi
 
 	log 2 "Dumping VE"
@@ -593,5 +593,5 @@ if [ $remove_area -eq 1 ]; then
 	logexec 2 vzctl destroy $VEID
 else
 	# Move config as veid.migrated to allow backward migration
-	mv -f $vpsconf $vpsconf.migrated 
+	mv -f $vpsconf $vpsconf.migrated
 fi

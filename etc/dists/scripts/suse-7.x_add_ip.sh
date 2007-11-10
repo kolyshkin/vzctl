@@ -55,9 +55,9 @@ function setup_network()
 
 function get_net_ids()
 {
-	
+
 	NETCONFIG_ID=`grep -E "^NETCONFIG=" ${CFGFILE} | head -n1 | sed  -e 's/NETCONFIG=\(.*\)$/\1/' -e 's/["_]//g'`
-	[ -z "${NETCONFIG_ID}" ] && NETCONFIG_ID=0 
+	[ -z "${NETCONFIG_ID}" ] && NETCONFIG_ID=0
 }
 
 function add_ip()

@@ -69,7 +69,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 {
 	int ret;
 	vps_res *res = &param->res;
-	
+
 	if (skip & SKIP_SETUP)
 		return 0;
 	if (vps_state != STATE_STARTING) {

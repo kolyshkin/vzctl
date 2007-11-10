@@ -119,7 +119,7 @@ int get_cap_mask(char *name, unsigned long *mask)
 		}
 	}
 	return -1;
-} 
+}
 
 /** merge capabilities and return in string format.
  *

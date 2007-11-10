@@ -33,7 +33,7 @@ function del_ip()
 {
 	local ifname
 	local ip
-	
+
 	echo ${IP_ADDR}
 	for ip in ${IP_ADDR}; do
 		ifname=`grep -B 1 -e "\\<${ip}\\>" ${CFGFILE} | \
@@ -44,7 +44,7 @@ function del_ip()
 
 		    # remove venet0_x from cfg
 		    del_param "${CFGFILE}" "${ifname}"
-			
+
 		    # del venet0_x from INTERFACES array
 		    del_param3 "${CFGFILE}" "INTERFACES" "${ifname}"
 		fi

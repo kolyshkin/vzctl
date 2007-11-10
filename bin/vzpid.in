@@ -61,7 +61,7 @@ else
 	pidlist=$*
 fi
 header
-for i in ${pidlist}; do 
+for i in ${pidlist}; do
 	getveid ${i}
 done
 

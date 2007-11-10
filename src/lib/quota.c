@@ -51,9 +51,9 @@ int quota_set(envid_t veid, char *private, dq_param *param)
 
 	if (param == NULL)
 		return -1;
-	if (param->diskspace == NULL && 
-		param->diskinodes == NULL && 
-		param->exptime == NULL && 
+	if (param->diskspace == NULL &&
+		param->diskinodes == NULL &&
+		param->exptime == NULL &&
 		param->ugidlimit == NULL &&
 		private == NULL)
 	{
@@ -92,7 +92,7 @@ int quota_set(envid_t veid, char *private, dq_param *param)
 		snprintf(buf, sizeof(buf), "%lu", param->exptime[0]);
 		arg[i++] = strdup(buf);
 	}
-	/* Set ugid limit */	
+	/* Set ugid limit */
 	if (param->ugidlimit != NULL && *param->ugidlimit) {
 		arg[i++] = strdup("-u");
 		snprintf(buf, sizeof(buf), "%lu", *param->ugidlimit);
@@ -160,7 +160,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup(buf);
 	arg[i++] = strdup("-n");
 	arg[i++] = strdup(buf);
-	/* ugid limit */	
+	/* ugid limit */
 	arg[i++] = strdup("-s");
 	if (param->ugidlimit != NULL && *param->ugidlimit) {
 		arg[i++] = strdup("1");
@@ -232,7 +232,7 @@ int quota_on(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup(buf);
 	arg[i++] = strdup("-n");
 	arg[i++] = strdup(buf);
-	/* ugid limit */	
+	/* ugid limit */
 	arg[i++] = strdup("-s");
 	if (param->ugidlimit != NULL && *param->ugidlimit) {
 		arg[i++] = strdup("1");
@@ -377,11 +377,11 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 	int ret;
 	unsigned long *tmp_ugidlimit = NULL;
 
-	if (dq->enable == NO) 
+	if (dq->enable == NO)
 		return 0;
-	if (dq->diskspace == NULL && 
-		dq->diskinodes == NULL && 
-		dq->exptime == NULL && 
+	if (dq->diskspace == NULL &&
+		dq->diskinodes == NULL &&
+		dq->exptime == NULL &&
 		dq->ugidlimit == NULL)
 	{
 		return 0;

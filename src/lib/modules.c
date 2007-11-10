@@ -33,7 +33,7 @@ int mod_parse(envid_t veid, struct mod_action *action, const char *name,
 	if (action == NULL)
 		return 0;
 	if (name == NULL)
-		ret = ERR_UNK;	// unknown option 
+		ret = ERR_UNK;	// unknown option
 	else
 		ret = 0;	// skip unknown parameters in config
 	for (i = 0, mod = action->mod_list; i < action->mod_count; i++, mod++) {
@@ -65,7 +65,7 @@ static inline int opt_size(struct option *opt)
 		return 0;
 	for (i = 0; opt[i].name != NULL; i++);
 
-	return i;	
+	return i;
 }
 
 struct option *mod_make_opt(struct option *opt, struct mod_action *action,
@@ -115,7 +115,7 @@ int mod_save_config(struct mod_action *action, list_head_t *conf)
 		mod_info = mod->mod_info;
 		if (mod_info == NULL || mod_info->store == NULL)
 			continue;
-		ret = mod_info->store(mod->data, conf);	
+		ret = mod_info->store(mod->data, conf);
 	}
 	return 0;
 }
@@ -167,7 +167,7 @@ int is_mod_action(struct mod_info *info, const char *name)
 		return 0;
 	if (name == NULL)
 		return 1;
-	for (p = info->actions; *p != NULL; p++) 
+	for (p = info->actions; *p != NULL; p++)
 		if (!strcmp(*p, name))
 			return 1;
 	return 0;

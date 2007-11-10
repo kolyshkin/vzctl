@@ -20,7 +20,7 @@
 #
 # Some parameters are passed in environment variables.
 # Required parameters:
-#   HOSTNM  - Sets host name for this VE. Modifies /etc/hosts 
+#   HOSTNM  - Sets host name for this VE. Modifies /etc/hosts
 function set_hostname()
 {
 	local cfgfile="$1"

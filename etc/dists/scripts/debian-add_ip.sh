@@ -47,7 +47,7 @@ function setup_network()
 auto ${LOOPBACK}
 iface ${LOOPBACK} inet loopback
 
-auto ${VENET_DEV} 
+auto ${VENET_DEV}
 iface ${VENET_DEV} inet static
 	address 127.0.0.1
 	netmask 255.255.255.255
@@ -78,7 +78,7 @@ function create_config()
 {
 	local ip=$1
 	local ifnum=$2
-	
+
 	if [ "${ip#*:}" = "${ip}" ]; then
 	    echo -e "auto ${VENET_DEV}:${ifnum}
 iface ${VENET_DEV}:${ifnum} inet static
@@ -90,7 +90,7 @@ iface ${VENET_DEV}:${ifnum} inet static
 	else
 	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}/" ${CFGFILE}.bak
 	fi
-	
+
 }
 
 function get_all_aliasid()

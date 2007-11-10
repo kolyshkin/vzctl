@@ -224,7 +224,7 @@ struct vz_load_avg {
 struct vz_cpu_stat {
 	unsigned long user_jif;
 	unsigned long nice_jif;
-	unsigned long system_jif; 
+	unsigned long system_jif;
 	unsigned long uptime_jif;
 	__u64 idle_clk;
 	__u64 strv_clk;

@@ -51,7 +51,7 @@ void logger(int log_level, int err_num, const char *format, ...);
 int set_log_file(char *file);
 
 /** Initialize logging.
- * 
+ *
  * @param file		log file.
  * @param veid		VE id.
  * @param enable	enable/disable logging.

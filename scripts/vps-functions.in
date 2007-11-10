@@ -122,7 +122,7 @@ function vzarp()
 	done
 }
 
-# Send ARP request to detect that somebody already have this IP 
+# Send ARP request to detect that somebody already have this IP
 function vzarpipdetect()
 {
 	local DEV
@@ -138,7 +138,7 @@ function vzarpipdetect()
 
 	for DEV in $NETDEVICES; do
 		${ARPSEND_CMD} -D ${cmd} $DEV || vzwarning "${ARPSEND_CMD} -D ${cmd} $DEV FAILED"
-	done	
+	done
 }
 
 # Send ARP request to update neighbour ARP caches
@@ -155,7 +155,7 @@ function vzarpipset()
 			opt="-i ${ip} -e ${ip}"
 			${ARPSEND_CMD} -U ${opt} ${dev} || vzwarning "${ARPSEND_CMD} -U ${opt} ${dev} FAILED"
 		done
-	done	
+	done
 }
 
 function vzaddrouting4()

@@ -178,7 +178,7 @@ int read_dist_actions(char *dist_name, char *dir, dist_actions *actions)
 		logger(-1, errno, "unable to open %s", file);
 		return VZ_NO_DISTR_CONF;
 	}
-	while (!feof(fp)) { 
+	while (!feof(fp)) {
 		buf[0] = 0;
 		if (fgets(buf, sizeof(buf), fp) == NULL)
 			break;

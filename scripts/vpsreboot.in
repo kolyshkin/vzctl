@@ -78,7 +78,7 @@ function lockfile()
 test -f ${VESTAT} || exit 0
 lockfile
 
-cd ${CONF_DIR} 2>/dev/null || exit 0 
+cd ${CONF_DIR} 2>/dev/null || exit 0
 VE_TOTAL=`ls -1 *.conf 2>/dev/null | sed s/.conf//`
 VE_RUN=`awk '
 	$1 != "VEID" && $1 != "Version:" {

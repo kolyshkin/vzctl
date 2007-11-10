@@ -44,7 +44,7 @@
 #include "types.h"
 
 LOG_DATA
-static struct Cveinfo *veinfo = NULL; 
+static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
 
 static char g_outbuffer[4096] = "";
@@ -76,7 +76,7 @@ static inline int get_run_ve(int update)
 {
 	int ret;
 	ret = get_run_ve_ioctl(update);
-	if (ret) 
+	if (ret)
 		ret = get_run_ve_proc(update);
 	return ret;
 }
@@ -203,7 +203,7 @@ int laverage_sort_fn(const void *val1, const void *val2)
 int id_sort_fn(const void *val1, const void *val2)
 {
 	int ret;
-	ret = (((const struct Cveinfo*)val1)->veid > 
+	ret = (((const struct Cveinfo*)val1)->veid >
 		((const struct Cveinfo*)val2)->veid);
 	return ret;
 }
@@ -211,7 +211,7 @@ int id_sort_fn(const void *val1, const void *val2)
 int status_sort_fn(const void *val1, const void *val2)
 {
 	int res;
-	res = ((const struct Cveinfo*)val1)->status - 
+	res = ((const struct Cveinfo*)val1)->status -
 		((const struct Cveinfo*)val2)->status;
 	if (!res)
 		res = id_sort_fn(val1, val2);
@@ -227,7 +227,7 @@ int fn(const void *val1, const void *val2)				\
 	if ((ret = check_empty_param(h1, h2)) == 2)			\
 		ret = strcmp(h1, h2);					\
 	return ret;					\
-}									
+}
 
 SORT_STR_FN(hostnm_sort_fn, hostname)
 SORT_STR_FN(name_sort_fn, name)
@@ -242,7 +242,7 @@ int fn(const void *val1, const void *val2)				\
 	if ((ret = check_empty_param(r1, r2)) == 2)			\
 		ret = r1->name[index] > r2->name[index];		\
 	return ret;					\
-}									
+}
 
 SORT_UL_RES(kmemsize_h_sort_fn, Cubc, ubc, kmemsize, 0)
 SORT_UL_RES(kmemsize_m_sort_fn, Cubc, ubc, kmemsize, 1)
@@ -375,7 +375,7 @@ SORT_UL_RES(dqinodes_h_sort_fn, Cquota, quota, diskinodes, 2)
 SORT_UL_RES(cpulimit_sort_fn, Ccpu, cpu, limit, 0)
 SORT_UL_RES(cpuunits_sort_fn, Ccpu, cpu, limit, 1)
 
-struct Cfield field_names[] = 
+struct Cfield field_names[] =
 {
 /* veid should have index 0 */
 {"veid", "VEID", "%10s", 0,  RES_NONE, print_veid, id_sort_fn},
@@ -527,7 +527,7 @@ static void print_hostname(struct Cveinfo *p, int index)
 	if (p->hostname != NULL)
 		str = p->hostname;
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (last_field != NULL && 
+	if (last_field != NULL &&
 		field_names[last_field->order].res_type != RES_HOSTNAME)
 	{
 		r = 32;
@@ -559,7 +559,7 @@ static void print_ip(struct Cveinfo *p, int index)
 
 	if (p->ip != NULL)
 		str = p->ip;
-	if (last_field != NULL && 
+	if (last_field != NULL &&
 		field_names[last_field->order].res_type != RES_IP)
 	{
 		/* Fixme: dont destroy original string */
@@ -567,7 +567,7 @@ static void print_ip(struct Cveinfo *p, int index)
 			*ch = 0;
 	}
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
-	if (last_field != NULL && 
+	if (last_field != NULL &&
 		field_names[last_field->order].res_type != RES_IP)
 	{
 		r = 15;
@@ -763,7 +763,7 @@ void update_quota(int veid, struct Cquota *quota)
 		return;
 	tmp->quota = x_malloc(sizeof(*quota));
 	memcpy(tmp->quota, quota, sizeof(*quota));
-	return; 
+	return;
 }
 
 void update_cpu(int veid, unsigned long limit, unsigned long units)
@@ -777,7 +777,7 @@ void update_cpu(int veid, unsigned long limit, unsigned long units)
 	cpu->limit[0] = limit;
 	cpu->limit[1] = units;
 	tmp->cpu = cpu;
-	return; 
+	return;
 }
 
 void update_la(int veid, struct Cla *la)
@@ -788,7 +788,7 @@ void update_la(int veid, struct Cla *la)
 		return;
 	tmp->la = x_malloc(sizeof(*la));
 	memcpy(tmp->la, la, sizeof(*la));
-	return; 
+	return;
 }
 
 char *parse_var(char *var)
@@ -811,7 +811,7 @@ do {								\
 		quota->name[1] = dq.name[0];			\
 		quota->name[2] = dq.name[1];			\
 	}							\
-} while(0);							
+} while(0);
 
 void merge_conf(struct Cveinfo *ve, vps_res *res)
 {
@@ -824,7 +824,7 @@ do {								\
 		break;						\
 	ubc->name[2] = res->ub.name[0];				\
 	ubc->name[3] = res->ub.name[1];				\
-} while(0);							
+} while(0);
 
 		MERGE_UBC(kmemsize, ve->ubc, res);
 		MERGE_UBC(lockedpages, ve->ubc, res);
@@ -902,7 +902,7 @@ int read_ves_param()
 	if (param->res.fs.private != NULL)
 		ve_private = strdup(param->res.fs.private_orig);
 	free_vps_param(param);
-	for (i = 0; i < n_veinfo; i++) { 
+	for (i = 0; i < n_veinfo; i++) {
 		veid = veinfo[i].veid;
 		param = init_vps_param();
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.conf", veid);
@@ -1117,7 +1117,7 @@ static int get_run_ve_proc(int update)
 		memset(&ve, 0, sizeof(struct Cveinfo));
 		if (res == 4) {
 			ve.ip = invert_ip(ips);
-			
+
 		}
 		ve.veid = veid;
 		ve.status = VE_RUNNING;
@@ -1145,7 +1145,7 @@ static inline int get_ve_ips(unsigned int id, char **str)
 	for (;;) {
 		veip.ip = addr;
 		ret = ioctl(vzctlfd, VZCTL_GET_VEIPS, &veip);
-		if (ret < 0) 
+		if (ret < 0)
 			goto out;
 		else if (ret <= veip.num)
 			break;
@@ -1158,7 +1158,7 @@ static inline int get_ve_ips(unsigned int id, char **str)
 
 		buf = x_malloc(ret * (16 * sizeof(char)) + 1);
 		cp = buf;
-		for (i = ret - 1; i >= 0; i--) 
+		for (i = ret - 1; i >= 0; i--)
 			cp += sprintf(cp, "%d.%d.%d.%d ", NIPQUAD(addr[i]));
 		*cp = '\0';
  		*str = buf;
@@ -1175,23 +1175,23 @@ static int get_run_ve_ioctl(int update)
 	struct vzlist_veidctl veid;
 	int nves;
 	void *buf = NULL;
-	int i; 
+	int i;
 
 	vzctlfd = open(VZCTLDEV, O_RDWR);
-	if (vzctlfd < 0) 
+	if (vzctlfd < 0)
 		goto error;
 	veid.num = 256;
 	buf = x_malloc(veid.num * sizeof(envid_t));
 	while (1) {
 		veid.id = buf;
 		ret = ioctl(vzctlfd, VZCTL_GET_VEIDS, &veid);
-		if (ret < 0) 
+		if (ret < 0)
 			goto out;
 		if (ret <= veid.num)
 			break;
 		veid.num = ret + 20;
 		buf = x_realloc(buf, veid.num * sizeof(envid_t));
-	} 
+	}
 	nves = ret;
 	for (i = 0; i < nves; i++) {
 		struct Cveinfo ve;
@@ -1208,7 +1208,7 @@ static int get_run_ve_ioctl(int update)
 			if (errno != ESRCH)
 				goto out;
 			continue;
-		} 
+		}
 		if (update)
 			update_ve(id, ve.ip, ve.status);
 		else
@@ -1249,7 +1249,7 @@ int get_run_quota_stat()
 				update_quota(prev_veid, &quota);
 			memset(&quota, 0, sizeof(quota));
 			continue;
-			
+
 		}
 		if (sscanf(buf, "%10s %lu %lu %lu %lu %lu", str, &usage,
 			&softlimit, &hardlimit, &time, &exp) == 6)
@@ -1340,7 +1340,7 @@ int get_ve_la(int veid)
 int get_ves_la()
 {
 	int i;
-	
+
 	if ((vzctlfd = open(VZCTLDEV, O_RDWR)) < 0)
 		return 1;
 	for (i = 0; i < n_veinfo; i++) {
@@ -1375,7 +1375,7 @@ int get_mounted_status()
 int get_ves_cpu()
 {
 	unsigned long tmp;
-	int veid, id, weight, rate; 
+	int veid, id, weight, rate;
 	FILE *fp;
 	char buf[128];
 
@@ -1456,7 +1456,7 @@ int build_field_order(char *fields)
 		sp = default_field_order;
 	ep = sp + strlen(sp);
 	do {
-		if ((p = strchr(sp, ',')) == NULL) 
+		if ((p = strchr(sp, ',')) == NULL)
 			p = ep;
 		nm_len = p - sp + 1;
 		if (nm_len > sizeof(name) - 1) {
@@ -1471,7 +1471,7 @@ int build_field_order(char *fields)
 		}
 		tmp = x_malloc(sizeof(struct Cfield_order));
 		tmp->order = order;
-		tmp->next = NULL;	
+		tmp->next = NULL;
 		if (prev == NULL)
 			g_field_order = tmp;
 		else
@@ -1510,7 +1510,7 @@ int collect()
 		fprintf(stderr, "VE not found\n");
 		return 1;
 	}
-	if (check_param(RES_QUOTA)) 
+	if (check_param(RES_QUOTA))
 		get_run_quota_stat();
 	if (check_param(RES_LA))
 		get_ves_la();
@@ -1524,13 +1524,13 @@ int collect()
 	if (name_pattern != NULL)
 		filter_by_name();
 	return 0;
-}	
+}
 
 void print_names()
 {
 	int i;
 
-	for (i = 0; i < sizeof(field_names) / sizeof(*field_names); i++) 
+	for (i = 0; i < sizeof(field_names) / sizeof(*field_names); i++)
 		printf("%-15s %-15s\n", field_names[i].name,
 					field_names[i].hdr);
 	return;
@@ -1590,7 +1590,7 @@ int main(int argc, char **argv)
 				&option_index);
 		if (c == -1)
 			break;
-		
+
 		switch(c) {
 		case 'S'	:
 			only_stopped_ve = 1;
@@ -1626,7 +1626,7 @@ int main(int argc, char **argv)
 			veid_only = 1;
 			break;
 		case 'n'	:
-			f_order = strdup(default_nm_field_order);	
+			f_order = strdup(default_nm_field_order);
 			with_names = 1;
 			break;
 		case 'N'	:
@@ -1652,7 +1652,7 @@ int main(int argc, char **argv)
 		qsort(g_ve_list, n_ve_list, sizeof(*g_ve_list), id_sort_fn);
 	}
 	init_log(NULL, 0, 0, 0, 0, NULL);
-	if (build_field_order(f_order)) 
+	if (build_field_order(f_order))
 		return 1;
 	if (getuid()) {
 		fprintf(stderr, "This program can only be run under root.\n");

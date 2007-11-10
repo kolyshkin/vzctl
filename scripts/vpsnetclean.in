@@ -34,7 +34,7 @@ test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
 #
 function get_run_ve()
 {
-	VE_RUN=`echo "${VES_INFO}" | awk '{if ($1 != 0) print $1}'` 
+	VE_RUN=`echo "${VES_INFO}" | awk '{if ($1 != 0) print $1}'`
 }
 
 #

@@ -101,7 +101,7 @@ int stat_file(const char *file)
 	struct stat st;
 
 	if (stat(file, &st)) {
-		if (errno != ENOENT) 
+		if (errno != ENOENT)
 			return -1;
 		return 0;
 	}
@@ -155,7 +155,7 @@ int parse_int(const char *str, int *val)
 int parse_ul(const char *str, unsigned long *val)
 {
 	char *tail;
-	
+
 	if (!strcmp(str, "unlimited")) {
 		*val = LONG_MAX;
 		return 0;
@@ -312,7 +312,7 @@ char *subst_VEID(envid_t veid, char *src)
 	char str[STR_SIZE];
 	char *sp, *se;
 	int r, len, veidlen;
-	
+
 	if (src == NULL)
 		return NULL;
 	/* Skip end '/' */
@@ -518,7 +518,7 @@ int set_not_blk(int fd)
 
 /** Close all fd.
  * @param close_std	flag for closing the [0-2] fds
- * @param ...		list of fds are skiped, (-1 is the end mark) 
+ * @param ...		list of fds are skiped, (-1 is the end mark)
 */
 void close_fds(int close_std, ...)
 {
@@ -528,7 +528,7 @@ void close_fds(int close_std, ...)
 
 	max = sysconf(_SC_OPEN_MAX);
 	if (max < NR_OPEN)
-		max = NR_OPEN; 
+		max = NR_OPEN;
 	if (close_std) {
 		fd = open("/dev/null", O_RDWR);
 		if (fd != -1) {
@@ -549,7 +549,7 @@ void close_fds(int close_std, ...)
 	va_end(ap);
 	for (fd = 3; fd < max; fd++) {
 		for (i = 0; skip_fds[i] != fd && skip_fds[i] != -1; i++);
-		if (skip_fds[i] == fd) 
+		if (skip_fds[i] == fd)
 			continue;
 		close(fd);
 	}
@@ -571,7 +571,7 @@ int move_config(int veid, int action)
 	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." MOUNT_PREFIX, veid);
 	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
 	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
-	
+
 	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." UMOUNT_PREFIX, veid);
 	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
 	action == BACKUP ? rename(conf, newconf) : unlink(newconf);

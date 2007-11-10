@@ -69,7 +69,7 @@ int vps_destroy_dir(envid_t veid, char *dir)
 			if ((ret = quota_off(veid, 1)))
 				return ret;
 	}
-	quota_ctl(veid, QUOTA_DROP);	
+	quota_ctl(veid, QUOTA_DROP);
 	if ((ret = destroydir(dir)))
 		return ret;
 	return 0;
@@ -153,7 +153,7 @@ static void _destroydir(char *root)
 				continue;
 			}
 			snprintf(buf, sizeof(buf), "%s/%s", root, ep->d_name);
-			if (stat(buf, &st)) 
+			if (stat(buf, &st))
 				continue;
 			if (!S_ISDIR(st.st_mode))
 				continue;
@@ -237,7 +237,7 @@ static int destroydir(char *dir)
 		return 0;
 	} else if (fd_lock == -1)
 		return VZ_FS_DEL_PRVT;
-	
+
 	sigaction(SIGCHLD, NULL, &actold);
 	sigemptyset(&act.sa_mask);
 	act.sa_handler = SIG_IGN;
@@ -271,7 +271,7 @@ static int destroydir(char *dir)
 int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 {
 	int ret;
-	
+
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (check_var(fs->root, "VE_ROOT is not set"))

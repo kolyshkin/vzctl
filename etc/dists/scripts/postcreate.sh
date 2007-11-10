@@ -60,7 +60,7 @@ BEGIN { srand(); }
 		line = line " "  ar[i];
 	}
 	print line;
-} 
+}
 ' > ${file}.$$ && /bin/mv -f ${file}.$$ ${file}
 	/bin/rm -f ${file}.$$ 2>/dev/null
 }
@@ -79,7 +79,7 @@ function disableroot()
 }
 
 [ -z "${VE_ROOT}" ] && return 1
-randcrontab 
+randcrontab
 disableroot
 
 exit 0

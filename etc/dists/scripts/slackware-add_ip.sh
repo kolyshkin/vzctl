@@ -58,7 +58,7 @@ function setup_network()
 function create_config()
 {
 	local ip=${1}
-	
+
 	echo "# /etc/rc.d/rc.inet1.conf
 #
 # This file contains the configuration settings for network interfaces.

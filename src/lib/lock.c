@@ -90,7 +90,7 @@ int vps_lock(envid_t veid, char *dir, char *status)
 		if (errno == EROFS)
 			logger(-1, errno, "Unable to create"
 				" lock file %s, use --skiplock option",
-				tmp_file);	
+				tmp_file);
 		else
 			logger(-1, errno, "Unable to create"
 				" temporary lock file: %s", tmp_file);

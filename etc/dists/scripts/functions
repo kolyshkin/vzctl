@@ -63,7 +63,7 @@ function put_param()
 	local name="$2"
 	local value="$3"
 	local path
-	
+
 	path=${file%/*}
 	if [ ! -d "${path}" ]; then
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
@@ -72,7 +72,7 @@ function put_param()
 		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -e "s|^$name=.*|$name=\"$value\"|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -94,7 +94,7 @@ function add_param()
 	local name=$2
 	local value=$3
 	local path
-	
+
 	path=${file%/*}
 	if [ ! -d "${path}" ]; then
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
@@ -104,7 +104,7 @@ function add_param()
 			error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -e "s|^$name=\"\(.*\)\"|$name=\"\1 $value \"|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -119,7 +119,7 @@ function del_param()
 	local name=$2
 	local value=$3
 	local path
-	
+
 	path=${file%/*}
 	if [ ! -d "${path}" ]; then
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
@@ -133,7 +133,7 @@ function del_param()
 			sed -e "s|^${name}=\(.*\)${value}\(.*\)|${name}=\1\2|" <${file} > ${file}.$$
 		fi
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -163,7 +163,7 @@ function put_param2()
 		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -e "s|^\<$name\>.*|$name $value|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -185,7 +185,7 @@ function put_param3() {
 	local name=$2
 	local value=$3
 	local path
-	
+
 	path=${file%/*}
 	if [ ! -d "${path}" ]; then
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
@@ -198,7 +198,7 @@ function put_param3() {
 			/bin/sed -e "s|^$name=\(.*\)|$name=\( \"$value\" \)|" < ${file} > ${file}.$$
 		fi
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -223,7 +223,7 @@ function add_param3() {
 	local name=$2
 	local value=$3
 	local path
-	
+
 	path=${file%/*}
 	if [ ! -d "${path}" ]; then
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
@@ -232,7 +232,7 @@ function add_param3() {
 		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -r "s|^$name=\((.*)\)|$name=\( \1 \"$value\" \)|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -252,14 +252,14 @@ function del_param3() {
 	local file=$1
 	local name=$2
 	local value=$3
-	
+
 	[ ! -f $file ] && return
-	
+
 	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
 		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -r "s|^($name=\( .*)\"$value\"(.* \))|\1\2|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
-			rm -f ${file}.$$ 2>/dev/null 
+			rm -f ${file}.$$ 2>/dev/null
 			error "Can't change file $file" $VZ_FS_NO_DISK_SPACE
 		fi
 		mv -f ${file}.$$ ${file}
@@ -272,7 +272,7 @@ function remove_debian_interface()
 {
 	local dev="$1"
 	local cfg="$2"
-	
+
 	${CP} ${cfg} ${cfg}.$$ || \
 		error "Can't copy file ${cfg}" $VZ_FS_NO_DISK_SPACE
 
@@ -340,7 +340,7 @@ function change_hostname()
 		}
 	' < ${cfg} > ${cfg}.$$
 	if [ $? -ne 0 ]; then
-		rm -f ${cfg}.$$ 2>/dev/null 
+		rm -f ${cfg}.$$ 2>/dev/null
 		error "Can't change file ${cfg}" $VZ_FS_NO_DISK_SPACE
 	fi
 	mv -f ${cfg}.$$ ${cfg}

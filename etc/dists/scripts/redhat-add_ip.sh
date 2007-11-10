@@ -125,7 +125,7 @@ function add_ip6()
 function get_all_aliasid()
 {
 	IFNUM=-1
-	
+
 	cd ${IFCFG_DIR} || return 1
 	IFNUMLIST=`ls -1 bak/${VENET_DEV_CFG}:* 2>/dev/null | \
 		sed "s/.*${VENET_DEV_CFG}://"`
@@ -172,14 +172,14 @@ function move_configs()
 {
 	cd ${IFCFG_DIR} || return 1
 	rm -rf ${VENET_DEV_CFG}:*
-	mv -f bak/* ${IFCFG_DIR}/ >/dev/null 2>&1 
+	mv -f bak/* ${IFCFG_DIR}/ >/dev/null 2>&1
 	rm -rf ${IFCFG_DIR}/bak
 }
 
 function add_ip()
 {
 	local ip
-	local new_ips 
+	local new_ips
 	local if_restart=
 
 	# In case we are starting VE
@@ -219,7 +219,7 @@ function add_ip()
 	move_configs
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		# synchronyze config files & interfaces
-		if [ "${NETWORKRESTART}" = "yes" ]; then 
+		if [ "${NETWORKRESTART}" = "yes" ]; then
 			/etc/init.d/network restart
 		elif [ -n "${if_restart}" ]; then
 			ifup ${VENET_DEV}

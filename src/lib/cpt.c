@@ -168,10 +168,10 @@ err_out:
 		if (cmd == CMD_SUSPEND && param->ctx) {
 			/* destroy context */
 			if (ioctl(cpt_fd, CPT_PUT_CONTEXT, veid) < 0)
-				logger(-1, errno, "Can't put context");		
+				logger(-1, errno, "Can't put context");
 		}
 	}
-	fflush(stderr);	
+	fflush(stderr);
 	close(err_p[0]);
 	return VZ_CHKPNT_ERROR;
 }
@@ -362,7 +362,7 @@ err_undump:
 			len -= len1;
 		} while (len > 0 && len1 > 0);
 	}
-	fflush(stderr);	
+	fflush(stderr);
 	close(error_pipe[0]);
 	write(err_p, &status, sizeof(status));
 	return status;
@@ -423,7 +423,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	}
 	param->rst_fd = rst_fd;
 	param->cmd = cmd;
-	ret = vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE, 
+	ret = vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE,
 		NULL, restrore_FN, param);
 	if (ret)
 		goto err;

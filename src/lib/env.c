@@ -154,7 +154,7 @@ vps_handler *vz_open(envid_t veid)
 		goto err;
 	}
 	h = calloc(1, sizeof(*h));
-	if (h == NULL) 
+	if (h == NULL)
 		goto err;
 	h->vzfd = vzfd;
 	h->stdfd = stdfd;
@@ -226,7 +226,7 @@ int vz_chroot(char *root)
 	struct sigaction act;
 
 	if (root == NULL) {
-		logger(-1, 0, "vz_chroot: VE root is not specified");	
+		logger(-1, 0, "vz_chroot: VE root is not specified");
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (chdir(root)) {
@@ -567,7 +567,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	if (!vps_is_mounted(res->fs.root)) {
 		/* increase quota to perform setup */
-		quouta_inc(&res->dq, 100);	
+		quouta_inc(&res->dq, 100);
 		if ((ret = vps_mount(h, veid, &res->fs, &res->dq, skip)))
 			return ret;
 		quouta_inc(&res->dq, -100);
@@ -597,7 +597,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
-			START_PREFIX);	
+			START_PREFIX);
 		if (stat_file(buf)) {
 			if (vps_exec_script(h, veid, res->fs.root, NULL, NULL,
 				buf, NULL, 0))
@@ -750,12 +750,12 @@ kill_vps:
 		ret = VZ_RESOURCE_ERROR;
 		logger(-1, errno, "Can not fork");
 		goto err;
-	
+
 	} else if (pid == 0) {
 		ret = real_env_stop(h, veid, root, M_KILL);
 		exit(ret);
 	}
-	ret = VZ_STOP_ERROR;	
+	ret = VZ_STOP_ERROR;
 	for (i = 0; i < MAX_SHTD_TM; i++) {
 		usleep(500000);
 		if (!vps_is_run(h, veid)) {
@@ -798,7 +798,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
-			STOP_PREFIX);	
+			STOP_PREFIX);
 		if (stat_file(buf)) {
 			if (vps_exec_script(h, veid, res->fs.root, NULL, NULL,
 				buf, NULL, 0))

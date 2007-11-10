@@ -272,13 +272,13 @@ int mk_quota_link()
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
 		(unsigned long)st.st_dev);
 	unlink(QUOTA_U);
-	if (symlink(buf, QUOTA_U)) 
-		logger(-1, errno, "Unable to create symlink %s", buf); 
+	if (symlink(buf, QUOTA_U))
+		logger(-1, errno, "Unable to create symlink %s", buf);
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_G,
 		(unsigned long)st.st_dev);
-	unlink(QUOTA_G);	
+	unlink(QUOTA_G);
 	if (symlink(buf, QUOTA_G))
-		logger(-1, errno, "Unable to create symlink %s", buf); 
+		logger(-1, errno, "Unable to create symlink %s", buf);
 	return 0;
 }
 
@@ -305,7 +305,7 @@ int add_reach_runlevel_mark()
 	}
 	ret = 0;
 	found = 0;
-	while (1) { 
+	while (1) {
 		len = read(fd, buf, sizeof(buf));
 		if (len == 0)
 			break;

@@ -76,7 +76,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 	char *arg[2];
 	char *env[4];
 	int quota = 0;
-	
+
 	snprintf(tarball, sizeof(tarball), "%s/%s.tar.gz", fs->tmpl, tar_nm);
 	if (!stat_file(tarball)) {
 		logger(-1, 0, "Cached os template %s not found",	tarball);
@@ -99,7 +99,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		ret = VZ_FS_NEW_VE_PRVT;
 		goto err;
 	}
-	if (dq != NULL && 
+	if (dq != NULL &&
 		dq->enable == YES &&
 		dq->diskspace != NULL &&
 		dq->diskinodes != NULL)
@@ -182,7 +182,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			vps_p->opt.config);
 		/* Do not use config if VE config exists */
-		if (!cfg_exists && stat_file(src)) 
+		if (!cfg_exists && stat_file(src))
 			sample_config = vps_p->opt.config;
 	}
 	if (sample_config != NULL) {
@@ -282,7 +282,7 @@ int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
 	char *arg[2];
 	char *env[3];
 	int ret;
- 
+
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	dist_name = get_dist_name(tmpl);

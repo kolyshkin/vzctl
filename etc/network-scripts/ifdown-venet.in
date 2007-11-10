@@ -32,5 +32,5 @@ else
 	vznet=$DEVICE
 fi
 
-echo "Shutting down interface $vznet: " 
+echo "Shutting down interface $vznet: "
 ip link set $vznet down

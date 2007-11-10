@@ -152,11 +152,11 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 		} else {
 			if (!tmp->active)
 				continue;
-			if ((ret = veth_dev_remove(h, veid, tmp))) 
+			if ((ret = veth_dev_remove(h, veid, tmp)))
 				break;
 		}
 	}
-	/* If operation failed remove added devices. 
+	/* If operation failed remove added devices.
 	 * Remove devices from list to skip saving.
 	 */
 	if (ret && rollback) {
@@ -464,7 +464,7 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 					dev_t->dev_name_ve);
 			}
 		}
-		if (dev_num != 0) 
+		if (dev_num != 0)
 			veth_ctl(h, veid, DEL, veth_del, 0);
 	}
 	if (veth_add != NULL) {
@@ -508,7 +508,7 @@ int check_veth_param(envid_t veid, veth_param *veth_old, veth_param *veth_new,
 	/* merge --netif_add & --ifname */
 	merge = 0;
 	list_for_each(dev, &veth_new->dev, list) {
-		if (dev != dev_t && 
+		if (dev != dev_t &&
 		    !strcmp(dev->dev_name_ve, dev_t->dev_name_ve))
 		{
 			fill_veth_dev(dev_t, dev);

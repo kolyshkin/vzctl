@@ -36,7 +36,7 @@ void usage()
 
 static int check_param(struct ub_struct *param)
 {
-	int ret = 0;	
+	int ret = 0;
 #define CHECKPARAM(name, str_name) \
 if (param->name == NULL) { \
 	fprintf(stderr, "Error: parameter " #str_name " not found\n"); \
@@ -83,15 +83,15 @@ int calculate(int veid, ub_param *ub, int verbose)
 	if (!(run = vps_read_ubc(veid, &ub_cur))) {
 		if (check_param(&ub_cur))
 			return 1;
-		kmem_net_cur = (double)ub_cur.kmemsize[0] + 
-			(double)ub_cur.tcprcvbuf[0] + 
+		kmem_net_cur = (double)ub_cur.kmemsize[0] +
+			(double)ub_cur.tcprcvbuf[0] +
 			(double)ub_cur.tcpsndbuf[0] +
 			(double)ub_cur.dgramrcvbuf[0] +
 			(double)ub_cur.othersockbuf[0];
 		/*	Low memory	*/
 		lm_cur = kmem_net_cur / lowmem;
 		/*	Total RAM	*/
-		tr_cur = ((double)ub_cur.physpages[0] * page + kmem_net_cur) 
+		tr_cur = ((double)ub_cur.physpages[0] * page + kmem_net_cur)
 					/ ram;
 		/*	Mem + Swap	*/
 		ms_cur = ((double)ub_cur.oomguarpages[0] * page +
@@ -100,14 +100,14 @@ int calculate(int veid, ub_param *ub, int verbose)
 		al_cur = ((double)ub_cur.privvmpages[0] * page +
 				kmem_net_cur) / (ram + swap);
 		/*	Numproc		*/
-		np_cur = (double)ub_cur.numproc[0] / thrmax;	
+		np_cur = (double)ub_cur.numproc[0] / thrmax;
 	}
-	kmem_net_max = (double)ub->kmemsize[1] + 
+	kmem_net_max = (double)ub->kmemsize[1] +
 		(double)ub->tcprcvbuf[1] +
 		(double)ub->tcpsndbuf[1] +
 		(double)ub->dgramrcvbuf[1] +
 		(double)ub->othersockbuf[1];
-	
+
 	/*	Low memory	*/
 	lm_max = kmem_net_max / lowmem;
 	lm_prm = lm_max;
@@ -115,7 +115,7 @@ int calculate(int veid, ub_param *ub, int verbose)
 	ms_prm = ((double)ub->oomguarpages[0] * page + kmem_net_max) /
 			(ram + swap);
 	/*	Allocated	*/
-	al_prm = ((double)ub->vmguarpages[0] * page + kmem_net_max) / 
+	al_prm = ((double)ub->vmguarpages[0] * page + kmem_net_max) /
 			(ram + swap);
 	al_max = ((double)ub->privvmpages[1] * page + kmem_net_max) /
 			(ram + swap);

@@ -102,7 +102,7 @@ static int parse_start_opt(int argc, char **argv, vps_param *param)
 };
 
 	while (1) {
-		c = getopt_long (argc, argv, "", start_options, NULL); 
+		c = getopt_long (argc, argv, "", start_options, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -153,7 +153,7 @@ static int parse_stop_opt(int argc, char **argv, vps_opt *opt)
 };
 
 	while (1) {
-		c = getopt_long (argc, argv, "", stop_options, NULL); 
+		c = getopt_long (argc, argv, "", stop_options, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -205,7 +205,7 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	{"name",	required_argument, NULL, PARAM_NAME},
 	{ NULL, 0, NULL, 0 }
 };
-	
+
 	opt = mod_make_opt(create_options, &g_action, NULL);
 	if (opt == NULL)
 		return -1;
@@ -258,7 +258,7 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 	ret = 0;
 	while (1) {
 		option_index = -1;
-		c = getopt_long (argc, argv, "", chkpnt_options, NULL); 
+		c = getopt_long (argc, argv, "", chkpnt_options, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -298,7 +298,7 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 			if (option_index < 0)
 				logger(-1, 0, "Invalid option -%c", c);
 			else
-				logger(-1, 0, "Invalid option --%s", 
+				logger(-1, 0, "Invalid option --%s",
 					chkpnt_options[option_index].name);
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
@@ -333,7 +333,7 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 
 	while (1) {
 		option_index = -1;
-		c = getopt_long (argc, argv, "", restore_options, NULL); 
+		c = getopt_long (argc, argv, "", restore_options, NULL);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -368,7 +368,7 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 			if (option_index < 0)
 				logger(-1, 0, "Invalid option -%c", c);
 			else
-				logger(-1, 0, "Invalid option --%s", 
+				logger(-1, 0, "Invalid option --%s",
 					restore_options[option_index].name);
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
@@ -423,7 +423,7 @@ static void merge_apply_param(vps_param *old, vps_param *new, char *cfg)
 	FREE_STR(new->res.fs.root_orig)
 	FREE_STR(new->res.fs.private_orig)
 	FREE_STR(new->res.tmpl.ostmpl)
-	FREE_STR(new->res.tmpl.dist)	
+	FREE_STR(new->res.tmpl.dist)
 	FREE_STR(new->res.misc.hostname)
 #undef FREE_STR
 	free_str_param(&new->res.net.ip);
@@ -456,7 +456,7 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 {
 	int ret;
 	struct option *opt;
-	
+
 	opt = mod_make_opt(get_set_opt(), &g_action, NULL);
 	if (opt == NULL)
 		return -1;
@@ -499,7 +499,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	char *dist_name;
 
 	ret = 0;
-	
+
 	if (!list_empty(&cmd_p->res.veth.dev) ||
 	    !list_empty(&cmd_p->del_res.veth.dev))
 	{
@@ -603,7 +603,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (ret) {
 			if (ret < 0) {
 				ret = VZ_VE_RUNNING;
-				goto err;	
+				goto err;
 			} else {
 				merge_vps_param(g_p, cmd_p);
 				ret = vps_restart(h, veid, g_p);
@@ -616,7 +616,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 err:
 	free_dist_actions(actions);
 	if (actions != NULL) free(actions);
-	
+
 	return ret;
 }
 
@@ -692,7 +692,7 @@ static int chkpnt(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p
 
 	cmd = cmd_p->res.cpt.cmd;
 	merge_vps_param(g_p, cmd_p);
-	if (cmd == CMD_KILL || cmd == CMD_RESUME) 
+	if (cmd == CMD_KILL || cmd == CMD_RESUME)
 		return cpt_cmd(h, veid, CMD_CHKPNT, &cmd_p->res.cpt, g_p);
 	return vps_chkpnt(h, veid, g_p, cmd, &cmd_p->res.cpt);
 }
@@ -732,7 +732,7 @@ static int parse_custom_opt(envid_t veid, int argc, char **argv,
 {
 	int ret;
 	struct option *opt;
-	
+
 	opt = mod_make_opt(NULL, &g_action, name);
 	if (opt == NULL)
 		return -1;
@@ -810,7 +810,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 	ret = 0;
 	if ((h = vz_open(veid)) == NULL)
 		return VZ_BAD_KERNEL;
-	if (action != ACTION_EXEC && 
+	if (action != ACTION_EXEC &&
 		action != ACTION_EXEC2 &&
 		action != ACTION_EXEC3 &&
 		action != ACTION_ENTER &&
@@ -856,7 +856,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		ret = restart(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_SET:
-		if (veid == 0) 
+		if (veid == 0)
 			ret = set_ve0(h, g_p, vps_p, cmd_p);
 		else
 			ret = set(h, veid, g_p, vps_p, cmd_p);

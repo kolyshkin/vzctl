@@ -30,11 +30,11 @@ char *list2str_c(char *name, char c, list_head_t *head)
 	const int delta = 256;
 	struct str_struct *p;
 
-	if (name != NULL) 
+	if (name != NULL)
 		buf_len = strlen(name) + 3;
 	else
 		buf_len = delta;
-	
+
 	buf_len = buf_len < delta ? delta : buf_len + delta;
 	buf = malloc(buf_len + 1);
 	if (buf == NULL)
@@ -73,7 +73,7 @@ char *list2str_c(char *name, char c, list_head_t *head)
 		r = snprintf(sp, ep - sp + 1, "%s ", p->val);
 		sp += r;
 	}
-	if (c)	
+	if (c)
 		sp[-1] = c;
 	else
 		sp[-1] = 0;
@@ -156,7 +156,7 @@ int add_str_param2(list_head_t *head, char *str)
 
 	if (str == NULL)
 		return 0;
-	if (list_is_init(head)) 
+	if (list_is_init(head))
 		list_head_init(head);
 	str_p = malloc(sizeof(*str_p));
 	if (str_p == NULL)

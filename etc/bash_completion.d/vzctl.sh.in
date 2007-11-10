@@ -40,7 +40,7 @@ _vzctl()
 	#echo "COMP_WORDS: $COMP_WORDS"
 	#echo "COMP_CWORD: $COMP_CWORD"
 	#echo "COMP_WORDS[1]: ${COMP_WORDS[1]}"
-	
+
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
 	prev=${COMP_WORDS[COMP_CWORD-1]}
@@ -75,8 +75,8 @@ _vzctl()
 		sys_module sys_rawio sys_chroot sys_ptrace sys_pacct
 		sys_admin sys_boot sys_nice sys_resource sys_time
 		sys_tty_config mknod lease setveid ve_admin"
-		
-									  
+
+
 
 	case $COMP_CWORD in
 	1)
@@ -105,7 +105,7 @@ _vzctl()
 			# VEID
 			COMPREPLY=( $( compgen -W "$(_get_ves $prev)" -- $cur ) )
 		else
-	
+
 			# flag or option
 			case $prev in
 			--ostemplate)
@@ -215,7 +215,7 @@ _vzctl()
 						# --verbose or --quiet used
 						cmd=${COMP_WORDS[2]}
 					fi
-		
+
 					case "$cmd" in
 					create)
 						COMPREPLY=( $( compgen -W "$vzctl_create_opts" -- $cur ) )

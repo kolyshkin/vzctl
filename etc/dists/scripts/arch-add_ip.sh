@@ -35,12 +35,12 @@ function remove_all_ve_aliases()
 {
 	local ve_if_name
 	local ve_if
-	
+
 	ve_if_name=`grep "^venet0_" ${CFGFILE}.bak | cut -d'=' -f1`
 
 	for ve_if in ${ve_if_name}; do
 	    /etc/rc.d/network ifdown ${ve_if} 2>/dev/null
-	    del_param "${CFGFILE}.bak" "${ve_if}" 
+	    del_param "${CFGFILE}.bak" "${ve_if}"
             del_param3 "${CFGFILE}.bak" "INTERFACES" "${ve_if}"
 	done
 }
@@ -52,7 +52,7 @@ function setup_network()
         put_param "${CFGFILE}.bak" "lo" "lo 127.0.0.1"
 	add_param3 "${CFGFILE}.bak" "INTERFACES" "lo"
     fi
-    
+
     # create venet0 and routes
     if ! grep -qe "^venet0=" ${CFGFILE}.bak 2>/dev/null; then
         put_param "${CFGFILE}.bak" "venet0" "venet0 127.0.0.1 netmask 255.255.255.255 broadcast 0.0.0.0"

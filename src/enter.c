@@ -57,7 +57,7 @@ static int pty_alloc(int *master, int *slave, struct termios *tios,
 		logger(-1, errno, "Unable to get tty name");
 	} else {
 		logger(2, 0, "Open %s", name);
-	} 
+	}
 	return 0;
 }
 
@@ -92,7 +92,7 @@ static void raw_on(void)
 	}
 	memcpy(&s_tios, &tios, sizeof(struct termios));
 	cfmakeraw(&tios);
-	if (tcsetattr(0, TCSADRAIN, &tios) == -1) 
+	if (tcsetattr(0, TCSADRAIN, &tios) == -1)
 		logger(-1, errno, "Unable to set raw mode");
 }
 
@@ -203,7 +203,7 @@ static void e_loop(int r_in, int w_in,  int r_out, int w_out, int info)
 					close(r_out);
 					fl |= 2;
 					break;
-				}	
+				}
 			if (FD_ISSET(info, &rd_set)) {
 				if (winchange(info, w_in) < 0)
 					fl |= 4;
@@ -215,7 +215,7 @@ static void e_loop(int r_in, int w_in,  int r_out, int w_out, int info)
 		}
 	}
 	/* Flush fds */
-	if (!(fl & 2)) 
+	if (!(fl & 2))
 		while (stdredir(r_out, w_out) == 0);
 }
 
@@ -275,7 +275,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			goto err;
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
 		if (ret < 0) {
-			if (errno == ESRCH) 
+			if (errno == ESRCH)
 				ret = VZ_VE_NOT_RUNNING;
 			else
 				ret = VZ_ENVCREATE_ERROR;

@@ -31,7 +31,7 @@
 
 /*  Check is fs mounted
  *  return: 1 - yes
- *	    0 - no	
+ *	    0 - no
  *	  < 0 - error
  */
 int vz_fs_is_mounted(char *root)
@@ -39,7 +39,7 @@ int vz_fs_is_mounted(char *root)
 	FILE *fp;
 	char buf[512];
 	char mnt[512];
-	int ret = 0; 
+	int ret = 0;
 
 	if ((fp = fopen("/proc/mounts", "r")) == NULL) {
 		logger(-1, errno,  "unable to open /proc/mounts");
@@ -51,7 +51,7 @@ int vz_fs_is_mounted(char *root)
 		if (sscanf(buf, "%*[^ ] %s ", mnt) != 1)
 			continue;
 		if (!strcmp(mnt, root)) {
-			ret = 1;	
+			ret = 1;
 			break;
 		}
 	}

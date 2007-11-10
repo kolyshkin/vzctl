@@ -170,7 +170,7 @@ static int vps_ip_ctl(vps_handler *h, envid_t veid, int op,
 	int inv_op;
 
 	list_for_each(ip, ip_h, list) {
-		if ((ret = ip_ctl(h, veid, op, ip->val))) 
+		if ((ret = ip_ctl(h, veid, op, ip->val)))
 			break;
 	}
 	if (ret && rollback) {
@@ -199,7 +199,7 @@ static inline int vps_add_ip(vps_handler *h, envid_t veid,
 		return ret;
 	if ((ret = run_net_script(veid, ADD, ip_h, state, net->skip_arpdetect)))
 		vps_ip_ctl(h, veid, VE_IP_DEL, ip_h, 0);
-	
+
 	return ret;
 }
 
@@ -247,7 +247,7 @@ static int netdev_ctl(vps_handler *h, int veid, int op, char *name)
 	ve_netdev.veid = veid;
 	ve_netdev.op = op;
 	ve_netdev.dev_name = name;
-	if (ioctl(h->vzfd, VZCTL_VE_NETDEV, &ve_netdev) < 0) 
+	if (ioctl(h->vzfd, VZCTL_VE_NETDEV, &ve_netdev) < 0)
 		return VZ_NETDEV_ERROR;
 	return 0;
 }
@@ -344,7 +344,7 @@ static inline int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 		if (token == NULL)
 			continue;
 		if (parse_int(token, &id))
-			continue;	
+			continue;
 		if (veid != id)
 			continue;
 		if ((token = strtok(NULL, " ")) != NULL)
@@ -395,7 +395,7 @@ static inline int get_vps_ip_ioctl(vps_handler *h, envid_t veid,
 	for (;;) {
 		veip.ip = addr;
 		ret = ioctl(h->vzfd, VZCTL_GET_VEIPS, &veip);
-		if (ret < 0) 
+		if (ret < 0)
 			goto out;
 		else if (ret <= veip.num)
 			break;
@@ -424,7 +424,7 @@ int get_vps_ip(vps_handler *h, envid_t veid, list_head_t *ip_h)
 {
 	int ret;
 	ret = get_vps_ip_ioctl(h, veid, ip_h);
-	if (ret < 0) 
+	if (ret < 0)
 		ret = get_vps_ip_proc(veid, ip_h);
 	if (ret < 0)
 		free_str_param(ip_h);

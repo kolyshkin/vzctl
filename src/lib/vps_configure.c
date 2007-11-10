@@ -54,7 +54,7 @@ const char *state2str(int state)
 		if (vps_states[i].id == state)
 			return vps_states[i].name;
 
-	return NULL;		
+	return NULL;
 }
 
 static const char *get_local_ip(vps_param *param)
@@ -86,7 +86,7 @@ int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char ipnm[STR_SIZE];
 
 	if (hostname == NULL)
-		return 0;	
+		return 0;
 	script = actions->set_hostname;
 	if (script == NULL) {
 		logger(0, 0, "Warning: set_hostname action script is not"
@@ -265,7 +265,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	const char *str_state;
 	char *delall = "IPDELALL=yes";
 
-	if (list_empty(&net->ip) && !net->delall && state != STATE_STARTING) 
+	if (list_empty(&net->ip) && !net->delall && state != STATE_STARTING)
 		return 0;
 	if (actions == NULL)
 		return 0;
@@ -321,7 +321,7 @@ int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		logger(0, 0, "Unable to configure VE: VE is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	if (actions == NULL) {	
+	if (actions == NULL) {
 		logger(0, 0, "Dist action not loaded");
 		return -1;
 	}

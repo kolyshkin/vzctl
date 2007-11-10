@@ -55,7 +55,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 	va_start(ap, format);
 	if (!g_log.quiet && g_log.verbose >= log_level) {
 		va_list ap_save;
-		
+
 		va_copy(ap_save, ap);
 		vfprintf(out, format, ap_save);
 		va_end(ap_save);
@@ -72,7 +72,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 		if (g_log.veid)
 			fprintf(g_log.fp, "VE %d : ", g_log.veid);
 		vfprintf(g_log.fp, format, ap);
-		if (err_no) 
+		if (err_no)
 			fprintf(g_log.fp, ": %s", strerror(err_no));
 		fprintf(g_log.fp, "\n");
 		fflush(g_log.fp);
@@ -83,13 +83,13 @@ void logger(int log_level, int err_no, const char *format, ...)
 int set_log_file(char *file)
 {
 	FILE *fp;
-	
+
 	if (g_log.fp != NULL) {
 		fclose(g_log.fp);
 		g_log.fp = NULL;
 	}
 	if (file != NULL) {
-		if ((fp = fopen(file, "a")) == NULL) 
+		if ((fp = fopen(file, "a")) == NULL)
 			return -1;
 		g_log.fp = fp;
 	}

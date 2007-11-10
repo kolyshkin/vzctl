@@ -57,7 +57,7 @@ static struct ubname2id {
 	{"OTHERSOCKBUF",PARAM_OTHERSOCKBUF},
 	{"DGRAMRCVBUF",	PARAM_DGRAMRCVBUF},
 	{"NUMOTHERSOCK",PARAM_NUMOTHERSOCK},
-	{"NUMFILE",	PARAM_NUMFILE}, 
+	{"NUMFILE",	PARAM_NUMFILE},
 	{"DCACHESIZE",	PARAM_DCACHESIZE},
 	{"NUMIPTENT",	PARAM_NUMIPTENT},
 	{"AVNUMPROC",	PARAM_AVNUMPROC},
@@ -155,7 +155,7 @@ const char *get_ub_name(int res_id)
 
 int set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 {
-	
+
 #define SET_UB_LIMIT(name, id)						\
 if (ub->name != NULL) {							\
 	if (setublimit(veid, id, ub->name)) {				\
@@ -271,7 +271,7 @@ if (res_id == id) {						\
 	ADD_UB_PARAM(numfile, PARAM_NUMFILE)
 	ADD_UB_PARAM(dcachesize, PARAM_DCACHESIZE)
 	ADD_UB_PARAM(numiptent, PARAM_NUMIPTENT)
-	ADD_UB_PARAM(avnumproc, PARAM_AVNUMPROC)	
+	ADD_UB_PARAM(avnumproc, PARAM_AVNUMPROC)
 #undef ADD_UB_PARAM
 }
 

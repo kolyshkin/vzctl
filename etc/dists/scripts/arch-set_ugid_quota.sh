@@ -20,7 +20,7 @@
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   MINOR	- root device minor number 
+#   MINOR	- root device minor number
 #   MAJOR	- root device major number
 
 SCRIPTANAME='/etc/rc.d/vzquota'
@@ -38,12 +38,12 @@ echo -e '#!/bin/sh
 
 [ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'
 rm -f /etc/mtab >/dev/null 2>&1
-	
+
 echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
 mnt=`grep -v " / " /proc/mounts`
 if [ $? == 0 ]; then
 	echo "$mnt" >> /etc/mtab
-fi 
+fi
 quotaon -aug
 ' > ${SCRIPTANAME} || {
 	echo "Unable to create ${SCRIPTNAME}"

@@ -39,7 +39,7 @@ for IP in $IP_ADDR; do
 	if [ "${VE_STATE}" = "running" -a -f "${VE_STATE_DIR}/${VEID}" ]; then
 		cat ${VE_STATE_DIR}/${VEID} | tr ' ' '\n' | \
 		grep -w -v "${IP}" | tr '\n' ' ' > ${VE_STATE_DIR}/${VEID}
-	fi		
+	fi
 done
 
 exit 0

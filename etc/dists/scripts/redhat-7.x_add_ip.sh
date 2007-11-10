@@ -90,7 +90,7 @@ NETMASK=255.255.255.255" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} || \
 function get_all_aliasid()
 {
 	IFNUM=-1
-	
+
 	cd ${IFCFG_DIR} || return 1
 	IFNUMLIST=`ls -1 bak/${VENET_DEV_CFG}:* 2>/dev/null | \
 		sed "s/.*${VENET_DEV_CFG}://"`
@@ -137,14 +137,14 @@ function move_configs()
 {
 	cd ${IFCFG_DIR} || return 1
 	rm -rf ${VENET_DEV_CFG}:*
-	mv -f bak/* ${IFCFG_DIR}/ >/dev/null 2>&1 
+	mv -f bak/* ${IFCFG_DIR}/ >/dev/null 2>&1
 	rm -rf ${IFCFG_DIR}/bak
 }
 
 function add_ip()
 {
 	local ip
-	local new_ips 
+	local new_ips
 	local if_restart=
 
 	# In case we are starting VE

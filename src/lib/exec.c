@@ -75,10 +75,10 @@ int execvep(const char *path, char *const argv[], char *const envp[])
 				p = p2 + 1;
 			} else {
 				p = 0;
-			}	
+			}
 		}
 		return -1;
-	} else 
+	} else
 		return execve(path, argv, envp);
 }
 
@@ -153,7 +153,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 	int ret, pid;
 	int in[2], out[2], err[2], st[2];
 	int fl = 0;
-	struct sigaction act;	
+	struct sigaction act;
 
 	if (pipe(in) < 0 ||
 		pipe(out) < 0 ||
@@ -206,7 +206,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		close_fds(0, st[1], h->vzfd, -1);
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
 		if (ret < 0) {
-			if (errno == ESRCH) 
+			if (errno == ESRCH)
 				ret = VZ_VE_NOT_RUNNING;
 			else
 				ret = VZ_ENVCREATE_ERROR;
@@ -278,12 +278,12 @@ env_err:
 				if (stdredir(err[0], STDERR_FILENO) < 0) {
 					fl |= 2;
 					close(err[0]);
-				}	
+				}
 			if (FD_ISSET(STDIN_FILENO, &rd_set))
 				if (stdredir(STDIN_FILENO, in[1]) < 0) {
 					fl |= 4;
 					close(in[1]);
-				}	
+				}
 		} else if (n < 0 && errno != EINTR) {
 			logger(-1, errno, "Error in select()");
 			close(out[0]);
@@ -323,7 +323,7 @@ err:
  * @param timeout	execution timeout, 0 - unlimited.
  * @return		0 on success.
  */
-int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode, 
+int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 	char *const argv[], char *const envp[], char *std_in, int timeout)
 {
 	int pid, ret;
@@ -363,7 +363,7 @@ int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data
 		close_fds(1, h->vzfd, -1);
 		ret = vz_env_create_ioctl(h, veid, VE_ENTER | flags);
 		if (ret < 0) {
-			if (errno == ESRCH) 
+			if (errno == ESRCH)
 				ret = VZ_VE_NOT_RUNNING;
 			else
 				ret = VZ_ENVCREATE_ERROR;
@@ -379,7 +379,7 @@ env_err:
 }
 
 int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
-	int flags) 
+	int flags)
 {
 	int pid, ret;
 
@@ -452,7 +452,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (!stat_file(vps_p->res.fs.private)) {
 		logger(-1, 0, "VE private area %s does not exist",
 			vps_p->res.fs.private);
-		return VZ_FS_NOPRVT;	
+		return VZ_FS_NOPRVT;
 	}
 	if (!(is_run = vps_is_run(h, veid))) {
 		if (!vps_is_mounted(root)) {

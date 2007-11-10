@@ -101,7 +101,7 @@ static vps_config config[] = {
 {"VE_PRIVATE",	NULL, PARAM_PRIVATE},
 {"TEMPLATE",	NULL, PARAM_TEMPLATE},
 {"NOATIME",	NULL, PARAM_NOATIME},
-/*	template     */ 
+/*	template     */
 {"OSTEMPLATE",	NULL, PARAM_OSTEMPLATE},
 {"DEF_OSTEMPLATE", NULL, PARAM_DEF_OSTEMPLATE},
 /*	CPU	*/
@@ -246,7 +246,7 @@ const vps_config *conf_get_by_id(const vps_config *conf, int id)
 
 	if (conf == NULL)
 		return NULL;
-	for (p = conf; p->name != NULL; p++) 
+	for (p = conf; p->name != NULL; p++)
 		if (p->id == id)
 			return p;
 	return NULL;
@@ -256,7 +256,7 @@ int opt_get_by_id(struct option *opt, int id)
 {
 	struct option *p;
 
-	for (p = opt; p->name != NULL; p++) 
+	for (p = opt; p->name != NULL; p++)
 		if (p->val == id)
 			return p->val;
 	return -1;
@@ -343,7 +343,7 @@ int conf_store_str(list_head_t *conf, char *name, const char *val)
 	char *buf;
 	int len;
 
-	if (val == NULL) 
+	if (val == NULL)
 		return 0;
 	len = strlen(name) + strlen(val) + 3;
 	buf = malloc(len + 1);
@@ -360,7 +360,7 @@ int conf_store_yesno(list_head_t *conf, char *name, int val)
 	char *buf;
 	int len;
 
-	if (!val) 
+	if (!val)
 		return 0;
 	len = strlen(name) + 6;
 	buf = malloc(len + 1);
@@ -447,7 +447,7 @@ static int parse_iptables(env_param *env, char *val)
 		return 0;
 	ret = 0;
 	do {
-		if ((ipt = find_ipt(token)) == NULL) { 
+		if ((ipt = find_ipt(token)) == NULL) {
 			logger(0, 0, "Warning: Unknown iptable module: %s,"
 				" skipped", token);
 			ret = ERR_INVAL_SKIP;
@@ -509,7 +509,7 @@ static int get_mul(char c)
 	case 'P':
 	case 'p':
 		return _page_size;
-	case 'B':	
+	case 'B':
 	case 'b':
 		return 1;
 	}
@@ -570,7 +570,7 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 		val[1] = tmp;
 	} else if (*tail == 0) {
 		val[1] = val[0];
-	} else 
+	} else
 		return ERR_INVAL;
 	return ret;
 }
@@ -813,7 +813,7 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 
 	if (id == PARAM_IP_ADD)
 		net = &vps_p->res.net;
-	else if (id == PARAM_IP_DEL) 
+	else if (id == PARAM_IP_DEL)
 		net = &vps_p->del_res.net;
 	else
 		return 0;
@@ -839,7 +839,7 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 			return ERR_INVAL;
 		if (inet_ntop(family, ip, dst, sizeof(dst)) == NULL)
 			return ERR_INVAL;
-		if (!find_ip(&net->ip, dst)) 
+		if (!find_ip(&net->ip, dst))
 			add_str_param(&net->ip, dst);
 	} while ((token = strtok(NULL, " ")));
 
@@ -865,7 +865,7 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		&vps_p->res.net.ip, &vps_p->del_res.net.ip, &ip);
 	str = list2str_c(conf->name, '"', &ip);
 	free_str_param(&ip);
-	if (str == NULL) 
+	if (str == NULL)
 		return -1;
 	add_str_param(conf_h, str);
 	free(str);
@@ -921,7 +921,7 @@ static int store_netdev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		 &vps_p->del_res.net.dev, &dev);
 	str = list2str_c(conf->name, '"', &dev);
 	free_str_param(&dev);
-	if (str == NULL) 
+	if (str == NULL)
 		return -1;
 	add_str_param(conf_h, str);
 	free(str);
@@ -1244,7 +1244,7 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 {
 	misc_param *misc = &vps_p->res.misc;
 	int ret;
-	
+
 	ret = 0;
 	switch (conf->id) {
 	case PARAM_ONBOOT:
@@ -1349,7 +1349,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 			return ERR_INVAL;
 		len = strlen(str) + 1;
 		if (len > IFNAMSIZE)
-			return ERR_INVAL; 
+			return ERR_INVAL;
 		snprintf(dev->dev_name, len, "%s", str);
 		return 0;
 	}
@@ -1365,7 +1365,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 	tmp = ch;
 
 	/* Parsing veth MAC address in VE0 */
-	if ((ch = strchr(tmp, ',')) == NULL) 
+	if ((ch = strchr(tmp, ',')) == NULL)
 		return ERR_INVAL;
 	len = ch - tmp;
 	if (len != 3*ETH_ALEN -1)
@@ -1378,7 +1378,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 	tmp = ch;
 
 	/* Parsing veth name in VE */
-	if ((ch = strchr(tmp, ',')) == NULL) 
+	if ((ch = strchr(tmp, ',')) == NULL)
 		return ERR_INVAL;
 	ch++;
 	len = ch - tmp;
@@ -1427,7 +1427,7 @@ void generate_veth_name(int veid, char *dev_name_ve,  char *dev_name, int len)
 
 	name = subst_VEID(veid, DEF_VETHNAME);
 	sscanf(dev_name_ve, "%*[^0-9]%d", &id);
-	snprintf(dev_name, len, "%s.%d", name, id);	
+	snprintf(dev_name, len, "%s.%d", name, id);
 	free(name);
 }
 
@@ -1453,7 +1453,7 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 		}
 		if (len > IFNAMSIZE)
 			return ERR_INVAL;
-		strcpy(dev->dev_name_ve, str);	
+		strcpy(dev->dev_name_ve, str);
 		break;
 	case PARAM_NETIF_MAC:
 		if (parse_hwaddr(str, dev->dev_addr_ve))
@@ -1490,7 +1490,7 @@ static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 			len = next - p;
 			if (len > IFNAMSIZE)
 				return ERR_INVAL;
-			if (dev->dev_name_ve[0] == '\0') 
+			if (dev->dev_name_ve[0] == '\0')
 				strncpy(dev->dev_name_ve, p, len);
 		} else if (!strncmp("host_ifname=", p, 12)) {
 			p += 12;
@@ -1719,7 +1719,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 	if (ch == ep) {
 		memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
 		dev->addrlen = ETH_ALEN;
-		return 0;	
+		return 0;
 	}
 	/* Parsing veth MAC address in VE */
 	len = strlen(ch);
@@ -1821,7 +1821,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		if (!strcmp(val, "name"))
 			vps_p->opt.apply_cfg_map = APPCONF_MAP_NAME;
 		else
-			ret = ERR_INVAL;	
+			ret = ERR_INVAL;
 		break;
 	case PARAM_APPLYCONFIG:
 		ret = conf_parse_str(&vps_p->opt.apply_cfg, val, 1);
@@ -1978,7 +1978,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			break;
 		if (parse_ul(val, &uid))
 			return ERR_INVAL;
-		if (uid < MINCPUUNITS || uid > MAXCPUUNITS) 
+		if (uid < MINCPUUNITS || uid > MAXCPUUNITS)
 			return ERR_INVAL;
 		vps_p->res.cpu.units = malloc(sizeof(unsigned long));
 		if (vps_p->res.cpu.units == NULL)
@@ -2058,7 +2058,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			break;
 		strcpy(dev.dev_name_ve, val);
 		add_veth_param(&vps_p->del_res.veth, &dev);
-	
+
 		break;
 	}
 	case PARAM_NETIF_IFNAME:
@@ -2198,7 +2198,7 @@ static int read_conf(char *fname, list_head_t *conf_h)
 
 	if (!stat_file(fname))
 		return 0;
-	if (!(fp = fopen(fname, "r"))) 
+	if (!(fp = fopen(fname, "r")))
 		return -1;
 	while (fgets(str, sizeof(str), fp)) {
 		add_str_param(conf_h, str);
@@ -2214,7 +2214,7 @@ static int write_conf(char *fname, list_head_t *head)
 	conf_struct *conf;
 	int fd = 2;
 	int len, ret;
-	
+
 	if (fname != NULL) {
 		snprintf(buf, sizeof(buf), "%s.tmp", fname);
 		if ((fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0644)) < 0) {
@@ -2322,7 +2322,7 @@ int vps_remove_cfg_param(envid_t veid, char *path, char *name)
 		found++;
 	}
 	if (found)
-		write_conf(path, &conf);	
+		write_conf(path, &conf);
 	free_str_param(&conf);
 
 	return 0;
@@ -2435,7 +2435,7 @@ int set_name(int veid, char *new_name, char *old_name)
 		!strcmp(old_name, new_name) &&
 		veid == veid_old)
 	{
-		return 0;	
+		return 0;
 	}
 	if (new_name[0] != 0) {
 		snprintf(buf, sizeof(buf), VENAME_DIR "/%s", new_name);
@@ -2669,7 +2669,7 @@ static void merge_dq(dq_param *dst, dq_param *src)
 	MERGE_P2(diskinodes)
 	MERGE_P(exptime)
 	MERGE_P(ugidlimit)
-	
+
 }
 
 static void merge_dev(dev_param *dst, dev_param *src)

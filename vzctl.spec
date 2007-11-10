@@ -1,9 +1,9 @@
 %define _initddir %_sysconfdir/init.d
 %define _vzdir /vz
-%define _lockdir %{_vzdir}/lock 
-%define _dumpdir %{_vzdir}/dump 
-%define _cachedir %{_vzdir}/template/cache 
-%define _veipdir /var/lib/vzctl/veip 
+%define _lockdir %{_vzdir}/lock
+%define _dumpdir %{_vzdir}/dump
+%define _cachedir %{_vzdir}/template/cache
+%define _veipdir /var/lib/vzctl/veip
 %define _pkglibdir %_libdir/vzctl
 %define _configdir %_sysconfdir/vz
 %define _scriptdir /usr/share/vzctl/scripts
@@ -12,7 +12,7 @@
 %define _logrdir %_sysconfdir/logrotate.d
 %define _crondir %{_configdir}/cron
 %define _distconfdir %{_configdir}/dists
-%define _namesdir %{_configdir}/names 
+%define _namesdir %{_configdir}/names
 %define _distscriptdir %{_distconfdir}/scripts
 %define _udevrulesdir %_sysconfdir/udev/rules.d
 %define _bashcdir %_sysconfdir/bash_completion.d
@@ -149,7 +149,7 @@ fi
 
 if [ -f /etc/SuSE-release ]; then
 	NET_CFG='ifdown-venet ifup-venet'
-	if ! grep -q -E "^alias venet0" /etc/modprobe.conf; then 
+	if ! grep -q -E "^alias venet0" /etc/modprobe.conf; then
 		echo "alias venet0 vznet" >> /etc/modprobe.conf
 	fi
 	ln -f /etc/sysconfig/network-scripts/ifcfg-venet0 /etc/sysconfig/network/ifcfg-venet0
@@ -159,7 +159,7 @@ if [ -f /etc/SuSE-release ]; then
 fi
 
 %preun
-if [ $1 = 0 ]; then 
+if [ $1 = 0 ]; then
 	/sbin/chkconfig --del vz >/dev/null 2>&1
 fi
 

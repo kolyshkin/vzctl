@@ -53,10 +53,10 @@ fi
 
 ip link set $vznet up
 
-echo "Bringing up interface $vznet: " 
+echo "Bringing up interface $vznet: "
 ip addr add 0.0.0.0/0 dev $vznet
 
-echo "Configuring interface $vznet: " 
+echo "Configuring interface $vznet: "
 sysctl -w net.ipv4.conf.$vznet.send_redirects=0
 
 if [ "${IPV6}" = "yes" ]; then

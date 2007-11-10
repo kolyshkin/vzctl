@@ -252,7 +252,7 @@ int main(int argc, char *argv[], char *envp[])
 	init_log(gparam->log.log_file, veid, gparam->log.enable != NO,
 		gparam->log.level, quiet, "vzctl");
 	/* Set verbose level from global config if not overwriten
-	   by --verbose 
+	   by --verbose
 	*/
 	if (!verbose_custom && gparam->log.verbose != NULL) {
 		verbose = *gparam->log.verbose;

@@ -60,7 +60,7 @@ struct iptables_s *find_ipt(const char *name)
 {
 	int i;
 
-	for (i = 0; iptables[i].name != NULL; i++) 
+	for (i = 0; iptables[i].name != NULL; i++)
 		if (!strcmp(name, iptables[i].name))
 			return &iptables[i];
 	return NULL;
@@ -95,6 +95,6 @@ unsigned long long get_ipt_mask(unsigned long ids)
 		if (iptables[i].id & ids)
 			mask |= iptables[i].mask;
 	}
-	return mask; 
+	return mask;
 }
 

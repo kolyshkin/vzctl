@@ -115,7 +115,7 @@ int calculate(int numerator, int verbose)
 				ru_utl.mem_swap *= k;
 				ru_utl.alloc_mem *= k;
 			}
-			shift_ubs_param(&ub_s);	
+			shift_ubs_param(&ub_s);
 			if (!calc_ve_commitment(&ub_s, &ru_comm, &mem,
 				 numerator))
 			{

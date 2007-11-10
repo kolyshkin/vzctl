@@ -60,7 +60,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	}
 	if ((ret = vps_quotaon(veid, fs->private, dq)))
 		return ret;
-	if ((ret = vz_mount(fs, 0))) 
+	if ((ret = vz_mount(fs, 0)))
 		vps_quotaoff(veid, dq);
 	return ret;
 }

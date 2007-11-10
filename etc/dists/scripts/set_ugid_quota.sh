@@ -20,7 +20,7 @@
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   MINOR	- root device minor number 
+#   MINOR	- root device minor number
 #   MAJOR	- root device major number
 SCRIPTANAME='/etc/init.d/vzquota'
 RCDIRS="/etc/rc.d /etc"
@@ -39,7 +39,7 @@ start() {
 	mnt=`grep -v " / " /proc/mounts`
 	if [ $? == 0 ]; then
 		echo "$mnt" >> /etc/mtab
-	fi 
+	fi
 	quotaon -aug
 }
 case "$1" in

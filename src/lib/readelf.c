@@ -44,12 +44,12 @@ struct elf_hdr_s {
 
 static inline int check_elf_magic(const uint8_t *buf)
 {
-	if (memcmp(buf, ELFMAG, 4) && 
+	if (memcmp(buf, ELFMAG, 4) &&
 		memcmp(buf, OLFMAG, 4))
 	{
 		return -1;
 	}
-	return 0;	
+	return 0;
 }
 
 int get_arch_from_elf(const char *file)
@@ -61,7 +61,7 @@ int get_arch_from_elf(const char *file)
 	if (stat(file, &st))
 		return -1;
 	if (!S_ISREG(st.st_mode))
-		return -1;	
+		return -1;
 	fd = open(file, O_RDONLY);
 	if (fd < 0)
 		return -1;

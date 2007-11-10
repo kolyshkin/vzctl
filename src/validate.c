@@ -72,13 +72,13 @@ static int read_yn()
 		else if (buf[0] == 'n')
 			return 	0;
 		fprintf(stderr, " (y/n) [y] ");
-	} 
+	}
 	return 0;
 }
 
 static int check_param(struct ub_struct *param, int log)
 {
-	int ret = 0;	
+	int ret = 0;
 #define CHECKPARAM(name) 						\
 	if (param->name == NULL) {					\
 		if (log)						\
@@ -444,7 +444,7 @@ if (ub->name != NULL) {							\
 				" %lu (currently, %lu)", val,
 				ub->dgramrcvbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ub->dgramrcvbuf[1] + val - 
+			tmp_val1 = ub->dgramrcvbuf[1] + val -
 					ub->dgramrcvbuf[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
@@ -481,10 +481,10 @@ if (ub->name != NULL) {							\
 	val1 = 129 * 1024;
 	if (ub->othersockbuf[0] < val) {
 		logger(-1, 0, "Warning: othersockbuf.bar should be >"
-				" %lu (currently, %lu)", val, 
+				" %lu (currently, %lu)", val,
 				ub->othersockbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ub->othersockbuf[1] + val - 
+			tmp_val1 = ub->othersockbuf[1] + val -
 					ub->othersockbuf[0];
 			tmp_val0 = val;
 			SET2_MES(tmp_val0, tmp_val1)
@@ -500,10 +500,10 @@ if (ub->name != NULL) {							\
 //		if (!ask) fprintf(stderr, "\n");
 	} else if (ub->othersockbuf[0] < val1) {
 		logger(-1, 0,"Recommendation: othersockbuf.bar should be >"
-				" %lu (currently, %lu)", val1, 
+				" %lu (currently, %lu)", val1,
 				ub->othersockbuf[0]);
 		if (ask || recover) {
-			tmp_val1 = ub->othersockbuf[1] + val1 - 
+			tmp_val1 = ub->othersockbuf[1] + val1 -
 					ub->othersockbuf[0];
 			tmp_val0 = val1;
 			SET2_MES(tmp_val0, tmp_val1)
@@ -549,7 +549,7 @@ int vps_validate(vps_res *param, int mode)
 	int ret;
 
 	if (mode == ACT_NONE)
-		return 0;	
+		return 0;
 	logger(0, 0, "Validating VE:");
 	ret  = validate(param, mode == ACT_FIX, 0);
 	if (mode == ACT_ERROR && ret)
@@ -567,8 +567,8 @@ int calc_ve_utilization(struct ub_struct *param, struct CRusage *rusage,
 		return -1;
 	if (check_param(param, 1))
 		return -1;
-	kmem_net = (double)param->kmemsize[0] + 
-		(double)param->tcprcvbuf[0] + 
+	kmem_net = (double)param->kmemsize[0] +
+		(double)param->tcprcvbuf[0] +
 		(double)param->tcpsndbuf[0] +
 		(double)param->dgramrcvbuf[0] +
 		(double)param->othersockbuf[0];
@@ -658,7 +658,7 @@ void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage)
 void mul_rusage(struct CRusage *rusage, int k)
 {
 	if (rusage == NULL)
-		return; 
+		return;
 	rusage->low_mem *= k;
 	rusage->total_ram *= k;
 	rusage->mem_swap *= k;
@@ -673,7 +673,7 @@ void shift_ubs_param(struct ub_struct *param)
 if (param->name != NULL) {						\
 	param->name[0] = param->name[1];				\
 	param->name[1] = param->name[2];				\
-} 
+}
 	SHIFTPARAM(numproc);
 	SHIFTPARAM(numtcpsock);
 	SHIFTPARAM(numothersock);
@@ -705,7 +705,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 	ub_param ub;
 	struct ub_struct ub_s;
 	struct mem_struct mem;
-	
+
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
 		logger(-1, errno, "Unable open " PROCUBC);
 		return -1;

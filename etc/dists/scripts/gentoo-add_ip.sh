@@ -90,7 +90,7 @@ function add_ip()
 
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		# synchronyze config files & interfaces
-		/etc/init.d/net.${VENET_DEV} restart 
+		/etc/init.d/net.${VENET_DEV} restart
 	fi
 }
 

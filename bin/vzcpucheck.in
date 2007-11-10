@@ -31,7 +31,7 @@ if [ $# -eq 1 ]; then
 	else
 		usage
 	fi
-elif [ $# -gt 1 ]; then 
+elif [ $# -gt 1 ]; then
 	usage
 fi
 

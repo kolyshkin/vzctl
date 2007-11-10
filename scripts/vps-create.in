@@ -31,7 +31,7 @@ vzcheckvar VE_PRVT PRIVATE_TEMPLATE
 function create_prvt()
 {
 	if test ! -d ${VE_PRVT}; then
-		vzerror "Destination dir doesn't exists: ${VE_PRVT}" $VZ_FS_NEW_VE_PRVT 
+		vzerror "Destination dir doesn't exists: ${VE_PRVT}" $VZ_FS_NEW_VE_PRVT
 	fi
 
 	if test ! -f $PRIVATE_TEMPLATE; then

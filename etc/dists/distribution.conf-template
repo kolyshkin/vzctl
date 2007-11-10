@@ -36,7 +36,7 @@
 #   IP_ADDR	- the IP address(es) to be added to the VE
 #                 (the space is used to separate several IP addresses)
 # Optional parameters:
-#   VE_STATE	- the state of the VE; can be either "starting" or "running" 
+#   VE_STATE	- the state of the VE; can be either "starting" or "running"
 #   IPDELALL	- deletes all old interfaces
 #
 ADD_IP=dist-add_ip.sh

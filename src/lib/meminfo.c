@@ -75,7 +75,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 				" configure meminfo skipped");
 			return 0;
 		}
-		meminfo.val = (((ULONG_MAX - 1) / param->val + 1) 
+		meminfo.val = (((ULONG_MAX - 1) / param->val + 1)
 			< privvmpages[0]) ?
 			 ULONG_MAX : privvmpages[0] * param->val;
 		break;
@@ -94,7 +94,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 			logger(0, 0, "Warning: meminfo feature is not supported"
 				" by kernel. skipped meminfo configure");
 		} else {
-			logger(-1, errno, "Unable to set meminfo");	
+			logger(-1, errno, "Unable to set meminfo");
 			return VZ_SET_MEMINFO_ERROR;
 		}
 	}

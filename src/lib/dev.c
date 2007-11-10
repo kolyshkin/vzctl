@@ -117,7 +117,7 @@ int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev)
 		if (res->name[0])
 			if ((ret = dev_create(root, res)))
 				break;
-		if ((ret = set_devperm(h, veid, res))) 
+		if ((ret = set_devperm(h, veid, res)))
 			break;
 	}
 	return ret;

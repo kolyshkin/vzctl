@@ -248,7 +248,7 @@ void parse_options (int argc, char **argv)
 
 	argc -= optind;
 	argv += optind;
- 
+
 	if (cmd == AR_NOTHING || argc != 1
 	    || (cmd == AR_DETECT && !trg_ipaddr_flag)
 	    || (cmd == AR_UPDATE && !src_ipaddr_flag))
@@ -273,7 +273,7 @@ void parse_options (int argc, char **argv)
 	hw_type :		htons(ARPHRD_ETHER),	\
 	prot_type :		htons(ETH_P_IP),	\
 	hw_addr_size :		ETH_ALEN,		\
-	prot_addr_size :	IP_ADDR_LEN	
+	prot_addr_size :	IP_ADDR_LEN
 
 u_char real_hwaddr[ETH_ALEN];
 struct in_addr real_ipaddr;
@@ -325,7 +325,7 @@ int init_device_addresses(int sock, const char* device)
 		logger(LOG_ERROR, "can't get iface '%s' address : %m", device);
 		return -1;
 	}
-	memcpy(&real_ipaddr, ifr.ifr_addr.sa_data + 2, IP_ADDR_LEN);	
+	memcpy(&real_ipaddr, ifr.ifr_addr.sa_data + 2, IP_ADDR_LEN);
 
 	logger(LOG_DEBUG, "got addresses hw='%s', ip='%s'",
 		print_hw_addr(real_hwaddr),
@@ -362,9 +362,9 @@ void create_arp_packet(struct arp_packet* pkt)
 	set_hw(pkt->rcpt_hw_addr, check(trg_arp_hwaddr, pkt->targ_hw_addr));
 	set_hw(pkt->sndr_hw_addr, check(src_arp_hwaddr, pkt->src_hw_addr));
 
-	/* special case 'cause we support multiple receipient ip addresses 
+	/* special case 'cause we support multiple receipient ip addresses
 	   we 'll setup 'pkt.rcpt_ip_addr' separately for each specified
-	   (-e option) 'trg_ipaddr' 
+	   (-e option) 'trg_ipaddr'
 	 */
 	if (trg_ipaddr_flag) {
 		/* at least one trg_ipaddr is specified */
@@ -381,7 +381,7 @@ void create_arp_packet(struct arp_packet* pkt)
 void set_trg_ipaddr(struct arp_packet* pkt, const struct in_addr ipaddr)
 {
 #define set_ip(to, from) (memcpy(to, &from, IP_ADDR_LEN))
-	set_ip(pkt->rcpt_ip_addr, ipaddr);	
+	set_ip(pkt->rcpt_ip_addr, ipaddr);
 #undef set_ip
 }
 
@@ -424,7 +424,7 @@ int recv_pack(void *buf, int len, struct sockaddr_ll *from)
 		// check for all sent packets addresses
 		if (memcmp(&trg_ipaddr[i], recv_pkt->sndr_ip_addr, IP_ADDR_LEN))
 			continue;
-		logger(LOG_DEBUG, "recv packet %s", print_arp_packet(recv_pkt));			
+		logger(LOG_DEBUG, "recv packet %s", print_arp_packet(recv_pkt));
 		logger(LOG_INFO, "%s is detected on another computer : %s",
 			print_ip_addr((u_char*) &trg_ipaddr[i]),
 			print_hw_addr(recv_pkt->sndr_hw_addr));
@@ -537,7 +537,7 @@ char* print_arp_packet(struct arp_packet* pkt)
 {
 	char* point = get_buf();
 	sprintf(point, "eth '%s' -> eth '%s'; arp sndr '%s' '%s'; %s; arp recipient '%s' '%s'",
-		print_hw_addr(pkt->src_hw_addr), 
+		print_hw_addr(pkt->src_hw_addr),
 		print_hw_addr(pkt->targ_hw_addr),
 		print_hw_addr(pkt->sndr_hw_addr),
 		print_ip_addr(pkt->sndr_ip_addr),
