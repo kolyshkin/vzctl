@@ -111,7 +111,7 @@ _vzctl()
 			--ostemplate)
 				# get the template path from the vz.conf
 				local vztmpl=`grep ^TEMPLATE @PKGCONFDIR@/vz.conf | cut -d "=" -f 2`
-				COMPREPLY=( $( compgen -W "$(ls -1 $vztmpl/cache/*.tar.gz | \
+				COMPREPLY=( $( compgen -W "$(ls -1 $vztmpl/cache/*.tar.gz |
 						    sed -e "s#^$vztmpl/cache/##" -e 's#.tar.gz$##')" -- $cur ) )
 
 				;;
@@ -122,7 +122,7 @@ _vzctl()
 				COMPREPLY=( $( compgen -W "restart ignore" -- $cur ) )
 				;;
 			--config|--applyconfig)
-				local configs=$(ls -1 @PKGCONFDIR@/conf/*.conf-sample | \
+				local configs=$(ls -1 @PKGCONFDIR@/conf/*.conf-sample |
 						    cut -d "-" -f 2- | sed -e 's#.conf-sample$##')
 
 				configs=${configs/.conf-sample/}
@@ -193,7 +193,7 @@ _vzctl()
 					fi
 					# get veth(ernet) device of VE, proc and config
 					local netif_proc="`awk "/${ve}/ { print \\$4 }" /proc/vz/veth`"
-					local netif_conf="`grep ^NETIF /etc/vz/conf/${ve}.conf | \
+					local netif_conf="`grep ^NETIF /etc/vz/conf/${ve}.conf |
 						sed -e 's/"/\n/g' -e 's/;/\n/g' -e 's/,/\n/g' -e 's/=/ /g' | awk '/^ifname/ {print \$2}'`"
 					netif="$netif_proc $netif_conf"
 				fi

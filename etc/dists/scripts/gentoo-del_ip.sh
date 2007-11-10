@@ -35,7 +35,7 @@ function del_ip()
 	local ip e_ip
 
 	for ip in ${IP_ADDR}; do
-		grep -qw "${ip}" ${CFGFILE} && found=true && \
+		grep -qw "${ip}" ${CFGFILE} && found=true &&
 			del_param3 "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
 	done
 	if [ -n "${found}" ]; then

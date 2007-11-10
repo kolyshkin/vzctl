@@ -163,21 +163,21 @@ function vzaddrouting4()
 	local src_addr=
 
 	if [ -n "${VE_ROUTE_SRC_DEV}" ]; then
-		src_addr=`ip route list table local dev ${VE_ROUTE_SRC_DEV} | \
-			grep '^local'| \
+		src_addr=`ip route list table local dev ${VE_ROUTE_SRC_DEV} |
+			grep '^local'|
 			cut -d' ' -f2 | grep -v '^127\.' | head -n 1`
 		if [ -z "${src_addr}" ]; then
 			vzerror "Unable to get source ip [${VE_ROUTE_SRC_DEV}]" $VZ_CANT_ADDIP
 		fi
 		src_addr="src ${src_addr}"
 	fi
-	${IP_CMD} route add $1 dev venet0 ${src_addr} || \
+	${IP_CMD} route add $1 dev venet0 ${src_addr} ||
 		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 ${src_addr}" $VZ_CANT_ADDIP
 }
 
 function vzaddrouting6()
 {
-	${IP_CMD} route add $1 dev venet0 || \
+	${IP_CMD} route add $1 dev venet0 ||
 		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0" $VZ_CANT_ADDIP
 }
 
@@ -209,7 +209,7 @@ function vzdelrouting()
 		else
 			arg="route del $1 dev venet0"
 		fi
-		${IP_CMD} ${arg} || \
+		${IP_CMD} ${arg} ||
 			vzwarning "vzdelrouting: ${IP_CMD} ${arg} failed"
 	fi
 }

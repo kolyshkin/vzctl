@@ -129,7 +129,7 @@ setup_cron()
 	check_old_cron_files
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
-	cat $SRC_CRONSCRIPT_DIR/vz* > $DST_CRONSCRIPT_DIR/vz && \
+	cat $SRC_CRONSCRIPT_DIR/vz* > $DST_CRONSCRIPT_DIR/vz &&
 		chmod 644 $DST_CRONSCRIPT_DIR/vz
 }
 
@@ -188,8 +188,8 @@ check_kernel_config()
 	local opt_must="SIM_FS VE VE_CALLS VZ_GENCALLS"
 	get_kernel_version
 	# For kernels >= 2.6.9 VZ_DEV must be set.
-	test "${KERNEL_MINOR}" -ge 6 && \
-		test "${KERNEL_PATCHLEVEL}" -gt 9 && \
+	test "${KERNEL_MINOR}" -ge 6 &&
+		test "${KERNEL_PATCHLEVEL}" -gt 9 &&
 			opt_must="${opt_must} VZ_DEV"
 #	local opt_rec="SCHED_VCPU FAIRSCHED VZ_QUOTA VZ_QUOTA_UGID VE_NETDEV VE_ETHDEV
 #			VE_IPTABLES VZ_CHECKPOINT VZ_WDOG"
@@ -367,7 +367,7 @@ start_ves()
 
 	need_restart=""
 	cd ${CONFIG_DIR} || return
-	velist=`grep -l '^ONBOOT=yes\|^ONBOOT=\"yes\"' [0-9]*.conf 2>/dev/null | \
+	velist=`grep -l '^ONBOOT=yes\|^ONBOOT=\"yes\"' [0-9]*.conf 2>/dev/null |
 		sed -e 's/.conf//g' | sort -n`
 	cd - >/dev/null
 	sysctl -q -w net.ipv4.route.src_check=0

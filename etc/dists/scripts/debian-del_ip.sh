@@ -37,7 +37,7 @@ function del_ip()
 	for ip in ${IP_ADDR}; do
 		if [ "${ip#*:}" = "${ip}" ]; then
 
-		    ifname=`grep -B 1 -w "${ip}" ${CFGFILE} | \
+		    ifname=`grep -B 1 -w "${ip}" ${CFGFILE} |
 				grep "${VENET_DEV}:" | cut -d' ' -f2`
 		    if [ -n "${ifname}" ]; then
 				ifdown "${ifname}" 2>/dev/null

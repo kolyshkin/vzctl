@@ -37,8 +37,8 @@ function set_dns()
 	fi
 	if [ -n "${server}" ]; then
 		[ -f ${cfgfile} ] || touch ${cfgfile}
-		sed "/nameserver.*/d" < ${cfgfile} > ${cfgfile}.$$ && \
-			mv -f ${cfgfile}.$$ ${cfgfile} || \
+		sed "/nameserver.*/d" < ${cfgfile} > ${cfgfile}.$$ &&
+			mv -f ${cfgfile}.$$ ${cfgfile} ||
 			error "Can't change file ${cfgfile}" ${VZ_FS_NO_DISK_SPACE}
 		for srv in ${server}; do
 			echo "nameserver ${srv}" >> ${cfgfile}

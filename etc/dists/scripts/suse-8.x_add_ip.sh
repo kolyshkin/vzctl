@@ -57,7 +57,7 @@ function create_config()
 	local ifnum=$2
 
 	echo "STARTMODE=onboot
-IPADDR=${ip}" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} || \
+IPADDR=${ip}" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} ||
 	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}:${ifnum}" ${VZ_FS_NO_DISK_SPACE}
 }
 
@@ -66,7 +66,7 @@ function get_all_aliasid()
 	IFNUM=-1
 
 	cd ${IFCFG_DIR} || return 1
-	IFNUMLIST=`ls -1 bak/${VENET_DEV_CFG}:* 2>/dev/null | \
+	IFNUMLIST=`ls -1 bak/${VENET_DEV_CFG}:* 2>/dev/null |
 		sed "s/.*${VENET_DEV_CFG}://"`
 }
 
@@ -76,7 +76,7 @@ function get_aliasid_by_ip()
 	local idlist
 
 	cd ${IFCFG_DIR} || return 1
-	IFNUM=`grep -l "IPADDR=${ip}$" ${VENET_DEV_CFG}:* | head -n 1 | \
+	IFNUM=`grep -l "IPADDR=${ip}$" ${VENET_DEV_CFG}:* | head -n 1 |
 		sed -e 's/.*:\([0-9]*\)$/\1/'`
 }
 
@@ -87,7 +87,7 @@ function get_free_aliasid()
 	[ -z "${IFNUMLIST}" ] && get_all_aliasid
 	while test -z ${found}; do
 		let IFNUM=IFNUM+1
-		echo "${IFNUMLIST}" | grep -q -E "^${IFNUM}$" 2>/dev/null || \
+		echo "${IFNUMLIST}" | grep -q -E "^${IFNUM}$" 2>/dev/null ||
 			found=1
 	done
 }
@@ -102,7 +102,7 @@ function backup_configs()
 
 	cd ${IFCFG_DIR} || return 1
 	if ls ${VENET_DEV_CFG}:* > /dev/null 2>&1; then
-		cp -rf ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ || \
+		cp -rf ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ ||
 			error "Unable to backup intrface config files" ${VZ_FS_NO_DISK_SPACE}
 	fi
 }

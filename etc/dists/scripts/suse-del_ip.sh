@@ -39,7 +39,7 @@ function del_ip()
 		return
 	fi
 	for ip in ${IP_ADDR}; do
-		ids=`grep -E "^IPADDR_.*=${ip}$" ${IFCFG} 2>/dev/null | \
+		ids=`grep -E "^IPADDR_.*=${ip}$" ${IFCFG} 2>/dev/null |
 			sed 's/^IPADDR_\(.*\)=.*/\1/'`
 		for id in ${ids}; do
 			sed -e "/^IPADDR_${id}=/{

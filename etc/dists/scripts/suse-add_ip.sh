@@ -49,7 +49,7 @@ function init()
 BOOTPROTO=static
 BROADCAST=0.0.0.0
 NETMASK=255.255.255.255
-IPADDR=127.0.0.1" > ${IFCFG} || \
+IPADDR=127.0.0.1" > ${IFCFG} ||
 	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
 
 	remove_fake_old_route ${ROUTES}
@@ -73,7 +73,7 @@ function create_config()
 	local ifnum=$2
 
 	echo "IPADDR_${ifnum}=${ip}
-LABEL_${ifnum}=${ifnum}" >> ${IFCFG} || \
+LABEL_${ifnum}=${ifnum}" >> ${IFCFG} ||
 	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
 }
 

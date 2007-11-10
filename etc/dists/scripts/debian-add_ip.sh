@@ -106,7 +106,7 @@ function get_free_aliasid()
 	[ -z "${IFNUMLIST}" ] && get_all_aliasid
 	while test -z ${found}; do
 		let IFNUM=IFNUM+1
-		echo "${IFNUMLIST}" | grep -q -E "^${IFNUM}$" 2>/dev/null || \
+		echo "${IFNUMLIST}" | grep -q -E "^${IFNUM}$" 2>/dev/null ||
 			found=1
 	done
 }

@@ -46,7 +46,7 @@ function fix_ifup()
 	if grep -q 'if \[ "\${DEVICE}" = "lo" \]; then' ${file} 2>/dev/null
 	then
 		cp -fp ${file} ${file}.$$ || return 1
-		/bin/sed -e 's/if \[ "\${DEVICE}" = "lo" \]; then/if \[ "${IPADDR}" = "127.0.0.1" \]; then/g' < ${file} > ${file}.$$ && \
+		/bin/sed -e 's/if \[ "\${DEVICE}" = "lo" \]; then/if \[ "${IPADDR}" = "127.0.0.1" \]; then/g' < ${file} > ${file}.$$ &&
 			mv -f ${file}.$$ ${file}
 		rm -f ${file}.$$ 2>/dev/null
 	fi
@@ -83,7 +83,7 @@ function create_config()
 
 	echo "DEVICE=${VENET_DEV}:${ifnum}
 IPADDR=${ip}
-NETMASK=255.255.255.255" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} || \
+NETMASK=255.255.255.255" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} ||
 	error "Unable to create interface config file" ${VZ_FS_NO_DISK_SPACE}
 }
 
@@ -92,7 +92,7 @@ function get_all_aliasid()
 	IFNUM=-1
 
 	cd ${IFCFG_DIR} || return 1
-	IFNUMLIST=`ls -1 bak/${VENET_DEV_CFG}:* 2>/dev/null | \
+	IFNUMLIST=`ls -1 bak/${VENET_DEV_CFG}:* 2>/dev/null |
 		sed "s/.*${VENET_DEV_CFG}://"`
 }
 
@@ -102,7 +102,7 @@ function get_aliasid_by_ip()
 	local idlist
 
 	cd ${IFCFG_DIR} || return 1
-	IFNUM=`grep -l "IPADDR=${ip}$" ${VENET_DEV_CFG}:* | head -n 1 | \
+	IFNUM=`grep -l "IPADDR=${ip}$" ${VENET_DEV_CFG}:* | head -n 1 |
 		sed -e 's/.*:\([0-9]*\)$/\1/'`
 }
 
@@ -113,7 +113,7 @@ function get_free_aliasid()
 	[ -z "${IFNUMLIST}" ] && get_all_aliasid
 	while test -z ${found}; do
 		let IFNUM=IFNUM+1
-		echo "${IFNUMLIST}" | grep -q -E "^${IFNUM}$" 2>/dev/null || \
+		echo "${IFNUMLIST}" | grep -q -E "^${IFNUM}$" 2>/dev/null ||
 			found=1
 	done
 }
@@ -128,7 +128,7 @@ function backup_configs()
 
 	cd ${IFCFG_DIR} || return 1
 	if ls ${VENET_DEV_CFG}:* > /dev/null 2>&1; then
-		cp -rf ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ || \
+		cp -rf ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ ||
 			error "Unable to backup intrface config files" ${VZ_FS_NO_DISK_SPACE}
 	fi
 }

@@ -72,7 +72,7 @@ function disableroot()
 	[ -f "$file" ] || return 0
 
 	if /bin/grep -q "^root::" "${file}" 2>/dev/null; then
-		/bin/sed 's/^root::/root:!!:/g' < ${file} > ${file}.$$ && \
+		/bin/sed 's/^root::/root:!!:/g' < ${file} > ${file}.$$ &&
 			/bin/mv -f ${file}.$$ ${file}
 		/bin/rm -f ${file}.$$ 2>/dev/null
 	fi

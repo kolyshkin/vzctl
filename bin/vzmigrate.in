@@ -437,7 +437,7 @@ fi
 
 log 1 "Syncing private"
 if ! $RSYNC --progress \
-		"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" | \
+		"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" |
 		grep "% of" | awk -v ORS="\r" '{print $10}'; then
 	log 0 "Failed to sync VE private areas"
 	undo_quota_on
@@ -517,7 +517,7 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 	fi
 
 	log 2 "Load 2nd level quota"
-	if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T < $VE_QUOTADUMP && \
+	if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T < $VE_QUOTADUMP &&
 			vzquota reload2 $VEID)"; then
 		log 0 "Failed to load 2nd level quota"
 		undo_copy_quota

@@ -100,7 +100,7 @@ function add_param()
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
 	fi
 	if grep -qe "^$name=" $file >/dev/null 2>&1; then
-		${CP} ${file} ${file}.$$ || \
+		${CP} ${file} ${file}.$$ ||
 			error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		/bin/sed -e "s|^$name=\"\(.*\)\"|$name=\"\1 $value \"|" < ${file} > ${file}.$$
 		if [ $? -ne 0 ]; then
@@ -125,7 +125,7 @@ function del_param()
 		 mkdir -p ${path} || error "Unable to create dir ${path}" $VZ_FS_NO_DISK_SPACE
 	fi
 	if grep -qe "^$name=" $file >/dev/null 2>&1; then
-		${CP} ${file} ${file}.$$ || \
+		${CP} ${file} ${file}.$$ ||
 			error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
 		if [ -z "${value}" ]; then
 			/bin/sed -e "/^${name}=.*/d" < ${file} > ${file}.$$
@@ -273,7 +273,7 @@ function remove_debian_interface()
 	local dev="$1"
 	local cfg="$2"
 
-	${CP} ${cfg} ${cfg}.$$ || \
+	${CP} ${cfg} ${cfg}.$$ ||
 		error "Can't copy file ${cfg}" $VZ_FS_NO_DISK_SPACE
 
 	awk '
@@ -295,7 +295,7 @@ function remove_fake_old_route()
 	if ! grep -qE '191.255.255.[0-1]' $file; then
 		return 0
 	fi
-	sed '/191.255.255.[0-1]/d' < ${file} > ${file}.$$ && \
+	sed '/191.255.255.[0-1]/d' < ${file} > ${file}.$$ &&
 		mv -f ${file}.$$ ${file}
 	rm -f ${file}.$$ 2>/dev/null
 }
@@ -313,7 +313,7 @@ function change_hostname()
 		put_param2 ${cfg} "127.0.0.1" "localhost.localdomain localhost"
 		return
 	fi
-	${CP} ${cfg} ${cfg}.$$ || \
+	${CP} ${cfg} ${cfg}.$$ ||
 		error "Can't copy file ${cfg}" $VZ_FS_NO_DISK_SPACE
 	awk -v ip="${ip}" -v host="${host}" -v comm="${comm}" '
 		BEGIN {found = 0; skip = 0}

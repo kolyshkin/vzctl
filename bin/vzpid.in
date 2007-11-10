@@ -33,7 +33,7 @@ function getveid()
 	local pid=$1
 
 	[ -f /proc/${pid}/status ] || return
-	cat /proc/${pid}/status | \
+	cat /proc/${pid}/status |
 awk -v pid=${pid} 'BEGIN{veid=0} /^'${namemark}'|^'${veidmark}'/{
 	if ($1 == "'${namemark}'") {
 		name = $2;
