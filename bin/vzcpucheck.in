@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -19,14 +19,14 @@ VERBOSE=0
 CPUINFO=/proc/cpuinfo
 FRSHD=/proc/fairsched
 
-function usage()
+usage()
 {
-	echo "Usage: vzcpucheck [-v]"
+	echo >&2 'Usage: vzcpucheck [-v]'
 	exit 2
 }
 
 if [ $# -eq 1 ]; then
-	if [ $1 = "-v" ]; then
+	if [ "$1" = '-v' ]; then
 		VERBOSE=1
 	else
 		usage
@@ -35,33 +35,22 @@ elif [ $# -gt 1 ]; then
 	usage
 fi
 
-if [ ! -r $FRSHD ]; then
-	echo "Can't read $FRSHD: Permission denied" 1>&2
-	exit 1;
-fi
-if [ ! -r $CPUINFO ]; then
-	echo "Can't read $CPUINFO: Permission denied" 1>&2
-	exit 1;
-fi
+cat "$CPUINFO" "$FRSHD" >/dev/null || exit 1
 
-CPUUTL=`cat  ${CPUINFO} | awk '
-{
-	if ($1 == "bogomips" || $1 == "BogoMIPS") {
-		sum += $3;
-	}
-}
-END {
-	print(sum * 25);
-}'`
+CPUUTL=`awk '
+BEGIN {IGNORECASE=1; sum=0}
+($1 == "bogomips") {sum += $3}
+END {print(sum * 25)}
+' <"$CPUINFO"`
 
-cat ${FRSHD} | awk -v totunits="$CPUUTL" -v verbose="$VERBOSE" '
+awk -v totunits="$CPUUTL" -v verbose="$VERBOSE" '
 BEGIN {
 	sum = 0;
 	fail = 0;
-	weight=-1
-	id=-1
-	getline
-	if ($1 == "Version:"){
+	weight = -1;
+	id = -1;
+	getline;
+	if ($1 == "Version:") {
 		getline;
 	}
 	for (i = 0; i < NF; i++) {
@@ -73,51 +62,46 @@ BEGIN {
 		}
 	}
 	if (weight == -1) {
-		print("ERROR: Unknown format of '$FRSHD' column: weight not found");
-		fail = 1
-		exit
+		print("ERROR: Unknown format of '"$FRSHD"' column: weight not found");
+		fail = 1;
+		exit;
 	}
 	if (id == -1) {
-		print("ERROR: Unknown format of '$FRSHD' column: id not found");
+		print("ERROR: Unknown format of '"$FRSHD"' column: id not found");
 		fail = 1;
-		exit
+		exit;
 	}
 	if (verbose) {
 		print("VEID\t\tCPUUNITS");
 		print("-------------------------");
 	}
 }
-{
-	if ($1 == 0 && $id != 0) {
-		if ($weight > 1) {
-			units = int(500000/$weight);
-		} else if ($weight == 0) {
-			units = 500000;
-		} else {
-			# $weight == 1
-			print("ERROR: VE0 CPU units not set, or set too high!");
-			print("Probably you have not started /etc/init.d/vz");
-			fail = 1;
-			exit
-		}
-		if (verbose) {
-			if ($id == 2147483647) {
-				print("0\t\t" units);
-			} else {
-				print($id "\t\t" units);
-			}
-		}
-		sum += units;
+($1 == 0 && $id != 0) {
+	if ($weight > 1) {
+		units = int(500000/$weight);
+	} else if ($weight == 0) {
+		units = 500000;
+	} else {
+		# $weight == 1
+		print("ERROR: VE0 CPU units not set, or set too high!");
+		print("Probably you have not started /etc/init.d/vz");
+		fail = 1;
+		exit;
 	}
+	if (verbose) {
+		if ($id == 2147483647) {
+			print("0\t\t" units);
+		} else {
+			print($id "\t\t" units);
+		}
+	}
+	sum += units;
 }
 END {
 	if (fail)
-		exit 1
+		exit 1;
 	print("Current CPU utilization: " sum);
 	print("Power of the node: " int(totunits));
-	if (sum > totunits) {
-		print("Warning: hardware node is overcommited");
-	}
-}'
-
-
+	if (sum > totunits)
+		print("Warning: hardware node is overcommitted");
+}' <"$FRSHD"
