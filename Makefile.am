@@ -30,6 +30,8 @@ vzdir       = /vz
 vzcachedir  = $(vzdir)/template/cache
 vzlockdir   = $(vzdir)/lock
 vzdumpdir   = $(vzdir)/dump
+vzprivdir   = $(vzdir)/private
+vzrootdir   = $(vzdir)/root
 veipdumpdir = $(localstatedir)/lib/vzctl/veip
 modulesdir  = $(pkglibdir)/modules
 
@@ -38,6 +40,8 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(vzcachedir)
 	$(mkinstalldirs) $(DESTDIR)$(vzlockdir)
 	$(mkinstalldirs) $(DESTDIR)$(vzdumpdir)
+	$(mkinstalldirs) $(DESTDIR)$(vzprivdir)
+	$(mkinstalldirs) $(DESTDIR)$(vzrootdir)
 	$(mkinstalldirs) $(DESTDIR)$(veipdumpdir)
 	$(mkinstalldirs) $(DESTDIR)$(modulesdir)
 

@@ -2,6 +2,8 @@
 %define _vzdir /vz
 %define _lockdir %{_vzdir}/lock
 %define _dumpdir %{_vzdir}/dump
+%define _privdir %{_vzdir}/private
+%define _rootdir %{_vzdir}/root
 %define _cachedir %{_vzdir}/template/cache
 %define _veipdir /var/lib/vzctl/veip
 %define _pkglibdir %_libdir/vzctl
@@ -80,6 +82,8 @@ rm -rf $RPM_BUILD_ROOT
 %ghost /etc/cron.d/vz
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
+%dir %attr(700,root,root) %{_privdir}
+%dir %attr(700,root,root) %{_rootdir}
 %dir %attr(755,root,root) %{_cachedir}
 %dir %attr(755,root,root) %{_veipdir}
 %dir %attr(755,root,root) %{_configdir}
