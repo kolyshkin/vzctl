@@ -30,6 +30,9 @@ EXTRA_DIST = \
 	$(distconf_DATA) \
 	$(wildcard *.conf)
 
+ALT_2x_VER    = 2.4
+ALT_VER       = 3.0 4.0
+ARCH_VER      = 0.7 0.8
 CENTOS_VER    = 3 4
 DEBIAN_VER    = 3.0 3.1 4.0
 FC_VER        = 1 2 3 4 5 6 7
@@ -44,7 +47,17 @@ SUSE_7x_VER   = 7.3
 SUSE_8x_VER   = 8.0 8.1 8.2
 SUSE_VER      = 9.0 9.1 9.2 9.3
 UBUNTU_VER    = 5.1
-ARCH_VER      = 0.7 0.8
+
+altlinux:
+	$(INSTALL_DATA) $(srcdir)/altlinux.conf $(DESTDIR)$(distconfdir)/altlinux.conf
+	for ver in $(ALT_2x_VER); do \
+		$(INSTALL_DATA) $(srcdir)/redhat-7.3.conf \
+		    $(DESTDIR)$(distconfdir)/altlinux-$$ver.conf; \
+	done
+	for ver in $(ALT_VER); do \
+		$(INSTALL_DATA) $(srcdir)/altlinux.conf \
+		    $(DESTDIR)$(distconfdir)/altlinux-$$ver.conf; \
+	done
 
 centos:
 	$(INSTALL_DATA) $(srcdir)/centos.conf $(DESTDIR)$(distconfdir)/centos.conf
@@ -78,6 +91,9 @@ gentoo:
 
 mandrake:
 	$(INSTALL_DATA) $(srcdir)/mandrake.conf $(DESTDIR)$(distconfdir)/mandrake.conf
+
+owl:
+	$(INSTALL_DATA) $(srcdir)/redhat-7.3.conf $(DESTDIR)$(distconfdir)/owl.conf
 
 redhat:
 	$(INSTALL_DATA) $(srcdir)/redhat.conf $(DESTDIR)$(distconfdir)/redhat.conf
@@ -144,16 +160,18 @@ arch:
 		    $(DESTDIR)$(distconfdir)/arch-$$ver.conf; \
 	done
 
-install-data-hook: centos \
+install-data-hook: altlinux \
+                   arch \
+                   centos \
                    debian \
                    fc \
                    fedora \
                    gentoo \
                    mandrake \
+                   owl \
                    redhat \
                    rhel \
                    slack \
                    sles \
                    suse \
-                   ubuntu \
-                   arch
+                   ubuntu
