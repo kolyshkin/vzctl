@@ -60,6 +60,7 @@ function setup_network()
 	mkdir -p ${IFCFG_DIR}
 	echo "DEVICE=${VENET_DEV}
 ONBOOT=yes
+BOOTPROTO=static
 IPADDR=127.0.0.1
 NETMASK=255.255.255.0
 NETWORK=${FAKEGATEWAYNET}
