@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -37,16 +37,16 @@ vzgetnetdev
 
 vzarpipdetect "$IP_ADDR"
 for IP in $IP_ADDR; do
-	vzaddrouting $IP
-	vzarp add $IP
+	vzarp add "$IP"
+	vzaddrouting "$IP"
 done
 vzarpipset "$IP_ADDR"
 # Save ip address information
-mkdir -p ${VE_STATE_DIR} >/dev/null 2>&1
-if [ "${VE_STATE}" = "starting" ]; then
-	echo -n  "${IP_ADDR} " > ${VE_STATE_DIR}/${VEID}
-elif [ "${VE_STATE}" = "running" ]; then
-	echo -n "${IP_ADDR} " >> ${VE_STATE_DIR}/${VEID}
+mkdir -p "$VE_STATE_DIR" >/dev/null 2>&1
+if [ "$VE_STATE" = 'starting' ]; then
+	echo -n "$IP_ADDR " > "$VE_STATE_DIR/$VEID"
+elif [ "$VE_STATE" = 'running' ]; then
+	echo -n "$IP_ADDR " >> "$VE_STATE_DIR/$VEID"
 fi
 
 exit 0
