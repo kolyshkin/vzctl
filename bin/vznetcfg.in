@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -15,25 +15,26 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-VZNETCFG=@PKGCONFDIR@/vznet.conf
+VZNETCFG='@PKGCONFDIR@/vznet.conf'
 
-[ -f ${VZNETCFG} ] && source ${VZNETCFG}
+[ -f "$VZNETCFG" ] && source "$VZNETCFG"
 
-function usage()
+usage()
 {
-	echo "vznetcfg init veth <dev>"
+	echo >&2 "vznetcfg init veth <dev>"
 }
 
-function init_veth()
+init_veth()
 {
-	local dev=$1
+	local dev="$1"
 
-	/sbin/ifconfig ${dev} up
+	ip link set "$dev" up
 }
+
 # Call the external script if defined
-if [ -n "${EXTERNAL_SCRIPT}" -a -x "${EXTERNAL_SCRIPT}" ]; then
+if [ -n "$EXTERNAL_SCRIPT" -a -x "$EXTERNAL_SCRIPT" ]; then
 	export VEID
-	exec ${EXTERNAL_SCRIPT} $@
+	exec "$EXTERNAL_SCRIPT" $@
 fi
 
 if test $# -le 2; then
@@ -41,14 +42,14 @@ if test $# -le 2; then
     exit 0
 fi
 
-CMD=$1
-case "${CMD}$2" in
+CMD="$1"
+case "$CMD$2" in
 	initveth)
 		if test $# -ne 3; then
 			usage
 			exit 1
 		fi
-		init_veth $3
+		init_veth "$3"
 		;;
 	*)
 		echo "invalid action"
