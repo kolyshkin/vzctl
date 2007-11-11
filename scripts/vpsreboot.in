@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -25,60 +25,58 @@ VESTAT=/proc/vz/vestat
 REBOOT_MARK='reboot'
 LOCKFILE='/var/lock/vereboot.lock'
 
-[ -f ${VZCONF} ] || exit
-. ${VZCONF}
+[ -f "$VZCONF" ] || exit
+. "$VZCONF"
 
-function check_reboot()
+check_reboot()
 {
-	local veid=${1}
+	local veid="$1"
 	local ve_root
 	local allowreboot
 
-	VEID=${veid}
-	[ -f "${CONF_DIR}/${veid}.conf" ] || return
+	VEID="$veid"
+	[ -f "$CONF_DIR/$veid.conf" ] || return
 	eval ` (
-		. ${VZCONF};
-		. ${CONF_DIR}/${veid}.conf;
-		echo ve_root=${VE_ROOT}\;;
-		echo allowreboot=${ALLOWREBOOT}\;;
+		. "$VZCONF"
+		. "$CONF_DIR/$veid.conf"
+		echo "ve_root=${VE_ROOT};"
+		echo "allowreboot=${ALLOWREBOOT}\;"
 	) `
-	if [ ! -z "${allowreboot}" -a "x${allowreboot}" = "xno" ]; then
-		return
-	fi
-	if [ -f "${ve_root}/${REBOOT_MARK}" ]; then
-		[ -z "${LOGFILE}" ] || echo "`date --iso-8601=seconds` vereboot : VE ${veid} : reboot " >> ${LOGFILE}
-		@SBINDIR@/vzctl start ${veid} >/dev/null 2>&1
+	[ "$allowreboot" = 'no' ] && return
+	if [ -f "$ve_root/$REBOOT_MARK" ]; then
+		[ -z "$LOGFILE" ] ||
+			echo "`date --iso-8601=seconds` vereboot : VE $veid : reboot " >> "$LOGFILE"
+		@SBINDIR@/vzctl start "$veid" >/dev/null 2>&1
 	fi
 }
 
-function lockfile()
+lockfile()
 {
-	local tmpfile="${LOCKFILE}.$$"
+	local tmpfile="$LOCKFILE.$$"
 
-	echo $$ > ${tmpfile} 2> /dev/null || exit
-
-	ln ${tmpfile} ${LOCKFILE} >& /dev/null && {
-		rm -f ${tmpfile}
+	echo $$ >"$tmpfile" 2>/dev/null || exit
+	if ln "$tmpfile" "$LOCKFILE" 2>/dev/null; then
+		rm -f "$tmpfile"
 		return
-	}
-	kill -0 `cat $LOCKFILE` >& /dev/null && {
-		rm -f ${tmpfile}
+	fi
+	if kill -0 `cat $LOCKFILE` 2>/dev/null; then
+		rm -f "$tmpfile"
 		exit
-	}
-	ln ${tmpfile} ${LOCKFILE} >& /dev/null && {
-		rm -f ${tmpfile}
+	fi
+	if ln "$tmpfile" "$LOCKFILE" 2>/dev/null; then
+		rm -f "$tmpfile"
 		return
-	}
-	rm -f ${LOCKFILE} ${tmpfile}
+	fi
+	rm -f "$tmpfile" "$LOCKFILE"
 	exit
 }
 
 # If VZ is not running -- do nothing
 # Fix for OpenVZ bug #107
-test -f ${VESTAT} || exit 0
+test -f "$VESTAT" || exit 0
 lockfile
 
-cd ${CONF_DIR} 2>/dev/null || exit 0
+cd "$CONF_DIR" 2>/dev/null || exit 0
 VE_TOTAL=`ls -1 *.conf 2>/dev/null | sed s/.conf//`
 VE_RUN=`awk '
 	$1 != "VEID" && $1 != "Version:" {
@@ -88,15 +86,15 @@ VE_RUN=`awk '
 	}
 ' ${VESTAT}`
 
-if [ -z "${VE_RUN}" ]; then
-	VE_STOPPED="${VE_TOTAL}"
+if [ -z "$VE_RUN" ]; then
+	VE_STOPPED="$VE_TOTAL"
 else
-	VE_STOPPED=`echo -e "${VE_TOTAL}" | egrep -v "${VE_RUN}"`
+	VE_STOPPED=`echo -e "$VE_TOTAL" | egrep -v "$VE_RUN"`
 fi
 
-for i in ${VE_STOPPED}; do
-	check_reboot ${i}
+for i in $VE_STOPPED; do
+	check_reboot "$i"
 done
 
-rm -f ${LOCKFILE}
+rm -f "$LOCKFILE"
 exit 0
