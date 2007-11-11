@@ -29,9 +29,10 @@
 #include "util.h"
 #include "logger.h"
 
-void usage()
+void usage(int rc)
 {
-	printf("Usage: vzmemcheck [-v] [-A]\n");
+	fprintf(rc ? stderr : stdout, "Usage: vzmemcheck [-v] [-A]\n");
+	exit(rc);
 }
 
 void header(int verbose, int param)
@@ -194,9 +195,9 @@ int main(int argc, char **argv)
 			numerator = 1;
 			break;
 		case 'h':
-			usage();
-			exit(1);
-			break;
+			usage(0);
+		default:
+			usage(1);
 		}
 	}
 	init_log(NULL, 0, 0, 0, 0, NULL);
