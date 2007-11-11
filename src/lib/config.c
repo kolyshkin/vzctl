@@ -516,104 +516,65 @@ static int get_mul(char c)
 	return -1;
 }
 
-/* This function parse string in form xxx[GMKPB]:yyy[GMKPB]
+/* This function parses string in form xxx[GMKPB]
+ */
+static const char *parse_ul_sfx(const char *str, unsigned long long *val, int divisor)
+{
+	int n;
+	char *tail;
+
+	if (!str || !val)
+		return NULL;
+	if (!strncmp(str, "unlimited", 9)) {
+		*val = LONG_MAX;
+		return str + 9;
+	}
+	errno = 0;
+	*val = strtoull(str, &tail, 10);
+	if (errno == ERANGE)
+		return NULL;
+	if (*tail != ':' && *tail != '\0') {
+		if (!divisor)
+			return NULL;
+		if ((n = get_mul(*tail)) < 0)
+			return NULL;
+		*val = (*val) * n / divisor;
+		++tail;
+	}
+	return tail;
+}
+
+/* This function parses string in form xxx[GMKPB]:yyy[GMKPB]
  * If :yyy is omitted, it is set to xxx.
  */
 static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 {
-	int n;
-	char *tail;
 	unsigned long long tmp;
 	int ret;
 
-	if (!str || !val)
+	if (!(str = parse_ul_sfx(str, &tmp, divisor)))
 		return ERR_INVAL;
-	ret = errno = 0;
-	tmp = strtoull(str, &tail, 10);
-	if (errno == ERANGE)
-		return ERR_INVAL;
-	if (!strncmp(str, "unlimited", 9)) {
-		tmp = LONG_MAX;
-		tail = (char *)str + 9;
-	} else if (*tail != ':' && *tail != '\0') {
-		if ((n = get_mul(*tail)) < 0)
-			return ERR_INVAL;
-		tmp = tmp * n / divisor;
-		tail++;
-	}
 	if (tmp > LONG_MAX) {
 		tmp = LONG_MAX;
 		ret = ERR_LONG_TRUNC;
 	}
 	val[0] = tmp;
-	if (*tail == ':') {
-		tail++;
-		errno = 0;
-		tmp = strtoull(tail, &tail, 10);
-		if (errno == ERANGE)
+	if (*str == ':') {
+		str = parse_ul_sfx(++str, &tmp, divisor);
+		if (!str || *str != '\0')
 			return ERR_INVAL;
-		if (*tail != '\0') {
-			if (!strncmp(tail, "unlimited", 9))
-				tmp = LONG_MAX;
-			else {
-				if (*(tail + 1) != '\0')
-					return ERR_INVAL;
-				if ((n = get_mul(*tail)) < 0)
-					return ERR_INVAL;
-				tmp = tmp * n / divisor;
-			}
-		}
 		if (tmp > LONG_MAX) {
 			tmp = LONG_MAX;
 			ret = ERR_LONG_TRUNC;
 		}
 		val[1] = tmp;
-	} else if (*tail == 0) {
+	} else if (*str == '\0') {
 		val[1] = val[0];
 	} else
 		return ERR_INVAL;
 	return ret;
 }
 
-/* This function parse string in form xxx:yyy
- * If :yyy is omitted, it is set to xxx.
- */
-
-int parse_twoul(const char *str, unsigned long *val)
-{
-	unsigned long long tmp;
-	char *tail;
-	int ret;
-
-	if (!str || !val)
-		return ERR_INVAL;
-	ret = errno = 0;
-	tmp = strtoull(str, &tail, 10);
-	if (errno == ERANGE)
-		return ERR_INVAL;
-	if (tmp > LONG_MAX) {
-		tmp = LONG_MAX;
-		ret = ERR_LONG_TRUNC;
-	}
-	val[0] = tmp;
-	if (*tail == ':') {
-		tail++;
-		errno = 0;
-		tmp = strtoull(tail, &tail, 10);
-		if ((*tail != '\0') || (errno == ERANGE))
-			return 1;
-		if (tmp > LONG_MAX) {
-			tmp = LONG_MAX;
-			ret = ERR_LONG_TRUNC;
-		}
-		val[1] = tmp;
-	} else if (*tail == 0) {
-		val[1] = val[0];
-	} else {
-		return ERR_INVAL;
-	}
-	return ret;
-}
 /******************** totalmem *************************/
 int parse_meminfo(meminfo_param *param, const char *val)
 {
@@ -672,10 +633,7 @@ int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 
 	if ((conf = conf_get_by_id(config, id)) == NULL)
 		return ERR_INVAL;
-	if (divisor)
-		ret = parse_twoul_sfx(val, res.limit, divisor);
-	else
-		ret = parse_twoul(val, res.limit);
+	ret = parse_twoul_sfx(val, res.limit, divisor ? divisor : 0);
 	if (ret && ret != ERR_LONG_TRUNC)
 		return ret;
 	res.res_id = id;
@@ -976,10 +934,7 @@ static int parse_dq(unsigned long **param, const char *val, int sfx)
 	tmp = malloc(sizeof(unsigned long) * 2);
 	if (tmp == NULL)
 		return ERR_NOMEM;
-	if (sfx)
-		ret = parse_twoul_sfx(val, tmp, 1024);
-	else
-		ret = parse_twoul(val, tmp);
+	ret = parse_twoul_sfx(val, tmp, sfx ? 1024 : 0);
 	if (ret && ret != ERR_LONG_TRUNC) {
 		free(tmp);
 		return ret;
