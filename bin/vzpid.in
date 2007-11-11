@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -18,50 +18,40 @@
 veidmark='envID:'
 namemark='Name:'
 
-function usage()
+usage()
 {
-	echo "Usage: vzpid [pid ...] [-h]"
+	echo 'Usage: vzpid [pid ...] [-h]'
 }
 
-function header()
+header()
 {
-	echo "Pid	VEID	Name"
+	printf '%s\t%s\t%s\n' 'Pid' 'VEID' 'Name'
 }
 
-function getveid()
+getveid()
 {
-	local pid=$1
+	local pid="$1"
 
-	[ -f /proc/${pid}/status ] || return
-	cat /proc/${pid}/status |
-awk -v pid=${pid} 'BEGIN{veid=0} /^'${namemark}'|^'${veidmark}'/{
-	if ($1 == "'${namemark}'") {
-		name = $2;
-	} else if ($1 == "'${veidmark}'") {
-		veid = $2;
-	}
-}
-END{
-	printf("%d\t%s\t%s\n", pid, veid, name);
-}'
+	[ -f "/proc/$pid/status" ] || return
+	awk -v "pid=$pid" '
+BEGIN {veid=0; name=""}
+($1 == "'"$namemark"'") {name = $2}
+($1 == "'"$veidmark"'") {veid = $2}
+END {printf("%d\t%s\t%s\n", pid, veid, name)}
+	' <"/proc/$pid/status"
 }
 
-pidlist=
 if [ $# -eq 0 ]; then
-	usage
+	usage >&2
 	exit 1
-elif [ $# -eq 1 -a "x$1" = "x-" ]; then
-	while read pid; do
-		pidlist="${pidlist} ${pid}"
-	done
-elif [ $# -eq 1 -a "x$1" = "x-h" ]; then
+elif [ $# -eq 1 -a "$1" = '-' ]; then
+	set -- `tr -s '[[:space:]]' ' '`
+elif [ $# -eq 1 -a "$1" = '-h' ]; then
 	usage
 	exit 0
-else
-	pidlist=$*
 fi
-header
-for i in ${pidlist}; do
-	getveid ${i}
-done
 
+header
+for i; do
+	getveid "$i"
+done
