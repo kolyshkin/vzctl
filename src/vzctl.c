@@ -43,21 +43,22 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p, int argc, char **argv, int skiplock);
 
-void version()
+void version(FILE *fp)
 {
-	fprintf(stdout, "vzctl version " VERSION "\n");
+	fprintf(fp, "vzctl version " VERSION "\n");
 }
 
-void usage()
+void usage(int rc)
 {
 	struct mod_action mod;
+	FILE *fp = rc ? stderr : stdout;
 
-	version();
-	fprintf(stdout, "Copyright (C) 2000-2007 SWsoft.\n");
-	fprintf(stdout, "This program may be distributed under the terms of the GNU GPL License.\n\n");
-	fprintf(stdout, "Usage: vzctl [options] <command> <veid> [parameters]\n"
+	version(fp);
+	fprintf(fp, "Copyright (C) 2000-2007 SWsoft.\n");
+	fprintf(fp, "This program may be distributed under the terms of the GNU GPL License.\n\n");
+	fprintf(fp, "Usage: vzctl [options] <command> <veid> [parameters]\n"
 "vzctl destroy | mount | umount | stop | status | enter <veid>\n"
-"vzctl create <veid> {--ostemplate <name>] [--config <name>]\n"
+"vzctl create <veid> [--ostemplate <name>] [--config <name>]\n"
 "   [--private <path>] [--root <path>] [--ipadd <addr>] | [--hostname <name>]\n"
 "vzctl start <veid> [--force] [--wait]\n"
 "vzctl exec | exec2 <veid> <command> [arg ...]\n"
@@ -79,8 +80,8 @@ void usage()
 "   [--ioprio <N>]\n");
 
 
-	fprintf(stdout, "   [--iptables <name>] [--disabled <yes|no>]\n");
-	fprintf(stdout, "   [UBC parameters]\n"
+	fprintf(fp, "   [--iptables <name>] [--disabled <yes|no>]\n");
+	fprintf(fp, "   [UBC parameters]\n"
 "UBC parameters (N - items, P - pages, B - bytes):\n"
 "Two numbers divided by colon means barrier:limit.\n"
 "In case the limit is not given it is set to the same value as the barrier.\n"
@@ -96,6 +97,7 @@ void usage()
 	init_modules(&mod, NULL);
 	mod_print_usage(&mod);
 	free_modules(&mod);
+	exit(rc);
 }
 
 int main(int argc, char *argv[], char *envp[])
@@ -148,7 +150,7 @@ int main(int argc, char *argv[], char *envp[])
 		} else if (!strcmp(opt, "--quiet"))
 			quiet = 1;
 		else if (!strcmp(opt, "--version")) {
-			version();
+			version(stdout);
 			exit(0);
 		} else if (!strcmp(opt, "--skiplock"))
 			skiplock = YES;
@@ -156,10 +158,8 @@ int main(int argc, char *argv[], char *envp[])
 			break;
 		argc--; argv++;
 	}
-	if (argc <= 1)	{
-		usage();
-		exit(VZ_INVALID_PARAMETER_SYNTAX);
-	}
+	if (argc <= 1)
+		usage(VZ_INVALID_PARAMETER_SYNTAX);
 	action_nm = argv[1];
 	init_log(NULL, 0, 1, verbose, 0, NULL);
 	if (!strcmp(argv[1], "set")) {
@@ -214,8 +214,7 @@ int main(int argc, char *argv[], char *envp[])
 	} else if (!strcmp(argv[1], "quotainit")) {
 		action = ACTION_QUOTAINIT;
 	} else if (!strcmp(argv[1], "--help")) {
-		usage();
-		exit(0);
+		usage(0);
 	} else {
 		init_modules(&g_action, action_nm);
 		action = ACTION_CUSTOM;
