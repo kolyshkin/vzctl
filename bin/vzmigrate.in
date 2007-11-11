@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -88,7 +88,7 @@ MIG_ERR_OVZ_NOT_RUNNING=14
 MIG_ERR_APPLY_CONFIG=15
 
 usage() {
-	cat <<EOF
+	cat >&2 <<EOF
 This program is used for VE migration to another node
 Usage:
 vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
@@ -145,9 +145,8 @@ logexec () {
 		$@
 	else
 		shift
-		$@ &> /dev/null
+		$@ >/dev/null 2>&1
 	fi
-	return $?
 }
 
 undo_conf () {
@@ -174,12 +173,12 @@ undo_root () {
 }
 
 undo_quota_init () {
-	[ "${DISK_QUOTA}" != "no" ] && $SSH "root@$host" "vzquota drop $VEID"
+	[ "${DISK_QUOTA}" = 'no' ] || $SSH "root@$host" "vzquota drop $VEID"
 	undo_root
 }
 
 undo_quota_on () {
-	[ "${DISK_QUOTA}" != "no" ] && $SSH "root@$host" "vzquota off $VEID"
+	[ "${DISK_QUOTA}" = 'no' ] || $SSH "root@$host" "vzquota off $VEID"
 	undo_quota_init
 }
 
@@ -265,7 +264,7 @@ while [ ! -z "$1" ]; do
 		if [ "$1" = "yes" ]; then
 			remove_area=1
 		elif [ "$1" = "no" ]; then
-			remove_area=0;
+			remove_area=0
 		else
 			usage
 		fi
@@ -380,7 +379,7 @@ fi
 
 logexec 2 $SSH root@$host vzctl set $VEID --applyconfig_map name --save
 # vzctl return code 20 or 21 in case of unrecognized option
-if [[ $? != 20 && $? != 21 && $? != 0 ]]; then
+if [ $? != 20 && $? != 21 && $? != 0 ]; then
 	log 0 "Failed to apply config on destination node"
 	undo_conf
 	exit $MIG_ERR_APPLY_CONFIG
