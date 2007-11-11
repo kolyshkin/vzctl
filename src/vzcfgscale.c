@@ -32,9 +32,9 @@ static struct option options[] =
 	{ NULL, 0, NULL, 0 }
 };
 
-void usage()
+void usage(int rc)
 {
-	fprintf(stderr, "Usage: vzcfgscale [options] <configfile>
+	fprintf(rc ? stderr : stdout, "Usage: vzcfgscale [options] <configfile>
 Options are:
 \t-o, --output-file <file>   Write output to file. Default is stdout
 \t-a, --all <coeff>          Scale all parameters to the value <coeff>
@@ -44,6 +44,7 @@ Options are:
 \t-n, --network-only <coeff> Scale only network bandwidth parameters
 \t-v, --validate             Validate UBC parameters
 \t-r, --remove               Removes VE-specific parameters\n");
+	exit(rc);
 }
 
 void remove_ve_spec(struct CParam *param)
@@ -219,10 +220,7 @@ int main(int argc, char **argv)
 	ubc_k = cpu_k = disk_k = net_k = all_k = 0;
 	remove = validate = 0;
 	if (argc < 2)
-	{
-		usage();
-		exit(1);
-	}
+		usage(1);
 	while(1)
 	{
 		int option_index = -1;
@@ -282,8 +280,7 @@ int main(int argc, char **argv)
 				validate = 1;
 				break;
 			case PARAM_HELP		:
-				usage();
-				exit(0);
+				usage(0);
 			case '?'		:
 				exit(1);
 			default			:
@@ -306,8 +303,7 @@ int main(int argc, char **argv)
 	}
 	if (in_file == NULL)
 	{
-		usage();
-		exit(1);
+		usage(1);
 	}
 	if (!stat(out_file, &st) && S_ISDIR(st.st_mode))
 	{
