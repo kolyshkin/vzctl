@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #
 # Common stuff for vzctl helper scripts
 # get the name of the script
-SELFNAME=`basename $0`
+SELFNAME="${0##*/}"
 
 # Set the sane umask
 umask 022
@@ -45,7 +45,7 @@ IP_CMD=/sbin/ip
 #   $2 - exit code
 # Example of usage:
 #   vzerror "Fatal error" 1
-function vzerror()
+vzerror()
 {
 	# print errors to stdout too
 	ERR=$?
@@ -58,7 +58,7 @@ function vzerror()
 #   $* - error message
 # Example of usage:
 #   vzwarning Invalid user
-function vzwarning()
+vzwarning()
 {
 	echo "$SELFNAME WARNING: $*"
 }
@@ -68,7 +68,7 @@ function vzwarning()
 #   $* - debug message
 # Example of usage:
 #   vzdebug Trying to start ls
-function vzdebug()
+vzdebug()
 {
 	echo "$SELFNAME: $*"
 }
@@ -79,18 +79,19 @@ function vzdebug()
 #   $* - option names
 # Example:
 #   vzcheckvar VEID IP_ADDR
-function vzcheckvar()
+vzcheckvar()
 {
-	for VAR in $*; do
-		if eval test "\"x\$$VAR\"" = "x"; then
-			vzerror "Missing parameter: $VAR" $VZ_INVALID_PARAMETER_SYNTAX
-		fi
+	local var
+
+	for var; do
+		eval test -n "\"\$$var\"" ||
+			vzerror "Missing parameter: $var" $VZ_INVALID_PARAMETER_SYNTAX
 	done
 }
 
 # This function fills $NETDEVICES with all network interfaces
 # You should always call it before calling vzarp
-function vzgetnetdev()
+vzgetnetdev()
 {
 	# Get a list of interfaces, excluding ones with LOOPBACK,
 	# NOARP, or SLAVE flags
@@ -107,109 +108,118 @@ function vzgetnetdev()
 	}' | sed -e 's/:$//' -e 's/@.*$//'`
 }
 
+# Find interface for given IP if it is local for one of $NETDEVICES
+vz_get_local_dev()
+{
+	[ -n "$NETDEVICES" ] || vzwarning 'Device list is empty'
+	[ -n "$1" -a -n "$NETDEVICES" ] || return 1
+
+	local dev netdev
+
+	dev="$(${IP_CMD} route get "$1" |sed -ne '/ via /! s/^.* dev \([^ ]\+\) \+src \+.*$/\1/p;Q')"
+	[ -n "$dev" ] || return 1
+
+	for netdev in $NETDEVICES; do
+		if [ "$dev" = "$netdev" ]; then
+			echo "$dev"
+			return 0
+		fi
+	done
+	return 1
+}
+
 # Adds/deletes public ARP records for given IP for all interfaces
 # Parameters:
 #   $1		- should be either "add" or "del"
 #   $2		- IP address
 #   $NETDEVICES - Network devices used to take MAC addresses from
-function vzarp()
+vzarp()
 {
-	local DEV
+	local dev
 
-	[ -z "${NETDEVICES}" ] && vzwarning "Device list is empty"
-	for DEV in $NETDEVICES; do
-		${IP_CMD} neigh $1 proxy $2 dev $DEV > /dev/null 2>&1
-	done
+	dev="$(vz_get_local_dev "$2")" || return
+	${IP_CMD} neigh "$1" proxy "$2" dev "$dev" >/dev/null 2>&1
 }
 
 # Send ARP request to detect that somebody already have this IP
-function vzarpipdetect()
+vzarpipdetect()
 {
-	local DEV
-	local ip
-	local cmd
+	[ -n "$1" ] || return
+	[ "$SKIP_ARPDETECT" = 'yes' ] && return
 
-	[ -z "${1}" ] && return
-	[ "${SKIP_ARPDETECT}" = "yes" ] && return
+	local dev ip
 
-	for ip in ${1}; do
-		cmd="$cmd -e $ip"
-	done
-
-	for DEV in $NETDEVICES; do
-		${ARPSEND_CMD} -D ${cmd} $DEV || vzwarning "${ARPSEND_CMD} -D ${cmd} $DEV FAILED"
+	for ip in $1; do
+		dev="$(vz_get_local_dev "$ip")" || continue
+		${ARPSEND_CMD} -D -e "$ip" "$dev" ||
+			vzwarning "$ARPSEND_CMD -D -e $ip $dev FAILED"
 	done
 }
 
 # Send ARP request to update neighbour ARP caches
-function vzarpipset()
+vzarpipset()
 {
-	local DEV
-	local ip
-	local dev
+	[ -n "$1" ] || return
 
-	[ -z "${1}" ] && return
+	local dev ip
 
-	for dev in $NETDEVICES; do
-		for ip in ${1}; do
-			opt="-i ${ip} -e ${ip}"
-			${ARPSEND_CMD} -U ${opt} ${dev} || vzwarning "${ARPSEND_CMD} -U ${opt} ${dev} FAILED"
-		done
+	for ip in $1; do
+		dev="$(vz_get_local_dev "$ip")" || continue
+		${ARPSEND_CMD} -U -i "$ip" -e "$ip" "$dev" ||
+			vzwarning "$ARPSEND_CMD -U -i $ip -e $ip $dev FAILED"
 	done
 }
 
-function vzaddrouting4()
+vzaddrouting4()
 {
 	local src_addr=
 
-	if [ -n "${VE_ROUTE_SRC_DEV}" ]; then
-		src_addr=`ip route list table local dev ${VE_ROUTE_SRC_DEV} |
-			grep '^local'|
-			cut -d' ' -f2 | grep -v '^127\.' | head -n 1`
-		if [ -z "${src_addr}" ]; then
+	if [ -n "$VE_ROUTE_SRC_DEV" ]; then
+		src_addr=`${IP_CMD} route list table local dev "$VE_ROUTE_SRC_DEV" |
+			grep '^local' | cut -d' ' -f2 | grep -v '^127\.' | head -n 1`
+		[ -n "$src_addr" ] ||
 			vzerror "Unable to get source ip [${VE_ROUTE_SRC_DEV}]" $VZ_CANT_ADDIP
-		fi
-		src_addr="src ${src_addr}"
+		src_addr="src $src_addr"
 	fi
-	${IP_CMD} route add $1 dev venet0 ${src_addr} ||
-		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 ${src_addr}" $VZ_CANT_ADDIP
+	${IP_CMD} route add "$1" dev venet0 $src_addr ||
+		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 $src_addr" $VZ_CANT_ADDIP
 }
 
-function vzaddrouting6()
+vzaddrouting6()
 {
-	${IP_CMD} route add $1 dev venet0 ||
+	${IP_CMD} route add "$1" dev venet0 ||
 		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0" $VZ_CANT_ADDIP
 }
 
 # Sets VE0 source routing for given IP
 # Parameters:
 #   $1 - IP address
-function vzaddrouting()
+vzaddrouting()
 {
 
-	if ! ${IP_CMD} route list table all $1 | grep "$1 dev venet0" > /dev/null 2>&1;
-	then
-		if [ "${1#*:}" = "${1}" ]; then
-			vzaddrouting4 $1
-		else
-			vzaddrouting6 $1
-		fi
+	${IP_CMD} route list table all "$1" | fgrep -qs "$1 dev venet0" &&
+		return 0
+	if [ "${1#*:}" = "$1" ]; then
+		vzaddrouting4 "$1"
+	else
+		vzaddrouting6 "$1"
 	fi
 }
 
 # Deletes VE0 source routing for given IP
 # Parameters:
 #   $1 - IP address
-function vzdelrouting()
+vzdelrouting()
 {
+	${IP_CMD} route list table all "$1" | fgrep -qs "$1 dev venet0" ||
+		return 0
 	local arg
-	if ${IP_CMD} route list table all $1 | grep  "$1 dev venet0" >/dev/null 2>&1; then
-		if [ "${1%%:*}" != "${1}" ]; then
-			arg="-6 route flush $1 dev venet0"
-		else
-			arg="route del $1 dev venet0"
-		fi
-		${IP_CMD} ${arg} ||
-			vzwarning "vzdelrouting: ${IP_CMD} ${arg} failed"
+
+	if [ "${1%%:*}" = "$1" ]; then
+		arg="route del $1 dev venet0"
+	else
+		arg="-6 route flush $1 dev venet0"
 	fi
+	${IP_CMD} $arg ||
+		vzwarning "vzdelrouting: ${IP_CMD} $arg failed"
 }
