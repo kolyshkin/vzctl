@@ -26,8 +26,6 @@
 #include "validate.h"
 #include "logger.h"
 
-log_param g_log;
-
 void usage()
 {
 	printf("Usage: vzcfgvalidate [-r|-i] <configfile>\n");

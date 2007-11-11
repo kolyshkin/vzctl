@@ -43,7 +43,6 @@
 #include "util.h"
 #include "types.h"
 
-LOG_DATA
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
 

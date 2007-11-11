@@ -32,8 +32,6 @@
 #include "util.h"
 #include "modules.h"
 
-LOG_DATA
-
 struct mod_action g_action;
 char *_proc_title;
 int _proc_title_len;

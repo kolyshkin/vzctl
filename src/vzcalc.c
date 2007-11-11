@@ -22,12 +22,9 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#include "logger.h"
 #include "ub.h"
 #include "config.h"
 #include "util.h"
-
-LOG_DATA
 
 void usage()
 {

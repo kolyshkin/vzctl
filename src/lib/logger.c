@@ -30,7 +30,7 @@
 #include "types.h"
 #include "logger.h"
 
-extern log_param g_log;
+LOG_DATA
 
 static inline void get_date(char *buf, int len)
 {

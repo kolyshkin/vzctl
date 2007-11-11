@@ -28,10 +28,6 @@
 #include "types.h"
 #include "config.h"
 
-/* The below two lines are needed to link vzsplit with libvzctl */
-#include <logger.h>
-LOG_DATA
-
 /* #include <linux/magic.h>
  * Instead of including a file which is not present in all environments,
  * we copy-paste reiserfs magic from it

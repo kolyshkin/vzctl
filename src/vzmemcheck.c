@@ -29,8 +29,6 @@
 #include "util.h"
 #include "logger.h"
 
-LOG_DATA
-
 void usage()
 {
 	printf("Usage: vzmemcheck [-v] [-A]\n");
