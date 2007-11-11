@@ -26,9 +26,10 @@
 #include "config.h"
 #include "util.h"
 
-void usage()
+void usage(int rc)
 {
-	printf("Usage: vzcalc [-v] <veid>\n");
+	fprintf(rc ? stderr : stdout, "Usage: vzcalc [-v] <veid>\n");
+	exit(rc);
 }
 
 static int check_param(struct ub_struct *param)
@@ -185,17 +186,14 @@ int main(int argc, char **argv)
 			verbose = 1;
 			break;
 		case 'h':
-			usage();
-			exit(1);
+			usage(0);
 			break;
 		default	:
 			exit(1);
 		}
 	}
-	if (optind == argc) {
-		usage();
-		exit(1);
-	}
+	if (optind == argc)
+		usage(1);
 	if (parse_int(argv[optind], &veid)) {
 		fprintf(stderr, "Invalid VE ID: %s\n", argv[optind]);
 		exit(1);
