@@ -26,11 +26,13 @@
 #include "validate.h"
 #include "logger.h"
 
-void usage()
+void usage(int rc)
 {
-	printf("Usage: vzcfgvalidate [-r|-i] <configfile>\n");
-	printf("	-r repair mode\n");
-	printf("	-i interactive repair mode\n");
+	FILE *fp = rc ? stderr : stdout;
+	fprintf(fp, "Usage: vzcfgvalidate [-r|-i] <configfile>\n");
+	fprintf(fp, "	-r repair mode\n");
+	fprintf(fp, "	-i interactive repair mode\n");
+	exit(rc);
 }
 
 int main(int argc, char **argv)
@@ -40,7 +42,7 @@ int main(int argc, char **argv)
 	char *infile = NULL;
 	int ret, opt, recover = 0, ask = 0;
 
-	while ((opt = getopt(argc, argv, "ri")) > 0)
+	while ((opt = getopt(argc, argv, "rih")) > 0)
 	{
 		switch(opt) {
 		case 'r'	:
@@ -49,15 +51,14 @@ int main(int argc, char **argv)
 		case 'i'	:
 			ask = 1;
 			break;
+		case 'h'	:
+			usage(0);
 		default	:
-			usage();
-			exit(1);
+			usage(1);
 		}
 	}
-	if (optind >= argc) {
-		usage();
-		exit(1);
-	}
+	if (optind >= argc)
+		usage(1);
 	infile = strdup(argv[optind]);
 	if (stat(infile, &st)) {
 		fprintf(stderr,"VE configuration file: %s not found\n", infile);
