@@ -173,13 +173,14 @@ char *level_string[MAX_SL+1] = {
 "Overall resource shortage. Please, do not change any parameters!\0"
 };
 
-void usage()
+void usage(int rc)
 {
-	fprintf(stderr, "Usage: vzsplit [-f config_name] "
+	fprintf(rc ? stderr : stdout, "Usage: vzsplit [-f config_name] "
 			"| [-n numves] | [-s swap_size\n"
 		"\t -f specified config name\n"
 		"\t -n specified number of VEs\n"
 		"\t -s specified swap in Kbytes\n");
+	exit(rc);
 }
 
 void header(FILE *fp)
@@ -578,14 +579,13 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'h':
+			usage(0);
 		default	:
-			usage();
-			exit(0);
+			usage(1);
 		}
 	}
 	if (optind < argc) {
-		usage();
-		exit(1);
+		usage(1);
 	}
 	if (num_ve == -1) {
 		printf("Enter the number of VEs: ");
