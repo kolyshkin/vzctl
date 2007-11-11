@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2007 SWsoft. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -28,25 +28,30 @@
 
 vzcheckvar VE_PRVT PRIVATE_TEMPLATE
 
-function create_prvt()
+create_prvt()
 {
-	if test ! -d ${VE_PRVT}; then
-		vzerror "Destination dir doesn't exists: ${VE_PRVT}" $VZ_FS_NEW_VE_PRVT
-	fi
+	local TMP AVAIL NEEDED HEADER OPT
 
-	if test ! -f $PRIVATE_TEMPLATE; then
-		vzerror "Tarball does not exist: ${PRIVATE_TEMPLATE}" $VZ_FS_NEW_VE_PRVT
+	[ -d "$VE_PRVT" ] ||
+		vzerror "Destination directory does not exist: $VE_PRVT" ${VZ_FS_NEW_VE_PRVT}
+	[ -f "$PRIVATE_TEMPLATE" ] ||
+		vzerror "Tarball does not exist: $PRIVATE_TEMPLATE" ${VZ_FS_NEW_VE_PRVT}
+	HEADER="$(od -A n -N 2 -t x1 -- "$PRIVATE_TEMPLATE")" ||
+		vzerror "Invalid tarball: $PRIVATE_TEMPLATE" ${VZ_FS_NEW_VE_PRVT}
+	TMP="$(df -P "$VE_PRVT")" ||
+		vzerror "Failed to calculate available disk space on $VE_PRVT" ${VZ_FS_NEW_VE_PRVT}
+	AVAIL="$(echo "$TMP" | awk 'END{print $4}')"
+	if [ "$HEADER" = ' 1f 8b' ]; then
+		NEEDED="$(gzip -l "$PRIVATE_TEMPLATE" | awk 'END{print int($2/1024)}')"
+		OPT=-z
+	else
+		NEEDED="$(find "$PRIVATE_TEMPLATE" -maxdepth 0 -path "$PRIVATE_TEMPLATE" -printf %k)"
+		OPT=
 	fi
-	TMP=`df -P ${VE_PRVT}`
-	AVAIL=`echo "${TMP}" | awk 'END{print $4}'`
-	NEEDED=`gzip -l  ${PRIVATE_TEMPLATE} | awk 'END{print int($2/1024)}'`
-	if test ${AVAIL} -lt ${NEEDED}; then
-		vzerror "Insufficient disk space in ${VE_PRVT} available: ${AVAIL} needed: ${NEEDED} <${TMP}>" ${VZ_FS_NO_DISK_SPACE}
-	fi
-	tar -C ${VE_PRVT} ${TAR_OPT} -xzf ${PRIVATE_TEMPLATE}
-	if [ $? -ne 0 ]; then
-		vzerror "Error in tar xzf $PRIVATE_TEMPLATE ${exclude}" $VZ_FS_NEW_VE_PRVT
-	fi
+	[ "$AVAIL" -ge "$NEEDED" ] ||
+		vzerror "Insufficient disk space in $VE_PRVT; available: $AVAIL, needed: $NEEDED" ${VZ_FS_NO_DISK_SPACE}
+	tar -C "$VE_PRVT" ${TAR_OPT} ${OPT} -xf "$PRIVATE_TEMPLATE" ||
+		vzerror "Error in tar ${TAR_OPT} ${OPT} -xf $PRIVATE_TEMPLATE" ${VZ_FS_NEW_VE_PRVT}
 }
 
 create_prvt
