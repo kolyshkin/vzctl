@@ -184,8 +184,8 @@ int none_sort_fn(const void *val1, const void *val2)
 
 int laverage_sort_fn(const void *val1, const void *val2)
 {
-	struct Cla *la1 = ((const struct Cveinfo *)val1)->la;
-	struct Cla *la2 = ((const struct Cveinfo *)val2)->la;
+	const struct Cla *la1 = ((const struct Cveinfo *)val1)->la;
+	const struct Cla *la2 = ((const struct Cveinfo *)val2)->la;
 	int res;
 
 	if ((res = check_empty_param(la1, la2)) == 2)
@@ -235,8 +235,8 @@ SORT_STR_FN(ip_sort_fn, ip)
 #define SORT_UL_RES(fn, type, res, name, index)				\
 int fn(const void *val1, const void *val2)				\
 {									\
-	struct type *r1 = ((const struct Cveinfo *)val1)->res;		\
-	struct type *r2 = ((const struct Cveinfo *)val2)->res;		\
+	const struct type *r1 = ((const struct Cveinfo *)val1)->res;	\
+	const struct type *r2 = ((const struct Cveinfo *)val2)->res;	\
 	int ret;							\
 	if ((ret = check_empty_param(r1, r2)) == 2)			\
 		ret = r1->name[index] > r2->name[index];		\
