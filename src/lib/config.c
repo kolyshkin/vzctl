@@ -633,7 +633,7 @@ int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 
 	if ((conf = conf_get_by_id(config, id)) == NULL)
 		return ERR_INVAL;
-	ret = parse_twoul_sfx(val, res.limit, divisor ? divisor : 0);
+	ret = parse_twoul_sfx(val, res.limit, divisor);
 	if (ret && ret != ERR_LONG_TRUNC)
 		return ret;
 	res.res_id = id;
