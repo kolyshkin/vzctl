@@ -550,7 +550,7 @@ static const char *parse_ul_sfx(const char *str, unsigned long long *val, int di
 static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 {
 	unsigned long long tmp;
-	int ret;
+	int ret = 0;
 
 	if (!(str = parse_ul_sfx(str, &tmp, divisor)))
 		return ERR_INVAL;
