@@ -53,6 +53,7 @@ static struct iptables_s iptables[] = {
 	{"xt_mac", VE_IP_MATCH_MAC_MOD, VE_IP_MATCH_MAC},
 #endif
 #endif /* VZCTL_ENV_CREATE_DATA */
+	{"ipt_owner", VE_IP_MATCH_OWNER_MOD, VE_IP_MATCH_OWNER},
 	{NULL, 0}
 };
 
