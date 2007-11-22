@@ -838,6 +838,11 @@ int vps_restart(vps_handler *h, envid_t veid, vps_param *param)
 	{
 		return ret;
 	}
+	if (param->opt.start_disabled == YES)
+	{
+		logger(-1, 0, "VE start disabled");
+		return VZ_VE_START_DISABLED;
+	}
 	ret = vps_start(h, veid, param, SKIP_NONE, NULL);
 
 	return ret;
