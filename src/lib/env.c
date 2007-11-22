@@ -662,10 +662,9 @@ err:
  *
  * @param h		VE handler.
  * @param veid		VE id.
- * @param res		VE resourses.
- * @param d_actions	distribution specific actions.
+ * @param param	VE parameters.
  * @param skip		flags to skip VE setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
- * @param action	modules list, used to call setup() callback
+ * @param mod		modules list, used to call setup() callback
  * @return		0 on success.
  */
 int vps_start(vps_handler *h, envid_t veid, vps_param *param,
@@ -777,7 +776,7 @@ err:
  *
  * @param h		VE handler.
  * @param veid		VE id.
- * @param res		VE resourses.
+ * @param param	VE parameters.
  * @param stop_mode	stop mode, one of (M_REBOOT M_HALT M_KILL).
  * @param skip		flag to skip run action script (SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call cleanup() callback.
@@ -822,6 +821,13 @@ end:
 	return ret;
 }
 
+/** Restart VE.
+ *
+ * @param h		VE handler.
+ * @param veid		VE id.
+ * @param param	VE parameters.
+ * @return		0 on success.
+ */
 int vps_restart(vps_handler *h, envid_t veid, vps_param *param)
 {
 	int ret;
