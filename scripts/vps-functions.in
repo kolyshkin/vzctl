@@ -108,24 +108,27 @@ vzgetnetdev()
 	}' | sed -e 's/:$//' -e 's/@.*$//'`
 }
 
-# Find interface for given IP if it is local for one of $NETDEVICES
-vz_get_local_dev()
+# Find neighbour interfaces for given IP.
+vz_get_neighbour_devs()
 {
 	[ -n "$NETDEVICES" ] || vzwarning 'Device list is empty'
 	[ -n "$1" -a -n "$NETDEVICES" ] || return 1
 
+	if [ "$NEIGHBOUR_DEVS" != 'detect' ]; then
+		echo $NETDEVICES
+		return 0
+	fi
+
 	local dev netdev
 
 	dev="$(${IP_CMD} route get "$1" |sed -ne '/ via /! s/^.* dev \([^ ]\+\) \+src \+.*$/\1/p;Q')"
-	[ -n "$dev" ] || return 1
+	[ -n "$dev" ] || return 0
 
 	for netdev in $NETDEVICES; do
 		if [ "$dev" = "$netdev" ]; then
 			echo "$dev"
-			return 0
 		fi
 	done
-	return 1
 }
 
 # Adds/deletes public ARP records for given IP for all interfaces
@@ -137,8 +140,9 @@ vzarp()
 {
 	local dev
 
-	dev="$(vz_get_local_dev "$2")" || return
-	${IP_CMD} neigh "$1" proxy "$2" dev "$dev" >/dev/null 2>&1
+	for dev in $(vz_get_neighbour_devs "$2"); do
+		${IP_CMD} neigh "$1" proxy "$2" dev "$dev" >/dev/null 2>&1
+	done
 }
 
 # Send ARP request to detect that somebody already have this IP
@@ -150,9 +154,10 @@ vzarpipdetect()
 	local dev ip
 
 	for ip in $1; do
-		dev="$(vz_get_local_dev "$ip")" || continue
-		${ARPSEND_CMD} -D -e "$ip" "$dev" ||
-			vzwarning "$ARPSEND_CMD -D -e $ip $dev FAILED"
+		for dev in $(vz_get_neighbour_devs "$ip"); do
+			${ARPSEND_CMD} -D -e "$ip" "$dev" ||
+				vzwarning "$ARPSEND_CMD -D -e $ip $dev FAILED"
+		done
 	done
 }
 
@@ -164,9 +169,10 @@ vzarpipset()
 	local dev ip
 
 	for ip in $1; do
-		dev="$(vz_get_local_dev "$ip")" || continue
-		${ARPSEND_CMD} -U -i "$ip" -e "$ip" "$dev" ||
-			vzwarning "$ARPSEND_CMD -U -i $ip -e $ip $dev FAILED"
+		for dev in $(vz_get_neighbour_devs "$ip"); do
+			${ARPSEND_CMD} -U -i "$ip" -e "$ip" "$dev" ||
+				vzwarning "$ARPSEND_CMD -U -i $ip -e $ip $dev FAILED"
+		done
 	done
 }
 
