@@ -51,6 +51,12 @@ This parameter specifies the network device name which ip address will used for
 source ip. If on HN configured > 1 network interfaces and needed to specify
 the source ip address, set corresponding \fIdevice\fR. By default takes the
 first in network device list.
+.IP \fBNEIGHBOUR_DEVS\fR[="\fBdetect\fR"]
+Controls on which interfaces to add/remove ARP records for a VE IP, also
+which interfaces to use to query/announce ARP. If this is set to \fBdetect\fR,
+the right network interface (the one which is in the same subnet as a VE IP)
+will be chosen automatically. Any other value restores old (as of vzctl 3.0.19
+or older) behavior, when all the possible interfaces were used.
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
 Value of this parameter is a directory in which all VE template data are
 stored.
