@@ -23,6 +23,7 @@
 #   VEID    - VE id
 #   IP_ADDR - VE IP address(es) divided by spaces
 
+. @PKGCONFDIR@/vz.conf
 . @PKGLIBDIR@/scripts/vps-functions
 
 # get list of network devices for vzarp

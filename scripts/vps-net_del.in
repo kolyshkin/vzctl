@@ -26,6 +26,7 @@
 #   VE_STATE      - state of VE; could be one of:
 #                     starting | stopping | running | stopped
 
+. @PKGCONFDIR@/vz.conf
 . @PKGLIBDIR@/scripts/vps-functions
 
 vzcheckvar IP_ADDR VEID

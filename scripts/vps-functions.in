@@ -108,7 +108,9 @@ vzgetnetdev()
 	}' | sed -e 's/:$//' -e 's/@.*$//'`
 }
 
-# Find neighbour interfaces for given IP.
+# Find neighbour interfaces for a given VE IP.
+# Make sure to source @PKGCONFDIR@/vz.conf before calling this,
+# in order to get the value of $NEIGHBOUR_DEVS from it.
 vz_get_neighbour_devs()
 {
 	[ -n "$NETDEVICES" ] || vzwarning 'Device list is empty'
