@@ -121,7 +121,7 @@ function add_ip()
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		rm -f "${CFGFILE}" 2>/dev/null
 	fi
-	if ! grep -qe "^auto ${VENET_DEV} " ${CFGFILE} 2>/dev/null; then
+	if ! grep -q -E "^auto ${VENET_DEV}([^:]|$)" ${CFGFILE} 2>/dev/null; then
 		setup_network
 	fi
 	if [ "${IPDELALL}" = "yes" ]; then
