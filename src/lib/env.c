@@ -84,11 +84,15 @@ int vz_env_create_data_ioctl(vps_handler *h,
 			sleep(1);
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE_DATA, data);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
+
+	if (errcode >= 0) {
+		/* Clear supplementary group IDs */
+		setgroups(0, NULL);
 #ifdef  __x86_64__
-	/* Set personality PER_LINUX32 for i386 based VEs */
-	if (errcode >= 0)
+		/* Set personality PER_LINUX32 for i386 based VEs */
 		set_personality32();
 #endif
+	}
 	return errcode;
 }
 
@@ -106,11 +110,14 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 			sleep(1);
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE, &env_create);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
+	if (errcode >= 0 && (flags & VE_ENTER)) {
+		/* Clear supplementary group IDs */
+		setgroups(0, NULL);
 #ifdef  __x86_64__
-	/* Set personality PER_LINUX32 for i386 based VEs */
-	if (errcode >= 0 && (flags & VE_ENTER))
+		/* Set personality PER_LINUX32 for i386 based VEs */
 		set_personality32();
 #endif
+	}
 	return errcode;
 }
 
