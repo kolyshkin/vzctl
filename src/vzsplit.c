@@ -390,7 +390,8 @@ int calculate_values()
 	privvm = guarpg * k_privvm[sl];
 	if (privvm > PRIVVM_PVE * mem_total) {
 		privvm = PRIVVM_PVE * mem_total;
-		guarpg = privvm;
+		if (guarpg > privvm)
+			guarpg = privvm;
 	}
 	params[PRIVVMPG].bar = CHECK_LIMIT(privvm);
 	params[PRIVVMPG].lim = CHECK_LIMIT(privvm * PRIVVM_DELTA);
