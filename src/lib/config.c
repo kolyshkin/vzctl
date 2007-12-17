@@ -1033,7 +1033,7 @@ static int parse_devices_str(const char *str, dev_res *dev)
 		dev->type |= VE_USE_MINOR;
 		if (parse_ul(minor, &val))
 			return -1;
-		dev->dev |= makedev(major, val);
+		dev->dev = makedev(major, val);
 	}
 	ret = parse_dev_perm(mode, &dev->mask);
 	return 0;
