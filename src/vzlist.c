@@ -1638,12 +1638,19 @@ int main(int argc, char **argv)
 	}
 	if (optind < argc) {
 		while (optind < argc) {
-			veid =  strtol(argv[optind++], &ep, 10);
+			veid =  strtol(argv[optind], &ep, 10);
 			if (*ep != 0 || !veid) {
-				fprintf(stderr, "Invalid veid: %s\n",
-				argv[optind - 1]);
-				return 1;
+				char name[STR_SIZE];
+
+				veid = get_veid_by_name(argv[optind]);
+				if (veid < 0) {
+					fprintf(stderr,
+						"VE ID %s is invalid.\n",
+						argv[optind]);
+					return 1;
+				}
 			}
+			optind++;
 			g_ve_list = x_realloc(g_ve_list,
 				sizeof(*g_ve_list) * ++n_ve_list);
 			g_ve_list[n_ve_list - 1] = veid;
