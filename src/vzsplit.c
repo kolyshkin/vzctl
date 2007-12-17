@@ -497,7 +497,7 @@ int check_disk_space() {
 				"of partition holding %s is 20Gb!\n",
 				ve_private);
 
-	ve_ds = ds_total / (DEF_DS);
+	ve_ds = ds_total / (DEF_DS * 1024 / statfs_buf.f_bsize);
 	ve_di = di_total / (DEF_DI);
 
 	if (ve_ds < num_ve) {
