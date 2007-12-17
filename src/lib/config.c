@@ -24,6 +24,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <getopt.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <linux/vzcalluser.h>
 #include <unistd.h>
@@ -1024,15 +1025,15 @@ static int parse_devices_str(const char *str, dev_res *dev)
 		dev->type = S_IFCHR;
 	else
 		return -1;
-	dev->dev = major << 8;
 	if (!strcmp(minor, "all")) {
 		dev->use_major = VE_USE_MAJOR;
 		dev->type |= VE_USE_MAJOR;
+		dev->dev = makedev(major, 0);
 	} else {
 		dev->type |= VE_USE_MINOR;
 		if (parse_ul(minor, &val))
 			return -1;
-		dev->dev |= (val & 0xFF);
+		dev->dev |= makedev(major, val);
 	}
 	ret = parse_dev_perm(mode, &dev->mask);
 	return 0;
@@ -1078,8 +1079,8 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
-		major = (res->dev >> 8) & 0xFF;
-		minor = res->dev & 0xFF;
+		major = major(res->dev);
+		minor = minor(res->dev);
 		if (res->mask & S_IROTH)
 			mask[i++] = 'r';
 		if (res->mask & S_IWOTH)

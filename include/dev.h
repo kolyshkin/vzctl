@@ -18,6 +18,7 @@
 #ifndef	_DEV_H_
 #define	_DEV_H_
 
+#include <sys/types.h>
 #include "list.h"
 
 #define DEV_MODE_READ		1
@@ -28,7 +29,7 @@
 typedef struct {
 	list_elem_t list;		/**< prev/next elements. */
 	char name[32];			/**< device name. */
-	unsigned int dev;		/**< device number. */
+	dev_t dev;			/**< device number. */
 	unsigned int type;		/**< S_IFBLK | S_IFCHR. */
 	unsigned int mask;		/**< access mode. */
 	int use_major;			/**< VE_USE_MAJOR | VE_USE_MINOR. */
