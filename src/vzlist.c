@@ -1640,8 +1640,6 @@ int main(int argc, char **argv)
 		while (optind < argc) {
 			veid =  strtol(argv[optind], &ep, 10);
 			if (*ep != 0 || !veid) {
-				char name[STR_SIZE];
-
 				veid = get_veid_by_name(argv[optind]);
 				if (veid < 0) {
 					fprintf(stderr,
