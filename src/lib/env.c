@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <grp.h>
 #include <sys/ioctl.h>
 #include <linux/vzcalluser.h>
 #include <sys/personality.h>
