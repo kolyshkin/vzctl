@@ -50,7 +50,7 @@ auto-started during system boot up unless this parameter is set to \fIyes\fR.
 Sets the path to root directory for this VE. This is essentially a mount
 point for VE root. Value must contain string \fI$VEID\fR, which will
 be substituted with numeric VE ID. Changing this parameter is not
-recommended, better edit \fBvz\fR(5) global configuration file.
+recommended, better edit \fBvz.conf\fR(5) global configuration file.
 .TP
 \fB--userpasswd\fR \fIuser\fR:\fIpassword\fR
 Sets password for the given user in VE, creating the user if it does not exists.
@@ -456,12 +456,12 @@ already exists, it will be removed.
 
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
 point for the VE root directory (default is \fBVE_ROOT\fR specified in
-\fBvz\fR(5) file). Argument can contain string \fI$VEID\fR, which will
+\fBvz.conf\fR(5) file). Argument can contain string \fI$VEID\fR, which will
 be substituted with numeric VE ID.
 
 You can use \fB--private\fR \fIpath\fR option to set the path to directory
 in which all the files and directories specific to this very VE are stored
-(default is \fBVE_PRIVATE\fR specified in \fBvz\fR(5) file). Argument can
+(default is \fBVE_PRIVATE\fR specified in \fBvz.conf\fR(5) file). Argument can
 contain string \fI$VEID\fR, which will be substituted with numeric VE ID.
 
 You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to a VE.
