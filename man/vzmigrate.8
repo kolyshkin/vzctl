@@ -1,28 +1,29 @@
-.TH vzmigrate 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
+.TH vzmigrate 8 "22 Feb 2008" "OpenVZ" "Containers"
 
 .SH NAME
-vzmigrate - utility for virtual environment migration between hardware nodes.
+vzmigrate - utility for container migration between hardware nodes.
 
 .SH SYNOPSIS
 .TP
 \fBvzmigrate\fR [\fB-r\fR|\fB--remove-area\fR \fByes\fR|\fBno\fR] [\fB--ssh=\fIssh_options\fR] \
-[\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fIveid\fR
+[\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fICTID\fR
 
 .SH DESCRIPTION
-This utility is used to migrate a VE from one (source) Hardware Node (HN)
+This utility is used to migrate a container from one (source) Hardware Node (HN)
 to another (destination) HN. The utility can migrate either stopped or running
-VE. For a stopped VE, simple VE private area transfer is performed
-(\fBrsync\fR(1) is used for file transfer). For running VEs,
+container. For a stopped container, simple CT private area transfer is performed
+(\fBrsync\fR(1) is used for file transfer). For running containers,
 migration may be offline (default) or online.
 
-This program uses ssh as a transport layer. You will need to put ssh
+This program uses \fBssh\fR as a transport layer. You will need to put ssh
 public key to destination node and be able to connect to node without
 entering password.
 
 .SH OPTIONS
 .TP
 \fB-r\fR, \fB--remove-area\fR \fByes\fR|\fBno\fR
-Whether to remove a VE area on source HN for the successfully migrated VE.
+Whether to remove a container area on source HN for the successfully
+migrated container.
 
 .TP
 \fB--ssh=\fIoptions\fR
@@ -32,29 +33,30 @@ or the like.
 
 .TP
 .B --keep-dst
-Do not clean synced destination VE private area in case of some
-error. It makes sense to use this option on big VE migration to avoid
-syncing VE private area again in case some error (on VE stop for
+Do not clean synced destination container private area in case of some
+error. It makes sense to use this option on big container migration to avoid
+syncing container private area again in case some error (on container stop for
 example) occurs during first migration attempt.
 
 .TP
 .B --online
-Perform online (zero-downtime) migration: during the migration the VE
-hangs for a while and after the migration it continues working as though nothing has
-happened.
+Perform online (zero-downtime) migration: during the migration the container
+hangs for a while and after the migration it continues working as though
+nothing has happened.
 
 .TP
 .B -v
-Verbose mode. Causes \fBvzmigrate\fP to print debugging messages about its progress.
+Verbose mode. Causes \fBvzmigrate\fP to print debugging messages about
+its progress.
 
 .SH EXAMPLES
-Migration of VE #101 to \fI192.168.1.130\fR with downtime:
+Migration of CT #101 to \fI192.168.1.130\fR with downtime:
 .br
 \f(CR	vzmigrate 192.168.1.130 101
 \fR
 .br
 
-Online migration of VE#102 to \fI192.168.1.130\fR:
+Online migration of CT #102 to \fI192.168.1.130\fR:
 .br
 \f(CR	vzmigrate --online 192.168.1.130 102
 \fR
@@ -68,36 +70,36 @@ Command completed successfully.
 Bad command line options.
 .TP
 .B 2 EXIT_VE_STOPPED
-VE is stopped.
+Container is stopped.
 .TP
 .B 4 EXIT_CONNECT
 Can't connect to destination (source) HN.
 .TP
 .B 6 EXIT_COPY
-VE private area copying/moving failed.
+Container private area copying/moving failed.
 .TP
 .B 7 EXIT_VE_START
-Can't start or restore destination VE.
+Can't start or restore destination CT.
 .TP
 .B 8 EXIT_VE_STOP
-Can't stop or checkpoint source VE.
+Can't stop or checkpoint source CT.
 .TP
 .B 9 EXIT_EXISTS
-VE already exists on destination HN.
+Container already exists on destination HN.
 .TP
 .B 10 EXIT_NOTEXIST
-VE does not exists on source HN.
+Container does not exists on source HN.
 .TP
 .B 12 EXIT_IP_INUSE
-You attempt to migrate VE which IP address(es) are already in use
+You attempt to migrate CT which IP address(es) are already in use
 on the destination node.
 .TP
 .B 13 EXIT_QUOTA
-Operation with VE quota failed.
+Operation with CT quota failed.
 
 
 .SH SEE ALSO
 .BR rsync (1)
 
 .SH COPYRIGHT
-Copyright (C) 2001-2007, SWsoft. Licensed under GNU GPL.
+Copyright (C) 2001-2008, Parallels, Inc. Licensed under GNU GPL.

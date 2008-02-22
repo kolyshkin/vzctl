@@ -1,26 +1,26 @@
-.TH vzsplit 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
+.TH vzsplit 8 "22 Feb 2008" "OpenVZ" "Containers"
 .SH NAME
-vzsplit \- generate a sample VE configuration file with a certain set of system resource control parameters.
+vzsplit \- generate a sample container configuration file with a certain set of system resource control parameters.
 .SH SYNOPSIS
 vzsplit [\fB-n\fR \fInumve\fR] [\fB-f\fR \fIconf_name\fR] [\fB-s\fR \fIswapsize\fR]
 .SH DESCRIPTION
 The \fBvzsplit\fR utility is used to split the Hardware Node into equal parts.
 It generates a full set of system resource control parameters for the
-given number of Virtual Environments. The values are calculated from
+given number of containers. The values are calculated from
 the total physical memory of the Hardware Node the utility runs on, and
-the number of Virtual Environments the Hardware Node shall be able
-to run even if the given number of Virtual Environments consume all
+the number of containers the Hardware Node shall be able
+to run even if the given number of containers consume all
 the resources available.
 Without any option given, \fBvzsplit\fR prompts for the desired number
-of Virtual Environments and outputs the resulting resource control
+of containers and outputs the resulting resource control
 parameters to stdout.
 If there are not enough system resources to run the specified number of
-VEs, an appropriate message is shown and the sample configuration file
+containers, an appropriate message is shown and the sample configuration file
 is not generated.
 .SH OPTIONS
 .TP
 \fB-n\fR \fInumve\fR
-Specify the number of VEs.
+Specify the number of containers.
 .TP
 \fB-f\fR \fIconf_name\fR
 Specify the configuration file name. The program output is placed to
@@ -34,5 +34,5 @@ returns 1.
 .SH SEE ALSO
 .BR vps.conf (5).
 .SH LICENSE
-Copyright (C) 2000-2007, SWsoft. Licensed under GNU GPL.
+Copyright (C) 2000-2008, Parallels, Inc. Licensed under GNU GPL.
 

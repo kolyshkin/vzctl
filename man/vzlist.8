@@ -1,35 +1,36 @@
-.TH vzlist 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
+.TH vzlist 8 "22 Feb 2008" "OpenVZ" "Containers"
 .SH NAME
-vzlist \- VE listing utility
+vzlist \- containers listing utility
 .SH SYNOPSIS
 vzlist [\fB-a\fR] [\fB-o\fR \fIname\fR[,\fIname\fR...]]
  [\fB-s\fR [\fI-\fR]\fIname\fR] [\fB-h\fR \fIpattern\fR]
  [\fB-H\fR] [\fB-S\fR] [\fB-n\fR] [\fB-N\fR <\fI-pattern\fR>]
- [\fIveid\fR [\fIveid\fR ..] | \fB-1\fR]
+ [\fICTID\fR [\fICTID\fR ..] | \fB-1\fR]
 .PP
 vzlist \fB-L\fR
 .SH DESCRIPTION
-This utility is used for listing VEs. By default only running VEs are listed.
-If \fIveid\fR is/are specified, only specified VEs are displayed.
-VE ID of \fB-1\fR is used to output VE IDs only, one per line.
+This utility is used for listing containers. By default only running containers
+are listed.
+If one or more \fICTID\fRs are specified, only specified containers are
+displayed. CTID of \fB-1\fR is used to output CT IDs only, one per line.
 .SH OPTIONS
 .IP "\fB--all\fR, \fB-a\fR"
-list all VEs.
+list all containers.
 .IP "\fB--sort\fR, \fB-s\fR"
 specify sorting order, the '-' before parameter means sort in reverse order
 .IP "\fB--hostname\fR, \fB-h\fR  <\fIpattern\fR>"
-display only VEes whose hostname matches the \fIpattern\fR.
+display only containers whose hostname matches the \fIpattern\fR.
 The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR.
 Note that wildcard characters should be properly escaped
 to avoid expansion by shell.
 .IP "\fB--name\fR, \fB-n\fR "
-display VE name.
+display container names.
 .IP "\fB--name_filter\fR, \fB-N\fR  <\fIpattern\fR>"
-display only VEs whose hostname matches the \fIpattern\fR.
+display only containers whose hostname matches the \fIpattern\fR.
 .IP "\fB--no-header\fR, \fB-H\fR"
 suppress displaying header
 .IP "\fB--stopped -S\fR"
-display only stopped VEs
+display only stopped containers
 .IP "\fB--list -L\fR"
 list all format specifiers
 
@@ -51,14 +52,14 @@ _
 .P
 For example:
 .br
-\f(CW	vzlist -o veid,kmemsize,kmemsize.l -s kmemsize\fR
+\f(CW	vzlist -o ctid,kmemsize,kmemsize.l -s kmemsize\fR
 .TS
 allbox center;
 lB lB
 lI l.
-Fixme1	FixmeToo
+Value	Header
 _
-veid	VEID
+ctid	CTID
 hostname	HOSTNAME
 name	NAME
 ip	IP_ADDR
@@ -176,4 +177,4 @@ cpuunits	CPUUNI
 .SH RETURN CODE
 Returns 0 upon success.
 .SH COPYRIGHT
-Copyright (C) 2000-2007, SWsoft. Licensed under GNU GPL.
+Copyright (C) 2000-2008, Parallels, Inc. Licensed under GNU GPL.

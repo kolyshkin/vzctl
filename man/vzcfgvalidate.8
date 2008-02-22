@@ -1,6 +1,6 @@
-.TH vzcfgvalidate 8 "12 Sep 2006" "OpenVZ" "Virtual Environments"
+.TH vzcfgvalidate 8 "22 Feb 2008" "OpenVZ" "Containers"
 .SH NAME
-vzcfgvalidate \- validate a VE configuration file
+vzcfgvalidate \- validate a container configuration file
 .SH SYNOPSIS
 vzcfgvalidate [\fB-r\fR | \fB-i\fR] \fIconfigfile\fR
 .SH OPTIONS
@@ -11,9 +11,9 @@ Repair mode.
 \fB-i\fR
 Interactive repair mode.
 .SH DESCRIPTION
-This utility checks validity of resource control parameters in VE config file
-\fIconfigfile\fR.  Configurations where resources allowed for Virtual
-Environment exceeds system capacity are not valid and dangerous
+This utility checks validity of resource control parameters in a container
+configuration file \fIconfigfile\fR. Configurations where resources allowed
+for a container exceeds system capacity are not valid and dangerous
 from stability point of view.
 
 There are three severity levels in output: Error, Warning, Recommendation.
@@ -23,4 +23,4 @@ If validation failed exit status is 2.
 .SH SEE ALSO
 .BR vps.conf (5).
 .SH LICENSE
-Copyright (C) 2000-2007, SWsoft. Licensed under GNU GPL.
+Copyright (C) 2000-2008, Parallels, Inc. Licensed under GNU GPL.

@@ -1,4 +1,4 @@
-.TH vz 5 "12 Jan 2007" "OpenVZ" "Virtual Environments"
+.TH vz 5 "22 Feb 2008" "OpenVZ" "Containers"
 .SH NAME
 vz \- global OpenVZ configuration file
 .SH SYNOPSIS
@@ -21,7 +21,7 @@ set to \fByes\fR, nothing will be done to boot up OpenVZ on this node.
 .IP "\fBLOCKDIR\fR=\fIdirectory\fR"
 Set the directory to put lock files to.
 .IP \fBVE0CPUUNITS\fR=\fInumber\fR
-Value of this parameter sets \fBcpuunits\fR for VE0.
+Value of this parameter sets \fBcpuunits\fR for CT0 (host system).
 .IP "\fBLOGGING\fR=\fByes\fR|\fBno\fR"
 Enables or disables logging. This parameter can be set to \fByes\fR or
 \fBno\fR, default is \fByes\fR.
@@ -43,8 +43,9 @@ In case the value of this parameter is set to \fBno\fR, all disk
 quota operations are disabled.
 .IP \fBVZFASTBOOT\fR=\fByes\fR|\fBno\fR
 This parameter is used by \f(CR/etc/init.d/vz start\fR script. In case the value
-of this parameter is set to \fByes\fR, VE with incorrectly shutdown quota state
-started without quota check and after all VEs started marked VEs restarted.
+of this parameter is set to \fByes\fR, all containers with incorrectly shutdown
+quota state are started without quota check, and after all containers will be
+started, those marked containers are restarted (to fix quotas).
 .SS Network interface parameters
 .IP \fBVE_ROUTE_SRC_DEV\fR="\fIdevice\fR"
 This parameter specifies the network device name which ip address will used for
@@ -52,35 +53,35 @@ source ip. If on HN configured > 1 network interfaces and needed to specify
 the source ip address, set corresponding \fIdevice\fR. By default takes the
 first in network device list.
 .IP \fBNEIGHBOUR_DEVS\fR[="\fBdetect\fR"]
-Controls on which interfaces to add/remove ARP records for a VE IP, also
+Controls on which interfaces to add/remove ARP records for a container IP, also
 which interfaces to use to query/announce ARP. If this is set to \fBdetect\fR,
-the right network interface (the one which is in the same subnet as a VE IP)
+the right network interface (the one which is in the same subnet as a CT IP)
 will be chosen automatically. Any other value restores old (as of vzctl 3.0.19
 or older) behavior, when all the possible interfaces were used.
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
-Value of this parameter is a directory in which all VE template data are
+Value of this parameter is a directory in which all container template data are
 stored.
-.SS Defaults for VE
-Below parameters are defaults for VE, and gets overwritten by parameters in
-\fBvps.conf\fR(5) VE configuration file.
+.SS Defaults for containers 
+Below parameters are defaults for containers, and gets overwritten by
+parameters in \fBvps.conf\fR(5) container configuration file.
 .IP \fBVE_ROOT\fR=\fIdirectory\fR
-Value of this parameter is the \fIdirectory\fR which serves as VE root
+Value of this parameter is the \fIdirectory\fR which serves as container root
 mount point. Value must contain string \fI$VEID\fR, it gets substituted
-with actual numeric VE ID.
+with actual numeric CT ID.
 .IP \fBVE_PRIVATE\fR=\fIdirectory\fR
 Value of this parameter is the \fIdirectory\fR in which all the
-files and directories specific to that VE are stored. Value must contain
-string \fI$VEID\fR, it gets substituted with actual numeric VE ID.
+files and directories specific to that container are stored. Value must contain
+string \fI$VEID\fR, it gets substituted with actual numeric CT ID.
 .IP \fBCONFIGFILE\fR=\fIname\fR
-Specified default configuration file on create action, corresponds to --config
-option
+Specified default configuration file on \fBcreate\fR action, corresponds to
+\fB--config\fR option.
 .PP
 Any other parameter that appears in per-PE configuration file \fBvps.conf\fR(5)
 can be also set here. Still, it is recommended to keep \fBTEMPLATE\fR,
 \fBVE_PRIVATE\fR and \fBVE_ROOT\fR in this configuration files, and all the
-other VE-related parameters in per-VE configuration files.
+other container related parameters in per-container configuration files.
 .SH SEE ALSO
 .BR vzctl (8),
 .BR vps.conf (5).
 .SH LICENSE
-Copyright (C) 2000-2007, SWsoft. Licensed under GNU GPL.
+Copyright (C) 2000-2008, Parallels, Inc. Licensed under GNU GPL.
