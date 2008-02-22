@@ -379,7 +379,7 @@ fi
 
 logexec 2 $SSH root@$host vzctl set $VEID --applyconfig_map name --save
 # vzctl return code 20 or 21 in case of unrecognized option
-if [ $? != 20 && $? != 21 && $? != 0 ]; then
+if [ $? != 20 ] && [ $? != 21 ] && [ $? != 0 ]; then
 	log 0 "Failed to apply config on destination node"
 	undo_conf
 	exit $MIG_ERR_APPLY_CONFIG
