@@ -19,12 +19,9 @@
 # Adds IP address(es) in a container running Gentoo-like distro.
 
 VENET_DEV=venet0
-
 IFCFG_DIR=/etc/conf.d
 IFCFG=${IFCFG_DIR}/net
-
 SCRIPT=/etc/runlevels/default/net.${VENET_DEV}
-
 HOSTFILE=/etc/hosts
 
 function fix_net()

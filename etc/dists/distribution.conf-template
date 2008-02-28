@@ -1,4 +1,4 @@
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,92 +16,106 @@
 #
 # This is a distribution configuration file template.
 # This configuration file is meant to run specific actions
-# depending on the Linux version the VE is running.
+# depending on the Linux distribution the container is running.
 #
-# After an action is initiated, it requests vzctl to read the configuration on the basis
-# of the DISTRIBUTION or (if not present) on the OSTEMPLATE variable in the VE
-# configuration file. In case an unknown distribution version has been found,
-# the default configuration file is used for this distribution.
-# If no configuration file was found, the default.conf file is used.
+# After an action is initiated, it requests vzctl to read the configuration
+# based on the value of DISTRIBUTION or (if not present) OSTEMPLATE variable
+# in the container configuration file. In case an unknown distribution
+# has been found, or neither OSTEMPLATE nor DISTRIBUTION is set, the default
+# configuration file default.conf is used.
 #
 
-# This script is launched inside a VE on executing the following commands:
-#	vzctl start VEID
-#	vzctl set VEID --ipadd <ip>
+# This script is launched inside a container on executing the following
+# commands:
+#	vzctl start CTID
+#	vzctl set CTID --ipadd <ip>
 #
-# The script is used to configure the network settings
-# on the VE startup or on the IP address(es) assignment.
-# The parameters are passed to the corresponding environment variables.
+# The script is used to configure the network settings during the container
+# startup or upon the IP address(es) assignment.
+# The parameters are passed as environment variables.
 # Required parameters:
-#   IP_ADDR	- the IP address(es) to be added to the VE
-#                 (the space is used to separate several IP addresses)
+#   VE_STATE	- the state of the container; can be one of:
+#		  starting | stopping | running
 # Optional parameters:
-#   VE_STATE	- the state of the VE; can be either "starting" or "running"
-#   IPDELALL	- deletes all old interfaces
+#   IP_ADDR	- space-separated list of IP address(es) to be ADDED
+#   IPV6	- if set, IPv6 is enabled globally
+#   IPDELALL	- if set, tells to delete all the IP addresses
 #
 ADD_IP=dist-add_ip.sh
 
-# This script is launched inside a VE on executing the following commands:
-#	vzctl set VEID --ipdel <ip>
-#	vzctl set VEID --ipdel <all>
+# This script is launched inside a container on executing the following
+# commands:
+#	vzctl set CTID --ipdel <ip>
+#	vzctl set CTID --ipdel <all>
 #
 # The script is used to delete an existing IP address(es).
-# The parameters are passed to the corresponding environment variables.
+# The parameters are passed as environment variables.
 # Required parameters:
-#   IP_ADDR	- the IP addresses to be deleted from the VE
-#		(the space is used to separate several IP addresses)
+#   VE_STATE	- the state of the container; can be one of:
+#		  starting | stopping | running
 # Optional parameters:
-#   IPDELALL	- deletes all existing IP addresses
+#   IP_ADDR	- space-separated list of IP address(es) to be DELETED
+#   IPV6	- if set, IPv6 is enabled globally
+#   IPDELALL	- if set, tells to delete all the IP addresses
 #
 DEL_IP=dist-del_ip.sh
 
-# This script is launched inside a VE on executing the following command:
-#	vzctl set VEID --hostname <name>
+# This script is launched inside a CT on executing the following command:
+#	vzctl set CTID --hostname <name>
 #
-# The script is used to configure the hostname of the VE.
-# The parameters are passed to the corresponding environment variables.
+# The script is used to configure the hostname of the container.
+# The parameters are passed as environment variables.
 # Required parameters:
-#   HOSTNM	- the hostname of the VE
+#   VE_STATE	- the state of the container; can be one of:
+#		  starting | stopping | running
+#   HOSTNM	- the hostname to be set
+#   		  (can be empty in case of --hostname '' specified)
+# Optional parameters:
+#   IP_ADDR	- the first IP address of the container
 #
 SET_HOSTNAME=dist-set_hostname.sh
 
-# This script is launched inside a VE on executing the following command:
-#	vzctl set VEID --searchdomain <domain> --nameserver <ip>
+# This script is launched inside a CT on executing the following command:
+#	vzctl set CTID --searchdomain <domain> --nameserver <ip>
 #
 # The script is used to configure DNS parameters in the /etc/resolv.conf file.
-# The parameters are passed to the corresponding environment variables.
+# The parameters are passed as environment variables.
 # Optional parameters:
-#   SEARCHDOMAIN- Sets a search domain(s) for the VE. Modifies the /etc/resolv.conf file.
-#   NAMESERVER	- Sets a name server(s) for the VE. Modifies the /etc/resolv.conf file.
+#   SEARCHDOMAIN - space-separated list of search domains
+#   NAMESERVER	 - space-separated list of name server IPs
+#
+# Script usually modifies the /etc/resolv.conf file.
 #
 SET_DNS=dist-set_dns.sh
 
-# This script is launched inside a VE on executing the following command:
-#	vzctl set VEID --userpasswd <user:passwd>
+# This script is launched inside a CT on executing the following command:
+#	vzctl set CTID --userpasswd <user:passwd>
 #
 # The script is used to add a new user or change the current password.
-# The parameters are passed to the corresponding environment variables.
+# The parameters are passed as environment variables.
 # Required parameters:
-#   USERPW  - Sets a new password for the VE user. If the user does not exist,
-# 		the script creates a new user with the specified password.
+#   USERPW	- space-separated list of user:password pairs
 #
 SET_USERPASS=dist-set_userpass.sh
 
-# This script is launched inside a VE on executing the following command:
-#	vzctl set VEID --quotaugidlimit <num>
+# This script is launched inside a CT on executing the following command:
+#	vzctl set CTID --quotaugidlimit <num>
 #
 # The script is used to set up second level quota.
-# The parameters are passed to the corresponding environment variables.
+# The parameters are passed as environment variables.
 # Required parameters:
+#   VE_STATE	- the state of the container; can be one of:
+#		  starting | stopping | running
+#   DEVFS	- container file system (usually 'simfs')
 #   MINOR	- the root device minor number
 #   MAJOR	- the root device major number
 SET_UGID_QUOTA=dist-set_ugid_quota.sh
 
-# This script is launched on the Hardware Node after the VE creation:
-#	vzctl create VEID
+# This script is launched on the host system after the container creation:
+#	vzctl create CTID
 #
 # The script is used to perform certain postcreate tasks.
-# The parameters are passed to the corresponding environment variables.
+# The parameters are passed as environment variables.
 # Required parameters:
-#   VE_ROOT	- the root path of the VE
+#   VE_ROOT	- the path to the container root directory (i.e. mount point)
 POST_CREATE=dist-postcreate.sh
