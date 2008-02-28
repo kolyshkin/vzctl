@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -187,7 +187,8 @@ static int destroydir(char *dir)
 		return 0;
 	}
 	if (!S_ISDIR(st.st_mode)) {
-		logger(-1, 0, "Warning: VE private area is not a directory");
+		logger(-1, 0, "Warning: container private area "
+				"is not a directory");
 		if (unlink(dir)) {
 			logger(-1, errno, "Unable to unlink %s", dir);
 			return -1;
@@ -277,20 +278,20 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (vps_is_run(h, veid)) {
-		logger(0, 0, "VE is currently runing."
-			" Stop it before proceeding.");
+		logger(0, 0, "Container is currently running."
+			" Stop it first.");
 		return VZ_VE_RUNNING;
 	}
 	if (vps_is_mounted(fs->root)) {
-		logger(0, 0, "VE is currently mounted (umount first)");
+		logger(0, 0, "Container is currently mounted (umount first)");
 		return VZ_FS_MOUNTED;
 	}
-	logger(0, 0, "Destroying VE private area: %s", fs->private);
+	logger(0, 0, "Destroying container private area: %s", fs->private);
 	if ((ret = vps_destroy_dir(veid, fs->private)))
 		return ret;
 	move_config(veid, BACKUP);
 	rmdir(fs->root);
-	logger(0, 0, "VE private area was destroyed");
+	logger(0, 0, "Container private area was destroyed");
 
 	return 0;
 }

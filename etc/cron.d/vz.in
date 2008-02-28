@@ -25,8 +25,8 @@
 # into @DST_CRONDDIR@/ with the right ownership and permissions.
 
 
-# Clean VEs network rules (arp,route,iptables)
+# Clean containers' network rules (arp,route,iptables)
 */5 * * * * root @PKGDATADIR@/scripts/vpsnetclean
 
-# Start VEs marked as rebooted.
+# Start containers marked as rebooted.
 */5 * * * * root @PKGDATADIR@/scripts/vpsreboot

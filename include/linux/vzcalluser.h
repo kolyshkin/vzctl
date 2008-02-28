@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,18 +34,18 @@ typedef unsigned envid_t;
 #endif
 
 /*
- * VE management ioctls
+ * CT management ioctls
  */
 
 struct vzctl_old_env_create {
 	envid_t veid;
 	unsigned flags;
-#define VE_CREATE 	1	/* Create VE, VE_ENTER added automatically */
+#define VE_CREATE 	1	/* Create CT, VE_ENTER added automatically */
 #define VE_EXCLUSIVE	2	/* Fail if exists */
-#define VE_ENTER	4	/* Enter existing VE */
-#define VE_TEST		8	/* Test if VE exists */
-#define VE_LOCK		16	/* Do not allow entering created VE */
-#define VE_SKIPLOCK	32	/* Allow entering embrion VE */
+#define VE_ENTER	4	/* Enter existing CT */
+#define VE_TEST		8	/* Test if CT exists */
+#define VE_LOCK		16	/* Do not allow entering created CT */
+#define VE_SKIPLOCK	32	/* Allow entering "embryo" CT */
 	__u32 addr;
 };
 

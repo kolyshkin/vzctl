@@ -51,7 +51,7 @@ Supply this option in case you do not use udev on your system.
 	--disable-cron
 
 Disables installation of cron files required by vzctl. Those are used to run
-periodical jobs required by OpenVZ, such as restarting VEs and cleaning up
+periodical jobs required by OpenVZ, such as restarting CTs and cleaning up
 host system routing table. Supply this option if you do not use cron daemon
 on your system.
 

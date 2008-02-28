@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,10 +107,10 @@ static int run_vznetcfg(envid_t veid, veth_dev *dev)
 	return ret;
 }
 
-/** Create/remove veth devices for VE.
+/** Create/remove veth devices for CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT ID.
  * @param dev		devices list.
  * @return		0 on success.
  */
@@ -126,7 +126,7 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(-1, 0, "Unable to %s veth: VE is not running",
+		logger(-1, 0, "Unable to %s veth: container is not running",
 			op == ADD ? "create" : "remove");
 		return VZ_VE_NOT_RUNNING;
 	}
@@ -450,7 +450,7 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 			free_veth_param(&veth_old);
 	} else if (!list_empty(&veth_del->dev)) {
 		dev_num = 0;
-		/* find host veth name by VE veth name */
+		/* find host veth name by CT veth name */
 		list_for_each(dev_t, &veth_del->dev, list) {
 			dev = find_veth_by_ifname_ve(&veth_old.dev,
 				dev_t->dev_name_ve);
@@ -459,9 +459,9 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 				strcpy(dev_t->dev_name, dev->dev_name);
 				dev_num++;
 			} else {
-				logger(-1, 0, "VE does not have configured"
-					" veth: %s, skipped",
-					dev_t->dev_name_ve);
+				logger(-1, 0, "Container does not have "
+						"configured veth: %s, skipped",
+						dev_t->dev_name_ve);
 			}
 		}
 		if (dev_num != 0)

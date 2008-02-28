@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 
 /** Setup user password
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param actions	distribution action scripts.
- * @param root		VE root.
+ * @param root		CT root.
  * @param pw		list of user:password parameters.
  * @return		0 on success.
  */

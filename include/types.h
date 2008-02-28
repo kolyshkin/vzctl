@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@
 /* Default environment variable PATH */
 #define	ENV_PATH	"PATH=/bin:/sbin:/usr/bin:/usr/sbin:"
 
-/* VE states */
+/* CT states */
 enum {
 	STATE_STARTING = 1,
 	STATE_RUNNING = 2,
@@ -66,7 +66,7 @@ enum {
 #define ERR_INVAL_SKIP	-6
 #define ERR_LONG_TRUNC  -7
 
-/** VE handler.
+/** CT handler.
  */
 typedef struct {
 	int vzfd;	/**< /dev/vzctl file descriptor. */

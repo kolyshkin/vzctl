@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,9 +42,9 @@ typedef struct {
  */
 int get_cap_mask(char *name, unsigned long *mask);
 
-/** Apply capability mask to VE.
+/** Apply capability mask to CT.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param cap		capability mask.
  * @return		0 on success.
  */

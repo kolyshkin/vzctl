@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ typedef struct str_struct ip_param;
 /** Data structure for network parameters.
  */
 typedef struct {
-	list_head_t ip;		/**< VE IP adresses list. */
-	list_head_t dev;	/**< VE network devices list. */
+	list_head_t ip;		/**< CT IP addresses list. */
+	list_head_t dev;	/**< CT network devices list. */
 	int delall;		/**< flag to delete all ip addresses. */
 	int skip_arpdetect;
 	int skip_route_cleanup;
@@ -40,15 +40,15 @@ typedef struct {
 
 } net_param;
 
-/** Setup VE network.
+/** Setup CT network.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param op		operation (ADD|DEL).
  * @param net		network parameters.
  * @param actions	distribution action scripts.
- * @param root		VE root.
- * @param state		VE state (STATE_STARTING|STATE_RUNNING).
+ * @param root		CT root.
+ * @param state		CT state (STATE_STARTING|STATE_RUNNING).
  * @retun		0 on success.
  */
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
@@ -56,8 +56,8 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 
 /** Setup access to Host system network devices.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param op		operation (ADD|DEL).
  * @param net		network parameters.
  * @return		0 on success.
@@ -66,10 +66,10 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net);
 
 int find_ip(list_head_t *ip_h,  char *ipaddr);
 
-/** Obtain list of IP addresses belonging to the VE.
+/** Obtain list of IP addresses belonging to the CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param ip_h		IP list head.
  * @return		0 on success.
  */

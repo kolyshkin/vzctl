@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	const char *file;
 
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "VE is not running");
+		logger(0, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (action == CMD_CHKPNT) {
@@ -76,14 +76,14 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	case CMD_KILL:
 		logger(0, 0, "Killing...");
 		if ((ret = ioctl(fd, CPT_KILL, 0)) < 0) {
-			logger(-1, errno, "Can not kill VE");
+			logger(-1, errno, "Can not kill container");
 			goto err;
 		}
 		break;
 	case CMD_RESUME:
 		logger(0, 0, "Resuming...");
 		if ((ret = ioctl(fd, CPT_RESUME, 0)) < 0) {
-			logger(-1, errno, "Can not resume VE");
+			logger(-1, errno, "Can not resume container");
 			goto err;
 		}
 		if (action == CMD_CHKPNT) {
@@ -129,24 +129,25 @@ int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
 	if (cmd == CMD_CHKPNT || cmd == CMD_SUSPEND) {
 		logger(0, 0, "\tsuspend...");
 		if (ioctl(cpt_fd, CPT_SUSPEND, 0) < 0) {
-			logger(-1, errno, "Can not suspend VE");
+			logger(-1, errno, "Can not suspend container");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
 		logger(0, 0, "\tdump...");
 		if (ioctl(cpt_fd, CPT_DUMP, 0) < 0) {
-			logger(-1, errno, "Can not dump VE");
+			logger(-1, errno, "Can not dump container");
 			if (cmd == CMD_CHKPNT)
 				if (ioctl(cpt_fd, CPT_RESUME, 0) < 0)
-					logger(-1, errno, "Can not resume VE");
+					logger(-1, errno, "Can not "
+							"resume container");
 			goto err_out;
 		}
 	}
 	if (cmd == CMD_CHKPNT) {
 		logger(0, 0, "\tkill...");
 		if (ioctl(cpt_fd, CPT_KILL, 0) < 0) {
-			logger(-1, errno, "Can not kill VE");
+			logger(-1, errno, "Can not kill container");
 			goto err_out;
 		}
 	}
@@ -186,12 +187,12 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
-		logger(-1, 0, "VE root is not set");
+		logger(-1, 0, "Container root is not set");
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to setup checkpointing: "
-			"VE is not running");
+			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	logger(0, 0, "Setting up checkpoint...");
@@ -230,7 +231,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		}
 	} else {
 		if (ioctl(cpt_fd, CPT_SET_VEID, veid) < 0) {
-			logger(0, errno, "Can not set veid");
+			logger(0, errno, "Can not set CT ID");
 			goto err;
 		}
 	}
@@ -268,7 +269,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	if (ret)
 		goto err;
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
-		/* Clear VE network configuration */
+		/* Clear CT network configuration */
 		run_net_script(veid, DEL, &vps_p->res.net.ip, STATE_RUNNING,
 			vps_p->res.net.skip_arpdetect);
 		if (cmd == CMD_CHKPNT)
@@ -302,7 +303,7 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	/* Close all fds */
 	close_fds(0, wait_p, err_p, h->vzfd, param->rst_fd, -1);
 	if (ioctl(param->rst_fd, CPT_SET_VEID, veid) < 0) {
-		logger(-1, errno, "Can't set VEID %d", param->rst_fd);
+		logger(-1, errno, "Can't set CT ID %d", param->rst_fd);
 		goto err;
 	}
 	if (pipe(error_pipe) < 0 ) {
@@ -333,7 +334,7 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		logger(-1, errno, "Error: undump failed");
 		goto err_undump;
 	}
-	/* Now we wait until VE setup will be done */
+	/* Now we wait until CT setup will be done */
 	read(wait_p, &len, sizeof(len));
 	if (param->cmd == CMD_RESTORE) {
 		logger(0, 0, "\tresume...");
@@ -377,10 +378,10 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to perform restore: "
-			"VE already running");
+			"container already running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	logger(0, 0, "Restoring VE ...");
+	logger(0, 0, "Restoring container ...");
 	ret = VZ_RESTORE_ERROR;
 	if ((rst_fd = open(PROC_RST, O_RDWR)) < 0) {
 		if (errno == ENOENT)

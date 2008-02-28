@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ static int dev_create(char *root, dev_res *dev)
 		return 0;
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
-	/* If device does not exist inside VE get
-	* information from VE0 and create it
+	/* If device does not exist inside CT get
+	* information from CT0 and create it
 	*/
 	snprintf(buf1, sizeof(buf1), "%s/dev/%s", root, dev->name);
 	ret = lstat(buf1, &st);
@@ -92,11 +92,11 @@ int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
 	return ret;
 }
 
-/** Allow/disallow access to devices on host system from VE.
+/** Allow/disallow access to devices on host system from CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param root		VE root.
+ * @param h		CT handler.
+ * @param veid		CT ID.
+ * @param root		CT root.
  * @param dev		devices list.
  * @return		0 on success.
  */
@@ -109,7 +109,8 @@ int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev)
 	if (list_empty(dev_h))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(-1, 0, "Unable to apply devperm: VE is not running");
+		logger(-1, 0, "Unable to apply devperm: "
+				"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	logger(0, 0, "Setting devices");

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -135,8 +135,8 @@ typedef struct ub_struct ub_param;
 
 /** Apply UBC resources.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param ubc		UBC parameters
  * @return		0 on success
  */
@@ -160,7 +160,7 @@ int add_ub_param(ub_param *ub, ub_res *res);
 
 /** Read UBC resources current usage from /proc/user_beancounters
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param ub		UBC parameters.
  * @return		0 on success.
  */

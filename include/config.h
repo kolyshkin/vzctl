@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 typedef struct str_struct conf_struct;
 
 typedef struct vps_config {
-	char *name;	/* VE config parameters name */
+	char *name;	/* CT config parameters name */
 	char *alias;	/* alias name for parameter */
 	int id;		/* command line option id */
 } vps_config;

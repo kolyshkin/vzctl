@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -1300,7 +1300,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 	memset(dev, 0, sizeof(*dev));
 	if (!operation) {
 		/* Removing veth device */
-		/* Parsing veth device name in VE0 */
+		/* Parsing veth device name in CT0 */
 		if ((ch = strchr(str, ',')) != NULL)
 			return ERR_INVAL;
 		len = strlen(str) + 1;
@@ -1310,7 +1310,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 		return 0;
 	}
 	/* Creating veth device */
-	/* Parsing veth device name in VE0 */
+	/* Parsing veth device name in CT0 */
 	if ((ch = strchr(str, ',')) == NULL)
 		return ERR_INVAL;
 	ch++;
@@ -1320,7 +1320,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 	snprintf(dev->dev_name, len, "%s", str);
 	tmp = ch;
 
-	/* Parsing veth MAC address in VE0 */
+	/* Parsing veth MAC address in CT0 */
 	if ((ch = strchr(tmp, ',')) == NULL)
 		return ERR_INVAL;
 	len = ch - tmp;
@@ -1333,7 +1333,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 	ch++;
 	tmp = ch;
 
-	/* Parsing veth name in VE */
+	/* Parsing veth name in CT */
 	if ((ch = strchr(tmp, ',')) == NULL)
 		return ERR_INVAL;
 	ch++;
@@ -1342,7 +1342,7 @@ static int parse_veth_str(const char *str, veth_dev *dev, int operation)
 		return ERR_INVAL;
 	snprintf(dev->dev_name_ve, len, "%s", tmp);
 
-	/* Parsing veth MAC address in VE */
+	/* Parsing veth MAC address in CT */
 	len = strlen(ch);
 	if (len != 3*ETH_ALEN -1)
 		return ERR_INVAL;
@@ -1614,7 +1614,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 	memset(dev, 0, sizeof(*dev));
 	ep = str + strlen(str);
 	/* Creating veth device */
-	/* Parsing veth device name in VE */
+	/* Parsing veth device name in CT */
 	if ((ch = strchr(str, ',')) == NULL) {
 		ch = ep;
 		len = ep - str;
@@ -1635,7 +1635,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		dev->addrlen = ETH_ALEN;
 		return 0;
 	}
-	/* Parsing veth MAC address in VE */
+	/* Parsing veth MAC address in CT */
 	if ((ch = strchr(tmp, ',')) == NULL) {
 		ch = ep;
 		len = ch - tmp;
@@ -1644,12 +1644,12 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		ch++;
 	}
 	if (len != MAC_SIZE) {
-		logger(-1, 0, "Invalid VE MAC address length");
+		logger(-1, 0, "Invalid container MAC address length");
 		return ERR_INVAL;
 	}
 	err = parse_hwaddr(tmp, dev->dev_addr_ve);
 	if (err) {
-		logger(-1, 0, "Invalid VE MAC address format");
+		logger(-1, 0, "Invalid container MAC address format");
 		return ERR_INVAL;
 	}
 	dev->addrlen = ETH_ALEN;
@@ -1661,7 +1661,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		dev->addrlen = ETH_ALEN;
 		return 0;
 	}
-	/* Parsing veth name in VE0 */
+	/* Parsing veth name in CT0 */
 	if ((ch = strchr(tmp, ',')) == NULL) {
 		ch = ep;
 		len = ch - tmp;
@@ -1677,7 +1677,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		dev->addrlen = ETH_ALEN;
 		return 0;
 	}
-	/* Parsing veth MAC address in VE */
+	/* Parsing veth MAC address in CT */
 	len = strlen(ch);
 	if (len != MAC_SIZE) {
 		logger(-1, 0, "Invalid host MAC address");
@@ -2075,7 +2075,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 }
 
 /********************************************************/
-/*	VE parse config stuff				*/
+/*	CT parse config stuff				*/
 /********************************************************/
 
 int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
@@ -2145,7 +2145,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 }
 
 /********************************************************/
-/*	VE save config stuff				*/
+/*	CT save config stuff				*/
 /********************************************************/
 static int read_conf(char *fname, list_head_t *conf_h)
 {
@@ -2383,7 +2383,7 @@ int set_name(int veid, char *new_name, char *old_name)
 	}
 	veid_old = get_veid_by_name(new_name);
 	if (veid_old >= 0 && veid_old != veid) {
-		logger(-1, 0, "Conflict: name %s already used by VE %d",
+		logger(-1, 0, "Conflict: name %s already used by container %d",
 			new_name, veid_old);
 		return VZ_SET_NAME_ERROR;
 	}

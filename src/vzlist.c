@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -376,10 +376,13 @@ SORT_UL_RES(cpuunits_sort_fn, Ccpu, cpu, limit, 1)
 
 struct Cfield field_names[] =
 {
-/* veid should have index 0 */
-{"veid", "VEID", "%10s", 0,  RES_NONE, print_veid, id_sort_fn},
+/* ctid should have index 0 */
+{"ctid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
+/* veid is for backward compatibility -- will be removed later */
+{"veid", "CTID", "%10s", 0,  RES_NONE, print_veid, id_sort_fn},
 /* vpsid is for backward compatibility -- will be removed later */
-{"vpsid" , "VEID", "%10s",  0, RES_NONE, print_veid, id_sort_fn},
+{"vpsid" , "CTID", "%10s",  0, RES_NONE, print_veid, id_sort_fn},
+
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
@@ -600,10 +603,10 @@ void usage()
 	fprintf(stderr, "Usage: vzlist [-a] [-o name[,name...]] [-s {name|-name}] [-h <pattern>] [-N <pattern>]\n");
 	fprintf(stderr, "\t\t[-H] [-S] [veid [veid ...]|-1]\n");
 	fprintf(stderr, "	vzlist -L\n\n");
-	fprintf(stderr, "\t--all -a\t list of all VEs\n");
+	fprintf(stderr, "\t--all -a\t list of all containers\n");
 	fprintf(stderr, "\t--output -o\t output only specified parameters\n");
 	fprintf(stderr, "\t--hostname -h\t hostname search pattern\n");
-	fprintf(stderr, "\t--name -n\t display VE name\n");
+	fprintf(stderr, "\t--name -n\t display container's name\n");
 	fprintf(stderr, "\t--name_filter -N\t name search patter\n");
 	fprintf(stderr, "\t--sort -s\t sort by specified parameter, - sign before parametr\n");
 	fprintf(stderr, "\t\t\t mean sort in reverse order\n");
@@ -1504,9 +1507,9 @@ int collect()
 	get_run_ve(update);
 	if (!only_stopped_ve && (ret = get_ub()))
 		return ret;
-	/* No VE found, exit with error */
+	/* No CT found, exit with error */
 	if (!n_veinfo) {
-		fprintf(stderr, "VE not found\n");
+		fprintf(stderr, "Container not found\n");
 		return 1;
 	}
 	if (check_param(RES_QUOTA))
@@ -1643,7 +1646,7 @@ int main(int argc, char **argv)
 				veid = get_veid_by_name(argv[optind]);
 				if (veid < 0) {
 					fprintf(stderr,
-						"VE ID %s is invalid.\n",
+						"CT ID %s is invalid.\n",
 						argv[optind]);
 					return 1;
 				}

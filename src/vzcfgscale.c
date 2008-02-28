@@ -43,7 +43,7 @@ Options are:
 \t-u, --ubc-only <coeff>     Scale only UBC parameters
 \t-n, --network-only <coeff> Scale only network bandwidth parameters
 \t-v, --validate             Validate UBC parameters
-\t-r, --remove               Removes VE-specific parameters\n");
+\t-r, --remove               Removes container-specific parameters\n");
 	exit(rc);
 }
 
@@ -335,7 +335,7 @@ int main(int argc, char **argv)
 	{
 		if (!vz_init(veid) && env_is_running(veid))
 		{
-			fprintf(stderr, "VE %d is running, apply parameters\n",
+			fprintf(stderr, "CT %d is running, apply parameters\n",
 				veid);
 			if (disk_k)
 				VZFSQuotaSet(veid, NULL, &param, QUOTA_SET, 0);

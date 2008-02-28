@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@ enum {
 
 int execvep(const char *path, char *const argv[], char *const envp[]);
 
-/** Execute command inside VE.
+/** Execute command inside CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param root		VE root.
+ * @param h		CT handler.
+ * @param veid		CT id.
+ * @param root		CT root.
  * @param exec_mode	execution mode (MODE_EXEC, MODE_BASH).
  * @param arg		argv array.
  * @param envp		command environment array.
@@ -47,11 +47,11 @@ int execvep(const char *path, char *const argv[], char *const envp[]);
 int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 	char *const argv[], char *const envp[], char *std_in, int timeout);
 
-/** Read script and execute it in VE.
+/** Read script and execute it in CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param root		VE root.
+ * @param h		CT handler.
+ * @param veid		CT id.
+ * @param root		CT root.
  * @param arg		argv array.
  * @param envp		command environment array.
  * @param fname		script file name

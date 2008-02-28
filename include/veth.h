@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ typedef struct {
 	char dev_addr[ETH_ALEN];	/**< device MAC address. */
 	int addrlen;			/**< device MAC address length. */
 	char dev_name[IFNAMSIZE];	/**< device name. */
-	char dev_addr_ve[ETH_ALEN];	/**< device MAC address in VE. */
-	int addrlen_ve;			/**< VE device MAC address length. */
-	char dev_name_ve[IFNAMSIZE];	/**< device name in VE. */
+	char dev_addr_ve[ETH_ALEN];	/**< device MAC address in CT. */
+	int addrlen_ve;			/**< CT device MAC address length. */
+	char dev_name_ve[IFNAMSIZE];	/**< device name in CT. */
 	int flags;
 	int active;
 	int configure;
@@ -55,10 +55,10 @@ typedef struct {
 	int delall;
 } veth_param;
 
-/** Create/remove veth devices for VE.
+/** Create/remove veth devices for CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @return		0 on success.
  */
 struct vps_param;

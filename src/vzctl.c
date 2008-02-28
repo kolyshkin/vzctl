@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ void usage(int rc)
 	FILE *fp = rc ? stderr : stdout;
 
 	version(fp);
-	fprintf(fp, "Copyright (C) 2000-2007 SWsoft.\n");
+	fprintf(fp, "Copyright (C) 2000-2008, Parallels, Inc.\n");
 	fprintf(fp, "This program may be distributed under the terms of the GNU GPL License.\n\n");
 	fprintf(fp, "Usage: vzctl [options] <command> <veid> [parameters]\n"
 "vzctl destroy | mount | umount | stop | restart | status | enter <veid>\n"
@@ -225,7 +225,7 @@ int main(int argc, char *argv[], char *envp[])
 		}
 	}
 	if (argc < 3) {
-		fprintf(stderr, "VE id is not given\n");
+		fprintf(stderr, "CT ID missing\n");
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	}
@@ -233,7 +233,7 @@ int main(int argc, char *argv[], char *envp[])
 		name = strdup(argv[2]);
 		veid = get_veid_by_name(name);
 		if (veid < 0) {
-			fprintf(stderr, "Bad VE id %s\n", argv[2]);
+			fprintf(stderr, "Bad CT ID %s\n", argv[2]);
 			ret = VZ_INVALID_PARAMETER_VALUE;
 			goto error;
 		}
@@ -265,11 +265,11 @@ int main(int argc, char *argv[], char *envp[])
 		goto error;
 	}
 	if (veid == 0 && action != ACTION_SET) {
-		fprintf(stderr, "Only set actions are allowed for VE0\n");
+		fprintf(stderr, "Only set actions are allowed for CT0\n");
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	} else if (veid < 0) {
-		fprintf(stderr, "Bad VE id %d\n", veid);
+		fprintf(stderr, "Bad CT ID %d\n", veid);
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
 	}
@@ -285,7 +285,8 @@ int main(int argc, char *argv[], char *envp[])
 		    vps_p->res.name.name != NULL &&
 		    strcmp(name, vps_p->res.name.name))
 		{
-			logger(-1, 0, "Unable to find VE by name %s", name);
+			logger(-1, 0, "Unable to find container by name %s",
+					name);
 			ret = VZ_INVALID_PARAMETER_VALUE;
 			goto error;
 		}
@@ -293,7 +294,7 @@ int main(int argc, char *argv[], char *envp[])
 			action != ACTION_STATUS &&
 			action != ACTION_SET)
 	{
-		logger(-1, 0, "VE config file does not exist");
+		logger(-1, 0, "Container config file does not exist");
 		ret = VZ_NOVECONFIG;
 		goto error;
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,9 +59,9 @@ static int getlockpid(char *file)
 	return pid;
 }
 
-/** Lock VE.
+/** Lock container.
  * Create lock file $dir/$veid.lck.
- * @param veid		VPD id.
+ * @param veid		CT ID.
  * @param dir		lock directory.
  * @param status	transition status.
  * @return		 0 - success
@@ -132,9 +132,9 @@ int vps_lock(envid_t veid, char *dir, char *status)
 	return ret;
 }
 
-/** Unlock VE.
+/** Unlock CT.
  *
- * @param veid		VE id.
+ * @param veid		CT ID.
  * @param dir		lock directory.
  */
 void vps_unlock(envid_t veid, char *dir)

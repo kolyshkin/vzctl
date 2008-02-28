@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -44,34 +44,34 @@ enum {
 	M_KILL,		/**< stop by SIGTERM. */
 };
 
-/** Allocate and initialize VE handler.
+/** Allocate and initialize CT handler.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @return		handler or NULL on error.
  */
 vps_handler *vz_open(envid_t veid);
 
-/** Close VE handler.
+/** Close CT handler.
  *
- * @param h		VE handler.
+ * @param h		CT handler.
  */
 void vz_close(vps_handler *h);
 
-/** Get VE status.
+/** Get CT status.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @return		1 - VE is running
- *			0 - VE is stopped.
+ * @param h		CT handler.
+ * @param veid		CT id.
+ * @return		1 - CT is running
+ *			0 - CT is stopped.
  */
 int vps_is_run(vps_handler *h, envid_t veid);
 
-/** Start VE.
+/** Start CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param param		VE resourses.
- * @param skip		flags to skip VE setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
+ * @param h		CT handler.
+ * @param veid		CT id.
+ * @param param		CT resources.
+ * @param skip		flags to skip CT setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call setup() callback
  * @return		0 on success.
  */
@@ -82,11 +82,11 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *mod,
 	env_create_FN fn, void *data);
 
-/** Stop VE.
+/** Stop CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param param		VE resourses.
+ * @param h		CT handler.
+ * @param veid		CT id.
+ * @param param		CT resources.
  * @param stop_mode	stop mode one of (M_REBOOT M_HALT M_KILL).
  * @param skip		flags to skip run action script (SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call cleanup() callback.
@@ -97,7 +97,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 
 /** Change root to specified directory
  *
- * @param		VE root
+ * @param		CT root
  * @return		0 on success
  */
 int vz_chroot(char *root);

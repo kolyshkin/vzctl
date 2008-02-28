@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
 . "$VZCONF"
 
 #
-# Get currently running VEs list
+# Get the list of currently running containers
 #
 get_run_ve()
 {
@@ -38,7 +38,7 @@ get_run_ve()
 }
 
 #
-# Get list of started VEs by vzctl
+# Get the list of started containers by vzctl
 #
 get_prev_ve()
 {
@@ -48,7 +48,7 @@ get_prev_ve()
 
 
 #
-# Get list of stopped VEs
+# Get the list of stopped containers
 #
 get_stopped_ve()
 {
@@ -81,7 +81,7 @@ clear_ve_net()
 	get_ip_list "$VEID"
 	vzgetnetdev
 	[ -z "$LOGFILE" ] ||
-		echo "`date --iso-8601=seconds` venetclean : VE $VEID : VE died, clear IPs: $IP_ADDR" >> "$LOGFILE"
+		echo "`date --iso-8601=seconds` venetclean : CT $VEID : CT died, clear IPs: $IP_ADDR" >> "$LOGFILE"
 	for ip in $IP_ADDR; do
 		# clear IP if not used
 		if ! echo -e "$VES_INFO" | grep -w "$ip" >/dev/null 2>&1; then

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -184,8 +184,8 @@ static inline cap_t make_cap_mask(cap_t on, cap_t off)
 	return (CAPDEFAULTMASK | on) & ~off;
 }
 
-/** Apply capability mask to VE.
- * @param veid		VE id.
+/** Apply capability mask to CT.
+ * @param veid		CT ID.
  * @param cap		capability mask.
  * @return		0 on success.
  */

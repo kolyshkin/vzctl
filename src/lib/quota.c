@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup("-I");
 	snprintf(buf, sizeof(buf), "%lu", param->diskinodes[1]);
 	arg[i++] = strdup(buf);
-	/* VE private */
+	/* CT private */
 	arg[i++] = strdup("-p");
 	arg[i++] = strdup(private);
 	/* Expiration time */
@@ -181,8 +181,8 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 
 /** Turn disk quota on.
  *
- * @param veid		VE id.
- * @param private	VE private area path.
+ * @param veid		CT ID.
+ * @param private	CT private area path.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -271,7 +271,7 @@ retry:
 
 /** Turn disk quota off.
  *
- * @param veid		VE id.
+ * @param veid		CT ID.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -302,7 +302,7 @@ int quota_off(envid_t veid, int force)
 
 /** Disk quota managment wraper.
  *
- * @param veid		VE id.
+ * @param veid		CT ID.
  * @param cmd		quota commands (QUOTA_MARKDURTY QUOTA_DROP QUOTA_STAT)
  * @return		0 on success.
  */
@@ -368,7 +368,7 @@ int quota_ctl(envid_t veid, int cmd)
 
 /** Setup disk quota limits.
  *
- * @param veid		VE id.
+ * @param veid		CT ID.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */

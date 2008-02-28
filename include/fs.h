@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,36 +34,36 @@
 /**  Data structure for file system parameter.
  */
 typedef struct {
-	char *private;		/**< VE private path. */
+	char *private;		/**< CT private path. */
 	char *private_orig;	/**< original not expanded private path. */
-	char *root;		/**< VE root path. */
+	char *root;		/**< CT root path. */
 	char *root_orig;	/**< original not expanded root path. */
 	char *tmpl;		/**< TEMPLATE path. */
 	int noatime;
 } fs_param;
 
-/** Get VE mount status.
+/** Get CT mount status.
  *
- * @param root		VE root.
- * @return		 1 - VE mounted
- *			 0 - VE unmounted.
+ * @param root		CT root.
+ * @return		 1 - CT mounted
+ *			 0 - CT unmounted.
  *			-1 - error
  */
 int vps_is_mounted(char *root);
 
-/** Mount VE.
+/** Mount CT.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
 int fsmount(envid_t veid, fs_param *fs, dq_param *dq);
 
-/** Mount VE and run mount action script if exists.
+/** Mount CT and run mount action script if exists.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @param skip		skip mount action scrips
@@ -72,19 +72,19 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq);
 int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	skipFlags skip);
 
-/** Unmount VE.
+/** Unmount CT.
  *
- * @param veid		VE id.
- * @param root		VE root.
+ * @param veid		CT id.
+ * @param root		CT root.
  * @return		0 on success.
  */
 int fsumount(envid_t veid, char *root);
 
-/** Unmount VE and run unmount action script if exists.
+/** Unmount CT and run unmount action script if exists.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param root		VE root.
+ * @param h		CT handler.
+ * @param veid		CT id.
+ * @param root		CT root.
  * @param skip		skip unmount action scrips
  * @return		0 on success.
  */

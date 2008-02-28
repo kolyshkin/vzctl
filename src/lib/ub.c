@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -192,8 +192,8 @@ if (ub->name != NULL) {							\
 
 /** Apply UBC resources.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT ID.
  * @param ubc		UBC parameters
  * @return		0 on success
  */
@@ -205,7 +205,7 @@ int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 		return 0;
 	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to apply UBC parameters: "
-			"VE is not running");
+			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((ret = set_ublimit(h, veid, ub)))
@@ -332,7 +332,7 @@ if ((src->x) != NULL) { 					\
 
 /** Read UBC resources current usage from /proc/user_beancounters
  *
- * @param veid		VE id.
+ * @param veid		CT ID.
  * @param ub		UBC parameters.
  * @return		0 on success.
  */

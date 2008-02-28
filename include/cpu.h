@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,16 +24,16 @@
 /** Data structure for cpu parameters.
  */
 typedef struct {
-	unsigned long *limit;	/**< CPU usage for the VE, in per cent. */
+	unsigned long *limit;	/**< CPU usage for the CT, in per cent. */
 	unsigned long *weight;
-	unsigned long *units;	/**< CPU weight for the VE, in units. */
-	unsigned long *vcpus;	/**< number of CPUs available in the running VE*/
+	unsigned long *units;	/**< CPU weight for the CT, in units. */
+	unsigned long *vcpus;	/**< number of CPUs available in the running CT */
 } cpu_param;
 
-/**  Apply cpu parameters on running VE.
+/**  Apply cpu parameters on running CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param cpu		cpu parameters.
  * @return		0 on success.
  */

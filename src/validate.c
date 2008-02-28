@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -550,7 +550,7 @@ int vps_validate(vps_res *param, int mode)
 
 	if (mode == ACT_NONE)
 		return 0;
-	logger(0, 0, "Validating VE:");
+	logger(0, 0, "Validating container:");
 	ret  = validate(param, mode == ACT_FIX, 0);
 	if (mode == ACT_ERROR && ret)
 		return VZ_VALIDATE_ERROR;
@@ -752,7 +752,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 			}
 		}
 	}
-	/* Last VE in /proc/user_beancounters */
+	/* Last CT in /proc/user_beancounters */
 	if (veid) {
 		if (ru_utl != NULL) {
 			calc_ve_utilization(&ub_s, &utl, &mem, 0);
@@ -787,7 +787,7 @@ int check_hn_overcommitment(int veid, struct ub_struct *param,
 	/* Calculate current HN overcommitment */
 	if (calc_hn_rusage(&ru_comm, NULL))
 		return 0;
-	/* Add VE resource usage */
+	/* Add CT resource usage */
 	calc_ve_commitment(param, &rusage_ve, &mem, 0);
 	inc_rusage(&ru_comm, &rusage_ve);
 	/* Convert to % */

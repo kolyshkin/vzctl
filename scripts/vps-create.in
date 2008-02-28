@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script should create VE private area
+# This script should create CT private area
 # For usage info see vz-create_prvt(5) man page.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VE_PRVT		- path to root of VE private areas
+#   VE_PRVT		- path to root of CT private areas
 #   PRIVATE_TEMPLATE	- path to private template used as a source for copying
 
 . @PKGLIBDIR@/scripts/vps-functions

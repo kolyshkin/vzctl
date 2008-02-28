@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ static const char *get_local_ip(vps_param *param)
 	list_head_t *h = &param->res.net.ip;
 	ip_param *ip;
 
-	/* Use first ip in the VE config */
+	/* Use first IP in the CT config */
 	if (param->g_param != NULL && !param->res.net.delall)
 		h = &param->g_param->res.net.ip;
 	if (list_empty(h))
@@ -251,7 +251,7 @@ int need_configure(vps_res *res)
 }
 
 /*
- * Setup (add/delete) IP address(es) inside VE
+ * Setup (add/delete) IP address(es) inside container
  */
 int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char *root, int op, net_param *net, int state)
@@ -318,7 +318,7 @@ int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (!need_configure(res))
 		return 0;
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Unable to configure VE: VE is not running");
+		logger(0, 0, "Unable to configure container: not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (actions == NULL) {

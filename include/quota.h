@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ typedef struct {
 
 /** Setup disk quota limits.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -54,8 +54,8 @@ int vps_set_quota(envid_t veid, dq_param *dq);
 
 /** Turn disk quota on.
  *
- * @param veid		VE id.
- * @param private	VE private area path.
+ * @param veid		CT id.
+ * @param private	CT private area path.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -63,7 +63,7 @@ int vps_quotaon(envid_t veid, char *private, dq_param *dq);
 
 /** Turn disk quota off.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param dq		disk quota parameters.
  * @return		0 on success.
  */
@@ -71,7 +71,7 @@ int vps_quotaoff(envid_t veid, dq_param *dq);
 
 /** Disk quota managment wraper.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param cmd		quota commands (QUOTA_MARKDURTY QUOTA_DROP QUOTA_STAT)
  * @return		0 on success.
  */
@@ -79,7 +79,7 @@ int quota_ctl(envid_t veid, int cmd);
 
 /** Turn quota off.
  *
- * @param veid		VE id.
+ * @param veid		CT id.
  * @param force		forcebly turn quota off.
  * @return		0 on success.
  */

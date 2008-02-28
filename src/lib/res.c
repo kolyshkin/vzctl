@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 #include "vps_configure.h"
 #include "io.h"
 
-/** Function called on VE start to setup resource management
+/** Function called on CT start to setup resource management
  *
  */
 int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
@@ -51,7 +51,7 @@ int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
 	return 0;
 }
 
-/** Function called on VE stop to cleanup resources
+/** Function called on CT stop to cleanup resources
  *
  */
 int vps_cleanup_res(vps_handler *h, envid_t veid, vps_param *param, int vps_state)
@@ -103,9 +103,11 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 
 	if (vps_state == STATE_RUNNING && vps_is_run(h, veid)) {
 		if (res->cap.on || res->cap.off)
-			logger(-1, 0, "Unable to set capability on running VE");
+			logger(-1, 0, "Unable to set capability "
+					"on running container");
 		if (res->env.ipt_mask) {
-			logger(-1, 0, "Unable to set iptables on running VE");
+			logger(-1, 0, "Unable to set iptables "
+					"on running container");
 			return VZ_SET_IPTABLES;
 		}
 	}

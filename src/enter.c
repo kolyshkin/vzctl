@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -336,11 +336,11 @@ err:
 	/* wait for pts allocation */
 	ret = read(st[0], &status, sizeof(status));
 	if (!ret) {
-		fprintf(stdout, "entered into VE %d\n", veid);
+		fprintf(stdout, "entered into CT %d\n", veid);
 		raw_on();
 		e_loop(fileno(stdin), in[1], out[0], fileno(stdout), info[1]);
 	} else {
-		fprintf(stdout, "enter into VE %d failed\n", veid);
+		fprintf(stdout, "enter into CT %d failed\n", veid);
 		set_not_blk(out[0]);
 		while (stdredir(out[0], fileno(stdout)) == 0)
 			;
@@ -352,7 +352,7 @@ err:
 		fprintf(stdout, "got signal %d\n", WTERMSIG(status));
 	if (!ret) {
 		raw_off();
-		fprintf(stdout, "exited from VE %d\n", veid);
+		fprintf(stdout, "exited from CT %d\n", veid);
 	}
 	close(in[1]); close(out[0]);
 	return ret ? status : 0;

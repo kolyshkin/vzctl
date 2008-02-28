@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -98,10 +98,10 @@ static int set_cpuunits(envid_t veid, unsigned int cpuunits)
 	return ret;
 }
 
-/** Change number of CPUs available in the running VE.
+/** Change number of CPUs available in the running CT.
  *
- * @param veid		VE id
- * @param vcpu		number of cpu
+ * @param veid		CT ID
+ * @param vcpu		number of cpus
  */
 int env_set_vcpus(envid_t veid, unsigned int vcpus)
 {
@@ -128,10 +128,10 @@ int hn_set_cpu(cpu_param *cpu)
 	return set_cpuunits(2147483647, *cpu->units);
 }
 
-/**  Apply cpu parameters on running VE.
+/**  Apply cpu parameters on running CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT ID.
  * @param cpu		cpu parameters.
  * @return		0 on success.
  */
@@ -148,7 +148,7 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 	}
 	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to apply CPU parameters: "
-			"VE is not running");
+			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (cpu->limit != NULL) {

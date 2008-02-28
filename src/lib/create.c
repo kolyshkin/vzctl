@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		logger(-1, 0, "Cached os template %s not found", tarball);
 		return VZ_PKGSET_NOT_FOUND;
 	}
-	/* Lock VE area */
+	/* Lock CT area */
 	if (make_dir(fs->private, 0))
 		return VZ_FS_NEW_VE_PRVT;
 	snprintf(tmp_dir, sizeof(tmp_dir), "%s.tmp", fs->private);
@@ -130,7 +130,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		quota_set(veid, fs->private, dq);
 		quota = 0;
 	}
-	/* Unlock VE area */
+	/* Unlock CT area */
 	rmdir(fs->private);
 	if (rename(tmp_dir, fs->private)) {
 		logger(-1, errno, "Can't rename %s to %s", tmp_dir, fs->private);
@@ -175,15 +175,16 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			return VZ_CP_CONFIG;
 		}
 		if (cfg_exists) {
-			logger(-1, 0, "Warning: VE config file already exists,"
-				" will be rewritten with %s", src);
+			logger(-1, 0, "Warning: container config file "
+					"already exists, will be "
+					"rewritten with %s", src);
 			unlink(dst);
 		}
 		sample_config = cmd_p->opt.config;
 	} else if (vps_p->opt.config != NULL) {
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			vps_p->opt.config);
-		/* Do not use config if VE config exists */
+		/* Do not use config if CT config exists */
 		if (!cfg_exists && stat_file(src))
 			sample_config = vps_p->opt.config;
 	}
@@ -241,14 +242,15 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			}
 		}
 		snprintf(tar_nm, sizeof(tar_nm), "cache/%s", tmpl->ostmpl);
-		logger(0, 0, "Creating VE private area (%s)", tmpl->ostmpl);
+		logger(0, 0, "Creating container private area (%s)",
+				tmpl->ostmpl);
 		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, tar_nm);
 	}
 	if (ret) {
 		if (sample_config != NULL)
 			unlink(dst);
 		vps_destroy_dir(veid, fs->private);
-		logger(-1, 0, "Creation of VE private area failed");
+		logger(-1, 0, "Creation of container private area failed");
 		return ret;
 	}
 	vps_postcreate(veid, &vps_p->res.fs, &vps_p->res.tmpl);
@@ -271,7 +273,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		cmd_p->res.tmpl.ostmpl = strdup(tmpl->ostmpl);
 	}
 	vps_save_config(veid, dst, cmd_p, vps_p, action);
-	logger(0, 0, "VE private area was created");
+	logger(0, 0, "Container private area was created");
 
 	return 0;
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -263,7 +263,7 @@ int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
 		return 0;
 	if (!vps_is_run(h, veid)){
 		logger(-1, 0, "Unable to setup network devices: "
-			"VE is not running");
+			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	cmd = (op == ADD) ? VE_NETDEV_ADD : VE_NETDEV_DEL;
@@ -304,7 +304,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 		return 0;
 	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to apply network parameters: "
-			"VE is not running");
+			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (net->ipv6_net != YES) {

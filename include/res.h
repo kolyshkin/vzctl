@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ typedef struct name_param {
 	char *name;
 } name_param;
 
-/** Data structure for VE resources.
+/** Data structure for CT resources.
  */
 typedef struct vps_res {
 	fs_param fs;		/**< file system parameters. */
@@ -123,14 +123,14 @@ struct vps_param {
 };
 typedef struct vps_param vps_param;
 
-/** Setting VE resources.
+/** Setting CT resources.
  *
- * @param h		VE handler.
- * @param veid		VE id.
+ * @param h		CT handler.
+ * @param veid		CT id.
  * @param actions	distribution action scripts.
- * @param fs		VE FS parameters
- * @param param		VE parameters.
- * @param vps_state	VE state.
+ * @param fs		CT FS parameters
+ * @param param		CT parameters.
+ * @param vps_state	CT state.
  * @param action	external modules.
  * @return		0 on success.
  */

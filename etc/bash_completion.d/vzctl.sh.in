@@ -8,23 +8,23 @@ _get_ves()
 	local rm_empty='sed s/^-[[:space:]]*//'
 	case $cmd in
 		create)
-			# create a new VEID, by increasing the last one
+			# create a new CTID, by increasing the last one
 			local veids=`@SBINDIR@/vzlist -H -a -oveid | tail -1`
 			[ -n "$veids" ] || veids=100
 			echo $((veids+1))
 			;;
 		start|mount|umount|destroy)
-			# stopped VEs
+			# stopped CTs
 			@SBINDIR@/vzlist -H -S -oveid
 			@SBINDIR@/vzlist -H -S -oname | $rm_empty
 			;;
 		stop|enter|exec*)
-			# running VEs
+			# running CTs
 			@SBINDIR@/vzlist -H -oveid
 			@SBINDIR@/vzlist -H -oname | $rm_emtpy
 			;;
 		*)
-			# All VEs
+			# All CTs
 			@SBINDIR@/vzlist -H -a -oveid
 			@SBINDIR@/vzlist -H -a -oname | $rm_empty
 			;;
@@ -94,7 +94,7 @@ _vzctl()
 			COMPREPLY=( $( compgen -W "$vzctl_cmds" -- $cur ) )
 			;;
 		*)
-			# VEID
+			# CTID
 			COMPREPLY=( $( compgen -W "$(_get_ves $prev)" -- $cur ) )
 			;;
 		esac
@@ -102,7 +102,7 @@ _vzctl()
 
 	*) # COMP_CWORD >= 3
 		if [[ $COMP_CWORD -eq 3 && ! $prev != '^[1-9][0-9]*$' ]]; then
-			# VEID
+			# CTID
 			COMPREPLY=( $( compgen -W "$(_get_ves $prev)" -- $cur ) )
 		else
 
@@ -172,13 +172,13 @@ _vzctl()
 				COMPREPLY=( $( compgen -W "$devices" -- $cur ) )
 				;;
 			--ipdel)
-				# Get VEID
+				# Get CTID
 				local ve=${COMP_WORDS[2]}
 				if [[ ! ${ve} != '^[1-9][0-9]*$' ]] ; then
 					# --verbose or --quiet used
 					ve=${COMP_WORDS[3]}
 				fi
-				# VENAME or VEID ?
+				# NAME or ID ?
 				LIST_OPT=`echo $ve | awk '/[a-zA-Z]/ {print "-N"}'`
 				local ips="`@SBINDIR@/vzlist -H -o ip $LIST_OPT $ve | grep -vi -`"
 				COMPREPLY=( $( compgen -W "$ips all" -- $cur ) )
@@ -191,7 +191,7 @@ _vzctl()
 						# --verbose or --quiet used
 						ve=${COMP_WORDS[3]}
 					fi
-					# get veth(ernet) device of VE, proc and config
+					# get veth(ernet) device of CT, proc and config
 					local netif_proc="`awk "/${ve}/ { print \\$4 }" /proc/vz/veth`"
 					local netif_conf="`grep ^NETIF /etc/vz/conf/${ve}.conf |
 						sed -e 's/"/\n/g' -e 's/;/\n/g' -e 's/,/\n/g' -e 's/=/ /g' | awk '/^ifname/ {print \$2}'`"

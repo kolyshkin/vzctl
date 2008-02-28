@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -131,11 +131,11 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (g_p->opt.start_disabled == YES &&
 		cmd_p->opt.start_force != YES)
 	{
-		logger(-1, 0, "VE start disabled");
+		logger(-1, 0, "Container start disabled");
 		return VZ_VE_START_DISABLED;
 	}
 	if (vps_is_run(h, veid)) {
-		logger(-1, 0, "VE is already running");
+		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
 	}
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
@@ -386,9 +386,9 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 {
 	int err = 0;
 
-	/* Check parameters that can't be set on running VE */
+	/* Check parameters that can't be set on running CT */
 	if (new_res->cap.on || new_res->cap.off) {
-		logger(-1, 0, "Unable to set capability on running VE");
+		logger(-1, 0, "Unable to set capability on running container");
 		if (setmode == SET_RESTART)
 			goto restart_ve;
 		else if (setmode != SET_IGNORE)
@@ -398,7 +398,8 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		if (!old_res->env.ipt_mask ||
 			new_res->env.ipt_mask != old_res->env.ipt_mask)
 		{
-			logger(-1, 0, "Unable to set iptables on running VE");
+			logger(-1, 0, "Unable to set iptables "
+					"on running container");
 			if (setmode == SET_RESTART)
 				goto restart_ve;
 			else if (setmode != SET_IGNORE)
@@ -407,7 +408,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	}
 	if (err && setmode == SET_NONE) {
 		logger(-1, 0, "WARNING: Some of the parameters"
-			" could not be applied to a running VE.\n"
+			" could not be applied to a running container.\n"
 			"\tPlease consider using --setmode option");
 	}
 	return err;
@@ -547,13 +548,15 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
 			cmd_p->res.fs.private_orig = NULL;
-			logger(-1, 0,"Unable to change VE_PRIVATE on a running VE");
+			logger(-1, 0,"Unable to change VE_PRIVATE "
+					"on a running container");
 			return VZ_VE_RUNNING;
 		}
 		if (cmd_p->res.fs.root_orig != NULL) {
 			free(cmd_p->res.fs.root_orig);
 			cmd_p->res.fs.root_orig = NULL;
-			logger(-1, 0, "Unable to change VE_ROOT on a running VE");
+			logger(-1, 0, "Unable to change VE_ROOT "
+					"on a running container");
 			return VZ_VE_RUNNING;
 		}
 	}
@@ -591,7 +594,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			goto err;
 		}
 	}
-	/* Skip applying parameters on stopped VE */
+	/* Skip applying parameters on stopped CT */
 	if (cmd_p->opt.save && !is_run) {
 		ret = mod_setup(h, veid, STATE_STOPPED, SKIP_NONE, &g_action,
 			cmd_p);
@@ -641,7 +644,7 @@ static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(-1, 0, "VE is not running");
+		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	return do_enter(h, veid, root);
@@ -720,7 +723,7 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 		exist = 1;
 	mounted = vps_is_mounted(fs->root);
 	run = vps_is_run(h, veid);
-	printf("VEID %d %s %s %s\n", veid,
+	printf("CTID %d %s %s %s\n", veid,
 		exist ? "exist" : "deleted",
 		mounted ? "mounted" : "unmounted",
 		run ? "running" : "down");
@@ -819,11 +822,11 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		if (skiplock != YES) {
 			lock_id = vps_lock(veid, g_p->opt.lockdir, "");
 			if (lock_id > 0) {
-				logger(-1, 0, "VE already locked");
+				logger(-1, 0, "Container already locked");
 				ret = VZ_LOCKED;
 				goto err;
 			} else if (lock_id < 0) {
-				logger(-1, 0, "Unable to lock VE");
+				logger(-1, 0, "Unable to lock container");
 				ret = VZ_SYSTEM_ERROR;
 				goto err;
 			}
@@ -863,7 +866,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->opt.save == YES) {
 			get_vps_conf_path(veid, fname, sizeof(fname));
 			vps_save_config(veid, fname, cmd_p, vps_p, &g_action);
-			logger(0, 0, "Saved parameters for VE %d", veid);
+			logger(0, 0, "Saved parameters for CT %d", veid);
 		} else if (cmd_p->opt.save != NO) {
 			if (list_empty(&cmd_p->res.misc.userpw)) {
 				logger(0, 0, "WARNING: Settings were not saved"
@@ -908,7 +911,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		break;
 	}
 err:
-	/* Unlock VE in case lock taken */
+	/* Unlock CT in case lock taken */
 	if (skiplock != YES && !lock_id)
 		vps_unlock(veid, g_p->opt.lockdir);
 	vz_close(h);

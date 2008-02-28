@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -311,11 +311,11 @@ err:
 	return ret;
 }
 
-/** Execute command inside VE.
+/** Execute command inside CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param root		VE root.
+ * @param h		CT handler.
+ * @param veid		CT ID.
+ * @param root		CT root.
  * @param exec_mode	execution mode (MODE_EXEC, MODE_BASH).
  * @param arg		argv array.
  * @param envp		command environment array.
@@ -328,10 +328,10 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 {
 	int pid, ret;
 
-	if (check_var(root, "VE root is not set"))
+	if (check_var(root, "Container root (VE_ROOT) is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(-1, 0, "VE is not running");
+		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((pid = fork()) < 0) {
@@ -383,10 +383,10 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 {
 	int pid, ret;
 
-	if (check_var(root, "VE root is not set"))
+	if (check_var(root, "Container root (VE_ROOT) is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
-		logger(-1, 0, "VE is not running");
+		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if ((pid = fork()) < 0) {
@@ -400,11 +400,11 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
 	return ret;
 }
 
-/** Read script and execute it in VE.
+/** Read script and execute it in CT.
  *
- * @param h		VE handler.
- * @param veid		VE id.
- * @param root		VE root.
+ * @param h		CT handler.
+ * @param veid		CT ID.
+ * @param root		CT root.
  * @param arg		argv array.
  * @param envp		command environment array.
  * @param fname		script file name
@@ -421,7 +421,7 @@ int vps_exec_script(vps_handler *h, envid_t veid, char *root,
 
 	if ((len = read_script(fname, func, &script)) < 0)
 		return -1;
-	logger(1, 0, "Running VE script: %s", fname);
+	logger(1, 0, "Running container script: %s", fname);
 	ret = vps_exec(h, veid, root, MODE_BASH, argv, envp, script, timeout);
 	if (script != NULL)
 		free(script);
@@ -450,7 +450,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (check_var(vps_p->res.fs.private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
 	if (!stat_file(vps_p->res.fs.private)) {
-		logger(-1, 0, "VE private area %s does not exist",
+		logger(-1, 0, "Container private area %s does not exist",
 			vps_p->res.fs.private);
 		return VZ_FS_NOPRVT;
 	}

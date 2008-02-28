@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+ *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 
 		fprintf(g_log.fp, "%s %s : ", date, g_log.prog);
 		if (g_log.veid)
-			fprintf(g_log.fp, "VE %d : ", g_log.veid);
+			fprintf(g_log.fp, "CT %d : ", g_log.veid);
 		vfprintf(g_log.fp, format, ap);
 		if (err_no)
 			fprintf(g_log.fp, ": %s", strerror(err_no));
