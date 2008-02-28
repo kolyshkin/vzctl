@@ -20,7 +20,7 @@
 %define _bashcdir %_sysconfdir/bash_completion.d
 
 
-Summary: Virtual Environments control utility
+Summary: OpenVZ containers control utility
 Name: vzctl
 Version: 3.0.22
 Release: 1%{?dist}
@@ -49,7 +49,7 @@ Requires: gawk
 Requires: openssh
 
 %description
-This utility allows system administator to control Virtual Environments,
+This utility allows system administator to control OpenVZ containers,
 i.e. create, start, shutdown, set various options and limits etc.
 
 %prep
@@ -168,11 +168,11 @@ if [ $1 = 0 ]; then
 fi
 
 %package lib
-Summary: Virtual Environments control API library
+Summary: Containers control API library
 Group: System Environment/Kernel
 
 %description lib
-Virtual Environments control API library
+Containers control API library
 
 %files lib
 %defattr(-,root,root)
