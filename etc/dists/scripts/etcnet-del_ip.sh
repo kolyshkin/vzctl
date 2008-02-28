@@ -16,13 +16,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 #
-# This script deletes IP alias(es) inside VE for etcnet based systems.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IPs to delete, several addresses should be divided by space
-# Optional parameters:
-#   IPDELALL      - delete all ip addresses
+# Deletes IP address(es) from a container running a etcnet-based system.
 
 VENET_DEV=venet0
 IFACE_DIR=/etc/net/ifaces

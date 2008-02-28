@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script configures quota startup script inside VE
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   MINOR	- root device minor number
-#   MAJOR	- root device major number
+# Configures quota startup script in a container.
+
 SCRIPTANAME='/etc/init.d/vzquota'
 DEFAULT="/etc/runlevels/default/vzquota"
 

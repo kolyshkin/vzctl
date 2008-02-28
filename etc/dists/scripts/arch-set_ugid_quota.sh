@@ -16,12 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script configures a quota startup script inside VE used dist. Archlinux.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   MINOR	- root device minor number
-#   MAJOR	- root device major number
+# Configures quota in a container running Archlinux.
 
 SCRIPTANAME='/etc/rc.d/vzquota'
 CFGFILE=/etc/rc.conf

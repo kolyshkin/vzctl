@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script sets up resolver inside VE
-# For usage info see vz-veconfig(5) man page.
-#
-# Some parameters are passed in environment variables.
-# Required parameters:
-#   SEARCHDOMAIN
-#       Sets search domain(s). Modifies /etc/resolv.conf
-#   NAMESERVER
-#       Sets name server(s). Modifies /etc/resolv.conf
+# Sets up resolver (/etc/resolv.conf) in a container.
+
 function set_dns()
 {
 	local cfgfile="$1"

@@ -1,0 +1,3 @@
+All the parameters to the scripts residing in this directory are passed as
+environment variables. See ../distribution.conf-template for description
+of those parameters.

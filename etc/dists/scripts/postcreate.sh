@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script runnning on HN and perform next postinstall tasks:
-# 1. Randomizes crontab for given VE so all crontab tasks
-#  of all VEs will not start at the same time.
+# runs on the host system and performs these postinstall tasks:
+# 1. Randomizes crontab for given container so all crontab tasks
+#    of all containers will not start at the same time.
 # 2. Disables root password if it is empty.
 #
 

@@ -16,17 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script configure IP alias(es) inside VE used dist. Archlinux.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IP address(es) to add
-#                   (several addresses should be divided by space)
-# Optional parameters:
-#   VE_STATE      - state of VE; could be one of:
-#                     starting | stopping | running | stopped
-#   IPDELALL      - delete all ip addresses
-#
+# Adds IP address(es) in a container running Archlinux.
 
 VENET_DEV=venet0
 CFGFILE=/etc/rc.conf

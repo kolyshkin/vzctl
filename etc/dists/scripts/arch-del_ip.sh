@@ -16,16 +16,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script deletes IP alias(es) inside VE  used dist. Archlinux.
-#
-# For usage info see ve-alias_del(5) man page.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IPs to delete, several addresses should be divided by space
-# Optional parameters:
-#   VE_STATE      - state of VE; could be one of:
-#                     starting | stopping | running | stopped
+# Deletes IP address(es) from a container running Archlinux.
+
 VENET_DEV=venet0
 CFGFILE=/etc/rc.conf
 

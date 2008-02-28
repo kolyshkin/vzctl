@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script sets user:passwd inside VE
-#
-# Some parameters are passed in environment variables.
-# Required parameters:
-#   USERPW  - Sets password for user, adding this user if it doesn't exist.
+# Sets user:passwd in a container, adding user if necessary.
+
 CFGFILE="/etc/passwd"
 
 function set_serrpasswd()

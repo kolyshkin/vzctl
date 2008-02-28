@@ -16,13 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script sets hostname inside VE used dist Archlinux
-#
-# Some parameters are passed in environment variables.
-# Required parameters:
-# Optional parameters:
-#   HOSTNM
-#       Sets host name for this VE. Modifies /etc/hosts and /etc/rc.conf
+# Sets hostname in a container running Archlinux.
 
 function set_host()
 {

@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,20 +16,10 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script configure IP alias(es) inside VE for SuSE-8 like distros.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IP address(es) to add
-#                   (several addresses should be divided by space)
-# Optional parameters:
-#   VE_STATE      - state of VE; could be one of:
-#                     starting | stopping | running | stopped
-#
+# Adds IP address(es) in a container running SuSE 8.
+
 VENET_DEV=venet0
 VENET_DEV_CFG=ifcfg-$VENET_DEV
-
-
 IFCFG_DIR=/etc/sysconfig/network/
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
 ROUTES=${IFCFG_DIR}/ifroute-${VENET_DEV}
@@ -121,7 +111,7 @@ function add_ip()
 	local new_ips
 	local if_restart=
 
-	# In case we are starting VE
+	# In case we are starting CT
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		# Remove all VENET config files
 		rm -f ${IFCFG} ${IFCFG}:* >/dev/null 2>&1

@@ -16,17 +16,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 #
-# This script configures IP alias(es) inside VE for etcnet based systems.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IP address(es) to add
-#                   (several addresses should be divided by space)
-# Optional parameters:
-#   VE_STATE      - state of VE; could be one of:
-#                     starting | stopping | running | stopped
-#   IPDELALL	  - delete all old interfaces
-#
+# Adds IP address(es) in a container running a etcnet-based systems.
 
 HOSTFILE=/etc/hosts
 IFACE_DIR=/etc/net/ifaces

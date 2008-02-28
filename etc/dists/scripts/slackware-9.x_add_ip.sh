@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2007 SWsoft. All rights reserved.
+#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,21 +16,10 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script configure IP addrss inside VE for Slackware like distros
-# Slackware does not support ip aliases so multiple ip addresses not allowed
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IP address(es) to add
-#                   (several addresses should be divided by space)
-# Optional parameters:
-#   VE_STATE      - state of VE; could be one of:
-#                     starting | stopping | running | stopped
-#   IPDELALL	  - delete all old interfaces
-#
+# Adds an IP address in a container running Slackware 9.
+# Slackware does not support IP aliases so multiple IP addresses not allowed
+
 VENET_DEV=venet0
-
-
 IFCFG_DIR=/etc/rc.d
 IFCFG=${IFCFG_DIR}/rc.inet1
 HOSTFILE=/etc/hosts
@@ -64,7 +53,7 @@ function create_config()
 
 function add_ip()
 {
-	# In case we are starting VE
+	# In case we are starting CT
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		setup_network
 	fi
