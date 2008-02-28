@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2000-2007 SWsoft. All rights reserved.
+# Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,35 +16,37 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# vzmigrate is used for VE migration to another node
+# vzmigrate is used for container migration to another node
 #
 # Usage:
 # vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
-#           destination_address VEID
+#           destination_address CTID
 # Options:
 #	-r, --remove-area yes|no
-#		Whether to remove VE on source HN for successfully migrated VE.
+#		Whether to remove container private area on the source
+#		hardware node after successful container migration.
 #	--ssh=<ssh options>
 #		Additional options that will be passed to ssh while establishing
 #		connection to destination HN. Please be careful with options
 #		passed, DO NOT pass destination hostname.
 #	--keep-dst
-#		Do not clean synced destination VE private area in case of some
-#		error. It makes sense to use this option on big VE migration to
-#		avoid syncing VE private area again in case some error
-#		(on VE stop for example) occurs during first migration attempt.
+#		Do not clean synced destination container private area
+#		in case of some	error. It makes sense to use this option
+#		for big container migration to avoid syncing container
+#		private area again in case some error (on container stop
+#		for example) occurs during first migration attempt.
 #	--online
-#		Perform online (zero-downtime) migration: during the migration the
-#		VE hangs for a while and after the migration it continues working
-#		as though nothing has happened.
+#		Perform online (zero-downtime) migration: during the migration
+#		container freezes for a while and after the migration it
+#		continues working as though nothing has happened.
 #	-v
 #		Verbose mode. Causes vzmigrate to print debugging messages about
 #		its progress (including some time statistics).
 #
 # Examples:
-#	Online migration of VE #101 to foo.com:
+#	Online migration of CT #101 to foo.com:
 #		vzmigrate --online foo.com 101
-#	Migration of VE #102 to foo.com with downtime:
+#	Migration of CT #102 to foo.com with downtime:
 #		vzmigrate foo.com 102
 # NOTE:
 #	This program uses ssh as a transport layer. You need to put ssh
@@ -89,26 +91,26 @@ MIG_ERR_APPLY_CONFIG=15
 
 usage() {
 	cat >&2 <<EOF
-This program is used for VE migration to another node
+This program is used for container migration to another node.
 Usage:
 vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
-	destination_address <VEID>
+	destination_address <CTID>
 Options:
 -r, --remove-area yes|no
-	Whether to remove VE on source HN for successfully migrated VE.
+	Whether to remove container on source host after successful migration.
 --ssh=<ssh options>
 	Additional options that will be passed to ssh while establishing
-	connection to destination HN. Please be careful with options
+	connection to destination host. Please be careful with options
 	passed, DO NOT pass destination hostname.
 --keep-dst
-	Do not clean synced destination VE private area in case of some
-	error. It makes sense to use this option on big VE migration to
-	avoid syncing VE private area again in case some error
-	(on VE stop for example) occurs during first migration attempt.
+	Do not clean synced destination container private area in case of some
+	error. It makes sense to use this option on big container migration to
+	avoid re-syncing container private area in case some error
+	(on container stop for example) occurs during first migration attempt.
 --online
 	Perform online (zero-downtime) migration: during the migration the
-	VE hangs for a while and after the migration it continues working
-	as though nothing has happened.
+	container freezes for some time and after the migration it
+	keeps working as though nothing has happened.
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics).
@@ -297,20 +299,20 @@ fi
 vpsconf="$confdir/$VEID.conf"
 
 if [ ! -r "$vzconf" -o ! -r "$vpsconf" ]; then
-	log 0 "Can't read global config or VE #$VEID config file"
+	log 0 "Can't read global config or CT #$VEID config file"
 	exit $MIG_ERR_NOEXIST
 fi
 
 get_status $(vzctl status $VEID)
 if [ "$exist" = "deleted" ]; then
-	log 0 "VE #$VEID doesn't exist"
+	log 0 "CT #$VEID doesn't exist"
 	exit $MIG_ERR_NOEXIST
 fi
 
 if [ $online -eq 1 ]; then
-	log 1 "Starting online migration of VE $VEID on $host"
+	log 1 "Starting online migration of CT $VEID to $host"
 else
-	log 1 "Starting migration of VE $VEID on $host"
+	log 1 "Starting migration of CT $VEID to $host"
 fi
 
 # Try to connect to destination
@@ -344,12 +346,12 @@ fi
 
 dst_exist=$($SSH "root@$host" "vzctl status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
-	log 0 "VE #$VEID already exists on destination node"
+	log 0 "CT #$VEID already exists on destination node"
 	exit $MIG_ERR_EXISTS
 fi
 
 if [ $online -eq 1 -a "$state" != "running" ]; then
-	log 0 "Can't perform online migration of stopped VE"
+	log 0 "Can't perform online migration of a stopped container"
 	exit $MIG_ERR_VPS_IS_STOPPED
 fi
 
@@ -400,16 +402,16 @@ if [ -n "$act_scripts" ]; then
 	fi
 fi
 
-log 2 "Creating remote VE root dir"
+log 2 "Creating remote container root dir"
 if ! $SSH "root@$host" "mkdir -p $VE_ROOT"; then
-	log 0 "Failed to make VE root"
+	log 0 "Failed to make container root directory"
 	undo_act_scripts
 	exit $MIG_ERR_COPY
 fi
 
-log 2 "Creating remote VE private dir"
+log 2 "Creating remote container private dir"
 if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE"; then
-	log 0 "Failed to make VE private area"
+	log 0 "Failed to make container private area directory"
 	undo_private
 	exit $MIG_ERR_COPY
 fi
@@ -438,25 +440,25 @@ log 1 "Syncing private"
 if ! $RSYNC --progress \
 		"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}" |
 		grep "% of" | awk -v ORS="\r" '{print $10}'; then
-	log 0 "Failed to sync VE private areas"
+	log 0 "Failed to sync container private areas"
 	undo_quota_on
 	exit $MIG_ERR_COPY
 fi
 
 if [ $online -eq 1 ]; then
-	log 1 "Live migrating VE"
+	log 1 "Live migrating container..."
 
-	log 2 "Suspending VE"
+	log 2 "Suspending container"
 	time_suspend=$(date +%s.%N)
 	if ! logexec 2 vzctl chkpnt $VEID --suspend ; then
-		log 0 "Failed to suspend VE"
+		log 0 "Failed to suspend container"
 		undo_sync
 		exit $MIG_ERR_CHECKPOINT
 	fi
 
-	log 2 "Dumping VE"
+	log 2 "Dumping container"
 	if ! logexec 2 vzctl chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
-		log 0 "Failed to dump VE"
+		log 0 "Failed to dump container"
 		undo_suspend
 		exit $MIG_ERR_CHECKPOINT
 	fi
@@ -470,16 +472,16 @@ if [ $online -eq 1 ]; then
 	fi
 else
 	if [ "$state" = "running" ]; then
-		log 1 "Stopping VE"
+		log 1 "Stopping container"
 		if ! logexec 2 vzctl stop $VEID ; then
-			log 0 "Failed to stop VE"
+			log 0 "Failed to stop container"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
 	elif [ "$mounted" = "mounted" ]; then
-		log 1 "Unmounting VE"
+		log 1 "Unmounting container"
 		if ! logexec 2 vzctl umount $VEID ; then
-			log 0 "Failed to umount VE"
+			log 0 "Failed to umount container"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
@@ -491,7 +493,7 @@ if [ "$state" = "running" ]; then
 	time_rsync2=$(date +%s.%N)
 	if ! $RSYNC \
 			"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
-		log 0 "Failed to sync VE private areas"
+		log 0 "Failed to sync container private areas"
 		undo_source_stage
 		exit $MIG_ERR_COPY
 	fi
@@ -527,18 +529,18 @@ else
 fi
 
 if [ $online -eq 1 ]; then
-	log 2 "Undumping VE"
+	log 2 "Undumping container"
 	time_undump=$(date +%s.%N)
 	if ! logexec 2 $SSH root@$host vzctl restore $VEID --undump \
 			--dumpfile $VE_DUMPFILE --skip_arpdetect ; then
-		log 0 "Failed to undump VE"
+		log 0 "Failed to undump container"
 		undo_copy_quota
 		exit $MIG_ERR_RESTORE_VPS
 	fi
 
-	log 2 "Resuming VE"
+	log 2 "Resuming container"
 	if ! logexec 2 $SSH root@$host vzctl restore $VEID --resume ; then
-		log 0 "Failed to resume VE"
+		log 0 "Failed to resume container"
 		undo_undump
 		exit $MIG_ERR_RESTORE_VPS
 	fi
@@ -553,7 +555,7 @@ if [ $online -eq 1 ]; then
 
 	log 1 "Cleanup"
 
-	log 2 "Killing VE"
+	log 2 "Killing container"
 	logexec 2 vzctl chkpnt $VEID --kill
 	logexec 2 vzctl umount $VEID
 
@@ -562,16 +564,16 @@ if [ $online -eq 1 ]; then
 	$SSH "root@$host" "rm -f $VE_DUMPFILE"
 else
 	if [ "$state" = "running" ]; then
-		log 1 "Starting VE"
+		log 1 "Starting container"
 		if ! logexec 2 $SSH root@$host vzctl start $VEID ; then
-			log 0 "Failed to start VE"
+			log 0 "Failed to start container"
 			undo_copy_quota
 			exit $MIG_ERR_START_VPS
 		fi
 	elif [ "$mounted" = "mounted" ]; then
-		log 1 "Mounting VE"
+		log 1 "Mounting container"
 		if ! logexec 2 $SSH root@$host vzctl mount $VEID ; then
-			log 0 "Failed to mount VE"
+			log 0 "Failed to mount container"
 			undo_copy_quota
 			exit $MIG_ERR_MOUNT_VPS
 		fi
@@ -588,7 +590,7 @@ else
 fi
 
 if [ $remove_area -eq 1 ]; then
-	log 2 "Destroying VE"
+	log 2 "Destroying container"
 	logexec 2 vzctl destroy $VEID
 else
 	# Move config as veid.migrated to allow backward migration
