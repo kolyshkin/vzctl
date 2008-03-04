@@ -126,7 +126,7 @@ typedef struct vps_param vps_param;
 /** Setting CT resources.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param actions	distribution action scripts.
  * @param fs		CT FS parameters
  * @param param		CT parameters.

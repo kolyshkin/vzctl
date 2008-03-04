@@ -46,7 +46,7 @@ enum {
 
 /** Allocate and initialize CT handler.
  *
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @return		handler or NULL on error.
  */
 vps_handler *vz_open(envid_t veid);
@@ -60,7 +60,7 @@ void vz_close(vps_handler *h);
 /** Get CT status.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @return		1 - CT is running
  *			0 - CT is stopped.
  */
@@ -69,7 +69,7 @@ int vps_is_run(vps_handler *h, envid_t veid);
 /** Start CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param param		CT resources.
  * @param skip		flags to skip CT setup (SKIP_SETUP|SKIP_ACTION_SCRIPT)
  * @param action	modules list, used to call setup() callback
@@ -85,7 +85,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 /** Stop CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param param		CT resources.
  * @param stop_mode	stop mode one of (M_REBOOT M_HALT M_KILL).
  * @param skip		flags to skip run action script (SKIP_ACTION_SCRIPT)

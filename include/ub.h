@@ -136,7 +136,7 @@ typedef struct ub_struct ub_param;
 /** Apply UBC resources.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param ubc		UBC parameters
  * @return		0 on success
  */
@@ -160,7 +160,7 @@ int add_ub_param(ub_param *ub, ub_res *res);
 
 /** Read UBC resources current usage from /proc/user_beancounters
  *
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param ub		UBC parameters.
  * @return		0 on success.
  */

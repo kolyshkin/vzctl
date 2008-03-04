@@ -35,7 +35,7 @@ int execvep(const char *path, char *const argv[], char *const envp[]);
 /** Execute command inside CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param root		CT root.
  * @param exec_mode	execution mode (MODE_EXEC, MODE_BASH).
  * @param arg		argv array.
@@ -50,7 +50,7 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 /** Read script and execute it in CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param root		CT root.
  * @param arg		argv array.
  * @param envp		command environment array.

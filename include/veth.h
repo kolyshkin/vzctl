@@ -58,7 +58,7 @@ typedef struct {
 /** Create/remove veth devices for CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @return		0 on success.
  */
 struct vps_param;

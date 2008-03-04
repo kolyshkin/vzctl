@@ -43,7 +43,7 @@ typedef struct {
 /** Setup CT network.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param op		operation (ADD|DEL).
  * @param net		network parameters.
  * @param actions	distribution action scripts.
@@ -57,7 +57,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 /** Setup access to Host system network devices.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param op		operation (ADD|DEL).
  * @param net		network parameters.
  * @return		0 on success.
@@ -69,7 +69,7 @@ int find_ip(list_head_t *ip_h,  char *ipaddr);
 /** Obtain list of IP addresses belonging to the CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param ip_h		IP list head.
  * @return		0 on success.
  */

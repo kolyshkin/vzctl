@@ -22,7 +22,7 @@
 /** Setup user password
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param actions	distribution action scripts.
  * @param root		CT root.
  * @param pw		list of user:password parameters.

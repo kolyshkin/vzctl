@@ -44,7 +44,7 @@ typedef struct {
 /** Allow/disallow access to devices on host system from CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param root		CT root.
  * @param dev		devices list.
  * @return		0 on success.

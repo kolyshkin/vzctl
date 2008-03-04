@@ -31,7 +31,7 @@ int vps_lock(envid_t veid, char *dir, char *status);
 
 /** Unlock CT.
  *
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param dir		lock directory.
  */
 void vps_unlock(envid_t veid, char *dir);

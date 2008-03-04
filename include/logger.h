@@ -53,7 +53,7 @@ int set_log_file(char *file);
 /** Initialize logging.
  *
  * @param file		log file.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param enable	enable/disable logging.
  * @param level		maximum logging level.
  * @param quiet		skip logging to stdout.

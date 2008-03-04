@@ -33,7 +33,7 @@ typedef struct {
 /**  Apply cpu parameters on running CT.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param cpu		cpu parameters.
  * @return		0 on success.
  */

@@ -44,7 +44,7 @@ int get_cap_mask(char *name, unsigned long *mask);
 
 /** Apply capability mask to CT.
  *
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param cap		capability mask.
  * @return		0 on success.
  */

@@ -53,7 +53,7 @@ int vps_is_mounted(char *root);
 
 /** Mount CT.
  *
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @return		0 on success.
@@ -63,7 +63,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq);
 /** Mount CT and run mount action script if exists.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
  * @param skip		skip mount action scrips
@@ -74,7 +74,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 
 /** Unmount CT.
  *
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param root		CT root.
  * @return		0 on success.
  */
@@ -83,7 +83,7 @@ int fsumount(envid_t veid, char *root);
 /** Unmount CT and run unmount action script if exists.
  *
  * @param h		CT handler.
- * @param veid		CT id.
+ * @param veid		CT ID.
  * @param root		CT root.
  * @param skip		skip unmount action scrips
  * @return		0 on success.
