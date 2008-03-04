@@ -187,7 +187,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
-		logger(-1, 0, "Container root is not set");
+		logger(-1, 0, "Container root (VE_ROOT) is not set");
 		return VZ_VE_ROOT_NOTSET;
 	}
 	if (!vps_is_run(h, veid)) {
@@ -242,9 +242,9 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		}
 	}
 	if (param->cpu_flags) {
-		logger(0, 0, "\tset cpu flags..");
+		logger(0, 0, "\tset CPU flags..");
 		if (ioctl(cpt_fd, CPT_SET_CPU_FLAGS, param->cpu_flags) < 0) {
-			logger(-1, errno, "Can not set cpu flags");
+			logger(-1, errno, "Can not set CPU flags");
 			goto err;
 		}
 	}
@@ -428,16 +428,16 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		NULL, restrore_FN, param);
 	if (ret)
 		goto err;
-	/* Restore 2level quota links & quota device */
+	/* Restore second-level quota links & quota device */
 	if ((cmd == CMD_RESTORE || cmd == CMD_UNDUMP) &&
 		vps_p->res.dq.ugidlimit != NULL && vps_p->res.dq.ugidlimit)
 	{
-		logger(0, 0, "Restore 2level quota");
+		logger(0, 0, "Restore second-level quota");
 		if (vps_execFn(h, veid, vps_p->res.fs.root, mk_quota_link, NULL,
 			VE_SKIPLOCK))
 		{
-			logger(-1, 0, "Warning: restore 2level quota links"
-				" failed");
+			logger(-1, 0, "Warning: restoring second-level "
+					"quota links failed");
 		}
 	}
 err:

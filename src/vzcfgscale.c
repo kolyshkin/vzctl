@@ -335,8 +335,8 @@ int main(int argc, char **argv)
 	{
 		if (!vz_init(veid) && env_is_running(veid))
 		{
-			fprintf(stderr, "CT %d is running, apply parameters\n",
-				veid);
+			fprintf(stderr, "Container %d is running, applying "
+					"new parameters\n", veid);
 			if (disk_k)
 				VZFSQuotaSet(veid, NULL, &param, QUOTA_SET, 0);
 			if (ubc_k)

@@ -101,7 +101,7 @@ static int set_cpuunits(envid_t veid, unsigned int cpuunits)
 /** Change number of CPUs available in the running CT.
  *
  * @param veid		CT ID
- * @param vcpu		number of cpus
+ * @param vcpu		number of CPUs
  */
 int env_set_vcpus(envid_t veid, unsigned int vcpus)
 {
