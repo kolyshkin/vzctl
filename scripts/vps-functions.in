@@ -17,6 +17,7 @@
 #
 #
 # Common stuff for vzctl helper scripts
+
 # get the name of the script
 SELFNAME="${0##*/}"
 
@@ -47,9 +48,9 @@ IP_CMD=/sbin/ip
 #   vzerror "Fatal error" 1
 vzerror()
 {
-	# print errors to stdout too
+	# print errors to stderr too
 	ERR=$?
-	echo "$SELFNAME ERROR: $1"
+	echo "$SELFNAME ERROR: $1" 1>&2
 	exit $2
 }
 
@@ -60,7 +61,7 @@ vzerror()
 #   vzwarning Invalid user
 vzwarning()
 {
-	echo "$SELFNAME WARNING: $*"
+	echo "$SELFNAME WARNING: $*" 1>&2
 }
 
 # Prints debug message
@@ -70,7 +71,7 @@ vzwarning()
 #   vzdebug Trying to start ls
 vzdebug()
 {
-	echo "$SELFNAME: $*"
+	echo "$SELFNAME: $*" 1>&2
 }
 
 # Checks if environment variable exists,
