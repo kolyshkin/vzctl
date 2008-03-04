@@ -16,12 +16,12 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script does clean up after CT shutdown
+# Clean up after container shutdown initiated from the inside.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VEID    - CT id
-#   IP_ADDR - CT IP address(es) divided by spaces
+#   VEID	- container ID
+#   IP_ADDR	- container's IP address(es), space-separated
 
 . @PKGCONFDIR@/vz.conf
 . @PKGLIBDIR@/scripts/vps-functions

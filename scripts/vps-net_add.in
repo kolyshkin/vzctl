@@ -16,16 +16,17 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script setup routing for given CT.
+# Set up routing for a given container.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VEID          - CT id
+#   VEID	- container ID
 # Optional parameters:
-#   IP_ADDR       - IP address(es) to add
+#   IP_ADDR	- IP address(es) to add
 #                   (several addresses should be divided by space)
-#   VE_STATE      - state of CT; could be one of:
-#                     starting | stopping | running | stopped
+#   VE_STATE	- state of CT; could be one of:
+#		  starting | stopping | running
+
 . @PKGCONFDIR@/vz.conf
 . @PKGLIBDIR@/scripts/vps-functions
 

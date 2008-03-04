@@ -16,15 +16,15 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script removes routing for given CT.
+# Remove routing for a given container.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   IP_ADDR       - IPs to delete, several addresses should be divided by space
-#   VEID          - CT id
+#   IP_ADDR	- IPs to delete, several addresses should be divided by space
+#   VEID	- container ID
 # Optional parameters:
-#   VE_STATE      - state of CT; could be one of:
-#                     starting | stopping | running | stopped
+#   VE_STATE	- state of the container; could be one of:
+#		  starting | stopping | running
 
 . @PKGCONFDIR@/vz.conf
 . @PKGLIBDIR@/scripts/vps-functions

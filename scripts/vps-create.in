@@ -16,8 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# This script should create CT private area
-# For usage info see vz-create_prvt(5) man page.
+# Create container's private area.
 #
 # Parameters are passed in environment variables.
 # Required parameters:

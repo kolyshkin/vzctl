@@ -16,8 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# Script to start CT was rebooted
-#
+# (Re)start those containers which were rebooted from the inside.
 
 VZCONF=@PKGCONFDIR@/vz.conf
 CONF_DIR=@PKGCONFDIR@/conf
