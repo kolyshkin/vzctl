@@ -2536,6 +2536,8 @@ void free_vps_param(vps_param *param)
 
 #define MERGE_INT(x)	if (src->x) dst->x = src->x;
 
+#define MERGE_INT2(x)	if (src->x >= 0) dst->x = src->x;
+
 #define MERGE_P(x)							\
 	if ((src->x) != NULL) { 					\
 		if ((dst->x) == NULL) 					\
@@ -2665,7 +2667,7 @@ static void merge_cpt(cpt_param *dst, cpt_param *src)
 
 static void merge_meminfo(meminfo_param *dst, meminfo_param *src)
 {
-	MERGE_INT(mode);
+	MERGE_INT2(mode);
 	MERGE_INT(val);
 }
 
@@ -2684,7 +2686,7 @@ static void merge_name(name_param *dst, name_param *src)
 }
 
 static void merge_io(io_param *dst, io_param *src) {
-	MERGE_INT(ioprio);
+	MERGE_INT2(ioprio);
 }
 
 static int merge_res(vps_res *dst, vps_res *src)
