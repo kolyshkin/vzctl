@@ -243,7 +243,7 @@ int mk_reboot_script()
 		logger(-1, errno, "Unable to create %s", buf);
 		return 1;
 	}
-	write(fd, REBOOT_SCRIPT, sizeof(REBOOT_SCRIPT));
+	write(fd, REBOOT_SCRIPT, sizeof(REBOOT_SCRIPT) - 1);
 	close(fd);
 
 	return 0;
