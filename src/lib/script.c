@@ -227,7 +227,7 @@ int mk_reboot_script()
 #define VZREBOOT	"S00vzreboot"
 #define RC1		"/etc/rc.d/rc6.d"
 #define RC2		"/etc/rc6.d"
-#define REBOOT_SCRIPT	"#!/bin/bash\n>/" REBOOT_MARK
+#define REBOOT_SCRIPT	"#!/bin/bash\n>" REBOOT_MARK
 
 	/* remove reboot flag */
 	unlink(REBOOT_MARK);
