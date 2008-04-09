@@ -37,8 +37,13 @@ static int dev_create(char *root, dev_res *dev)
 {
 	char buf1[STR_SIZE];
 	char buf2[STR_SIZE];
-	struct stat st;
+	struct stat st, st2;
 	int ret;
+	const char* udev_paths[] = {
+		"/lib/udev/devices",
+		"/etc/udev/devices",
+		NULL};
+	int i;
 
 	if (!dev->name[0])
 		return 0;
@@ -72,6 +77,20 @@ static int dev_create(char *root, dev_res *dev)
 	if (mknod(buf1, st.st_mode, st.st_rdev)) {
 		logger(-1, errno, "Unable to create device %s", buf1);
 		return VZ_SET_DEVICES;
+	}
+	/* Try to create static device node for udev */
+	for (i = 0; udev_paths[i] != NULL, i++) {
+		if (stat(udev_paths[i], &st2) == 0) {
+			if (S_ISDIR(st2.st_mode)) {
+				snprintf(buf1, sizeof(buf1),
+						"%s/%s/%s",
+						root, udev_paths[i],
+						dev->name);
+				make_dir(buf1, 0);
+				mknod(buf1, st.st_mode, st.st_rdev);
+				break;
+			}
+		}
 	}
 	return 0;
 }
