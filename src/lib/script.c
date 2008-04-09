@@ -206,12 +206,7 @@ int run_pre_script(int veid, char *script)
 	env[1] = strdup(buf);
 	env[2] = strdup(ENV_PATH);
 	env[3] = NULL;
-/*
-	if ((dist = get_ostmpl(gparam)) != NULL) {
-		snprintf(buf, sizeof(buf), "DIST=%s", dist);
-		env = ListAddElem(env, buf, NULL, NULL);
-	}
-*/
+
 	if ((ret = run_script(script, arg, env, 0)))
 		ret = VZ_ACTIONSCRIPT_ERROR;
 	free_arg(env);
