@@ -19,10 +19,9 @@
 # depending on the Linux distribution the container is running.
 #
 # After an action is initiated, it requests vzctl to read the configuration
-# based on the value of DISTRIBUTION or (if not present) OSTEMPLATE variable
-# in the container configuration file. In case an unknown distribution
-# has been found, or neither OSTEMPLATE nor DISTRIBUTION is set, the default
-# configuration file default.conf is used.
+# based on the value of OSTEMPLATE variable in the container configuration
+# file. In case an unknown distribution is found or OSTEMPLATE is not set,
+# the default configuration file default.conf is used.
 #
 
 # This script is launched inside a container on executing the following
