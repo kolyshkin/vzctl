@@ -449,7 +449,7 @@ static int parse_iptables(env_param *env, char *val)
 	ret = 0;
 	do {
 		if ((ipt = find_ipt(token)) == NULL) {
-			logger(0, 0, "Warning: Unknown iptable module: %s,"
+			logger(-1, 0, "Warning: Unknown iptable module: %s,"
 				" skipped", token);
 			ret = ERR_INVAL_SKIP;
 			continue;
