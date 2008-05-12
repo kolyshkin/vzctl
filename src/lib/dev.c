@@ -79,7 +79,7 @@ static int dev_create(char *root, dev_res *dev)
 		return VZ_SET_DEVICES;
 	}
 	/* Try to create static device node for udev */
-	for (i = 0; udev_paths[i] != NULL, i++) {
+	for (i = 0; udev_paths[i] != NULL; i++) {
 		if (stat(udev_paths[i], &st2) == 0) {
 			if (S_ISDIR(st2.st_mode)) {
 				snprintf(buf1, sizeof(buf1),
