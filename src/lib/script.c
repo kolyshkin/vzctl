@@ -280,12 +280,24 @@ int mk_quota_link()
 #define INITTAB_FILE		"/etc/inittab"
 #define INITTAB_VZID		"vz:"
 #define INITTAB_ACTION		INITTAB_VZID "35:once:touch " VZFIFO_FILE "\n"
+
+#define EVENTS_DIR		"/etc/event.d/"
+#define EVENTS_FILE		EVENTS_DIR "call_on_default_rc"
+#define EVENTS_SCRIPT	\
+	"# This task runs if default runlevel is reached\n"	\
+	"start on stopped rc2\n"				\
+	"start on stopped rc3\n"				\
+	"start on stopped rc4\n"				\
+	"start on stopped rc5\n"				\
+	"exec touch " VZFIFO_FILE "\n"
+
 #define MAX_WAIT_TIMEOUT	60 * 60
 
 int add_reach_runlevel_mark()
 {
 	int fd, found, len, ret;
 	char buf[4096];
+	struct stat st;
 
 	unlink(VZFIFO_FILE);
 	if (mkfifo(VZFIFO_FILE, 0644)) {
@@ -293,6 +305,14 @@ int add_reach_runlevel_mark()
 			strerror(errno));
 		return -1;
 	}
+	/* Create upstart specific script */
+	if (!stat(EVENTS_DIR, &st)) {
+		if ((fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644))) {
+			write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
+			close(fd);
+		}
+	}
+	/* Add a line to /etc/inittab */
 	if ((fd = open(INITTAB_FILE, O_RDWR | O_APPEND)) == -1) {
 		fprintf(stderr, "Unable to open " INITTAB_FILE " %s\n",
 			strerror(errno));
