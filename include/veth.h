@@ -45,6 +45,7 @@ typedef struct {
 	int flags;
 	int active;
 	int configure;
+	int mac_filter;
 } veth_dev;
 
 /** Devices list.

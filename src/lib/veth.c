@@ -36,6 +36,27 @@
 #include "logger.h"
 #include "script.h"
 
+static int veth_dev_mac_filter(vps_handler *h, envid_t veid, veth_dev *dev)
+{
+	struct vzctl_ve_hwaddr veth;
+	int ret;
+
+	veth.op = dev->mac_filter == YES ? VE_ETH_DENY_MAC_CHANGE :
+							VE_ETH_ALLOW_MAC_CHANGE;
+	veth.veid = veid;
+	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
+	memcpy(veth.dev_name_ve, dev->dev_name_ve, IFNAMSIZE);
+	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
+	if (ret) {
+		if (errno != ENODEV) {
+			logger(-1, errno, "Unable to set mac filter");
+			ret = VZ_VETH_ERROR;
+		} else
+			ret = 0;
+	}
+	return ret;
+}
+
 static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
 {
 	struct vzctl_ve_hwaddr veth;
@@ -147,6 +168,10 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 					break;
 			}
 			tmp->flags = 1;
+			if (tmp->mac_filter) {
+				if ((ret = veth_dev_mac_filter(h, veid, tmp)))
+					break;
+			}
 			if ((ret = run_vznetcfg(veid, tmp)))
 				break;
 		} else {
@@ -319,6 +344,9 @@ void fill_veth_dev(veth_dev *dst, veth_dev *src)
 		memcpy(dst->dev_addr_ve, src->dev_addr_ve, sizeof(dst->dev_addr));
 		dst->addrlen_ve = src->addrlen_ve;
 	}
+	if (src->mac_filter) {
+		dst->mac_filter = src->mac_filter;
+	}
 }
 
 int merge_veth_dev(veth_dev *old, veth_dev *new, veth_dev *merged)
@@ -425,13 +453,32 @@ int read_proc_veth(envid_t veid, veth_param *veth)
 	return 0;
 }
 
+static void fill_veth_dev_name(veth_param *configured, veth_param *new)
+{
+	veth_dev *it, *dev;
+
+	if (list_empty(&configured->dev))
+		return;
+	list_for_each(it, &new->dev, list) {
+		dev = find_veth_by_ifname_ve(&configured->dev, it->dev_name_ve);
+		if (dev != NULL) {
+			if (*it->dev_name == '\0')
+				strcpy(it->dev_name, dev->dev_name);
+			it->active = 1;
+		} else {
+			logger(-1, 0, "Container does not have "
+					"configured veth: %s, skipped",
+					it->dev_name_ve);
+		}
+	}
+}
+
 int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 	char *root, veth_param *veth_add, veth_param *veth_del, int state,
 	int skip)
 {
 	int ret, dev_num;
 	veth_param veth_old;
-	veth_dev *dev_t, *dev;
 
 	if (list_empty(&veth_add->dev) &&
 		list_empty(&veth_del->dev) &&
@@ -450,32 +497,11 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 			free_veth_param(&veth_old);
 	} else if (!list_empty(&veth_del->dev)) {
 		dev_num = 0;
-		/* find host veth name by CT veth name */
-		list_for_each(dev_t, &veth_del->dev, list) {
-			dev = find_veth_by_ifname_ve(&veth_old.dev,
-				dev_t->dev_name_ve);
-			if (dev != NULL) {
-				dev_t->active = 1;
-				strcpy(dev_t->dev_name, dev->dev_name);
-				dev_num++;
-			} else {
-				logger(-1, 0, "Container does not have "
-						"configured veth: %s, skipped",
-						dev_t->dev_name_ve);
-			}
-		}
-		if (dev_num != 0)
-			veth_ctl(h, veid, DEL, veth_del, 0);
+		fill_veth_dev_name(&veth_old, veth_del);
+		veth_ctl(h, veid, DEL, veth_del, 0);
 	}
-	if (veth_add != NULL) {
-		if (!list_empty(&veth_old.dev)) {
-			list_for_each(dev_t, &veth_add->dev, list) {
-				dev = find_veth_by_ifname_ve(&veth_old.dev,
-					dev_t->dev_name_ve);
-				if (dev != NULL)
-					dev_t->active = 1;
-			}
-		}
+	if (!list_empty(&veth_add->dev)) {
+		fill_veth_dev_name(&veth_old, veth_add);
 		ret = veth_ctl(h, veid, ADD, veth_add, 1);
 	}
 	if (!list_empty(&veth_old.dev))

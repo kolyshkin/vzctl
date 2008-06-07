@@ -33,8 +33,10 @@ typedef unsigned envid_t;
 struct vzctl_ve_hwaddr {
 	envid_t veid;
 	int op;
-#define VE_ETH_ADD	1
-#define VE_ETH_DEL	2
+#define VE_ETH_ADD			1
+#define VE_ETH_DEL			2
+#define VE_ETH_ALLOW_MAC_CHANGE		3
+#define VE_ETH_DENY_MAC_CHANGE		4
 	unsigned char	dev_addr[6];
 	int addrlen;
 	char		dev_name[16];

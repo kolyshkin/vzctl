@@ -206,6 +206,7 @@ static struct option set_opt[] = {
 /*	netif	*/
 {"netif_add",	required_argument, NULL, PARAM_NETIF_ADD_CMD},
 {"netif_del",	required_argument, NULL, PARAM_NETIF_DEL_CMD},
+{"mac_filter",	required_argument, NULL, PARAM_NETIF_MAC_FILTER},
 
 {"mac",		required_argument, NULL, PARAM_NETIF_MAC},
 {"ifname",	required_argument, NULL, PARAM_NETIF_IFNAME},
@@ -1376,6 +1377,22 @@ static int parse_veth(vps_param *vps_p, char *val, int operation)
 }
 
 /********************* NETIF **********************************/
+
+static int parse_mac_filter_cmd (veth_dev *dev, char *str)
+{
+
+	if (dev == NULL)
+		return ERR_INVAL;
+
+	if (!strcmp(str, "on"))
+		dev->mac_filter = YES;
+	else if (!strcmp(str, "off"))
+		dev->mac_filter = NO;
+	else
+		return ERR_INVAL;
+	return 0;
+}
+
 void generate_veth_name(int veid, char *dev_name_ve,  char *dev_name, int len)
 {
 	char *name;
@@ -1391,6 +1408,7 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 {
 	veth_dev *dev;
 	int len;
+	int ret;
 
 	dev = NULL;
 	dev = find_veth_configure(&veth->dev);
@@ -1425,6 +1443,10 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 		if (parse_hwaddr(str, dev->dev_addr))
 			return ERR_INVAL;
 		dev->addrlen = ETH_ALEN;
+		break;
+	case PARAM_NETIF_MAC_FILTER:
+		if ((ret = parse_mac_filter_cmd(dev, str)))
+			return ret;
 		break;
 	}
 	return 0;
@@ -1477,6 +1499,18 @@ static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 			if (err)
 				return err;
 			dev->addrlen = ETH_ALEN;
+		} else if (!strncmp("mac_filter=", p, 11)) {
+			p += 11;
+			len = next - p;
+			if (len == 0)
+				continue;
+			if (len >= sizeof(tmp))
+				return ERR_INVAL;
+			strncpy(tmp, p, len);
+			tmp[len] = 0;
+			err = parse_mac_filter_cmd(dev, tmp);
+			if (err)
+				return err;
 		}
 		p = ++next;
 	} while (p < ep);
@@ -1591,6 +1625,12 @@ static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			sp += snprintf(sp, ep - sp,
 				"host_mac=%02X:%02X:%02X:%02X:%02X:%02X,",
 				STR2MAC(dev->dev_addr));
+			if (sp >= ep)
+				break;
+		}
+		if (dev->mac_filter) {
+			sp += snprintf(sp, ep - sp, "mac_filter=%s,",
+				dev->mac_filter == YES ? "on" : "off");
 			if (sp >= ep)
 				break;
 		}
@@ -2021,6 +2061,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_NETIF_MAC:
 	case PARAM_NETIF_HOST_IFNAME:
 	case PARAM_NETIF_HOST_MAC:
+	case PARAM_NETIF_MAC_FILTER:
 		ret = add_netif_param(&vps_p->res.veth, id, val);
 		break;
 	case PARAM_NAME:
