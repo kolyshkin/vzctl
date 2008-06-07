@@ -165,6 +165,7 @@ static int set_cap(envid_t veid, cap_t mask, int pid)
 
 	memset(&header, 0, sizeof(header));
 	header.version = _LINUX_CAPABILITY_VERSION;
+	capget(&header, NULL); /* Get linux capability version from kernel */
 	header.pid = pid;
 
 	memset(&data, 0, sizeof(data));
