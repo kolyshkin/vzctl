@@ -132,6 +132,20 @@ interface name for virtual interface in the host system.
 \fB--host_mac\fR \fIXX:XX:XX:XX:XX:XX\fR
 MAC address of interface in the host system.
 .TP
+\fB--mac_filter\fR \fIon|off\fR
+Enables/disables MAC address filtering for the Container veth device and
+the possibility of configuring the MAC address of this device from inside
+the Container. If the filtering is turned on:
+.br
+* the veth device accepts only those packets that have a MAC address in
+their headers corresponding to that of this device (excluding all broadcast
+and multicast packets);
+.br
+* it is impossible to modify the veth MAC address from inside the Container.
+.br
+By default, this functionality is enabled for all veth devices existing
+inside the Container.
+.TP
 \fBResource limits\fR
 
 The following options sets barrier and limit for various user beancounters.
