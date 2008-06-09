@@ -58,7 +58,7 @@ lockfile()
 		rm -f "$tmpfile"
 		return
 	fi
-	if kill -0 `cat $LOCKFILE` 2>/dev/null; then
+	if kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then
 		rm -f "$tmpfile"
 		exit
 	fi
