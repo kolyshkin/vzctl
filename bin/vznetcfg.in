@@ -17,7 +17,7 @@
 #
 VZNETCFG='@PKGCONFDIR@/vznet.conf'
 
-[ -f "$VZNETCFG" ] && source "$VZNETCFG"
+[ -f "$VZNETCFG" ] && . "$VZNETCFG"
 
 usage()
 {
