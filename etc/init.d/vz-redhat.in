@@ -174,7 +174,7 @@ get_kernel_version()
 	[ ! -z "$KERNEL_MAJOR" ] && return
 
 	local ver=$(uname -r)
-	local kernel=$(echo $ver | sed s/-.*//)
+	local kernel=$(echo $ver | sed s/[-+].*//)
 	KERNEL_MAJOR=$(echo $kernel | awk -F . '{print $1}')
 	KERNEL_MINOR=$(echo $kernel | awk -F . '{print $2}')
 	KERNEL_PATCHLEVEL=$(echo $kernel | awk -F . '{print $3}')
