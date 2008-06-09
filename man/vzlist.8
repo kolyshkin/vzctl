@@ -3,39 +3,45 @@
 vzlist \- containers listing utility
 .SH SYNOPSIS
 vzlist [\fB-a\fR] [\fB-o\fR \fIname\fR[,\fIname\fR...]]
- [\fB-s\fR [\fI-\fR]\fIname\fR] [\fB-h\fR \fIpattern\fR]
- [\fB-H\fR] [\fB-S\fR] [\fB-n\fR] [\fB-N\fR <\fI-pattern\fR>]
- [\fICTID\fR [\fICTID\fR ..] | \fB-1\fR]
+ [\fB-s\fR [\fB-\fR]\fIname\fR] [\fB-h\fR \fIpattern\fR]
+ [\fB-H\fR] [\fB-S\fR] [\fB-n\fR] [\fB-N\fR \fI-pattern\fR]
+ [\fICTID\fR [\fICTID\fR ...] | \fB-1\fR]
 .PP
 vzlist \fB-L\fR
 .SH DESCRIPTION
-This utility is used for listing containers. By default only running containers
-are listed.
+This utility is used for listing containers and their parameters.
+By default only running containers are listed.
 If one or more \fICTID\fRs are specified, only specified containers are
 displayed. CTID of \fB-1\fR is used to output CT IDs only, one per line.
 .SH OPTIONS
-.IP "\fB--all\fR, \fB-a\fR"
+.IP "\fB-a\fR, \fB--all\fR"
 list all containers.
-.IP "\fB--sort\fR, \fB-s\fR"
-specify sorting order, the '-' before parameter means sort in reverse order
-.IP "\fB--hostname\fR, \fB-h\fR  <\fIpattern\fR>"
-display only containers whose hostname matches the \fIpattern\fR.
+.IP "\fB-o\fR, \fB--output\fR \fIname\fR[,\fIname\fR...]"
+display only parameters specified by \fIname\fRs (see \fBSTANDARD FORMAT
+SPECIFIERS\fR below).
+.IP "\fB-s\fR, \fB--sort\fR [\fB-\fR]\fIname\fR"
+specify sorting order. The \fB-\fR before parameter means
+sorting in reverse order.
+.IP "\fB-h\fR, \fB--hostname\fR \fIpattern\fR"
+display only containers whose hostnames matches the \fIpattern\fR.
 The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR.
 Note that wildcard characters should be properly escaped
 to avoid expansion by shell.
-.IP "\fB--name\fR, \fB-n\fR "
-display container names.
-.IP "\fB--name_filter\fR, \fB-N\fR  <\fIpattern\fR>"
-display only containers whose hostname matches the \fIpattern\fR.
-.IP "\fB--no-header\fR, \fB-H\fR"
-suppress displaying header
-.IP "\fB--stopped -S\fR"
-display only stopped containers
-.IP "\fB--list -L\fR"
-list all format specifiers
+.IP "\fB-n\fR, \fB--name\fR"
+display container names instead of hostnames.
+.IP "\fB-N\fR, \fB--name_filter\fR \fIpattern\fR"
+display only containers whose names matches the \fIpattern\fR. See
+\fB--hostname\fR for \fIpattern\fR description.
+.IP "\fB-H\fR, \fB--no-header\fR"
+suppress displaying header.
+.IP "\fB-S\fR, \fB--stopped\fR"
+list only stopped containers.
+.IP "\fB-L\fR, \fB--list\fR"
+list all available format specifiers.
 
 .SS STANDARD FORMAT SPECIFIERS
-These may be used to control both output format and sorting.
+These may be used to control both output format (\fB-o\fR, \fB--output\fR)
+and sorting (\fB-s\fR, \fB--sort\fR).
 .TS
 allbox center;
 lB lB
@@ -49,10 +55,6 @@ _
  .s	softlimit
  .h	hardlimit
 .TE
-.P
-For example:
-.br
-\f(CW	vzlist -o ctid,kmemsize,kmemsize.l -s kmemsize\fR
 .TS
 allbox center;
 lB lB
@@ -174,6 +176,10 @@ laverage	LAVERAGE
 cpulimit	CPULIM
 cpuunits	CPUUNI
 .TE
+.P
+For example:
+.br
+\f(CW	vzlist -o ctid,kmemsize,kmemsize.l -s kmemsize\fR
 .SH RETURN CODE
 Returns 0 upon success.
 .SH COPYRIGHT
