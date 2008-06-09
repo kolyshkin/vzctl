@@ -274,8 +274,10 @@ if (ub->name != NULL) {							\
 	CHECK_B(numsiginfo)
 	CHECK_BL(ub->dcachesize, dcachesize)
 	CHECK_B(numiptent)
-	CHECK_BL(param->dq.diskspace, diskspace)
-	CHECK_BL(param->dq.diskinodes, diskinodes)
+	if (param->dq.enable == YES) {
+		CHECK_BL(param->dq.diskspace, diskspace)
+		CHECK_BL(param->dq.diskinodes, diskinodes)
+	}
 
 /*	2 Check formulas			*/
 	val = ub->numfile[0] * 384;

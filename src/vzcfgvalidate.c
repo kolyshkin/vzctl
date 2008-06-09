@@ -37,7 +37,7 @@ void usage(int rc)
 
 int main(int argc, char **argv)
 {
-	vps_param *param;
+	vps_param *param, *gparam;
 	struct stat st;
 	char *infile = NULL;
 	int ret, opt, recover = 0, ask = 0;
@@ -59,6 +59,16 @@ int main(int argc, char **argv)
 	}
 	if (optind >= argc)
 		usage(1);
+	init_log(NULL, 0, 1, 0, 0, NULL);
+
+	/* Read global config */
+	gparam=init_vps_param();
+	if (vps_parse_config(0, GLOBAL_CFG, gparam, NULL)) {
+		fprintf(stderr, "WARNING: Global configuration file %s "
+				"not found\n", GLOBAL_CFG);
+	}
+
+	/* Read container config */
 	infile = strdup(argv[optind]);
 	if (stat(infile, &st)) {
 		fprintf(stderr,"Container configuration file %s not found\n",
@@ -66,10 +76,13 @@ int main(int argc, char **argv)
 		free(infile);
 		exit(1);
 	}
-	init_log(NULL, 0, 1, 0, 0, NULL);
 	param = init_vps_param();
 	if (vps_parse_config(0, infile, param, NULL))
 		exit(1);
+
+	/* Merge configs (needed for DISK_QUOTA value, maybe others) */
+	merge_vps_param(gparam, param);
+
 	if (!(ret = validate(&param->res, recover, ask)))	{
 		if (recover || ask)
 			if (vps_save_config(0, infile, param, NULL, NULL))
