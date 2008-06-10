@@ -23,7 +23,8 @@
 
 typedef __u32 cap_t;
 
-#define CAP_TO_MASK(x) (1 << (x))
+#undef CAP_TO_MASK
+#define CAP_TO_MASK(x) (1 << ((x) & 31)) /* mask for indexed __u32 */
 #define cap_raise(c, flag) (c |=  CAP_TO_MASK(flag))
 #define cap_lower(c, flag) (c &=  CAP_TO_MASK(flag))
 
