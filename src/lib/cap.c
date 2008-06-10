@@ -97,6 +97,10 @@ static char *cap_names[] = {
 "FS_MASK"		/*	0x1f	*/
 };
 
+/* We can't include sys/capability.h since it conflicts
+ * with linux/capability.h, so we put this prototype here */
+extern int capget(cap_user_header_t header, const cap_user_data_t data);
+
 static inline int capset(cap_user_header_t header, cap_user_data_t data)
 {
 	return syscall(__NR_capset, header, data);
