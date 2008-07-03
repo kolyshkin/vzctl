@@ -212,6 +212,7 @@ static struct option set_opt[] = {
 {"ifname",	required_argument, NULL, PARAM_NETIF_IFNAME},
 {"host_mac",	required_argument, NULL, PARAM_NETIF_HOST_MAC},
 {"host_ifname",	required_argument, NULL, PARAM_NETIF_HOST_IFNAME},
+{"bridge",	required_argument, NULL, PARAM_NETIF_BRIDGE},
 
 /*	name	*/
 {"name",	required_argument, NULL, PARAM_NAME},
@@ -1448,6 +1449,16 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 		if ((ret = parse_mac_filter_cmd(dev, str)))
 			return ret;
 		break;
+	case PARAM_NETIF_BRIDGE:
+		if (dev->dev_bridge[0] != 0) {
+			logger(-1, 0,"Multiple use of"
+				" --bridge option not allowed");
+			return ERR_INVAL;
+		}
+		if (len > IFNAMSIZE)
+			return ERR_INVAL;
+		strcpy(dev->dev_bridge, str);
+		break;
 	}
 	return 0;
 }
@@ -1511,6 +1522,13 @@ static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 			err = parse_mac_filter_cmd(dev, tmp);
 			if (err)
 				return err;
+		} else if (!strncmp("bridge=", p, 7)) {
+			p += 7;
+			len = next - p;
+			if (len > IFNAMSIZE)
+				return ERR_INVAL;
+			if (dev->dev_bridge[0] == '\0')
+				strncpy(dev->dev_bridge, p, len);
 		}
 		p = ++next;
 	} while (p < ep);
@@ -1608,6 +1626,12 @@ static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			if (sp >= ep)
 				break;
 		}
+		if (dev->dev_bridge[0] != 0) {
+			sp += snprintf(sp, ep - sp, "bridge=%s,",
+				dev->dev_bridge);
+			if (sp >= ep)
+				break;
+		}
 		if (dev->addrlen_ve != 0) {
 			sp += snprintf(sp, ep - sp,
 				"mac=%02X:%02X:%02X:%02X:%02X:%02X,",
@@ -1683,17 +1707,24 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		len = ch - tmp;
 		ch++;
 	}
-	if (len != MAC_SIZE) {
-		logger(-1, 0, "Invalid container MAC address length");
-		return ERR_INVAL;
+	
+	if (len) {
+	        if (len != MAC_SIZE) {
+		        logger(-1, 0, "Invalid container MAC address length");
+			return ERR_INVAL;
+		}
+		err = parse_hwaddr(tmp, dev->dev_addr_ve);
+		if (err) {
+		  logger(-1, 0, "Invalid container MAC address format");
+		  return ERR_INVAL;
+		}
+	} else {
+		generate_mac(veid, dev->dev_name_ve, dev->dev_addr_ve);
 	}
-	err = parse_hwaddr(tmp, dev->dev_addr_ve);
-	if (err) {
-		logger(-1, 0, "Invalid container MAC address format");
-		return ERR_INVAL;
-	}
-	dev->addrlen = ETH_ALEN;
+	dev->addrlen_ve = ETH_ALEN;
+
 	tmp = ch;
+
 	if (ch == ep) {
 		generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
 			sizeof(dev->dev_name));
@@ -1709,26 +1740,58 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		len = ch - tmp;
 		ch++;
 	}
-	if (len > IFNAMSIZE)
-		return ERR_INVAL;
-	snprintf(dev->dev_name, len + 1, "%s", tmp);
-	if (ch == ep) {
-		memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
-		dev->addrlen = ETH_ALEN;
-		return 0;
+	if (len) {
+	        if (len > IFNAMSIZE)
+		        return ERR_INVAL;
+		snprintf(dev->dev_name, len + 1, "%s", tmp);
+		if (ch == ep) {
+		        memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
+			dev->addrlen = ETH_ALEN;
+			return 0;
+		}
+	} else {
+	        generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
+				   sizeof(dev->dev_name));
 	}
+
+	tmp = ch;
+
 	/* Parsing veth MAC address in CT */
-	len = strlen(ch);
-	if (len != MAC_SIZE) {
-		logger(-1, 0, "Invalid host MAC address");
-		return ERR_INVAL;
+	if ((ch = strchr(tmp, ',')) == NULL) {
+		ch = ep;
+		len = ch - tmp;
+	} else {
+		len = ch - tmp;
+		ch++;
 	}
-	err = parse_hwaddr(ch, dev->dev_addr);
-	if (err) {
-		logger(-1, 0, "Invalid host MAC address");
-		return ERR_INVAL;
+
+	if (len) {
+	        if (len != MAC_SIZE) {
+		        logger(-1, 0, "Invalid host MAC address");
+			return ERR_INVAL;
+		}
+		err = parse_hwaddr(tmp, dev->dev_addr);
+		if (err) {
+		  logger(-1, 0, "Invalid host MAC address");
+		  return ERR_INVAL;
+		}
+		dev->addrlen = ETH_ALEN;
+		if (ch == ep) {
+		        return 0;
+		}
+	} else {
+	        generate_mac(veid, dev->dev_name, dev->dev_addr);
+	        dev->addrlen = ETH_ALEN;
 	}
-	dev->addrlen_ve = ETH_ALEN;
+
+	/* Parsing bridge name */
+	len = strlen (ch);
+
+	if (len > IFNAMSIZE)
+	        return ERR_INVAL;
+
+	snprintf(dev->dev_bridge, len + 1, "%s", ch);
+
 	return 0;
 }
 
@@ -2062,6 +2125,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_NETIF_HOST_IFNAME:
 	case PARAM_NETIF_HOST_MAC:
 	case PARAM_NETIF_MAC_FILTER:
+	case PARAM_NETIF_BRIDGE:
 		ret = add_netif_param(&vps_p->res.veth, id, val);
 		break;
 	case PARAM_NAME:

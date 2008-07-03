@@ -334,6 +334,8 @@ void fill_veth_dev(veth_dev *dst, veth_dev *src)
 {
 	if (src->dev_name[0] != 0)
 		strcpy(dst->dev_name, src->dev_name);
+	if (src->dev_bridge[0] != 0)
+		strcpy(dst->dev_bridge, src->dev_bridge);
 	if (src->addrlen != 0) {
 		memcpy(dst->dev_addr, src->dev_addr, sizeof(dst->dev_addr));
 		dst->addrlen = src->addrlen;

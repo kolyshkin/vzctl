@@ -46,6 +46,7 @@ typedef struct {
 	int active;
 	int configure;
 	int mac_filter;
+	char dev_bridge[IFNAMSIZE];	/**< bridge name. */
 } veth_dev;
 
 /** Devices list.
