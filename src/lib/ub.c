@@ -210,7 +210,7 @@ int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 	}
 	if ((ret = set_ublimit(h, veid, ub)))
 		return ret;
-	logger(-1, 0, "UB limits were set successefully");
+	logger(-1, 0, "UB limits were set successfully");
 	return 0;
 }
 
