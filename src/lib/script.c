@@ -279,7 +279,7 @@ int mk_quota_link()
 
 #define INITTAB_FILE		"/etc/inittab"
 #define INITTAB_VZID		"vz:"
-#define INITTAB_ACTION		INITTAB_VZID "35:once:touch " VZFIFO_FILE "\n"
+#define INITTAB_ACTION		INITTAB_VZID "2345:once:touch " VZFIFO_FILE "\n"
 
 #define EVENTS_DIR		"/etc/event.d/"
 #define EVENTS_FILE		EVENTS_DIR "call_on_default_rc"
