@@ -59,8 +59,11 @@ ADD_IP=dist-add_ip.sh
 #
 DEL_IP=dist-del_ip.sh
 
-# This script is launched inside a CT on executing the following command:
+# This script is launched inside a CT on executing the following commands:
 #	vzctl set CTID --hostname <name>
+#	vzctl (re)start CTID (if HOSTNAME is set in CT config)
+#	vzctl set CTID (when changing the capability or iptables setup,
+#			and CT restarting is allowed for config changes)
 #
 # The script is used to configure the hostname of the container.
 # The parameters are passed as environment variables.
