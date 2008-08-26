@@ -40,8 +40,8 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(vzcachedir)
 	$(mkinstalldirs) $(DESTDIR)$(vzlockdir)
 	$(mkinstalldirs) $(DESTDIR)$(vzdumpdir)
-	$(mkinstalldirs) $(DESTDIR)$(vzprivdir)
-	$(mkinstalldirs) $(DESTDIR)$(vzrootdir)
+	$(mkinstalldirs) -m 700 $(DESTDIR)$(vzprivdir)
+	$(mkinstalldirs) -m 700 $(DESTDIR)$(vzrootdir)
 	$(mkinstalldirs) $(DESTDIR)$(veipdumpdir)
 	$(mkinstalldirs) $(DESTDIR)$(modulesdir)
 
