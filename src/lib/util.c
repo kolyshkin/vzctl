@@ -28,7 +28,7 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <stdarg.h>
-#include <linux/limits.h>
+#include <limits.h>
 #include <dirent.h>
 
 #include "util.h"

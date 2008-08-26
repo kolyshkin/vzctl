@@ -29,6 +29,7 @@
 #include <linux/vzcalluser.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <limits.h>
 
 #include "logger.h"
 #include "list.h"
