@@ -282,9 +282,10 @@ int mk_quota_link()
 #define INITTAB_ACTION		INITTAB_VZID "2345:once:touch " VZFIFO_FILE "\n"
 
 #define EVENTS_DIR		"/etc/event.d/"
-#define EVENTS_FILE		EVENTS_DIR "call_on_default_rc"
+#define EVENTS_FILE		EVENTS_DIR "vz_init_done"
 #define EVENTS_SCRIPT	\
 	"# This task runs if default runlevel is reached\n"	\
+	"# Added by OpenVZ vzctl\n"				\
 	"start on stopped rc2\n"				\
 	"start on stopped rc3\n"				\
 	"start on stopped rc4\n"				\
@@ -310,6 +311,7 @@ int add_reach_runlevel_mark()
 		if ((fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644))) {
 			write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
 			close(fd);
+			return 0;
 		}
 	}
 	/* Add a line to /etc/inittab */
