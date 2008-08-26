@@ -21,7 +21,7 @@ _get_ves()
 		stop|enter|exec*)
 			# running CTs
 			@SBINDIR@/vzlist -H -oveid
-			@SBINDIR@/vzlist -H -oname | $rm_emtpy
+			@SBINDIR@/vzlist -H -oname | $rm_empty
 			;;
 		*)
 			# All CTs
