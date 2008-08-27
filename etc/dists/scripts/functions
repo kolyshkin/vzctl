@@ -316,27 +316,42 @@ function change_hostname()
 	${CP} ${cfg} ${cfg}.$$ ||
 		error "Can't copy file ${cfg}" $VZ_FS_NO_DISK_SPACE
 	awk -v ip="${ip}" -v host="${host}" -v comm="${comm}" '
-		BEGIN {found = 0; skip = 0}
+		BEGIN { found = 0; extranames = ""; alias=""; }
 		$0 == comm {found = 1; next}
-		found {
+		found || ($2 == host && (ip == "" || ip == $1)) {
 			if (ip == "") {ip = $1}
+			for (i=3; i <= NF; i++) { EXTRANAMES[$i] = 1 }
+			found = 0;
 			next;
 		}
-		$2 == host && !found {skip = 1}
-		$1 == "127.0.0.1" {
-			print "127.0.0.1 localhost.localdomain localhost";
+		ip != "" && $1 == ip && $2 != host {
+			for (i=2; i <= NF; i++) { EXTRANAMES[$i] = 1 }
 			next;
 		}
+		$1 == "127.0.0.1" { ate_localhost = 1; next; }
 		{print}
 		END {
-			if (skip) exit 0;
 			if (ip == "") { ip ="127.0.0.1" }
-			print comm;
-			alias=""
-			if ((i=index(host, ".")) > 1) {
-				alias=substr(host, 1, i - 1);
+			if (ate_localhost && ip != "127.0.0.1") {
+				print "127.0.0.1 localhost.localdomain localhost";
 			}
-			print ip " " host " " alias;
+			print comm;
+			if ((i=index(host, ".")) > 1) {
+				alias= " " substr(host, 1, i - 1);
+				if (! (alias in EXTRANAMES)) {
+					EXTRANAMES[alias] = 1;
+				}
+			}
+			if (ip == "127.0.0.1") {
+				if (! ("localhost" in EXTRANAMES)) {
+					EXTRANAMES["localhost"] = 1;
+				}
+				if (! ("localhost.localdomain" in EXTRANAMES)) {
+					EXTRANAMES["localhost.localdomain"] = 1;
+				}
+			}
+			for (extraname in EXTRANAMES) { extranames = extranames " " extraname }
+			print ip " " host extranames;
 		}
 	' < ${cfg} > ${cfg}.$$
 	if [ $? -ne 0 ]; then
