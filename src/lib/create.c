@@ -175,10 +175,10 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			return VZ_CP_CONFIG;
 		}
 		if (cfg_exists) {
-			logger(-1, 0, "Warning: container config file "
-					"already exists, will be "
-					"rewritten with %s", src);
-			unlink(dst);
+			logger(-1, 0, "Error: container config file %s "
+					"already exists, can not use --config "
+					"option", dst);
+			return VZ_CP_CONFIG; /* FIXME */
 		}
 		sample_config = cmd_p->opt.config;
 	} else if (vps_p->opt.config != NULL) {
