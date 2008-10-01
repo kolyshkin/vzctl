@@ -25,6 +25,8 @@
 static struct feature_s features[] = {
 	{ "sysfs",	0,	VE_FEATURE_SYSFS },
 	{ "nfs",	0,	VE_FEATURE_NFS },
+	{ "sit",	0,	VE_FEATURE_SIT},
+	{ "ipip",	0,	VE_FEATURE_IPIP},
 	{ NULL}
 };
 
