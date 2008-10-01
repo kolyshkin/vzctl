@@ -163,6 +163,9 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		logger(-1, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
+	/* Default for envp if not set */
+	if (envp == NULL)
+		envp = envp_bash;
 	/* Set non block mode */
 	set_not_blk(out[0]);
 	set_not_blk(err[0]);
@@ -214,12 +217,12 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		}
 		close(h->vzfd);
 		if (exec_mode == MODE_EXEC && argv != NULL) {
-			execvep(argv[0], argv, envp != NULL ? envp : envp_bash);
+			execvep(argv[0], argv, envp);
 		} else {
 			execve("/bin/bash", argv != NULL ? argv : argv_bash,
-					envp != NULL ? envp : envp_bash);
+					envp);
 			execve("/bin/sh", argv != NULL ? argv : argv_bash,
-					envp != NULL ? envp : envp_bash);
+					envp);
 		}
 		ret = VZ_FS_BAD_TMPL;
 env_err:
