@@ -1509,7 +1509,7 @@ int collect()
 		return ret;
 	/* No CT found, exit with error */
 	if (!n_veinfo) {
-		fprintf(stderr, "Container not found\n");
+		fprintf(stderr, "Container(s) not found\n");
 		return 1;
 	}
 	if (check_param(RES_QUOTA))
