@@ -21,16 +21,16 @@ for tmp in $IFACES; do
     NETIF_OPTIONS=$(echo $tmp | sed 's/,/\n/g')
     for str in $NETIF_OPTIONS; do 
         # getting 'ifname' parameter value
-        if [[ "$str" =~ "^ifname=" ]]; then
+        if [[ "$str" =~ ^ifname= ]]; then
             # remove the parameter name from the string (along with '=')
 	    CTIFNAME=${str#*=}
         fi
-        if [[ "$str" =~ "^bridge=" ]]; then
+        if [[ "$str" =~ ^bridge= ]]; then
             # remove the parameter name from the string (along with '=')
 	    CTBRIDGE=${str#*=}
         fi
         # getting 'host_ifname' parameter value
-        if [[ "$str" =~ "^host_ifname=" ]]; then
+        if [[ "$str" =~ ^host_ifname= ]]; then
             # remove the parameter name from the string (along with '=')
 	    VZHOSTIF=${str#*=}
         fi
