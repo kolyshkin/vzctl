@@ -27,6 +27,11 @@ display only containers whose hostnames matches the \fIpattern\fR.
 The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR.
 Note that wildcard characters should be properly escaped
 to avoid expansion by shell.
+.IP "\fB-d\fR, \fB--description\fR \fIpattern\fR"
+display only containers with descriptions matching the \fIpattern\fR.
+The following wildcard characters can be used: \fB*\fR, \fB?\fR, \fB[]\fR.
+Note that wildcard characters should be properly escaped
+to avoid expansion by shell.
 .IP "\fB-n\fR, \fB--name\fR"
 display container names instead of hostnames.
 .IP "\fB-N\fR, \fB--name_filter\fR \fIpattern\fR"
@@ -64,6 +69,7 @@ _
 ctid	CTID
 hostname	HOSTNAME
 name	NAME
+description	DESCRIPTION
 ip	IP_ADDR
 status	STATUS
 kmemsize	KMEMSIZE

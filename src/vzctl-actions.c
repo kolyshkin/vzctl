@@ -203,6 +203,7 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	{"ipadd",	required_argument, NULL, PARAM_IP_ADD},
 	{"hostname",	required_argument, NULL, PARAM_HOSTNAME},
 	{"name",	required_argument, NULL, PARAM_NAME},
+	{"description",	required_argument, NULL, PARAM_DESCRIPTION},
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -426,6 +427,7 @@ static void merge_apply_param(vps_param *old, vps_param *new, char *cfg)
 	FREE_STR(new->res.tmpl.ostmpl)
 	FREE_STR(new->res.tmpl.dist)
 	FREE_STR(new->res.misc.hostname)
+	FREE_STR(new->res.misc.description)
 #undef FREE_STR
 	free_str_param(&new->res.net.ip);
 	if (new->opt.origin_sample == NULL)

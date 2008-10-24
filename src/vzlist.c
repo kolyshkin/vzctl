@@ -51,6 +51,7 @@ static char *p_outbuffer = g_outbuffer;
 static char *e_buf = g_outbuffer + sizeof(g_outbuffer) - 1;
 static char *host_pattern = NULL;
 static char *name_pattern = NULL;
+static char *desc_pattern = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
 struct Cfield_order *last_field = NULL;
@@ -87,6 +88,7 @@ static inline int get_run_ve(int update)
 static void print_hostname(struct Cveinfo *p, int index);
 static void print_name(struct Cveinfo *p, int index);
 static void print_ip(struct Cveinfo *p, int index);
+static void print_description(struct Cveinfo *p, int index);
 
 /* Print functions */
 static void print_veid(struct Cveinfo *p, int index)
@@ -230,6 +232,7 @@ int fn(const void *val1, const void *val2)				\
 
 SORT_STR_FN(hostnm_sort_fn, hostname)
 SORT_STR_FN(name_sort_fn, name)
+SORT_STR_FN(description_sort_fn, description)
 SORT_STR_FN(ip_sort_fn, ip)
 
 #define SORT_UL_RES(fn, type, res, name, index)				\
@@ -385,6 +388,7 @@ struct Cfield field_names[] =
 
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
+{"description", "DESCRIPTION", "%-32s", 0, RES_DESCRIPTION, print_description, description_sort_fn }, 
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"status", "STATUS", "%-7s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
@@ -553,6 +557,23 @@ static void print_name(struct Cveinfo *p, int index)
 	p_outbuffer +=  r;
 }
 
+static void print_description(struct Cveinfo *p, int index)
+{
+	int r;
+	char *str = "-";
+
+	if (p->description != NULL)
+		str = p->description;
+
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
+	if (last_field != NULL &&
+		field_names[last_field->order].res_type != RES_DESCRIPTION)
+	{
+		r = 32;
+	}
+	p_outbuffer += r;
+}
+
 static void print_ip(struct Cveinfo *p, int index)
 {
 	int r;
@@ -608,6 +629,7 @@ void usage()
 	fprintf(stderr, "\t--hostname -h\t hostname search pattern\n");
 	fprintf(stderr, "\t--name -n\t display container's name\n");
 	fprintf(stderr, "\t--name_filter -N\t name search patter\n");
+	fprintf(stderr, "\t--description -d\t description search pattern\n");
 	fprintf(stderr, "\t--sort -s\t sort by specified parameter, - sign before parametr\n");
 	fprintf(stderr, "\t\t\t mean sort in reverse order\n");
 	fprintf(stderr, "\t--no-header -H\t supress display header\n");
@@ -670,6 +692,17 @@ int filter_by_name()
 
 	for (i = 0; i < n_veinfo; i++) {
 		if (!check_pattern(veinfo[i].name, name_pattern))
+			veinfo[i].hide = 1;
+	}
+	return 0;
+}
+
+int filter_by_description()
+{
+	int i;
+
+	for (i = 0; i < n_veinfo; i++) {
+		if (!check_pattern(veinfo[i].description, desc_pattern))
 			veinfo[i].hide = 1;
 	}
 	return 0;
@@ -876,6 +909,8 @@ do {								\
 	}
 	if (res->misc.hostname != NULL)
 		ve->hostname = strdup(res->misc.hostname);
+	if (res->misc.description != NULL)
+		ve->description = strdup(res->misc.description);
 	if (res->name.name != NULL) {
 		int veid_nm = get_veid_by_name(res->name.name);
 		if (veid_nm == ve->veid)
@@ -1525,6 +1560,8 @@ int collect()
 		filter_by_hostname();
 	if (name_pattern != NULL)
 		filter_by_name();
+	if (desc_pattern != NULL)
+		filter_by_description();
 	return 0;
 }
 
@@ -1549,6 +1586,8 @@ void free_veinfo()
 			free(veinfo[i].hostname);
 		if (veinfo[i].name != NULL)
 			free(veinfo[i].name);
+		if (veinfo[i].description != NULL)
+			free(veinfo[i].description);
 		if (veinfo[i].ubc != NULL)
 			free(veinfo[i].ubc);
 		if (veinfo[i].quota != NULL)
@@ -1572,6 +1611,7 @@ static struct option list_options[] =
 	{"name",	no_argument, NULL, 'n'},
 	{"name_filter", required_argument, NULL, 'N'},
 	{"hostname",	required_argument, NULL, 'h'},
+	{"description", required_argument, NULL, 'd'},
 	{"output",	required_argument, NULL, 'o'},
 	{"sort",	required_argument, NULL, 's'},
 	{"list",	no_argument, NULL, 'L'},
@@ -1588,7 +1628,7 @@ int main(int argc, char **argv)
 
 	while (1) {
 		int option_index = -1;
-		c = getopt_long(argc, argv, "HSanN:h:o:s:Le1", list_options,
+		c = getopt_long(argc, argv, "HSanN:h:d:o:s:Le1", list_options,
 				&option_index);
 		if (c == -1)
 			break;
@@ -1608,6 +1648,9 @@ int main(int argc, char **argv)
 			break;
 		case 'h'	:
 			host_pattern = strdup(optarg);
+			break;
+		case 'd'	:
+			desc_pattern = strdup(optarg);
 			break;
 		case 'o'	:
 			f_order = strdup(optarg);

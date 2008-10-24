@@ -91,6 +91,7 @@ static vps_config config[] = {
 {"NETDEV",	NULL, PARAM_NETDEV_ADD},
 {"",		NULL, PARAM_NETDEV_DEL},
 {"HOSTNAME",	NULL, PARAM_HOSTNAME},
+{"DESCRIPTION",	NULL, PARAM_DESCRIPTION},
 {"NAMESERVER",	NULL, PARAM_NAMESERVER},
 {"IPV6",	NULL, PARAM_IPV6NET},
 {"SEARCHDOMAIN",NULL, PARAM_SEARCHDOMAIN},
@@ -219,6 +220,7 @@ static struct option set_opt[] = {
 {"name",	required_argument, NULL, PARAM_NAME},
 {"features",	required_argument, NULL, PARAM_FEATURES},
 {"ioprio",	required_argument, NULL, PARAM_IOPRIO},
+{"description",	required_argument, NULL, PARAM_DESCRIPTION},
 
 {NULL, 0, NULL, 0}
 };
@@ -1223,6 +1225,9 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	case PARAM_NAMESERVER:
 		ret = conf_store_strlist(conf_h, conf->name, &misc->nameserver);
 		break;
+	case PARAM_DESCRIPTION:
+		ret = conf_store_str(conf_h, conf->name, misc->description);
+		break;
 	case PARAM_SEARCHDOMAIN:
 		ret = conf_store_strlist(conf_h, conf->name,
 			&misc->searchdomain);
@@ -1867,6 +1872,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_HOSTNAME:
 		ret = conf_parse_str(&vps_p->res.misc.hostname, val, 1);
+		break;
+	case PARAM_DESCRIPTION:
+		ret = conf_parse_str(&vps_p->res.misc.description, val, 1);
 		break;
 	case PARAM_NAMESERVER:
 		ret = conf_parse_strlist(&vps_p->res.misc.nameserver, val, 1);
@@ -2565,6 +2573,7 @@ static void free_misc(misc_param *misc)
 	free_str_param(&misc->searchdomain);
 	free_str_param(&misc->userpw);
 	FREE_P(misc->hostname)
+	FREE_P(misc->description)
 }
 
 static void free_net(net_param *net)
@@ -2723,6 +2732,7 @@ static void merge_misc(misc_param *dst, misc_param *src)
 	MERGE_LIST(searchdomain)
 	MERGE_LIST(userpw)
 	MERGE_STR(hostname)
+	MERGE_STR(description)
 	MERGE_INT(wait);
 }
 

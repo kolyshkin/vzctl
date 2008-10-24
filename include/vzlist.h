@@ -83,6 +83,7 @@ struct Cveinfo {
 	int veid;
 	char *hostname;
 	char *name;
+	char *description;
 	char *ip;
 	char *ve_private;
 	char *ve_root;
@@ -102,6 +103,7 @@ struct Cveinfo {
 #define RES_LA		5
 #define RES_CPU		6
 #define RES_NAME	7
+#define RES_DESCRIPTION	8
 
 struct Cfield {
 	char *name;
