@@ -74,7 +74,7 @@ void usage(int rc)
 "   [--noatime yes|no] [--capability <name>:on|off ...]\n"
 "   [--devices b|c:major:minor|all:r|w|rw]\n"
 "   [--devnodes device:r|w|rw|none]\n"
-"   [--netif_add <ifname[,mac,host_ifname,host_mac]]>] [--netif_del <ifname>]\n"
+"   [--netif_add <ifname[,mac,host_ifname,host_mac,bridge]]>] [--netif_del <ifname>]\n"
 "   [--applyconfig <name>] [--applyconfig_map <name>]\n"
 "   [--features <name:on|off>] [--name <vename>]\n"
 "   [--ioprio <N>]\n");
