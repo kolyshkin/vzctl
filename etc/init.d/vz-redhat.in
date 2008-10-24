@@ -27,8 +27,8 @@
 # Provides: vz
 # required-start: $network $remote_fs $local_fs sshd
 # required-stop:
-# Default-Start: 2 3 5
-# Default-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
 # Short-Description: OpenVZ startup script
 # Description: OpenVZ startup script.
 ### END INIT INFO
