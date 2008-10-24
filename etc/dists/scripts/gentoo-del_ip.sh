@@ -16,24 +16,40 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# Deletes IP address(es) from a container running Gentoo-like distro.
-
+# This script deletes IP alias(es) inside CT for Gentoo like distros.
+# For usage info see ve-alias_del(5) man page.
+#
+# Parameters are passed in environment variables.
+# Required parameters:
+#   IP_ADDR       - IPs to delete, several addresses should be divided by space
+# Optional parameters:
+#   VE_STATE      - state of CT; could be one of:
+#                     starting | stopping | running | stopped
 VENET_DEV=venet0
 CFGFILE=/etc/conf.d/net
 
-# Function to delete IP address for Debian template
+# Return true is we have openrc based CT and false if not.
+# Note: /etc/gentoo-release has nothing to do with openrc
+function is_openrc()
+{
+	[ -f /lib/librc.so ]
+}
+
 function del_ip()
 {
-	local found=
-	local ip e_ip
-
+	local ip
 	for ip in ${IP_ADDR}; do
-		grep -qw "${ip}" ${CFGFILE} && found=true &&
-			del_param3 "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
+		if grep -qw "${ip}" ${CFGFILE}; then
+			if is_openrc ; then
+				del_param "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
+			else
+				del_param3 "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
+			fi
+			if [ "x${VE_STATE}" = "xrunning" ]; then
+				/etc/init.d/net.${VENET_DEV} restart >/dev/null 2>&1
+			fi
+		fi
 	done
-	if [ -n "${found}" ]; then
-		/etc/init.d/net.${VENET_DEV} restart 2>/dev/null 1>/dev/null
-	fi
 }
 
 del_ip

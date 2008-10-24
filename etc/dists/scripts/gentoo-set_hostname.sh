@@ -16,7 +16,21 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# Sets hostname in a container running Gentoo-like distro.
+# This script sets hostname inside Gentoo based CT with
+# baselayout-1/openrc used as services/stratup/shutdown system.
+#
+# Some parameters are passed in environment variables.
+# Required parameters:
+# Optional parameters:
+#   HOSTNM
+#       Sets host name for this CT. Modifies /etc/conf.d/hostname
+
+# Return true is we have openrc based CT and false if not.
+# Note: /etc/gentoo-release has nothing to do with openrc
+function is_openrc()
+{
+	[ -f /lib/librc.so ] 
+}
 
 function set_hostname()
 {
@@ -24,7 +38,17 @@ function set_hostname()
 	local hostname=$2
 
 	[ -z "${hostname}" ] && return 0
-	put_param "${cfgfile}" "HOSTNAME" "${hostname}"
+	if is_openrc ; then
+		if grep -qe "^HOSTNAME=" ${cfgfile} >/dev/null 2>&1; then
+			del_param ${cfgfile} "HOSTNAME"
+		fi
+		put_param "${cfgfile}" "hostname" "${hostname}"
+	else
+		if grep -qe "^hostname=" ${cfgfile} >/dev/null 2>&1; then
+			del_param ${cfgfile} "hostname"
+		fi
+		put_param "${cfgfile}" "HOSTNAME" "${hostname}"
+	fi
 	hostname ${hostname}
 }
 

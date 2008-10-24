@@ -16,14 +16,17 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# Configures quota startup script in a container.
-
+# This script configures quota startup script inside CT
+#
+# Parameters are passed in environment variables.
+# Required parameters:
+#   MINOR	- root device minor number
+#   MAJOR	- root device major number
 SCRIPTANAME='/etc/init.d/vzquota'
-DEFAULT="/etc/runlevels/default/vzquota"
 
 if [ -z "$MAJOR" ]; then
+	rc-update del vzquota default > /dev/null 2>&1
 	rm -f ${SCRIPTANAME} > /dev/null 2>&1
-	rm -f ${DEFAULT} > /dev/null 2>&1
 	rm -f /etc/mtab > /dev/null 2>&1
 	ln -sf /proc/mounts /etc/mtab
 	exit 0
@@ -53,6 +56,6 @@ stop() {
 }
 chmod 755 ${SCRIPTANAME}
 
-ln -sf ${SCRIPTANAME} ${DEFAULT}
+rc-update add vzquota default
 
 exit 0
