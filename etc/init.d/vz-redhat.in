@@ -197,7 +197,7 @@ check_kernel_config()
 	conf="`zcat /proc/config.gz 2>/dev/null | grep -E -v '^#|^$'`"
 
 	for opt in $opt_must; do
-		if ! echo "$conf" | grep -q "$opt="; then
+		if ! echo "$conf" 2>/dev/null | grep -q "$opt="; then
 			echo "ERROR: Missing kernel config option: CONFIG_$opt"
 			err=1
 		fi
