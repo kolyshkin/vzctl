@@ -445,9 +445,9 @@ int read_proc_veth(envid_t veid, veth_param *veth)
 		parse_hwaddr(mac, dev.dev_addr);
 		parse_hwaddr(mac_ve, dev.dev_addr_ve);
 		strncpy(dev.dev_name, dev_name, IFNAMSIZE);
-		dev.dev_name[IFNAMSIZE] = 0;
+		dev.dev_name[IFNAMSIZE - 1] = 0;
 		strncpy(dev.dev_name_ve, dev_name_ve, IFNAMSIZE);
-		dev.dev_name_ve[IFNAMSIZE] = 0;
+		dev.dev_name_ve[IFNAMSIZE - 1] = 0;
 		dev.active = 1;
 		add_veth_param(veth, &dev);
 	}
