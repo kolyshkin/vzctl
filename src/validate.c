@@ -343,7 +343,8 @@ if (ub->name != NULL) {							\
 	val &= LONG_MAX;
 	if (ub->tcpsndbuf[1] - ub->tcpsndbuf[0] < val) {
 		logger(-1, 0, "Error: tcpsndbuf.lim-tcpsndbuf.bar"
-				" should be > %lu (currently, %lu)", val,
+				" should be > %lu (currently, %lu-%lu=%lu)",
+				val, ub->tcpsndbuf[1], ub->tcpsndbuf[0],
 				ub->tcpsndbuf[1]-ub->tcpsndbuf[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->tcpsndbuf[0] + val;
@@ -363,7 +364,8 @@ if (ub->name != NULL) {							\
 	val &= LONG_MAX;
 	if (ub->othersockbuf[1] - ub->othersockbuf[0] < val) {
 		logger(-1, 0, "Error: othersockbuf.lim-othersockbuf.bar"
-				" should be > %lu (currently, %lu)", val,
+				" should be > %lu (currently, %lu-%lu=%lu)",
+				val, ub->othersockbuf[1], ub->othersockbuf[0],
 				ub->othersockbuf[1]-ub->othersockbuf[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->othersockbuf[0] + val;
@@ -383,7 +385,8 @@ if (ub->name != NULL) {							\
 	val &= LONG_MAX;
 	if (ub->tcprcvbuf[1] - ub->tcprcvbuf[0] < val) {
 		logger(-1, 0, "Warning: tcprcvbuf.lim-tcprcvbuf.bar"
-				" should be > %lu (currently, %lu)", val,
+				" should be > %lu (currently, %lu-%lu=%lu)",
+				val, ub->tcprcvbuf[1], ub->tcprcvbuf[0],
 				ub->tcprcvbuf[1] - ub->tcprcvbuf[0]);
 		if (ask || recover) {
 			tmp_val1 = ub->tcprcvbuf[0] + val;
