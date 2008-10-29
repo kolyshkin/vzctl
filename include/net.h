@@ -24,6 +24,7 @@
 #include "list.h"
 #include "types.h"
 #include "dist.h"
+#include "ub.h"
 
 typedef struct str_struct net_dev_param;
 typedef struct str_struct ip_param;
@@ -62,7 +63,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
  * @param net_del	network parameters for devices to be deleted
  * @return		0 on success.
  */
-int vps_set_netdev(vps_handler *h, envid_t veid,
+int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		net_param *net_add, net_param *net_del);
 
 int find_ip(list_head_t *ip_h,  char *ipaddr);

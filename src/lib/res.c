@@ -86,7 +86,8 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	{
 		return ret;
 	}
-	if ((ret = vps_set_netdev(h, veid, &res->net, &param->del_res.net)))
+	if ((ret = vps_set_netdev(h, veid, &res->ub,
+					&res->net, &param->del_res.net)))
 		return ret;
 	if ((ret = vps_set_cpu(h, veid, &res->cpu)))
 		return ret;
