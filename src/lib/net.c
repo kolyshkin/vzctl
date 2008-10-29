@@ -252,29 +252,40 @@ static int netdev_ctl(vps_handler *h, int veid, int op, char *name)
 	return 0;
 }
 
-int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net)
+int set_netdev(vps_handler *h, envid_t veid, int cmd, net_param *net)
 {
 	int ret = 0;
 	list_head_t *dev_h = &net->dev;
 	net_dev_param *dev;
-	int cmd;
 
 	if (list_empty(dev_h))
+		return 0;
+	list_for_each(dev, dev_h, list) {
+		if ((ret = netdev_ctl(h, veid, cmd, dev->val))) {
+			logger(-1, errno, "Unable to %s netdev %s",
+				(cmd == VE_NETDEV_ADD ) ? "add": "del",
+				dev->val);
+			break;
+		}
+	}
+	return ret;
+}
+
+int vps_set_netdev(vps_handler *h, envid_t veid,
+		net_param *net_add, net_param *net_del)
+{
+	int ret = 0;
+
+	if (list_empty(&net_add->dev) && list_empty(&net_del->dev))
 		return 0;
 	if (!vps_is_run(h, veid)){
 		logger(-1, 0, "Unable to setup network devices: "
 			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	cmd = (op == ADD) ? VE_NETDEV_ADD : VE_NETDEV_DEL;
-	list_for_each(dev, dev_h, list) {
-		if ((ret = netdev_ctl(h, veid, cmd, dev->val))) {
-			logger(-1, errno, "Unable to %s netdev %s",
-				(op == ADD) ? "add": "del", dev->val);
-			break;
-		}
-	}
-	return ret;
+	if (ret = set_netdev(h, veid, VE_NETDEV_DEL, net_del) != 0)
+		return ret;
+	return set_netdev(h, veid, VE_NETDEV_ADD, net_add);
 }
 
 static int remove_ipv6_addr(net_param *net)

@@ -58,11 +58,12 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
  *
  * @param h		CT handler.
  * @param veid		CT ID.
- * @param op		operation (ADD|DEL).
- * @param net		network parameters.
+ * @param net_add	network parameters for devices to be added
+ * @param net_del	network parameters for devices to be deleted
  * @return		0 on success.
  */
-int vps_netdev_ctl(vps_handler *h, envid_t veid, int op, net_param *net);
+int vps_set_netdev(vps_handler *h, envid_t veid,
+		net_param *net_add, net_param *net_del);
 
 int find_ip(list_head_t *ip_h,  char *ipaddr);
 
