@@ -51,13 +51,20 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 		/* update meminfo on --privvmpages, --meminfo */
 		if (param->mode < 0 && privvmpages == NULL)
 			return 0;
-		if (gparam->mode < 0 && vps_p->g_param != NULL) {
-			param = &vps_p->g_param->res.meminfo;
-			if (param->mode != VE_MEMINFO_PRIVVMPAGES)
-				return 0;
+		if (vps_p->g_param != NULL) {
+			if (privvmpages == NULL)
+				/* use privvmpages from VE.conf on --meminfo */
+				privvmpages = vps_p->g_param->res.ub.privvmpages;
+
+			if (param->mode < 0) {
+				/* use meminfo from VE.conf on --privvmpages */
+				param = &vps_p->g_param->res.meminfo;
+				if (param->mode < 0)
+					param = &default_param;
+				if (param->mode != VE_MEMINFO_PRIVVMPAGES)
+					return 0;
+			}
 		}
-		if (privvmpages == NULL && vps_p->g_param != NULL)
-			privvmpages = vps_p->g_param->res.ub.privvmpages;
 	}
 	if (param->mode < 0)
 		param = &default_param;
