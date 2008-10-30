@@ -17,7 +17,7 @@
 
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(vzctl, 3.0.22, devel@openvz.org)
+AC_INIT(vzctl, 3.0.23, devel@openvz.org)
 
 # Change sysconfdir default since otherwise some important files
 # (an initscript, files for logrotate, cron, and udev) will be installed
