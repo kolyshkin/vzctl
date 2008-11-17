@@ -79,7 +79,7 @@ iface ${VENET_DEV}:${ifnum} inet static
 " >> ${CFGFILE}.bak
 
 	else
-	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}/" ${CFGFILE}.bak
+	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}\/0/" ${CFGFILE}.bak
 	fi
 
 }
