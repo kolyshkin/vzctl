@@ -24,12 +24,11 @@ function set_hostname()
 	local hostname=$2
 
 	[ -z "${hostname}" ] && return 0
-	echo "${hostname}" > ${cfgfile}
+	echo "${hostname}" > /etc/hostname
 	hostname ${hostname}
 }
 
 change_hostname /etc/hosts "${HOSTNM}" "${IP_ADDR}"
 set_hostname /etc/hostname "${HOSTNM}"
-set_hostname /etc/mailname "${HOSTNM}"
 
 exit 0
