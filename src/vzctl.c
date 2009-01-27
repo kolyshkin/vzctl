@@ -181,7 +181,7 @@ int main(int argc, char *argv[], char *envp[])
 	} else if (!strcmp(argv[1], "restart")) {
 		action = ACTION_RESTART;
 	//	status = ST_RESTART;
-	} else if (!strcmp(argv[1], "destroy")) {
+	} else if (!strcmp(argv[1], "destroy") || !strcmp(argv[1], "delete")) {
 		action = ACTION_DESTROY;
 	//	status = ST_DESTROY;
 	} else if (!strcmp(argv[1], "mount")) {
