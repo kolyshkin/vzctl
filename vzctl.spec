@@ -135,7 +135,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf
 %attr(644,root,root) %config(noreplace) %{_crondir}/vz
-%config %{_vpsconfdir}/ve-vps.basic.conf-sample
+%config %{_vpsconfdir}/ve-basic.conf-sample
 %config %{_vpsconfdir}/ve-light.conf-sample
 %config %{_vpsconfdir}/ve-unlimited.conf-sample
 %config %{_vpsconfdir}/0.conf

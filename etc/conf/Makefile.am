@@ -18,7 +18,7 @@
 include $(top_srcdir)/paths.am
 
 VE0CONFIG = 0.conf
-VECONFIG  = ve-light.conf-sample ve-vps.basic.conf-sample ve-unlimited.conf-sample
+VECONFIG  = ve-light.conf-sample ve-basic.conf-sample ve-unlimited.conf-sample
 
 if ARCH_IA64
 VECONFIG_EXT = .ia64
