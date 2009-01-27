@@ -55,7 +55,7 @@ typedef struct {
  * @param dist_name	distribution name.
  * @param dir		directory distribution config file will be searched.
  * @param dist		filled dist_actions
- * @return 		0 on success
+ * @return		0 on success
  */
 int read_dist_actions(char *dist_name, char *dir, dist_actions *dist);
 

@@ -33,7 +33,7 @@
 #define VPS_NET_ADD		LIB_SCRIPTS_DIR "vps-net_add"
 #define VPS_NET_DEL		LIB_SCRIPTS_DIR "vps-net_del"
 
-#define envid_t 	unsigned int
+#define envid_t		unsigned int
 #define STR_SIZE	512
 #define PATH_LEN	256
 

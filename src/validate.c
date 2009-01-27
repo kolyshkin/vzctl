@@ -70,7 +70,7 @@ static int read_yn()
 			return 1;
 		}
 		else if (buf[0] == 'n')
-			return 	0;
+			return 0;
 		fprintf(stderr, " (y/n) [y] ");
 	}
 	return 0;
@@ -79,7 +79,7 @@ static int read_yn()
 static int check_param(struct ub_struct *param, int log)
 {
 	int ret = 0;
-#define CHECKPARAM(name) 						\
+#define CHECKPARAM(name)						\
 	if (param->name == NULL) {					\
 		if (log)						\
 			logger(-1, 0, "Error: parameter " #name		\
@@ -118,10 +118,10 @@ int validate(vps_res *param, int recover, int ask)
 #define SET_MES(val)	logger(0, 0, "set to %lu", val);
 #define SET2_MES(val1, val2) logger(0, 0,"set to %lu:%lu", val1, val2);
 
-#define CHECK_BL(x, name) 						\
-if (x != NULL) { 							\
+#define CHECK_BL(x, name)						\
+if (x != NULL) {							\
 	if (x[0] > x[1]) {						\
-		logger(-1, 0, "Error: barrier should be <= limit for " 	\
+		logger(-1, 0, "Error: barrier should be <= limit for "	\
 			#name " (currently, %lu:%lu)",			\
 			x[0], x[1]);					\
 		if (ask || recover) {					\
@@ -148,7 +148,7 @@ if (ub->name != NULL) {							\
 			" for " #name " (currently, %lu:%lu)",		\
 			ub->name[0], ub->name[1]);			\
 		if (ask || recover) {					\
-			tmp_val0 = max_ul(ub->name[0], ub->name[1]); 	\
+			tmp_val0 = max_ul(ub->name[0], ub->name[1]);	\
 			tmp_val1 = tmp_val0;				\
 			SET2_MES(tmp_val0, tmp_val1)			\
 			if (ask) recover = read_yn();			\
@@ -674,7 +674,7 @@ void mul_rusage(struct CRusage *rusage, int k)
 
 void shift_ubs_param(struct ub_struct *param)
 {
-#define SHIFTPARAM(name) 						\
+#define SHIFTPARAM(name)						\
 if (param->name != NULL) {						\
 	param->name[0] = param->name[1];				\
 	param->name[1] = param->name[2];				\

@@ -36,8 +36,8 @@
 /*
  * Read pid id from lock file:
  * return: -1 read error
- * 	    0 incorrect pid
- * 	   >0 pid id
+ *	    0 incorrect pid
+ *	   >0 pid id
  */
 static int getlockpid(char *file)
 {

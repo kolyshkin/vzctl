@@ -40,7 +40,7 @@ typedef unsigned envid_t;
 struct vzctl_old_env_create {
 	envid_t veid;
 	unsigned flags;
-#define VE_CREATE 	1	/* Create CT, VE_ENTER added automatically */
+#define VE_CREATE	1	/* Create CT, VE_ENTER added automatically */
 #define VE_EXCLUSIVE	2	/* Fail if exists */
 #define VE_ENTER	4	/* Enter existing CT */
 #define VE_TEST		8	/* Test if CT exists */
@@ -159,7 +159,7 @@ struct vzctl_ve_meminfo {
 	(VE_IP_IPTABLES |				\
 	VE_IP_FILTER | VE_IP_MANGLE |			\
 	VE_IP_MATCH_LIMIT | VE_IP_MATCH_MULTIPORT |	\
-	VE_IP_MATCH_TOS | VE_IP_TARGET_REJECT | 	\
+	VE_IP_MATCH_TOS | VE_IP_TARGET_REJECT |		\
 	VE_IP_TARGET_TCPMSS | VE_IP_MATCH_TCPMSS |	\
 	VE_IP_MATCH_TTL | VE_IP_MATCH_LENGTH)
 
@@ -256,7 +256,7 @@ struct vzctl_cpustatctl {
 					struct vzctl_env_create_data)
 #define VZCTL_VE_NETDEV		_IOW(VZCTLTYPE, 11,			\
 					struct vzctl_ve_netdev)
-#define VZCTL_VE_MEMINFO	_IOW(VZCTLTYPE, 13,                     \
+#define VZCTL_VE_MEMINFO	_IOW(VZCTLTYPE, 13,			\
 					struct vzctl_ve_meminfo)
 
 #ifdef __KERNEL__
@@ -285,7 +285,7 @@ struct compat_vzctl_env_create_data {
 					struct compat_vzctl_env_create_data)
 #define VZCTL_COMPAT_VE_NETDEV	_IOW(VZCTLTYPE, 11,			\
 					struct compat_vzctl_ve_netdev)
-#define VZCTL_COMPAT_VE_MEMINFO	_IOW(VZCTLTYPE, 13,                     \
+#define VZCTL_COMPAT_VE_MEMINFO	_IOW(VZCTLTYPE, 13,			\
 					struct compat_vzctl_ve_meminfo)
 #endif
 #endif

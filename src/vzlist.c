@@ -120,7 +120,7 @@ static void print_cpulimit(struct Cveinfo *p, int index)
 }
 
 #define PRINT_UL_RES(fn, res, name)					\
-static void fn(struct Cveinfo *p, int index)		  		\
+static void fn(struct Cveinfo *p, int index)				\
 {									\
 	if (p->res == NULL ||						\
 		(p->status != VE_RUNNING &&				\
@@ -153,7 +153,7 @@ PRINT_UL_RES(print_ubc_numfile, ubc, numfile)
 PRINT_UL_RES(print_ubc_numiptent, ubc, numiptent)
 
 #define PRINT_DQ_RES(fn, res, name)					\
-static void fn(struct Cveinfo *p, int index)		  		\
+static void fn(struct Cveinfo *p, int index)				\
 {									\
 	if (p->res == NULL ||						\
 		(p->status != VE_RUNNING && (index == 0)))		\
@@ -219,7 +219,7 @@ int status_sort_fn(const void *val1, const void *val2)
 	return res;
 }
 
-#define SORT_STR_FN(fn, name)	 					\
+#define SORT_STR_FN(fn, name)						\
 int fn(const void *val1, const void *val2)				\
 {									\
 	const char *h1 = ((const struct Cveinfo*)val1)->name;		\
@@ -388,7 +388,7 @@ struct Cfield field_names[] =
 
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
-{"description", "DESCRIPTION", "%-32s", 0, RES_DESCRIPTION, print_description, description_sort_fn }, 
+{"description", "DESCRIPTION", "%-32s", 0, RES_DESCRIPTION, print_description, description_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"status", "STATUS", "%-7s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
@@ -1118,8 +1118,8 @@ char *invert_ip(char *ips)
 		strncpy(ip_str, p, len);
 		ip_str[len] = 0;
 		if ((family = get_netaddr(ip_str, ip)) == -1)
-                	continue;;
-	        if ((inet_ntop(family, ip, ip_str, sizeof(ip_str) - 1)) == NULL)
+			continue;;
+		if ((inet_ntop(family, ip, ip_str, sizeof(ip_str) - 1)) == NULL)
 			continue;
 		rc = sprintf(tp, "%s ", ip_str);
 		if (rc == -1)
@@ -1198,7 +1198,7 @@ static inline int get_ve_ips(unsigned int id, char **str)
 		for (i = ret - 1; i >= 0; i--)
 			cp += sprintf(cp, "%d.%d.%d.%d ", NIPQUAD(addr[i]));
 		*cp = '\0';
- 		*str = buf;
+		*str = buf;
 	} else
 		*str = strdup("");
 out:

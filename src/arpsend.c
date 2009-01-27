@@ -409,7 +409,7 @@ int recv_pack(void *buf, int len, struct sockaddr_ll *from)
 	int i;
 	struct arp_packet * recv_pkt = (struct arp_packet*) buf;
 
- 	if (recv_pkt->frame_type != htons(ETH_P_ARP)) {
+	if (recv_pkt->frame_type != htons(ETH_P_ARP)) {
 		logger(LOG_ERROR, "unknown eth frame type : %#x", recv_pkt->frame_type);
 		goto out;
 	}

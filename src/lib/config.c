@@ -1713,10 +1713,10 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		len = ch - tmp;
 		ch++;
 	}
-	
+
 	if (len) {
-	        if (len != MAC_SIZE) {
-		        logger(-1, 0, "Invalid container MAC address length");
+		if (len != MAC_SIZE) {
+			logger(-1, 0, "Invalid container MAC address length");
 			return ERR_INVAL;
 		}
 		err = parse_hwaddr(tmp, dev->dev_addr_ve);
@@ -1747,17 +1747,17 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		ch++;
 	}
 	if (len) {
-	        if (len > IFNAMSIZE)
-		        return ERR_INVAL;
+		if (len > IFNAMSIZE)
+			return ERR_INVAL;
 		snprintf(dev->dev_name, len + 1, "%s", tmp);
 		if (ch == ep) {
-		        memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
+			memcpy(dev->dev_addr, dev->dev_addr_ve, ETH_ALEN);
 			dev->addrlen = ETH_ALEN;
 			return 0;
 		}
 	} else {
-	        generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
-				   sizeof(dev->dev_name));
+		generate_veth_name(veid, dev->dev_name_ve, dev->dev_name,
+				sizeof(dev->dev_name));
 	}
 
 	tmp = ch;
@@ -1772,29 +1772,29 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 	}
 
 	if (len) {
-	        if (len != MAC_SIZE) {
-		        logger(-1, 0, "Invalid host MAC address");
+		if (len != MAC_SIZE) {
+			logger(-1, 0, "Invalid host MAC address");
 			return ERR_INVAL;
 		}
 		err = parse_hwaddr(tmp, dev->dev_addr);
 		if (err) {
-		  logger(-1, 0, "Invalid host MAC address");
-		  return ERR_INVAL;
+			logger(-1, 0, "Invalid host MAC address");
+			return ERR_INVAL;
 		}
 		dev->addrlen = ETH_ALEN;
 		if (ch == ep) {
-		        return 0;
+			return 0;
 		}
 	} else {
-	        generate_mac(veid, dev->dev_name, dev->dev_addr);
-	        dev->addrlen = ETH_ALEN;
+		generate_mac(veid, dev->dev_name, dev->dev_addr);
+		dev->addrlen = ETH_ALEN;
 	}
 
 	/* Parsing bridge name */
 	len = strlen (ch);
 
 	if (len > IFNAMSIZE)
-	        return ERR_INVAL;
+		return ERR_INVAL;
 
 	snprintf(dev->dev_bridge, len + 1, "%s", ch);
 
@@ -2654,16 +2654,16 @@ void free_vps_param(vps_param *param)
 #define MERGE_INT2(x)	if (src->x >= 0) dst->x = src->x;
 
 #define MERGE_P(x)							\
-	if ((src->x) != NULL) { 					\
-		if ((dst->x) == NULL) 					\
-			dst->x = malloc(sizeof(*(dst->x)));	 	\
+	if ((src->x) != NULL) {						\
+		if ((dst->x) == NULL)					\
+			dst->x = malloc(sizeof(*(dst->x)));		\
 		*dst->x = *src->x;					\
 	}
 
 #define MERGE_P2(x)							\
-	if ((src->x) != NULL) { 					\
-		if ((dst->x) == NULL) 					\
-			dst->x = malloc(sizeof(*(dst->x)) * 2);	 	\
+	if ((src->x) != NULL) {						\
+		if ((dst->x) == NULL)					\
+			dst->x = malloc(sizeof(*(dst->x)) * 2);		\
 		dst->x[0] = src->x[0];					\
 		dst->x[1] = src->x[1];					\
 	}

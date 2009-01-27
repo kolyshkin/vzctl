@@ -365,4 +365,3 @@ int main(int argc, char **argv)
 	fprintf(stderr, "Scale completed: success\n");
 	return 0;
 }
-

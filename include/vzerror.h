@@ -30,8 +30,8 @@
 #define VZ_RESOURCE_ERROR		6
 #define VZ_ENVCREATE_ERROR		7
 
-#define VZ_COMMAND_EXECUTION_ERROR 	8
-#define VZ_LOCKED 			9
+#define VZ_COMMAND_EXECUTION_ERROR	8
+#define VZ_LOCKED			9
 /* global config file not found */
 #define VZ_NOCONFIG			10
 #define VZ_NOSCRIPT			11

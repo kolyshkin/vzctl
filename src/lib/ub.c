@@ -299,9 +299,9 @@ int add_ub_param(ub_param *ub, ub_res *res)
 void merge_ub(ub_param *dst, ub_param *src)
 {
 #define MERGE_P2(x)						\
-if ((src->x) != NULL) { 					\
-	if ((dst->x) == NULL) 					\
-		dst->x = malloc(sizeof(*(dst->x)) * 2);	 	\
+if ((src->x) != NULL) {						\
+	if ((dst->x) == NULL)					\
+		dst->x = malloc(sizeof(*(dst->x)) * 2);		\
 	dst->x[0] = src->x[0];					\
 	dst->x[1] = src->x[1];					\
 }
