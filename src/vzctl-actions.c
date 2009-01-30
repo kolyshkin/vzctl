@@ -521,7 +521,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			return ret;
 	}
 	/* Reset UB parameters from config  */
-	if (cmd_p->opt.reset_ub == YES) {
+	if (cmd_p->opt.reset_ub == YES && h != NULL) {
 		ret = vps_set_ublimit(h, veid, &vps_p->res.ub);
 		cmd_p->opt.save = NO; // suppress savewarning
 		return ret;
@@ -545,7 +545,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			return ret;
 		}
 	}
-	is_run = vps_is_run(h, veid);
+	is_run = h != NULL && vps_is_run(h, veid);
 	if (is_run) {
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
@@ -574,7 +574,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			free(dist_name);
 	}
 	/* Setup password */
-	if (!list_empty(&cmd_p->res.misc.userpw)) {
+	if (h != NULL && !list_empty(&cmd_p->res.misc.userpw)) {
 		if (!is_run)
 			if ((ret = vps_start(h, veid, g_p,
 				SKIP_SETUP|SKIP_ACTION_SCRIPT, NULL)))
@@ -813,8 +813,16 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 	char fname[STR_SIZE];
 
 	ret = 0;
-	if ((h = vz_open(veid)) == NULL)
-		return VZ_BAD_KERNEL;
+	if ((h = vz_open(veid)) == NULL) {
+		/* Accept to run "set --save --force" on non-openvz
+		 * kernel */
+		if (action != ACTION_SET ||
+		    cmd_p->opt.save_force != YES ||
+		    cmd_p->opt.save != YES)
+		{
+			return VZ_BAD_KERNEL;
+		}
+	}
 	if (action != ACTION_EXEC &&
 		action != ACTION_EXEC2 &&
 		action != ACTION_EXEC3 &&

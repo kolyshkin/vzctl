@@ -92,6 +92,7 @@ enum {
 
 typedef struct {
 	int save;
+	int save_force;
 	int fast_kill;
 	int skip_lock;
 	int skip_setup;

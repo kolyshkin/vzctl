@@ -33,9 +33,11 @@ Disables logging to log file and screen.
 .IP \fB--verbose\fR 4
 Sets logging level to maximum value.
 .SS Setting container parameters
-.IP "\fBset\fR \fICTID\fR [\fIparameters\fR] [\fB--save\fR]" 4
+.IP "\fBset\fR \fICTID\fR [\fIparameters\fR] [\fB--save\fR] [\fB--force\fR]" 4
 This command sets various container parameters. If a \fB--save\fR flag is given,
 parameters are saved in container configuration file \fBvps.conf\fR(5).
+Use \fB--force\fR to save the parameters even if the current kernel
+doesn't support OpenVZ.
 If a container is currently running, \fBvzctl\fR applies these parameters
 to the container.
 

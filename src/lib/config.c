@@ -137,6 +137,7 @@ static vps_config config[] = {
 
 static struct option set_opt[] = {
 {"save",	no_argument, NULL, PARAM_SAVE},
+{"force",	no_argument, NULL, PARAM_FORCE},
 {"applyconfig",	required_argument, NULL, PARAM_APPLYCONFIG},
 {"applyconfig_map",	required_argument, NULL, PARAM_APPLYCONFIG_MAP},
 {"config",	required_argument, NULL, PARAM_CONFIG},
@@ -1863,6 +1864,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_SAVE:
 		vps_p->opt.save = YES;
+		break;
+	case PARAM_FORCE:
+		vps_p->opt.save_force = YES;
 		break;
 	case PARAM_RESET_UB:
 		vps_p->opt.reset_ub = YES;
