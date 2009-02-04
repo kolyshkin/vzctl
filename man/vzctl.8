@@ -340,7 +340,7 @@ sets number of CPUs available in the container.
 .TP
 \fBMemory output parameters\fR
 
-This parameter control output of /proc/meminfo inside a container 
+This parameter control output of /proc/meminfo inside a container
 .IP "\fB--meminfo\fR \fBnone\fR
 No /proc/meminfo virtualization (the same as on host system).
 .IP "\fB--meminfo\fR \fImode\fR:\fIvalue\fR"
@@ -382,7 +382,7 @@ delete network device from a specified container
 \fB--diskspace\fR \fInum\fR[:\fInum\fR]
 sets soft and hard disk quotas, in blocks. First parameter is soft quota,
 second is hard quota. One block is currently equal to 1Kb.
-Also suffixes  \fBG\fR, \fBM\fR, \fBK\fR can be specified
+Also suffixes \fBG\fR, \fBM\fR, \fBK\fR can be specified
 (see \fBResource limits\fR section for more info).
 .TP
 \fB--diskinodes\fR \fInum\fR[:\fInum\fR]
@@ -509,7 +509,7 @@ You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to a contain
 You can use \fB--hostname\fR \fIname\fR option to set a host name for
 a container.
 .IP "\fBdestroy\fR | \fBdelete\fR" 4
-Removes a container private area by deleting all files, directories and 
+Removes a container private area by deleting all files, directories and
 the configuration file of this container.
 .IP "\fBstart\fR [\fB--wait\fR] [\fB--force\fR]" 4
 Mounts (if necessary) and starts a container. Unless \fB--wait\fR option
