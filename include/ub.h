@@ -97,6 +97,9 @@
 #ifndef UB_IPTENTRIES
 #define UB_IPTENTRIES	23	/* Number of iptables rules */
 #endif
+#ifndef UB_SWAPPAGES
+#define UB_SWAPPAGES	24
+#endif
 #define UB_DUMMY	255
 
 /** Data structure for UBC parameter.
@@ -130,6 +133,7 @@ struct ub_struct {
 	unsigned long *dcachesize;
 	unsigned long *numiptent;
 	unsigned long *avnumproc;
+	unsigned long *swappages;
 };
 typedef struct ub_struct ub_param;
 

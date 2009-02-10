@@ -61,6 +61,7 @@ static struct ubname2id {
 	{"DCACHESIZE",	PARAM_DCACHESIZE},
 	{"NUMIPTENT",	PARAM_NUMIPTENT},
 	{"AVNUMPROC",	PARAM_AVNUMPROC},
+	{"SWAPPAGES",	PARAM_SWAPPAGES},
 	{NULL, 0},
 };
 
@@ -128,6 +129,7 @@ inline static int is_ub_empty(ub_param *ub)
 	CHECK_UB(numfile)
 	CHECK_UB(dcachesize)
 	CHECK_UB(numiptent)
+	CHECK_UB(swappages)
 #undef CHECK_UB
 
 	return 1;
@@ -185,6 +187,16 @@ if (ub->name != NULL) {							\
 	SET_UB_LIMIT(numfile, UB_NUMFILE)
 	SET_UB_LIMIT(dcachesize, UB_DCACHESIZE)
 	SET_UB_LIMIT(numiptent, UB_IPTENTRIES)
+	if (ub->swappages &&
+	    setublimit(veid, UB_SWAPPAGES, ub->swappages) == -1)
+	{
+		if (errno == EINVAL) {
+			logger(-1, ENOSYS, "failed to set swappages");
+		} else {
+			logger(-1, errno, "failed to set swappages");
+			return VZ_SETUBC_ERROR;
+		}
+	}
 #undef SET_UB_LIMIT
 
 	return 0;
@@ -327,6 +339,7 @@ if ((src->x) != NULL) {						\
 	MERGE_P2(dcachesize)
 	MERGE_P2(numiptent)
 	MERGE_P2(avnumproc)
+	MERGE_P2(swappages)
 #undef MERGE_P2
 }
 

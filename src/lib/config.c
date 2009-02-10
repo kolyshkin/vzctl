@@ -83,6 +83,7 @@ static vps_config config[] = {
 {"NUMIPTENT",	NULL, PARAM_NUMIPTENT},
 {"IPTENTRIES",	"NUMIPTENT", -1},
 {"AVNUMPROC",	NULL, PARAM_AVNUMPROC},
+{"SWAPPAGES",	NULL, PARAM_SWAPPAGES},
 /*	Capability */
 {"CAPABILITY",	NULL, PARAM_CAP},
 /*	Network	*/
@@ -163,6 +164,7 @@ static struct option set_opt[] = {
 {"dcachesize",	required_argument, NULL, PARAM_DCACHESIZE},
 {"numiptent",	required_argument, NULL, PARAM_NUMIPTENT},
 {"avnumproc",	required_argument, NULL, PARAM_AVNUMPROC},
+{"swappages",	required_argument, NULL, PARAM_SWAPPAGES},
 /*	Capability */
 {"capability",	required_argument, NULL, PARAM_CAP},
 /*	Network	*/
@@ -685,6 +687,7 @@ if (ub->res != NULL) {							\
 	ADD_UB_PARAM(dcachesize, PARAM_DCACHESIZE)
 	ADD_UB_PARAM(numiptent, PARAM_NUMIPTENT)
 	ADD_UB_PARAM(avnumproc, PARAM_AVNUMPROC)
+	ADD_UB_PARAM(swappages, PARAM_SWAPPAGES)
 #undef ADD_UB_PARAM
 
 	return 0;
@@ -1933,6 +1936,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_PHYSPAGES:
 	case PARAM_VMGUARPAGES:
 	case PARAM_OOMGUARPAGES:
+	case PARAM_SWAPPAGES:
 		ret = parse_ub(vps_p, val, id, _page_size);
 		break;
 	case PARAM_NUMPROC:

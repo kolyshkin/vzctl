@@ -91,7 +91,9 @@ void usage(int rc)
 "   --oomguarpages P[:P]	--lockedpages P[:P]	--privvmpages P[:P]\n"
 "   --shmpages P[:P]	--numfile N[:N]		--numflock N[:N]\n"
 "   --numpty N[:N]	--numsiginfo N[:N]	--dcachesize N[:N]\n"
-"   --numiptent N[:N]	--physpages P[:P]	--avnumproc N[:N]\n");
+"   --numiptent N[:N]	--physpages P[:P]	--avnumproc N[:N]\n"
+"   --swappages P[:P]\n"
+);
 	memset(&mod, 0, sizeof(mod));
 	set_log_level(0);
 	init_modules(&mod, NULL);

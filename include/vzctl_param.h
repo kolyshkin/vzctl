@@ -134,6 +134,7 @@
 #define PARAM_NETIF_MAC_FILTER	360
 #define PARAM_NETIF_BRIDGE	361
 #define PARAM_DESCRIPTION	362
+#define PARAM_SWAPPAGES		363
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif
