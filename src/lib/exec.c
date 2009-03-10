@@ -39,7 +39,7 @@
 static volatile sig_atomic_t alarm_flag, child_exited;
 static char *argv_bash[] = {"bash", NULL};
 static char *envp_bash[] = {"HOME=/", "TERM=linux",
-	"PATH=/bin:/sbin:/usr/bin:/usr/sbin:.", NULL};
+	"PATH=/bin:/sbin:/usr/bin:/usr/sbin", NULL};
 
 int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
 

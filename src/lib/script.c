@@ -38,7 +38,7 @@
 #include "fs.h"
 
 volatile sig_atomic_t alarm_flag;
-static char *envp_bash[] = {"HOME=/", "TERM=linux", "PATH=/bin:/sbin:/usr/bin:/usr/sbin:", NULL};
+static char *envp_bash[] = {"HOME=/", "TERM=linux", "PATH=/bin:/sbin:/usr/bin:/usr/sbin", NULL};
 
 int read_script(const char *fname, char *include, char **buf)
 {

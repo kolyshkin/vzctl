@@ -294,7 +294,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 			char buf[64];
 			char *term;
 			char *arg[] = {"-bash", NULL};
-			char *env[] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin:",
+			char *env[] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin",
 				"HISTFILE=/dev/null",
 				"USER=root", "HOME=/root", "LOGNAME=root",
 				NULL, /* for TERM */
