@@ -70,7 +70,7 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 	fi
 	IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
 	if [ "${IPV6}" = "yes" ]; then
-    		IPT_MODULES="${IPT_MODULES} ${IP6TABLES}"
+		IPT_MODULES="${IPT_MODULES} ${IP6TABLES}"
 	fi
 	VZFS_MODULES="simfs"
 fi
