@@ -58,7 +58,23 @@ setup_cron()
 {
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
-	[ -d "$DST_CRONSCRIPT_DIR" ] || return
+	if [ ! -d "${DST_CRONSCRIPT_DIR}" ]; then
+		if [ "x${SKIP_CRON_WARNINGS}" != "xyes" ]; then
+			ewarn "Automatic setup of cron jobs works only if a system cron daemon can use"
+			ewarn "\${DST_CRONSCRIPT_DIR} (${DST_CRONSCRIPT_DIR}) as a spool directory"
+			ewarn "(e.g. sys-process/vixie-cron can). On your system ${DST_CRONSCRIPT_DIR}"
+			ewarn "is not a directory even, thus you need manually set the following cron jobs:"
+			echo
+			grep -E -v '(^#|^$)' ${SRC_CRONSCRIPT_DIR}/vz*
+			echo
+			ewarn "Alternatevely, please, set cron execution of scripts inside ${SRC_CRONSCRIPT_DIR}"
+			ewarn "so that modifications in those scripts be handled automatically."
+			ewarn
+			ewarn "If you already did that and wish to avoid this warning message put"
+			ewarn "SKIP_CRON_WARNINGS=yes into /etc/conf.d/vz."
+		fi
+		return
+	fi
 	cat $SRC_CRONSCRIPT_DIR/vz* > $DST_CRONSCRIPT_DIR/vz &&
 		chmod 644 $DST_CRONSCRIPT_DIR/vz
 }
