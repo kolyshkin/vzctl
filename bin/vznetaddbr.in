@@ -30,7 +30,7 @@ for iface in $NETIFLIST; do
 	bridge=vmbr0
 
     echo "Adding interface $host_ifname to bridge $bridge on CT0 for CT$VEID"
-    ip addr add 0 dev "$host_ifname"
+    ip link set dev "$host_ifname" up
     echo 1 >"/proc/sys/net/ipv4/conf/$host_ifname/proxy_arp"
     echo 1 >"/proc/sys/net/ipv4/conf/$host_ifname/forwarding"
     brctl addif "$bridge" "$host_ifname"
