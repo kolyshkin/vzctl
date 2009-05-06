@@ -103,7 +103,7 @@ vzgetnetdev()
 	/^[0-9]+/ && /UP/ && !/LOOPBACK/ && !/SLAVE/ && !/NOARP/ {
 		dev=$2;
 	}
-	/^[\ \t]+inet / {
+	/^[\ \t]+inet6? / {
 		if (dev != "") print (dev);
 		dev="";
 	}' | sed -e 's/:$//' -e 's/@.*$//'`
