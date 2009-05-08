@@ -69,6 +69,7 @@ AC_C_INLINE
 # Compiler settings
 CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline"
 CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
+CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
 
 if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
 	CFLAGS="${CFLAGS} -m64"
