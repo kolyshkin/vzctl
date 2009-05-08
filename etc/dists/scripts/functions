@@ -320,7 +320,16 @@ function change_hostname()
 		$0 == comm {found = 1; next}
 		found || ($2 == host && (ip == "" || ip == $1)) {
 			if (ip == "") {ip = $1}
-			for (i=3; i <= NF; i++) { EXTRANAMES[$i] = 1 }
+			for (i=3; i <= NF; i++) {
+                               if ((j=index($2, ".")) > 1) {
+				        origalias= substr($2, 1, j - 1);
+				        if (origalias != $i) {
+					        EXTRANAMES[$i] = 1;
+                                        }
+				} else {
+					EXTRANAMES[$i] = 1;
+                                }
+                        }
 			found = 0;
 			next;
 		}
