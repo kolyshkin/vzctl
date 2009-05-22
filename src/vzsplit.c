@@ -217,6 +217,7 @@ int get_cpupower(int *cpuunits)
 		*cpuunits = total / (num_ve + 1);
 		return 0;
 	}
+	fclose(fd);
 	return 1;
 }
 
