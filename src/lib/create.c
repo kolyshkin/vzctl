@@ -172,13 +172,15 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			cmd_p->opt.config);
 		if (!stat_file(src)) {
 			logger(-1, 0, "File %s is not found", src);
-			return VZ_CP_CONFIG;
+			ret = VZ_CP_CONFIG;
+			goto err;
 		}
 		if (cfg_exists) {
 			logger(-1, 0, "Error: container config file %s "
 					"already exists, can not use --config "
 					"option", dst);
-			return VZ_CP_CONFIG; /* FIXME */
+			ret = VZ_CP_CONFIG; /* FIXME */
+			goto err;
 		}
 		sample_config = cmd_p->opt.config;
 	} else if (vps_p->opt.config != NULL) {
@@ -190,9 +192,15 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	}
 	if (sample_config != NULL) {
 		if (cp_file(dst, src))
-			return VZ_CP_CONFIG;
+		{
+			ret = VZ_CP_CONFIG;
+			goto err;
+		}
 		if ((conf_p = init_vps_param()) == NULL)
-			return VZ_RESOURCE_ERROR;
+		{
+			ret = VZ_RESOURCE_ERROR;
+			goto err_cfg;
+		}
 		vps_parse_config(veid, src, conf_p, action);
 		merge_vps_param(vps_p, conf_p);
 		if (conf_p->opt.origin_sample == NULL)
@@ -201,29 +209,35 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	}
 	merge_vps_param(vps_p, cmd_p);
 	if (check_var(fs->tmpl, "TEMPLATE is not set"))
+	{
 		ret = VZ_VE_TMPL_NOTSET;
+		goto err_cfg;
+	}
 	else if (check_var(fs->private, "VE_PRIVATE is not set"))
+	{
 		ret = VZ_VE_PRIVATE_NOTSET;
+		goto err_cfg;
+	}
 	else if (check_var(fs->root, "VE_ROOT is not set"))
+	{
 		ret = VZ_VE_ROOT_NOTSET;
+		goto err_cfg;
+	}
 	else if (stat_file(fs->private)) {
 		logger(-1, 0, "Private area already exists in %s", fs->private);
 		ret = VZ_FS_PRVT_AREA_EXIST;
+		goto err_cfg;
 	}
 
-	if ((ret == 0) && (cmd_p->res.name.name)) {
-		ret = set_name(veid, cmd_p->res.name.name, cmd_p->res.name.name);
-	}
-
-	/* Error? Clean up and exit */
-	if (ret != 0) {
-		if (sample_config != NULL)
-			unlink(dst);
-		return ret;
+	if (cmd_p->res.name.name) {
+		if ((ret = set_name(veid, cmd_p->res.name.name,
+					cmd_p->res.name.name)))
+			goto err_cfg;
 	}
 
 	if (action != NULL && action->mod_count) {
-		ret = mod_setup(h, veid, 0, 0, action, vps_p);
+		if ((ret = mod_setup(h, veid, 0, 0, action, vps_p)))
+			goto err_private;
 	} else {
 		/* Set default ostemplate if not specified */
 		if (cmd_p->res.tmpl.ostmpl == NULL &&
@@ -232,8 +246,12 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		{
 			tmpl->ostmpl = strdup(tmpl->def_ostmpl);
 		}
+
 		if (check_var(tmpl->ostmpl, "OS template is not specified"))
-			return VZ_VE_PKGSET_NOTSET;
+		{
+			ret = VZ_VE_PKGSET_NOTSET;
+			goto err_cfg;
+		}
 		if (stat_file(VZOSTEMPLATE)) {
 			full_ostmpl = get_ostemplate_name(tmpl->ostmpl);
 			if (full_ostmpl != NULL) {
@@ -244,16 +262,12 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		snprintf(tar_nm, sizeof(tar_nm), "cache/%s", tmpl->ostmpl);
 		logger(0, 0, "Creating container private area (%s)",
 				tmpl->ostmpl);
-		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, tar_nm);
+		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, tar_nm)))
+			goto err_private;
 	}
-	if (ret) {
-		if (sample_config != NULL)
-			unlink(dst);
-		vps_destroy_dir(veid, fs->private);
-		logger(-1, 0, "Creation of container private area failed");
-		return ret;
-	}
-	vps_postcreate(veid, &vps_p->res.fs, &vps_p->res.tmpl);
+
+	if ((ret = vps_postcreate(veid, &vps_p->res.fs, &vps_p->res.tmpl)))
+		goto err_root;
 	move_config(veid, DESTR);
 	/* store root, private, ostemplate in case default used */
 	if (cmd_p->res.fs.root_orig == NULL &&
@@ -274,8 +288,18 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	}
 	vps_save_config(veid, dst, cmd_p, vps_p, action);
 	logger(0, 0, "Container private area was created");
-
 	return 0;
+
+err_root:
+	rmdir(fs->root);
+err_private:
+	vps_destroy_dir(veid, fs->private);
+err_cfg:
+	if (sample_config != NULL)
+		unlink(dst);
+err:
+	logger(-1, 0, "Creation of container private area failed");
+	return ret;
 }
 
 int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
