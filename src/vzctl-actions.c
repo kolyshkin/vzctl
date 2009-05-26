@@ -872,7 +872,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		} else if (cmd_p->opt.save != NO) {
 			if (list_empty(&cmd_p->res.misc.userpw)) {
 				logger(0, 0, "WARNING: Settings were not saved"
-				" and will be resetted to original values on"
+				" and will be reset to original values at the"
 				" next start (use --save flag)");
 			}
 		}
