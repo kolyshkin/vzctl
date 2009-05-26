@@ -61,7 +61,7 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 		return 0;
 	snprintf(file, sizeof(file), "%s/%s/%s", dir, DIST_SCRIPTS, action);
 	if (!stat_file(file)) {
-		logger(-1, 0, "Action script %s does not found", file);
+		logger(-1, 0, "Action script %s not found", file);
 		return 0;
 	}
 	switch (id) {
