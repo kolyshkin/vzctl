@@ -287,9 +287,19 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		cmd_p->res.tmpl.ostmpl = strdup(tmpl->ostmpl);
 	}
 	vps_save_config(veid, dst, cmd_p, vps_p, action);
+
+	if ((ret = run_pre_script(veid, USER_CREATE_SCRIPT)))
+	{
+		logger(0, 0, "User create script " USER_CREATE_SCRIPT
+				" exited with error");
+		goto err_names;
+	}
+
 	logger(0, 0, "Container private area was created");
 	return 0;
 
+err_names:
+	remove_names(veid);
 err_root:
 	rmdir(fs->root);
 err_private:
