@@ -252,6 +252,7 @@ void free_ub_param(ub_param *ub)
 	FREE_P(dcachesize)
 	FREE_P(numiptent)
 	FREE_P(avnumproc)
+	FREE_P(swappages)
 #undef FREE_P
 }
 
@@ -284,6 +285,7 @@ if (res_id == id) {						\
 	ADD_UB_PARAM(dcachesize, PARAM_DCACHESIZE)
 	ADD_UB_PARAM(numiptent, PARAM_NUMIPTENT)
 	ADD_UB_PARAM(avnumproc, PARAM_AVNUMPROC)
+	ADD_UB_PARAM(swappages, PARAM_SWAPPAGES)
 #undef ADD_UB_PARAM
 }
 
