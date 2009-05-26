@@ -555,7 +555,7 @@ void close_fds(int close_std, ...)
 	}
 }
 
-/* Renames (to "*.destroyed" if action == MOVE) or removes config,
+/* Renames (to "*.destroyed" if action == BACKUP) or removes config,
  * (if action == DESTR)
  * Also, appropriate mount/umount scripts are linked.
  */
