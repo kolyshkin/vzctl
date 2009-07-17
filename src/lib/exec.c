@@ -46,10 +46,8 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
 int execvep(const char *path, char *const argv[], char *const envp[])
 {
 	if (!strchr(path, '/')) {
-		char *p = getenv("PATH");
+		char *p = "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin";
 
-		if (!p)
-			p = "/bin:/usr/bin:/sbin";
 		for (; p && *p;) {
 			char partial[FILENAME_MAX];
 			char *p2;
