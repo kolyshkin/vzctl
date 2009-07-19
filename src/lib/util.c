@@ -540,7 +540,7 @@ void close_fds(int close_std, ...)
 	/* build aray of skiped fds */
 	va_start(ap, close_std);
 	skip_fds[0] = -1;
-	for (i = 0; i < sizeof(skip_fds); i++) {
+	for (i = 0; i < (sizeof(skip_fds)/sizeof(skip_fds[0])); i++) {
 		fd = va_arg(ap, int);
 		skip_fds[i] = fd;
 		if (fd == -1)
