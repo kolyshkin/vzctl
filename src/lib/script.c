@@ -62,7 +62,7 @@ int read_script(const char *fname, char *include, char **buf)
 		}
 		if (stat_file(inc))
 			len = read_script(inc, NULL, buf);
-		if (inc != NULL) free(inc);
+		free(inc);
 		if (len < 0)
 			return -1;
 	}

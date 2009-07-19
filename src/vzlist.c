@@ -952,10 +952,8 @@ int read_ves_param()
 								ve_private);
 		free_vps_param(param);
 	}
-	if (ve_root != NULL)
-		free(ve_root);
-	if (ve_private != NULL)
-		free(ve_private);
+	free(ve_root);
+	free(ve_private);
 
 	return 0;
 }
@@ -1712,9 +1710,9 @@ int main(int argc, char **argv)
 		return ret;
 	print_ve();
 	free_veinfo();
-	if (host_pattern != NULL) free(host_pattern);
-	if (name_pattern != NULL) free(name_pattern);
-	if (f_order != NULL) free(f_order);
+	free(host_pattern);
+	free(name_pattern);
+	free(f_order);
 
 	return 0;
 }

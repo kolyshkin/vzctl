@@ -570,8 +570,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		dist_name = get_dist_name(&g_p->res.tmpl);
 		if ((ret = read_dist_actions(dist_name, DIST_DIR, actions)))
 			return ret;
-		if (dist_name != NULL)
-			free(dist_name);
+		free(dist_name);
 	}
 	/* Setup password */
 	if (h != NULL && !list_empty(&cmd_p->res.misc.userpw)) {
@@ -620,7 +619,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		STATE_RUNNING, SKIP_NONE, &g_action);
 err:
 	free_dist_actions(actions);
-	if (actions != NULL) free(actions);
+	free(actions);
 
 	return ret;
 }

@@ -176,8 +176,7 @@ vps_handler *vz_open(envid_t veid)
 	return h;
 
 err:
-	if (h != NULL)
-		free(h);
+	free(h);
 	if (vzfd != -1)
 		close(vzfd);
 	if (stdfd != -1)
@@ -565,8 +564,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		return ret;
 	dist_name = get_dist_name(&res->tmpl);
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
-	if (dist_name != NULL)
-		free(dist_name);
+	free(dist_name);
 	if (ret)
 		return ret;
 	logger(0, 0, "Starting container ...");

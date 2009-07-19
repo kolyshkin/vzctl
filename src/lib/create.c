@@ -326,8 +326,7 @@ int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
 		return VZ_VE_ROOT_NOTSET;
 	dist_name = get_dist_name(tmpl);
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
-	if (dist_name != NULL)
-		free(dist_name);
+	free(dist_name);
 	if (ret)
 		return ret;
 	if (actions.post_create == NULL) {

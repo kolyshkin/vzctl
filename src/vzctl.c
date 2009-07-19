@@ -311,7 +311,7 @@ error:
 	free_vps_param(vps_p);
 	free_vps_param(cmd_p);
 	free_log();
-	if (name != NULL) free(name);
+	free(name);
 
 	return ret;
 }

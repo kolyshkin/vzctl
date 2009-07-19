@@ -426,8 +426,7 @@ int vps_exec_script(vps_handler *h, envid_t veid, char *root,
 		return -1;
 	logger(1, 0, "Running container script: %s", fname);
 	ret = vps_exec(h, veid, root, MODE_BASH, argv, envp, script, timeout);
-	if (script != NULL)
-		free(script);
+	free(script);
 	return ret;
 }
 

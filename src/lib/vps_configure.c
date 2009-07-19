@@ -177,7 +177,7 @@ int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		ret = VZ_CHANGEPASS;
 		logger(0, 0, "Password change failed");
 	}
-	if (str != NULL) free(str);
+	free(str);
 	return ret;
 }
 
@@ -302,7 +302,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	envp[i] = NULL;
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
-	if (str != NULL) free(str);
+	free(str);
 
 	return ret;
 }
