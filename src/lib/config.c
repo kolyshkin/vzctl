@@ -2224,8 +2224,10 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 		str = malloc(len);
 	else
 		str = alloca(len);
-	if (str == NULL)
+	if (str == NULL) {
+		fclose(fp);
 		return VZ_RESOURCE_ERROR;
+	}
 	while (fgets(str, len, fp)) {
 		line++;
 		if ((rtoken = parse_line(str, ltoken, sizeof(ltoken))) == NULL)
