@@ -308,6 +308,7 @@ int main(int argc, char **argv)
 	if (!stat(out_file, &st) && S_ISDIR(st.st_mode))
 	{
 		printf("Error: output file %s is directory\n", out_file);
+		free(in_file);
 		return 1;
 	}
 	if (all_k)
@@ -320,6 +321,7 @@ int main(int argc, char **argv)
 	if (ParseConfig(0, in_file, &param, 0))
 	{
 		fprintf(stderr, "Unable open %s\n", in_file);
+		free(in_file);
 		return 1;
 	}
 	scale(ubc_k, cpu_k, disk_k, net_k, &param);
@@ -328,8 +330,10 @@ int main(int argc, char **argv)
 	if (validate)
 	{
 		param.validatemode = strdup(STR_ACT_ERROR);
-		if (validate_ve(0, &param))
+		if (validate_ve(0, &param)) {
+			free(in_file);
 			return 1;
+		}
 	}
 	if ((veid = get_id(in_file)))
 	{
@@ -357,6 +361,7 @@ int main(int argc, char **argv)
 	}
 	if (out_file != NULL && !remove)
 		cpfile(in_file, out_file);
+	free(in_file);
 	if (SaveConfig(0, out_file, &param) == -1)
 		return 1;
 	if (!validate && param.class_id != NULL && *param.class_id == 1)
