@@ -31,6 +31,8 @@
 #define UMOUNT_PREFIX		"umount"
 #define START_PREFIX		"start"
 #define STOP_PREFIX		"stop"
+#define PRE_MOUNT_PREFIX	"premount"
+#define POST_UMOUNT_PREFIX	"postumount"
 
 #define DESTR_PREFIX		"destroyed"
 

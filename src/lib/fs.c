@@ -136,6 +136,21 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 		logger(-1, 0, "Container is already mounted");
 		return 0;
 	}
+	/* Execute pre mount scripts */
+	if (!(skip & SKIP_ACTION_SCRIPT)) {
+		snprintf(buf, sizeof(buf), "%svps.%s", VPS_CONF_DIR,
+			PRE_MOUNT_PREFIX);
+		for (i = 0; i < 2; i++) {
+			if (run_pre_script(veid, buf)) {
+				logger(-1, 0, "Error executing mount script %s",
+					buf);
+				fsumount(veid, fs->root);
+				return VZ_ACTIONSCRIPT_ERROR;
+			}
+			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
+				veid, PRE_MOUNT_PREFIX);
+		}
+	}
 	if ((ret = fsmount(veid, fs, dq)))
 		return ret;
 	/* Execute per-CT & global mount scripts */
@@ -194,6 +209,19 @@ int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip)
 	}
 	if (!(ret = fsumount(veid, root)))
 		logger(0, 0, "Container is unmounted");
+	if (!(skip & SKIP_ACTION_SCRIPT)) {
+		snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
+			veid, POST_UMOUNT_PREFIX);
+		for (i = 0; i < 2; i++) {
+			if (run_pre_script(veid, buf)) {
+				logger(-1, 0, "Error executing umount script %s",
+					buf);
+				return VZ_ACTIONSCRIPT_ERROR;
+			}
+			snprintf(buf, sizeof(buf), "%svps.%s", VPS_CONF_DIR,
+				POST_UMOUNT_PREFIX);
+		}
+	}
 
 	return ret;
 }
