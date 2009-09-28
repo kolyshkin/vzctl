@@ -212,12 +212,12 @@ int get_cpupower(int *cpuunits)
 	while (fgets(str, sizeof(str), fd))
 		if (sscanf(str, "bogomips\t: %u", &val) == 1)
 			total += val;
+	fclose(fd);
 	if (total) {
 		total *= 25;
 		*cpuunits = total / (num_ve + 1);
 		return 0;
 	}
-	fclose(fd);
 	return 1;
 }
 
