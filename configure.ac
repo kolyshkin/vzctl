@@ -38,6 +38,11 @@ AC_CANONICAL_TARGET
 # Automake
 AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2])
 
+# Enable silent build rules by default, requires at least
+# Automake-1.11. Disable by either passing --disable-silent-rules to
+# configure or passing V=1 to make
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
 # Disable build of static libraries by default.
 AC_DISABLE_STATIC
 
