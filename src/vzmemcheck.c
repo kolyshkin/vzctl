@@ -65,17 +65,18 @@ int calculate(int numerator, int verbose)
 	FILE *fd;
 	struct ub_struct ub_s;
 
-	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		fprintf(stderr, "Unable to open file " PROCUBC ": %s\n",
-			strerror(errno));
-		return 1;
-	}
 	if (get_mem(&mem.ram))
 		return 1;
 	if (get_swap(&mem.swap))
 		mem.swap = 1;
 	if (get_lowmem(&mem.lowmem))
 		return 1;
+
+	if ((fd = fopen(PROCUBC, "r")) == NULL) {
+		fprintf(stderr, "Unable to open file " PROCUBC ": %s\n",
+			strerror(errno));
+		return 1;
+	}
 	mem.lowmem *= 0.4;
 	memset(&ub_s, 0, sizeof(ub_s));
 	memset(&rutotal_comm, 0, sizeof(rutotal_comm));
