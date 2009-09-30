@@ -77,17 +77,10 @@ BEGIN {
 	}
 }
 ($1 == 0 && $id != 0) {
-	if ($weight > 1) {
+	if ($weight > 0) {
 		units = int(500000/$weight);
 	} else if ($weight == 0) {
 		units = 500000;
-	} else {
-		# $weight == 1
-		print("ERROR: VE0 CPU units not set, or set too high!");
-		print("Probably you have not started /etc/init.d/vz");
-		fail = 1;
-		exit;
-	}
 	if (verbose) {
 		if ($id == 2147483647) {
 			print("0\t\t" units);
