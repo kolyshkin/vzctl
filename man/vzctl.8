@@ -1,12 +1,12 @@
-.TH vzctl 8 "22 Feb 2008" "OpenVZ" "Containers"
+.TH vzctl 8 "1 Oct 2009" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- utility to control an OpenVZ container.
 .SH SYNOPSIS
 vzctl [\fIflags\fR] \fBcreate\fR \fICTID\fR
-\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR]
+[\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR]
 [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]
 .PP
-vzctl [\fIflags\fR] \fBset\fR \fICTID\fR [\fIparameters\fR] [\fB--save\fR]
+vzctl [\fIflags\fR] \fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR]
 .PP
 vzctl [\fIflags\fR] \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
 \fBstart\fR | \fBstop\fR | \fBrestart\fR |
@@ -26,29 +26,34 @@ Containers can be referred to by either numeric \fICTID\fR or
 by name (see \fB--name\fR option). Note that CT ID <= 100 are reserved for
 OpenVZ internal purposes.
 .SH OPTIONS
+
 .SS Flags
+
 These flags can be used with almost any option.
 .IP \fB--quiet\fR 4
 Disables logging to log file and screen.
 .IP \fB--verbose\fR 4
 Sets logging level to maximum value.
+
 .SS Setting container parameters
-.IP "\fBset\fR \fICTID\fR [\fIparameters\fR] [\fB--save\fR] [\fB--force\fR]" 4
+
+.IP "\fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR] [\fB--force\fR]" 4
 This command sets various container parameters. If a \fB--save\fR flag is given,
 parameters are saved in container configuration file \fBvps.conf\fR(5).
 Use \fB--force\fR to save the parameters even if the current kernel
 doesn't support OpenVZ.
-If a container is currently running, \fBvzctl\fR applies these parameters
+If the container is currently running, \fBvzctl\fR applies these parameters
 to the container.
 
-The following options can be used with \fBset\fR command.
+The following parameters can be used with \fBset\fR command.
+
 .TP
-\fBMiscellaneous parameters\fR
+\fBMiscellaneous\fR
 .TP
-\fB--onboot\fR \fIyes\fR|\fIno\fR
-Sets whether this container will be started during system boot up.
-The container will not be auto-started during system boot up unless
-this parameter is set to \fIyes\fR.
+\fB--onboot\fR \fByes\fR|\fBno\fR
+Sets whether the container will be started during system boot up.
+The container will not be auto-started unless this parameter
+is set to \fIyes\fR.
 .TP
 \fB--root\fR \fIpath\fR
 Sets the path to root directory for this container. This is essentially a mount
@@ -67,11 +72,11 @@ Note that this option is not saved in configuration file at all (so
 In case container root filesystem is not mounted, it is automatically mounted,
 then all the appropriate file changes are applied, then it is unmounted.
 
-Note that container files should be created before using this option.
+Note that container should be created before using this option.
 .TP
 \fB--disabled\fR \fIyes\fR|\fIno\fR
-Disable container start. To force the start of a disabled container, use
-\fBvzctl start\fR with \fB--force\fR option.
+Disable container start. To force the start of a disabled container,
+use \fBvzctl start --force\fR.
 .TP
 \fB--name\fR \fIname\fR
 Add a name for a container. The \fIname\fR can later be used in
@@ -80,11 +85,12 @@ subsequent calls to \fBvzctl\fR in place of \fICTID\fR.
 \fB--description\fR \fIstring\fR
 Add a textual description for a container.
 .TP
-\fB--setmode\fR \fIrestart\fR|\fIignore\fR
-Whether to restart a container after applying any parameters requiring that
-the container be restarted for those to take effect.
+\fB--setmode\fR \fBrestart\fR|\fBignore\fR
+Whether to restart a container after applying parameters that require
+the container to be restarted in order to take effect.
+
 .TP
-\fBNetwork related parameters\fR
+\fBNetworking\fR
 .TP
 \fB--ipadd\fR \fIaddr\fR
 Adds IP address to a given container. Note that this option is incremental, so
@@ -120,12 +126,13 @@ used in custom network start scripts to automatically add the interface
 to a bridge. All parameters except \fIifname\fR are optional
 and are automatically generated if not specified.
 .TP
-\fB--netif_del\fR \fIdev_name\fR|\fBall\fR
+\fB--netif_del\fR \fIdev_name\fR | \fBall\fR
 Removes virtual ethernet device from a container. If you want to remove all
 devices, use \fBall\fR.
-.TP
-\fBInterface configuration\fR
 
+.TP
+\fBVeth interface configuration\fR
+.PP
 The following options can be used to reconfigure the already-created virtual
 ethernet interface. To select the interface to configure, use
 \fB--ifname\fR \fIname\fR option.
@@ -148,14 +155,15 @@ Enables/disables MAC address filtering for the Container veth device and
 the possibility of configuring the MAC address of this device from inside
 the Container. If the filtering is turned on:
 .br
-* the veth device accepts only those packets that have a MAC address in
+ \(bu the veth device accepts only those packets that have a MAC address in
 their headers corresponding to that of this device (excluding all broadcast
 and multicast packets);
 .br
-* it is impossible to modify the veth MAC address from inside the Container.
-.br
+ \(bu it is impossible to modify the veth MAC address from inside the Container.
+
 By default, this functionality is enabled for all veth devices existing
 inside the Container.
+
 .TP
 \fBResource limits\fR
 
@@ -187,9 +195,8 @@ Available suffixes are:
 other architectures may differ).
 
 You can also specify the literal word \fBunlimited\fR in place of a number.
-In that case the corresponding value will be set to \fBLONG_MAX\fB, i. e.
+In that case the corresponding value will be set to \fBLONG_MAX\fR, i. e.
 the maximum possible value.
-
 .TP
 \fB--numproc\fR \fIitems\fR[:\fIitems\fR]
 Maximum number of processes and kernel-level threads.
@@ -219,7 +226,7 @@ The meaning of the limit is currently unspecified; it should be set to
 \fB--kmemsize\fR \fIbytes\fR[:\fIbytes\fR]
 Maximum amount of kernel memory used. This parameter is related to
 \fB--numproc\fR. Each process consumes certain amount of kernel memory -
-16 KB at leas, 30-50 KB typically. Very large processes may consume
+16 KB at least, 30-50 KB typically. Very large processes may consume
 a bit more. It is important to have a certain safety gap between the
 barrier and the limit of this parameter: equal barrier and limit may
 lead to the situation where the kernel will need to kill container's
@@ -325,6 +332,7 @@ as 0.
 
 Note that in order for the value to be shown as total swap space,
 \fB--meminfo\fR parameter should be set to value other than \fBnone\fR.
+
 .TP
 \fBCPU fair scheduler parameters\fR
 
@@ -344,33 +352,37 @@ You can set CPU weight for CT0 (host system itself) as well
 \fB--cpulimit\fR \fInum\fR[\fB%\fR]
 Limit of CPU usage for the container, in per cent.
 Note if the computer has 2 CPUs, it has total of 200% CPU time. Default CPU
-limit is 0 (no CPU limit).
+limit is \fB0\fR (no CPU limit).
 .TP
 \fB--cpus\fR \fInum\fR
 sets number of CPUs available in the container.
+
 .TP
 \fBMemory output parameters\fR
 
-This parameter control output of /proc/meminfo inside a container
-.IP "\fB--meminfo\fR \fBnone\fR
+This parameter control output of /proc/meminfo inside a container.
+.TP
+\fB--meminfo\fR \fBnone\fR
 No /proc/meminfo virtualization (the same as on host system).
-.IP "\fB--meminfo\fR \fImode\fR:\fIvalue\fR"
+.TP
+\fB--meminfo\fR \fImode\fR:\fIvalue\fR
 Configure total memory output in a container. Reported free memory is evaluated
 accordingly to the mode being set. Reported swap is evaluated
 according to the settings of \fB--swappages\fR parameter.
-.br
+
 You can use the following modes for \fImode\fR:
 .br
-\fBpages\fR:\fIvalue\fR - sets total memory in pages
+ \(bu \fBpages\fR:\fIvalue\fR - sets total memory in pages;
 .br
-\fBprivvmpages\fR:\fIvalue\fR - sets total memory as
-\fBprivvmpages\fR * \fIvalue\fR
+ \(bu \fBprivvmpages\fR:\fIvalue\fR - sets total memory as
+\fBprivvmpages\fR * \fIvalue\fR.
 
 Default is \fBprivvmpages:1\fR.
+
 .TP
 \fBIptables control parameters\fR
 .TP
-.IP "\fB--iptables\fR \fIname\fR"
+\fB--iptables\fR \fIname\fR
 Restrict access to iptables modules inside a container (by default all iptables
 modules that are loaded in the host system are accessible inside a container).
 
@@ -382,12 +394,16 @@ You can use the following values for \fIname\fR:
 \fBip_conntrack_irc\fR, \fBipt_conntrack\fR, \fBipt_state\fR,
 \fBipt_helper\fR, \fBiptable_nat\fR, \fBip_nat_ftp\fR, \fBip_nat_irc\fR,
 \fBipt_REDIRECT\fR, \fBxt_mac\fR, \fBipt_owner\fR.
+
 .TP
 \fBNetwork devices control parameters\fR
-.IP "\fB--netdev_add\fR \fIname\fR"
+.TP
+\fB--netdev_add\fR \fIname\fR
 move network device from the host system to a specified container
-.IP "\fB--netdev_del\fR \fIname\fR"
+.TP
+\fB--netdev_del\fR \fIname\fR
 delete network device from a specified container
+
 .TP
 \fBDisk quota parameters\fR
 .TP
@@ -411,11 +427,13 @@ quotas inside the container will not be accounted.
 
 Note that if you have previously set value of this parameter to \fB0\fR,
 changing it while the container is running will not take effect.
+
 .TP
 \fBMount option\fR
 .TP
-\fB--noatime\fR \fByes\fR|\fBno\fR
+\fB--noatime\fR \fByes\fR | \fBno\fR
 Sets noatime flag (do not update inode access times) on file system.
+
 .TP
 \fBCapability option\fR
 .TP
@@ -442,6 +460,7 @@ You can use the following values for \fIcapname\fR:
 implications, so do not do it unless you know what you are doing. Also note
 that setting \fBsetpcap:on\fR for a container will most probably lead to
 inability to start it.
+
 .TP
 \fBDevice access management\fR
 .TP
@@ -455,26 +474,29 @@ is created in a container by \fBvzctl\fR. Example:
 \fB--devices\fR \fBb|c\fR:\fImajor\fR:\fIminor\fR|\fBall\fR:\fB[r][w][q]|none\fR
 Give the container an access to a \fBb\fRlock or \fBc\fRharacter device
 designated by its \fImajor\fR and \fIminor\fR numbers. Device file have to be created manually.
+
 .TP
 \fBFeatures management\fR
 .TP
 \fB--features\fR \fIname\fR:\fBon|off\fR
 Enable or disable a specific container feature.
 Known features are: \fIsysfs\fR, \fInfs\fR, \fIsit\fR, \fIipip\fR, \fIppp\fR.
+
 .TP
 \fBApply config\fR
 .TP
 \fB--applyconfig\fR \fIname\fR
 Read container parameters from the container sample configuration file
-\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR, and
-apply them, if --save option specified save to the container config file.
+\fB\f(CW/etc/vz/conf/ve-\fIname\fR\fB\f(CW.conf-sample\fR, and
+apply them, if \fB--save\fR option specified save to the container config file.
 The following parameters are not changed: \fBHOSTNAME\fR, \fBIP_ADDRESS\fR,
 \fBOSTEMPLATE\fR, \fBVE_ROOT\fR, and \fBVE_PRIVATE\fR.
 .TP
 \fB--applyconfig_map\fR \fIgroup\fR
 Apply container config parameters selected by \fIgroup\fR. Now only
-\fRname\fR argument is supported, to restore container name based on NAME
+\fRname\fR argument is supported, to restore container name based on \fBNAME\fR
 variable in container configuration file.
+
 .TP
 \fBI/O priority management\fR
 .TP
@@ -496,7 +518,9 @@ dump file name \fB/vz/dump/Dump.\fICTID\fR is used.
 \fBrestore\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
 This command restores a container from the dump file created by the
 \fBchkpnt\fR command.
+
 .SS Performing container actions
+
 .IP "\fBcreate\fR \fICTID\fR [\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]" 4
 Creates a new container area. This operation should be done once, before
 the first start of the container.
@@ -515,10 +539,11 @@ be substituted with numeric CT ID.
 You can use \fB--private\fR \fIpath\fR option to set the path to directory
 in which all the files and directories specific to this very container
 are stored (default is \fBVE_PRIVATE\fR specified in \fBvz.conf\fR(5) file).
-Argument can contain string \fI$VEID\fR, which will be substituted with
+Argument can contain literal string \fB$VEID\fR, which will be substituted with
 the numeric CT ID.
 
-You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to a container. Note that this option can be used multiple times.
+You can use \fB--ipadd\fR \fIaddr\fR option to assign an IP address to
+a container. Note that this option can be used multiple times.
 
 You can use \fB--hostname\fR \fIname\fR option to set a host name for
 a container.
@@ -735,10 +760,10 @@ To permanently remove this container:
 \fR
 .SH FILES
 .ad l
-\f(CR
+\fB\f(CR
 /etc/vz/vz.conf
 .br
-/etc/vz/conf/\fICTID\fR.conf
+/etc/vz/conf/\fICTID\fB\f(CR.conf
 .br
 /proc/vz/veinfo
 .br
@@ -752,4 +777,4 @@ To permanently remove this container:
 .BR vps.conf (5),
 .BR vzquota (8).
 .SH LICENSE
-Copyright (C) 2000-2008, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2000-2009, Parallels, Inc. Licensed under GNU GPL.
