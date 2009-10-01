@@ -445,13 +445,14 @@ inability to start it.
 .TP
 \fBDevice access management\fR
 .TP
-\fB--devnodes\fR \fIdevice\fR:\fBr|w|rw|none\fR
-Give the container an access (\fBr\fR - read only, \fBw\fR - write only,
-\fBrw\fR - read/write, \fBnone\fR - no access) to a device designated
-by the special file /dev/\fIdevice\fR. Device file is created in a container
-by \fBvzctl\fR.
+\fB--devnodes\fR \fIdevice\fR:\fB[r][w][q]|none\fR
+Give the container an access (\fBr\fR - read, \fBw\fR - write,
+\fBq\fR - disk quota management, \fBnone\fR - no access)
+to a device designated by the special file /dev/\fIdevice\fR. Device file
+is created in a container by \fBvzctl\fR. Example:
+\fBvzctl set 777 --devnodes sdb:rwq\fR.
 .TP
-\fB--devices\fR \fBb|c\fR:\fImajor\fR:\fIminor\fR|\fBall\fR:[\fBr\fR|\fBw\fR|\fBrw\fR|\fBnone\fR]
+\fB--devices\fR \fBb|c\fR:\fImajor\fR:\fIminor\fR|\fBall\fR:\fB[r][w][q]|none\fR
 Give the container an access to a \fBb\fRlock or \fBc\fRharacter device
 designated by its \fImajor\fR and \fIminor\fR numbers. Device file have to be created manually.
 .TP
