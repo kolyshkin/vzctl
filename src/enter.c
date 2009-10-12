@@ -293,7 +293,7 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 		if ((pid = fork()) == 0) {
 			char buf[64];
 			char *term;
-			char *arg[] = {"-bash", NULL};
+			char *arg[] = {NULL, NULL};
 			char *env[] = {"PATH=/bin:/sbin:/usr/bin:/usr/sbin",
 				"HISTFILE=/dev/null",
 				"USER=root", "HOME=/root", "LOGNAME=root",
@@ -310,9 +310,11 @@ int do_enter(vps_handler *h, envid_t veid, char *root)
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
 				env[sizeof(env)/sizeof(env[0]) - 2] = buf;
 			}
+			arg[0] = "-bash";
 			execve("/bin/bash", arg, env);
+			arg[0] = "-sh";
 			execve("/bin/sh", arg, env);
-			logger(-1, errno, "enter failed: unable to exec bash");
+			logger(-1, errno, "enter failed: unable to exec sh");
 			exit(1);
 		} else if (pid < 0) {
 			logger(-1, errno, "Unable to fork");
