@@ -19,10 +19,51 @@ sbin_SCRIPTS = vzcpucheck \
                vzmigrate \
                vznetcfg \
                vzpid \
-               vznetaddbr
+               vznetaddbr \
+               vzifup-post
 
 EXTRA_DIST=$(sbin_SCRIPTS:%=%.in)
 
 CLEANFILES = $(sbin_SCRIPTS)
 
 include $(top_srcdir)/pathsubst.am
+
+install-redhat:
+	@if [ ! -e "$(DESTDIR)/sbin/ifup-local" -a \
+			! -L "$(DESTDIR)/sbin/ifup-local" ]; then \
+		$(MKDIR_P) "$(DESTDIR)/sbin"; \
+		$(LN_S) "..$(sbindir)/vzifup-post" \
+			"$(DESTDIR)/sbin/ifup-local"; \
+	else \
+		echo; \
+		echo " ***************************************************"; \
+		echo " WARNING: file $(DESTDIR)/sbin/ifup-local is present!"; \
+		echo " You have to manually edit the above file so that "; \
+		echo " it calls $(sbindir)/vzifup-post"; \
+		echo " ***************************************************"; \
+		echo; \
+	fi
+
+
+install-suse:
+	$(MKDIR_P) "$(DESTDIR)/etc/sysconfig/network/if-up.d"
+	$(LN_S) "../../../..$(sbindir)/vzifup-post" \
+		"$(DESTDIR)/etc/sysconfig/network/if-up.d/"
+
+install-debian:
+	$(MKDIR_P) "$(DESTDIR)/etc/network/if-up.d"
+	$(LN_S) "../../..$(sbindir)/vzifup-post" \
+		"$(DESTDIR)/etc/network/if-up.d/"
+
+install-gentoo:
+	@echo
+	@echo "***************************************************"
+	@echo "Please add the following code to /etc/conf.d/net:"
+	@echo
+	@echo "postup() {"
+	@echo '	$(sbindir)/vzifup-post $${IFACE}'
+	@echo "}"
+	@echo "***************************************************"
+	@echo
+
+.PHONY: install-redhat install-suse install-debian install-gentoo

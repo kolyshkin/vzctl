@@ -1,0 +1,43 @@
+#!/bin/bash
+# Copyright (C) 2008-2009, Parallels, Inc. All rights reserved.
+#
+# Update ARP table for all containers on interface up
+
+[ ! -f /proc/vz/veinfo ] && exit 0
+
+test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
+test -f @PKGCONFDIR@/vz.conf || exit 1
+. @PKGLIBDIR@/scripts/vps-functions
+. @PKGCONFDIR@/vz.conf
+
+update_arp()
+{
+	local veip
+	for veip in $(awk '!/^Version/ { print $1 }' /proc/vz/veip); do
+		vzarp add ${veip}
+	done
+}
+
+usage()
+{
+	echo "Usage: vzarp-ifup DEVICE" 1>&2
+	exit 1
+}
+
+[ ! -f /proc/vz/veinfo ] && exit 0
+
+# Supplied interface name
+DEV=$1
+[ -z "${DEV}" ] && usage
+
+# Get possible interface names
+vzgetnetdev
+[-z "${NETDEVICES}" ] && exit 0
+
+# Check if a device name given is in the list returned by vzgetnetdev
+# Indeed we do not want to add arp entries for e.g. 'lo'
+echo "${NETDEVICES}" | grep -qw "${DEV}" || exit 0
+
+NETDEVICES="${DEV}"
+update_arp
+exit 0

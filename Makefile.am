@@ -51,8 +51,13 @@ DISTRO_TARGETS = \
 	install-suse \
 	install-debian
 
-$(DISTRO_TARGETS):
+DISTRO_TARGETS_ALL = \
+	$(DISTRO_TARGETS) \
+	install-redhat-from-spec
+
+$(DISTRO_TARGETS_ALL):
 	$(MAKE) $(AM_MAKEFLAGS) -C etc $@
+	$(MAKE) $(AM_MAKEFLAGS) -C bin $@
 
 install-data-hook:
 	@echo

@@ -34,6 +34,7 @@ EXTRA_DIST = $(pkgconf_DATA)
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
 
+install-redhat-from-spec: install-redhat
 install-redhat:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
 	$(MAKE) $(AM_MAKEFLAGS) -C network-scripts $@

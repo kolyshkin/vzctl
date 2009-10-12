@@ -64,7 +64,8 @@ make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT vpsconfdir=%{_vpsconfdir} install install-redhat
+make DESTDIR=$RPM_BUILD_ROOT vpsconfdir=%{_vpsconfdir} \
+	install install-redhat-from-spec
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 # This could go to vzctl-lib-devel, but since we don't have it...
@@ -106,6 +107,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/vzpid
 %attr(755,root,root) %{_sbindir}/vzcfgvalidate
 %attr(755,root,root) %{_sbindir}/vzmigrate
+%attr(755,root,root) %{_sbindir}/vzifup-post
 %attr(755,root,root) %{_scriptdir}/vpsreboot
 %attr(755,root,root) %{_scriptdir}/vpsnetclean
 %attr(644,root,root) %{_logrdir}/vzctl
@@ -127,6 +129,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzcpucheck.8.*
 #%attr(644, root, root) %{_mandir}/man8/vzcheckovr.8.*
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
+%attr(644, root, root) %{_mandir}/man8/vzifup-post.8.*
 %attr(644, root, root) %{_mandir}/man5/vps.conf.5.*
 %attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 %attr(644, root, root) %{_udevrulesdir}/*
@@ -162,6 +165,18 @@ if [ -f /etc/SuSE-release ]; then
 	for file in ${NET_CFG}; do
 		ln -sf /etc/sysconfig/network-scripts/${file} /etc/sysconfig/network/scripts/${file}
 	done
+fi
+# Install a symlink to vzifup-post
+if [ -f /etc/SuSE-release ]; then
+	ln -sf %{_sbindir}/vzifup-post /etc/sysconfig/network/if-up.d/
+else # RedHat/Fedora/CentOS case
+	if [ ! -e /sbin/ifup-local ]; then
+		ln -sf %{_sbindir}/vzifup-post /sbin/ifup-local
+	else
+		echo " WARNING: file /sbin/ifup-local is present!"
+		echo " You have to manually edit the above file so that"
+		echo " it calls %{_sbindir}/vzifup-post"
+	fi
 fi
 
 %preun
