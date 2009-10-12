@@ -37,7 +37,6 @@
 #include "script.h"
 
 static volatile sig_atomic_t alarm_flag, child_exited;
-static char *argv_bash[] = {"bash", NULL};
 static char *envp_bash[] = {"HOME=/", "TERM=linux",
 	"PATH=/bin:/sbin:/usr/bin:/usr/sbin", NULL};
 
@@ -145,13 +144,14 @@ int env_wait(int pid)
 }
 
 static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
-	int exec_mode, char *const argv[], char *const envp[], char *std_in,
+	int exec_mode, char *argv[], char *const envp[], char *std_in,
 	int timeout)
 {
 	int ret, pid;
 	int in[2], out[2], err[2], st[2];
 	int fl = 0;
 	struct sigaction act;
+	char *def_argv[] = { NULL, NULL };
 
 	if (pipe(in) < 0 ||
 		pipe(out) < 0 ||
@@ -217,10 +217,12 @@ static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
 		if (exec_mode == MODE_EXEC && argv != NULL) {
 			execvep(argv[0], argv, envp);
 		} else {
-			execve("/bin/bash", argv != NULL ? argv : argv_bash,
-					envp);
-			execve("/bin/sh", argv != NULL ? argv : argv_bash,
-					envp);
+			if (argv == NULL)
+				argv = def_argv;
+			argv[0] = "/bin/bash";
+			execve(argv[0], argv, envp);
+			argv[0] = "/bin/sh";
+			execve(argv[0], argv, envp);
 		}
 		ret = VZ_FS_BAD_TMPL;
 env_err:
@@ -325,7 +327,7 @@ err:
  * @return		0 on success.
  */
 int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
-	char *const argv[], char *const envp[], char *std_in, int timeout)
+	char *argv[], char *const envp[], char *std_in, int timeout)
 {
 	int pid, ret;
 
@@ -414,7 +416,7 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
  * @return		0 on success.
  */
 int vps_exec_script(vps_handler *h, envid_t veid, char *root,
-	char *const argv[], char *const envp[], const char *fname, char *func,
+	char *argv[], char *const envp[], const char *fname, char *func,
 	int timeout)
 {
 	int len, ret;
