@@ -286,7 +286,8 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			free(cmd_p->res.tmpl.ostmpl);
 		cmd_p->res.tmpl.ostmpl = strdup(tmpl->ostmpl);
 	}
-	vps_save_config(veid, dst, cmd_p, vps_p, action);
+	if ((ret = vps_save_config(veid, dst, cmd_p, vps_p, action)))
+		goto err_names;
 
 	if ((ret = run_pre_script(veid, USER_CREATE_SCRIPT)))
 	{

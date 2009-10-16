@@ -2296,7 +2296,7 @@ static int write_conf(char *fname, list_head_t *head)
 	char *tmpfile, *file;
 	conf_struct *conf;
 	FILE * fp;
-	int ret = 1;
+	int ret = VZ_CONFIG_SAVE_ERROR;
 	const char *suffix = ".tmp";
 	char *fmt;
 
@@ -2391,12 +2391,12 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 	if (action != NULL)
 		mod_save_config(action, &new_conf);
 	if ((ret = vps_merge_conf(&conf, &new_conf)) > 0)
-		write_conf(path, &conf);
+		ret = write_conf(path, &conf);
 	free_str_param(&conf);
 	free_str_param(&new_conf);
 	free_vps_param(tmp_old_p);
 
-	return 0;
+	return ret;
 }
 
 int vps_remove_cfg_param(envid_t veid, char *path, char *name)
@@ -2418,10 +2418,10 @@ int vps_remove_cfg_param(envid_t veid, char *path, char *name)
 		found++;
 	}
 	if (found)
-		write_conf(path, &conf);
+		ret = write_conf(path, &conf);
 	free_str_param(&conf);
 
-	return 0;
+	return ret;
 
 }
 

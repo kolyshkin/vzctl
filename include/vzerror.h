@@ -144,5 +144,7 @@
 #define VZ_VETH_ERROR			130
 #define VZ_SET_NAME_ERROR		131
 #define VZ_WAIT_FAILED			133
+
+#define VZ_CONFIG_SAVE_ERROR		139
 #endif /* _VZ_ERROR_H_ */
 
