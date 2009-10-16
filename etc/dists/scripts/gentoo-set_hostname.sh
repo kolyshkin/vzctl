@@ -25,11 +25,11 @@
 #   HOSTNM
 #       Sets host name for this CT. Modifies /etc/conf.d/hostname
 
-# Return true is we have openrc based CT and false if not.
-# Note: /etc/gentoo-release has nothing to do with openrc
-function is_openrc()
+# Return true if we have old baselayout-1.x based CT and false if not.
+# Note: /etc/gentoo-release has nothing to do with init system
+function is_baselayout1()
 {
-	[ -f /lib/librc.so ] 
+	[ -f /sbin/functions.sh ]
 }
 
 function set_hostname()
@@ -41,7 +41,7 @@ function set_hostname()
 
 	hostname=${hostname%%.*}
 
-	if is_openrc ; then
+	if ! is_baselayout1 ; then
 		if grep -qe "^HOSTNAME=" ${cfgfile} >/dev/null 2>&1; then
 			del_param ${cfgfile} "HOSTNAME"
 		fi

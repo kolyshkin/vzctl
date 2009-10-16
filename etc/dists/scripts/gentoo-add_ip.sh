@@ -34,11 +34,11 @@ SCRIPT=/etc/runlevels/default/net.${VENET_DEV}
 
 HOSTFILE=/etc/hosts
 
-# Return true if we have openrc based CT and false if not.
-# Note: /etc/gentoo-release has nothing to do with openrc
-function is_openrc()
+# Return true if we have old baselayout-1.x based CT and false if not.
+# Note: /etc/gentoo-release has nothing to do with init system
+function is_baselayout1()
 {
-	[ -f /lib/librc.so ]
+	[ -f /sbin/functions.sh ]
 }
 
 function comment_line_regex()
@@ -59,7 +59,7 @@ function set_config()
 		comment_line_regex "^config_eth"
 		comment_line_regex "^routes_eth"
 	fi
-	if is_openrc ; then
+	if ! is_baselayout1 ; then
 		put_param ${IFCFG} "config_${VENET_DEV}" ""
 		put_param ${IFCFG} "routes_${VENET_DEV}" "default"
 	else
@@ -102,7 +102,7 @@ function add_ip()
 
 	for ip in ${IP_ADDR}; do
 		if ! grep -qw "config_${VENET_DEV}=\(.*\"${ip}[\"\/].*\)" ${IFCFG}; then
-			if is_openrc ; then
+			if ! is_baselayout1 ; then
 				add_param "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
 			else
 				add_param3 "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
