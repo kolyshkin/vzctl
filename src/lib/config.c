@@ -15,6 +15,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -2290,43 +2293,56 @@ static int read_conf(char *fname, list_head_t *conf_h)
 
 static int write_conf(char *fname, list_head_t *head)
 {
-	char buf[STR_SIZE];
+	char *tmpfile, *file;
 	conf_struct *conf;
-	int fd = 2;
-	int len, ret;
+	FILE * fp;
+	int ret = 1;
+	const char *suffix = ".tmp";
+	char *fmt;
 
-	if (fname != NULL) {
-		snprintf(buf, sizeof(buf), "%s.tmp", fname);
-		if ((fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0644)) < 0) {
-			logger(-1, errno, "Unable to create configuration"
-				" file %s", buf);
+	file = canonicalize_file_name(fname);
+	if (file == NULL) {
+		if (errno != ENOENT)
+		{
+			logger(-1, errno, "Unable to resolve path %s", fname);
 			return 1;
 		}
+		file = strdup(fname);
+	}
+	tmpfile = malloc(strlen(file) + strlen(suffix) + 1);
+	sprintf(tmpfile, "%s%s", file, suffix);
+	if ((fp = fopen(tmpfile, "w")) == NULL) {
+		logger(-1, errno, "Unable to create configuration"
+			" file %s", tmpfile);
+		goto out;
 	}
 	list_for_each(conf, head, list) {
 		if (conf->val == NULL)
 			continue;
-		len = strlen(conf->val);
-		ret = write(fd, conf->val, len);
-		if (ret < 0) {
-			logger(-1, errno, "Unable to write %d bytes to %s",
-					len, buf);
-			unlink(buf);
-			close(fd);
-			return 1;
-		}
 		if (strchr(conf->val, '\n') == NULL)
-			write(fd, "\n", 1);
-	}
-	if (fname != NULL) {
-		close(fd);
-		if (rename(buf, fname)) {
-			logger(-1, errno, "Unable to move %s -> %s",
-				buf, fname);
-			return 1;
+			fmt="%s\n";
+		else
+			fmt="%s";
+		if (fprintf(fp, fmt, conf->val) < 0) {
+			logger(-1, errno, "Error writing to %s",
+					tmpfile);
+			fclose(fp);
+			goto out2;
 		}
 	}
-	return 0;
+	fclose(fp);
+	if (rename(tmpfile, file)) {
+		logger(-1, errno, "Unable to move %s -> %s",
+			tmpfile, file );
+		goto out2;
+	}
+	ret = 0;
+out2:
+	unlink(tmpfile);
+out:
+	free(tmpfile);
+	free(file);
+	return ret;
 }
 
 static int vps_merge_conf(list_head_t *dst, list_head_t *src)
