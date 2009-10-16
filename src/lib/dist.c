@@ -140,16 +140,19 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 			*ep = 0;
 		} while (ep > buf);
 		snprintf(file, len, "%s/%s", dir, DIST_CONF_DEF);
-		logger(-1, 0, "Warning: configuration file"
-			" for distribution %s not found default used",
-			dist_name);
+		logger(-1, 0, "Warning: configuration file "
+			"for distribution %s not found, ",
+			"using defaults from %s/%s",
+			dist_name, dir, DIST_CONF_DEF);
 	} else {
 		snprintf(file, len, "%s/%s", dir, DIST_CONF_DEF);
-		logger(-1, 0, "Warning: distribution not specified"
-			" default used %s", file);
+		logger(-1, 0, "Warning: distribution not specified "
+			"in CT config, "
+			"using defaults from %s/%s", dir, DIST_CONF_DEF);
 	}
 	if (!stat_file(file)) {
-		logger(-1, 0, "Distribution configuration not found %s", file);
+		logger(-1, 0, "Distribution configuration file "
+			       "%s/%s not found", dir, file);
 		return VZ_NO_DISTR_CONF;
 	}
 	return 0;
