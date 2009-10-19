@@ -126,14 +126,31 @@ check_old_cron_files()
 	done
 }
 
+if ! type is_ignored_file >/dev/null 2>&1; then
+	is_ignored_file() {
+		case "$1" in
+		    *~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave)
+			return 0
+			;;
+		esac
+		return 1
+	}
+fi
+
 setup_cron()
 {
+	local f ch
+
 	check_old_cron_files
 	[ -z "$SRC_CRONSCRIPT_DIR" ] && return
 	[ -d "$SRC_CRONSCRIPT_DIR" ] || return
 	[ -d "$DST_CRONSCRIPT_DIR" ] || return
-	cat $SRC_CRONSCRIPT_DIR/vz* > $DST_CRONSCRIPT_DIR/vz &&
-		chmod 644 $DST_CRONSCRIPT_DIR/vz
+	for f in $SRC_CRONSCRIPT_DIR/vz*; do
+		if ! is_ignored_file $f; then
+			cat $f > $DST_CRONSCRIPT_DIR/vz && ch=yes
+		fi
+	done
+	[ $ch = 'yes' ] && chmod 644 $DST_CRONSCRIPT_DIR/vz
 }
 
 remove_cron()
