@@ -143,7 +143,6 @@ static struct option set_opt[] = {
 {"force",	no_argument, NULL, PARAM_FORCE},
 {"applyconfig",	required_argument, NULL, PARAM_APPLYCONFIG},
 {"applyconfig_map",	required_argument, NULL, PARAM_APPLYCONFIG_MAP},
-{"config",	required_argument, NULL, PARAM_CONFIG},
 {"reset_ub",	no_argument, NULL, PARAM_RESET_UB},
 {"iptables",	required_argument, NULL, PARAM_IPTABLES},
 /*	UB	*/
