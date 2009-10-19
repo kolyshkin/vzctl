@@ -24,6 +24,9 @@ function set_hostname()
 	local hostname=$2
 
 	[ -z "${hostname}" ] && return 0
+
+	hostname=${hostname%%.*}
+
 	echo "${hostname}" > ${cfgfile}
 
 	hostname ${hostname}

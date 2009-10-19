@@ -25,6 +25,9 @@ function set_hostname()
 	local val=$3
 
 	[ -z "${val}" ] && return 0
+
+	val=${val%%.*}
+
 	put_param "${cfgfile}" "${var}" "${val}"
 
 	hostname "${val}"

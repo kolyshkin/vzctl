@@ -38,6 +38,9 @@ function set_hostname()
 	local hostname=$2
 
 	[ -z "${hostname}" ] && return 0
+
+	hostname=${hostname%%.*}
+
 	if is_openrc ; then
 		if grep -qe "^HOSTNAME=" ${cfgfile} >/dev/null 2>&1; then
 			del_param ${cfgfile} "HOSTNAME"
