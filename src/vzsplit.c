@@ -68,7 +68,7 @@
 #define PTY_PVE		512
 
 /* default diskspace values */
-#define HOST_DS		10737418240ULL /* 10 GB */
+#define HOST_DS		10485760ULL /* 10 GB */
 #define DEF_DS		225280
 #define HOST_DI		100000
 #define DEF_DI		88000
@@ -474,6 +474,8 @@ int check_disk_space() {
 	}
 
 	ds_total = statfs_buf.f_blocks;
+	/* convert to Kbytes */
+	ds_total *= (statfs_buf.f_bsize / 1024);
 	di_total = statfs_buf.f_files;
 
 	if (statfs_buf.f_type == REISERFS_SUPER_MAGIC) {
@@ -482,11 +484,11 @@ int check_disk_space() {
 		noinodes = 1;
 	}
 
-	if (ds_total / 2 < HOST_DS / statfs_buf.f_bsize) {
+	if (ds_total / 2 < HOST_DS) {
 		rec = 1;
 		ds_total /= 2;
 	} else
-		ds_total -= HOST_DS / statfs_buf.f_bsize;
+		ds_total -= HOST_DS;
 
 	if (noinodes != 1) {
 		if (di_total / 2 < HOST_DI) {
@@ -500,8 +502,8 @@ int check_disk_space() {
 				"of partition holding %s is 20Gb!\n",
 				ve_private);
 
-	ve_ds = ds_total / (DEF_DS * 1024 / statfs_buf.f_bsize);
-	ve_di = di_total / (DEF_DI);
+	ve_ds = ds_total / DEF_DS;
+	ve_di = di_total / DEF_DI;
 
 	if (ve_ds < num_ve) {
 		retval = 1;
