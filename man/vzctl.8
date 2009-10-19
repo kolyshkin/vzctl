@@ -383,8 +383,13 @@ Default is \fBprivvmpages:1\fR.
 \fBIptables control parameters\fR
 .TP
 \fB--iptables\fR \fIname\fR
-Restrict access to iptables modules inside a container (by default all iptables
-modules that are loaded in the host system are accessible inside a container).
+Allow to use the functionality of \fIname\fR iptables module inside
+the container. To specify multiple \fIname\fRs, repeat --iptables
+for each, or use space-separated list as an argument
+(enclosed in single or double quotes to protect spaces).
+
+The default list of enabled iptables modules is specified
+by the \fBIPTABLES\fR variable in \fBvz.conf\fR(5).
 
 You can use the following values for \fIname\fR:
 \fBiptable_filter\fR, \fBiptable_mangle\fR, \fBipt_limit\fR,
