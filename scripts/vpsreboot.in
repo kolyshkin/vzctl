@@ -59,8 +59,12 @@ lockfile()
 		return
 	fi
 	if kill -0 `cat $LOCKFILE 2>/dev/null` 2>/dev/null; then
+		# Process is still running
 		rm -f "$tmpfile"
 		exit
+	else
+		# Not running -- retry
+		rm -f $LOCKFILE
 	fi
 	if ln "$tmpfile" "$LOCKFILE" 2>/dev/null; then
 		rm -f "$tmpfile"
