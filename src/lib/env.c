@@ -58,7 +58,7 @@ static int set_personality(unsigned long mask)
 	unsigned long per;
 
 	per = personality(0xffffffff) | mask;
-	logger(3, 0, "Set personality %#10.8x", per);
+	logger(3, 0, "Set personality %#10.8lx", per);
 	if (personality(per) == -1) {
 		logger(2, errno, "Unable to set personality PER_LINUX32");
 		return  -1;
@@ -311,7 +311,8 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	res = (vps_res *) data;
 	memset(&create_param, 0, sizeof(create_param));
 	create_param.iptables_mask = get_ipt_mask(res->env.ipt_mask);
-	logger(3, 0, "Set iptables mask %#10.8x", create_param.iptables_mask);
+	logger(3, 0, "Set iptables mask %#10.8llx",
+			(unsigned long long) create_param.iptables_mask);
 	if (res->cpu.vcpus != NULL)
 		create_param.total_vcpus = *res->cpu.vcpus;
 	env_create_data.veid = veid;
@@ -523,7 +524,7 @@ static void fix_numiptent(ub_param *ub)
 		return;
 	min_ipt = min_ul(ub->numiptent[0], ub->numiptent[1]);
 	if (min_ipt < MIN_NUMIPTENT) {
-		logger(-1, 0, "Warning: NUMIPTENT %d:%d is less"
+		logger(-1, 0, "Warning: NUMIPTENT %lu:%lu is less"
 			" than minimally allowable value, set to %d:%d",
 			ub->numiptent[0], ub->numiptent[1],
 			MIN_NUMIPTENT, MIN_NUMIPTENT);
