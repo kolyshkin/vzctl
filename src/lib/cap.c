@@ -114,7 +114,7 @@ static inline int capset(cap_user_header_t header, cap_user_data_t data)
  */
 int get_cap_mask(char *name, unsigned long *mask)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(cap_names) / sizeof(*cap_names); i++) {
 		if (!strcasecmp(name, cap_names[i])) {
@@ -134,7 +134,8 @@ int get_cap_mask(char *name, unsigned long *mask)
  */
 void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
 {
-	int i, r;
+	unsigned int i;
+	int r;
 	char *sp, *ep;
 
 	sp = buf;
