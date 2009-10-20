@@ -1092,7 +1092,8 @@ char *remove_sp(char *str)
 char *invert_ip(char *ips)
 {
 	char *tmp, *p, *ep, *tp;
-	int len, rc;
+	size_t len;
+	int rc;
 	unsigned int ip[4];
 	int family;
 	char ip_str[64];
@@ -1468,7 +1469,7 @@ int get_ve_list()
 
 int search_field(char *name)
 {
-	int i;
+	unsigned int i;
 
 	if (name == NULL)
 		return -1;
@@ -1484,7 +1485,8 @@ int build_field_order(char *fields)
 	struct Cfield_order *tmp, *prev = NULL;
 	char *sp, *ep, *p;
 	char name[32];
-	int order, nm_len;
+	int order;
+	size_t nm_len;
 
 	sp = fields;
 	if (fields == NULL)
@@ -1565,7 +1567,7 @@ int collect()
 
 void print_names()
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(field_names) / sizeof(*field_names); i++)
 		printf("%-15s %-15s\n", field_names[i].name,
