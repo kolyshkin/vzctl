@@ -141,7 +141,7 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 		} while (ep > buf);
 		snprintf(file, len, "%s/%s", dir, DIST_CONF_DEF);
 		logger(-1, 0, "Warning: configuration file "
-			"for distribution %s not found, ",
+			"for distribution %s not found, "
 			"using defaults from %s/%s",
 			dist_name, dir, DIST_CONF_DEF);
 	} else {
