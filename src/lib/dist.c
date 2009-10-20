@@ -41,7 +41,7 @@ static struct distr_conf {
 
 static int get_action_id(char *name)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(action2id) / sizeof(*action2id); i++)
 		if (!strcmp(name, action2id[i].name))
