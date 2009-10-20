@@ -145,7 +145,7 @@ int get_ub_resid(char *name)
 	return -1;
 }
 
-const char *get_ub_name(int res_id)
+const char *get_ub_name(unsigned int res_id)
 {
 	int i;
 
@@ -357,7 +357,8 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 	char str[STR_SIZE];
 	char name[64];
 	const char *fmt = NULL; /* make gcc happy */
-	int ret, found, id;
+	int ret, found;
+	envid_t id;
 	unsigned long held, maxheld, barrier, limit;
 	ub_res res;
 
