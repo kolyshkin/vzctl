@@ -48,7 +48,7 @@ static struct vps_state{
 
 const char *state2str(int state)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(vps_states) / sizeof(*vps_states); i++)
 		if (vps_states[i].id == state)
