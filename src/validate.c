@@ -45,7 +45,7 @@ static struct {
 
 int action2id(char *mode)
 {
-	int i;
+	unsigned int i;
 
 	if (mode == NULL)
 		return ACT_NONE;
