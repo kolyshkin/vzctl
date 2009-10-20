@@ -78,7 +78,8 @@ int vps_destroy_dir(envid_t veid, char *dir)
 static char *get_destroy_root(char *dir)
 {
 	struct stat st;
-	int id, len;
+	dev_t id;
+	int len;
 	char *p, *prev;
 	char tmp[STR_SIZE];
 
