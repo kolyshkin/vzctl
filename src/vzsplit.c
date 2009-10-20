@@ -673,7 +673,7 @@ int main(int argc, char **argv)
 	if ((pagesize = sysconf(_SC_PAGE_SIZE)) == -1)
 		pagesize = 4096;
 
-	if (low_total > 2 << 30) {
+	if (low_total > 2U << 30) {
 		if (proc_calc > 2 * MAX_TOTAL_PIDS)
 			proc_calc = 2 * MAX_TOTAL_PIDS;
 	} else if (proc_calc > MAX_TOTAL_PIDS)
