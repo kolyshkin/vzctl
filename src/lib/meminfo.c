@@ -110,7 +110,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 
 int get_meminfo_mode(char *name)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(mode_tbl_) / sizeof(mode_tbl_[0]); i++)
 		if (!strcmp(mode_tbl_[i].mode_nm, name))
@@ -121,7 +121,7 @@ int get_meminfo_mode(char *name)
 
 const char *get_meminfo_mode_nm(int id)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(mode_tbl_) / sizeof(mode_tbl_[0]); i++)
 		if (mode_tbl_[i].mode_id == id)
