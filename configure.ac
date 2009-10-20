@@ -72,7 +72,7 @@ AC_C_INLINE
 # Checks for library functions.
 
 # Compiler settings
-CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline"
+CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline -Wextra"
 CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
 CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
 
