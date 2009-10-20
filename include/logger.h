@@ -41,7 +41,8 @@ typedef struct {
  * @param err_num		errno
  * @param format		fprintf format.
  */
-void logger(int log_level, int err_num, const char *format, ...);
+void logger(int log_level, int err_num, const char *format, ...)
+	__attribute__ ((__format__ (__printf__, 3, 4)));
 
 /** Change/set log file.
  *
