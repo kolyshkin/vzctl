@@ -311,7 +311,8 @@ char *subst_VEID(envid_t veid, char *src)
 	char *srcp;
 	char str[STR_SIZE];
 	char *sp, *se;
-	int r, len, veidlen;
+	int r;
+	unsigned int len, veidlen;
 
 	if (src == NULL)
 		return NULL;
@@ -361,14 +362,14 @@ int get_pagesize()
 
 int get_mem(unsigned long long *mem)
 {
-	long pagesize;
-	if ((*mem = sysconf(_SC_PHYS_PAGES)) == -1) {
+	long pages, pagesize;
+	if ((pages = sysconf(_SC_PHYS_PAGES)) == -1) {
 		logger(-1, errno, "Unable to get total phys pages");
 		return -1;
 	}
 	if ((pagesize = get_pagesize()) < 0)
 		return -1;
-	*mem *= pagesize;
+	*mem = pages * pagesize;
 	return 0;
 }
 
@@ -522,7 +523,8 @@ int set_not_blk(int fd)
 */
 void close_fds(int close_std, ...)
 {
-	int fd, max, i;
+	int fd, max;
+	unsigned int i;
 	va_list ap;
 	int skip_fds[255];
 
@@ -595,7 +597,8 @@ void remove_names(envid_t veid)
 	struct dirent *ep;
 	DIR *dp;
 	char *p;
-	int id;
+	int r;
+	envid_t id;
 
 	if (!(dp = opendir(VENAME_DIR)))
 		return;
@@ -605,10 +608,10 @@ void remove_names(envid_t veid)
 			continue;
 		if (!S_ISLNK(st.st_mode))
 			continue;
-		id = readlink(buf, content, sizeof(content) - 1);
-		if (id < 0)
+		r = readlink(buf, content, sizeof(content) - 1);
+		if (r < 0)
 			continue;
-		content[id] = 0;
+		content[r] = 0;
 		if ((p = strrchr(content, '/')) != NULL)
 			p++;
 		if (sscanf(p, "%d.conf", &id) == 1 && veid == id)
