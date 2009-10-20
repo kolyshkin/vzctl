@@ -427,7 +427,7 @@ int read_proc_veth(envid_t veid, veth_param *veth)
 	char mac_ve[MAC_SIZE + 1];
 	char dev_name[IFNAMSIZE + 1];
 	char dev_name_ve[IFNAMSIZE + 1];
-	int id;
+	envid_t id;
 	veth_dev dev;
 
 	fp = fopen(PROC_VETH, "r");
