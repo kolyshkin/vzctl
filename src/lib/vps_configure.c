@@ -228,7 +228,7 @@ int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	}
 	envp[i++] = strdup(ENV_PATH);
 	envp[i] = NULL;
-	logger(0, 0, "Setting quota ugidlimit: %d", *dq->ugidlimit);
+	logger(0, 0, "Setting quota ugidlimit: %ld", *dq->ugidlimit);
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
 	free_arg(envp);
