@@ -122,20 +122,22 @@ vz_get_neighbour_devs()
 		return 0
 	fi
 
-	local route dev netdev
+	local route devs dev netdev
 
 	route="$(${IP_CMD} route get "$1" |grep ' dev .* src ')"
 	# match: $1 ... dev $dev ...
-	dev="$(echo "$route" |sed -ne '/ via /! s/^.* dev \+\([^ ]\+\) .*$/\1/p;Q')"
-	[ -n "$dev" ] ||
+	devs="$(echo "$route" |sed -ne '/ via /! s/^.* dev \+\([^ ]\+\) .*$/\1/p;Q')"
+	[ -n "$devs" ] ||
 	# match: $1 ... via $1 ... dev $dev ...
-	dev="$(echo "$route" |sed -ne 's/^\([^ ]\+\) \(.* \)\?via \+\1 \(.* \)\?dev \+\([^ ]\+\) .*$/\4/p;Q')"
-	[ -n "$dev" ] || return 0
+	devs="$(echo "$route" |sed -ne 's/^\([^ ]\+\) \(.* \)\?via \+\1 \(.* \)\?dev \+\([^ ]\+\) .*$/\4/p;Q')"
+	[ -n "$devs" ] || return 0
 
 	for netdev in $NETDEVICES; do
-		if [ "$dev" = "$netdev" ]; then
-			echo "$dev"
-		fi
+		for dev in $devs; do
+			if [ "$dev" = "$netdev" ]; then
+				echo "$dev"
+			fi
+		done
 	done
 }
 
