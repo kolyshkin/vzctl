@@ -700,7 +700,7 @@ if (ub->res != NULL) {							\
 
 static int parse_cap(char *str, cap_param *cap)
 {
-	int len;
+	unsigned int len;
 	char *p, *token;
 	char cap_nm[128];
 	unsigned long *mask;
@@ -1118,7 +1118,7 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 static int parse_devnodes_str(const char *str, dev_res *dev)
 {
 	char *ch;
-	int len;
+	unsigned int len;
 	char buf[64];
 	struct stat st;
 
@@ -1478,7 +1478,8 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 {
 	const char *p, *next, *ep;
-	int len, err;
+	unsigned int len;
+	int err;
 	char tmp[256];
 
 	memset(dev, 0, sizeof(*dev));
@@ -2346,7 +2347,8 @@ out:
 
 static int vps_merge_conf(list_head_t *dst, list_head_t *src)
 {
-	int len, cnt = 0;
+	unsigned int len;
+	int cnt = 0;
 	conf_struct *conf, *line;
 	char ltoken[STR_SIZE];
 	char *p;
