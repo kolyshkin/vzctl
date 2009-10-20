@@ -614,7 +614,7 @@ out:
 int read_ip_addr(struct in_addr* in_addr, const char* str)
 {
 	in_addr->s_addr=inet_addr(str);
-	if(in_addr->s_addr == -1)
+	if(in_addr->s_addr == INADDR_NONE)
 		return -1;
 	return 0;
 }
