@@ -150,6 +150,12 @@ vzarp()
 
 	for dev in $(vz_get_neighbour_devs "$2"); do
 		${IP_CMD} neigh "$1" proxy "$2" dev "$dev" >/dev/null 2>&1
+
+		# Send ARP request to update neighbour ARP caches
+		if [ "$1" = "add" ]; then
+			${ARPSEND_CMD} -U -i "$2" -e "$2" "$dev" ||
+				vzwarning "$ARPSEND_CMD -U -i $2 -e $2 $dev FAILED"
+		fi
 	done
 }
 
@@ -165,21 +171,6 @@ vzarpipdetect()
 		for dev in $(vz_get_neighbour_devs "$ip"); do
 			${ARPSEND_CMD} -D -e "$ip" "$dev" ||
 				vzwarning "$ARPSEND_CMD -D -e $ip $dev FAILED"
-		done
-	done
-}
-
-# Send ARP request to update neighbour ARP caches
-vzarpipset()
-{
-	[ -n "$1" ] || return
-
-	local dev ip
-
-	for ip in $1; do
-		for dev in $(vz_get_neighbour_devs "$ip"); do
-			${ARPSEND_CMD} -U -i "$ip" -e "$ip" "$dev" ||
-				vzwarning "$ARPSEND_CMD -U -i $ip -e $ip $dev FAILED"
 		done
 	done
 }

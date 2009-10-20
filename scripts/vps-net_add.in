@@ -41,7 +41,6 @@ for IP in $IP_ADDR; do
 	vzarp add "$IP"
 	vzaddrouting "$IP"
 done
-vzarpipset "$IP_ADDR"
 # Save ip address information
 mkdir -p "$VE_STATE_DIR" >/dev/null 2>&1
 if [ "$VE_STATE" = 'starting' ]; then
