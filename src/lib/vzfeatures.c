@@ -28,7 +28,7 @@ static struct feature_s features[] = {
 	{ "sit",	0,	VE_FEATURE_SIT},
 	{ "ipip",	0,	VE_FEATURE_IPIP},
 	{ "ppp",	0,	VE_FEATURE_PPP},
-	{ NULL}
+	{ NULL,		0,	0 }
 };
 
 struct feature_s *find_feature(const char *name)

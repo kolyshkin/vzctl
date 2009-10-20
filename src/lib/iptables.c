@@ -54,7 +54,7 @@ static struct iptables_s iptables[] = {
 #endif
 #endif /* VZCTL_ENV_CREATE_DATA */
 	{"ipt_owner", VE_IP_MATCH_OWNER_MOD, VE_IP_MATCH_OWNER},
-	{NULL, 0}
+	{NULL, 0, 0}
 };
 
 struct iptables_s *find_ipt(const char *name)
