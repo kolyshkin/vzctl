@@ -354,8 +354,8 @@ int get_pagesize()
 	long pagesize;
 
 	if ((pagesize = sysconf(_SC_PAGESIZE)) == -1) {
-		fprintf(stderr, "Unable to get page size");
-		return -11;
+		logger(-1, errno, "Unable to get page size");
+		return -1;
 	}
 	return pagesize;
 }
