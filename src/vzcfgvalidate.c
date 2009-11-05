@@ -25,6 +25,9 @@
 #include "config.h"
 #include "validate.h"
 #include "logger.h"
+#include "util.h"
+
+extern int page_size;
 
 void usage(int rc)
 {
@@ -60,6 +63,9 @@ int main(int argc, char **argv)
 	if (optind >= argc)
 		usage(1);
 	init_log(NULL, 0, 1, 0, 0, NULL);
+
+	if ((page_size = get_pagesize()) < 0)
+		return 1;
 
 	/* Read global config */
 	gparam=init_vps_param();

@@ -29,6 +29,8 @@
 #include "util.h"
 #include "logger.h"
 
+extern int page_size;
+
 void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout, "Usage: vzmemcheck [-v] [-A]\n");
@@ -202,7 +204,9 @@ int main(int argc, char **argv)
 		}
 	}
 	init_log(NULL, 0, 0, 0, 0, NULL);
-	get_pagesize();
+	page_size = get_pagesize();
+	if (page_size < 0)
+		return 1;
 	ret = calculate(numerator, verbose);
 	exit(ret);
 }

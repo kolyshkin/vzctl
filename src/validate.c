@@ -31,7 +31,7 @@
 #include "logger.h"
 #include "util.h"
 
-static int page_size = 4096;
+int page_size = -1;
 
 static struct {
 	char *name;
