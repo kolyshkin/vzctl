@@ -81,7 +81,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 	if (!stat_file(tarball))
 		snprintf(tarball, sizeof(tarball), "%s/%s.tar.gz", fs->tmpl, tar_nm);
 	if (!stat_file(tarball)) {
-		logger(-1, 0, "Cached os template %s not found", tarball);
+		logger(-1, 0, "Cached OS template %s not found", tarball);
 		return VZ_PKGSET_NOT_FOUND;
 	}
 	/* Lock CT area */
