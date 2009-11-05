@@ -2427,14 +2427,14 @@ int vps_remove_cfg_param(envid_t veid, char *path, char *name)
 }
 
 /********************************************************************/
-int vps_parse_opt(envid_t veid, vps_param *param, int opt, char *rval,
-	struct mod_action *action)
+int vps_parse_opt(envid_t veid, struct option *opts, vps_param *param,
+	int opt, char *rval, struct mod_action *action)
 {
 	int id, ret = 0;
 
 	if (param == NULL)
 		return -1;
-	if ((id = opt_get_by_id(set_opt, opt)) != -1) {
+	if ((id = opt_get_by_id(opts, opt)) != -1) {
 		ret = parse(veid, param, rval, id);
 	} else if (action != NULL) {
 		ret = mod_parse(veid, action, NULL, opt, rval);

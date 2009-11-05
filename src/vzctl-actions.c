@@ -55,7 +55,7 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 			break;
 		if (c == '?')
 			return VZ_INVALID_PARAMETER_VALUE;
-		ret = vps_parse_opt(veid, param, c, optarg, &g_action);
+		ret = vps_parse_opt(veid, opt, param, c, optarg, &g_action);
 		if (!ret)
 			continue;
 		else if (ret == ERR_INVAL || ret == ERR_INVAL_SKIP ||
