@@ -289,9 +289,11 @@ Setting the barrier and
 the limit to different values does not make practical sense.
 .TP
 \fB--numfile\fR \fIitems\fR[:\fIitems\fR]
-Maximum number of open files.
-Setting the barrier and
-the limit to different values does not make practical sense.
+Maximum number of open files. In most cases the barrier and the limit
+should be set to the same value. Setting the barrier to \fB0\fR effectively
+disables pre-charging optimization for this beancounter in the kernel,
+which leads to the held value being precise but could slightly degrade
+file open performance.
 .TP
 \fB--numflock\fR \fIitems\fR[:\fIitems\fR]
 Maximum number of file locks. Safety gap should be between barrier and limit.
