@@ -90,16 +90,17 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 	return 0;
 }
 
-static int parse_start_opt(int argc, char **argv, vps_param *param)
+static int parse_startstop_opt(int argc, char **argv, vps_param *param,
+		int start, int stop)
 {
 	int c, ret = 0;
 	struct option start_options[] = {
-	{"force", no_argument, NULL, PARAM_FORCE},
-	{"skip_ve_setup", no_argument, NULL, PARAM_SKIP_VE_SETUP},
-	{"wait", no_argument, NULL, PARAM_WAIT},
-
-	{ NULL, 0, NULL, 0 }
-};
+		{"force", no_argument, NULL, PARAM_FORCE},
+		{"skip_ve_setup", no_argument, NULL, PARAM_SKIP_VE_SETUP},
+		{"wait", no_argument, NULL, PARAM_WAIT},
+		{"fast", no_argument, NULL, PARAM_FAST},
+		{ NULL, 0, NULL, 0 }
+	};
 
 	while (1) {
 		c = getopt_long (argc, argv, "", start_options, NULL);
@@ -107,13 +108,28 @@ static int parse_start_opt(int argc, char **argv, vps_param *param)
 			break;
 		switch (c) {
 		case PARAM_FORCE:
-			param->opt.start_force = YES;
+			if (start)
+				param->opt.start_force = YES;
+			else
+				ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
 		case PARAM_SKIP_VE_SETUP:
-			param->opt.skip_setup = YES;
+			if (start)
+				param->opt.skip_setup = YES;
+			else
+				ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
 		case PARAM_WAIT:
-			param->res.misc.wait = YES;
+			if (start)
+				param->res.misc.wait = YES;
+			else
+				ret = VZ_INVALID_PARAMETER_SYNTAX;
+			break;
+		case PARAM_FAST:
+			if (stop)
+				param->opt.fast_kill = YES;
+			else
+				ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
 		default:
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
@@ -144,30 +160,6 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	return ret;
 }
 
-static int parse_stop_opt(int argc, char **argv, vps_opt *opt)
-{
-	int c, ret = 0;
-	struct option stop_options[] = {
-	{"fast",	no_argument, NULL, PARAM_FAST},
-	{ NULL, 0, NULL, 0 }
-};
-
-	while (1) {
-		c = getopt_long (argc, argv, "", stop_options, NULL);
-		if (c == -1)
-			break;
-		switch (c) {
-		case PARAM_FAST:
-			opt->fast_kill = YES;
-			break;
-		default		:
-			ret = VZ_INVALID_PARAMETER_SYNTAX;
-			break;
-		}
-	}
-	return ret;
-}
-
 static int stop(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
 {
 	int ret;
@@ -185,7 +177,17 @@ static int stop(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
 static int restart(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
-	return vps_restart(h, veid, g_p);
+	int ret;
+
+	logger(0, 0, "Restarting container");
+
+	if (vps_is_run(h, veid)) {
+		ret = stop(h, veid, g_p, cmd_p);
+		if (ret != 0)
+			return ret;
+	}
+
+	return start(h, veid, g_p, cmd_p);
 }
 
 static int parse_create_opt(envid_t veid, int argc, char **argv,
@@ -610,7 +612,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 				goto err;
 			} else {
 				merge_vps_param(g_p, cmd_p);
-				ret = vps_restart(h, veid, g_p);
+				ret = restart(h, veid, g_p, cmd_p);
 				goto err;
 			}
 		}
@@ -758,11 +760,14 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 	case ACTION_CREATE:
 		ret = parse_create_opt(veid, argc, argv, param);
 		break;
-	case ACTION_STOP:
-		ret = parse_stop_opt(argc, argv, &param->opt);
-		break;
 	case ACTION_START:
-		ret = parse_start_opt(argc, argv, param);
+		ret = parse_startstop_opt(argc, argv, param, 1, 0);
+		break;
+	case ACTION_STOP:
+		ret = parse_startstop_opt(argc, argv, param, 0, 1);
+		break;
+	case ACTION_RESTART:
+		ret = parse_startstop_opt(argc, argv, param, 1, 1);
 		break;
 	case ACTION_DESTROY:
 		break;

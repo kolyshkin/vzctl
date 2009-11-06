@@ -828,30 +828,3 @@ end:
 	free_str_param(&param->del_res.net.ip);
 	return ret;
 }
-
-/** Restart CT.
- *
- * @param h		CT handler.
- * @param veid		CT ID.
- * @param param		CT parameters.
- * @return		0 on success.
- */
-int vps_restart(vps_handler *h, envid_t veid, vps_param *param)
-{
-	int ret;
-
-	logger(0, 0, "Restarting container");
-	if (vps_is_run(h, veid) &&
-		(ret = vps_stop(h, veid, param, M_REBOOT, SKIP_NONE, NULL)))
-	{
-		return ret;
-	}
-	if (param->opt.start_disabled == YES)
-	{
-		logger(-1, 0, "Container start disabled in config");
-		return VZ_VE_START_DISABLED;
-	}
-	ret = vps_start(h, veid, param, SKIP_NONE, NULL);
-
-	return ret;
-}

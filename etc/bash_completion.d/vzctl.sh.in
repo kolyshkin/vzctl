@@ -62,6 +62,9 @@ _vzctl()
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--noatime --capability --devnodes --devices --applyconfig \
 		--name --ioprio --setmode --meminfo"
+	vzctl_start_opts="--wait --force"
+	vzctl_stop_opts="--fast"
+	vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 
 	iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
@@ -226,8 +229,14 @@ _vzctl()
 					chkpnt|restore)
 						COMPREPLY=( $( compgen -W "--dumpfile" -- $cur ) )
 						;;
+					start)
+						COMPREPLY=( $( compgen -W "$vzctl_start_opts" -- $cur ) )
+						;;
 					stop)
-						COMPREPLY=( $( compgen -W "--fast" -- $cur ) )
+						COMPREPLY=( $( compgen -W "$vzctl_stop_opts" -- $cur ) )
+						;;
+					restart)
+						COMPREPLY=( $( compgen -W "$vzctl_restart_opts" -- $cur ) )
 						;;
 					*)
 						;;
