@@ -564,8 +564,11 @@ wait till the default runlevel is reached will be made by vzctl.
 
 Specify \fB--force\fR if you want to start a container which is disabled
 (see \fB--disabled\fR).
-.IP \fBstop\fR 4
-Stops and unmounts a container.
+.IP "\fBstop\fR [\fB--fast\fR]" 4
+Stops and unmounts a container. Normally, \fBhalt\fR(8) is executed
+inside a container; option \fB--fast\fR makes \fBvzctl\fR use
+\fBreboot\fR(2) syscall instead which is faster but can lead to
+unclean container shutdown.
 .IP \fBrestart\fR 4
 Restarts a container, i.e. stops it if it is running, and starts again.
 .IP \fBstatus\fR 4
