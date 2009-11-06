@@ -879,6 +879,10 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 			ret = set(h, veid, g_p, vps_p, cmd_p);
 		if (cmd_p->opt.save == YES) {
 			get_vps_conf_path(veid, fname, sizeof(fname));
+			/* Warn if config does not exist */
+			if (!stat_file(fname))
+				logger(-1, errno, "WARNING: %s not found",
+					fname);
 			ret = vps_save_config(veid, fname,
 					cmd_p, vps_p, &g_action);
 			if (ret == 0)
