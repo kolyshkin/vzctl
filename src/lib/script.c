@@ -292,6 +292,22 @@ int mk_quota_link()
 	"start on stopped rc5\n"				\
 	"exec touch " VZFIFO_FILE "\n"
 
+/* Ubuntu 9.10 needs different machinery */
+#define EVENTS_DIR_UBUNTU	"/etc/init/"
+#define EVENTS_FILE_UBUNTU	EVENTS_DIR_UBUNTU "vz_init_done.conf"
+#define EVENTS_SCRIPT_UBUNTU	\
+	"# tell vzctl that start was successfull\n"			\
+	"#\n"								\
+	"# This task is to tell vzctl that start was successfull\n"	\
+	"\n"								\
+	"description	\"tell vzctl that start was successfull\"\n"	\
+	"\n"								\
+	"start on runlevel [2345]\n"					\
+	"\n"								\
+	"task\n"							\
+	"\n"								\
+	"exec touch " VZFIFO_FILE "\n"
+
 #define MAX_WAIT_TIMEOUT	60 * 60
 
 int add_reach_runlevel_mark()
@@ -315,6 +331,18 @@ int add_reach_runlevel_mark()
 			return -1;
 		}
 		write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
+		close(fd);
+		return 0;
+	} else if (!stat(EVENTS_DIR_UBUNTU, &st)) {
+		fd = open(EVENTS_FILE_UBUNTU, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+		if (fd == -1) {
+			fprintf(stderr, "Unable to create "
+				EVENTS_FILE_UBUNTU ": %s\n",
+				strerror(errno));
+			return -1;
+		}
+		write(fd, EVENTS_SCRIPT_UBUNTU,
+			sizeof(EVENTS_SCRIPT_UBUNTU) - 1);
 		close(fd);
 		return 0;
 	}
