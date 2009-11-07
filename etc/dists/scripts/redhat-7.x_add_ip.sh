@@ -141,6 +141,7 @@ function add_ip()
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		# Remove all VENET config files
 		rm -f ${IFCFG} ${IFCFG}:* >/dev/null 2>&1
+		[ -z "${IP_ADDR}" ] && return 0
 	fi
 	if [ ! -f "${IFCFG}" ]; then
 		setup_network
@@ -167,6 +168,8 @@ function add_ip()
 	move_configs
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		if [ -n "${if_restart}" ]; then
+			ifup ${VENET_DEV}
+		elif ! ifconfig ${VENET_DEV} | grep -q RUNNING 2>/dev/null; then
 			ifup ${VENET_DEV}
 		else
 			# synchronyze config files & interfaces
