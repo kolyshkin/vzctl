@@ -209,6 +209,8 @@ function add_ip()
 		# synchronyze config files & interfaces
 		if [ "${NETWORKRESTART}" = "yes" ]; then
 			/etc/init.d/network restart
+		elif ! ifconfig ${VENET_DEV}|grep -q RUNNING 2>/dev/null; then
+			/etc/init.d/network restart
 		elif [ -n "${if_restart}" ]; then
 			ifup ${VENET_DEV}
 		else
