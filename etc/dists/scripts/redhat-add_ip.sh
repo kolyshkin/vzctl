@@ -174,6 +174,11 @@ function add_ip()
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		# Remove all VENET config files
 		rm -f ${IFCFG} ${IFCFG}:* >/dev/null 2>&1
+		if [ -z "${IP_ADDR}" ]; then
+			# Just enable networking
+			put_param $NETFILE NETWORKING yes
+			return 0
+		fi
 	fi
 	if [ ! -f "${IFCFG}" ]; then
 		setup_network
