@@ -39,11 +39,26 @@ function setup_network()
 	if [ -f ${CFGFILE}.template ]; then
 		cat ${CFGFILE}.template >> ${CFGFILE}
 	fi
-	echo -e "
-# Auto generated interfaces
+	# Set up loopback
+	if ! grep -qw lo ${CFGFILE}; then
+		echo -e "# Auto generated ${LOOPBACK} interface
 auto ${LOOPBACK}
-iface ${LOOPBACK} inet loopback
+iface ${LOOPBACK} inet loopback" >> ${CFGFILE}
+	fi
 
+	# Set up /etc/hosts
+	if [ ! -f $HOSTFILE ]; then
+		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
+
+		if [ "${IPV6}" = "yes" ]; then
+			echo "::1 localhost.localdomain localhost" >> $HOSTFILE
+		fi
+fi
+
+	[ -z "${IP_ADDR}" ] && return
+	# Set up venet0
+	echo -e "
+# Auto generated ${VENET_DEV} interface
 auto ${VENET_DEV}
 iface ${VENET_DEV} inet static
 	address 127.0.0.1
@@ -65,14 +80,6 @@ iface venet0 inet6 static
 		cat ${CFGFILE}.tail >> ${CFGFILE}
 	fi
 
-	# Set up /etc/hosts
-	if [ ! -f $HOSTFILE ]; then
-		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
-
-		if [ "${IPV6}" = "yes" ]; then
-			echo "::1 localhost.localdomain localhost" >> $HOSTFILE
-		fi
-	fi
 }
 
 function create_config()
@@ -120,9 +127,9 @@ function add_ip()
 	local iface
 
 	if [ "x${VE_STATE}" = "xstarting" ]; then
-		rm -f "${CFGFILE}" 2>/dev/null
-	fi
-	if ! grep -q -E "^auto ${VENET_DEV}([^:]|$)" ${CFGFILE} 2>/dev/null; then
+		remove_debian_interface "${VENET_DEV}:[0-9]*" ${CFGFILE}
+		setup_network
+	elif ! grep -q -E "^auto ${VENET_DEV}([^:]|$)" ${CFGFILE} 2>/dev/null; then
 		setup_network
 	fi
 	if [ "${IPDELALL}" = "yes" ]; then
