@@ -308,11 +308,15 @@ int add_reach_runlevel_mark()
 	}
 	/* Create upstart specific script */
 	if (!stat(EVENTS_DIR, &st)) {
-		if ((fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644))) {
-			write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
-			close(fd);
-			return 0;
+		fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+		if (fd == -1) {
+			fprintf(stderr, "Unable to create " EVENTS_FILE
+				": %s\n", strerror(errno));
+			return -1;
 		}
+		write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
+		close(fd);
+		return 0;
 	}
 	/* Add a line to /etc/inittab */
 	if ((fd = open(INITTAB_FILE, O_RDWR | O_APPEND)) == -1) {
