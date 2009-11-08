@@ -371,7 +371,8 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 {
 	int ret = 0;
 
-	if (list_empty(&net->ip) && !net->delall)
+	if (list_empty(&net->ip) && !net->delall &&
+			!(state == STATE_STARTING && op == ADD))
 		return 0;
 	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to apply network parameters: "
