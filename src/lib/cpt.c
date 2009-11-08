@@ -281,6 +281,8 @@ err:
 	if (ret) {
 		ret = VZ_CHKPNT_ERROR;
 		logger(-1, 0, "Checkpointing failed");
+		if (cmd == CMD_CHKPNT || cmd == CMD_DUMP)
+			unlink(param->dumpfile ? : dumpfile);
 	}
 	if (dump_fd != -1)
 		close(dump_fd);
