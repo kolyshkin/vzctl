@@ -58,6 +58,10 @@ which interfaces to use to query/announce ARP. If this is set to \fBdetect\fR,
 the right network interface (the one which is in the same subnet as a CT IP)
 will be chosen automatically. Any other value restores old (as of vzctl 3.0.19
 or older) behavior, when all the possible interfaces were used.
+.IP \fBERROR_ON_ARPFAIL\fR=\fByes\fR|\fBno\fR
+In case the value of this parameter is set to \fByes\fR, vzctl will fail to
+start a container if there is another host with the same IP in the subnet.
+The value of \fBno\fR makes vzctl to only print the warning.
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
 Value of this parameter is a directory in which all container template data are
 stored.

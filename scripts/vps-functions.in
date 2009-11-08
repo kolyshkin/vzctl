@@ -166,13 +166,15 @@ vzarpipdetect()
 {
 	[ -n "$1" ] || return
 	[ "$SKIP_ARPDETECT" = 'yes' ] && return
+	local errwarn
+	[ "$ERROR_ON_ARPFAIL" = 'yes' ] && errwarn=vzerror || errwarn=vzwarning
 
 	local dev ip
 
 	for ip in $1; do
 		for dev in $(vz_get_neighbour_devs "$ip"); do
 			${ARPSEND_CMD} -D -e "$ip" "$dev" ||
-				vzwarning "$ARPSEND_CMD -D -e $ip $dev FAILED"
+				$errwarn "$ARPSEND_CMD -D -e $ip $dev FAILED" 1
 		done
 	done
 }
