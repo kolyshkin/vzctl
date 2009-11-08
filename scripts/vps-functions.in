@@ -56,12 +56,12 @@ vzerror()
 
 # Prints warning message
 # Parameters:
-#   $* - error message
+#   $1 - a message
 # Example of usage:
-#   vzwarning Invalid user
+#   vzwarning 'Invalid user'
 vzwarning()
 {
-	echo "$SELFNAME WARNING: $*" 1>&2
+	echo "$SELFNAME WARNING: $1" 1>&2
 }
 
 # Prints debug message
