@@ -81,6 +81,7 @@ BEGIN {
 		units = int(500000/$weight);
 	} else if ($weight == 0) {
 		units = 500000;
+	}
 	if (verbose) {
 		if ($id == 2147483647) {
 			print("0\t\t" units);
