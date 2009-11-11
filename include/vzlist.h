@@ -64,6 +64,7 @@ struct Cubc {
 	unsigned long dcachesize[5];
 	unsigned long numfile[5];
 	unsigned long numiptent[5];
+	unsigned long swappages[5];
 };
 
 struct Cquota {

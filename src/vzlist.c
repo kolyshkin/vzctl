@@ -151,6 +151,7 @@ PRINT_UL_RES(print_ubc_numothersock, ubc, numothersock)
 PRINT_UL_RES(print_ubc_dcachesize, ubc, dcachesize)
 PRINT_UL_RES(print_ubc_numfile, ubc, numfile)
 PRINT_UL_RES(print_ubc_numiptent, ubc, numiptent)
+PRINT_UL_RES(print_ubc_swappages, ubc, swappages)
 
 #define PRINT_DQ_RES(fn, res, name)					\
 static void fn(struct Cveinfo *p, int index)				\
@@ -366,6 +367,12 @@ SORT_UL_RES(numiptent_l_sort_fn, Cubc, ubc, numiptent, 2)
 SORT_UL_RES(numiptent_b_sort_fn, Cubc, ubc, numiptent, 3)
 SORT_UL_RES(numiptent_f_sort_fn, Cubc, ubc, numiptent, 4)
 
+SORT_UL_RES(swappages_h_sort_fn, Cubc, ubc, swappages, 0)
+SORT_UL_RES(swappages_m_sort_fn, Cubc, ubc, swappages, 1)
+SORT_UL_RES(swappages_l_sort_fn, Cubc, ubc, swappages, 2)
+SORT_UL_RES(swappages_b_sort_fn, Cubc, ubc, swappages, 3)
+SORT_UL_RES(swappages_f_sort_fn, Cubc, ubc, swappages, 4)
+
 SORT_UL_RES(dqblocks_u_sort_fn, Cquota, quota, diskspace, 0)
 SORT_UL_RES(dqblocks_s_sort_fn, Cquota, quota, diskspace, 1)
 SORT_UL_RES(dqblocks_h_sort_fn, Cquota, quota, diskspace, 2)
@@ -510,6 +517,12 @@ struct Cfield field_names[] =
 {"numiptent.b", "NIPTENT.B", "%10s", 2, RES_UBC,print_ubc_numiptent, numiptent_b_sort_fn},
 {"numiptent.l", "NIPTENT.L", "%10s", 3, RES_UBC,print_ubc_numiptent, numiptent_l_sort_fn},
 {"numiptent.f", "NIPTENT.F", "%10s", 4, RES_UBC,print_ubc_numiptent, numiptent_f_sort_fn},
+
+{"swappages", "SWAPP", "%10s", 0, RES_UBC,print_ubc_swappages, swappages_h_sort_fn},
+{"swappages.m", "SWAPP.M", "%10s", 1, RES_UBC,print_ubc_swappages, swappages_m_sort_fn},
+{"swappages.b", "SWAPP.B", "%10s", 2, RES_UBC,print_ubc_swappages, swappages_b_sort_fn},
+{"swappages.l", "SWAPP.L", "%10s", 3, RES_UBC,print_ubc_swappages, swappages_l_sort_fn},
+{"swappages.f", "SWAPP.F", "%10s", 4, RES_UBC,print_ubc_swappages, swappages_f_sort_fn},
 
 {"diskspace", "DQBLOCKS", "%10s", 0, RES_QUOTA, print_dq_blocks, dqblocks_u_sort_fn},
 {"diskspace.s", "DQBLOCKS.S", "%10s", 1, RES_QUOTA, print_dq_blocks, dqblocks_s_sort_fn},
@@ -881,6 +894,7 @@ do {								\
 		MERGE_UBC(dcachesize, ve->ubc, res);
 		MERGE_UBC(numfile, ve->ubc, res);
 		MERGE_UBC(numiptent, ve->ubc, res);
+		MERGE_UBC(swappages, ve->ubc, res);
 #undef MERGE_UBC
 	}
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
@@ -1054,6 +1068,8 @@ int get_ub()
 		UPDATE_UBC(name, numfile, ve.ubc, held, maxheld, barrier, \
 			limit, failcnt)
 		UPDATE_UBC(name, numiptent, ve.ubc, held, maxheld, barrier, \
+			limit, failcnt)
+		UPDATE_UBC(name, swappages, ve.ubc, held, maxheld, barrier, \
 			limit, failcnt)
 	}
 	if (veid && check_veid_restr(veid)) {
