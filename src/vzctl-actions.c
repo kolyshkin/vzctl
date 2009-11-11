@@ -422,7 +422,7 @@ restart_ve:
 
 static void merge_apply_param(vps_param *old, vps_param *new, char *cfg)
 {
-#define FREE_STR(x)	if ((x) != NULL) { free(x); x = NULL;}
+#define FREE_STR(x)	free(x); x = NULL;
 
 	FREE_STR(new->res.fs.root_orig)
 	FREE_STR(new->res.fs.private_orig)

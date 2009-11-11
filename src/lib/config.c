@@ -2545,7 +2545,7 @@ int set_name(int veid, char *new_name, char *old_name)
 	return 0;
 }
 
-#define FREE_P(x)	if ((x) != NULL) { free(x); x = NULL; }
+#define FREE_P(x)	free(x); x = NULL;
 
 static void free_opt(vps_opt *opt)
 {

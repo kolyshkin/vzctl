@@ -228,7 +228,7 @@ int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 
 void free_ub_param(ub_param *ub)
 {
-#define FREE_P(x) if (ub->x != NULL) {free(ub->x); ub->x = NULL;}
+#define FREE_P(x) free(ub->x); ub->x = NULL;
 	if (ub == NULL)
 		return;
 	FREE_P(kmemsize)
