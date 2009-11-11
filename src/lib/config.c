@@ -368,19 +368,9 @@ int conf_store_str(list_head_t *conf, char *name, const char *val)
 
 int conf_store_yesno(list_head_t *conf, char *name, int val)
 {
-	char *buf;
-	int len;
-
 	if (!val)
 		return 0;
-	len = strlen(name) + 6;
-	buf = malloc(len + 1);
-	if (buf == NULL)
-		return ERR_NOMEM;
-	sprintf(buf, "%s=\"%s\"", name,	val == YES ? "yes" : "no");
-	if (add_str_param2(conf, buf))
-		return ERR_NOMEM;
-	return 0;
+	return conf_store_str(conf, name, val == YES ? "yes" : "no");
 }
 
 /******************** Features *************************/
