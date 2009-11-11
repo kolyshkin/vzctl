@@ -126,9 +126,9 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 	if (ret)
 		goto err;
 	if (quota) {
-		if (ret = quota_off(veid, 0) != 0)
+		if ((ret = quota_off(veid, 0)) != 0)
 			goto err;
-		if (ret = quota_set(veid, fs->private, dq) != 0)
+		if ((ret = quota_set(veid, fs->private, dq)) != 0)
 			goto err;
 		quota = 0;
 	}
