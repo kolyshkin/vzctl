@@ -166,17 +166,17 @@ float	k_privvm[MAX_SL]	= {6, 3, 1.5};
 int	k_pglock[MAX_SL]	= {10, 3, 1};
 int	k_msl[MAX_SL]		= {10485760, 2097152, 0};
 
-char *level_string[MAX_SL+1] = {
-"Free resource distribution. Any parameters may be increased\0",
-"Normal resource distribution. Secondary parameters may be increased\0",
-"Partial resource shortage. Auxiliary parameters may be increased\0",
-"Overall resource shortage. Please, do not change any parameters!\0"
+char *level_string[MAX_SL + 1] = {
+	"Free resource distribution. Any parameters may be increased",
+	"Normal resource distribution. Secondary parameters may be increased",
+	"Partial resource shortage. Auxiliary parameters may be increased",
+	"Overall resource shortage. Please, do not change any parameters!"
 };
 
 void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout, "Usage: vzsplit [-f config_name] "
-			"| [-n numves] | [-s swap_size]\n"
+		"| [-n numves] | [-s swap_size]\n"
 		"\t -f specified config name\n"
 		"\t -n specified number of containers\n"
 		"\t -s specified swap in Kbytes\n");
@@ -428,8 +428,7 @@ char * get_ve_private()
 	vps_parse_config(0, GLOBAL_CFG, param, NULL);
 	ve_private = param->res.fs.private_orig;
 
-	if (ve_private == NULL)
-	{
+	if (ve_private == NULL) {
 		free_vps_param(param);
 		return NULL;
 	}
@@ -460,7 +459,7 @@ int check_disk_space() {
 		nofs = 1;
 	}
 	else {
-		if (statfs (ve_private, &statfs_buf) < 0) {
+		if (statfs(ve_private, &statfs_buf) < 0) {
 			fprintf(stderr, "WARNING: statfs on %s failed: %s.\n",
 				ve_private, strerror(errno));
 			nofs = 1;
