@@ -21,8 +21,6 @@
 #include <stdio.h>
 #include "types.h"
 
-#define	LOG_DATA	log_param g_log = {NULL, 0, 1, 0, 0, "", 0};
-
 /** Data structure for logging.
  */
 typedef struct {
