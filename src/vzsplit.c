@@ -29,6 +29,7 @@
 #include "config.h"
 
 #include "logger.h"
+#include "util.h"
 
 /* #include <linux/magic.h>
  * Instead of including a file which is not present in all environments,
@@ -555,7 +556,9 @@ int main(int argc, char **argv)
 		case 'f':
 			len = strlen(optarg) + strlen(VPS_CONF_DIR) +
 				strlen("ve-.conf-sample");
-			name = (char*)malloc(len + 1);
+			name = (char *)vz_malloc(len + 1);
+			if (!name)
+				exit(1);
 			sprintf(name, VPS_CONF_DIR "ve-%s.conf-sample", optarg);
 			if (!stat(name, &st)) {
 				logger(-1, 0, "File %s already exist",
