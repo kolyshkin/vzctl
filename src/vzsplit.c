@@ -28,6 +28,8 @@
 #include "types.h"
 #include "config.h"
 
+#include "logger.h"
+
 /* #include <linux/magic.h>
  * Instead of including a file which is not present in all environments,
  * we copy-paste reiserfs magic from it
@@ -206,7 +208,7 @@ int get_cpupower(int *cpuunits)
 
 	*cpuunits = DEF_CPUUNITS;
 	if ((fd = fopen(PROCCPU, "r")) == NULL) {
-		fprintf(stderr, "Cannot open " PROCCPU "\n");
+		logger(-1, errno, "Cannot open " PROCCPU);
 		return 1;
 	}
 	while (fgets(str, sizeof(str), fd))
@@ -228,8 +230,7 @@ int lconv(char *name)
 
 	if (name != NULL) {
 		if ((fp = fopen(name, "w")) == NULL) {
-			fprintf(stderr, "Unable to create %s: %s\n", name,
-					strerror(errno));
+			logger(-1, errno, "Unable to create %s", name);
 			return 1;
 		}
 	} else {
@@ -251,7 +252,7 @@ int lconv(char *name)
 	fprintf(fp, "CPUUNITS=\"%d\"\n", cpuunits);
 	if (name) {
 		fclose(fp);
-		fprintf(stderr, "Config %s was created\n", name);
+		logger(-1, 0, "Config %s was created", name);
 	}
 	return 0;
 }
@@ -320,8 +321,8 @@ int calculate_values()
 		} while  ((rest < 0) && (numproc > MINPROC));
 
 		if (rest < 0) {
-			fprintf(stderr, "Fatal resource shortage, try to "
-					"decrease the number of containers\n");
+			logger(-1, 0, "Fatal resource shortage, try to "
+					"decrease the number of containers");
 			return 1;
 		}
 		params[DGRAM].lim = params[DGRAM].bar = MINDGRAMBUF;
@@ -454,20 +455,20 @@ int check_disk_space() {
 
 	ve_private = get_ve_private();
 	if (ve_private == NULL) {
-		fprintf(stderr, "WARNING: unable to get VE_PRIVATE value "
-				"from " GLOBAL_CFG ".\n");
+		logger(-1, 0, "WARNING: unable to get VE_PRIVATE value "
+				"from " GLOBAL_CFG ".");
 		nofs = 1;
 	}
 	else {
 		if (statfs(ve_private, &statfs_buf) < 0) {
-			fprintf(stderr, "WARNING: statfs on %s failed: %s.\n",
-				ve_private, strerror(errno));
+			logger(-1, errno, "WARNING: statfs on %s failed",
+				ve_private);
 			nofs = 1;
 		}
 	}
 
 	if (nofs == 1) {
-		fprintf(stderr, "Default disk space values to be used.\n\n");
+		logger(-1, 0, "Default disk space values to be used.\n");
 		ds_total = 0; di_total = 0;
 		return retval;
 	}
@@ -497,8 +498,8 @@ int check_disk_space() {
 			di_total -= HOST_DI;
 	}
 	if (rec)
-		fprintf(stderr, "WARNING: Recommended minimal size "
-				"of partition holding %s is 20Gb!\n",
+		logger(-1, 0, "WARNING: Recommended minimal size "
+			"of partition holding %s is 20Gb!",
 				ve_private);
 
 	ve_ds = ds_total / DEF_DS;
@@ -515,12 +516,12 @@ int check_disk_space() {
 			ve_allowed = ve_di;
 	}
 	if (retval == 1) {
-		fprintf(stderr, "WARNING: partition holding %s do not "
+		logger(-1, 0, "WARNING: partition holding %s do not "
 				"have space required for %d containers\n"
-				"The maximum allowed value is %d\n",
+				"The maximum allowed value is %d",
 				ve_private, num_ve, ve_allowed);
-		fprintf(stderr, "Default disk space values "
-				"will be used\n\n");
+		logger(-1, 0, "Default disk space values "
+				"will be used\n");
 		ds_total = 0; di_total = 0;
 	}
 
@@ -547,6 +548,8 @@ int main(int argc, char **argv)
 	low_total = 0;
 	swap_total = 0;
 
+	init_log(NULL, 0, 1, 0, 0, "vzsplit");
+
 	while ((opt = getopt(argc, argv, "f:n:s:h")) > 0) {
 		switch(opt) {
 		case 'f':
@@ -555,7 +558,7 @@ int main(int argc, char **argv)
 			name = (char*)malloc(len + 1);
 			sprintf(name, VPS_CONF_DIR "ve-%s.conf-sample", optarg);
 			if (!stat(name, &st)) {
-				fprintf(stderr,"File %s already exist\n",
+				logger(-1, 0, "File %s already exist",
 					name);
 				exit(1);
 			}
@@ -563,22 +566,22 @@ int main(int argc, char **argv)
 		case 'n':
 			num_ve = strtol(optarg, &tail, 10);
 			if (*tail != '\0') {
-				fprintf(stderr, "Invalid argument "
-						"for -n: %s\n",	optarg);
+				logger(-1, 0, "Invalid argument "
+						"for -n: %s", optarg);
 				exit(1);
 			}
 			break;
 		case 's':
 			if (optarg[0] == '-') {
-				fprintf(stderr, "Negative value for -s\n");
+				logger(-1, 0, "Negative value for -s");
 				exit(-1);
 			}
 			swp = 1;
 			swap_total = strtoll(optarg, &tail, 10);
 			swap_total <<= 10;
 			if (*tail != '\0') {
-				fprintf(stderr, "Invalid argument "
-						"for -s: %s\n",	optarg);
+				logger(-1, 0, "Invalid argument "
+						"for -s: %s", optarg);
 				exit(1);
 			}
 			break;
@@ -594,17 +597,17 @@ int main(int argc, char **argv)
 	if (num_ve == -1) {
 		printf("Enter the number of containers: ");
 		if (scanf("%d", &num_ve) != 1) {
-			fprintf(stderr, "Invalid value.\n");
+			logger(-1, 0, "Invalid value.");
 			exit(1);
 		}
 	}
 	if (num_ve < 1) {
-		fprintf(stderr, "Incorrect value for number of containers.\n");
+		logger(-1, 0, "Incorrect value for number of containers.");
 		exit(1);
 	}
 
 	if ((fd = fopen(PROCMEM, "r")) == NULL) {
-		fprintf(stderr, "Cannot open " PROCMEM"\n");
+		logger(-1, errno, "Cannot open " PROCMEM);
 		exit(1);
 	}
 
@@ -620,21 +623,21 @@ int main(int argc, char **argv)
 	if (low_total == 0)
 		low_total = mem_total;
 	if (mem_total < SYSRSRV) {
-		fprintf(stderr, "At least 128 Mb of RAM should be "
-				"installed on Hardware Node\n");
+		logger(-1, 0, "At least 128 Mb of RAM should be "
+				"installed on Hardware Node");
 		exit(1);
 	}
 
 	if (swap_total > 2 * mem_total)
-		fprintf(stderr, "The optimal swap space size is %llu Mb, "
-				"twice bigger than the RAM size\n\n",
+		logger(-1, 0, "The optimal swap space size is %llu Mb, "
+				"twice bigger than the RAM size\n",
 				(2 * mem_total) >> 20);
 	ve_allowed = num_ve;
 	retval = 0;
 
 	if (((mem_total + swap_total - SYSRSRV) / num_ve) < MEMPERVE) {
-		fprintf(stderr, "On node with %llu Mb of memory (RAM + swap) "
-				"%d containers can not be allocated\n",
+		logger(-1, 0, "On node with %llu Mb of memory (RAM + swap) "
+				"%d containers can not be allocated",
 				(mem_total + swap_total) >> 20, num_ve);
 		ve_allowed = (mem_total + swap_total - SYSRSRV) / MEMPERVE;
 		retval = 1;
@@ -643,8 +646,8 @@ int main(int argc, char **argv)
 	if (((low_total - SYSRSRV)/ ve_allowed) < LOWPERVE) {
 		int ve_low;
 
-		fprintf(stderr, "On node with %llu Mb of Low Memory "
-				"%d containers can not be allocated\n",
+		logger(-1, 0, "On node with %llu Mb of Low Memory "
+				"%d containers can not be allocated",
 				low_total >> 20, num_ve);
 		ve_low = (low_total - SYSRSRV) / LOWPERVE;
 		if (ve_low < ve_allowed)
@@ -653,13 +656,13 @@ int main(int argc, char **argv)
 	}
 
 	if (retval != 0) {
-		fprintf(stderr, "The maximum allowed value is %d\n",
+		logger(-1, 0, "The maximum allowed value is %d",
 				ve_allowed);
 		exit(retval);
 	}
 
 	if ((fd = fopen(PROCTHREADS, "r")) == NULL) {
-		fprintf(stderr, "Cannot open " PROCTHREADS "\n");
+		logger(-1, errno, "Cannot open " PROCTHREADS);
 		exit(1);
 	}
 	if (fgets(str, sizeof(str), fd))
