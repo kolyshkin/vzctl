@@ -19,6 +19,9 @@
 #define	_UTIL_H_
 
 #include "types.h"
+#include <stdlib.h>
+#include "logger.h"
+
 #define BACKUP		0
 #define DESTR		1
 
@@ -54,4 +57,18 @@ int set_not_blk(int fd);
 void close_fds(int close_std, ...);
 int move_config(int veid, int action);
 void remove_names(envid_t veid);
+
+#define logger_enomem(log_level, err, size, file, line)			\
+	logger(log_level, err, "%s:%i: Can't allocate %lu bytes",	\
+		file, line, (unsigned long)size)
+
+#define vz_malloc(size)						\
+	({							\
+		void *p = malloc(size);				\
+		if (!p)						\
+			logger_enomem(-1, ENOMEM, size,		\
+					__FILE__, __LINE__);	\
+		p;						\
+	})
+
 #endif
