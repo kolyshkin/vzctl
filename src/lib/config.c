@@ -2648,15 +2648,15 @@ void free_vps_param(vps_param *param)
 
 static void merge_opt(vps_opt *dst, vps_opt *src)
 {
-	MERGE_INT(save);
-	MERGE_INT(fast_kill);
-	MERGE_INT(skip_lock);
-	MERGE_INT(skip_setup);
-	MERGE_INT(start_disabled);
-	MERGE_INT(start_force);
-	MERGE_INT(onboot);
-	MERGE_INT(setmode);
-	MERGE_INT(apply_cfg_map);
+	MERGE_INT(save)
+	MERGE_INT(fast_kill)
+	MERGE_INT(skip_lock)
+	MERGE_INT(skip_setup)
+	MERGE_INT(start_disabled)
+	MERGE_INT(start_force)
+	MERGE_INT(onboot)
+	MERGE_INT(setmode)
+	MERGE_INT(apply_cfg_map)
 
 	MERGE_STR(config)
 	MERGE_STR(origin_sample)
@@ -2670,7 +2670,7 @@ static void merge_fs(fs_param *dst, fs_param *src)
 	MERGE_STR(private)
 	MERGE_STR(private_orig)
 	MERGE_STR(tmpl)
-	MERGE_INT(noatime);
+	MERGE_INT(noatime)
 }
 
 static void merge_tmpl(tmpl_param *dst, tmpl_param *src)
@@ -2738,31 +2738,31 @@ static void merge_dev(dev_param *dst, dev_param *src)
 
 static void merge_cap(cap_param *dst, cap_param *src)
 {
-	MERGE_INT(on);
-	MERGE_INT(off);
+	MERGE_INT(on)
+	MERGE_INT(off)
 }
 
 static void merge_env(env_param *dst, env_param *src)
 {
-	MERGE_INT(veid);
-	MERGE_INT(ipt_mask);
-	MERGE_INT(features_mask);
-	MERGE_INT(features_known);
+	MERGE_INT(veid)
+	MERGE_INT(ipt_mask)
+	MERGE_INT(features_mask)
+	MERGE_INT(features_known)
 }
 
 static void merge_cpt(cpt_param *dst, cpt_param *src)
 {
-	MERGE_STR(dumpdir);
-	MERGE_STR(dumpfile);
-	MERGE_INT(ctx);
-	MERGE_INT(cpu_flags);
-	MERGE_INT(cmd);
+	MERGE_STR(dumpdir)
+	MERGE_STR(dumpfile)
+	MERGE_INT(ctx)
+	MERGE_INT(cpu_flags)
+	MERGE_INT(cmd)
 }
 
 static void merge_meminfo(meminfo_param *dst, meminfo_param *src)
 {
-	MERGE_INT2(mode);
-	MERGE_INT(val);
+	MERGE_INT2(mode)
+	MERGE_INT(val)
 }
 
 static void merge_veth(veth_param *dst, veth_param *src)
@@ -2775,12 +2775,12 @@ static void merge_veth(veth_param *dst, veth_param *src)
 
 static void merge_name(name_param *dst, name_param *src)
 {
-	MERGE_STR(name);
-	MERGE_INT(veid);
+	MERGE_STR(name)
+	MERGE_INT(veid)
 }
 
 static void merge_io(io_param *dst, io_param *src) {
-	MERGE_INT2(ioprio);
+	MERGE_INT2(ioprio)
 }
 
 static int merge_res(vps_res *dst, vps_res *src)
@@ -2813,8 +2813,8 @@ int merge_vps_param(vps_param *dst, vps_param *src)
 
 int merge_global_param(vps_param *dst, vps_param *src)
 {
-	MERGE_INT(res.dq.enable);
-	MERGE_INT(res.net.ipv6_net);
-	MERGE_INT(del_res.net.ipv6_net);
+	MERGE_INT(res.dq.enable)
+	MERGE_INT(res.net.ipv6_net)
+	MERGE_INT(del_res.net.ipv6_net)
 	return 0;
 }
