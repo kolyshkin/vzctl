@@ -302,14 +302,14 @@ static int parse_setmode(vps_param *vps_p, const char *val)
 	return 0;
 }
 
-int conf_parse_strlist(list_head_t *list, const char *val, int checkdup)
+static int conf_parse_strlist(list_head_t *list, const char *val, int checkdup)
 {
 	if (add_str2list(list, val))
 		return ERR_NOMEM;
 	return 0;
 }
 
-int conf_parse_str(char **dst, const char *val, int checkdup)
+static int conf_parse_str(char **dst, const char *val, int checkdup)
 {
 	if (*dst != NULL) {
 		if (checkdup)
@@ -322,7 +322,7 @@ int conf_parse_str(char **dst, const char *val, int checkdup)
 	return 0;
 }
 
-int conf_parse_yesno(int *dst, const char *val, int checkdup)
+static int conf_parse_yesno(int *dst, const char *val, int checkdup)
 {
 	int ret;
 
@@ -334,7 +334,7 @@ int conf_parse_yesno(int *dst, const char *val, int checkdup)
 	return 0;
 }
 
-int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val)
+static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val)
 {
 	char *str;
 
@@ -349,7 +349,7 @@ int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val)
 	return 0;
 }
 
-int conf_store_str(list_head_t *conf, char *name, const char *val)
+static int conf_store_str(list_head_t *conf, char *name, const char *val)
 {
 	char *buf;
 	int len;
@@ -366,7 +366,7 @@ int conf_store_str(list_head_t *conf, char *name, const char *val)
 	return 0;
 }
 
-int conf_store_yesno(list_head_t *conf, char *name, int val)
+static int conf_store_yesno(list_head_t *conf, char *name, int val)
 {
 	if (!val)
 		return 0;
