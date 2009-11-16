@@ -345,11 +345,12 @@ static int conf_parse_ulong(unsigned long **dst, const char *valstr)
 	return 0;
 }
 
-static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val)
+static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val,
+		int allow_empty)
 {
 	char *str;
 
-	if (list_empty(val))
+	if (list_empty(val) && !allow_empty)
 		return 0;
 	if ((str = list2str_c(name, '"', val)) == NULL)
 		return ERR_NOMEM;;
@@ -821,7 +822,7 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
 	list_head_t ip;
-	char *str;
+	int ret;
 
 	list_head_init(&ip);
 	if (conf->id != PARAM_IP_ADD)
@@ -834,14 +835,10 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	}
 	merge_str_list(vps_p->res.net.delall, &old_p->res.net.ip,
 		&vps_p->res.net.ip, &vps_p->del_res.net.ip, &ip);
-	str = list2str_c(conf->name, '"', &ip);
+	ret = conf_store_strlist(conf_h, conf->name, &ip, 1);
 	free_str_param(&ip);
-	if (str == NULL)
-		return -1;
-	add_str_param(conf_h, str);
-	free(str);
 
-	return 0;
+	return ret;
 }
 
 static int check_netdev(const char *devname)
@@ -878,7 +875,7 @@ static int store_netdev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
 	list_head_t dev;
-	char *str;
+	int ret;
 
 	list_head_init(&dev);
 	if (conf->id != PARAM_NETDEV_ADD)
@@ -890,14 +887,10 @@ static int store_netdev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	}
 	merge_str_list(0, &old_p->res.net.dev, &vps_p->res.net.dev,
 		 &vps_p->del_res.net.dev, &dev);
-	str = list2str_c(conf->name, '"', &dev);
+	ret = conf_store_strlist(conf_h, conf->name, &dev, 1);
 	free_str_param(&dev);
-	if (str == NULL)
-		return -1;
-	add_str_param(conf_h, str);
-	free(str);
 
-	return 0;
+	return ret;
 }
 
 /********************* fs *******************************/
@@ -1230,14 +1223,15 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		ret = conf_store_str(conf_h, conf->name, misc->hostname);
 		break;
 	case PARAM_NAMESERVER:
-		ret = conf_store_strlist(conf_h, conf->name, &misc->nameserver);
+		ret = conf_store_strlist(conf_h, conf->name,
+				&misc->nameserver, 0);
 		break;
 	case PARAM_DESCRIPTION:
 		ret = conf_store_str(conf_h, conf->name, misc->description);
 		break;
 	case PARAM_SEARCHDOMAIN:
 		ret = conf_store_strlist(conf_h, conf->name,
-			&misc->searchdomain);
+			&misc->searchdomain, 0);
 		break;
 	}
 	return ret;
