@@ -2090,12 +2090,12 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		vps_p->res.veth.version = 1;
 		break;
 	case PARAM_VETH_ADD_CMD:
-		logger(0, 0, "Warning: --veth_add option is outdated use"
+		logger(0, 0, "Warning: --veth_add option is deprecated, use"
 			" --netif_add instead");
 		ret = parse_veth(vps_p, val, 1);
 		break;
 	case PARAM_VETH_DEL_CMD:
-		logger(0, 0, "Warning: --veth_del option is outdated use"
+		logger(0, 0, "Warning: --veth_del option is deprecated, use"
 			" --netif_del instead");
 		ret = parse_veth(vps_p, val, 0);
 		break;
