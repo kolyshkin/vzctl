@@ -331,6 +331,20 @@ static int conf_parse_yesno(int *dst, const char *val)
 	return 0;
 }
 
+static int conf_parse_ulong(unsigned long **dst, const char *valstr)
+{
+	unsigned long val;
+	if (*dst != NULL)
+		return ERR_DUP;
+	if (parse_ul(valstr, &val) != 0)
+		return ERR_INVAL;
+	*dst = malloc(sizeof(unsigned long));
+	if (*dst == NULL)
+		return ERR_NOMEM;
+	**dst = val;
+	return 0;
+}
+
 static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val)
 {
 	char *str;
@@ -1837,7 +1851,6 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 {
 	int ret;
 	int int_id;
-	unsigned long uid;
 
 	ret = 0;
 	if (!_page_size) {
@@ -2014,24 +2027,10 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			ret = ERR_INVAL;
 		break;
 	case PARAM_QUOTATIME:
-		if (vps_p->res.dq.exptime != NULL)
-			break;
-		vps_p->res.dq.exptime = malloc(sizeof(unsigned long));
-		if (parse_ul(val, vps_p->res.dq.exptime)) {
-			free(vps_p->res.dq.exptime);
-			vps_p->res.dq.exptime = NULL;
-			ret = ERR_INVAL;
-		}
+		ret = conf_parse_ulong(&vps_p->res.dq.exptime, val);
 		break;
 	case PARAM_QUOTAUGIDLIMIT:
-		if (vps_p->res.dq.ugidlimit != NULL)
-			break;
-		vps_p->res.dq.ugidlimit = malloc(sizeof(unsigned long));
-		if (parse_ul(val, vps_p->res.dq.ugidlimit)) {
-			free(vps_p->res.dq.ugidlimit);
-			vps_p->res.dq.ugidlimit = NULL;
-			ret = ERR_INVAL;
-		}
+		ret = conf_parse_ulong(&vps_p->res.dq.ugidlimit, val);
 		break;
 	case PARAM_DEVICES:
 		ret = parse_dev(vps_p, val);
@@ -2040,26 +2039,19 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_devnodes(vps_p, val);
 		break;
 	case PARAM_CPUUNITS:
-		if (vps_p->res.cpu.units != NULL)
-			break;
-		if (parse_ul(val, &uid))
-			return ERR_INVAL;
-		if (uid < MINCPUUNITS || uid > MAXCPUUNITS)
-			return ERR_INVAL;
-		vps_p->res.cpu.units = malloc(sizeof(unsigned long));
-		if (vps_p->res.cpu.units == NULL)
-			return ERR_NOMEM;
-		*vps_p->res.cpu.units = uid;
+		{
+			unsigned long *u = vps_p->res.cpu.units;
+			ret = conf_parse_ulong(&u, val);
+			if (ret != 0)
+				break;
+			if ((*u < MINCPUUNITS || *u > MAXCPUUNITS)) {
+				free(u); u = NULL;
+				ret = ERR_INVAL;
+			}
+		}
 		break;
 	case PARAM_CPUWEIGHT:
-		if (vps_p->res.cpu.weight != NULL)
-			break;
-		if (parse_ul(val, &uid))
-			return ERR_INVAL;
-		vps_p->res.cpu.weight = malloc(sizeof(unsigned long));
-		if (vps_p->res.cpu.weight == NULL)
-			return ERR_NOMEM;
-		*vps_p->res.cpu.weight = uid;
+		ret = conf_parse_ulong(&vps_p->res.cpu.weight, val);
 		break;
 	case PARAM_CPULIMIT:
 		if (vps_p->res.cpu.limit != NULL)
@@ -2068,14 +2060,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			return ERR_INVAL;
 		break;
 	case PARAM_VCPUS:
-		if (vps_p->res.cpu.vcpus != NULL)
-			break;
-		if (parse_ul(val, &uid))
-			return ERR_INVAL;
-		vps_p->res.cpu.vcpus = malloc(sizeof(unsigned long));
-		if (vps_p->res.cpu.vcpus == NULL)
-			return ERR_NOMEM;
-		*vps_p->res.cpu.vcpus = uid;
+		ret = conf_parse_ulong(&vps_p->res.cpu.vcpus, val);
 		break;
 	case PARAM_MEMINFO:
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
