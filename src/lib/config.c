@@ -302,31 +302,28 @@ static int parse_setmode(vps_param *vps_p, const char *val)
 	return 0;
 }
 
-static int conf_parse_strlist(list_head_t *list, const char *val, int checkdup)
+static int conf_parse_strlist(list_head_t *list, const char *val)
 {
 	if (add_str2list(list, val))
 		return ERR_NOMEM;
 	return 0;
 }
 
-static int conf_parse_str(char **dst, const char *val, int checkdup)
+static int conf_parse_str(char **dst, const char *val)
 {
-	if (*dst != NULL) {
-		if (checkdup)
-			return ERR_DUP;
-		free(*dst);
-	}
+	if (*dst)
+		return ERR_DUP;
 	*dst = strdup(val);
 	if (*dst == NULL)
 		return ERR_NOMEM;
 	return 0;
 }
 
-static int conf_parse_yesno(int *dst, const char *val, int checkdup)
+static int conf_parse_yesno(int *dst, const char *val)
 {
 	int ret;
 
-	if (*dst && checkdup)
+	if (*dst)
 		return ERR_DUP;
 	if ((ret = yesno2id(val)) < 0)
 		return ERR_INVAL;
@@ -1850,10 +1847,10 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	}
 	switch (id) {
 	case PARAM_CONFIG:
-		ret = conf_parse_str(&vps_p->opt.config, val, 1);
+		ret = conf_parse_str(&vps_p->opt.config, val);
 		break;
 	case PARAM_CONFIG_SAMPLE:
-		ret = conf_parse_str(&vps_p->opt.origin_sample, val, 1);
+		ret = conf_parse_str(&vps_p->opt.origin_sample, val);
 		break;
 	case PARAM_SAVE:
 		vps_p->opt.save = YES;
@@ -1865,25 +1862,25 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		vps_p->opt.reset_ub = YES;
 		break;
 	case PARAM_ONBOOT:
-		ret = conf_parse_yesno(&vps_p->opt.onboot, val, 1);
+		ret = conf_parse_yesno(&vps_p->opt.onboot, val);
 		break;
 	case PARAM_DISABLED:
-		ret = conf_parse_yesno(&vps_p->opt.start_disabled, val, 1);
+		ret = conf_parse_yesno(&vps_p->opt.start_disabled, val);
 		break;
 	case PARAM_HOSTNAME:
-		ret = conf_parse_str(&vps_p->res.misc.hostname, val, 1);
+		ret = conf_parse_str(&vps_p->res.misc.hostname, val);
 		break;
 	case PARAM_DESCRIPTION:
-		ret = conf_parse_str(&vps_p->res.misc.description, val, 1);
+		ret = conf_parse_str(&vps_p->res.misc.description, val);
 		break;
 	case PARAM_NAMESERVER:
-		ret = conf_parse_strlist(&vps_p->res.misc.nameserver, val, 1);
+		ret = conf_parse_strlist(&vps_p->res.misc.nameserver, val);
 		break;
 	case PARAM_SEARCHDOMAIN:
-		ret = conf_parse_strlist(&vps_p->res.misc.searchdomain, val, 1);
+		ret = conf_parse_strlist(&vps_p->res.misc.searchdomain, val);
 		break;
 	case PARAM_USERPW:
-		ret = conf_parse_strlist(&vps_p->res.misc.userpw, val, 1);
+		ret = conf_parse_strlist(&vps_p->res.misc.userpw, val);
 		break;
 	case PARAM_APPLYCONFIG_MAP:
 		if (!strcmp(val, "name"))
@@ -1892,22 +1889,22 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			ret = ERR_INVAL;
 		break;
 	case PARAM_APPLYCONFIG:
-		ret = conf_parse_str(&vps_p->opt.apply_cfg, val, 1);
+		ret = conf_parse_str(&vps_p->opt.apply_cfg, val);
 		break;
 	case PARAM_SETMODE:
 		ret = parse_setmode(vps_p, val);
 		break;
 	case PARAM_LOGFILE:
-		ret = conf_parse_str(&vps_p->log.log_file, val, 1);
+		ret = conf_parse_str(&vps_p->log.log_file, val);
 		break;
 	case PARAM_LOCKDIR:
-		ret = conf_parse_str(&vps_p->opt.lockdir, val, 1);
+		ret = conf_parse_str(&vps_p->opt.lockdir, val);
 		break;
 	case PARAM_DUMPDIR:
-		ret = conf_parse_str(&vps_p->res.cpt.dumpdir, val, 1);
+		ret = conf_parse_str(&vps_p->res.cpt.dumpdir, val);
 		break;
 	case PARAM_LOGGING:
-		ret = conf_parse_yesno(&vps_p->log.enable, val, 1);
+		ret = conf_parse_yesno(&vps_p->log.enable, val);
 		break;
 	case PARAM_LOGLEVEL:
 		if (parse_int(val, &int_id))
@@ -1966,7 +1963,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		vps_p->res.net.skip_arpdetect = YES;
 		break;
 	case PARAM_IPV6NET:
-		ret = conf_parse_yesno(&vps_p->res.net.ipv6_net, val, 1);
+		ret = conf_parse_yesno(&vps_p->res.net.ipv6_net, val);
 		vps_p->del_res.net.ipv6_net = vps_p->res.net.ipv6_net;
 		break;
 	case PARAM_NETDEV_ADD:
@@ -1976,33 +1973,33 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = add_netdev(&vps_p->del_res.net, val);
 		break;
 	case PARAM_ROOT:
-		if (!(ret = conf_parse_str(&vps_p->res.fs.root_orig, val, 1)))
+		if (!(ret = conf_parse_str(&vps_p->res.fs.root_orig, val)))
 			vps_p->res.fs.root = subst_VEID(veid, val);
 		break;
 	case PARAM_PRIVATE:
-		if (!(ret = conf_parse_str(&vps_p->res.fs.private_orig, val,1)))
+		if (!(ret = conf_parse_str(&vps_p->res.fs.private_orig, val)))
 			vps_p->res.fs.private = subst_VEID(veid, val);
 		break;
 	case PARAM_TEMPLATE:
-		ret = conf_parse_str(&vps_p->res.fs.tmpl, val, 1);
+		ret = conf_parse_str(&vps_p->res.fs.tmpl, val);
 		break;
 	case PARAM_NOATIME:
-		ret = conf_parse_yesno(&vps_p->res.fs.noatime, val, 1);
+		ret = conf_parse_yesno(&vps_p->res.fs.noatime, val);
 		break;
 	case PARAM_DEF_OSTEMPLATE:
-		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val, 1);
+		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val);
 		break;
 	case PARAM_PKGSET:
-		ret = conf_parse_str(&vps_p->res.tmpl.pkgset, val, 1);
+		ret = conf_parse_str(&vps_p->res.tmpl.pkgset, val);
 		break;
 	case PARAM_PKGVER:
-		ret = conf_parse_str(&vps_p->res.tmpl.pkgver, val, 1);
+		ret = conf_parse_str(&vps_p->res.tmpl.pkgver, val);
 		break;
 	case PARAM_OSTEMPLATE:
-		ret = conf_parse_str(&vps_p->res.tmpl.ostmpl, val, 1);
+		ret = conf_parse_str(&vps_p->res.tmpl.ostmpl, val);
 		break;
 	case PARAM_DISK_QUOTA:
-		ret = conf_parse_yesno(&vps_p->res.dq.enable, val, 1);
+		ret = conf_parse_yesno(&vps_p->res.dq.enable, val);
 		break;
 	case PARAM_DISKSPACE:
 		if (vps_p->res.dq.diskspace != NULL)
@@ -2143,7 +2140,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			break;
 		if (check_name(val))
 			return ERR_INVAL;
-		ret = conf_parse_str(&vps_p->res.name.name, val, 1);
+		ret = conf_parse_str(&vps_p->res.name.name, val);
 		break;
 	case PARAM_VEID:
 		if (parse_int(val, &int_id))
