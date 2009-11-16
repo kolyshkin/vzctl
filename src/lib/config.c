@@ -385,6 +385,17 @@ static int conf_store_yesno(list_head_t *conf, char *name, int val)
 	return conf_store_str(conf, name, val == YES ? "yes" : "no");
 }
 
+static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
+{
+	char buf[] = "18446744073709551615"; /* ULONG_MAX on 64 bit */
+
+	if (val == NULL)
+		return 0;
+
+	snprintf(buf, sizeof(buf), "%lu", *val);
+	return conf_store_str(conf, name, buf);
+}
+
 /******************** Features *************************/
 static int parse_features(env_param *env, char *val)
 {
@@ -971,18 +982,10 @@ static int store_dq(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		add_str_param(conf_h, buf);
 		break;
 	case PARAM_QUOTATIME:
-		if (param->exptime == NULL)
-			break;
-		snprintf(buf, sizeof(buf), "%s=\"%lu\"", conf->name,
-			 param->exptime[0]);
-		add_str_param(conf_h, buf);
+		conf_store_ulong(conf_h, conf->name, param->exptime);
 		break;
 	case PARAM_QUOTAUGIDLIMIT:
-		if (param->ugidlimit == NULL)
-			break;
-		snprintf(buf, sizeof(buf), "%s=\"%lu\"", conf->name,
-			param->ugidlimit[0]);
-		add_str_param(conf_h, buf);
+		conf_store_ulong(conf_h, conf->name, param->ugidlimit);
 		break;
 	}
 	return 0;
@@ -1263,39 +1266,21 @@ static int parse_cpulimit(unsigned long **param, const char *str)
 static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
-	char buf[STR_SIZE];
 	cpu_param *cpu = &vps_p->res.cpu;
 
 	switch (conf->id) {
 	case PARAM_CPUUNITS:
-		if (cpu->units == NULL)
-			break;
-		snprintf(buf, sizeof(buf), "%s=\"%lu\"",
-				conf->name, *cpu->units);
-		add_str_param(conf_h, buf);
+		conf_store_ulong(conf_h, conf->name, cpu->units);
 		break;
 	case PARAM_CPUWEIGHT:
-		if (cpu->weight == NULL)
-			break;
-		snprintf(buf, sizeof(buf), "%s=\"%lu\"",
-			conf->name, *cpu->weight);
-		add_str_param(conf_h, buf);
+		conf_store_ulong(conf_h, conf->name, cpu->weight);
 		break;
 	case PARAM_CPULIMIT:
-		if (cpu->limit == NULL)
-			break;
-		snprintf(buf, sizeof(buf), "%s=\"%lu\"",
-			conf->name, *cpu->limit);
-		add_str_param(conf_h, buf);
+		conf_store_ulong(conf_h, conf->name, cpu->limit);
 		break;
 	case PARAM_VCPUS:
-		if (cpu->vcpus == NULL)
-			break;
-		snprintf(buf, sizeof(buf), "%s=\"%lu\"",
-			conf->name, *cpu->vcpus);
-		add_str_param(conf_h, buf);
+		conf_store_ulong(conf_h, conf->name, cpu->vcpus);
 		break;
-
 	}
 	return 0;
 }
