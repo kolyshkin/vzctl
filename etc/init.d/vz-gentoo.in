@@ -160,12 +160,8 @@ start_ve() {
 	local veid velist msg need_restart=""
 
 	# get all containers we should start on boot
-	if ! cd ${VPSCONFDIR}; then
-		eerror $? "Unable to cd to ${VPSCONFDIR}"
-		return 1
-	fi
-	velist=$(grep -l '^ONBOOT=yes\|^ONBOOT=\"yes\"' [0-9]*.conf 2>/dev/null | sed -e 's/.conf//g' | sort -n)
-	cd - >/dev/null
+	velist=$(vzlist -aH -octid,onboot |
+		awk '$2 == "yes" {print $1}')
 
 	/sbin/sysctl -q -w net.ipv4.route.src_check=0
 

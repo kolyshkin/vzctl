@@ -387,10 +387,8 @@ start_ves()
 	local need_restart
 
 	need_restart=""
-	cd ${CONFIG_DIR} || return
-	velist=`grep -l '^ONBOOT=yes\|^ONBOOT=\"yes\"' [0-9]*.conf 2>/dev/null |
-		sed -e 's/.conf//g' | sort -n`
-	cd - >/dev/null
+	velist=$(vzlist -aH -octid,onboot |
+		awk '$2 == "yes" {print $1}')
 	sysctl -q -w net.ipv4.route.src_check=0
 	for veid in $velist; do
 		[ "${veid}" = "0" ] && continue
