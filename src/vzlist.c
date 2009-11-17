@@ -125,6 +125,16 @@ static void print_onboot(struct Cveinfo *p, int index)
 			p->onboot == YES ? "yes" : "no");
 }
 
+static void print_bootorder(struct Cveinfo *p, int index)
+{
+	if (p->bootorder == NULL)
+		 p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+				 "%10s", "-");
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+				"%10lu", p->bootorder[index]);
+}
+
 #define PRINT_UL_RES(fn, res, name)					\
 static void fn(struct Cveinfo *p, int index)				\
 {									\
@@ -224,6 +234,28 @@ int status_sort_fn(const void *val1, const void *val2)
 	if (!res)
 		res = id_sort_fn(val1, val2);
 	return res;
+}
+
+int bootorder_sort_fn(const void *val1, const void *val2)
+{
+	int ret;
+	unsigned long *r1 = ((const struct Cveinfo*)val1)->bootorder;
+	unsigned long *r2 = ((const struct Cveinfo*)val2)->bootorder;
+
+	ret = check_empty_param(r1, r2);
+	switch (ret) {
+		case 0: /* both NULL */
+			return !id_sort_fn(val1, val2);
+		case 2: /* both not NULL */
+			break;
+		default: /* one is NULL, other is not */
+			return ret;
+	}
+
+	if (*r1 == *r2)
+		return !id_sort_fn(val1, val2);
+
+	return (*r1 > *r2);
 }
 
 #define SORT_STR_FN(fn, name)						\
@@ -544,6 +576,8 @@ struct Cfield field_names[] =
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
 
 {"onboot", "ONBOOT", "%-9s", 0, RES_ONBOOT, print_onboot, none_sort_fn},
+{"bootorder", "BOOTORDER", "%10s", 0, RES_BOOTORDER,
+	print_bootorder, bootorder_sort_fn},
 };
 
 static void print_hostname(struct Cveinfo *p, int index)
@@ -943,6 +977,10 @@ do {								\
 	if (res->fs.private != NULL)
 		ve->ve_private = strdup(res->fs.private);
 	ve->onboot = res->misc.onboot;
+	if (res->misc.bootorder != NULL) {
+		ve->bootorder = x_malloc(sizeof(*ve->bootorder));
+		*ve->bootorder = *res->misc.bootorder;
+	}
 }
 
 int read_ves_param()
@@ -1625,6 +1663,8 @@ void free_veinfo()
 			free(veinfo[i].ve_root);
 		if (veinfo[i].ve_private != NULL)
 			free(veinfo[i].ve_private);
+		if (veinfo[i].bootorder != NULL)
+			free(veinfo[i].bootorder);
 	}
 }
 

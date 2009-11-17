@@ -95,6 +95,7 @@ struct Cveinfo {
 	int status;
 	int hide;
 	int onboot;
+	unsigned long *bootorder;
 };
 
 #define RES_NONE	0
@@ -107,6 +108,7 @@ struct Cveinfo {
 #define RES_NAME	7
 #define RES_DESCRIPTION	8
 #define RES_ONBOOT	9
+#define RES_BOOTORDER	10
 
 struct Cfield {
 	char *name;
