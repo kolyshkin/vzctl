@@ -143,7 +143,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup("-B");
 	snprintf(buf, sizeof(buf), "%lu", param->diskspace[1]);
 	arg[i++] = strdup(buf);
-	/*Disk inodes */
+	/* Disk inodes */
 	arg[i++] = strdup("-i");
 	snprintf(buf, sizeof(buf), "%lu", param->diskinodes[0]);
 	arg[i++] = strdup(buf);
@@ -218,7 +218,7 @@ int quota_on(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup("-B");
 	snprintf(buf, sizeof(buf), "%lu", param->diskspace[1]);
 	arg[i++] = strdup(buf);
-	/*Disk inodes */
+	/* Disk inodes */
 	arg[i++] = strdup("-i");
 	snprintf(buf, sizeof(buf), "%lu", param->diskinodes[0]);
 	arg[i++] = strdup(buf);
@@ -300,7 +300,7 @@ int quota_off(envid_t veid, int force)
 	return ret;
 }
 
-/** Disk quota managment wraper.
+/** Disk quota management wrapper.
  *
  * @param veid		CT ID.
  * @param cmd		quota commands (QUOTA_MARKDIRTY QUOTA_DROP QUOTA_STAT)

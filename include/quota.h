@@ -37,11 +37,11 @@
 /** Data structure for disk quota parameters.
  */
 typedef struct {
-	int enable;			/**< quota enable yes/no. */
-	unsigned long *diskspace;	/**< disk block limit. */
+	int enable;			/**< is quota enabled (YES or NO). */
+	unsigned long *diskspace;	/**< disk blocks limit. */
 	unsigned long *diskinodes;	/**< disk inodes limit. */
-	unsigned long *exptime;		/**< quot aexpiration time. */
-	unsigned long *ugidlimit;	/**< userqroup quota limit. */
+	unsigned long *exptime;		/**< quota expiration time. */
+	unsigned long *ugidlimit;	/**< user/group quota limit. */
 } dq_param;
 
 /** Setup disk quota limits.
@@ -69,7 +69,7 @@ int vps_quotaon(envid_t veid, char *private, dq_param *dq);
  */
 int vps_quotaoff(envid_t veid, dq_param *dq);
 
-/** Disk quota managment wraper.
+/** Disk quota management wrapper.
  *
  * @param veid		CT ID.
  * @param cmd		quota commands (QUOTA_MARKDIRTY QUOTA_DROP QUOTA_STAT)
@@ -80,7 +80,7 @@ int quota_ctl(envid_t veid, int cmd);
 /** Turn quota off.
  *
  * @param veid		CT ID.
- * @param force		forcebly turn quota off.
+ * @param force		forcibly turn quota off.
  * @return		0 on success.
  */
 int quota_off(envid_t veid, int force);
