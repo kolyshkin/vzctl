@@ -135,6 +135,8 @@ static vps_config config[] = {
 
 {"FEATURES",	NULL, PARAM_FEATURES},
 {"IOPRIO",	NULL, PARAM_IOPRIO},
+{"BOOTORDER",	NULL, PARAM_BOOTORDER},
+
 {NULL		,NULL, -1}
 };
 
@@ -226,6 +228,7 @@ static struct option set_opt[] = {
 {"features",	required_argument, NULL, PARAM_FEATURES},
 {"ioprio",	required_argument, NULL, PARAM_IOPRIO},
 {"description",	required_argument, NULL, PARAM_DESCRIPTION},
+{"bootorder",	required_argument, NULL, PARAM_BOOTORDER},
 
 {NULL, 0, NULL, 0}
 };
@@ -1214,6 +1217,10 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	case PARAM_ONBOOT:
 		ret = conf_store_yesno(conf_h, conf->name, misc->onboot);
 		break;
+	case PARAM_BOOTORDER:
+		ret = conf_store_ulong(conf_h, conf->name,
+				misc->bootorder);
+		break;
 	case PARAM_DISABLED:
 		ret = conf_store_yesno(conf_h, conf->name,
 			vps_p->opt.start_disabled);
@@ -2118,6 +2125,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		if (parse_ioprio(id, &vps_p->res.io, val))
 			return ERR_INVAL;
 		break;
+	case PARAM_BOOTORDER:
+		ret = conf_parse_ulong(&vps_p->res.misc.bootorder, val);
+		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);
 		break;
@@ -2552,6 +2562,7 @@ static void free_misc(misc_param *misc)
 	free_str_param(&misc->userpw);
 	FREE_P(misc->hostname)
 	FREE_P(misc->description)
+	FREE_P(misc->bootorder)
 }
 
 static void free_net(net_param *net)
@@ -2711,7 +2722,8 @@ static void merge_misc(misc_param *dst, misc_param *src)
 	MERGE_STR(hostname)
 	MERGE_STR(description)
 	MERGE_INT(onboot)
-	MERGE_INT(wait);
+	MERGE_P(bootorder)
+	MERGE_INT(wait)
 }
 
 static void merge_dq(dq_param *dst, dq_param *src)

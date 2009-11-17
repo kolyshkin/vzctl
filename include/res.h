@@ -53,6 +53,7 @@ typedef struct {
 	char *hostname;
 	char *description;
 	int onboot;
+	unsigned long *bootorder;
 	int wait;
 } misc_param;
 
