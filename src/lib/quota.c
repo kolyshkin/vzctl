@@ -303,7 +303,7 @@ int quota_off(envid_t veid, int force)
 /** Disk quota managment wraper.
  *
  * @param veid		CT ID.
- * @param cmd		quota commands (QUOTA_MARKDURTY QUOTA_DROP QUOTA_STAT)
+ * @param cmd		quota commands (QUOTA_MARKDIRTY QUOTA_DROP QUOTA_STAT)
  * @return		0 on success.
  */
 int quota_ctl(envid_t veid, int cmd)
@@ -317,7 +317,7 @@ int quota_ctl(envid_t veid, int cmd)
 	i = 0;
 	arg[i++] = strdup(VZQUOTA);
 	switch (cmd) {
-	case QUOTA_MARKDURTY:
+	case QUOTA_MARKDIRTY:
 		arg[i++] =strdup( "setlimit");
 		snprintf(buf, sizeof(buf), "%d", veid);
 		arg[i++] = strdup(buf);
@@ -421,7 +421,7 @@ int vps_quotaon(envid_t veid, char *private, dq_param *dq)
 	if (dq == NULL)
 		return 0;
 	if (dq->enable == NO) {
-//		quota_ctl(veid, QUOTA_MARKDURTY);
+//		quota_ctl(veid, QUOTA_MARKDIRTY);
 		return 0;
 	} else {
 		if (quota_ctl(veid, QUOTA_SHOW) == EXITCODE_QUOTNOTEXIST) {

@@ -23,7 +23,7 @@
 #define QUOTA_DROP		1
 #define QUOTA_STAT		2
 #define QUOTA_STAT2		3
-#define QUOTA_MARKDURTY		9
+#define QUOTA_MARKDIRTY		9
 #define QUOTA_SHOW		5
 
 #define QUOTA_EXPTIME		259200
@@ -72,7 +72,7 @@ int vps_quotaoff(envid_t veid, dq_param *dq);
 /** Disk quota managment wraper.
  *
  * @param veid		CT ID.
- * @param cmd		quota commands (QUOTA_MARKDURTY QUOTA_DROP QUOTA_STAT)
+ * @param cmd		quota commands (QUOTA_MARKDIRTY QUOTA_DROP QUOTA_STAT)
  * @return		0 on success.
  */
 int quota_ctl(envid_t veid, int cmd);
