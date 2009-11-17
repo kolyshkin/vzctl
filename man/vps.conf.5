@@ -1,4 +1,4 @@
-.TH vps.conf 5 "9 Nov 2009" "OpenVZ" "Containers"
+.TH vps.conf 5 "17 Nov 2009" "OpenVZ" "Containers"
 .SH NAME
 vps.conf \- configuration file for an OpenVZ container.
 .SH SYNOPSIS
@@ -28,6 +28,9 @@ Specifies whether this container will be started during system bootup.
 Default is \fBno\fR, meaning the container will not be started
 if \fBONBOOT\fR parameter is omitted.
 Corresponds to the \fB--onboot\fR option.
+.IP \fBBOOTORDER\fR="\fInumber\fR"
+Specifies the CT boot order priority. Corresponds to the
+\fB--bootorder\fR option.
 .IP \fBOSTEMPLATE\fR="\fItmpl_name\fR"
 Corresponds to the \fB--ostemplate\fR option.
 .IP \fBVE_ROOT\fR="\fIdirectory\fR"

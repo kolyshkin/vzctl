@@ -1,4 +1,4 @@
-.TH vzctl 8 "1 Oct 2009" "OpenVZ" "Containers"
+.TH vzctl 8 "17 Nov 2009" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- utility to control an OpenVZ container.
 .SH SYNOPSIS
@@ -54,6 +54,12 @@ The following parameters can be used with \fBset\fR command.
 Sets whether the container will be started during system boot up.
 The container will not be auto-started unless this parameter
 is set to \fIyes\fR.
+.TP
+\fB--bootorder\fR \fInumber\fR
+Sets the boot order priority for this CT. The higher the \fInumber\fR is,
+the earlier in the boot process this container starts. By default this
+parameter is unset, which is considered to be the lowest priority, so
+containers with unset \fBbootorder\fR will start last.
 .TP
 \fB--root\fR \fIpath\fR
 Sets the path to root directory for this container. This is essentially a mount
