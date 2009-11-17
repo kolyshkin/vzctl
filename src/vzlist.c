@@ -868,7 +868,7 @@ void merge_conf(struct Cveinfo *ve, vps_res *res)
 		memset(ve->ubc, 0, sizeof(struct Cubc));
 #define MERGE_UBC(name, ubc, res)				\
 do {								\
-	if (res == NULL || res->ub.name == NULL) 		\
+	if (res == NULL || res->ub.name == NULL)		\
 		break;						\
 	ubc->name[2] = res->ub.name[0];				\
 	ubc->name[3] = res->ub.name[1];				\
