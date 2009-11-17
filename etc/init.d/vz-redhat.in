@@ -387,7 +387,7 @@ start_ves()
 	local need_restart
 
 	need_restart=""
-	velist=$(vzlist -aH -octid,onboot |
+	velist=$(vzlist -aH -octid,onboot -s-bootorder |
 		awk '$2 == "yes" {print $1}')
 	sysctl -q -w net.ipv4.route.src_check=0
 	for veid in $velist; do

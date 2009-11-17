@@ -160,7 +160,7 @@ start_ve() {
 	local veid velist msg need_restart=""
 
 	# get all containers we should start on boot
-	velist=$(vzlist -aH -octid,onboot |
+	velist=$(vzlist -aH -octid,onboot -s-bootorder |
 		awk '$2 == "yes" {print $1}')
 
 	/sbin/sysctl -q -w net.ipv4.route.src_check=0
