@@ -29,7 +29,7 @@
 
 #define VZQUOTA		"/usr/sbin/vzquota"
 
-void quouta_inc(dq_param *param, int delta)
+void quota_inc(dq_param *param, int delta)
 {
 	if (param->enable != YES)
 		return;

@@ -87,5 +87,5 @@ int quota_off(envid_t veid, int force);
 int quota_on(envid_t veid, char *private, dq_param *param);
 int quota_set(envid_t veid, char *private, dq_param *param);
 int quota_init(envid_t veid, char *private, dq_param *param);
-void quouta_inc(dq_param *param, int delta);
+void quota_inc(dq_param *param, int delta);
 #endif

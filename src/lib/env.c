@@ -575,10 +575,10 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	if (!vps_is_mounted(res->fs.root)) {
 		/* increase quota to perform setup */
-		quouta_inc(&res->dq, 100);
+		quota_inc(&res->dq, 100);
 		if ((ret = vps_mount(h, veid, &res->fs, &res->dq, skip)))
 			return ret;
-		quouta_inc(&res->dq, -100);
+		quota_inc(&res->dq, -100);
 	}
 	if (pipe(wait_p) < 0) {
 		logger(-1, errno, "Can not create pipe");
