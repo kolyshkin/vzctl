@@ -119,6 +119,12 @@ static void print_cpulimit(struct Cveinfo *p, int index)
 			p->cpu->limit[index]);
 }
 
+static void print_onboot(struct Cveinfo *p, int index)
+{
+	p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+			p->onboot == YES ? "yes" : "no");
+}
+
 #define PRINT_UL_RES(fn, res, name)					\
 static void fn(struct Cveinfo *p, int index)				\
 {									\
@@ -535,7 +541,9 @@ struct Cfield field_names[] =
 {"laverage", "LAVERAGE", "%14s", 0, RES_LA, print_laverage, laverage_sort_fn},
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
-{"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn}
+{"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
+
+{"onboot", "ONBOOT", "%-9s", 0, RES_ONBOOT, print_onboot, none_sort_fn},
 };
 
 static void print_hostname(struct Cveinfo *p, int index)
@@ -934,6 +942,7 @@ do {								\
 		ve->ve_root = strdup(res->fs.root);
 	if (res->fs.private != NULL)
 		ve->ve_private = strdup(res->fs.private);
+	ve->onboot = res->misc.onboot;
 }
 
 int read_ves_param()

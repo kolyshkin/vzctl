@@ -94,6 +94,7 @@ struct Cveinfo {
 	struct Ccpu *cpu;
 	int status;
 	int hide;
+	int onboot;
 };
 
 #define RES_NONE	0
@@ -105,6 +106,7 @@ struct Cveinfo {
 #define RES_CPU		6
 #define RES_NAME	7
 #define RES_DESCRIPTION	8
+#define RES_ONBOOT	9
 
 struct Cfield {
 	char *name;
