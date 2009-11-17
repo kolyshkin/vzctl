@@ -414,6 +414,13 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 	return ret;
 }
 
+/** Turn disk quota on.
+ *
+ * @param veid		CT ID.
+ * @param private	CT private area path.
+ * @param dq		disk quota parameters.
+ * @return		0 on success.
+ */
 int vps_quotaon(envid_t veid, char *private, dq_param *dq)
 {
 	int ret;
@@ -435,6 +442,12 @@ int vps_quotaon(envid_t veid, char *private, dq_param *dq)
 	return 0;
 }
 
+/** Turn disk quota off.
+ *
+ * @param veid		CT ID.
+ * @param dq		disk quota parameters.
+ * @return		0 on success.
+ */
 int vps_quotaoff(envid_t veid, dq_param *dq)
 {
 	if (dq == NULL)

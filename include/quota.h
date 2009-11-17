@@ -44,45 +44,11 @@ typedef struct {
 	unsigned long *ugidlimit;	/**< user/group quota limit. */
 } dq_param;
 
-/** Setup disk quota limits.
- *
- * @param veid		CT ID.
- * @param dq		disk quota parameters.
- * @return		0 on success.
- */
 int vps_set_quota(envid_t veid, dq_param *dq);
-
-/** Turn disk quota on.
- *
- * @param veid		CT ID.
- * @param private	CT private area path.
- * @param dq		disk quota parameters.
- * @return		0 on success.
- */
 int vps_quotaon(envid_t veid, char *private, dq_param *dq);
-
-/** Turn disk quota off.
- *
- * @param veid		CT ID.
- * @param dq		disk quota parameters.
- * @return		0 on success.
- */
 int vps_quotaoff(envid_t veid, dq_param *dq);
 
-/** Disk quota management wrapper.
- *
- * @param veid		CT ID.
- * @param cmd		quota commands (QUOTA_MARKDIRTY QUOTA_DROP QUOTA_STAT)
- * @return		0 on success.
- */
 int quota_ctl(envid_t veid, int cmd);
-
-/** Turn quota off.
- *
- * @param veid		CT ID.
- * @param force		forcibly turn quota off.
- * @return		0 on success.
- */
 int quota_off(envid_t veid, int force);
 int quota_on(envid_t veid, char *private, dq_param *param);
 int quota_set(envid_t veid, char *private, dq_param *param);
