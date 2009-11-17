@@ -387,7 +387,7 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 		return 0;
 	}
 	if (quota_ctl(veid, QUOTA_STAT)) {
-		logger(-1, 0, "Error: Unable to apply new quota values"
+		logger(-1, 0, "Error: Unable to apply new quota values:"
 			" quota not running");
 		return -1;
 	}
@@ -401,8 +401,8 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 //			dq->ugidlimit = NULL;
 		} else if (!ret && !*dq->ugidlimit) {
 			logger(-1, 0, "WARNING: Unable to turn ugid quota"
-				" off. new parameters will be applyed"
-				" on next start");
+				" off. New parameters will be applied"
+				" during the next start");
 			tmp_ugidlimit = dq->ugidlimit;
 			dq->ugidlimit = NULL;
 		}
