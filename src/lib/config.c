@@ -1212,7 +1212,7 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	ret = 0;
 	switch (conf->id) {
 	case PARAM_ONBOOT:
-		ret = conf_store_yesno(conf_h, conf->name, vps_p->opt.onboot);
+		ret = conf_store_yesno(conf_h, conf->name, misc->onboot);
 		break;
 	case PARAM_DISABLED:
 		ret = conf_store_yesno(conf_h, conf->name,
@@ -1854,7 +1854,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		vps_p->opt.reset_ub = YES;
 		break;
 	case PARAM_ONBOOT:
-		ret = conf_parse_yesno(&vps_p->opt.onboot, val);
+		ret = conf_parse_yesno(&vps_p->res.misc.onboot, val);
 		break;
 	case PARAM_DISABLED:
 		ret = conf_parse_yesno(&vps_p->opt.start_disabled, val);
@@ -2654,7 +2654,6 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_INT(skip_setup)
 	MERGE_INT(start_disabled)
 	MERGE_INT(start_force)
-	MERGE_INT(onboot)
 	MERGE_INT(setmode)
 	MERGE_INT(apply_cfg_map)
 
@@ -2711,6 +2710,7 @@ static void merge_misc(misc_param *dst, misc_param *src)
 	MERGE_LIST(userpw)
 	MERGE_STR(hostname)
 	MERGE_STR(description)
+	MERGE_INT(onboot)
 	MERGE_INT(wait);
 }
 

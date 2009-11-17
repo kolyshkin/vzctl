@@ -52,6 +52,7 @@ typedef struct {
 	list_head_t searchdomain;
 	char *hostname;
 	char *description;
+	int onboot;
 	int wait;
 } misc_param;
 
@@ -99,7 +100,6 @@ typedef struct {
 	int start_disabled;
 	int start_force;
 	int setmode;
-	int onboot;
 	char *config;
 	char *origin_sample;
 	char *lockdir;
