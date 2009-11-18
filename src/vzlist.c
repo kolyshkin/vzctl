@@ -122,7 +122,7 @@ static void print_cpulimit(struct Cveinfo *p, int index)
 static void print_onboot(struct Cveinfo *p, int index)
 {
 	p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
-			p->onboot == YES ? "yes" : "no");
+			"%6s", p->onboot == YES ? "yes" : "no");
 }
 
 static void print_bootorder(struct Cveinfo *p, int index)
@@ -575,7 +575,7 @@ struct Cfield field_names[] =
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
 
-{"onboot", "ONBOOT", "%-9s", 0, RES_ONBOOT, print_onboot, none_sort_fn},
+{"onboot", "ONBOOT", "%6s", 0, RES_ONBOOT, print_onboot, none_sort_fn},
 {"bootorder", "BOOTORDER", "%10s", 0, RES_BOOTORDER,
 	print_bootorder, bootorder_sort_fn},
 };
