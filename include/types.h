@@ -48,7 +48,8 @@
 #define DEL		1
 
 /* Default environment variable PATH */
-#define	ENV_PATH	"PATH=/bin:/sbin:/usr/bin:/usr/sbin:"
+#define	ENV_PATH	"PATH=/usr/local/sbin:/usr/local/bin:" \
+			"/usr/sbin:/usr/bin:/sbin:/bin"
 
 /* CT states */
 enum {
