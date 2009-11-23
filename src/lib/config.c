@@ -2025,15 +2025,16 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_devnodes(vps_p, val);
 		break;
 	case PARAM_CPUUNITS:
+		ret = conf_parse_ulong(&vps_p->res.cpu.units, val);
+		if (ret != 0)
+			break;
+
+		if ((*vps_p->res.cpu.units < MINCPUUNITS ||
+				*vps_p->res.cpu.units > MAXCPUUNITS))
 		{
-			unsigned long *u = vps_p->res.cpu.units;
-			ret = conf_parse_ulong(&u, val);
-			if (ret != 0)
-				break;
-			if ((*u < MINCPUUNITS || *u > MAXCPUUNITS)) {
-				free(u); u = NULL;
-				ret = ERR_INVAL;
-			}
+			free(vps_p->res.cpu.units);
+			vps_p->res.cpu.units = NULL;
+			ret = ERR_INVAL;
 		}
 		break;
 	case PARAM_CPUWEIGHT:
