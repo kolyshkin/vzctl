@@ -21,7 +21,10 @@
 #include "types.h"
 #include "quota.h"
 
-#define MNT_DETACH		0x00000002
+#ifndef MNT_DETACH
+# define MNT_DETACH		0x00000002
+#endif
+
 /** Action script prefixes.
  */
 #define MOUNT_PREFIX		"mount"
