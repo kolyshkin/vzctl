@@ -127,7 +127,7 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 	g_log.veid = veid;
 	g_log.quiet = quiet;
 	if (progname != NULL)
-		snprintf(g_log.prog, sizeof(g_log.prog), progname);
+		snprintf(g_log.prog, sizeof(g_log.prog), "%s", progname);
 	else
 		g_log.prog[0] = 0;
 
