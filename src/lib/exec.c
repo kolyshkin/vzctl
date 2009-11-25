@@ -43,39 +43,39 @@ int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
 
 int execvep(const char *path, char *const argv[], char *const envp[])
 {
-	if (!strchr(path, '/')) {
-		char *p = DEF_PATH;
+	const char *p, *p2;
 
-		for (; p && *p;) {
-			char partial[FILENAME_MAX];
-			char *p2;
-
-			p2 = strchr(p, ':');
-			if (p2) {
-				size_t len = p2 - p;
-
-				strncpy(partial, p, len);
-				partial[len] = 0;
-			} else {
-				strcpy(partial, p);
-			}
-			if (strlen(partial))
-				strcat(partial, "/");
-			strcat(partial, path);
-
-			execve(partial, argv, envp != NULL ? envp : envp_bash);
-
-			if (errno != ENOENT)
-				return -1;
-			if (p2) {
-				p = p2 + 1;
-			} else {
-				p = 0;
-			}
-		}
-		return -1;
-	} else
+	if (strchr(path, '/'))
 		return execve(path, argv, envp);
+
+	for (p = DEF_PATH; p && *p; p = p2) {
+		char partial[FILENAME_MAX];
+
+		p2 = strchr(p, ':');
+		if (p2) {
+			size_t len = p2 - p;
+
+			strncpy(partial, p, len);
+			partial[len] = 0;
+			p2++;
+		} else {
+			strcpy(partial, p);
+		}
+		if (strlen(partial))
+			strcat(partial, "/");
+
+		strncat(partial, path, sizeof(partial) - 1);
+		if (strlen(partial) >= sizeof(partial) - 1) {
+			errno = ENAMETOOLONG;
+			break;
+		}
+
+		execve(partial, argv, envp ? envp : envp_bash);
+
+		if (errno != ENOENT)
+			break;
+	}
+	return -1;
 }
 
 static int stdredir(int rdfd, int wrfd)
