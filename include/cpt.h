@@ -3,7 +3,6 @@
 #include "types.h"
 #define PROC_CPT	"/proc/cpt"
 #define PROC_RST	"/proc/rst"
-#define DEF_DUMPDIR	"/var/tmp"
 
 #define CMD_CHKPNT		1
 #define CMD_SUSPEND		2
@@ -13,9 +12,6 @@
 
 #define CMD_KILL		10
 #define CMD_RESUME		11
-
-
-#define DEF_DUMPFILE	"Dump.%d"
 
 typedef struct {
 	char *dumpdir;

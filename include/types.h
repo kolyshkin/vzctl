@@ -52,6 +52,10 @@
 			"/usr/sbin:/usr/bin:/sbin:/bin"
 #define ENV_PATH	"PATH=" DEF_PATH
 
+/* Defaults for checkpointing */
+#define DEF_DUMPDIR	"/vz/dump"
+#define DEF_DUMPFILE	"Dump.%d"
+
 /* CT states */
 enum {
 	STATE_STARTING = 1,

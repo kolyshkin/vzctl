@@ -505,6 +505,12 @@ const char *get_vps_state_str(int vps_state)
 	return p;
 }
 
+int get_dump_file(unsigned veid, const char *dumpdir, char *buf, int size)
+{
+	return snprintf(buf, size, "%s/" DEF_DUMPFILE,
+			dumpdir != NULL ? dumpdir : DEF_DUMPDIR, veid);
+}
+
 int set_not_blk(int fd)
 {
 	int oldfl, ret;
