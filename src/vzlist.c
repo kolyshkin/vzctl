@@ -1779,6 +1779,7 @@ int main(int argc, char **argv)
 	free_veinfo();
 	free(host_pattern);
 	free(name_pattern);
+	free(desc_pattern);
 	free(f_order);
 
 	return 0;
