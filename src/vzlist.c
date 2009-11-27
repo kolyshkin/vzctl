@@ -676,21 +676,24 @@ void *x_realloc(void *ptr, int size)
 
 void usage()
 {
-	fprintf(stderr, "Usage: vzlist [-a] [-o name[,name...]] [-s {name|-name}] [-h <pattern>] [-N <pattern>]\n");
-	fprintf(stderr, "\t\t[-H] [-S] [veid [veid ...]|-1]\n");
-	fprintf(stderr, "	vzlist -L\n\n");
-	fprintf(stderr, "\t--all -a\t list of all containers\n");
-	fprintf(stderr, "\t--output -o\t output only specified parameters\n");
-	fprintf(stderr, "\t--hostname -h\t hostname search pattern\n");
-	fprintf(stderr, "\t--name -n\t display container's name\n");
-	fprintf(stderr, "\t--name_filter -N\t name search patter\n");
-	fprintf(stderr, "\t--description -d\t description search pattern\n");
-	fprintf(stderr, "\t--sort -s\t sort by specified parameter, - sign before parametr\n");
-	fprintf(stderr, "\t\t\t mean sort in reverse order\n");
-	fprintf(stderr, "\t--no-header -H\t supress display header\n");
-	fprintf(stderr, "\t--stopped -S\t list of stopped Ve\n");
-	fprintf(stderr, "\t--list -L\t list of allowed parameters\n");
-	return;
+	fprintf(stderr, "\n"
+"Usage:	vzlist	[-a|-S] [-n] [-H] [-o field[,field...]] [-s [-]field]\n"
+"		[-h pattern] [-N pattern] [-d pattern] [CTID [CTID ...]|-1]\n"
+"	vzlist -L\n"
+"\n"
+"Options:\n"
+"	-a, --all		list all containers\n"
+"	-S, --stopped		list stopped containers\n"
+"	-n, --name		display containers' names\n"
+"	-H, --no-header		suppress columns header\n"
+"	-o, --output		output only specified fields\n"
+"	-s, --sort		sort by the specified field\n"
+"				('-field' to reverse sort order)\n"
+"	-h, --hostname		filter CTs by hostname pattern\n"
+"	-N, --name_filter	filter CTs by name pattern\n"
+"	-d, --description	filter CTs by description pattern\n"
+"	-L, --list		get possible field names\n"
+	);
 }
 
 int id_search_fn(const void* val1, const void* val2)
