@@ -958,10 +958,10 @@ do {								\
 	{
 		ve->cpu = x_malloc(sizeof(struct Ccpu));
 		memset(ve->cpu, 0, sizeof(struct Ccpu));
-		if (res->cpu.units != NULL)
-			ve->cpu->limit[0] = *res->cpu.units;
 		if (res->cpu.limit != NULL)
-			ve->cpu->limit[1] = *res->cpu.limit;
+			ve->cpu->limit[0] = *res->cpu.limit;
+		if (res->cpu.units != NULL)
+			ve->cpu->limit[1] = *res->cpu.units;
 	}
 	if (res->misc.hostname != NULL)
 		ve->hostname = strdup(res->misc.hostname);
