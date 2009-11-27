@@ -52,6 +52,7 @@ static char *e_buf = g_outbuffer + sizeof(g_outbuffer) - 1;
 static char *host_pattern = NULL;
 static char *name_pattern = NULL;
 static char *desc_pattern = NULL;
+static char *dumpdir = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
 struct Cfield_order *last_field = NULL;
@@ -98,7 +99,7 @@ static void print_veid(struct Cveinfo *p, int index)
 
 static void print_status(struct Cveinfo *p, int index)
 {
-	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-7s", ve_status[p->status]);
+	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-9s", ve_status[p->status]);
 }
 
 static void print_laverage(struct Cveinfo *p, int index)
@@ -435,7 +436,7 @@ struct Cfield field_names[] =
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
 {"description", "DESCRIPTION", "%-32s", 0, RES_DESCRIPTION, print_description, description_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
-{"status", "STATUS", "%-7s", 0, RES_NONE, print_status, status_sort_fn},
+{"status", "STATUS", "%-9s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
 {"kmemsize", "KMEMSIZE", "%10s", 0, RES_UBC, print_ubc_kmemsize, kmemsize_h_sort_fn},
 {"kmemsize.m", "KMEMSIZE.M", "%10s", 1, RES_UBC, print_ubc_kmemsize, kmemsize_m_sort_fn},
@@ -1002,6 +1003,8 @@ int read_ves_param()
 		ve_root = strdup(param->res.fs.root_orig);
 	if (param->res.fs.private != NULL)
 		ve_private = strdup(param->res.fs.private_orig);
+	if (param->res.cpt.dumpdir != NULL)
+		dumpdir = strdup(param->res.cpt.dumpdir);
 	free_vps_param(param);
 	for (i = 0; i < n_veinfo; i++) {
 		veid = veinfo[i].veid;
@@ -1457,9 +1460,9 @@ int get_ves_la()
 int get_mounted_status()
 {
 	int i;
+	char buf[512];
+
 	for (i = 0; i < n_veinfo; i++) {
-		if (veinfo[i].ve_root == NULL)
-			continue;
 		if (veinfo[i].status == VE_RUNNING)
 			continue;
 		if (veinfo[i].ve_private == NULL ||
@@ -1468,6 +1471,11 @@ int get_mounted_status()
 			veinfo[i].hide = 1;
 			continue;
 		}
+		get_dump_file(veinfo[i].veid, dumpdir, buf, sizeof(buf));
+		if (stat_file(buf))
+			veinfo[i].status = VE_SUSPENDED;
+		if (veinfo[i].ve_root == NULL)
+			continue;
 		if (vps_is_mounted(veinfo[i].ve_root))
 			veinfo[i].status = VE_MOUNTED;
 	}

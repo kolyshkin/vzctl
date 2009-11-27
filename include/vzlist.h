@@ -34,13 +34,15 @@
 enum {
 	VE_RUNNING,
 	VE_STOPPED,
-	VE_MOUNTED
+	VE_MOUNTED,
+	VE_SUSPENDED
 };
 
 char *ve_status[]= {
 	"running",
 	"stopped",
-	"mounted"
+	"mounted",
+	"suspended"
 };
 
 struct Cubc {
