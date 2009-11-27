@@ -1615,8 +1615,8 @@ int collect()
 	if (check_param(RES_LA))
 		get_ves_la();
 	if (check_param(RES_CPU))
-		if ((ret = get_ves_cpu()))
-			return 1;
+		if (!only_stopped_ve && (ret = get_ves_cpu()))
+			return ret;
 	read_ves_param();
 	get_mounted_status();
 	if (host_pattern != NULL)
