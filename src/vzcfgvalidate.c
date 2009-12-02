@@ -27,12 +27,13 @@
 #include "logger.h"
 #include "util.h"
 
+const char progname[] = "vzcfgvalidate";
 extern int page_size;
 
 void usage(int rc)
 {
 	FILE *fp = rc ? stderr : stdout;
-	fprintf(fp, "Usage: vzcfgvalidate [-r|-i] <configfile>\n");
+	fprintf(fp, "Usage: %s [-r|-i] <configfile>\n", progname);
 	fprintf(fp, "	-r repair mode\n");
 	fprintf(fp, "	-i interactive repair mode\n");
 	exit(rc);
@@ -62,7 +63,7 @@ int main(int argc, char **argv)
 	if (optind >= argc)
 		usage(1);
 
-	init_log(NULL, 0, 1, 0, 0, NULL);
+	init_log(NULL, 0, 1, 0, 0, progname);
 
 	if ((page_size = get_pagesize()) < 0)
 		return 1;
@@ -70,15 +71,15 @@ int main(int argc, char **argv)
 	/* Read global config */
 	gparam = init_vps_param();
 	if (vps_parse_config(0, GLOBAL_CFG, gparam, NULL)) {
-		fprintf(stderr, "WARNING: Global configuration file %s "
-				"not found\n", GLOBAL_CFG);
+		logger(-1, 0, "WARNING: Global configuration file %s "
+			"not found", GLOBAL_CFG);
 	}
 
 	/* Read container config */
 	infile = strdup(argv[optind]);
 	if (stat(infile, &st)) {
-		fprintf(stderr,"Container configuration file %s not found\n",
-				infile);
+		logger(-1, 0, "Container configuration file %s not found",
+			infile);
 		free(infile);
 		exit(1);
 	}
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
 		if (recover || ask)
 			if (vps_save_config(0, infile, param, NULL, NULL))
 				return 1;
-		fprintf(stderr, "Validation completed: success\n");
+		logger(-1, 0, "Validation completed: success");
 	}
 	exit(ret);
 }
