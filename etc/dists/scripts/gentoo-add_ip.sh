@@ -43,10 +43,10 @@ function is_baselayout1()
 
 function comment_line_regex()
 {
-	cp -pf ${IFCFG} ${IFCFG}.$$ || \
+	cp -pf ${IFCFG} ${IFCFG}.$$ ||
 		error "Failed to comment ${1}: unable to copy ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
-	sed -e "s/${1}/#${1}/" < ${IFCFG} > ${IFCFG}.$$ && \
-	mv -f ${IFCFG}.$$ ${IFCFG} 2>/dev/null
+	sed -e "s/${1}/#${1}/" < ${IFCFG} > ${IFCFG}.$$ &&
+		mv -f ${IFCFG}.$$ ${IFCFG} 2>/dev/null
 	if [ $? -ne 0 ]; then
 		rm -f ${IFCFG}.$$ 2>/dev/null
 		error "Failed to comment ${1}: unable to create ${IFCFG}."
