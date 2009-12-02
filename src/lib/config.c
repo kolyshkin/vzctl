@@ -402,26 +402,22 @@ static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
 /******************** Features *************************/
 static int parse_features(env_param *env, char *val)
 {
-	int ret;
+	int ret = 0;
 	char *token;
 	struct feature_s *feat;
 
-	if ((token = strtok(val, "\t ")) == NULL)
-		return 0;
-
-	ret = 0;
-	do {
+	for_each_strtok(token, val, "\t ") {
 		feat = find_feature(token);
-		if (feat == NULL) {
+		if (!feat) {
 			logger(0, 0, "Warning: Unknown feature: %s", token);
 			ret = ERR_INVAL_SKIP;
 			continue;
 		}
-
 		if (feat->on)
 			env->features_mask |= feat->mask;
 		env->features_known |= feat->mask;
-	} while ((token = strtok(NULL, "\t ")) != NULL);
+	}
+
 	return ret;
 }
 
@@ -468,20 +464,19 @@ static int parse_iptables(env_param *env, char *val)
 {
 	char *token;
 	struct iptables_s *ipt;
-	int ret;
+	int ret = 0;
 
-	if ((token = strtok(val, "\t ")) == NULL)
-		return 0;
-	ret = 0;
-	do {
-		if ((ipt = find_ipt(token)) == NULL) {
+	for_each_strtok(token, val, "\t ") {
+		ipt = find_ipt(token);
+		if (!ipt) {
 			logger(-1, 0, "Warning: Unknown iptable module: %s,"
 				" skipped", token);
 			ret = ERR_INVAL_SKIP;
 			continue;
 		}
-		env->ipt_mask |= (unsigned long) ipt->mask;
-	} while ((token = strtok(NULL, "\t ")));
+		env->ipt_mask |= (unsigned long)ipt->mask;
+	}
+
 	return ret;
 }
 
@@ -721,9 +716,7 @@ static int parse_cap(char *str, cap_param *cap)
 	char cap_nm[128];
 	unsigned long *mask;
 
-	if ((token = strtok(str, "\t ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, str, "\t ") {
 		if ((p = strrchr(token, ':')) == NULL) {
 			logger(-1, 0, "Invalid syntaxes in %s:"
 				" capname:on|off", token);
@@ -746,7 +739,7 @@ static int parse_cap(char *str, cap_param *cap)
 			logger(-1, 0, "Capability %s is unknown", cap_nm);
 			return ERR_INVAL;
 		}
-	} while ((token = strtok(NULL, " ")));
+	}
 
 	return 0;
 }
@@ -804,9 +797,7 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 	else
 		return 0;
 
-	if ((token = strtok(val, "\t ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, "\t ") {
 		if (id == PARAM_IP_DEL && !strcmp(token, "all")) {
 			vps_p->res.net.delall = YES;
 			continue;
@@ -827,7 +818,7 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 			return ERR_INVAL;
 		if (!find_ip(&net->ip, dst))
 			add_str_param(&net->ip, dst);
-	} while ((token = strtok(NULL, " ")));
+	}
 
 	return 0;
 }
@@ -874,13 +865,11 @@ int add_netdev(net_param *net, char *val)
 {
 	char *token;
 
-	if ((token = strtok(val, "\t ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, "\t ") {
 		if (check_netdev(token))
 			return ERR_INVAL;
 		add_str_param(&net->dev, token);
-	} while ((token = strtok(NULL, "\t ")));
+	}
 
 	return 0;
 }
@@ -1055,14 +1044,12 @@ static int parse_dev(vps_param *vps_p, char *val)
 	char *token;
 	dev_res dev;
 
-	if ((token = strtok(val, " ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, " ") {
 		if (parse_devices_str(token, &dev))
 			return ERR_INVAL;
 		if (add_dev_param(&vps_p->res.dev, &dev))
 			return ERR_NOMEM;
-	} while ((token = strtok(NULL, " ")));
+	}
 
 	return 0;
 }
@@ -1155,14 +1142,12 @@ static int parse_devnodes(vps_param *vps_p, char *val)
 	char *token;
 	dev_res dev;
 
-	if ((token = strtok(val, " ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, " ") {
 		if (parse_devnodes_str(token, &dev))
 			return ERR_INVAL;
 		if (add_dev_param(&vps_p->res.dev, &dev))
 			return ERR_NOMEM;
-	} while ((token = strtok(NULL, " ")));
+	}
 
 	return 0;
 }
@@ -1361,17 +1346,14 @@ static int parse_veth(vps_param *vps_p, char *val, int operation)
 	char *token;
 	veth_dev dev;
 
-	if ((token = strtok(val, " ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, " ") {
 		if (parse_veth_str(token, &dev, operation))
 			return ERR_INVAL;
 		if (operation)
 			ret = add_veth_param(&vps_p->res.veth, &dev);
 		else
 			ret = add_veth_param(&vps_p->del_res.veth, &dev);
-
-	} while ((token = strtok(NULL, " ")));
+	}
 
 	return 0;
 }
@@ -1555,21 +1537,15 @@ static int parse_netif(envid_t veid, veth_param *veth, char *val)
 	char *token;
 	veth_dev dev;
 
-	if ((token = strtok(val, ";")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, ";") {
 		if (parse_netif_str(veid, token, &dev)) {
 			free_veth_dev(&dev);
 			continue;
 		}
-		if (find_veth_by_ifname_ve(&veth->dev,
-				dev.dev_name_ve) == NULL)
-		{
+		if (!find_veth_by_ifname_ve(&veth->dev, dev.dev_name_ve))
 			ret = add_veth_param(veth, &dev);
-		}
 		free_veth_dev(&dev);
-
-	} while ((token = strtok(NULL, ";")));
+	}
 
 	return 0;
 }
@@ -1801,14 +1777,11 @@ static int parse_netif_cmd(envid_t veid, veth_param *veth, char *val)
 	char *token;
 	veth_dev dev;
 
-	if ((token = strtok(val, " ")) == NULL)
-		return 0;
-	do {
+	for_each_strtok(token, val, " ") {
 		if (parse_netif_str_cmd(veid, token, &dev))
 			return ERR_INVAL;
 		ret = add_veth_param(veth, &dev);
-
-	} while ((token = strtok(NULL, " ")));
+	}
 
 	return 0;
 }
