@@ -44,7 +44,8 @@ int main(int argc, char **argv)
 	vps_param *param, *gparam;
 	struct stat st;
 	char *infile = NULL;
-	int ret, opt, recover = 0, ask = 0;
+	int opt, recover = 0, ask = 0;
+	int ret = 1;
 
 	while ((opt = getopt(argc, argv, "rih")) > 0) {
 		switch(opt) {
@@ -80,21 +81,24 @@ int main(int argc, char **argv)
 	if (stat(infile, &st)) {
 		logger(-1, 0, "Container configuration file %s not found",
 			infile);
-		free(infile);
-		exit(1);
+		goto err;
 	}
 	param = init_vps_param();
 	if (vps_parse_config(0, infile, param, NULL))
-		exit(1);
+		goto err;
 
 	/* Merge configs (needed for DISK_QUOTA value, maybe others) */
 	merge_vps_param(gparam, param);
 
-	if (!(ret = validate(&param->res, recover, ask)))	{
+	if (!(ret = validate(&param->res, recover, ask))) {
 		if (recover || ask)
 			if (vps_save_config(0, infile, param, NULL, NULL))
-				return 1;
+				goto err;
 		logger(-1, 0, "Validation completed: success");
 	}
+	ret = 0;
+
+err:
+	free(infile);
 	exit(ret);
 }
