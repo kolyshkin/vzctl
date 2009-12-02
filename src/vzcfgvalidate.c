@@ -78,6 +78,10 @@ int main(int argc, char **argv)
 
 	/* Read container config */
 	infile = strdup(argv[optind]);
+	if (!infile) {
+		logger(-1, 0, "No free memory");
+		goto err;
+	}
 	if (stat(infile, &st)) {
 		logger(-1, 0, "Container configuration file %s not found",
 			infile);
