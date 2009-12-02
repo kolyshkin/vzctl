@@ -45,8 +45,7 @@ int main(int argc, char **argv)
 	char *infile = NULL;
 	int ret, opt, recover = 0, ask = 0;
 
-	while ((opt = getopt(argc, argv, "rih")) > 0)
-	{
+	while ((opt = getopt(argc, argv, "rih")) > 0) {
 		switch(opt) {
 		case 'r'	:
 			recover = 1;
@@ -62,13 +61,14 @@ int main(int argc, char **argv)
 	}
 	if (optind >= argc)
 		usage(1);
+
 	init_log(NULL, 0, 1, 0, 0, NULL);
 
 	if ((page_size = get_pagesize()) < 0)
 		return 1;
 
 	/* Read global config */
-	gparam=init_vps_param();
+	gparam = init_vps_param();
 	if (vps_parse_config(0, GLOBAL_CFG, gparam, NULL)) {
 		fprintf(stderr, "WARNING: Global configuration file %s "
 				"not found\n", GLOBAL_CFG);
