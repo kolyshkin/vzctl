@@ -43,10 +43,10 @@ FAKEGATEWAYNET=192.0.2.0
 #   error "Fatal error" 1
 function error()
 {
-        # print errors to stdout too
-        ERR=$?
-        echo "$SELFNAME ERROR: $1"
-        exit $2
+	# print errors to stdout too
+	ERR=$?
+	echo "$SELFNAME ERROR: $1"
+	exit $2
 }
 
 # Puts line
@@ -321,15 +321,15 @@ function change_hostname()
 		found || ($2 == host && (ip == "" || ip == $1)) {
 			if (ip == "") {ip = $1}
 			for (i=3; i <= NF; i++) {
-                               if ((j=index($2, ".")) > 1) {
-				        origalias= substr($2, 1, j - 1);
-				        if (origalias != $i) {
-					        EXTRANAMES[$i] = 1;
-                                        }
+				if ((j=index($2, ".")) > 1) {
+					origalias= substr($2, 1, j - 1);
+					if (origalias != $i) {
+						EXTRANAMES[$i] = 1;
+					}
 				} else {
 					EXTRANAMES[$i] = 1;
-                                }
-                        }
+				}
+			}
 			found = 0;
 			next;
 		}
