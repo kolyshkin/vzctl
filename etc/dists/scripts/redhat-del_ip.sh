@@ -56,6 +56,11 @@ function del_ip()
 				ifconfig ${VENET_DEV}:${aliasid} down >/dev/null 2>&1
 			fi
 		done
+		# Even if file not found, try to delete IP
+		for aliasid in $(ifconfig | grep -B1 "\\<inet addr:${ip}\\>" |
+				awk "/^${VENET_DEV}:/ {print \$1}"); do
+			ifconfig ${aliasid} down >/dev/null 2>&1
+		done
 	done
 }
 
