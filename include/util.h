@@ -72,4 +72,7 @@ void remove_names(envid_t veid);
 		p;						\
 	})
 
+#define for_each_strtok(p, str, sep)				\
+	for (p = strtok(str, sep); p; p = strtok(NULL, sep))
+
 #endif
