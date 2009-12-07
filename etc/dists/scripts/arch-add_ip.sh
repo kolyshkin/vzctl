@@ -31,7 +31,7 @@ function remove_all_ve_aliases()
 	for ve_if in ${ve_if_name}; do
 	    /etc/rc.d/network ifdown ${ve_if} 2>/dev/null
 	    del_param "${CFGFILE}.bak" "${ve_if}"
-            del_param3 "${CFGFILE}.bak" "INTERFACES" "${ve_if}"
+	    del_param3 "${CFGFILE}.bak" "INTERFACES" "${ve_if}"
 	done
 }
 
@@ -39,13 +39,13 @@ function setup_network()
 {
     # create lo
     if ! grep -qe "^lo=" ${CFGFILE}.bak 2>/dev/null; then
-        put_param "${CFGFILE}.bak" "lo" "lo 127.0.0.1"
+	put_param "${CFGFILE}.bak" "lo" "lo 127.0.0.1"
 	add_param3 "${CFGFILE}.bak" "INTERFACES" "lo"
     fi
 
     # create venet0 and routes
     if ! grep -qe "^venet0=" ${CFGFILE}.bak 2>/dev/null; then
-        put_param "${CFGFILE}.bak" "venet0" "venet0 127.0.0.1 netmask 255.255.255.255 broadcast 0.0.0.0"
+	put_param "${CFGFILE}.bak" "venet0" "venet0 127.0.0.1 netmask 255.255.255.255 broadcast 0.0.0.0"
 	add_param3 "${CFGFILE}.bak" "INTERFACES" "venet0"
 	put_param "${CFGFILE}.bak" "rt_venet0" "-net 191.255.255.1 netmask 255.255.255.255 dev venet0"
 	put_param "${CFGFILE}.bak" "rt_default" "default gw 191.255.255.1"
@@ -69,8 +69,8 @@ function create_config()
 function get_all_aliasid()
 {
 	IFNUM=-1
-        IFNUMLIST=`grep -e "^${VENET_DEV}_.*$" 2> /dev/null ${CFGFILE}.bak \
-		    | sed "s/.*${VENET_DEV}_//" | cut -d '=' -f 1`
+	IFNUMLIST=`grep -e "^${VENET_DEV}_.*$" 2> /dev/null ${CFGFILE}.bak |
+		   sed "s/.*${VENET_DEV}_//" | cut -d '=' -f 1`
 }
 
 function get_free_aliasid()

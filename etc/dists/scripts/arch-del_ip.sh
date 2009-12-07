@@ -29,7 +29,7 @@ function del_ip()
 	echo ${IP_ADDR}
 	for ip in ${IP_ADDR}; do
 		ifname=`grep -B 1 -e "\\<${ip}\\>" ${CFGFILE} |
-			    grep "${VENET_DEV}_" | cut -d'=' -f1`
+			grep "${VENET_DEV}_" | cut -d'=' -f1`
 		if [ -n "${ifname}" ]; then
 		    # shutdown interface venet0_x
 		    /etc/rc.d/network ifdown ${ifname} 2> /dev/null
