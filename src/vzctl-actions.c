@@ -717,7 +717,7 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 
 static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 {
-	int exist = 0, mounted = 0, run = 0;
+	int exist = 0, mounted = 0, run = 0, suspended = 0;
 	char buf[STR_SIZE];
 	fs_param *fs = &param->res.fs;
 
@@ -726,10 +726,16 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 		exist = 1;
 	mounted = vps_is_mounted(fs->root);
 	run = vps_is_run(h, veid);
-	printf("CTID %d %s %s %s\n", veid,
+	if (exist == 1) {
+		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));
+		if (stat_file(buf))
+			suspended = 1;
+	}
+	printf("CTID %d %s %s %s%s\n", veid,
 		exist ? "exist" : "deleted",
 		mounted ? "mounted" : "unmounted",
-		run ? "running" : "down");
+		run ? "running" : "down",
+		suspended ? " suspended" : "");
 	return 0;
 }
 
