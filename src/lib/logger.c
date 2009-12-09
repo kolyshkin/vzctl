@@ -114,7 +114,7 @@ void set_log_verbose(int level)
 }
 
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
-	char *progname)
+	const char *progname)
 {
 	int ret = 0;
 

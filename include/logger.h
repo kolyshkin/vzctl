@@ -59,7 +59,7 @@ int set_log_file(char *file);
  * @param progname	program name.
  */
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
-	char *progname);
+	const char *progname);
 
 /** Close logging.
  */
