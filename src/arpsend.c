@@ -618,6 +618,3 @@ int read_ip_addr(struct in_addr* in_addr, const char* str)
 		return -1;
 	return 0;
 }
-
-
-

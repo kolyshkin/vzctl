@@ -396,4 +396,3 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 	fclose(fd);
 	return !found;
 }
-

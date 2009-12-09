@@ -67,4 +67,3 @@ void free_ubs_limit(struct ub_struct *ubs);
 void shift_ubs_param(struct ub_struct *param);
 void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage);
 #endif
-

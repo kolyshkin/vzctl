@@ -843,4 +843,3 @@ int check_hn_overcommitment(int veid, struct ub_struct *param,
 	}
 	return actid == ACT_ERROR ? VZ_OVERCOMMIT_ERROR : 0;
 }
-

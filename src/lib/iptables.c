@@ -98,4 +98,3 @@ unsigned long long get_ipt_mask(unsigned long ids)
 	}
 	return mask;
 }
-

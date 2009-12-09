@@ -690,4 +690,3 @@ int main(int argc, char **argv)
 	retval = lconv(name);
 	exit(retval);
 }
-

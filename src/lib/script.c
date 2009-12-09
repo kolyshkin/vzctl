@@ -419,4 +419,3 @@ err:
 	unlink(VZFIFO_FILE);
 	return ret;
 }
-

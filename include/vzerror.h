@@ -147,4 +147,3 @@
 
 #define VZ_CONFIG_SAVE_ERROR		139
 #endif /* _VZ_ERROR_H_ */
-

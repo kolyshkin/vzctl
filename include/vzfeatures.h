@@ -28,4 +28,3 @@ struct feature_s *find_feature(const char *name);
 void features_mask2str(unsigned long long, unsigned long long, char *, int);
 
 #endif //_VZFEATURES_H_
-

@@ -513,4 +513,3 @@ int get_vps_ip(vps_handler *h, envid_t veid, list_head_t *ip_h)
 	return ret;
 }
 #endif
-

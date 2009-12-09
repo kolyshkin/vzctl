@@ -164,5 +164,3 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 
 	return ret;
 }
-
-

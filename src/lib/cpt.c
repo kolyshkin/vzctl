@@ -447,4 +447,3 @@ err:
 		logger(0, 0, "Restoring completed succesfully");
 	return ret;
 }
-

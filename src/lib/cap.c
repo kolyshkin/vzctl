@@ -203,4 +203,3 @@ int vps_set_cap(envid_t veid, cap_param *cap)
 
 	return set_cap(veid, mask, 0);
 }
-
