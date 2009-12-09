@@ -67,7 +67,7 @@ int get_arch_from_elf(const char *file)
 		return -1;
 	nbytes = read(fd, (void *) &elf_hdr, sizeof(elf_hdr));
 	close(fd);
-	if (nbytes < sizeof(elf_hdr))
+	if (nbytes < (int)sizeof(elf_hdr))
 		return -1;
 	if (check_elf_magic(elf_hdr.ident))
 		return -1;
