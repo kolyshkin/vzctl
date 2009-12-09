@@ -49,7 +49,8 @@ typedef struct {
  * @param dev		devices list.
  * @return		0 on success.
  */
-int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev);
+int vps_set_devperm(vps_handler *h, envid_t veid, const char *root,
+		dev_param *dev);
 int set_devperm(vps_handler *h, envid_t veid, dev_res *dev);
 int add_dev_param(dev_param *dev, dev_res *res);
 void free_dev_param(dev_param *dev);

@@ -53,7 +53,8 @@ typedef struct {
  * @retun		0 on success.
  */
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
-	dist_actions *actions, char *root, int state, int skip_arpdetect);
+	dist_actions *actions, const char *root,
+	int state, int skip_arpdetect);
 
 /** Setup access to Host system network devices.
  *

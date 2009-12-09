@@ -228,7 +228,7 @@ static void preload_lib()
 	endgrent();
 }
 
-int do_enter(vps_handler *h, envid_t veid, char *root)
+int do_enter(vps_handler *h, envid_t veid, const char *root)
 {
 	int pid, ret, status;
 	int in[2], out[2], st[2], info[2];

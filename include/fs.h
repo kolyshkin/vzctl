@@ -52,7 +52,7 @@ typedef struct {
  *			 0 - CT unmounted.
  *			-1 - error
  */
-int vps_is_mounted(char *root);
+int vps_is_mounted(const char *root);
 
 /** Mount CT.
  *
@@ -81,7 +81,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
  * @param root		CT root.
  * @return		0 on success.
  */
-int fsumount(envid_t veid, char *root);
+int fsumount(envid_t veid, const char *root);
 
 /** Unmount CT and run unmount action script if exists.
  *
@@ -91,12 +91,12 @@ int fsumount(envid_t veid, char *root);
  * @param skip		skip unmount action scrips
  * @return		0 on success.
  */
-int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip);
+int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip);
 
 int vps_set_fs(fs_param *g_fs, fs_param *fs);
 
 extern const char *vz_fs_get_name();
-extern int vz_fs_is_mounted(char *root);
+extern int vz_fs_is_mounted(const char *root);
 extern int vz_mount(fs_param *fs, int remount);
 
 #endif

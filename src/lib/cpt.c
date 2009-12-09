@@ -106,7 +106,7 @@ err:
 	return ret ? err : 0;
 }
 
-int real_chkpnt(int cpt_fd, envid_t veid, char *root, cpt_param *param,
+int real_chkpnt(int cpt_fd, envid_t veid, const char *root, cpt_param *param,
 	int cmd)
 {
 	int ret, len, len1;
@@ -183,7 +183,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	int dump_fd = -1;
 	char dumpfile[PATH_LEN];
 	int cpt_fd, pid, ret;
-	char *root = vps_p->res.fs.root;
+	const char *root = vps_p->res.fs.root;
 
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {

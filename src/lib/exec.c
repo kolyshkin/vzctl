@@ -142,7 +142,7 @@ int env_wait(int pid)
 	return ret;
 }
 
-static int vps_real_exec(vps_handler *h, envid_t veid, char *root,
+static int vps_real_exec(vps_handler *h, envid_t veid, const char *root,
 	int exec_mode, char *argv[], char *const envp[], char *std_in,
 	int timeout)
 {
@@ -325,7 +325,7 @@ err:
  * @param timeout	execution timeout, 0 - unlimited.
  * @return		0 on success.
  */
-int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
+int vps_exec(vps_handler *h, envid_t veid, const char *root, int exec_mode,
 	char *argv[], char *const envp[], char *std_in, int timeout)
 {
 	int pid, ret;
@@ -349,8 +349,8 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
 	return ret;
 }
 
-int _real_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
-	int flags)
+int _real_execFn(vps_handler *h, envid_t veid, const char *root,
+		execFn fn, void *data, int flags)
 {
 	int ret, pid;
 
@@ -380,8 +380,8 @@ env_err:
 	return ret;
 }
 
-int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
-	int flags)
+int vps_execFn(vps_handler *h, envid_t veid, const char *root,
+		execFn fn, void *data, int flags)
 {
 	int pid, ret;
 
@@ -414,7 +414,7 @@ int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
  * @param timeout	execution timeout, 0 - unlimited.
  * @return		0 on success.
  */
-int vps_exec_script(vps_handler *h, envid_t veid, char *root,
+int vps_exec_script(vps_handler *h, envid_t veid, const char *root,
 	char *argv[], char *const envp[], const char *fname, char *func,
 	int timeout)
 {
@@ -436,7 +436,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	int rd_p[2], wr_p[2];
 	int ret, retry;
 	char *argv[2];
-	char *root = vps_p->res.fs.root;
+	const char *root = vps_p->res.fs.root;
 
 	if (!stat_file(script))	{
 		logger(-1, 0, "Script not found: %s", script);

@@ -367,7 +367,7 @@ static int remove_ipv6_addr(net_param *net)
 }
 
 int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
-	dist_actions *actions, char *root, int state, int skip)
+	dist_actions *actions, const char *root, int state, int skip)
 {
 	int ret = 0;
 

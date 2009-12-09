@@ -44,7 +44,7 @@ int execvep(const char *path, char *const argv[], char *const envp[]);
  * @param timeout	execution timeout, 0 - unlimited.
  * @return		0 on success.
  */
-int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
+int vps_exec(vps_handler *h, envid_t veid, const char *root, int exec_mode,
 	char *argv[], char *const envp[], char *std_in, int timeout);
 
 /** Read script and execute it in CT.
@@ -59,12 +59,12 @@ int vps_exec(vps_handler *h, envid_t veid, char *root, int exec_mode,
  * @param timeout	execution timeout, 0 - unlimited.
  * @return		0 on success.
  */
-int vps_exec_script(vps_handler *h, envid_t veid, char *root,
+int vps_exec_script(vps_handler *h, envid_t veid, const char *root,
 	char *argv[], char *const envp[], const char *fname, char *func,
 	int timeout);
 
-int vps_execFn(vps_handler *h, envid_t veid, char *root, execFn fn, void *data,
-	int flags);
+int vps_execFn(vps_handler *h, envid_t veid, const char *root,
+		execFn fn, void *data, int flags);
 
 int env_wait(int pid);
 

@@ -75,7 +75,7 @@ static const char *get_local_ip(vps_param *param)
 }
 
 int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, char *hostname, const char *ip, int state)
+	const char *root, char *hostname, const char *ip, int state)
 {
 	char *envp[5];
 	const char *script;
@@ -113,7 +113,7 @@ int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 }
 
 int vps_dns_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, misc_param *net, int state)
+	const char *root, misc_param *net, int state)
 {
 	char *envp[10];
 	char *str;
@@ -152,7 +152,7 @@ int vps_dns_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 }
 
 int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, list_head_t *pw)
+	const char *root, list_head_t *pw)
 {
 	char *envp[3];
 	const char *script;
@@ -182,7 +182,7 @@ int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 }
 
 int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, dq_param *dq, int state)
+	const char *root, dq_param *dq, int state)
 {
 	char *envp[6];
 	const char *script;
@@ -254,7 +254,7 @@ int need_configure(vps_res *res)
  * Setup (add/delete) IP address(es) inside container
  */
 int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, int op, net_param *net, int state)
+	const char *root, int op, net_param *net, int state)
 {
 	char *envp[6];
 	char *str;
@@ -310,7 +310,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 
 
 int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, int op, vps_param *param, int state)
+	const char *root, int op, vps_param *param, int state)
 {
 	int ret;
 	vps_res *res = &param->res;

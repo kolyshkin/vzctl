@@ -476,8 +476,8 @@ static void fill_veth_dev_name(veth_param *configured, veth_param *new)
 }
 
 int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, veth_param *veth_add, veth_param *veth_del, int state,
-	int skip)
+	const char *root, veth_param *veth_add, veth_param *veth_del,
+	int state, int skip)
 {
 	int ret, dev_num;
 	veth_param veth_old;

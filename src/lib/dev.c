@@ -33,7 +33,7 @@
 #include "env.h"
 #include "logger.h"
 
-static int dev_create(char *root, dev_res *dev)
+static int dev_create(const char *root, dev_res *dev)
 {
 	char buf1[STR_SIZE];
 	char buf2[STR_SIZE];
@@ -119,7 +119,8 @@ int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
  * @param dev		devices list.
  * @return		0 on success.
  */
-int vps_set_devperm(vps_handler *h, envid_t veid, char *root, dev_param *dev)
+int vps_set_devperm(vps_handler *h, envid_t veid, const char *root,
+		dev_param *dev)
 {
 	int ret = 0;
 	dev_res *res;

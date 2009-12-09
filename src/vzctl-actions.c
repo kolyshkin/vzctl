@@ -40,7 +40,7 @@
 #include "modules.h"
 
 extern struct mod_action g_action;
-extern int do_enter(vps_handler *h, envid_t veid, char *root);
+extern int do_enter(vps_handler *h, envid_t veid, const char *root);
 
 int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 	vps_param *param)
@@ -641,7 +641,7 @@ static int umount(vps_handler *h, envid_t veid, vps_param *g_p,
 static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
-	char *root = g_p->res.fs.root;
+	const char *root = g_p->res.fs.root;
 
 	set_log_file(NULL);
 	if (check_var(root, "VE_ROOT is not set"))
@@ -653,8 +653,8 @@ static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 	return do_enter(h, veid, root);
 }
 
-static int exec(vps_handler *h, int action, envid_t veid, char *root, int argc,
-	char **argv)
+static int exec(vps_handler *h, int action, envid_t veid, const char *root,
+		int argc, char **argv)
 {
 	int mode;
 	char **arg = NULL;

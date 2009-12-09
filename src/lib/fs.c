@@ -37,7 +37,7 @@ int vps_is_run(vps_handler *h, envid_t veid);
  *			 0 - CT unmounted.
  *			-1 - error
  */
-int vps_is_mounted(char *root)
+int vps_is_mounted(const char *root)
 {
 	return vz_fs_is_mounted(root);
 }
@@ -65,7 +65,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	return ret;
 }
 
-static int real_umount(envid_t veid, char *root)
+static int real_umount(envid_t veid, const char *root)
 {
 	int i, ret, n;
 
@@ -97,7 +97,7 @@ static int real_umount(envid_t veid, char *root)
  * @param root		CT root.
  * @return		0 on success.
  */
-int fsumount(envid_t veid, char *root)
+int fsumount(envid_t veid, const char *root)
 {
 	int ret;
 
@@ -166,7 +166,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
  * @param skip		skip unmount action scrips
  * @return		0 on success.
  */
-int vps_umount(vps_handler *h, envid_t veid, char *root, skipFlags skip)
+int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip)
 {
 	char buf[PATH_LEN];
 	int ret, i;

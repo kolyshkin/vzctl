@@ -65,8 +65,8 @@ typedef struct {
  */
 struct vps_param;
 int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
-	char *root, veth_param *veth_add, veth_param *veth_del, int state,
-	int skip);
+	const char *root, veth_param *veth_add, veth_param *veth_del,
+	int state, int skip);
 int add_veth_param(veth_param *list, veth_dev *dev);
 void free_veth(list_head_t *head);
 void free_veth_param(veth_param *dev);

@@ -45,7 +45,8 @@
 
 #define ENVRETRY	3
 
-static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode);
+static int env_stop(vps_handler *h, envid_t veid, const char *root,
+		int stop_mode);
 
 static inline int setluid(uid_t uid)
 {
@@ -226,7 +227,7 @@ int vps_is_run(vps_handler *h, envid_t veid)
  * @param		CT root
  * @return		0 on success
  */
-int vz_chroot(char *root)
+int vz_chroot(const char *root)
 {
 	int i;
 	sigset_t sigset;
@@ -681,7 +682,7 @@ int vps_start(vps_handler *h, envid_t veid, vps_param *param,
 	return vps_start_custom(h, veid, param, skip, mod, NULL, NULL);
 }
 
-static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
+static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 	int stop_mode)
 {
 	int ret;
@@ -722,7 +723,8 @@ static int real_env_stop(vps_handler *h, envid_t veid, char *vps_root,
 	return 0;
 }
 
-static int env_stop(vps_handler *h, envid_t veid, char *root, int stop_mode)
+static int env_stop(vps_handler *h, envid_t veid, const char *root,
+		int stop_mode)
 {
 	struct sigaction act, actold;
 	int i, pid, ret = 0;

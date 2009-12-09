@@ -75,12 +75,12 @@ int vps_destroy_dir(envid_t veid, char *dir)
 	return 0;
 }
 
-static char *get_destroy_root(char *dir)
+static char *get_destroy_root(const char *dir)
 {
 	struct stat st;
 	dev_t id;
 	int len;
-	char *p, *prev;
+	const char *p, *prev;
 	char tmp[STR_SIZE];
 
 	if (stat(dir, &st) < 0)
@@ -135,7 +135,7 @@ char *maketmpdir(const char *dir)
 /* Removes all the directories under 'root'
  * those names start with 'destroy_dir_magic'
  */
-static void _destroydir(char *root)
+static void _destroydir(const char *root)
 {
 	char buf[STR_SIZE];
 	struct stat st;

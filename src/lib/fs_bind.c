@@ -34,7 +34,7 @@
  *	    0 - no
  *	  < 0 - error
  */
-int vz_fs_is_mounted(char *root)
+int vz_fs_is_mounted(const char *root)
 {
 	FILE *fp;
 	char buf[512];
