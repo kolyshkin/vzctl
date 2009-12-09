@@ -120,7 +120,7 @@ static void winchange_handler(int sig)
 	win_changed = 1;
 }
 
-void set_proc_title(char *tty)
+static void set_proc_title(char *tty)
 {
 	char *p;
 
