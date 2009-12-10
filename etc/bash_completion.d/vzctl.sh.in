@@ -49,7 +49,7 @@ _vzctl()
 	vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status enter exec exec2 runscript"
 	vzctl_create_opts="--ostemplate --config --private --root \
-		--ipadd --hostname FIXME"
+		--ipadd --hostname --name --description"
 	vzctl_set_opts="--save --onboot --root --private \
 		--userpasswd --disabled --ipadd --ipdel \
 		--hostname --nameserver --searchdomain \
