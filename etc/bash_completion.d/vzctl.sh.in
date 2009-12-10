@@ -62,7 +62,7 @@ _vzctl()
 		--iptables --netdev_add --netdev_del --netif_add --netif_del \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--noatime --capability --devnodes --devices --applyconfig \
-		--name --ioprio --setmode --meminfo"
+		--name --ioprio --setmode --meminfo --bootorder"
 	vzctl_start_opts="--wait --force"
 	vzctl_stop_opts="--fast"
 	vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
