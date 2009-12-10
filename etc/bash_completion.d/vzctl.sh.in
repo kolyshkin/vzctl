@@ -57,7 +57,8 @@ _vzctl()
 		--kmemsize --tcpsndbuf --tcprcvbuf --othersockbuf \
 		--dgramrcvbuf --oomguarpages --lockedpages --privvmpages \
 		--shmpages --numfile --numflock --numpty --numsiginfo \
-		--dcachesize --numiptent --physpages --cpuunits --cpulimit \
+		--dcachesize --numiptent --physpages --swappages \
+		--cpuunits --cpulimit --cpus \
 		--iptables --netdev_add --netdev_del --netif_add --netif_del \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--noatime --capability --devnodes --devices --applyconfig \
