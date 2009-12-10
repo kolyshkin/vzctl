@@ -9,23 +9,23 @@ _get_ves()
 	case $cmd in
 		create)
 			# create a new CTID, by increasing the last one
-			local veids=`@SBINDIR@/vzlist -H -a -oveid | tail -1`
+			local veids=`@SBINDIR@/vzlist -H -a -octid | tail -1`
 			[ -n "$veids" ] || veids=100
 			echo $((veids+1))
 			;;
 		start|mount|umount|destroy)
 			# stopped CTs
-			@SBINDIR@/vzlist -H -S -oveid
+			@SBINDIR@/vzlist -H -S -octid
 			@SBINDIR@/vzlist -H -S -oname | $rm_empty
 			;;
 		stop|enter|exec*)
 			# running CTs
-			@SBINDIR@/vzlist -H -oveid
+			@SBINDIR@/vzlist -H -octid
 			@SBINDIR@/vzlist -H -oname | $rm_empty
 			;;
 		*)
 			# All CTs
-			@SBINDIR@/vzlist -H -a -oveid
+			@SBINDIR@/vzlist -H -a -octid
 			@SBINDIR@/vzlist -H -a -oname | $rm_empty
 			;;
 	esac
