@@ -13,7 +13,7 @@ _get_ves()
 			[ -n "$veids" ] || veids=100
 			echo $((veids+1))
 			;;
-		start|mount|umount|destroy)
+		start|mount|umount|destroy|delete)
 			# stopped CTs
 			@SBINDIR@/vzlist -H -S -octid
 			@SBINDIR@/vzlist -H -S -oname | $rm_empty
@@ -46,7 +46,7 @@ _vzctl()
 	prev=${COMP_WORDS[COMP_CWORD-1]}
 
 	vzctl_common_opts="--quiet --verbose --help --version"
-	vzctl_cmds="create destroy mount umount chkpnt restore \
+	vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status enter exec exec2 runscript"
 	vzctl_create_opts="--ostemplate --config --private --root \
 		--ipadd --hostname FIXME"
