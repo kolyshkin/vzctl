@@ -1,4 +1,4 @@
-.TH vps.conf 5 "17 Nov 2009" "OpenVZ" "Containers"
+.TH vps.conf 5 "10 Dec 2009" "OpenVZ" "Containers"
 .SH NAME
 vps.conf \- configuration file for an OpenVZ container.
 .SH SYNOPSIS
@@ -24,7 +24,7 @@ Corresponds to the \fB--name\fR option.
 .IP \fBDESCRIPTION\fR="\fIstring\fR"
 Corresponds to the \fB--description\fR option.
 .IP \fBONBOOT\fR="\fByes\fR|\fBno\fR"
-Specifies whether this container will be started during system bootup.
+Specifies whether this container will be started during system boot.
 Default is \fBno\fR, meaning the container will not be started
 if \fBONBOOT\fR parameter is omitted.
 Corresponds to the \fB--onboot\fR option.
@@ -40,9 +40,9 @@ Corresponds to the \fB--private\fR option.
 .IP \fBDISABLED\fR="\fByes\fR|\fBno\fR"
 Corresponds to the \fB--disabled\fR option.
 .IP \fBORIGIN_SAMPLE\fR="\fIname\fR"
-Name of container sample config which the container is based on.
+Name of container sample configuration which the container is based on.
 .IP \fBCONFIG_CUSTOMIZED\fR="\fByes\fR|\fBno\fR"
-Set to \fByes\fR if the container config was modified.
+Set to \fByes\fR if the container configuration was modified.
 .SS Resource management parameters
 .IP \fBNUMPROC\fR
 Corresponds to the \fB--numproc\fR option.
@@ -111,6 +111,7 @@ Corresponds to the \fB--searchdomain\fR option. Several search domains
 are divided by spaces.
 .SH SEE ALSO
 .BR vzctl (8),
-.BR vz.conf (5).
+.BR vz.conf (5),
+.BR http://wiki.openvz.org/UBC .
 .SH LICENSE
 Copyright (C) 2001-2008, Parallels, Inc. Licensed under GNU GPL.

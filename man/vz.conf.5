@@ -1,6 +1,6 @@
-.TH vz 5 "22 Feb 2008" "OpenVZ" "Containers"
+.TH vz.conf 5 "10 Dec 2009" "OpenVZ" "Containers"
 .SH NAME
-vz \- global OpenVZ configuration file
+vz.conf \- global OpenVZ configuration file
 .SH SYNOPSIS
 /etc/vz/vz.conf
 .SH DESCRIPTION
@@ -48,10 +48,10 @@ quota state are started without quota check, and after all containers will be
 started, those marked containers are restarted (to fix quotas).
 .SS Network interface parameters
 .IP \fBVE_ROUTE_SRC_DEV\fR="\fIdevice\fR"
-This parameter specifies the network device name which ip address will used for
-source ip. If on HN configured > 1 network interfaces and needed to specify
-the source ip address, set corresponding \fIdevice\fR. By default takes the
-first in network device list.
+This parameter specifies the network device name which IP address will be
+used as the source IP. This is helpful in case more than one network
+interface is configured on HN and there is a need to specify the source
+IP address. Default is the first device in the network device list.
 .IP \fBNEIGHBOUR_DEVS\fR[="\fBdetect\fR"]
 Controls on which interfaces to add/remove ARP records for a container IP, also
 which interfaces to use to query/announce ARP. If this is set to \fBdetect\fR,
@@ -66,24 +66,26 @@ The value of \fBno\fR makes vzctl to only print the warning.
 Value of this parameter is a directory in which all container template data are
 stored.
 .SS Defaults for containers
-Below parameters are defaults for containers, and gets overwritten by
-parameters in \fBvps.conf\fR(5) container configuration file.
+Below parameters are defaults for containers, and can be overwritten by
+parameters in \fBvps.conf\fR(5) per-container configuration file.
 .IP \fBVE_ROOT\fR=\fIdirectory\fR
 Value of this parameter is the \fIdirectory\fR which serves as container root
-mount point. Value must contain string \fI$VEID\fR, it gets substituted
-with actual numeric CT ID.
+mount point. Value must contain literal string \fB$VEID\fR, which will be
+substituted with the actual numeric CT ID.
 .IP \fBVE_PRIVATE\fR=\fIdirectory\fR
 Value of this parameter is the \fIdirectory\fR in which all the
 files and directories specific to that container are stored. Value must contain
-string \fI$VEID\fR, it gets substituted with actual numeric CT ID.
+literal string \fB$VEID\fR, which will be substituted with the actual
+numeric CT ID.
 .IP \fBCONFIGFILE\fR=\fIname\fR
 Specified default configuration file on \fBcreate\fR action, corresponds to
 \fB--config\fR option.
 .PP
-Any other parameter that appears in per-PE configuration file \fBvps.conf\fR(5)
-can be also set here. Still, it is recommended to keep \fBTEMPLATE\fR,
-\fBVE_PRIVATE\fR and \fBVE_ROOT\fR in this configuration files, and all the
-other container related parameters in per-container configuration files.
+Most of the other parameters that appear in per-container configuration files
+\fBvps.conf\fR(5) can be also set here. Still, it is recommended to keep
+\fBTEMPLATE\fR, \fBVE_PRIVATE\fR and \fBVE_ROOT\fR in this configuration
+file, and all the other container related parameters in per-container
+configuration files.
 .SH SEE ALSO
 .BR vzctl (8),
 .BR vps.conf (5).

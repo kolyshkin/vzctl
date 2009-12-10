@@ -51,7 +51,7 @@ The following parameters can be used with \fBset\fR command.
 \fBMiscellaneous\fR
 .TP
 \fB--onboot\fR \fByes\fR|\fBno\fR
-Sets whether the container will be started during system boot up.
+Sets whether the container will be started during system boot.
 The container will not be auto-started unless this parameter
 is set to \fIyes\fR.
 .TP
@@ -63,8 +63,8 @@ containers with unset \fBbootorder\fR will start last.
 .TP
 \fB--root\fR \fIpath\fR
 Sets the path to root directory for this container. This is essentially a mount
-point for container's root directory. The value must contain string
-\fI$VEID\fR, which will be substituted with the numeric CT ID.
+point for container's root directory. Argument can contain literal string
+\fB$VEID\fR, which will be substituted with the numeric CT ID.
 Changing this parameter is not recommended, better edit
 \fBvz.conf\fR(5) global configuration file.
 .TP
@@ -114,18 +114,18 @@ container (distribution-dependent).
 Sets DNS server IP address for a container. If you want to set several
 nameservers, you should do it at once, so use \fB--nameserver\fR option
 multiple times in one call to \fBvzctl\fR, as all the name server values
-set in previous calls to \fBvzctl\fR gets overwritten.
+set in previous calls to \fBvzctl\fR are overwritten.
 .TP
 \fB--searchdomain\fR \fIname\fR
 Sets DNS search domains for a container. If you want to set several search
 domains, you should do it at once, so use \fB--searchdomain\fR option
 multiple times in one call to \fBvzctl\fR, as all the search domain values
-set in previous calls to \fBvzctl\fR gets overwritten.
+set in previous calls to \fBvzctl\fR are overwritten.
 .TP
 \fB--netif_add\fR \fIifname[\fR,\fImac\fR,\fIhost_ifname\fR,\fIhost_mac\fR,\fIbridge]\fR
-Adds a virtual ethernet device (veth) to a given container. Here \fIifname\fR
-is the ethernet device name in the container, \fImac\fR is its MAC address,
-\fIhost_ifname\fR is the ethernet device name on the host, and
+Adds a virtual Ethernet device (veth) to a given container. Here \fIifname\fR
+is the Ethernet device name in the container, \fImac\fR is its MAC address,
+\fIhost_ifname\fR is the Ethernet device name on the host, and
 \fIhost_mac\fR is its MAC address. MAC addresses should be in the format
 like XX:XX:XX:XX:XX:XX. \fIbridge\fR is an optional parameter which can be
 used in custom network start scripts to automatically add the interface
@@ -133,14 +133,14 @@ to a bridge. All parameters except \fIifname\fR are optional
 and are automatically generated if not specified.
 .TP
 \fB--netif_del\fR \fIdev_name\fR | \fBall\fR
-Removes virtual ethernet device from a container. If you want to remove all
+Removes virtual Ethernet device from a container. If you want to remove all
 devices, use \fBall\fR.
 
 .TP
 \fBVeth interface configuration\fR
 .PP
 The following options can be used to reconfigure the already-created virtual
-ethernet interface. To select the interface to configure, use
+Ethernet interface. To select the interface to configure, use
 \fB--ifname\fR \fIname\fR option.
 .TP
 \fB--mac\fR \fIXX:XX:XX:XX:XX:XX\fR
@@ -421,17 +421,19 @@ delete network device from a specified container
 \fBDisk quota parameters\fR
 .TP
 \fB--diskspace\fR \fInum\fR[:\fInum\fR]
-sets soft and hard disk quotas, in blocks. First parameter is soft quota,
-second is hard quota. One block is currently equal to 1Kb.
-Also suffixes \fBG\fR, \fBM\fR, \fBK\fR can be specified
-(see \fBResource limits\fR section for more info).
+sets soft and hard disk quota limits, in blocks. First parameter is soft limit,
+second is hard limit. One block is currently equal to 1Kb.
+Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
+(see \fBResource limits\fR section for more info on suffixes).
 .TP
 \fB--diskinodes\fR \fInum\fR[:\fInum\fR]
-sets soft and hard disk quotas, in i-nodes. First parameter is soft quota,
-second is hard quota.
+sets soft and hard disk quota limits, in i-nodes. First parameter is
+soft limit, second is hard limit.
 .TP
 \fB--quotatime\fR \fIseconds\fR
-sets soft overusage time limit for disk quota (also known as grace period).
+sets quota grace period. Container is permitted to exceed its soft limits
+for the grace period, but once it has expired, the soft limit is enforced
+as a hard limit.
 .TP
 \fB--quotaugidlimit\fR \fInum\fR
 sets maximum number of user/group IDs in a container for which disk quota inside
@@ -445,7 +447,7 @@ changing it while the container is running will not take effect.
 \fBMount option\fR
 .TP
 \fB--noatime\fR \fByes\fR | \fBno\fR
-Sets noatime flag (do not update inode access times) on file system.
+Sets noatime flag (do not update inode access times) on filesystem.
 
 .TP
 \fBCapability option\fR
@@ -546,8 +548,8 @@ file already exists, it will be removed.
 
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
 point for the container root directory (default is \fBVE_ROOT\fR specified in
-\fBvz.conf\fR(5) file). Argument can contain string \fI$VEID\fR, which will
-be substituted with numeric CT ID.
+\fBvz.conf\fR(5) file). Argument can contain literal string \fB$VEID\fR,
+which will be substituted with the numeric CT ID.
 
 You can use \fB--private\fR \fIpath\fR option to set the path to directory
 in which all the files and directories specific to this very container
@@ -789,10 +791,13 @@ To permanently remove this container:
 .br
 /proc/user_beancounters
 .br
+/proc/bc/*
+.br
 /proc/fairsched\fR
 .SH SEE ALSO
 .BR vz.conf (5),
 .BR vps.conf (5),
-.BR vzquota (8).
+.BR vzquota (8),
+.BR http://wiki.openvz.org/UBC .
 .SH LICENSE
 Copyright (C) 2000-2009, Parallels, Inc. Licensed under GNU GPL.
