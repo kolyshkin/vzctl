@@ -174,7 +174,7 @@ static void e_loop(int r_in, int w_in,  int r_out, int w_out, int info)
 	set_not_blk(r_out);
 	while (!child_term) {
 		/* Process SIGWINCH
-		 * read winsize from stdin and send annonce to the other end.
+		 * read winsize from stdin and send announce to the other end.
 		 */
 		if (win_changed) {
 			struct winsize ws;
