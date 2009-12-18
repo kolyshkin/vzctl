@@ -302,7 +302,7 @@ int mk_quota_link()
 	"\n"								\
 	"description	\"tell vzctl that start was successfull\"\n"	\
 	"\n"								\
-	"start on runlevel [2345]\n"					\
+	"start on stopped rc RUNLEVEL=[2345]\n"				\
 	"\n"								\
 	"task\n"							\
 	"\n"								\
