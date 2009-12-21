@@ -6,6 +6,8 @@ _get_ves()
 {
 	local cmd=$1
 	local rm_empty='sed s/^-[[:space:]]*//'
+    # Only allow this completion when user has root privileges
+    [ "$EUID" -ne 0 ] && exit 1
 	case $cmd in
 		create)
 			# create a new CTID, by increasing the last one
@@ -176,6 +178,8 @@ _vzctl()
 				COMPREPLY=( $( compgen -W "$devices" -- $cur ) )
 				;;
 			--ipdel)
+                # Only allow this completion when user has root privileges
+                [ "$EUID" -ne 0 ] && exit 1
 				# Get CTID
 				local ve=${COMP_WORDS[2]}
 				if [[ ! ${ve} != '^[1-9][0-9]*$' ]] ; then
