@@ -28,6 +28,8 @@ static struct feature_s features[] = {
 	{ "sit",	0,	VE_FEATURE_SIT},
 	{ "ipip",	0,	VE_FEATURE_IPIP},
 	{ "ppp",	0,	VE_FEATURE_PPP},
+	{ "ipgre",	0,	VE_FEATURE_IPGRE },
+	{ "bridge",	0,	VE_FEATURE_BRIDGE },
 	{ NULL,		0,	0 }
 };
 
