@@ -40,7 +40,8 @@
 #include "modules.h"
 
 extern struct mod_action g_action;
-extern int do_enter(vps_handler *h, envid_t veid, const char *root);
+extern int do_enter(vps_handler *h, envid_t veid, const char *root,
+			int argc, char **argv);
 
 int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 	vps_param *param)
@@ -638,11 +639,9 @@ static int umount(vps_handler *h, envid_t veid, vps_param *g_p,
 	return vps_umount(h, veid, g_p->res.fs.root, 0);
 }
 
-static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
-	vps_param *cmd_p)
+static int enter(vps_handler *h, envid_t veid, const char *root,
+		int argc, char **argv)
 {
-	const char *root = g_p->res.fs.root;
-
 	set_log_file(NULL);
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
@@ -650,7 +649,11 @@ static int enter(vps_handler *h, envid_t veid, vps_param *g_p,
 		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	return do_enter(h, veid, root);
+	if (argc > 0) {
+		/* omit "--exec" argument */
+		argc -= 1; argv += 1;
+	}
+	return do_enter(h, veid, root, argc, argv);
 }
 
 static int exec(vps_handler *h, int action, envid_t veid, const char *root,
@@ -774,6 +777,22 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 		break;
 	case ACTION_RESTART:
 		ret = parse_startstop_opt(argc, argv, param, 1, 1);
+		break;
+	case ACTION_ENTER:
+		if (argc >= 2) {
+			if (!strcmp(argv[1], "--exec")) {
+				if ((argc == 2) || (*argv[2] == NULL)) {
+					fprintf(stderr,
+						"No command line "
+						"given for --exec\n");
+					ret = VZ_INVALID_PARAMETER_SYNTAX;
+				}
+			} else {
+				fprintf(stderr,
+					"Invalid option '%s'\n", argv[1]);
+				ret = VZ_INVALID_PARAMETER_SYNTAX;
+			}
+		}
 		break;
 	case ACTION_DESTROY:
 		break;
@@ -906,7 +925,7 @@ int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
 		ret = show_status(h, veid, g_p);
 		break;
 	case ACTION_ENTER:
-		ret = enter(h, veid, g_p, cmd_p);
+		ret = enter(h, veid, g_p->res.fs.root, argc, argv);
 		break;
 	case ACTION_EXEC:
 	case ACTION_EXEC2:

@@ -10,7 +10,7 @@ vzctl [\fIflags\fR] \fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR]
 .PP
 vzctl [\fIflags\fR] \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
 \fBstart\fR | \fBstop\fR | \fBrestart\fR |
-\fBstatus\fR | \fBenter\fR \fICTID\fR
+\fBstatus\fR | \fBenter\fR \fICTID\fR [\fB--exec \fIcommand\fR [\fIarg\fR ...]]
 .PP
 vzctl [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
@@ -607,8 +607,12 @@ The same as \fBexec\fR, but return code is that of \fIcommand\fR.
 .IP \fBrunscript\fR 4
 Run specified shell script in a container, if the container is not running
 it will be started.
-.IP \fBenter\fR 4
+.IP "\fBenter\fR [\fB--exec \fIcommand\fR [\fIarg\fR ...]]" 4
 Enters into a container. This option is a back-door for host root only.
+You can use \fB--exec\fR option to run \fIcommand\fR with arguments
+right after entering into container.
+.IP
+NOTE: after exiting that command you still stay inside the container.
 .SS Other options
 .IP \fB--help\fR 4
 Prints help message with a brief list of possible options.
@@ -769,6 +773,30 @@ To execute command \fBls -la\fR in this container:
 To execute command pipe \fBls -l / | sort\fR in this container:
 .br
 \f(CR	vzctl exec 1000 'ls -l / | sort'
+\fR
+.P
+To enter this container, execute command \fBapt-get install vim\fR and stay inside the container:
+.br
+\f(CR	vzctl enter 1000 --exec apt-get install vim
+\fR
+.P
+For automatical logout use a construction \fB"\fIcommand\fR [\fIarg ...\fR]\fB && logout"\fR
+or \fB"\fIcommand\fR [\fIarg ...\fR]\fB ; logout"\fR.
+.br
+Quotation marks are required if you use \fB&&\fR or \fB;\fR in such complex command.
+A difference between using \fB&&\fR or \fB;\fR in command is shown below.
+.P
+To enter this container, execute command \fBapt-get install vim\fR and logout after
+successful installation (or stay inside the container if installation process failed)
+use \fB&&\fR:
+.br
+\f(CR	vzctl enter 1000 --exec "apt-get install vim && logout"
+\fR
+.P
+To enter this container, execute command \fBapt-get install vim\fR and logout
+independently of exit code of installation process use \fB;\fR:
+.br
+\f(CR	vzctl enter 1000 --exec "apt-get install vim ; logout"
 \fR
 .P
 To stop this container:

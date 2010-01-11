@@ -228,11 +228,13 @@ static void preload_lib()
 	endgrent();
 }
 
-int do_enter(vps_handler *h, envid_t veid, const char *root)
+int do_enter(vps_handler *h, envid_t veid, const char *root,
+		int argc, char **argv)
 {
 	int pid, ret, status;
 	int in[2], out[2], st[2], info[2];
 	struct sigaction act;
+	int i;
 
 	if (pipe(in) < 0 || pipe(out) < 0 || pipe(st) < 0 || pipe(info) < 0) {
 		logger(-1, errno, "Unable to create pipe");
@@ -340,6 +342,33 @@ err:
 	if (!ret) {
 		fprintf(stdout, "entered into CT %d\n", veid);
 		raw_on();
+		if (argc) {
+			/* pass command line arguments into CT */
+			for (i = 0; i < argc; i++) {
+				if (write(in[1], argv[i],
+						strlen(argv[i])) < 0) {
+					fprintf(stdout,
+						"failed to pass "
+						"command arguments into CT "
+						"%d\n", veid);
+					break;
+				}
+				/* separate every argument by space */
+				if (write(in[1], " ", 1) < 0) {
+					fprintf(stdout,
+						"failed to pass "
+						"command arguments into CT "
+						"%d\n", veid);
+					break;
+				}
+			}
+			/* run command by 'Enter' key emulation */
+			if (write(in[1], "\n", 1) < 0)
+				fprintf(stdout,
+					"failed to finish "
+					"command arguments sequence "
+					"while passing into CT %d\n", veid);
+		}
 		e_loop(fileno(stdin), in[1], out[0], fileno(stdout), info[1]);
 	} else {
 		fprintf(stdout, "enter into CT %d failed\n", veid);

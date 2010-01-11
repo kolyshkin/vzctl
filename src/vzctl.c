@@ -57,7 +57,8 @@ void usage(int rc)
 	fprintf(fp, "Copyright (C) 2000-2008, Parallels, Inc.\n");
 	fprintf(fp, "This program may be distributed under the terms of the GNU GPL License.\n\n");
 	fprintf(fp, "Usage: vzctl [options] <command> <veid> [parameters]\n"
-"vzctl destroy | mount | umount | stop | restart | status | enter <veid>\n"
+"vzctl destroy | mount | umount | stop | restart | status\n"
+"vzctl enter <veid> [--exec <command> [arg ...]]\n"
 "vzctl create <veid> [--ostemplate <name>] [--config <name>]\n"
 "   [--private <path>] [--root <path>] [--ipadd <addr>] | [--hostname <name>]\n"
 "vzctl start <veid> [--force] [--wait]\n"
