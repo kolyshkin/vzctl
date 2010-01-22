@@ -53,11 +53,11 @@ iface ${LOOPBACK} inet loopback" >> ${CFGFILE}
 		if [ "${IPV6}" = "yes" ]; then
 			echo "::1 localhost.localdomain localhost" >> $HOSTFILE
 		fi
-fi
+	fi
 
-	[ -z "${IP_ADDR}" ] && return
-	# Set up venet0
-	echo -e "
+	if [ -n "${IP_ADDR}" ]; then
+		# Set up venet0
+		echo -e "
 # Auto generated ${VENET_DEV} interface
 auto ${VENET_DEV}
 iface ${VENET_DEV} inet static
@@ -67,13 +67,14 @@ iface ${VENET_DEV} inet static
 	up route add -net ${FAKEGATEWAY} netmask 255.255.255.255 dev ${VENET_DEV}
 	up route add default gw ${FAKEGATEWAY}" >> ${CFGFILE}
 
-	if [ "${IPV6}" = "yes" ]; then
-		echo -e "
+		if [ "${IPV6}" = "yes" ]; then
+			echo -e "
 iface venet0 inet6 static
 	address ::1
 	netmask 128
 " >> ${CFGFILE}
 
+		fi
 	fi
 
 	if [ -f ${CFGFILE}.tail ]; then
