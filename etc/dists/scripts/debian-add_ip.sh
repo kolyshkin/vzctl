@@ -129,8 +129,14 @@ function add_ip()
 	local iface
 
 	if [ "x${VE_STATE}" = "xstarting" ]; then
-		remove_debian_interface "${VENET_DEV}:[0-9]*" ${CFGFILE}
-		setup_network
+		if test -n "$IP_ADDR"; then
+			setup_network
+		else
+			# IP_ADDR empty, do we need to remove old ones?
+			if grep -q -F "${VENET_DEV}:" ${CFGFILE}; then
+				setup_network
+			fi
+		fi
 	elif ! grep -q -E "^auto ${VENET_DEV}([^:]|$)" ${CFGFILE} 2>/dev/null; then
 		setup_network
 	fi
