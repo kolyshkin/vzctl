@@ -105,7 +105,8 @@ iface ${VENET_DEV}:${ifnum} inet static
 function get_all_aliasid()
 {
 	IFNUM=-1
-        IFNUMLIST=`grep -e "^auto ${VENET_DEV}:.*$" 2> /dev/null ${CFGFILE}.bak | sed "s/.*${VENET_DEV}://"`
+	IFNUMLIST=$(grep -e "^auto ${VENET_DEV}:.*$" 2>/dev/null
+		${CFGFILE}.bak | sed "s/.*${VENET_DEV}://")
 }
 
 function get_free_aliasid()
