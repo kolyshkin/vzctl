@@ -45,7 +45,7 @@ ADD_IP=dist-add_ip.sh
 # This script is launched inside a container on executing the following
 # commands:
 #	vzctl set CTID --ipdel <ip>
-#	vzctl set CTID --ipdel <all>
+#	vzctl set CTID --ipdel all
 #
 # The script is used to delete an existing IP address(es).
 # The parameters are passed as environment variables.
@@ -71,7 +71,7 @@ DEL_IP=dist-del_ip.sh
 #   VE_STATE	- the state of the container; can be one of:
 #		  starting | stopping | running
 #   HOSTNM	- the hostname to be set
-#   		  (can be empty in case of --hostname '' specified)
+#		  (can be empty in case of --hostname '' specified)
 # Optional parameters:
 #   IP_ADDR	- the first IP address of the container
 #
