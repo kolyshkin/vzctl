@@ -30,6 +30,9 @@ function setup_network()
 # Please create/edit $CFGFILE.head and $CFGFILE.tail instead,
 # their contents will be inserted at the beginning and at the end
 # of this file, respectively.
+#
+# NOTE: it is NOT guaranteed that the contents of $CFGFILE.tail
+# will be at the very end of this file.
 " > ${CFGFILE}
 
 	if [ -f ${CFGFILE}.head ]; then
