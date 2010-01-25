@@ -2437,9 +2437,10 @@ int get_veid_by_name(char *name)
 static int check_name(char *name)
 {
 	char *p;
+	const char *validchars = " -+_.";
 
 	for (p = name; *p != '\0'; p++) {
-		if (!isdigit(*p) && !isalpha(*p) && *p != '-' && *p != '_')
+		if (!isdigit(*p) && !isalpha(*p) && !strchr(validchars, *p))
 			return -1;
 	}
 	return 0;
