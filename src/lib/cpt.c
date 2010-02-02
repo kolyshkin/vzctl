@@ -264,6 +264,8 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		ret = env_wait(pid);
 		exit(ret);
 	}
+	close(cpt_fd);
+	cpt_fd = -1;
 	ret = env_wait(pid);
 	if (ret)
 		goto err;
@@ -285,7 +287,8 @@ err:
 	}
 	if (dump_fd != -1)
 		close(dump_fd);
-	close(cpt_fd);
+	if (cpt_fd != -1)
+		close(cpt_fd);
 
 	return ret;
 }
