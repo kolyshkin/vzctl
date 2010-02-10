@@ -343,7 +343,7 @@ try:
 			case EINVAL:
 				ret = VZ_ENVCREATE_ERROR;
 				/* Run-time kernel did not understand the
-				 * latest create_parem -- so retry with
+				 * latest create_param -- so retry with
 				 * the old env_create_param structs.
 				 */
 				switch (env_create_data.datalen) {
