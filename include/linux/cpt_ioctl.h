@@ -43,5 +43,7 @@
 #define CPT_TEST_CAPS	_IOW(CPTCTLTYPE, 19, unsigned int)
 #define CPT_TEST_VECAPS	_IOW(CPTCTLTYPE, 20, unsigned int)
 #define CPT_SET_ERRORFD _IOW(CPTCTLTYPE, 21, int)
+#define CPT_LINKDIR_ADD _IOW(CPTCTLTYPE, 24, int)
+#define CPT_HARDLNK_ON  _IOW(CPTCTLTYPE, 25, int)
 
 #endif

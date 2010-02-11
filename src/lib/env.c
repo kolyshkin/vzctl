@@ -42,6 +42,7 @@
 #include "iptables.h"
 #include "readelf.h"
 #include "vzsyscalls.h"
+#include "cpt.h"
 
 #define ENVRETRY	3
 
@@ -314,6 +315,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	create_param.iptables_mask = get_ipt_mask(res->env.ipt_mask);
 	logger(3, 0, "Set iptables mask %#10.8llx",
 			(unsigned long long) create_param.iptables_mask);
+	clean_hardlink_dir("/");
 	if (res->cpu.vcpus != NULL)
 		create_param.total_vcpus = *res->cpu.vcpus;
 	env_create_data.veid = veid;

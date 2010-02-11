@@ -16,6 +16,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -29,6 +33,8 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include <unistd.h>
+#include <dirent.h>
+
 
 #include "cpt.h"
 #include "env.h"
@@ -38,6 +44,8 @@
 #include "vzerror.h"
 #include "logger.h"
 #include "util.h"
+
+static int setup_hardlink_dir(const char *mntdir, int cpt_fd);
 
 int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	vps_param *vps_p)
@@ -82,6 +90,7 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 		break;
 	case CMD_RESUME:
 		logger(0, 0, "Resuming...");
+		clean_hardlink_dir(vps_p->res.fs.root);
 		if ((ret = ioctl(fd, CPT_RESUME, 0)) < 0) {
 			logger(-1, errno, "Can not resume container");
 			goto err;
@@ -135,9 +144,13 @@ int real_chkpnt(int cpt_fd, envid_t veid, const char *root, cpt_param *param,
 	}
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
 		logger(0, 0, "\tdump...");
+		clean_hardlink_dir("/");
+		if (setup_hardlink_dir("/", cpt_fd))
+			goto err_out;
 		if (ioctl(cpt_fd, CPT_DUMP, 0) < 0) {
 			logger(-1, errno, "Can not dump container");
 			if (cmd == CMD_CHKPNT)
+				clean_hardlink_dir("/");
 				if (ioctl(cpt_fd, CPT_RESUME, 0) < 0)
 					logger(-1, errno, "Can not "
 							"resume container");
@@ -333,6 +346,9 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	* environment is created.
 	*/
 	close(STDIN_FILENO);
+
+	ioctl(param->rst_fd, CPT_HARDLNK_ON);
+
 	logger(0, 0, "\tundump...");
 	if (ioctl(param->rst_fd, CPT_UNDUMP, 0) < 0) {
 		logger(-1, errno, "Error: undump failed");
@@ -341,6 +357,7 @@ static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	/* Now we wait until CT setup will be done */
 	read(wait_p, &len, sizeof(len));
 	if (param->cmd == CMD_RESTORE) {
+		clean_hardlink_dir("/");
 		logger(0, 0, "\tresume...");
 		if (ioctl(param->rst_fd, CPT_RESUME, 0)) {
 			logger(-1, errno, "Error: resume failed");
@@ -449,4 +466,59 @@ err:
 	if (!ret)
 		logger(0, 0, "Restoring completed succesfully");
 	return ret;
+}
+
+/* with mix of md5sum: try generate unique name */
+#define CPT_HARDLINK_DIR ".cpt_hardlink_dir_a920e4ddc233afddc9fb53d26c392319"
+
+void clean_hardlink_dir(const char *mntdir)
+{
+	char buf[STR_SIZE];
+	struct dirent *ep;
+	DIR *dp;
+
+	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
+
+	unlink(buf);		/* if file was created by someone */
+	if (!(dp = opendir(buf)))
+		return;
+	while ((ep = readdir(dp))) {
+		if (!strcmp(ep->d_name, ".") || !strcmp(ep->d_name, ".."))
+			continue;
+
+		snprintf(buf, sizeof(buf), "%s/%s/%s",
+				mntdir, CPT_HARDLINK_DIR, ep->d_name);
+		unlink(buf);
+	}
+	closedir(dp);
+
+	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
+	rmdir(buf);
+}
+
+static int setup_hardlink_dir(const char *mntdir, int cpt_fd)
+{
+	char buf[STR_SIZE];
+	int fd, res = 0;
+
+	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
+	mkdir(buf, 0711);
+
+	fd = open(buf, O_RDONLY | O_NOFOLLOW | O_DIRECTORY);
+	if (fd < 0) {
+		logger(-1, errno, "Error: Unable to open "
+				"hardlink directory %s", buf);
+		return 1;
+	}
+
+	if (ioctl(cpt_fd, CPT_LINKDIR_ADD, fd) < 0) {
+		if (errno != EINVAL) {
+			res = 1;
+			logger(-1, errno, "Cannot set linkdir in kernel");
+		}
+		rmdir(buf);
+	}
+
+	close(fd);
+	return res;
 }
