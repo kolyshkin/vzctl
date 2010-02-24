@@ -298,6 +298,13 @@ if [ -z "$host" -o -z "$VEID" -o $# -ne 0 ]; then
 	usage
 fi
 
+# Support CT names as well
+VEID=$(vzlist -o ctid -H $VEID | tr -d ' ')
+if [ -z "$VEID" ]; then
+	# Error message is printed by vzlist to stderr
+	exit $MIG_ERR_NOEXIST
+fi
+
 vpsconf="$confdir/$VEID.conf"
 
 if [ ! -r "$vzconf" -o ! -r "$vpsconf" ]; then
