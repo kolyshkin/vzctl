@@ -102,6 +102,7 @@ struct vzctl_ve_meminfo {
 #define VE_IP_TARGET_REDIRECT_MOD	(1U<<23)
 #define VE_IP_MATCH_OWNER_MOD		(1U<<24)
 #define VE_IP_MATCH_MAC_MOD		(1U<<25)
+#define VE_IP_MATCH_RECENT_MOD		(1U<<26)
 
 /* these masks represent modules with their dependences */
 #define VE_IP_IPTABLES		(VE_IP_IPTABLES_MOD)
@@ -152,6 +153,8 @@ struct vzctl_ve_meminfo {
 #define VE_IP_MATCH_MAC		(VE_IP_MATCH_MAC_MOD	\
 					| VE_IP_IPTABLES)
 #define VE_IP_MATCH_OWNER	(VE_IP_MATCH_OWNER_MOD	\
+					| VE_IP_IPTABLES)
+#define VE_IP_MATCH_RECENT	(VE_IP_MATCH_RECENT_MOD	\
 					| VE_IP_IPTABLES)
 
 /* safe iptables mask to be used by default */
