@@ -30,3 +30,12 @@ man_MANS = arpsend.8 \
            vzifup-post.8
 
 EXTRA_DIST = $(man_MANS)
+
+check-man-dates:
+	for FILE in $(man_MANS); do \
+		DATE="$$(LANG=C git log -1 --format='format:%cD' \
+			$${FILE} | awk '{print $$2, $$3, $$4}')" && \
+		echo $$FILE: $$DATE && \
+		sed -e "1s%\(\.TH \w\w* [0-9] \"\)[0-9]* \w\w* [0-9][0-9][0-9][0-9]%\1$${DATE}%" -i $${FILE}; \
+	done
+	git diff $(man_MANS)
