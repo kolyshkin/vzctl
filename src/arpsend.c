@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+ * Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
  *
  * This code is public domain.
  *

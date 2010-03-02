@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ void usage(int rc)
 	FILE *fp = rc ? stderr : stdout;
 
 	version(fp);
-	fprintf(fp, "Copyright (C) 2000-2008, Parallels, Inc.\n");
+	fprintf(fp, "Copyright (C) 2000-2010, Parallels, Inc.\n");
 	fprintf(fp, "This program may be distributed under the terms of the GNU GPL License.\n\n");
 	fprintf(fp, "Usage: vzctl [options] <command> <ctid> [parameters]\n"
 "vzctl destroy | mount | umount | stop | restart | status\n"
