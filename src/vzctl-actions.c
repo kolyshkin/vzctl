@@ -781,7 +781,7 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 	case ACTION_ENTER:
 		if (argc >= 2) {
 			if (!strcmp(argv[1], "--exec")) {
-				if ((argc == 2) || (*argv[2] == NULL)) {
+				if ((argc == 2) || (*argv[2] == '\0')) {
 					fprintf(stderr,
 						"No command line "
 						"given for --exec\n");
