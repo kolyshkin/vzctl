@@ -1,4 +1,4 @@
-.TH vzctl 8 "17 Nov 2009" "OpenVZ" "Containers"
+.TH vzctl 8 "2 Mar 2010" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- utility to control an OpenVZ container.
 .SH SYNOPSIS
@@ -805,6 +805,7 @@ independently of exit code of installation process use \fB;\fR:
 .br
 \f(CR	vzctl enter 1000 --exec "apt-get install vim ; logout"
 \fR
+.P
 Note that you need to quote the command if you use \fB&&\fR or \fB;\fR.
 .P
 To stop this container:
