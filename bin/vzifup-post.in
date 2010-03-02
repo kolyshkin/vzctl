@@ -32,7 +32,7 @@ DEV=$1
 
 # Get possible interface names
 vzgetnetdev
-[-z "${NETDEVICES}" ] && exit 0
+[ -z "${NETDEVICES}" ] && exit 0
 
 # Check if a device name given is in the list returned by vzgetnetdev
 # Indeed we do not want to add arp entries for e.g. 'lo'
