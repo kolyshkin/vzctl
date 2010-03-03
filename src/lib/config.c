@@ -2411,8 +2411,8 @@ vps_param *init_vps_param()
 
 int get_veid_by_name(const char *name)
 {
-	char buf[64];
-	char content[256];
+	char buf[STR_SIZE];
+	char content[STR_SIZE];
 	char *p;
 	int veid, ret;
 
