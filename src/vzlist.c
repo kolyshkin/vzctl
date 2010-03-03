@@ -129,8 +129,8 @@ static void print_onboot(struct Cveinfo *p, int index)
 static void print_bootorder(struct Cveinfo *p, int index)
 {
 	if (p->bootorder == NULL)
-		 p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
-				 "%10s", "-");
+		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+				"%10s", "-");
 	else
 		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
 				"%10lu", p->bootorder[index]);
@@ -428,9 +428,9 @@ struct Cfield field_names[] =
 /* ctid should have index 0 */
 {"ctid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
 /* veid is for backward compatibility -- will be removed later */
-{"veid", "CTID", "%10s", 0,  RES_NONE, print_veid, id_sort_fn},
+{"veid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
 /* vpsid is for backward compatibility -- will be removed later */
-{"vpsid" , "CTID", "%10s",  0, RES_NONE, print_veid, id_sort_fn},
+{"vpsid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
 
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
@@ -594,7 +594,7 @@ static void print_hostname(struct Cveinfo *p, int index)
 	{
 		r = 32;
 	}
-	p_outbuffer +=  r;
+	p_outbuffer += r;
 }
 
 static void print_name(struct Cveinfo *p, int index)
@@ -610,7 +610,7 @@ static void print_name(struct Cveinfo *p, int index)
 	{
 		r = 32;
 	}
-	p_outbuffer +=  r;
+	p_outbuffer += r;
 }
 
 static void print_description(struct Cveinfo *p, int index)
@@ -651,7 +651,7 @@ static void print_ip(struct Cveinfo *p, int index)
 	{
 		r = 15;
 	}
-	p_outbuffer +=  r;
+	p_outbuffer += r;
 }
 
 void *x_malloc(int size)
@@ -722,8 +722,8 @@ void print_hdr()
 }
 
 /*
-   1 - match
-   0 - do not match
+	1 - match
+	0 - do not match
 */
 inline int check_pattern(char *str, char *pat)
 {
@@ -1146,7 +1146,7 @@ char *remove_sp(char *str)
 	while (sp < ep) {
 		*tp = *sp;
 		if (isspace(*sp)) {
-			*tp =  ' ';
+			*tp = ' ';
 			skip++;
 		} else
 			skip = 0;
@@ -1392,7 +1392,7 @@ int get_stop_quota_stat(int veid)
 	while(!feof(fp)) {
 		if (fgets(buf, sizeof(buf), fp) == NULL)
 			break;
-		if (sscanf(buf, "%15s %lu %lu %lu", res,  &usage,
+		if (sscanf(buf, "%15s %lu %lu %lu", res, &usage,
 				&softlimit, &hardlimit) != 4)
 		{
 			continue;
@@ -1760,7 +1760,7 @@ int main(int argc, char **argv)
 	}
 	if (optind < argc) {
 		while (optind < argc) {
-			veid =  strtol(argv[optind], &ep, 10);
+			veid = strtol(argv[optind], &ep, 10);
 			if (*ep != 0 || !veid) {
 				veid = get_veid_by_name(argv[optind]);
 				if (veid < 0) {
