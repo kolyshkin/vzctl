@@ -432,7 +432,7 @@ int vps_exec_script(vps_handler *h, envid_t veid, const char *root,
 
 int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 {
-	int is_run;
+	int is_run, is_mounted;
 	int rd_p[2], wr_p[2];
 	int ret, retry;
 	char *argv[2];
@@ -456,7 +456,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		return VZ_FS_NOPRVT;
 	}
 	if (!(is_run = vps_is_run(h, veid))) {
-		if (!vps_is_mounted(root)) {
+		if (!(is_mounted = vps_is_mounted(root))) {
 			if ((ret = fsmount(veid, &vps_p->res.fs,
 				&vps_p->res.dq )))
 			{
@@ -478,7 +478,8 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		retry = 0;
 		while (retry++ < 10 && vps_is_run(h, veid))
 			usleep(500000);
-		fsumount(veid, root);
+		if (!is_mounted)
+			fsumount(veid, root);
 	}
 	return ret;
 }
