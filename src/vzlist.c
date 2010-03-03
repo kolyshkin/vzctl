@@ -55,7 +55,7 @@ static char *desc_pattern = NULL;
 static char *dumpdir = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
-struct Cfield_order *last_field = NULL;
+static int is_last_field;
 static char *default_field_order = "veid,numproc,status,ip,hostname";
 static char *default_nm_field_order = "veid,numproc,status,ip,name";
 static int g_sort_field = 0;
@@ -589,11 +589,8 @@ static void print_hostname(struct Cveinfo *p, int index)
 	if (p->hostname != NULL)
 		str = p->hostname;
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (last_field != NULL &&
-		field_names[last_field->order].res_type != RES_HOSTNAME)
-	{
+	if (!is_last_field)
 		r = 32;
-	}
 	p_outbuffer += r;
 }
 
@@ -605,11 +602,8 @@ static void print_name(struct Cveinfo *p, int index)
 	if (p->name != NULL)
 		str = p->name;
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (last_field != NULL &&
-		field_names[last_field->order].res_type != RES_NAME)
-	{
+	if (!is_last_field)
 		r = 32;
-	}
 	p_outbuffer += r;
 }
 
@@ -622,11 +616,8 @@ static void print_description(struct Cveinfo *p, int index)
 		str = p->description;
 
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (last_field != NULL &&
-		field_names[last_field->order].res_type != RES_DESCRIPTION)
-	{
+	if (!is_last_field)
 		r = 32;
-	}
 	p_outbuffer += r;
 }
 
@@ -638,19 +629,15 @@ static void print_ip(struct Cveinfo *p, int index)
 
 	if (p->ip != NULL)
 		str = p->ip;
-	if (last_field != NULL &&
-		field_names[last_field->order].res_type != RES_IP)
+	if (!is_last_field)
 	{
 		/* Fixme: dont destroy original string */
 		if ((ch = strchr(str, ' ')) != NULL)
 			*ch = 0;
 	}
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
-	if (last_field != NULL &&
-		field_names[last_field->order].res_type != RES_IP)
-	{
+	if (!is_last_field)
 		r = 15;
-	}
 	p_outbuffer += r;
 }
 
@@ -785,8 +772,11 @@ void print_ve()
 			continue;
 		if (only_stopped_ve && veinfo[idx].status == VE_RUNNING)
 			continue;
+		is_last_field = 0;
 		for (p = g_field_order; p != NULL; p = p->next) {
 			f = p->order;
+			if (p->next == NULL)
+				is_last_field = 1;
 			field_names[f].print_fn(&veinfo[idx],
 						field_names[f].index);
 			if (p_outbuffer >= e_buf)
@@ -1586,7 +1576,6 @@ int build_field_order(char *fields)
 			prev->next = tmp;
 		prev = tmp;
 	} while (sp < ep);
-	last_field = prev;
 	return 0;
 }
 
