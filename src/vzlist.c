@@ -694,6 +694,17 @@ int veid_search_fn(const void* val1, const void* val2)
 	return (*(const int *)val1 - *(const int *)val2);
 }
 
+char* trim_eol_space(char *sp, char *ep)
+{
+/*	if (ep == NULL)
+		ep = sp + strlen(sp); */
+
+	ep--;
+	while (isspace(*ep) && ep >= sp) *ep-- = '\0';
+
+	return sp;
+}
+
 void print_hdr()
 {
 	struct Cfield_order *p;
@@ -708,7 +719,7 @@ void print_hdr()
 		if (p->next != NULL)
 			*p_outbuffer++ = ' ';
 	}
-	printf("%s\n", g_outbuffer);
+	printf("%s\n", trim_eol_space(g_outbuffer, p_outbuffer));
 	g_outbuffer[0] = 0;
 	p_outbuffer = g_outbuffer;
 }
@@ -789,7 +800,7 @@ void print_ve()
 			if (p->next != NULL)
 				*p_outbuffer++ = ' ';
 		}
-		printf("%s\n", g_outbuffer);
+		printf("%s\n", trim_eol_space(g_outbuffer, p_outbuffer));
 		g_outbuffer[0] = 0;
 		p_outbuffer = g_outbuffer;
 	}
