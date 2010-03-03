@@ -808,7 +808,7 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 		break;
 	case ACTION_RUNSCRIPT:
 		if (argc < 2) {
-			fprintf(stderr, "Script does not specified\n");
+			fprintf(stderr, "Script not specified\n");
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
 		}
 		break;
