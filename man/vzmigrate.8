@@ -5,7 +5,8 @@ vzmigrate - utility for container migration between hardware nodes.
 
 .SH SYNOPSIS
 .TP
-\fBvzmigrate\fR [\fB-r\fR|\fB--remove-area\fR \fByes\fR|\fBno\fR] [\fB--ssh=\fIssh_options\fR] \
+\fBvzmigrate\fR [\fB-r\fR|\fB--remove-area\fR \fByes\fR|\fBno\fR] \
+[\fB--ssh=\fIssh_options\fR] [\fB--rsync=\fIrsync_options\fR] \
 [\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fICTID\fR
 
 .SH DESCRIPTION
@@ -30,6 +31,12 @@ migrated container. Default is \fByes\fR.
 Additional \fIoptions\fR that will be passed to ssh while establishing
 connection to destination HN. You may add options like \fB-c blowfish\fR
 or the like.
+
+.TP
+\fB--rsync=\fIoptions\fR
+Additional \fIoptions\fR that will be passed to \fBrsync\fR(8).
+You may add options like \fB-z\fR to enable data compression
+if you are migrating over a slow link.
 
 .TP
 .B --keep-dst
