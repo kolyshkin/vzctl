@@ -734,7 +734,7 @@ inline int check_pattern(char *str, char *pat)
 	return !fnmatch(pat, str, 0);
 }
 
-int filter_by_hostname()
+void filter_by_hostname()
 {
 	int i;
 
@@ -742,10 +742,9 @@ int filter_by_hostname()
 		if (!check_pattern(veinfo[i].hostname, host_pattern))
 			veinfo[i].hide = 1;
 	}
-	return 0;
 }
 
-int filter_by_name()
+void filter_by_name()
 {
 	int i;
 
@@ -753,10 +752,9 @@ int filter_by_name()
 		if (!check_pattern(veinfo[i].name, name_pattern))
 			veinfo[i].hide = 1;
 	}
-	return 0;
 }
 
-int filter_by_description()
+void filter_by_description()
 {
 	int i;
 
@@ -764,7 +762,6 @@ int filter_by_description()
 		if (!check_pattern(veinfo[i].description, desc_pattern))
 			veinfo[i].hide = 1;
 	}
-	return 0;
 }
 
 void print_ve()
