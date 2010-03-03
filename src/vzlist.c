@@ -701,11 +701,16 @@ void print_hdr()
 
 	for (p = g_field_order; p != NULL; p = p->next) {
 		f = p->order;
-		printf(field_names[f].hdr_fmt, field_names[f].hdr);
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				field_names[f].hdr_fmt, field_names[f].hdr);
+		if (p_outbuffer >= e_buf)
+			break;
 		if (p->next != NULL)
-			printf(" ");
+			*p_outbuffer++ = ' ';
 	}
-	printf("\n");
+	printf("%s\n", g_outbuffer);
+	g_outbuffer[0] = 0;
+	p_outbuffer = g_outbuffer;
 }
 
 /*
