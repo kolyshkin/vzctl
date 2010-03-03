@@ -2409,7 +2409,7 @@ vps_param *init_vps_param()
 	return param;
 }
 
-int get_veid_by_name(char *name)
+int get_veid_by_name(const char *name)
 {
 	char buf[64];
 	char content[256];
