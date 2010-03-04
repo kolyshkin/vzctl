@@ -28,6 +28,8 @@ CLEANFILES = $(sbin_SCRIPTS)
 
 include $(top_srcdir)/pathsubst.am
 
+install-redhat-from-spec:
+
 install-redhat:
 	@if [ ! -e "$(DESTDIR)/sbin/ifup-local" -a \
 			! -L "$(DESTDIR)/sbin/ifup-local" ]; then \
@@ -66,4 +68,5 @@ install-gentoo:
 	@echo "***************************************************"
 	@echo
 
-.PHONY: install-redhat install-suse install-debian install-gentoo
+.PHONY: install-redhat install-suse install-debian install-gentoo \
+	install-redhat-from-spec
