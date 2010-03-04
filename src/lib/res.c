@@ -100,16 +100,6 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if ((ret = ve_ioprio_set(h, veid, &res->io, param)))
 		return ret;
 
-	if (vps_state == STATE_RUNNING && vps_is_run(h, veid)) {
-		if (res->cap.on || res->cap.off)
-			logger(-1, 0, "Unable to set capability "
-					"on running container");
-		if (res->env.ipt_mask) {
-			logger(-1, 0, "Unable to set iptables "
-					"on running container");
-			return VZ_SET_IPTABLES;
-		}
-	}
 	if (!(skip & SKIP_CONFIGURE))
 		vps_configure(h, veid, actions, fs->root, ADD, param, vps_state);
 	/* Setup quota limits after configure steps */
