@@ -385,18 +385,16 @@ err_syntax:
 	logger(-1, 0, "Invalid syntax: only one sub command may be used");
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
+
 int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	vps_res *new_res, vps_res *old_res)
 {
-	int err = 0;
+	int found = 0;
 
 	/* Check parameters that can't be set on running CT */
 	if (new_res->cap.on || new_res->cap.off) {
 		logger(-1, 0, "Unable to set capability on running container");
-		if (setmode == SET_RESTART)
-			goto restart_ve;
-		else if (setmode != SET_IGNORE)
-			err = -1;
+		found++;
 	}
 	if (new_res->env.ipt_mask) {
 		if (!old_res->env.ipt_mask ||
@@ -404,21 +402,23 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		{
 			logger(-1, 0, "Unable to set iptables "
 					"on running container");
-			if (setmode == SET_RESTART)
-				goto restart_ve;
-			else if (setmode != SET_IGNORE)
-				err = -1;
+			found++;
 		}
 	}
-	if (err && setmode == SET_NONE) {
-		logger(-1, 0, "WARNING: Some of the parameters"
-			" could not be applied to a running container.\n"
-			"\tPlease consider using --setmode option");
-	}
-	return err;
+	if (!found)
+		return 0;
 
-restart_ve:
-	return 1;
+	switch (setmode) {
+		case SET_RESTART:
+			return 1;
+		case SET_IGNORE:
+			return -1;
+		case SET_NONE:
+			logger(-1, 0, "WARNING: Some of the parameters could "
+				"not be applied to a running container.\n"
+				"\tPlease consider using --setmode option");
+			return 0;
+	}
 }
 
 static void merge_apply_param(vps_param *old, vps_param *new, char *cfg)
