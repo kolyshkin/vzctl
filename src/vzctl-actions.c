@@ -403,6 +403,9 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 					"on running container");
 		found++;
 	}
+	/* If iptables mask is set and it differs from the old one.
+	 * FIXME: we don't catch the case when the new set is empty
+	 * and the old one is not (vzctl set --iptables '') */
 	if (new_res->env.ipt_mask &&
 			new_res->env.ipt_mask != old_res->env.ipt_mask)
 	{
