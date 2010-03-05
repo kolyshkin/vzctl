@@ -386,14 +386,18 @@ err_syntax:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
+/* Check parameters that can't be set on running CT */
 int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	vps_res *new_res, vps_res *old_res)
 {
 	int found = 0;
 	int loud = (setmode != SET_RESTART);
 
-	/* Check parameters that can't be set on running CT */
-	if (new_res->cap.on || new_res->cap.off) {
+	/* If some caps are set and they differ from the old ones */
+	if ( (new_res->cap.on &&
+				(new_res->cap.on != old_res->cap.on)) ||
+		(new_res->cap.off &&
+				(new_res->cap.off != old_res->cap.off)) ) {
 		if (loud)
 			logger(-1, 0, "Unable to set capability "
 					"on running container");
