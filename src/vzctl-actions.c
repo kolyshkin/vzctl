@@ -400,7 +400,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 				(new_res->cap.off != old_res->cap.off)) ) {
 		if (loud)
 			logger(-1, 0, "Unable to set capability "
-					"on running container");
+					"on a running container");
 		found++;
 	}
 	/* If iptables mask is set and it differs from the old one.
@@ -411,7 +411,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	{
 		if (loud)
 			logger(-1, 0, "Unable to set iptables "
-					"on running container");
+					"on a running container");
 		found++;
 	}
 	if (!found)
