@@ -449,6 +449,7 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		case SET_IGNORE:
 			return -1;
 		case SET_NONE:
+		default:
 			logger(-1, 0, "WARNING: Some of the parameters could "
 				"not be applied to a running container.\n"
 				"\tPlease consider using --setmode option");
