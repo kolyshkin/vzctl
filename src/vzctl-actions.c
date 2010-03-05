@@ -569,8 +569,8 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		return ret;
 	}
 	if (cmd_p->opt.setmode == SET_RESTART && !cmd_p->opt.save) {
-		logger(-1, 0, "it's impossible to use"
-			" restart mode without --save");
+		logger(-1, 0, "Error: --setmode restart doesn't make sense"
+			" without --save flag");
 		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 	if (cmd_p->res.name.name != NULL) {
