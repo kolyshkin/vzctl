@@ -31,8 +31,7 @@ static int ioprio_set(int which, int who, int ioprio)
 	return syscall(__NR_ioprio_set, which, who, ioprio);
 }
 
-int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param,
-							vps_param *vps_p)
+int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param)
 {
 	int ioprio;
 	int ret;

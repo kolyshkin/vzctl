@@ -97,7 +97,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 	if((ret = vps_meminfo_set(h, veid, &res->meminfo, param, vps_state)))
 		return ret;
-	if ((ret = ve_ioprio_set(h, veid, &res->io, param)))
+	if ((ret = ve_ioprio_set(h, veid, &res->io)))
 		return ret;
 
 	if (!(skip & SKIP_CONFIGURE))

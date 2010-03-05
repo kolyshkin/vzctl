@@ -23,5 +23,4 @@
 #define IOPRIO_CLASS_SHIFT	13
 #define IOPRIO_CLASS_BE		2
 
-extern int ve_ioprio_set(vps_handler *h, envid_t veid,
-				io_param *io_param, vps_param *vps_p);
+extern int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param);
