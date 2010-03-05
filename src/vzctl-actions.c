@@ -403,15 +403,13 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 					"on running container");
 		found++;
 	}
-	if (new_res->env.ipt_mask) {
-		if (!old_res->env.ipt_mask ||
+	if (new_res->env.ipt_mask &&
 			new_res->env.ipt_mask != old_res->env.ipt_mask)
-		{
-			if (loud)
-				logger(-1, 0, "Unable to set iptables "
-						"on running container");
-			found++;
-		}
+	{
+		if (loud)
+			logger(-1, 0, "Unable to set iptables "
+					"on running container");
+		found++;
 	}
 	if (!found)
 		return 0;
