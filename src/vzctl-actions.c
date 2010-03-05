@@ -414,6 +414,17 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 					"on a running container");
 		found++;
 	}
+	/* If some features are set (to either on or off)
+	 * and the new mask differs from the old one */
+	if (new_res->env.features_known &&
+			new_res->env.features_mask !=
+			old_res->env.features_mask)
+	{
+		if (loud)
+			logger(-1, 0, "Unable to set features "
+					"on a running container");
+		found++;
+	}
 	if (!found)
 		return 0;
 
