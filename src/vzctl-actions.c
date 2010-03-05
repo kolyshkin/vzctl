@@ -38,6 +38,7 @@
 #include "lock.h"
 #include "vps_configure.h"
 #include "modules.h"
+#include "io.h"
 
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
@@ -526,6 +527,8 @@ static int set_ve0(vps_handler *h, vps_param *g_p,
 	}
 	ret = vps_set_ublimit(h, 0, ub);
 	if (ret)
+		return ret;
+	if ((ret = ve_ioprio_set(h, 0, &cmd_p->res.io)))
 		return ret;
 	if (cpu != NULL)
 		if ((ret = hn_set_cpu(cpu)))
