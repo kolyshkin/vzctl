@@ -59,7 +59,7 @@ function add_ip()
 	fi
 	for ip in ${IP_ADDR}; do
 		if [ "${IPDELALL}" != "yes" ]; then
-			if grep -qw "${ip}" ${IFCFG} 2>dev/null; then
+			if grep -qw "${ip}" ${IFCFG} 2>/dev/null; then
 				break
 			fi
 		fi
