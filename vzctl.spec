@@ -60,7 +60,7 @@ CFLAGS="$RPM_OPT_FLAGS" %configure \
 	--enable-bashcomp \
 	--enable-logrotate \
 	--disable-static
-make
+make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
