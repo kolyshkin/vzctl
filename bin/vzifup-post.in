@@ -5,6 +5,16 @@
 
 [ ! -f /proc/vz/veinfo ] && exit 0
 
+usage()
+{
+	echo "Usage: $(basename $0) DEVICE" 1>&2
+	exit 1
+}
+
+# Supplied interface name
+DEV=$1
+[ -z "${DEV}" ] && usage
+
 test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
 test -f @PKGCONFDIR@/vz.conf || exit 1
 . @PKGLIBDIR@/scripts/vps-functions
@@ -17,18 +27,6 @@ update_arp()
 		vzarp add ${veip}
 	done
 }
-
-usage()
-{
-	echo "Usage: vzarp-ifup DEVICE" 1>&2
-	exit 1
-}
-
-[ ! -f /proc/vz/veinfo ] && exit 0
-
-# Supplied interface name
-DEV=$1
-[ -z "${DEV}" ] && usage
 
 # Get possible interface names
 vzgetnetdev
