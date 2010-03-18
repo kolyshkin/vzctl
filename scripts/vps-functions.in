@@ -102,7 +102,8 @@ vzgetnetdev()
 	}
 	/^[0-9]+: / && /\<UP\>/ && !/\<LOOPBACK\>/ \
 			&& !/\<SLAVE\>/ && !/\<NOARP\>/ {
-		dev=$2;
+		if ($2 !~ /^veth[0-9]+/)
+			dev=$2;
 	}
 	/^[\ \t]+inet6? / {
 		if (dev != "") print (dev);
