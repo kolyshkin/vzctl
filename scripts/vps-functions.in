@@ -97,10 +97,10 @@ vzgetnetdev()
 	# Get a list of interfaces, excluding ones with LOOPBACK,
 	# NOARP, or SLAVE flags
 	NETDEVICES=`${IP_CMD} addr list | awk '
-	/^[0-9]+/ {
+	/^[0-9]+: / {
 		dev="";
 	}
-	/^[0-9]+/ && /\<UP\>/ && !/\<LOOPBACK\>/ \
+	/^[0-9]+: / && /\<UP\>/ && !/\<LOOPBACK\>/ \
 			&& !/\<SLAVE\>/ && !/\<NOARP\>/ {
 		dev=$2;
 	}
