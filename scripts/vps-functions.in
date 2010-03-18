@@ -100,7 +100,8 @@ vzgetnetdev()
 	/^[0-9]+/ {
 		dev="";
 	}
-	/^[0-9]+/ && /UP/ && !/LOOPBACK/ && !/SLAVE/ && !/NOARP/ {
+	/^[0-9]+/ && /\<UP\>/ && !/\<LOOPBACK\>/ \
+			&& !/\<SLAVE\>/ && !/\<NOARP\>/ {
 		dev=$2;
 	}
 	/^[\ \t]+inet6? / {
