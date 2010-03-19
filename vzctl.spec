@@ -172,6 +172,9 @@ if [ -f /etc/SuSE-release ]; then
 else # RedHat/Fedora/CentOS case
 	if [ ! -e /sbin/ifup-local ]; then
 		ln -sf %{_sbindir}/vzifup-post /sbin/ifup-local
+	elif readlink /sbin/ifup-local |
+				fgrep -q %{_sbindir}/vzifup-post; then
+		: # Nothing to do, symlink already points to our script
 	else
 		echo " WARNING: file /sbin/ifup-local is present!"
 		echo " You have to manually edit the above file so that"

@@ -36,6 +36,9 @@ install-redhat:
 		$(MKDIR_P) "$(DESTDIR)/sbin"; \
 		$(LN_S) "..$(sbindir)/vzifup-post" \
 			"$(DESTDIR)/sbin/ifup-local"; \
+	elif readlink "$(DESTDIR)/sbin/ifup-local" | \
+			fgrep -q vzifup-post; then \
+		true; \
 	else \
 		echo; \
 		echo " ***************************************************"; \
