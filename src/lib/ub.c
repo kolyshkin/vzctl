@@ -76,7 +76,7 @@ int check_ub(ub_param *ub)
 
 #define CHECK_UB(name)							\
 if (ub->name == NULL) {							\
-	logger(-1, 0, "UB parameter " #name " not set");			\
+	logger(-1, 0, "Error: required UB parameter " #name " not set");\
 	ret = VZ_NOTENOUGHUBCPARAMS;					\
 }
 
