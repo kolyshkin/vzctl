@@ -78,8 +78,8 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 		break;
 	case VE_MEMINFO_PRIVVMPAGES:
 		if (privvmpages == NULL) {
-			logger(0, 0, "Warning: privvmpages is not set"
-				" configure meminfo skipped");
+			logger(0, 0, "Warning: privvmpages not set, "
+				"skipping meminfo configuration");
 			return 0;
 		}
 		meminfo.val = (((ULONG_MAX - 1) / param->val + 1)
