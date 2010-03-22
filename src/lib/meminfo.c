@@ -91,10 +91,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 			" to set meminfo parameter");
 		return 0;
 	}
-	if (param->mode == VE_MEMINFO_NONE)
-		logger(0, 0, "Configure meminfo: none");
-	else
-		logger(0, 0, "Configure meminfo: %lu", meminfo.val);
+	logger(1, 0, "Configuring meminfo: %lu", meminfo.val);
 	ret = ioctl(h->vzfd, VZCTL_VE_MEMINFO, &meminfo);
 	if (ret < 0) {
 		if (errno == ENOTTY) {
