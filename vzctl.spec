@@ -130,7 +130,7 @@ rm -rf $RPM_BUILD_ROOT
 #%attr(644, root, root) %{_mandir}/man8/vzcheckovr.8.*
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man8/vzifup-post.8.*
-%attr(644, root, root) %{_mandir}/man5/vps.conf.5.*
+%attr(644, root, root) %{_mandir}/man5/ctid.conf.5.*
 %attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 %attr(644, root, root) %{_udevrulesdir}/*
 %attr(644, root, root) %{_bashcdir}/*

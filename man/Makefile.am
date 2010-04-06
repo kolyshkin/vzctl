@@ -16,7 +16,7 @@
 #
 
 man_MANS = arpsend.8 \
-           vps.conf.5 \
+           ctid.conf.5 \
            vzcalc.8 \
            vzcfgvalidate.8 \
            vz.conf.5 \

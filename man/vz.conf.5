@@ -67,7 +67,7 @@ Value of this parameter is a directory in which all container template data are
 stored.
 .SS Defaults for containers
 Below parameters are defaults for containers, and can be overwritten by
-parameters in \fBvps.conf\fR(5) per-container configuration file.
+parameters in \fBctid.conf\fR(5) per-container configuration file.
 .IP \fBVE_ROOT\fR=\fIdirectory\fR
 Value of this parameter is the \fIdirectory\fR which serves as container root
 mount point. Value must contain literal string \fB$VEID\fR, which will be
@@ -82,12 +82,12 @@ Specified default configuration file on \fBcreate\fR action, corresponds to
 \fB--config\fR option.
 .PP
 Most of the other parameters that appear in per-container configuration files
-\fBvps.conf\fR(5) can be also set here. Still, it is recommended to keep
+\fBctid.conf\fR(5) can be also set here. Still, it is recommended to keep
 \fBTEMPLATE\fR, \fBVE_PRIVATE\fR and \fBVE_ROOT\fR in this configuration
 file, and all the other container related parameters in per-container
 configuration files.
 .SH SEE ALSO
 .BR vzctl (8),
-.BR vps.conf (5).
+.BR ctid.conf (5).
 .SH LICENSE
 Copyright (C) 2000-2009, Parallels, Inc. Licensed under GNU GPL.

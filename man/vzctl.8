@@ -42,7 +42,7 @@ Sets logging level to maximum value.
 
 .IP "\fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR] [\fB--force\fR]" 4
 This command sets various container parameters. If a \fB--save\fR flag is given,
-parameters are saved in container configuration file \fBvps.conf\fR(5).
+parameters are saved in container configuration file \fBctid.conf\fR(5).
 Use \fB--force\fR to save the parameters even if the current kernel
 doesn't support OpenVZ.
 If the container is currently running, \fBvzctl\fR applies these parameters
@@ -655,7 +655,7 @@ Permission denied
 .IP 13
 Capability setting failed
 .IP 14
-Container configuration file \fBvps.conf\fR(5) not found
+Container configuration file \fBctid.conf\fR(5) not found
 .IP 15
 Timeout on \fBvzctl exec\fR
 .IP 16
@@ -834,7 +834,7 @@ To permanently remove this container:
 /proc/fairsched\fR
 .SH SEE ALSO
 .BR vz.conf (5),
-.BR vps.conf (5),
+.BR ctid.conf (5),
 .BR vzquota (8),
 .BR http://wiki.openvz.org/UBC .
 .SH LICENSE
