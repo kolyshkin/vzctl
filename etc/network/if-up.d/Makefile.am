@@ -1,4 +1,5 @@
-#  Copyright (C) 2006-2008, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2009 Derek Poon and the University of British Columbia.
+#  All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,31 +16,17 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-if ENABLE_BASHCOMP
-bashcdir    = $(sysconfdir)/bash_completion.d
-endif
+NETSSCRIPTS = vzifup-post
 
-if ENABLE_CRON
-cronddir    = $(pkgconfdir)/cron
-dst_cronddir= $(sysconfdir)/cron.d
-endif
+EXTRA_DIST = \
+	$(NETSSCRIPTS:%=%.in)
 
-if ENABLE_LOGROTATE
-logrdir     = $(sysconfdir)/logrotate.d
-endif
+CLEANFILES = $(NETSSCRIPTS)
 
-if ENABLE_UDEV
-udevdir     = $(sysconfdir)/udev/rules.d
-endif
+include $(top_srcdir)/pathsubst.am
 
-initddir    = $(sysconfdir)/init.d
-netsdir     = $(sysconfdir)/sysconfig/network-scripts
-ifupdir     = $(sysconfdir)/network/if-up.d
-
-pkgconfdir  = $(sysconfdir)/vz
-vpsconfdir  = $(pkgconfdir)/conf
-distconfdir = $(pkgconfdir)/dists
-namesdir    = $(pkgconfdir)/names
-
-vzlibdir    = $(pkglibdir)/scripts
-vzcrondir   = $(pkgdatadir)/scripts
+install-debian: $(NETSSCRIPTS)
+	$(mkinstalldirs) $(DESTDIR)$(ifupdir)
+	for file in $(NETSSCRIPTS); do \
+		$(INSTALL_SCRIPT) $$file $(DESTDIR)$(ifupdir)/$$file; \
+	done

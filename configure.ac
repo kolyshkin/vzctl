@@ -150,6 +150,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/dists/Makefile
                  etc/init.d/Makefile
                  etc/logrotate.d/Makefile
+                 etc/network/if-up.d/Makefile
                  etc/network-scripts/Makefile
                  etc/udev/Makefile
                  etc/Makefile

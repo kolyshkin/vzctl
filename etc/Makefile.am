@@ -24,6 +24,7 @@ SUBDIRS = \
 	dists \
 	init.d \
 	logrotate.d \
+	network/if-up.d \
 	network-scripts \
 	udev
 
@@ -44,6 +45,7 @@ install-suse:
 
 install-debian:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@
+	$(MAKE) $(AM_MAKEFLAGS) -C network/if-up.d $@
 
 install-gentoo:
 	$(MAKE) $(AM_MAKEFLAGS) -C init.d $@

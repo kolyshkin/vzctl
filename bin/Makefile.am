@@ -56,9 +56,6 @@ install-suse:
 		"$(DESTDIR)/etc/sysconfig/network/if-up.d/"
 
 install-debian:
-	$(MKDIR_P) "$(DESTDIR)/etc/network/if-up.d"
-	$(LN_S) "../../..$(sbindir)/vzifup-post" \
-		"$(DESTDIR)/etc/network/if-up.d/"
 
 install-gentoo:
 	@echo
