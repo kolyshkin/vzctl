@@ -1251,6 +1251,8 @@ static int parse_cpulimit(unsigned long **param, const char *str)
 		return ERR_INVAL;
 
 	*param = malloc(sizeof(unsigned long));
+	if (!*param)
+		return ERR_NOMEM;
 	**param = val;
 	return 0;
 }
