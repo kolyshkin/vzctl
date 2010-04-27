@@ -64,7 +64,7 @@ _vzctl()
 		--iptables --netdev_add --netdev_del --netif_add --netif_del \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--noatime --capability --devnodes --devices --applyconfig \
-		--name --ioprio --setmode --meminfo --bootorder"
+		--name --ioprio --setmode --meminfo --bootorder --features"
 	vzctl_start_opts="--wait --force"
 	vzctl_stop_opts="--fast"
 	vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
@@ -82,6 +82,7 @@ _vzctl()
 		sys_admin sys_boot sys_nice sys_resource sys_time
 		sys_tty_config mknod lease setveid ve_admin"
 
+	feature_names="sysfs nfs sit ipip ppp ipgre bridge nfsd"
 
 
 	case $COMP_CWORD in
@@ -166,6 +167,11 @@ _vzctl()
 #					COMPREPLY=( $(compgen -W \
 #					"${cap}:on ${cap}:off" -- $cur) )
 #				fi
+				;;
+			--features)
+				# featurename:on|off
+				COMPREPLY=( $( compgen -W "$feature_names" -- $cur ) )
+				# FIXME: add :on or :off -- can't make it work
 				;;
 			--devnodes)
 				# FIXME: device:r|w|rw|none
