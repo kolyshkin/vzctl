@@ -53,7 +53,9 @@ int read_script(const char *fname, char *include, char **buf)
 	}
 	/* Read include file first */
 	if (include != NULL) {
-		inc = malloc(strlen(fname) + strlen(include) + 1);
+		inc = vz_malloc(strlen(fname) + strlen(include) + 1);
+		if (!inc)
+			return -1;
 		if ((p = strrchr(fname, '/')) != NULL) {
 			snprintf(inc, p - fname + 2, "%s", fname);
 			strcat(inc, include);
