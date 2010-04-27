@@ -69,23 +69,27 @@ static inline int opt_size(struct option *opt)
 }
 
 struct option *mod_make_opt(struct option *opt, struct mod_action *action,
-	const char *name)
+				const char *name)
 {
 	int size, total, i;
-	struct option *mod_opt, *new = NULL;
+	struct option *p, *mod_opt, *new = NULL;
 	struct mod *mod;
 	struct mod_info *mod_info;
 
 	total = opt_size(opt);
 	if (total) {
 		new = malloc(sizeof(*new) * (total + 1));
+		if (!new)
+			return NULL;
 		memcpy(new, opt, sizeof(*new) * total);
 	}
+
 	if (action == NULL) {
 		if (new != NULL)
 			memset(new + total, 0, sizeof(*new));
 		return new;
 	}
+
 	for (i = 0, mod = action->mod_list; i < action->mod_count; i++, mod++) {
 		mod_info = mod->mod_info;
 		if (mod_info == NULL || mod_info->get_opt == NULL)
@@ -94,12 +98,20 @@ struct option *mod_make_opt(struct option *opt, struct mod_action *action,
 		size = opt_size(mod_opt);
 		if (!size)
 			continue;
-		new = realloc(new, sizeof(*new) * (total + size + 1));
+		p = realloc(new, sizeof(*new) * (total + size + 1));
+		if (!p) {
+			free(new);
+			new = NULL;
+			goto out;
+		} else
+			new = p;
 		memcpy(new + total, mod_opt, sizeof(*new) * size);
 		total += size;
 	}
+
 	if (new != NULL)
 		memset(new + total, 0, sizeof(*new));
+out:
 	return new;
 }
 
