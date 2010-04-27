@@ -2246,7 +2246,10 @@ static int write_conf(char *fname, list_head_t *head)
 		}
 		file = strdup(fname);
 	}
-	tmpfile = malloc(strlen(file) + strlen(suffix) + 1);
+	tmpfile = vz_malloc(strlen(file) + strlen(suffix) + 1);
+	if (!tmpfile) {
+		goto out_file;
+	}
 	sprintf(tmpfile, "%s%s", file, suffix);
 	if ((fp = fopen(tmpfile, "w")) == NULL) {
 		logger(-1, errno, "Unable to create configuration"
@@ -2278,6 +2281,7 @@ out2:
 	unlink(tmpfile);
 out:
 	free(tmpfile);
+out_file:
 	free(file);
 	return ret;
 }
