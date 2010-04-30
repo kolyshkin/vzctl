@@ -169,31 +169,23 @@ int main(int argc, char *argv[], char *envp[])
 	if (!strcmp(argv[1], "set")) {
 		init_modules(&g_action, "set");
 		action = ACTION_SET;
-	//	status = ST_SET;
 	} else if (!strcmp(argv[1], "create")) {
 		init_modules(&g_action, "create");
 		action = ACTION_CREATE;
-	//	status = ST_CREATE;
 	} else if (!strcmp(argv[1], "start")) {
 		init_modules(&g_action, "set");
 		action = ACTION_START;
-	//	status = ST_START;
 	} else if (!strcmp(argv[1], "stop")) {
 		init_modules(&g_action, "set");
 		action = ACTION_STOP;
-	//	status = ST_STOP;
 	} else if (!strcmp(argv[1], "restart")) {
 		action = ACTION_RESTART;
-	//	status = ST_RESTART;
 	} else if (!strcmp(argv[1], "destroy") || !strcmp(argv[1], "delete")) {
 		action = ACTION_DESTROY;
-	//	status = ST_DESTROY;
 	} else if (!strcmp(argv[1], "mount")) {
 		action = ACTION_MOUNT;
-	//	status = ST_MOUNT;
 	} else if (!strcmp(argv[1], "umount")) {
 		action = ACTION_UMOUNT;
-	//	status = ST_UMOUNT;
 	} else if (!strcmp(argv[1], "exec3")) {
 		action = ACTION_EXEC3;
 	} else if (!strcmp(argv[1], "exec2")) {

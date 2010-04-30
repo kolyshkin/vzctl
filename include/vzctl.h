@@ -20,27 +20,18 @@
 
 /* Action numeration should begin with 1. Value 0 is reserved. */
 #define ACTION_CREATE		1
-#define ST_CREATE		"creating"
 #define ACTION_DESTROY		2
-#define ST_DESTROY		"destroying"
 #define ACTION_MOUNT		3
-#define ST_MOUNT		"mounting"
 #define ACTION_UMOUNT		4
-#define ST_UMOUNT		"unmounting"
 #define ACTION_START		5
-#define ST_START		"starting"
 #define ACTION_STOP		6
-#define ST_STOP			"stopping"
 #define ACTION_RESTART		7
-#define ST_RESTART		"restarting"
 #define ACTION_SET		8
-#define ST_SET			"setting"
 #define ACTION_STATUS		9
 #define ACTION_EXEC		10
 #define ACTION_EXEC2		11
 #define ACTION_EXEC3		12
 #define ACTION_ENTER		13
-#define ST_QUOTA_INIT		"initializing-quota"
 #define	ACTION_RUNSCRIPT	14
 #define	ACTION_CUSTOM		15
 #define ACTION_CHKPNT		16
