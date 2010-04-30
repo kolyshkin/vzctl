@@ -38,9 +38,9 @@ int _proc_title_len;
 
 void init_modules(struct mod_action *action, const char *name);
 void free_modules(struct mod_action *action);
-int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
+int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	vps_param *param, const char *name);
-int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
+int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p, int argc, char **argv, int skiplock);
 
 void version(FILE *fp)
@@ -106,7 +106,7 @@ void usage(int rc)
 
 int main(int argc, char *argv[], char *envp[])
 {
-	int action = 0;
+	act_t action = -1;
 	int verbose = 0;
 	int verbose_tmp;
 	int verbose_custom = 0;

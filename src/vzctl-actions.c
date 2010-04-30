@@ -701,7 +701,7 @@ static int enter(vps_handler *h, envid_t veid, const char *root,
 	return do_enter(h, veid, root, argc, argv);
 }
 
-static int exec(vps_handler *h, int action, envid_t veid, const char *root,
+static int exec(vps_handler *h, act_t action, envid_t veid, const char *root,
 		int argc, char **argv)
 {
 	int mode;
@@ -802,7 +802,7 @@ static int parse_custom_opt(envid_t veid, int argc, char **argv,
 	return ret;
 }
 
-int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
+int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	vps_param *param, const char *name)
 {
 	int ret = 0;
@@ -878,7 +878,7 @@ int parse_action_opt(envid_t veid, int action, int argc, char *argv[],
 	return ret;
 }
 
-int run_action(envid_t veid, int action, vps_param *g_p, vps_param *vps_p,
+int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p, int argc, char **argv, int skiplock)
 {
 	vps_handler *h = NULL;
