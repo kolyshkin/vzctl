@@ -50,6 +50,7 @@ int execvep(const char *path, char *const argv[], char *const envp[])
 
 	for (p = DEF_PATH; p && *p; p = p2) {
 		char partial[FILENAME_MAX];
+		size_t res;
 
 		p2 = strchr(p, ':');
 		if (p2) {
@@ -62,10 +63,10 @@ int execvep(const char *path, char *const argv[], char *const envp[])
 			strcpy(partial, p);
 		}
 		if (strlen(partial))
-			strcat(partial, "/");
+			vz_strlcat(partial, "/", sizeof(partial));
 
-		strncat(partial, path, sizeof(partial) - 1);
-		if (strlen(partial) >= sizeof(partial) - 1) {
+		res = vz_strlcat(partial, path, sizeof(partial));
+		if (res >= sizeof(partial)) {
 			errno = ENAMETOOLONG;
 			break;
 		}

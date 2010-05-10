@@ -625,3 +625,23 @@ void remove_names(envid_t veid)
 	}
 	closedir(dp);
 }
+
+size_t vz_strlcat(char *dst, const char *src, size_t count)
+{
+	size_t dsize = strlen(dst);
+	size_t len = strlen(src);
+	size_t res = dsize + len;
+
+	if (dsize >= count)
+		return dsize;
+
+	dst += dsize;
+	count -= dsize;
+	if (len >= count)
+		len = count - 1;
+
+	memcpy(dst, src, len);
+	dst[len] = 0;
+
+	return res;
+}
