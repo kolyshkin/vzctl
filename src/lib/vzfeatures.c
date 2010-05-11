@@ -38,14 +38,11 @@ struct feature_s *find_feature(const char *name)
 
 	for (feat = features; feat->name != NULL; feat++) {
 		len = strlen(feat->name);
-		if (strncmp(name, feat->name, len) == 0)
+		if (strncmp(name, feat->name, len) == 0 && name[len] == ':')
 			break;
 	}
 
 	if (feat->name == NULL)
-		return NULL;
-
-	if (name[len] != ':')
 		return NULL;
 
 	if (strcmp(name + len + 1, "on") == 0) {
