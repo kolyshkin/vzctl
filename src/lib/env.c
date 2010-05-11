@@ -30,6 +30,7 @@
 #include <linux/vzcalluser.h>
 #include <sys/personality.h>
 #include <linux/reboot.h>
+#include <sys/mount.h>
 
 #include "vzerror.h"
 #include "res.h"
@@ -359,6 +360,12 @@ try:
 			goto env_err;
 		}
 	}
+	if (create_param.feature_mask & VE_FEATURE_NFSD) {
+		mount("nfsd", "/proc/fs/nfsd", "nfsd", 0, 0);
+		make_dir("/var/lib/nfs/rpc_pipefs", 1);
+		mount("sunrpc", "/var/lib/nfs/rpc_pipefs", "rpc_pipefs", 0, 0);
+	}
+
 	/* Close status descriptor to report that
 	 * environment is created.
 	*/
