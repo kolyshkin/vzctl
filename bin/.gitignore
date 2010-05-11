@@ -4,4 +4,5 @@ vzcpucheck
 vzmigrate
 vznetcfg
 vzpid
+vznetaddbr
 vzifup-post
