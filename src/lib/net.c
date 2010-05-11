@@ -196,7 +196,8 @@ int vps_add_ip(vps_handler *h, envid_t veid,
 	list_head_t *ip_h = &net->ip;
 
 	if ((str = list2str(NULL, ip_h)) != NULL) {
-		logger(0, 0, "Adding IP address(es): %s", str);
+		if (str[0] != '\0')
+			logger(0, 0, "Adding IP address(es): %s", str);
 		free(str);
 	}
 	if ((ret = vps_ip_ctl(h, veid, VE_IP_ADD, ip_h, 1)))
@@ -215,7 +216,8 @@ int vps_del_ip(vps_handler *h, envid_t veid,
 	list_head_t *ip_h = &net->ip;
 
 	if ((str = list2str(NULL, ip_h)) != NULL) {
-		logger(0, 0, "Deleting IP address(es): %s", str);
+		if (str[0] != '\0')
+			logger(0, 0, "Deleting IP address(es): %s", str);
 		free(str);
 	}
 	if ((ret = vps_ip_ctl(h, veid, VE_IP_DEL, ip_h, 1)))
