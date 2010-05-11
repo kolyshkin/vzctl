@@ -23,7 +23,7 @@ AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
             -DPKGCONFDIR=\"$(pkgconfdir)\" \
             -DPKGLIBDIR=\"$(pkglibdir)\"
 
-LIB_VER = 0.0.2
+LIB_VER = 0.0.3
 
 lib_LTLIBRARIES = libvzctl.la
 
