@@ -591,7 +591,7 @@ else
 			undo_copy_quota
 			exit $MIG_ERR_MOUNT_VPS
 		fi
-	else
+	elif [ "${DISK_QUOTA}" != "no" ]; then
 		log 1 "Turning quota off"
 		if ! logexec 2 $SSH root@$host vzquota off $VEID ; then
 			log 0 "failed to turn quota off"
