@@ -246,7 +246,7 @@ static int destroydir(char *dir)
 	sigaction(SIGCHLD, &act, NULL);
 
 	if (!(pid = fork())) {
-		int fd;
+		int fd, i;
 
 		setsid();
 		fd = open("/dev/null", O_WRONLY);
@@ -256,6 +256,10 @@ static int destroydir(char *dir)
 			close(2);
 			dup2(fd, 1);
 			dup2(fd, 2);
+		}
+		for (i = 3; i < 1024; i++) {
+			if (i != fd_lock)
+				close(i);
 		}
 		_destroydir(tmp);
 		_unlock(fd_lock, buf);
