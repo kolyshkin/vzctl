@@ -235,7 +235,6 @@ static int destroydir(char *dir)
 	snprintf(buf, sizeof(buf), "%s/rm.lck", tmp);
 	if ((fd_lock = _lock(buf, 0)) == -2) {
 		/* Already locked */
-		_unlock(fd_lock, NULL);
 		return 0;
 	} else if (fd_lock == -1)
 		return VZ_FS_DEL_PRVT;
