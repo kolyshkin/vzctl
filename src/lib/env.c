@@ -352,19 +352,26 @@ try:
 	close(fd);
 
 	mk_reboot_script();
-	if (res->dq.ugidlimit != NULL)
-		mk_quota_link();
+
 	if (res->misc.wait == YES) {
 		if (add_reach_runlevel_mark()) {
 			ret = VZ_WAIT_FAILED;
 			goto env_err;
 		}
 	}
+
+	mount("proc", "/proc", "proc", 0, 0);
+	if (stat_file("/sys"))
+		mount("sysfs", "/sys", "sysfs", 0, 0);
+
 	if (create_param.feature_mask & VE_FEATURE_NFSD) {
 		mount("nfsd", "/proc/fs/nfsd", "nfsd", 0, 0);
 		make_dir("/var/lib/nfs/rpc_pipefs", 1);
 		mount("sunrpc", "/var/lib/nfs/rpc_pipefs", "rpc_pipefs", 0, 0);
 	}
+
+	if (res->dq.ugidlimit != NULL)
+		mk_quota_link();
 
 	/* Close status descriptor to report that
 	 * environment is created.
