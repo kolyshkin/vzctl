@@ -86,7 +86,7 @@ static char *get_destroy_root(const char *dir)
 	if (stat(dir, &st) < 0)
 		return NULL;
 	id = st.st_dev;
-	p = dir + strlen(dir) - 1;
+	p = dir + strlen(dir);
 	prev = p;
 	while (p > dir) {
 		while (p > dir && (*p == '/' || *p == '.')) p--;
