@@ -271,6 +271,17 @@ print_failure()
 	echo
 }
 
+print_warning()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		echo -n "$1"
+		warning $"$1"
+	else
+		echo -n "- Warning: $1 "
+	fi
+	echo
+}
+
 # Calls either print_success or print_failure, depending on $?
 # Optional argument $1 -- an error string passed to print_failure.
 print_result()
@@ -335,6 +346,9 @@ start_net()
 		ip -6 addr add fe80::1/128 dev $VZDEV
 	fi
 	sysctl -q -w net.ipv4.conf.$VZDEV.send_redirects=0
+	if [ "$(sysctl -n -e net.ipv4.ip_forward)" != "1" ]; then
+		print_warning "IP forwarding is not enabled"
+	fi
 }
 
 stop_net()
