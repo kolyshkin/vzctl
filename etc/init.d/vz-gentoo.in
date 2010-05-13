@@ -135,7 +135,7 @@ start_net() {
 		/sbin/sysctl -q -w net.ipv4.conf.${VZDEV}.send_redirects=0
 	eend $?
 
-	if [ "x$(/sbin/sysctl net.ipv4.ip_forward 2>/dev/null | awk '{print $3}')" = "x0" ]; then
+	if [ "x$(/sbin/sysctl -n -e net.ipv4.ip_forward)" != "x1" ]; then
 		ewarn "It looks like you have ip forwarding disabled. To make networking"
 		ewarn "available for containers, please, run sysctl -w net.ipv4.ip_forward=1"
 	fi
