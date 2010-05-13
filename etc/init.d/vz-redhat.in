@@ -331,15 +331,10 @@ start_net()
 	ip link set $VZDEV up
 	print_result
 	ip addr add 0.0.0.0/0 dev $VZDEV
-	__echo "Configuring interface $VZDEV: "
-	sysctl -q -w net.ipv4.conf.$VZDEV.send_redirects=0
-	print_result
 	if [ "${IPV6}" = "yes" ]; then
-		__echo "Configuring ipv6 $VZDEV: "
-		# Fix me: ip addres should be generated
 		ip -6 addr add fe80::1/128 dev $VZDEV
-		print_result
 	fi
+	sysctl -q -w net.ipv4.conf.$VZDEV.send_redirects=0
 }
 
 stop_net()
