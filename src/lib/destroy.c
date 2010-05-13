@@ -169,6 +169,16 @@ static void _destroydir(const char *root)
 	} while(del);
 }
 
+static int _unlink(const char *s)
+{
+	if (unlink(s)) {
+		logger(-1, errno, "Unable to unlink %s", s);
+		return -1;
+	}
+	return 0;
+
+}
+
 static int destroydir(char *dir)
 {
 	char buf[STR_SIZE];
@@ -180,22 +190,36 @@ static int destroydir(char *dir)
 	int ret = 0;
 	struct stat st;
 
-	if (stat(dir, &st)) {
+	if (lstat(dir, &st)) {
 		if (errno != ENOENT) {
-			logger(-1, errno, "Unable to stat %s", dir);
+			logger(-1, errno, "Unable to lstat %s", dir);
 			return -1;
 		}
 		return 0;
 	}
+
+	if (S_ISLNK(st.st_mode)) {
+		int i;
+		i = readlink(dir, tmp, sizeof(tmp) - 1);
+		if (i == -1) {
+			logger(-1, 0, "Unable to readlink %s", dir);
+			return -1;
+		}
+		tmp[i] = '\0';
+		logger(-1, 0, "Warning: container private area %s "
+				"is a symlink to %s.\n"
+				"Not removing link destination, "
+				"you have to do it manually.",
+				dir, tmp);
+		return _unlink(dir);
+	}
+
 	if (!S_ISDIR(st.st_mode)) {
-		logger(-1, 0, "Warning: container private area "
-				"is not a directory");
-		if (unlink(dir)) {
-			logger(-1, errno, "Unable to unlink %s", dir);
-			return -1;
-		}
-		return 0;
+		logger(-1, 0, "Warning: container private area %s "
+				"is not a directory", dir);
+		return _unlink(dir);
 	}
+
 	root = get_destroy_root(dir);
 	if (root == NULL) {
 		logger(-1, 0, "Unable to get root for %s", dir);
