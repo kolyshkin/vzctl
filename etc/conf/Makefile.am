@@ -1,4 +1,4 @@
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ EXTRA_DIST = $(VE0CONFIG:%=%.x86) \
              $(VECONFIG:%=%.x86_64)
 
 %: %$(VECONFIG_EXT)
-	$(INSTALL) $< $@
+	$(AM_V_GEN)$(INSTALL) $< $@
 
 vpsconf_DATA = \
 	$(VE0CONFIG) \
