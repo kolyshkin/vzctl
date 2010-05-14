@@ -319,7 +319,7 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 		return ret;
 	move_config(veid, BACKUP);
 	if (rmdir(fs->root) < 0)
-		logger(-1, 0, "Warning: failed to remove %s", fs->root);
+		logger(-1, errno, "Warning: failed to remove %s", fs->root);
 	logger(0, 0, "Container private area was destroyed");
 
 	return 0;
