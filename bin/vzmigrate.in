@@ -128,13 +128,13 @@ EOF
 log () {
 	if [ $1 -eq 0 ]; then
 		shift
-		echo -e "Error: " $@ >&2
+		printf "Error: " $@ >&2
 	elif [ $1 -eq 1 ]; then
 		shift
-		echo -e $@
+		printf $@
 	elif [ $verbose -eq 1 ]; then
 		shift
-		echo -e "   " $@
+		printf "   " $@
 	fi
 }
 
