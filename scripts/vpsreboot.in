@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -78,23 +78,7 @@ lockfile()
 # Fix for OpenVZ bug #107
 test -f "$VESTAT" || exit 0
 lockfile
-
-cd "$CONF_DIR" 2>/dev/null || exit 0
-VE_TOTAL=`ls -1 *.conf 2>/dev/null | sed s/.conf//`
-VE_RUN=`awk '
-	$1 != "VEID" && $1 != "Version:" {
-		if (i++)
-			 printf("|");
-		 printf("^%s$", $1);
-	}
-' ${VESTAT}`
-
-if [ -z "$VE_RUN" ]; then
-	VE_STOPPED="$VE_TOTAL"
-else
-	VE_STOPPED=`echo -e "$VE_TOTAL" | egrep -v "$VE_RUN"`
-fi
-
+VE_STOPPED=$(@SBINDIR@/vzlist -H -octid -S 2>/dev/null)
 for i in $VE_STOPPED; do
 	check_reboot "$i"
 done
