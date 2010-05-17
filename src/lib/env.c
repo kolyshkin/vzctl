@@ -357,6 +357,8 @@ try:
 		}
 	}
 	mount("proc", "/proc", "proc", 0, 0);
+	if (stat_file("/sys"))
+		mount("sysfs", "/sys", "sysfs", 0, 0);
 
 	if (create_param.feature_mask & VE_FEATURE_NFSD) {
 		mount("nfsd", "/proc/fs/nfsd", "nfsd", 0, 0);
