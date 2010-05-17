@@ -29,7 +29,7 @@ if [ -z "$MAJOR" ]; then
 	exit 0
 fi
 
-echo -e '#!/bin/sh
+echo '#!/bin/sh
 
 [ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'
 rm -f /etc/mtab >/dev/null 2>&1

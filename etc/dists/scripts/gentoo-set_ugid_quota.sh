@@ -32,7 +32,7 @@ if [ -z "$MAJOR" ]; then
 	exit 0
 fi
 
-echo -e '#!/sbin/runscript
+echo '#!/sbin/runscript
 
 start() {
 	[ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'

@@ -27,7 +27,7 @@ if [ -z "$MAJOR" ]; then
 	ln -sf /proc/mounts /etc/mtab
 	exit 0
 fi
-echo -e '#!/bin/sh
+echo '#!/bin/sh
 start() {
 	[ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'
 	rm -f /etc/mtab >/dev/null 2>&1
