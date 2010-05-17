@@ -270,35 +270,6 @@ int vz_setluid(envid_t veid)
 	return 0;
 }
 
-/*
- * Checks if sysfs needs to be enabled for this CT.
- * Now we do that only for distributions from sysfs_dists.
- * FIXME: provide a generic way to enable/disable sysfs per CT.
-*/
-static int sysfs_required(vps_res *res)
-{
-	static char *sysfs_dists[] = {"opensuse", "suse", "sles", NULL};
-
-	tmpl_param *tmp = &res->tmpl;
-	int len, i;
-	char *name;
-
-	for (i = 0; name = sysfs_dists[i], name != NULL; i++) {
-		len = strlen(name);
-		if (tmp->ostmpl != NULL &&
-			!strncmp(tmp->ostmpl, name, len))
-		{
-			return 1;
-		}
-		if (tmp->dist != NULL &&
-			!strncmp(tmp->dist, name, len))
-		{
-			return 1;
-		}
-	}
-	return 0;
-}
-
 static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
@@ -323,8 +294,8 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 
 	create_param.feature_mask = res->env.features_mask;
 	create_param.known_features = res->env.features_known;
-	if (!(res->env.features_known & VE_FEATURE_SYSFS) &&
-			sysfs_required(res)) {
+	/* sysfs enabled by default, unless explicitly set */
+	if (! res->env.features_known & VE_FEATURE_SYSFS) {
 		create_param.feature_mask |= VE_FEATURE_SYSFS;
 		create_param.known_features |= VE_FEATURE_SYSFS;
 	}
