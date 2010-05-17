@@ -58,7 +58,7 @@ get_stopped_ve()
 	if [ -z "$VE_RUN" ]; then
 		VE_STOPPED="$VE_PREV"
 	else
-		VE_STOPPED=`echo -e "$VE_PREV" | grep -w -v "$VE_RUN"`
+		VE_STOPPED=`echo "$VE_PREV" | grep -w -v "$VE_RUN"`
 	fi
 }
 
@@ -84,7 +84,7 @@ clear_ve_net()
 		echo "`date --iso-8601=seconds` venetclean : CT $VEID : CT died, clear IPs: $IP_ADDR" >> "$LOGFILE"
 	for ip in $IP_ADDR; do
 		# clear IP if not used
-		if ! echo -e "$VES_INFO" | grep -w "$ip" >/dev/null 2>&1; then
+		if ! echo "$VES_INFO" | grep -w "$ip" >/dev/null 2>&1; then
 			vzdelrouting "$ip"
 			vzarp del "$ip"
 		fi
