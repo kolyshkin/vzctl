@@ -1,4 +1,4 @@
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ ARCH_VER      = 0.7 0.8
 CENTOS_VER    = 3 4
 DEBIAN_VER    = 3.0 3.1 4.0
 FC_VER        = 1 2 3 4 5 6 7
-FEDORA_VER    = 7 8 9
+FEDORA_VER    = 7 8 9 10 11 12 13
 REDHAT_7x_VER = 7.0 7.1 7.2 7.3
 REDHAT_VER    = 8.0 9
 RHEL_VER      = 3 4
@@ -86,6 +86,8 @@ fedora:
 		$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
 			$(DESTDIR)$(distconfdir)/fedora-$$ver.conf; \
 	done
+	$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
+		$(DESTDIR)$(distconfdir)/fedora.conf
 
 gentoo:
 	$(INSTALL_DATA) $(srcdir)/gentoo.conf $(DESTDIR)$(distconfdir)/gentoo.conf
