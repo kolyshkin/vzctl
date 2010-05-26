@@ -120,6 +120,15 @@ static void print_cpulimit(struct Cveinfo *p, int index)
 			p->cpu->limit[index]);
 }
 
+static void print_ioprio(struct Cveinfo *p, int index)
+{
+	if (p->io.ioprio < 0)
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%3s", "-");
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%3d",
+			p->io.ioprio);
+}
+
 static void print_onboot(struct Cveinfo *p, int index)
 {
 	p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
@@ -257,6 +266,12 @@ int bootorder_sort_fn(const void *val1, const void *val2)
 		return !id_sort_fn(val1, val2);
 
 	return (*r1 > *r2);
+}
+
+int ioprio_sort_fn(const void *val1, const void *val2)
+{
+	return ((const struct Cveinfo *)val1)->io.ioprio >
+		((const struct Cveinfo *)val2)->io.ioprio;
 }
 
 #define SORT_STR_FN(fn, name)						\
@@ -575,6 +590,8 @@ struct Cfield field_names[] =
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
+
+{"ioprio", "IOP", "%3s", 1, RES_IO, print_ioprio, ioprio_sort_fn},
 
 {"onboot", "ONBOOT", "%6s", 0, RES_ONBOOT, print_onboot, none_sort_fn},
 {"bootorder", "BOOTORDER", "%10s", 0, RES_BOOTORDER,
@@ -988,6 +1005,7 @@ do {								\
 		ve->bootorder = x_malloc(sizeof(*ve->bootorder));
 		*ve->bootorder = *res->misc.bootorder;
 	}
+	ve->io.ioprio = res->io.ioprio;
 }
 
 int read_ves_param()

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -82,6 +82,10 @@ struct Ccpu {
 	unsigned long limit[2];		// 0-limit, 1-units
 };
 
+struct Cio {
+	int ioprio;
+};
+
 struct Cveinfo {
 	int veid;
 	char *hostname;
@@ -94,6 +98,7 @@ struct Cveinfo {
 	struct Cquota *quota;
 	struct Cla *la;
 	struct Ccpu *cpu;
+	struct Cio io;
 	int status;
 	int hide;
 	int onboot;
@@ -111,6 +116,7 @@ struct Cveinfo {
 #define RES_DESCRIPTION	8
 #define RES_ONBOOT	9
 #define RES_BOOTORDER	10
+#define RES_IO		11
 
 struct Cfield {
 	char *name;
