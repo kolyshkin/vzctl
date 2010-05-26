@@ -437,8 +437,10 @@ int parse_ioprio(int id, io_param *io, char *val)
 {
 	if (parse_int(val, &io->ioprio))
 		return ERR_INVAL;
-	if (io->ioprio < VE_IOPRIO_MIN || io->ioprio > VE_IOPRIO_MAX)
+	if (io->ioprio < VE_IOPRIO_MIN || io->ioprio > VE_IOPRIO_MAX) {
+		io->ioprio = -1;
 		return ERR_INVAL;
+	}
 	return 0;
 }
 
