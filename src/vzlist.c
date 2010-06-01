@@ -612,13 +612,13 @@ struct Cfield field_names[] =
 {"swappages.l", "SWAPP.L", "%10s", 3, RES_UBC,print_ubc_swappages, swappages_l_sort_fn},
 {"swappages.f", "SWAPP.F", "%10s", 4, RES_UBC,print_ubc_swappages, swappages_f_sort_fn},
 
-{"diskspace", "DQBLOCKS", "%10s", 0, RES_QUOTA, print_dq_blocks, dqblocks_u_sort_fn},
-{"diskspace.s", "DQBLOCKS.S", "%10s", 1, RES_QUOTA, print_dq_blocks, dqblocks_s_sort_fn},
-{"diskspace.h", "DQBLOCKS.H", "%10s", 2, RES_QUOTA, print_dq_blocks, dqblocks_h_sort_fn},
+{"diskspace", "DSPACE", "%10s", 0, RES_QUOTA, print_dq_blocks, dqblocks_u_sort_fn},
+{"diskspace.s", "DSPACE.S", "%10s", 1, RES_QUOTA, print_dq_blocks, dqblocks_s_sort_fn},
+{"diskspace.h", "DSPACE.H", "%10s", 2, RES_QUOTA, print_dq_blocks, dqblocks_h_sort_fn},
 
-{"diskinodes", "DQINODES", "%10s", 0, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
-{"diskinodes.s", "DQINODES.S", "%10s", 1, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
-{"diskinodes.h", "DQINODES.H", "%10s", 2, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
+{"diskinodes", "DINODES", "%10s", 0, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
+{"diskinodes.s", "DINODES.S", "%10s", 1, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
+{"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
 
 {"laverage", "LAVERAGE", "%14s", 0, RES_LA, print_laverage, laverage_sort_fn},
 
