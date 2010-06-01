@@ -802,6 +802,7 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 	for_each_strtok(token, val, "\t ") {
 		if (id == PARAM_IP_DEL && !strcmp(token, "all")) {
 			vps_p->res.net.delall = YES;
+			vps_p->del_res.net.delall = YES;
 			continue;
 		}
 		if (!strcmp(token, "0.0.0.0"))
