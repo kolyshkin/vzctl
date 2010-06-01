@@ -385,8 +385,8 @@ struct Cfield field_names[] =
 {"vpsid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
 
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
-{"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
-{"description", "DESCRIPTION", "%-32s", 0, RES_DESCRIPTION, print_description, description_sort_fn },
+{"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
+{"description", "DESCRIPTION", "%-32s", 0, RES_NONE, print_description, description_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"status", "STATUS", "%-9s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
@@ -528,10 +528,10 @@ struct Cfield field_names[] =
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
 
-{"ioprio", "IOP", "%3s", 1, RES_IO, print_ioprio, ioprio_sort_fn},
+{"ioprio", "IOP", "%3s", 1, RES_NONE, print_ioprio, ioprio_sort_fn},
 
-{"onboot", "ONBOOT", "%6s", 0, RES_ONBOOT, print_onboot, none_sort_fn},
-{"bootorder", "BOOTORDER", "%10s", 0, RES_BOOTORDER,
+{"onboot", "ONBOOT", "%6s", 0, RES_NONE, print_onboot, none_sort_fn},
+{"bootorder", "BOOTORDER", "%10s", 0, RES_NONE,
 	print_bootorder, bootorder_sort_fn},
 };
 

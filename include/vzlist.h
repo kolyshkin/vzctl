@@ -112,11 +112,6 @@ struct Cveinfo {
 #define RES_IP		4
 #define RES_LA		5
 #define RES_CPU		6
-#define RES_NAME	7
-#define RES_DESCRIPTION	8
-#define RES_ONBOOT	9
-#define RES_BOOTORDER	10
-#define RES_IO		11
 
 struct Cfield {
 	char *name;
