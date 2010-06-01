@@ -86,12 +86,46 @@ static inline int get_run_ve(int update)
 #endif
 
 
-static void print_hostname(struct Cveinfo *p, int index);
-static void print_name(struct Cveinfo *p, int index);
-static void print_ip(struct Cveinfo *p, int index);
-static void print_description(struct Cveinfo *p, int index);
-
 /* Print functions */
+#define PRINT_STR_FIELD(fieldname, length) \
+static void print_ ## fieldname(struct Cveinfo *p, int index) \
+{ \
+	int r; \
+	char *str = "-"; \
+ \
+	if (p->fieldname != NULL) \
+		str = p->fieldname; \
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, \
+		"%-" #length "s", str); \
+	if (!is_last_field) \
+		r = length; \
+	p_outbuffer += r; \
+}
+
+PRINT_STR_FIELD(hostname, 32)
+PRINT_STR_FIELD(name, 32)
+PRINT_STR_FIELD(description, 32)
+
+static void print_ip(struct Cveinfo *p, int index)
+{
+	int r;
+	char *str = "-";
+	char *ch;
+
+	if (p->ip != NULL)
+		str = p->ip;
+	if (!is_last_field)
+	{
+		/* Fixme: dont destroy original string */
+		if ((ch = strchr(str, ' ')) != NULL)
+			*ch = 0;
+	}
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
+	if (!is_last_field)
+		r = 15;
+	p_outbuffer += r;
+}
+
 static void print_veid(struct Cveinfo *p, int index)
 {
 	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10d", p->veid);
@@ -597,66 +631,6 @@ struct Cfield field_names[] =
 {"bootorder", "BOOTORDER", "%10s", 0, RES_BOOTORDER,
 	print_bootorder, bootorder_sort_fn},
 };
-
-static void print_hostname(struct Cveinfo *p, int index)
-{
-	int r;
-	char *str = "-";
-
-	if (p->hostname != NULL)
-		str = p->hostname;
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (!is_last_field)
-		r = 32;
-	p_outbuffer += r;
-}
-
-static void print_name(struct Cveinfo *p, int index)
-{
-	int r;
-	char *str = "-";
-
-	if (p->name != NULL)
-		str = p->name;
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (!is_last_field)
-		r = 32;
-	p_outbuffer += r;
-}
-
-static void print_description(struct Cveinfo *p, int index)
-{
-	int r;
-	char *str = "-";
-
-	if (p->description != NULL)
-		str = p->description;
-
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-32s", str);
-	if (!is_last_field)
-		r = 32;
-	p_outbuffer += r;
-}
-
-static void print_ip(struct Cveinfo *p, int index)
-{
-	int r;
-	char *str = "-";
-	char *ch;
-
-	if (p->ip != NULL)
-		str = p->ip;
-	if (!is_last_field)
-	{
-		/* Fixme: dont destroy original string */
-		if ((ch = strchr(str, ' ')) != NULL)
-			*ch = 0;
-	}
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
-	if (!is_last_field)
-		r = 15;
-	p_outbuffer += r;
-}
 
 void *x_malloc(int size)
 {
