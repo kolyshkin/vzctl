@@ -105,6 +105,7 @@ static void print_ ## fieldname(struct Cveinfo *p, int index) \
 PRINT_STR_FIELD(hostname, 32)
 PRINT_STR_FIELD(name, 32)
 PRINT_STR_FIELD(description, 32)
+PRINT_STR_FIELD(ostemplate, 32)
 
 static void print_ip(struct Cveinfo *p, int index)
 {
@@ -322,6 +323,7 @@ int name ## _sort_fn(const void *val1, const void *val2)		\
 SORT_STR_FN(hostname)
 SORT_STR_FN(name)
 SORT_STR_FN(description)
+SORT_STR_FN(ostemplate)
 SORT_STR_FN(ip)
 
 #define SORT_UL_RES(fn, res, name, index)				\
@@ -387,6 +389,7 @@ struct Cfield field_names[] =
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
 {"description", "DESCRIPTION", "%-32s", 0, RES_NONE, print_description, description_sort_fn },
+{"ostemplate", "OSTEMPLATE", "%-32s", 0, RES_NONE, print_ostemplate, ostemplate_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"status", "STATUS", "%-9s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
@@ -868,6 +871,8 @@ do {								\
 		ve->hostname = strdup(res->misc.hostname);
 	if (res->misc.description != NULL)
 		ve->description = strdup(res->misc.description);
+	if (res->tmpl.ostmpl != NULL)
+		ve->ostemplate = strdup(res->tmpl.ostmpl);
 	if (res->name.name != NULL) {
 		int veid_nm = get_veid_by_name(res->name.name);
 		if (veid_nm == ve->veid)
@@ -1559,6 +1564,8 @@ void free_veinfo()
 			free(veinfo[i].name);
 		if (veinfo[i].description != NULL)
 			free(veinfo[i].description);
+		if (veinfo[i].ostemplate != NULL)
+			free(veinfo[i].ostemplate);
 		if (veinfo[i].ubc != NULL)
 			free(veinfo[i].ubc);
 		if (veinfo[i].quota != NULL)

@@ -91,6 +91,7 @@ struct Cveinfo {
 	char *hostname;
 	char *name;
 	char *description;
+	char *ostemplate;
 	char *ip;
 	char *ve_private;
 	char *ve_root;
