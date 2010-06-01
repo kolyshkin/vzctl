@@ -179,53 +179,53 @@ static void print_bootorder(struct Cveinfo *p, int index)
 				"%10lu", p->bootorder[index]);
 }
 
-#define PRINT_UL_RES(fn, res, name)					\
-static void fn(struct Cveinfo *p, int index)				\
+#define PRINT_UBC(name)							\
+static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	if (p->res == NULL ||						\
+	if (p->ubc == NULL ||						\
 		(p->status != VE_RUNNING &&				\
 			(index == 0 || index == 1 || index == 4)))	\
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
 	else								\
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
-					p->res->name[index]);		\
+					p->ubc->name[index]);		\
 }									\
 
-PRINT_UL_RES(print_ubc_kmemsize, ubc, kmemsize)
-PRINT_UL_RES(print_ubc_lockedpages, ubc, lockedpages)
-PRINT_UL_RES(print_ubc_privvmpages, ubc, privvmpages)
-PRINT_UL_RES(print_ubc_shmpages, ubc, shmpages)
-PRINT_UL_RES(print_ubc_numproc, ubc, numproc)
-PRINT_UL_RES(print_ubc_physpages, ubc, physpages)
-PRINT_UL_RES(print_ubc_vmguarpages, ubc, vmguarpages)
-PRINT_UL_RES(print_ubc_oomguarpages, ubc, oomguarpages)
-PRINT_UL_RES(print_ubc_numtcpsock, ubc, numtcpsock)
-PRINT_UL_RES(print_ubc_numflock, ubc, numflock)
-PRINT_UL_RES(print_ubc_numpty, ubc, numpty)
-PRINT_UL_RES(print_ubc_numsiginfo, ubc, numsiginfo)
-PRINT_UL_RES(print_ubc_tcpsndbuf, ubc, tcpsndbuf)
-PRINT_UL_RES(print_ubc_tcprcvbuf, ubc, tcprcvbuf)
-PRINT_UL_RES(print_ubc_othersockbuf, ubc, othersockbuf)
-PRINT_UL_RES(print_ubc_dgramrcvbuf, ubc, dgramrcvbuf)
-PRINT_UL_RES(print_ubc_numothersock, ubc, numothersock)
-PRINT_UL_RES(print_ubc_dcachesize, ubc, dcachesize)
-PRINT_UL_RES(print_ubc_numfile, ubc, numfile)
-PRINT_UL_RES(print_ubc_numiptent, ubc, numiptent)
-PRINT_UL_RES(print_ubc_swappages, ubc, swappages)
+PRINT_UBC(kmemsize)
+PRINT_UBC(lockedpages)
+PRINT_UBC(privvmpages)
+PRINT_UBC(shmpages)
+PRINT_UBC(numproc)
+PRINT_UBC(physpages)
+PRINT_UBC(vmguarpages)
+PRINT_UBC(oomguarpages)
+PRINT_UBC(numtcpsock)
+PRINT_UBC(numflock)
+PRINT_UBC(numpty)
+PRINT_UBC(numsiginfo)
+PRINT_UBC(tcpsndbuf)
+PRINT_UBC(tcprcvbuf)
+PRINT_UBC(othersockbuf)
+PRINT_UBC(dgramrcvbuf)
+PRINT_UBC(numothersock)
+PRINT_UBC(dcachesize)
+PRINT_UBC(numfile)
+PRINT_UBC(numiptent)
+PRINT_UBC(swappages)
 
-#define PRINT_DQ_RES(fn, res, name)					\
-static void fn(struct Cveinfo *p, int index)				\
+#define PRINT_DQ(name)							\
+static void print_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	if (p->res == NULL ||						\
+	if (p->quota == NULL ||						\
 		(p->status != VE_RUNNING && (index == 0)))		\
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
 	else								\
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
-					p->res->name[index]);		\
+					p->quota->name[index]);		\
 }									\
 
-PRINT_DQ_RES(print_dq_blocks, quota, diskspace)
-PRINT_DQ_RES(print_dq_inodes, quota, diskinodes)
+PRINT_DQ(diskspace)
+PRINT_DQ(diskinodes)
 
 /* Sort functions */
 
@@ -308,8 +308,8 @@ int ioprio_sort_fn(const void *val1, const void *val2)
 		((const struct Cveinfo *)val2)->io.ioprio;
 }
 
-#define SORT_STR_FN(fn, name)						\
-int fn(const void *val1, const void *val2)				\
+#define SORT_STR_FN(name)						\
+int name ## _sort_fn(const void *val1, const void *val2)		\
 {									\
 	const char *h1 = ((const struct Cveinfo*)val1)->name;		\
 	const char *h2 = ((const struct Cveinfo*)val2)->name;		\
@@ -319,158 +319,61 @@ int fn(const void *val1, const void *val2)				\
 	return ret;					\
 }
 
-SORT_STR_FN(hostnm_sort_fn, hostname)
-SORT_STR_FN(name_sort_fn, name)
-SORT_STR_FN(description_sort_fn, description)
-SORT_STR_FN(ip_sort_fn, ip)
+SORT_STR_FN(hostname)
+SORT_STR_FN(name)
+SORT_STR_FN(description)
+SORT_STR_FN(ip)
 
-#define SORT_UL_RES(fn, type, res, name, index)				\
+#define SORT_UL_RES(fn, res, name, index)				\
 int fn(const void *val1, const void *val2)				\
 {									\
-	const struct type *r1 = ((const struct Cveinfo *)val1)->res;	\
-	const struct type *r2 = ((const struct Cveinfo *)val2)->res;	\
+	const struct C ## res *r1 = ((const struct Cveinfo *)val1)->res;\
+	const struct C ## res *r2 = ((const struct Cveinfo *)val2)->res;\
 	int ret;							\
 	if ((ret = check_empty_param(r1, r2)) == 2)			\
 		ret = r1->name[index] > r2->name[index];		\
 	return ret;					\
 }
 
-SORT_UL_RES(kmemsize_h_sort_fn, Cubc, ubc, kmemsize, 0)
-SORT_UL_RES(kmemsize_m_sort_fn, Cubc, ubc, kmemsize, 1)
-SORT_UL_RES(kmemsize_l_sort_fn, Cubc, ubc, kmemsize, 2)
-SORT_UL_RES(kmemsize_b_sort_fn, Cubc, ubc, kmemsize, 3)
-SORT_UL_RES(kmemsize_f_sort_fn, Cubc, ubc, kmemsize, 4)
+#define SORT_UBC(res)							\
+SORT_UL_RES(res ## _h_sort_fn, ubc, res, 0)				\
+SORT_UL_RES(res ## _m_sort_fn, ubc, res, 1)				\
+SORT_UL_RES(res ## _l_sort_fn, ubc, res, 2)				\
+SORT_UL_RES(res ## _b_sort_fn, ubc, res, 3)				\
+SORT_UL_RES(res ## _f_sort_fn, ubc, res, 4)
 
-SORT_UL_RES(lockedpages_h_sort_fn, Cubc, ubc, lockedpages, 0)
-SORT_UL_RES(lockedpages_m_sort_fn, Cubc, ubc, lockedpages, 1)
-SORT_UL_RES(lockedpages_l_sort_fn, Cubc, ubc, lockedpages, 2)
-SORT_UL_RES(lockedpages_b_sort_fn, Cubc, ubc, lockedpages, 3)
-SORT_UL_RES(lockedpages_f_sort_fn, Cubc, ubc, lockedpages, 4)
+SORT_UBC(kmemsize)
+SORT_UBC(lockedpages)
+SORT_UBC(privvmpages)
+SORT_UBC(shmpages)
+SORT_UBC(numproc)
+SORT_UBC(physpages)
+SORT_UBC(vmguarpages)
+SORT_UBC(oomguarpages)
+SORT_UBC(numtcpsock)
+SORT_UBC(numflock)
+SORT_UBC(numpty)
+SORT_UBC(numsiginfo)
+SORT_UBC(tcpsndbuf)
+SORT_UBC(tcprcvbuf)
+SORT_UBC(othersockbuf)
+SORT_UBC(dgramrcvbuf)
+SORT_UBC(numothersock)
+SORT_UBC(dcachesize)
+SORT_UBC(numfile)
+SORT_UBC(numiptent)
+SORT_UBC(swappages)
 
-SORT_UL_RES(privvmpages_h_sort_fn, Cubc, ubc, privvmpages, 0)
-SORT_UL_RES(privvmpages_m_sort_fn, Cubc, ubc, privvmpages, 1)
-SORT_UL_RES(privvmpages_l_sort_fn, Cubc, ubc, privvmpages, 2)
-SORT_UL_RES(privvmpages_b_sort_fn, Cubc, ubc, privvmpages, 3)
-SORT_UL_RES(privvmpages_f_sort_fn, Cubc, ubc, privvmpages, 4)
+#define SORT_DQ(res)							\
+SORT_UL_RES(res ## _u_sort_fn, quota, res, 0)				\
+SORT_UL_RES(res ## _s_sort_fn, quota, res, 1)				\
+SORT_UL_RES(res ## _h_sort_fn, quota, res, 2)
 
-SORT_UL_RES(shmpages_h_sort_fn, Cubc, ubc, shmpages, 0)
-SORT_UL_RES(shmpages_m_sort_fn, Cubc, ubc, shmpages, 1)
-SORT_UL_RES(shmpages_l_sort_fn, Cubc, ubc, shmpages, 2)
-SORT_UL_RES(shmpages_b_sort_fn, Cubc, ubc, shmpages, 3)
-SORT_UL_RES(shmpages_f_sort_fn, Cubc, ubc, shmpages, 4)
+SORT_DQ(diskspace)
+SORT_DQ(diskinodes)
 
-SORT_UL_RES(numproc_h_sort_fn, Cubc, ubc, numproc, 0)
-SORT_UL_RES(numproc_m_sort_fn, Cubc, ubc, numproc, 1)
-SORT_UL_RES(numproc_l_sort_fn, Cubc, ubc, numproc, 2)
-SORT_UL_RES(numproc_b_sort_fn, Cubc, ubc, numproc, 3)
-SORT_UL_RES(numproc_f_sort_fn, Cubc, ubc, numproc, 4)
-
-SORT_UL_RES(physpages_h_sort_fn, Cubc, ubc, physpages, 0)
-SORT_UL_RES(physpages_m_sort_fn, Cubc, ubc, physpages, 1)
-SORT_UL_RES(physpages_l_sort_fn, Cubc, ubc, physpages, 2)
-SORT_UL_RES(physpages_b_sort_fn, Cubc, ubc, physpages, 3)
-SORT_UL_RES(physpages_f_sort_fn, Cubc, ubc, physpages, 4)
-
-SORT_UL_RES(vmguarpages_h_sort_fn, Cubc, ubc, vmguarpages, 0)
-SORT_UL_RES(vmguarpages_m_sort_fn, Cubc, ubc, vmguarpages, 1)
-SORT_UL_RES(vmguarpages_l_sort_fn, Cubc, ubc, vmguarpages, 2)
-SORT_UL_RES(vmguarpages_b_sort_fn, Cubc, ubc, vmguarpages, 3)
-SORT_UL_RES(vmguarpages_f_sort_fn, Cubc, ubc, vmguarpages, 4)
-
-SORT_UL_RES(oomguarpages_h_sort_fn, Cubc, ubc, oomguarpages, 0)
-SORT_UL_RES(oomguarpages_m_sort_fn, Cubc, ubc, oomguarpages, 1)
-SORT_UL_RES(oomguarpages_l_sort_fn, Cubc, ubc, oomguarpages, 2)
-SORT_UL_RES(oomguarpages_b_sort_fn, Cubc, ubc, oomguarpages, 3)
-SORT_UL_RES(oomguarpages_f_sort_fn, Cubc, ubc, oomguarpages, 4)
-
-SORT_UL_RES(numtcpsock_h_sort_fn, Cubc, ubc, numtcpsock, 0)
-SORT_UL_RES(numtcpsock_m_sort_fn, Cubc, ubc, numtcpsock, 1)
-SORT_UL_RES(numtcpsock_l_sort_fn, Cubc, ubc, numtcpsock, 2)
-SORT_UL_RES(numtcpsock_b_sort_fn, Cubc, ubc, numtcpsock, 3)
-SORT_UL_RES(numtcpsock_f_sort_fn, Cubc, ubc, numtcpsock, 4)
-
-SORT_UL_RES(numflock_h_sort_fn, Cubc, ubc, numflock, 0)
-SORT_UL_RES(numflock_m_sort_fn, Cubc, ubc, numflock, 1)
-SORT_UL_RES(numflock_l_sort_fn, Cubc, ubc, numflock, 2)
-SORT_UL_RES(numflock_b_sort_fn, Cubc, ubc, numflock, 3)
-SORT_UL_RES(numflock_f_sort_fn, Cubc, ubc, numflock, 4)
-
-SORT_UL_RES(numpty_h_sort_fn, Cubc, ubc, numpty, 0)
-SORT_UL_RES(numpty_m_sort_fn, Cubc, ubc, numpty, 1)
-SORT_UL_RES(numpty_l_sort_fn, Cubc, ubc, numpty, 2)
-SORT_UL_RES(numpty_b_sort_fn, Cubc, ubc, numpty, 3)
-SORT_UL_RES(numpty_f_sort_fn, Cubc, ubc, numpty, 4)
-
-SORT_UL_RES(numsiginfo_h_sort_fn, Cubc, ubc, numsiginfo, 0)
-SORT_UL_RES(numsiginfo_m_sort_fn, Cubc, ubc, numsiginfo, 1)
-SORT_UL_RES(numsiginfo_l_sort_fn, Cubc, ubc, numsiginfo, 2)
-SORT_UL_RES(numsiginfo_b_sort_fn, Cubc, ubc, numsiginfo, 3)
-SORT_UL_RES(numsiginfo_f_sort_fn, Cubc, ubc, numsiginfo, 4)
-
-SORT_UL_RES(tcpsndbuf_h_sort_fn, Cubc, ubc, tcpsndbuf, 0)
-SORT_UL_RES(tcpsndbuf_m_sort_fn, Cubc, ubc, tcpsndbuf, 1)
-SORT_UL_RES(tcpsndbuf_l_sort_fn, Cubc, ubc, tcpsndbuf, 2)
-SORT_UL_RES(tcpsndbuf_b_sort_fn, Cubc, ubc, tcpsndbuf, 3)
-SORT_UL_RES(tcpsndbuf_f_sort_fn, Cubc, ubc, tcpsndbuf, 4)
-
-SORT_UL_RES(tcprcvbuf_h_sort_fn, Cubc, ubc, tcprcvbuf, 0)
-SORT_UL_RES(tcprcvbuf_m_sort_fn, Cubc, ubc, tcprcvbuf, 1)
-SORT_UL_RES(tcprcvbuf_l_sort_fn, Cubc, ubc, tcprcvbuf, 2)
-SORT_UL_RES(tcprcvbuf_b_sort_fn, Cubc, ubc, tcprcvbuf, 3)
-SORT_UL_RES(tcprcvbuf_f_sort_fn, Cubc, ubc, tcprcvbuf, 4)
-
-SORT_UL_RES(othersockbuf_h_sort_fn, Cubc, ubc, othersockbuf, 0)
-SORT_UL_RES(othersockbuf_m_sort_fn, Cubc, ubc, othersockbuf, 1)
-SORT_UL_RES(othersockbuf_l_sort_fn, Cubc, ubc, othersockbuf, 2)
-SORT_UL_RES(othersockbuf_b_sort_fn, Cubc, ubc, othersockbuf, 3)
-SORT_UL_RES(othersockbuf_f_sort_fn, Cubc, ubc, othersockbuf, 4)
-
-SORT_UL_RES(dgramrcvbuf_h_sort_fn, Cubc, ubc, dgramrcvbuf, 0)
-SORT_UL_RES(dgramrcvbuf_m_sort_fn, Cubc, ubc, dgramrcvbuf, 1)
-SORT_UL_RES(dgramrcvbuf_l_sort_fn, Cubc, ubc, dgramrcvbuf, 2)
-SORT_UL_RES(dgramrcvbuf_b_sort_fn, Cubc, ubc, dgramrcvbuf, 3)
-SORT_UL_RES(dgramrcvbuf_f_sort_fn, Cubc, ubc, dgramrcvbuf, 4)
-
-SORT_UL_RES(numothersock_h_sort_fn, Cubc, ubc, numothersock, 0)
-SORT_UL_RES(numothersock_m_sort_fn, Cubc, ubc, numothersock, 1)
-SORT_UL_RES(numothersock_l_sort_fn, Cubc, ubc, numothersock, 2)
-SORT_UL_RES(numothersock_b_sort_fn, Cubc, ubc, numothersock, 3)
-SORT_UL_RES(numothersock_f_sort_fn, Cubc, ubc, numothersock, 4)
-
-SORT_UL_RES(dcachesize_h_sort_fn, Cubc, ubc, dcachesize, 0)
-SORT_UL_RES(dcachesize_m_sort_fn, Cubc, ubc, dcachesize, 1)
-SORT_UL_RES(dcachesize_l_sort_fn, Cubc, ubc, dcachesize, 2)
-SORT_UL_RES(dcachesize_b_sort_fn, Cubc, ubc, dcachesize, 3)
-SORT_UL_RES(dcachesize_f_sort_fn, Cubc, ubc, dcachesize, 4)
-
-SORT_UL_RES(numfile_h_sort_fn, Cubc, ubc, numfile, 0)
-SORT_UL_RES(numfile_m_sort_fn, Cubc, ubc, numfile, 1)
-SORT_UL_RES(numfile_l_sort_fn, Cubc, ubc, numfile, 2)
-SORT_UL_RES(numfile_b_sort_fn, Cubc, ubc, numfile, 3)
-SORT_UL_RES(numfile_f_sort_fn, Cubc, ubc, numfile, 4)
-
-SORT_UL_RES(numiptent_h_sort_fn, Cubc, ubc, numiptent, 0)
-SORT_UL_RES(numiptent_m_sort_fn, Cubc, ubc, numiptent, 1)
-SORT_UL_RES(numiptent_l_sort_fn, Cubc, ubc, numiptent, 2)
-SORT_UL_RES(numiptent_b_sort_fn, Cubc, ubc, numiptent, 3)
-SORT_UL_RES(numiptent_f_sort_fn, Cubc, ubc, numiptent, 4)
-
-SORT_UL_RES(swappages_h_sort_fn, Cubc, ubc, swappages, 0)
-SORT_UL_RES(swappages_m_sort_fn, Cubc, ubc, swappages, 1)
-SORT_UL_RES(swappages_l_sort_fn, Cubc, ubc, swappages, 2)
-SORT_UL_RES(swappages_b_sort_fn, Cubc, ubc, swappages, 3)
-SORT_UL_RES(swappages_f_sort_fn, Cubc, ubc, swappages, 4)
-
-SORT_UL_RES(dqblocks_u_sort_fn, Cquota, quota, diskspace, 0)
-SORT_UL_RES(dqblocks_s_sort_fn, Cquota, quota, diskspace, 1)
-SORT_UL_RES(dqblocks_h_sort_fn, Cquota, quota, diskspace, 2)
-
-SORT_UL_RES(dqinodes_u_sort_fn, Cquota, quota, diskinodes, 0)
-SORT_UL_RES(dqinodes_s_sort_fn, Cquota, quota, diskinodes, 1)
-SORT_UL_RES(dqinodes_h_sort_fn, Cquota, quota, diskinodes, 2)
-
-SORT_UL_RES(cpulimit_sort_fn, Ccpu, cpu, limit, 0)
-SORT_UL_RES(cpuunits_sort_fn, Ccpu, cpu, limit, 1)
+SORT_UL_RES(cpulimit_sort_fn, cpu, limit, 0)
+SORT_UL_RES(cpuunits_sort_fn, cpu, limit, 1)
 
 struct Cfield field_names[] =
 {
@@ -481,7 +384,7 @@ struct Cfield field_names[] =
 /* vpsid is for backward compatibility -- will be removed later */
 {"vpsid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
 
-{"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostnm_sort_fn},
+{"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NAME, print_name, name_sort_fn},
 {"description", "DESCRIPTION", "%-32s", 0, RES_DESCRIPTION, print_description, description_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
@@ -612,13 +515,13 @@ struct Cfield field_names[] =
 {"swappages.l", "SWAPP.L", "%10s", 3, RES_UBC,print_ubc_swappages, swappages_l_sort_fn},
 {"swappages.f", "SWAPP.F", "%10s", 4, RES_UBC,print_ubc_swappages, swappages_f_sort_fn},
 
-{"diskspace", "DSPACE", "%10s", 0, RES_QUOTA, print_dq_blocks, dqblocks_u_sort_fn},
-{"diskspace.s", "DSPACE.S", "%10s", 1, RES_QUOTA, print_dq_blocks, dqblocks_s_sort_fn},
-{"diskspace.h", "DSPACE.H", "%10s", 2, RES_QUOTA, print_dq_blocks, dqblocks_h_sort_fn},
+{"diskspace", "DSPACE", "%10s", 0, RES_QUOTA, print_diskspace, diskspace_u_sort_fn},
+{"diskspace.s", "DSPACE.S", "%10s", 1, RES_QUOTA, print_diskspace, diskspace_s_sort_fn},
+{"diskspace.h", "DSPACE.H", "%10s", 2, RES_QUOTA, print_diskspace, diskspace_h_sort_fn},
 
-{"diskinodes", "DINODES", "%10s", 0, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
-{"diskinodes.s", "DINODES.S", "%10s", 1, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
-{"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_dq_inodes, dqinodes_u_sort_fn},
+{"diskinodes", "DINODES", "%10s", 0, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
+{"diskinodes.s", "DINODES.S", "%10s", 1, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
+{"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
 
 {"laverage", "LAVERAGE", "%14s", 0, RES_LA, print_laverage, laverage_sort_fn},
 
