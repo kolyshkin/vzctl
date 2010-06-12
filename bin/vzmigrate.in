@@ -188,7 +188,7 @@ undo_quota_on () {
 }
 
 undo_sync () {
-	# Root will be destroed in undo_root
+	# Root will be destroyed in undo_root
 	undo_quota_on
 }
 
@@ -256,7 +256,6 @@ if [ $# -lt 2 ]; then
 fi
 
 while [ ! -z "$1" ]; do
-	log 1 "OPT:$1"
 	case "$1" in
 	--online)
 		online=1
@@ -505,8 +504,7 @@ fi
 if [ "$state" = "running" ]; then
 	log 2 "Syncing private (2nd pass)"
 	time_rsync2=$(date +%s.%N)
-	if ! $RSYNC \
-			"$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
+	if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
 		log 0 "Failed to sync container private areas"
 		undo_source_stage
 		exit $MIG_ERR_COPY
