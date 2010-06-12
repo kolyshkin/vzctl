@@ -128,13 +128,13 @@ EOF
 log () {
 	if [ $1 -eq 0 ]; then
 		shift
-		printf "Error: " $@ >&2
+		echo "Error: $*" >&2
 	elif [ $1 -eq 1 ]; then
 		shift
-		printf $@
+		echo "$*"
 	elif [ $verbose -eq 1 ]; then
 		shift
-		printf "   " $@
+		echo "   $@"
 	fi
 }
 
@@ -560,11 +560,11 @@ if [ $online -eq 1 ]; then
 	fi
 	time_finish=$(date +%s.%N)
 	log 2 "Times:"
-	log 2 "\tSuspend + Dump:\t" $(get_time $time_suspend $time_copy_dump)
-	log 2 "\tCopy dump file:\t" $(get_time $time_copy_dump $time_rsync2)
-	log 2 "\tSecond rsync:\t" $(get_time $time_rsync2 $time_quota)
-	log 2 "\t2nd level quota:\t" $(get_time $time_quota $time_undump)
-	log 2 "\tUndump + Resume:\t" $(get_time $time_undump $time_finish)
+	log 2 "  Suspend + Dump: " $(get_time $time_suspend $time_copy_dump)
+	log 2 "  Copy dump file: " $(get_time $time_copy_dump $time_rsync2)
+	log 2 "  Second rsync:   " $(get_time $time_rsync2 $time_quota)
+	log 2 "  2nd level quota:" $(get_time $time_quota $time_undump)
+	log 2 "  Undump + Resume:" $(get_time $time_undump $time_finish)
 	log 2 "Total time: " $(get_time $time_suspend $time_finish)
 
 	log 1 "Cleanup"
