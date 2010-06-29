@@ -34,7 +34,7 @@ NETMASK=255.255.255.255
 BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
 
 	echo "${FAKEGATEWAY}	0.0.0.0 255.255.255.255	${VENET_DEV}
-default	${FAKEGATEWAY}	0.0.0.0	${VENET_DEV}" > ${ROUTES} || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
+default	${FAKEGATEWAY}	0.0.0.0	${VENET_DEV}" > ${ROUTES} || error "Can't write to file $ROUTES" $VZ_FS_NO_DISK_SPACE
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE

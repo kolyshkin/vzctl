@@ -51,7 +51,7 @@ BOOTPROTO=static
 BROADCAST=0.0.0.0
 NETMASK=255.255.255.255
 IPADDR=127.0.0.1" > ${IFCFG} ||
-	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
+	error "Can't write to file ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
 
 	remove_fake_old_route ${ROUTES}
 	if ! grep -q -E "${FAKEGATEWAYNET}[[:space:]]0.0.0.0[[:space:]]255.255.255.0[[:space:]]${VENET_DEV}" ${ROUTES} 2>/dev/null;
@@ -76,7 +76,7 @@ function create_config()
 
 	echo "IPADDR_${ifnum}=${ip}
 LABEL_${ifnum}=${ifnum}" >> ${IFCFG} ||
-	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}" ${VZ_FS_NO_DISK_SPACE}
+	error "Can't write to file ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
 }
 
 function add_ip()
