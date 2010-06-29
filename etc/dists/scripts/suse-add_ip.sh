@@ -32,6 +32,16 @@ function get_aliases()
 	IFNUMLIST=`grep -e "^LABEL_" ${IFCFG} | sed 's/^LABEL_\(.*\)=.*/\1/'`
 }
 
+# Fix a bug in sles9 ifup-route script
+function fix_ifup_route()
+{
+	local file=/etc/sysconfig/network/scripts/ifup-route
+	local str='run_iproute $ACTION to $TYPE $DEST via $GWAY $IFACE $IPOPTS'
+	if grep -q "$str" $file; then
+		sed -i -e "/$str/s/via \$GWAY/\${GWAY:+via \$GWAY}/" $file
+	fi
+}
+
 function init()
 {
 
@@ -56,6 +66,7 @@ IPADDR=127.0.0.1" > ${IFCFG} ||
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
 	fi
+	fix_ifup_route
 }
 
 function create_config()
