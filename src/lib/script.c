@@ -325,17 +325,7 @@ int add_reach_runlevel_mark()
 		return -1;
 	}
 	/* Create upstart specific script */
-	if (!stat(EVENTS_DIR, &st)) {
-		fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644);
-		if (fd == -1) {
-			fprintf(stderr, "Unable to create " EVENTS_FILE
-				": %s\n", strerror(errno));
-			return -1;
-		}
-		write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
-		close(fd);
-		return 0;
-	} else if (!stat(EVENTS_DIR_UBUNTU, &st)) {
+	if (!stat(EVENTS_DIR_UBUNTU, &st)) {
 		fd = open(EVENTS_FILE_UBUNTU, O_WRONLY|O_TRUNC|O_CREAT, 0644);
 		if (fd == -1) {
 			fprintf(stderr, "Unable to create "
@@ -345,6 +335,16 @@ int add_reach_runlevel_mark()
 		}
 		write(fd, EVENTS_SCRIPT_UBUNTU,
 			sizeof(EVENTS_SCRIPT_UBUNTU) - 1);
+		close(fd);
+		return 0;
+	} else if (!stat(EVENTS_DIR, &st)) {
+		fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+		if (fd == -1) {
+			fprintf(stderr, "Unable to create " EVENTS_FILE
+				": %s\n", strerror(errno));
+			return -1;
+		}
+		write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
 		close(fd);
 		return 0;
 	}
