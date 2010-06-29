@@ -42,7 +42,7 @@ function fix_ifup_route()
 	fi
 }
 
-function init()
+function init_config()
 {
 
 	mkdir -p ${IFCFG_DIR}
@@ -53,19 +53,14 @@ NETMASK=255.255.255.255
 IPADDR=127.0.0.1" > ${IFCFG} ||
 	error "Can't write to file ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
 
-	remove_fake_old_route ${ROUTES}
-	if ! grep -q -E "${FAKEGATEWAYNET}[[:space:]]0.0.0.0[[:space:]]255.255.255.0[[:space:]]${VENET_DEV}" ${ROUTES} 2>/dev/null;
-	then
-		echo "${FAKEGATEWAYNET}	0.0.0.0 255.255.255.0	${VENET_DEV}" >> ${ROUTES}
-	fi
-	if ! grep -q -E "default[[:space:]]${FAKEGATEWAY}[[:space:]]0.0.0.0[[:space:]]${VENET_DEV}" ${ROUTES} 2>/dev/null;
-	then
-		echo "default ${FAKEGATEWAY}	0.0.0.0	${VENET_DEV}" >> ${ROUTES}
-	fi
 	# Set up /etc/hosts
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
 	fi
+	cat << EOF > ${ROUTES}
+default - - ${VENET_DEV}
+default :: - ${VENET_DEV}
+EOF
 	fix_ifup_route
 }
 
@@ -84,12 +79,14 @@ function add_ip()
 	local ip
 	local ifnum=-1
 
-	if [ "x${IPDELALL}" = "xyes" -o "x${VE_STATE}" = "xstarting" ]; then
-		rm -f ${IFCFG} 2>/dev/null
+	if [ "x${VE_STATE}" = "xstarting" ]; then
+		init_config
+	elif [ "x${IPDELALL}" = "xyes" ]; then
+		init_config
+	elif [ ! -f "${IFCFG}" ]; then
+		init_config
 	fi
-	if [ ! -f "${IFCFG}" ]; then
-		init
-	fi
+
 	get_aliases
 	for ip in ${IP_ADDR}; do
 		found=

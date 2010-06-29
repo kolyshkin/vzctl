@@ -24,7 +24,6 @@ IFCFG_DIR=/etc/sysconfig/network-scripts
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
 NETFILE=/etc/sysconfig/network
 HOSTFILE=/etc/hosts
-ROUTE=${IFCFG_DIR}/route-${VENET_DEV}
 NETWORKRESTART=
 
 function fix_ifup()
@@ -54,16 +53,13 @@ IPADDR=127.0.0.1
 NETMASK=255.255.255.255
 BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
 
-
-	remove_fake_old_route ${ROUTE}
-	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${ROUTE} 2>/dev/null; then
-		echo "${FAKEGATEWAYNET}/24 dev ${VENET_DEV} scope host
-default via ${FAKEGATEWAY}" >> ${ROUTE} || error "Can't write to file ${ROUTE}" ${VZ_FS_NO_DISK_SPACE}
-	fi
 	# Set /etc/sysconfig/network
 	put_param $NETFILE NETWORKING yes
-	put_param $NETFILE GATEWAY ${FAKEGATEWAY}
-
+	# Set default route to venet0
+	put_param $NETFILE GATEWAYDEV ${VENETDEV}
+	# Remove old (obsoleted) fake route
+	del_param $NETFILE GATEWAY
+	[ -f "${IFCFG_DIR}/route-venet0" ] && rm -f ${IFCFG_DIR}/route-venet0
 	# setup ipv6
 	setup6_network
 

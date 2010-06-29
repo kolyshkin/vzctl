@@ -42,8 +42,7 @@ create_venet_config()
 		error "Cannot create $dir" ${VZ_FS_NO_DISK_SPACE}
 	echo >"$dir/ipv4address" ||
 		error "Cannot create $dir/ipv4address" ${VZ_FS_NO_DISK_SPACE}
-	echo "$FAKEGATEWAYNET/24 scope host dev $dir
-default via $FAKEGATEWAY dev $dir" >"$dir/ipv4route" ||
+	echo "default dev $dir" >"$dir/ipv4route" ||
 		error "Cannot create $dir/ipv4route" ${VZ_FS_NO_DISK_SPACE}
 	echo 'BOOTPROTO=static
 ONBOOT=yes

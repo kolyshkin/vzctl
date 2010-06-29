@@ -64,9 +64,7 @@ function set_config()
 		put_param ${IFCFG} "routes_${VENET_DEV}" "default"
 	else
 		put_param3 ${IFCFG} "config_${VENET_DEV}" ""
-		put_param3 ${IFCFG} "routes_${VENET_DEV}" \
-			"-net ${FAKEGATEWAYNET}/24" # dev ${VENET_DEV}
-		add_param3 ${IFCFG} "routes_${VENET_DEV}" "default via ${FAKEGATEWAY}"
+		add_param3 ${IFCFG} "routes_${VENET_DEV}" "default"
 	fi
 }
 

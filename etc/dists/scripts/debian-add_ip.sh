@@ -67,8 +67,8 @@ iface ${VENET_DEV} inet static
 	address 127.0.0.1
 	netmask 255.255.255.255
 	broadcast 0.0.0.0
-	up route add -net ${FAKEGATEWAY} netmask 255.255.255.255 dev ${VENET_DEV}
-	up route add default gw ${FAKEGATEWAY}" >> ${CFGFILE}
+	up route add default dev ${VENET_DEV}
+" >> ${CFGFILE}
 
 		if [ "${IPV6}" = "yes" ]; then
 			echo "

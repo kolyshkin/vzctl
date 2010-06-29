@@ -287,19 +287,6 @@ function remove_debian_interface()
 	rm -f ${cfg}.$$ 2>/dev/null
 }
 
-function remove_fake_old_route()
-{
-	local file="$1"
-
-	[ -f "${file}" ] || return 0
-	if ! grep -qE '191.255.255.[0-1]' $file; then
-		return 0
-	fi
-	sed '/191.255.255.[0-1]/d' < ${file} > ${file}.$$ &&
-		mv -f ${file}.$$ ${file}
-	rm -f ${file}.$$ 2>/dev/null
-}
-
 function change_hostname()
 {
 	local cfg="$1"
