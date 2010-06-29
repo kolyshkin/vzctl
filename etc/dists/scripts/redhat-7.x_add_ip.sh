@@ -119,7 +119,7 @@ function backup_configs()
 	cd ${IFCFG_DIR} || return 1
 	if ls ${VENET_DEV_CFG}:* > /dev/null 2>&1; then
 		cp -rf ${VENET_DEV_CFG}:* ${IFCFG_DIR}/bak/ ||
-			error "Unable to backup intrface config files" ${VZ_FS_NO_DISK_SPACE}
+			error "Unable to backup interface config files" ${VZ_FS_NO_DISK_SPACE}
 	fi
 }
 
