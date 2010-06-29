@@ -58,7 +58,7 @@ BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK
 	remove_fake_old_route ${ROUTE}
 	if ! grep -q "${FAKEGATEWAYNET}/24 dev ${VENET_DEV}" ${ROUTE} 2>/dev/null; then
 		echo "${FAKEGATEWAYNET}/24 dev ${VENET_DEV} scope host
-default via ${FAKEGATEWAY}" >> ${ROUTE} || error "Can't create ${ROUTE}" ${VZ_FS_NO_DISK_SPACE}
+default via ${FAKEGATEWAY}" >> ${ROUTE} || error "Can't write to file ${ROUTE}" ${VZ_FS_NO_DISK_SPACE}
 	fi
 	# Set /etc/sysconfig/network
 	put_param $NETFILE NETWORKING yes
@@ -92,12 +92,13 @@ function create_config()
 {
 	local ip=$1
 	local ifnum=$2
+	local file=${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum}
 
 	echo "DEVICE=${VENET_DEV}:${ifnum}
 ONBOOT=yes
 IPADDR=${ip}
-NETMASK=255.255.255.255" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} ||
-	error "Unable to create interface config file" ${VZ_FS_NO_DISK_SPACE}
+NETMASK=255.255.255.255" > $file ||
+	error "Can't write to file $file" ${VZ_FS_NO_DISK_SPACE}
 }
 
 function add_ip6()

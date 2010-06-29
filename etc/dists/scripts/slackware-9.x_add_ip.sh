@@ -28,7 +28,7 @@ function fix_rcinet1()
 {
 
 	[ -f "${IFCFG}" ] || return 0
-	cp -fp ${IFCFG} ${IFCFG}.$$ || error "unable to create ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
+	cp -fp ${IFCFG} ${IFCFG}.$$ || error "Can't copy file ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
 	sed -e "s/^GATEWAY=.*/GATEWAY=\"${FAKEGATEWAY}\"/" -e 's/^USE_DHCP=.*/\#USE_DHCP=\"\"/' -e 's/eth0/venet0/g' -e 's/^[\ \t]*\/sbin\/route add default gw .*/\t\/sbin\/route add -net '${FAKEGATEWAYNET}'\/24 dev venet0; \/sbin\/route add default gw \${GATEWAY} dev venet0/' < ${IFCFG} > ${IFCFG}.$$ && mv -f ${IFCFG}.$$ ${IFCFG}
 	rm -f ${IFCFG}.$$ >/dev/null 2>&1
 }

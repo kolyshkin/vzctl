@@ -26,10 +26,10 @@ HOSTFILE=/etc/hosts
 
 function fix_rcinet1()
 {
-	file="${IFCFG_DIR}/rc.inet1"
+	local file="${IFCFG_DIR}/rc.inet1"
 
 	[ -f "${file}" ] || return 0
-	cp -fp ${file} ${file}.$$ || error "unable to create ${file}" ${VZ_FS_NO_DISK_SPACE}
+	cp -fp ${file} ${file}.$$ || error "Can't copy file ${file}" ${VZ_FS_NO_DISK_SPACE}
 	sed -e 's/eth/venet/g' -e 's/^[\ \t]*\/sbin\/route add default gw .*/\t\/sbin\/route add -net '${FAKEGATEWAYNET}'\/24 dev venet0; \/sbin\/route add default gw \${GATEWAY} dev venet0/' < ${file} > ${file}.$$ && mv -f ${file}.$$ ${file}
 	rm -f ${file}.$$ >/dev/null 2>&1
 }

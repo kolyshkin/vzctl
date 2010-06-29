@@ -70,11 +70,12 @@ function create_config()
 {
 	local ip=$1
 	local ifnum=$2
+	local file=${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum}
 
 	echo "DEVICE=${VENET_DEV}:${ifnum}
 IPADDR=${ip}
-NETMASK=255.255.255.255" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} ||
-	error "Unable to create interface config file" ${VZ_FS_NO_DISK_SPACE}
+NETMASK=255.255.255.255" > $file ||
+	error "Can't write to file $file" ${VZ_FS_NO_DISK_SPACE}
 }
 
 function get_all_aliasid()

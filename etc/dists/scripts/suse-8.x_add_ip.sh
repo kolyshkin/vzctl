@@ -45,10 +45,11 @@ function create_config()
 {
 	local ip=$1
 	local ifnum=$2
+	local file=${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum}
 
 	echo "STARTMODE=onboot
-IPADDR=${ip}" > ${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum} ||
-	error "Can't write to file ${IFCFG_DIR}/${VENET_DEV_CFG}:${ifnum}" ${VZ_FS_NO_DISK_SPACE}
+IPADDR=${ip}" > $file ||
+	error "Can't write to file $file" ${VZ_FS_NO_DISK_SPACE}
 }
 
 function get_all_aliasid()
