@@ -199,8 +199,6 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	struct option *opt;
 	struct option create_options[] = {
 	{"ostemplate",	required_argument, NULL, PARAM_OSTEMPLATE},
-	{"pkgver",	required_argument, NULL, PARAM_PKGVER},
-	{"pkgset",	required_argument, NULL, PARAM_PKGSET},
 	{"config",	required_argument, NULL, PARAM_CONFIG},
 	{"private",	required_argument, NULL, PARAM_PRIVATE},
 	{"root",	required_argument, NULL, PARAM_ROOT},
@@ -552,8 +550,6 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	{"noatime",	required_argument, NULL, PARAM_NOATIME},
 	/*	template	*/
 	{"ostemplate",	required_argument, NULL, PARAM_OSTEMPLATE},
-	{"pkgset",	required_argument, NULL, PARAM_PKGSET},
-	{"pkgver",	required_argument, NULL, PARAM_PKGVER},
 	/*	Cpu	*/
 	{"cpuunits",	required_argument, NULL, PARAM_CPUUNITS},
 	{"cpuweight",	required_argument, NULL, PARAM_CPUWEIGHT},

@@ -82,7 +82,7 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		snprintf(tarball, sizeof(tarball), "%s/%s.tar.gz", fs->tmpl, tar_nm);
 	if (!stat_file(tarball)) {
 		logger(-1, 0, "Cached OS template %s not found", tarball);
-		return VZ_PKGSET_NOT_FOUND;
+		return VZ_OSTEMPLATE_NOT_FOUND;
 	}
 	/* Lock CT area */
 	if (make_dir(fs->private, 0))
@@ -251,7 +251,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 
 		if (check_var(tmpl->ostmpl, "OS template is not specified"))
 		{
-			ret = VZ_VE_PKGSET_NOTSET;
+			ret = VZ_VE_OSTEMPLATE_NOTSET;
 			goto err_cfg;
 		}
 		if (stat_file(VZOSTEMPLATE)) {

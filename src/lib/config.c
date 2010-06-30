@@ -1868,12 +1868,6 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_DEF_OSTEMPLATE:
 		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val);
 		break;
-	case PARAM_PKGSET:
-		ret = conf_parse_str(&vps_p->res.tmpl.pkgset, val);
-		break;
-	case PARAM_PKGVER:
-		ret = conf_parse_str(&vps_p->res.tmpl.pkgver, val);
-		break;
 	case PARAM_OSTEMPLATE:
 		ret = conf_parse_str(&vps_p->res.tmpl.ostmpl, val);
 		break;
@@ -2431,8 +2425,6 @@ static void free_tmpl(tmpl_param *tmpl)
 {
 	FREE_P(tmpl->def_ostmpl)
 	FREE_P(tmpl->ostmpl)
-	FREE_P(tmpl->pkgset)
-	FREE_P(tmpl->pkgver)
 	FREE_P(tmpl->dist)
 }
 
@@ -2573,8 +2565,6 @@ static void merge_tmpl(tmpl_param *dst, tmpl_param *src)
 {
 	MERGE_STR(def_ostmpl)
 	MERGE_STR(ostmpl)
-	MERGE_STR(pkgset)
-	MERGE_STR(pkgver)
 	MERGE_STR(dist)
 }
 

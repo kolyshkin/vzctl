@@ -53,7 +53,7 @@
 #define VZ_VE_TMPL_NOTSET		24
 #define VZ_NOTENOUGHPARAMS		27
 #define VZ_NOTENOUGHUBCPARAMS		28
-#define VZ_VE_PKGSET_NOTSET		29
+#define VZ_VE_OSTEMPLATE_NOTSET		29
 /*****************************
     CT errors
  *****************************/
@@ -130,7 +130,7 @@
 #define	VZ_IP_NA			89
 
 /* Template Error */
-#define VZ_PKGSET_NOT_FOUND		91
+#define VZ_OSTEMPLATE_NOT_FOUND		91
 
 #define VZ_GET_IP_ERROR			100
 #define VZ_NETDEV_ERROR			104

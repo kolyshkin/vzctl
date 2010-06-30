@@ -33,8 +33,6 @@
 typedef struct {
 	char *def_ostmpl;
 	char *ostmpl;
-	char *pkgset;
-	char *pkgver;
 	char *dist;
 } tmpl_param;
 

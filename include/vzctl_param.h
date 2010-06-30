@@ -40,8 +40,6 @@
 #define PARAM_NUMFILE		'n'
 #define PARAM_DCACHESIZE	'x'
 
-#define PARAM_PKGVER		11
-#define PARAM_PKGSET		12
 #define PARAM_OSTEMPLATE	13
 
 #define PARAM_CPUWEIGHT		14
