@@ -1068,7 +1068,7 @@ char *invert_ip(char *ips)
 	int rc;
 	unsigned int ip[4];
 	int family;
-	char ip_str[64];
+	char ip_str[INET6_ADDRSTRLEN];
 
 	if (ips == NULL)
 		return NULL;

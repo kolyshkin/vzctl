@@ -689,8 +689,8 @@ int check_ip_dot(char *ip)
 static int parse_ip(vps_param *vps_p, char *val, int id)
 {
 	char *token;
-	char dst[64];
-	unsigned int ip[16];
+	char dst[INET6_ADDRSTRLEN];
+	unsigned char ip[sizeof(struct in6_addr)];
 	int family;
 	net_param *net;
 

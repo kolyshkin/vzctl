@@ -301,9 +301,9 @@ int get_netaddr(const char *ip_str, unsigned int *ip)
 
 const char *get_netname(unsigned int *ip, int family)
 {
-	static char buf[64];
+	static char buf[INET6_ADDRSTRLEN];
 
-	return inet_ntop(family, ip, buf, sizeof(buf) - 1);
+	return inet_ntop(family, ip, buf, sizeof(buf));
 }
 
 char *subst_VEID(envid_t veid, char *src)
