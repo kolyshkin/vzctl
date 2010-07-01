@@ -53,7 +53,6 @@ typedef struct {
  */
 typedef struct {
 	list_head_t dev;
-	int version;
 	int delall;
 } veth_param;
 

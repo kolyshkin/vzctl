@@ -565,9 +565,6 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	{"quotatime",	required_argument, NULL, PARAM_QUOTATIME},
 	{"quotaugidlimit", required_argument, NULL, PARAM_QUOTAUGIDLIMIT},
 	{"meminfo",	required_argument, NULL, PARAM_MEMINFO},
-	/*	veth	*/
-	{"veth_add",	required_argument, NULL, PARAM_VETH_ADD_CMD},
-	{"veth_del",	required_argument, NULL, PARAM_VETH_DEL_CMD},
 	/*	netif	*/
 	{"netif_add",	required_argument, NULL, PARAM_NETIF_ADD_CMD},
 	{"netif_del",	required_argument, NULL, PARAM_NETIF_DEL_CMD},

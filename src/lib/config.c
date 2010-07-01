@@ -1184,87 +1184,6 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
-/******************** VETH *********************************/
-static int parse_veth_str(const char *str, veth_dev *dev, int operation)
-{
-	char *ch, *tmp;
-	int len, err;
-
-	memset(dev, 0, sizeof(*dev));
-	if (!operation) {
-		/* Removing veth device */
-		/* Parsing veth device name in CT0 */
-		if ((ch = strchr(str, ',')) != NULL)
-			return ERR_INVAL;
-		len = strlen(str) + 1;
-		if (len > IFNAMSIZE)
-			return ERR_INVAL;
-		snprintf(dev->dev_name, len, "%s", str);
-		return 0;
-	}
-	/* Creating veth device */
-	/* Parsing veth device name in CT0 */
-	if ((ch = strchr(str, ',')) == NULL)
-		return ERR_INVAL;
-	ch++;
-	len = ch - str;
-	if (len > IFNAMSIZE)
-		return ERR_INVAL;
-	snprintf(dev->dev_name, len, "%s", str);
-	tmp = ch;
-
-	/* Parsing veth MAC address in CT0 */
-	if ((ch = strchr(tmp, ',')) == NULL)
-		return ERR_INVAL;
-	len = ch - tmp;
-	if (len != 3*ETH_ALEN -1)
-		return ERR_INVAL;
-	dev->addrlen = ETH_ALEN;
-	err = parse_hwaddr(tmp, dev->dev_addr);
-	if (err)
-		return ERR_INVAL;
-	ch++;
-	tmp = ch;
-
-	/* Parsing veth name in CT */
-	if ((ch = strchr(tmp, ',')) == NULL)
-		return ERR_INVAL;
-	ch++;
-	len = ch - tmp;
-	if (len > IFNAMSIZE)
-		return ERR_INVAL;
-	snprintf(dev->dev_name_ve, len, "%s", tmp);
-
-	/* Parsing veth MAC address in CT */
-	len = strlen(ch);
-	if (len != 3*ETH_ALEN -1)
-		return ERR_INVAL;
-	dev->addrlen_ve = ETH_ALEN;
-	err = parse_hwaddr(ch, dev->dev_addr_ve);
-	if (err)
-		return ERR_INVAL;
-
-	return 0;
-}
-
-static int parse_veth(vps_param *vps_p, char *val, int operation)
-{
-	int ret;
-	char *token;
-	veth_dev dev;
-
-	for_each_strtok(token, val, " ") {
-		if (parse_veth_str(token, &dev, operation))
-			return ERR_INVAL;
-		if (operation)
-			ret = add_veth_param(&vps_p->res.veth, &dev);
-		else
-			ret = add_veth_param(&vps_p->del_res.veth, &dev);
-	}
-
-	return 0;
-}
-
 /********************* NETIF **********************************/
 
 static int parse_mac_filter_cmd (veth_dev *dev, char *str)
@@ -1927,29 +1846,13 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
 		break;
 	case PARAM_VETH_ADD:
-		if (!list_empty(&vps_p->res.veth.dev))
-			break;
-		ret = parse_veth(vps_p, val, 1);
-		vps_p->res.veth.version = 1;
-		break;
-	case PARAM_VETH_ADD_CMD:
-		logger(0, 0, "Warning: --veth_add option is deprecated, use"
-			" --netif_add instead");
-		ret = parse_veth(vps_p, val, 1);
-		break;
-	case PARAM_VETH_DEL_CMD:
-		logger(0, 0, "Warning: --veth_del option is deprecated, use"
-			" --netif_del instead");
-		ret = parse_veth(vps_p, val, 0);
+		logger(0, 0, "Warning: VETH parameter is deprecated, remove "
+				"it and use --netif_add instead");
 		break;
 	case PARAM_NETIF_ADD:
-		/* Skip VETH parameter if NETIF exists */
-		if (vps_p->res.veth.version)
-			free_veth_param(&vps_p->res.veth);
 		if (!list_empty(&vps_p->res.veth.dev))
 			break;
 		ret = parse_netif(veid, &vps_p->res.veth, val);
-		vps_p->res.veth.version = 0;
 		break;
 	case PARAM_NETIF_ADD_CMD:
 		ret = parse_netif_cmd(veid, &vps_p->res.veth, val);
