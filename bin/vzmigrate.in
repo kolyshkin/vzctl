@@ -19,7 +19,7 @@
 # vzmigrate is used for container migration to another node
 
 
-ACT_SCRIPTS_SFX="start stop mount umount"
+ACT_SCRIPTS_SFX="start stop mount umount premount postumount"
 # blowfish is a fast block cipher, much faster then 3des
 SSH_OPTIONS="-c blowfish"
 SCP_OPTIONS=$SSH_OPTIONS
