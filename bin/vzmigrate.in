@@ -24,6 +24,7 @@ ACT_SCRIPTS_SFX="start stop mount umount premount postumount"
 SSH_OPTIONS="-c blowfish"
 SCP_OPTIONS=$SSH_OPTIONS
 RSYNC_OPTIONS="-aH --delete --numeric-ids"
+VZCTL=vzctl
 
 online=0
 verbose=0
@@ -127,7 +128,7 @@ logexec () {
 }
 
 undo_conf () {
-	$SSH "root@$host" "vzctl set $VEID --name '' --save > /dev/null"
+	$SSH "root@$host" "$VZCTL set $VEID --name '' --save > /dev/null"
 	$SSH "root@$host" "rm -f $vpsconf"
 }
 
@@ -166,7 +167,7 @@ undo_sync () {
 }
 
 undo_suspend () {
-	logexec 2 vzctl chkpnt $VEID --resume
+	logexec 2 $VZCTL chkpnt $VEID --resume
 	undo_sync
 }
 
@@ -184,9 +185,9 @@ undo_copy_dump () {
 
 undo_stop () {
 	if [ "$state" = "running" ]; then
-		vzctl start $VEID
+		$VZCTL start $VEID
 	elif [ "$mounted" = "mounted" ]; then
-		vzctl mount $VEID
+		$VZCTL mount $VEID
 	fi
 	undo_sync
 }
@@ -210,7 +211,7 @@ undo_copy_quota () {
 }
 
 undo_undump () {
-	logexec 2 $SSH root@$host vzctl restore $VEID --kill
+	logexec 2 $SSH root@$host $VZCTL restore $VEID --kill
 	undo_copy_quota
 }
 
@@ -307,7 +308,7 @@ if [ ! -r "$vzconf" ]; then
 	exit $MIG_ERR_NOEXIST
 fi
 
-get_status $(vzctl status $VEID)
+get_status $($VZCTL status $VEID)
 if [ "$exist" = "deleted" ]; then
 	log 0 "CT #$VEID doesn't exist"
 	exit $MIG_ERR_NOEXIST
@@ -348,7 +349,7 @@ if [ $online -eq 1 ]; then
 	fi
 fi
 
-dst_exist=$($SSH "root@$host" "vzctl status $VEID" | awk '{print $3}')
+dst_exist=$($SSH "root@$host" "$VZCTL status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
 	log 0 "CT #$VEID already exists on destination node"
 	exit $MIG_ERR_EXISTS
@@ -383,7 +384,7 @@ if ! logexec 2 $SCP $vpsconf root@$host:$vpsconf ; then
 	exit $MIG_ERR_COPY
 fi
 
-logexec 2 $SSH root@$host vzctl set $VEID --applyconfig_map name --save
+logexec 2 $SSH root@$host $VZCTL set $VEID --applyconfig_map name --save
 # vzctl return code 20 or 21 in case of unrecognized option
 if [ $? != 20 ] && [ $? != 21 ] && [ $? != 0 ]; then
 	log 0 "Failed to apply config on destination node"
@@ -424,14 +425,14 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 	log 1 "Initializing remote quota"
 
 	log 2 "Quota init"
-	if ! $SSH "root@$host" "vzctl quotainit $VEID"; then
+	if ! $SSH "root@$host" "$VZCTL quotainit $VEID"; then
 		log 0 "Failed to initialize quota"
 		undo_root
 		exit $MIG_ERR_QUOTA
 	fi
 
 	log 2 "Turning remote quota on"
-	if ! $SSH "root@$host" "vzctl quotaon $VEID"; then
+	if ! $SSH "root@$host" "$VZCTL quotaon $VEID"; then
 		log 0 "Failed to turn quota on"
 		undo_quota_init
 		exit $MIG_ERR_QUOTA
@@ -452,14 +453,14 @@ if [ $online -eq 1 ]; then
 
 	log 2 "Suspending container"
 	time_suspend=$(date +%s.%N)
-	if ! logexec 2 vzctl chkpnt $VEID --suspend ; then
+	if ! logexec 2 $VZCTL chkpnt $VEID --suspend ; then
 		log 0 "Failed to suspend container"
 		undo_sync
 		exit $MIG_ERR_CHECKPOINT
 	fi
 
 	log 2 "Dumping container"
-	if ! logexec 2 vzctl chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
+	if ! logexec 2 $VZCTL chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
 		log 0 "Failed to dump container"
 		undo_suspend
 		exit $MIG_ERR_CHECKPOINT
@@ -475,14 +476,14 @@ if [ $online -eq 1 ]; then
 else
 	if [ "$state" = "running" ]; then
 		log 1 "Stopping container"
-		if ! logexec 2 vzctl stop $VEID ; then
+		if ! logexec 2 $VZCTL stop $VEID ; then
 			log 0 "Failed to stop container"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
 		fi
 	elif [ "$mounted" = "mounted" ]; then
 		log 1 "Unmounting container"
-		if ! logexec 2 vzctl umount $VEID ; then
+		if ! logexec 2 $VZCTL umount $VEID ; then
 			log 0 "Failed to umount container"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
@@ -532,7 +533,7 @@ fi
 if [ $online -eq 1 ]; then
 	log 2 "Undumping container"
 	time_undump=$(date +%s.%N)
-	if ! logexec 2 $SSH root@$host vzctl restore $VEID --undump \
+	if ! logexec 2 $SSH root@$host $VZCTL restore $VEID --undump \
 			--dumpfile $VE_DUMPFILE --skip_arpdetect ; then
 		log 0 "Failed to undump container"
 		undo_copy_quota
@@ -540,7 +541,7 @@ if [ $online -eq 1 ]; then
 	fi
 
 	log 2 "Resuming container"
-	if ! logexec 2 $SSH root@$host vzctl restore $VEID --resume ; then
+	if ! logexec 2 $SSH root@$host $VZCTL restore $VEID --resume ; then
 		log 0 "Failed to resume container"
 		undo_undump
 		exit $MIG_ERR_RESTORE_VPS
@@ -557,8 +558,8 @@ if [ $online -eq 1 ]; then
 	log 1 "Cleanup"
 
 	log 2 "Killing container"
-	logexec 2 vzctl chkpnt $VEID --kill
-	logexec 2 vzctl umount $VEID
+	logexec 2 $VZCTL chkpnt $VEID --kill
+	logexec 2 $VZCTL umount $VEID
 
 	log 2 "Removing dumpfiles"
 	rm -f "$VE_DUMPFILE"
@@ -566,14 +567,14 @@ if [ $online -eq 1 ]; then
 else
 	if [ "$state" = "running" ]; then
 		log 1 "Starting container"
-		if ! logexec 2 $SSH root@$host vzctl start $VEID ; then
+		if ! logexec 2 $SSH root@$host $VZCTL start $VEID ; then
 			log 0 "Failed to start container"
 			undo_copy_quota
 			exit $MIG_ERR_START_VPS
 		fi
 	elif [ "$mounted" = "mounted" ]; then
 		log 1 "Mounting container"
-		if ! logexec 2 $SSH root@$host vzctl mount $VEID ; then
+		if ! logexec 2 $SSH root@$host $VZCTL mount $VEID ; then
 			log 0 "Failed to mount container"
 			undo_copy_quota
 			exit $MIG_ERR_MOUNT_VPS
@@ -592,7 +593,7 @@ fi
 
 if [ $remove_area -eq 1 ]; then
 	log 2 "Destroying container"
-	logexec 2 vzctl destroy $VEID
+	logexec 2 $VZCTL destroy $VEID
 else
 	# Move config as veid.migrated to allow backward migration
 	mv -f $vpsconf $vpsconf.migrated
