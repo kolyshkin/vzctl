@@ -40,7 +40,7 @@ char *arg2str(char **arg);
 void free_arg(char **arg);
 unsigned long min_ul(unsigned long val1, unsigned long val2);
 int yesno2id(const char *str);
-int get_netaddr(const char *ip_str, unsigned int *ip);
+int get_netaddr(const char *ip_str, void *ip);
 const char *get_netname(unsigned int *ip, int family);
 char *subst_VEID(envid_t veid, char *src);
 int get_pagesize();

@@ -287,7 +287,7 @@ int yesno2id(const char *str)
 	return -1;
 }
 
-int get_netaddr(const char *ip_str, unsigned int *ip)
+int get_netaddr(const char *ip_str, void *ip)
 {
 	if (strchr(ip_str, ':')) {
 		if (inet_pton(AF_INET6, ip_str, ip) <= 0)
