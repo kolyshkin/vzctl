@@ -552,8 +552,6 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if ((ret = check_ub(&res->ub)))
 		return ret;
 	dist_name = get_dist_name(&res->tmpl);
-	if (!dist_name)
-		return VZ_SET_NAME_ERROR;
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
 	free(dist_name);
 	if (ret)
