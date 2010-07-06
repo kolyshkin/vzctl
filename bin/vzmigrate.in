@@ -17,43 +17,6 @@
 #
 #
 # vzmigrate is used for container migration to another node
-#
-# Usage:
-# vzmigrate [-r yes|no] [--ssh=<options>] [--rsync=<options>]
-#           [--keep-dst] [--online] [-v] destination_address CTID
-# Options:
-#	-r, --remove-area yes|no
-#		Whether to remove container private area on the source
-#		hardware node after successful container migration.
-#	--ssh=<ssh options>
-#		Additional options that will be passed to ssh while establishing
-#		connection to destination HN. Please be careful with options
-#		passed, DO NOT pass destination hostname.
-#	--rsync=<rsync options>
-#		Additional options that will be passed to rsync.
-#	--keep-dst
-#		Do not clean synced destination container private area
-#		in case of some	error. It makes sense to use this option
-#		for big container migration to avoid syncing container
-#		private area again in case some error (on container stop
-#		for example) occurs during first migration attempt.
-#	--online
-#		Perform online (zero-downtime) migration: during the migration
-#		container freezes for a while and after the migration it
-#		continues working as though nothing has happened.
-#	-v
-#		Verbose mode. Causes vzmigrate to print debugging messages about
-#		its progress (including some time statistics).
-#
-# Examples:
-#	Online migration of CT #101 to foo.com:
-#		vzmigrate --online foo.com 101
-#	Migration of CT #102 to foo.com with downtime:
-#		vzmigrate foo.com 102
-# NOTE:
-#	This program uses ssh as a transport layer. You need to put ssh
-#	public key to destination node and be able to connect without
-#	entering a password.
 
 
 ACT_SCRIPTS_SFX="start stop mount umount"
@@ -116,6 +79,15 @@ Options:
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics).
+Examples:
+	Online migration of CT #101 to foo.com:
+		vzmigrate --online foo.com 101
+	Migration of CT #102 to foo.com with downtime:
+		vzmigrate foo.com 102
+Notes:
+	This program uses ssh as a transport layer. You need to put ssh
+	public key to destination node and be able to connect without
+	entering a password.
 EOF
 	exit $MIG_ERR_USAGE
 }
