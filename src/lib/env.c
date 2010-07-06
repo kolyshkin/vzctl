@@ -473,7 +473,7 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	close(wait_p[0]);
 	close(err_p[1]);
 	ret = read(status_p[0], &errcode, sizeof(errcode));
-	if (ret) {
+	if (ret > 0) {
 		ret = errcode;
 		switch(ret) {
 		case VZ_NO_ACCES:
