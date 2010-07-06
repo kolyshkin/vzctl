@@ -327,8 +327,6 @@ int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	dist_name = get_dist_name(tmpl);
-	if (!dist_name)
-		return VZ_SET_NAME_ERROR;
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
 	free(dist_name);
 	if (ret)
