@@ -78,7 +78,8 @@ Options:
 	keeps working as though nothing has happened.
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
-	its progress (including some time statistics).
+	its progress (including some time statistics). Multiple -v options
+	increase the verbosity. The maximum is 3.
 Examples:
 	Online migration of CT #101 to foo.com:
 		vzmigrate --online foo.com 101
@@ -104,7 +105,7 @@ log () {
 	elif [ $1 -eq 1 ]; then
 		shift
 		echo "$*"
-	elif [ $verbose -eq 1 ]; then
+	elif [ $verbose -gt 0 ]; then
 		shift
 		echo "   $@"
 	fi
@@ -116,7 +117,7 @@ log () {
 # 2 - debug execution (output will be printed if verbose mode is set,
 #     in other case stdout and stderr redirected to /dev/null)
 logexec () {
-	if [ $1 -eq 1 -o $verbose -eq 1 ]; then
+	if [ $1 -eq 1 -o $verbose -gt 0 ]; then
 		shift
 		$@
 	else
@@ -233,7 +234,13 @@ while [ ! -z "$1" ]; do
 		online=1
 		;;
 	-v)
-		verbose=1
+		verbose=$((verbose+1)) # can just be 'let verbose++' in bash
+		;;
+	-vv)
+		verbose=$((verbose+2))
+		;;
+	-vvv)
+		verbose=$((verbose+3))
 		;;
 	--remove-area|-r)
 		shift
@@ -261,6 +268,14 @@ while [ ! -z "$1" ]; do
 	esac
 	shift
 done
+
+if [ $verbose -gt 1 ]; then
+	RSYNC_OPTIONS="$RSYNC_OPTIONS -v"
+fi
+if [ $verbose -gt 2]; then
+	SSH_OPTIONS="$SSH_OPTIONS -v"
+	SCP_OPTIONS="$SCP_OPTIONS -v"
+fi
 
 RSYNC="rsync $RSYNC_OPTIONS"
 SSH="ssh $SSH_OPTIONS"
