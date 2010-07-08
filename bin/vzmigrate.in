@@ -274,7 +274,7 @@ if [ $verbose -gt 1 ]; then
 	RSYNC_OPTIONS="$RSYNC_OPTIONS -v"
 	VZCTL="$VZCTL --verbose"
 fi
-if [ $verbose -gt 2]; then
+if [ $verbose -gt 2 ]; then
 	SSH_OPTIONS="$SSH_OPTIONS -v"
 	SCP_OPTIONS="$SCP_OPTIONS -v"
 fi
