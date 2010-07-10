@@ -74,6 +74,15 @@ size_t vz_strlcat(char *dst, const char *src, size_t count);
 		p;						\
 	})
 
+#define vz_strdup(str)						\
+	({							\
+		char *p = strdup(str);				\
+		if (!p)						\
+			logger_enomem(-1, ENOMEM, strlen(str),	\
+					__FILE__, __LINE__);	\
+		p;						\
+	})
+
 #define for_each_strtok(p, str, sep)				\
 	for (p = strtok(str, sep); p; p = strtok(NULL, sep))
 
