@@ -1836,8 +1836,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_CPULIMIT:
 		if (vps_p->res.cpu.limit != NULL)
 			break;
-		if (parse_cpulimit(&vps_p->res.cpu.limit, val))
-			return ERR_INVAL;
+		ret = parse_cpulimit(&vps_p->res.cpu.limit, val);
 		break;
 	case PARAM_VCPUS:
 		ret = conf_parse_ulong(&vps_p->res.cpu.vcpus, val);
