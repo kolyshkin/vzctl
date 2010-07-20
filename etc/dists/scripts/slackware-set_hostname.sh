@@ -25,8 +25,6 @@ function set_hostname()
 
 	[ -z "${hostname}" ] && return 0
 
-	hostname=${hostname%%.*}
-
 	echo "${hostname}" > ${cfgfile}
 
 	hostname ${hostname}
