@@ -36,24 +36,22 @@ _get_ves()
 
 _vzctl()
 {
-	local cur prev cmd vzctl_cmds vzctl_create_opts vzctl_set_opts
-	local iptables_names cap_names
-
 	#echo "ARGS: $*"
 	#echo "COMP_WORDS: $COMP_WORDS"
 	#echo "COMP_CWORD: $COMP_CWORD"
 	#echo "COMP_WORDS[1]: ${COMP_WORDS[1]}"
 
 	COMPREPLY=()
-	cur=${COMP_WORDS[COMP_CWORD]}
-	prev=${COMP_WORDS[COMP_CWORD-1]}
+	local cur=${COMP_WORDS[COMP_CWORD]}
+	local prev=${COMP_WORDS[COMP_CWORD-1]}
 
-	vzctl_common_opts="--quiet --verbose --help --version"
-	vzctl_cmds="create destroy delete mount umount chkpnt restore \
+
+	local vzctl_common_opts="--quiet --verbose --help --version"
+	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status enter exec exec2 runscript"
-	vzctl_create_opts="--ostemplate --config --private --root \
+	local vzctl_create_opts="--ostemplate --config --private --root \
 		--ipadd --hostname --name --description"
-	vzctl_set_opts="--save --onboot --root --private \
+	local vzctl_set_opts="--save --onboot --root --private \
 		--userpasswd --disabled --ipadd --ipdel \
 		--hostname --nameserver --searchdomain \
 		--numproc --numtcpsock --numothersock --vmguarpages \
@@ -66,24 +64,24 @@ _vzctl()
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--noatime --capability --devnodes --devices --applyconfig \
 		--name --ioprio --setmode --meminfo --bootorder --features"
-	vzctl_start_opts="--wait --force"
-	vzctl_stop_opts="--fast"
-	vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
+	local vzctl_start_opts="--wait --force"
+	local vzctl_stop_opts="--fast"
+	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 
-	iptables_names="iptable_filter iptable_mangle ipt_limit
+	local iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
 		ipt_tcpmss ipt_ttl ipt_LOG ipt_length ip_conntrack
 		ip_conntrack_ftp ip_conntrack_irc ipt_conntrack ipt_state
 		ipt_helper iptable_nat ip_nat_ftp ip_nat_irc ipt_REDIRECT"
 
-	cap_names="chown dac_override dac_read_search fowner fsetid kill
+	local cap_names="chown dac_override dac_read_search fowner fsetid kill
 		setgid setuid setpcap linux_immutable net_bind_service
 		net_broadcast net_admin net_raw ipc_lock ipc_owner
 		sys_module sys_rawio sys_chroot sys_ptrace sys_pacct
 		sys_admin sys_boot sys_nice sys_resource sys_time
 		sys_tty_config mknod lease setveid ve_admin"
 
-	feature_names="sysfs nfs sit ipip ppp ipgre bridge nfsd"
+	local feature_names="sysfs nfs sit ipip ppp ipgre bridge nfsd"
 
 
 	case $COMP_CWORD in
@@ -224,7 +222,7 @@ _vzctl()
 			*)
 				if [[ "${prev::2}" != "--" || "$prev" = "--save" ]]; then
 					# List options
-					cmd=${COMP_WORDS[1]}
+					local cmd=${COMP_WORDS[1]}
 					if [ ${cmd::2} = "--" ] ; then
 						# --verbose or --quiet used
 						cmd=${COMP_WORDS[2]}
