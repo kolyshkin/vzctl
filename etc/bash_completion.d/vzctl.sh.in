@@ -107,8 +107,8 @@ _vzctl()
 		;;
 
 	*) # COMP_CWORD >= 3
-		if [[ $COMP_CWORD -eq 3 && ! $prev != '^[1-9][0-9]*$' ]]; then
-			# CTID
+		if [ $COMP_CWORD -eq 3 -a ${COMP_WORDS[1]::2} = "--" ]; then
+			# Global option was used, need CTID here
 			COMPREPLY=( $( compgen -W "$(_get_ves $prev)" -- $cur ) )
 		else
 
