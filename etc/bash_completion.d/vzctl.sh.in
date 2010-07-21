@@ -131,7 +131,6 @@ _vzctl()
 				local configs=$(command ls -1 @PKGCONFDIR@/conf/*.conf-sample |
 						    cut -d "-" -f 2- | sed -e 's#.conf-sample$##')
 
-				configs=${configs/.conf-sample/}
 				COMPREPLY=( $( compgen -W "$configs" -- $cur ) )
 				;;
 			--iptables)
