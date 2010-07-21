@@ -186,8 +186,9 @@ _vzctl()
 				# when user has root privileges
 				[ "$EUID" -ne 0 ] && exit 1
 				# Get CTID
+				local cmd=${COMP_WORDS[1]}
 				local ve=${COMP_WORDS[2]}
-				if [[ ! ${ve} != '^[1-9][0-9]*$' ]] ; then
+				if [ ${cmd::2} = "--" ] ; then
 					# --verbose or --quiet used
 					ve=${COMP_WORDS[3]}
 				fi
@@ -197,8 +198,10 @@ _vzctl()
 			--netif_del)
 				local netif
 				if [ -f /proc/vz/veth ]; then
+					# Get CTID
+					local cmd=${COMP_WORDS[1]}
 					local ve=${COMP_WORDS[2]}
-					if [[ ! ${ve} != '^[1-9][0-9]*$' ]] ; then
+					if [ ${cmd::2} = "--" ] ; then
 						# --verbose or --quiet used
 						ve=${COMP_WORDS[3]}
 					fi
