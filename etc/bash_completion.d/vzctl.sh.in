@@ -194,9 +194,7 @@ _vzctl()
 					# --verbose or --quiet used
 					ve=${COMP_WORDS[3]}
 				fi
-				# NAME or ID ?
-				LIST_OPT=`echo $ve | awk '/[a-zA-Z]/ {print "-N"}'`
-				local ips="`@SBINDIR@/vzlist -H -o ip $LIST_OPT $ve 2>/dev/null | grep -vi -`"
+				local ips="`@SBINDIR@/vzlist -H -o ip $ve 2>/dev/null | grep -vi -`"
 				COMPREPLY=( $( compgen -W "$ips all" -- $cur ) )
 				;;
 			--netif_del)
