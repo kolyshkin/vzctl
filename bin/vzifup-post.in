@@ -24,7 +24,9 @@ update_arp()
 {
 	local veip
 	for veip in $(awk '!/^Version/ { print $1 }' /proc/vz/veip); do
+		[ "$NEIGHBOUR_DEVS" = 'detect' ] && vzdelrouting "${veip}"
 		vzarp add ${veip}
+		[ "$NEIGHBOUR_DEVS" = 'detect' ] && vzaddrouting "${veip}"
 	done
 }
 
