@@ -2040,17 +2040,15 @@ static int write_conf(char *fname, list_head_t *head)
 
 	file = canonicalize_file_name(fname);
 	if (file == NULL) {
-		if (errno != ENOENT)
-		{
+		if (errno != ENOENT) {
 			logger(-1, errno, "Unable to resolve path %s", fname);
 			return 1;
 		}
 		file = strdup(fname);
 	}
 	tmpfile = vz_malloc(strlen(file) + strlen(suffix) + 1);
-	if (!tmpfile) {
+	if (!tmpfile)
 		goto out_file;
-	}
 	sprintf(tmpfile, "%s%s", file, suffix);
 	if ((fp = fopen(tmpfile, "w")) == NULL) {
 		logger(-1, errno, "Unable to create configuration"
