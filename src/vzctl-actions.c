@@ -694,7 +694,9 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		need_configure(&cmd_p->del_res) ||
 		!list_empty(&cmd_p->res.misc.userpw))
 	{
-		actions = malloc(sizeof(*actions));
+		actions = vz_malloc(sizeof(*actions));
+		if (!actions)
+			return ERR_NOMEM;
 		dist_name = get_dist_name(&g_p->res.tmpl);
 		if ((ret = read_dist_actions(dist_name, DIST_DIR, actions)))
 			return ret;
