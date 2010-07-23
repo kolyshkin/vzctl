@@ -2044,7 +2044,9 @@ static int write_conf(char *fname, list_head_t *head)
 			logger(-1, errno, "Unable to resolve path %s", fname);
 			return 1;
 		}
-		file = strdup(fname);
+		file = vz_strdup(fname);
+		if (!file)
+			return ret;
 	}
 	tmpfile = vz_malloc(strlen(file) + strlen(suffix) + 1);
 	if (!tmpfile)
