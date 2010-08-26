@@ -45,8 +45,9 @@ int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param)
 			ioprio | IOPRIO_CLASS_BE << IOPRIO_CLASS_SHIFT);
 	if (ret) {
 		if (errno == EINVAL)
-			logger(-1, 0, "Warning: ioprio feature is not supported"
-					" by kernel. skipped ioprio configure");
+			logger(-1, 0, "Warning: ioprio feature is not "
+					"supported by the kernel, ioprio "
+					"configuration is skipped");
 		else
 			logger(-1, errno, "Unable to set ioprio");
 	}
