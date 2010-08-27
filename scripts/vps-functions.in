@@ -100,8 +100,8 @@ vzgetnetdev()
 	/^[0-9]+: / {
 		dev="";
 	}
-	/^[0-9]+: / && /\<UP\>/ && !/\<LOOPBACK\>/ \
-			&& !/\<SLAVE\>/ && !/\<NOARP\>/ {
+	/^[0-9]+: / && /[^A-Z_]UP[^A-Z_]/ && !/[^A-Z_]LOOPBACK[^A-Z_]/ \
+			&& !/[^A-Z_]SLAVE[^A-Z_]/ && !/[^A-Z_]NOARP[^A-Z_]/ {
 		if ($2 !~ /^veth[0-9]+/)
 			dev=$2;
 	}
