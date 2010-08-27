@@ -56,7 +56,7 @@ BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK
 	# Set /etc/sysconfig/network
 	put_param $NETFILE NETWORKING yes
 	# Set default route to venet0
-	put_param $NETFILE GATEWAYDEV ${VENETDEV}
+	put_param $NETFILE GATEWAYDEV ${VENET_DEV}
 	# Remove old (obsoleted) fake route
 	del_param $NETFILE GATEWAY
 	[ -f "${IFCFG_DIR}/route-venet0" ] && rm -f ${IFCFG_DIR}/route-venet0
