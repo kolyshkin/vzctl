@@ -38,7 +38,7 @@ VE_STATE_DIR="/var/lib/vzctl/veip/"
 CONF_DIR="@PKGCONFDIR@/conf/"
 
 ARPSEND_CMD="arpsend -c 1 -w 1"
-IP_CMD=/sbin/ip
+IP_CMD="ip"
 
 # Prints error message and exits
 # Parameters:
