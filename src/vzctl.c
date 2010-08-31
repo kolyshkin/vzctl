@@ -21,6 +21,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <signal.h>
+#include <limits.h>
 
 #include "vzctl.h"
 #include "env.h"
