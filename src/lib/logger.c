@@ -45,16 +45,16 @@ static inline void get_date(char *buf, int len)
 void logger(int log_level, int err_no, const char *format, ...)
 {
 	va_list ap;
-	FILE *out;
-	char date[64];
 
-	if (log_level < 0)
-		out = stderr;
-	else
-		out = stdout;
 	va_start(ap, format);
 	if (!g_log.quiet && g_log.verbose >= log_level) {
+		FILE *out;
 		va_list ap_save;
+
+		if (log_level < 0)
+			out = stderr;
+		else
+			out = stdout;
 
 		va_copy(ap_save, ap);
 		vfprintf(out, format, ap_save);
@@ -65,9 +65,9 @@ void logger(int log_level, int err_no, const char *format, ...)
 		fflush(out);
 	}
 	if (g_log.fp != NULL && g_log.level >= log_level) {
+		char date[64];
 
 		get_date(date, sizeof(date));
-
 		fprintf(g_log.fp, "%s %s : ", date, g_log.prog);
 		if (g_log.veid)
 			fprintf(g_log.fp, "CT %d : ", g_log.veid);
