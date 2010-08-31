@@ -27,10 +27,10 @@ typedef struct {
 	FILE *fp;		/**< log file pointer. */
 	int level;		/**< maximum logging level. */
 	int enable;		/**< enable/disable logging. */
-	int quiet;		/**< skip logging to stdout. */
+	int quiet;		/**< skip logging to stdout/stderr. */
 	int verbose;		/**< Console verbosity. */
 	char prog[32];		/**< program name. */
-	envid_t veid;
+	envid_t veid;		/**< Container ID (CTID). */
 } log_param;
 
 /** Print message to log file & stdout.
@@ -55,7 +55,7 @@ int set_log_file(char *file);
  * @param veid		CT ID.
  * @param enable	enable/disable logging.
  * @param level		maximum logging level.
- * @param quiet		skip logging to stdout.
+ * @param quiet		skip logging to stdout/stderr.
  * @param progname	program name.
  */
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
