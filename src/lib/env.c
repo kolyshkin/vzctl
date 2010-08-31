@@ -610,7 +610,8 @@ err:
 	free_dist_actions(&actions);
 	if (ret) {
 		/* Kill environment */
-		logger(-1, 0, "Container start failed");
+		logger(-1, 0, "Container start failed (try to check kernel "
+				"messages, e.g. \"dmesg | tail\")");
 		write(wait_p[1], &err, sizeof(err));
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
