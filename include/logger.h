@@ -67,5 +67,7 @@ void free_log();
 
 void set_log_level(int level);
 void set_log_verbose(int level);
+void set_log_ctid(envid_t id);
+void set_log_quiet(int quiet);
 
 #endif

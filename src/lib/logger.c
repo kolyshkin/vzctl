@@ -113,6 +113,14 @@ void set_log_verbose(int level)
 	g_log.verbose = level;
 }
 
+void set_log_ctid(envid_t id) {
+	g_log.veid = id;
+}
+
+void set_log_quiet(int quiet) {
+	g_log.quiet = quiet;
+}
+
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 	const char *progname)
 {
