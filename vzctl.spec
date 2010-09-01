@@ -199,7 +199,6 @@ Containers control API library
 %attr(755,root,root) %{_libdir}/libvzctl-*.so
 %dir %{_pkglibdir}
 %dir %{_pkglibdir}/scripts
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-stop
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-functions
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_add
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_del

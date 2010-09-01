@@ -42,6 +42,6 @@ for IP in $IP_ADDR; do
 		grep -w -v "$IP" | tr '\n' ' ' > "$VE_STATE_DIR/$VEID"
 	fi
 done
-
+test "$VE_STATE" = 'stopping' && rm -f "$VE_STATE_DIR/$VEID"
 exit 0
 # end of script

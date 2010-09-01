@@ -809,10 +809,10 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	if ((ret = env_stop(h, veid, res->fs.root, stop_mode)))
 		goto end;
 	mod_cleanup(h, veid, action, param);
-	vps_cleanup_res(h, veid, param, STATE_STOPPING);
+	/* Cleanup CT IPs */
+	run_net_script(veid, DEL, &param->del_res.net.ip,
+			STATE_STOPPING, param->res.net.skip_arpdetect);
 	ret = vps_umount(h, veid, res->fs.root, skip);
-	/* Clear CT network configuration */
-	ret = run_pre_script(veid, VPS_STOP);
 
 end:
 	free_str_param(&param->del_res.net.ip);

@@ -51,18 +51,6 @@ int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
 	return 0;
 }
 
-/** Function called on CT stop to cleanup resources
- *
- */
-int vps_cleanup_res(vps_handler *h, envid_t veid, vps_param *param, int vps_state)
-{
-	list_head_t *ips = &param->del_res.net.ip;
-
-	run_net_script(veid, DEL, ips, STATE_RUNNING,
-		param->res.net.skip_arpdetect);
-	return 0;
-}
-
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
 	struct mod_action *action)

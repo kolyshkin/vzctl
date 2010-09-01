@@ -29,7 +29,6 @@
 
 #define VZFIFO_FILE		"/.vzfifo"
 
-#define VPS_STOP		LIB_SCRIPTS_DIR "vps-stop"
 #define VPS_NET_ADD		LIB_SCRIPTS_DIR "vps-net_add"
 #define VPS_NET_DEL		LIB_SCRIPTS_DIR "vps-net_del"
 
