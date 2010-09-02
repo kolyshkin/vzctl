@@ -11,3 +11,4 @@ vzctl
 vzlist
 vzmemcheck
 vzsplit
+vzeventd

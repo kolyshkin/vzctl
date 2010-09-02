@@ -1,0 +1,9 @@
+#!/bin/sh
+I=1
+while vzctl --quiet status $VEID | fgrep -w running; do
+	sleep $I
+	I=$((I+1))
+	test $I -gt 10 && exit 1
+done
+
+vzctl --quiet start $VEID

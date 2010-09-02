@@ -21,7 +21,9 @@ vzlib_SCRIPTS = \
 	vps-create \
 	vps-functions \
 	vps-net_add \
-	vps-net_del
+	vps-net_del \
+	vzevent-stop \
+	vzevent-reboot
 
 vzcron_SCRIPTS = \
 	vpsnetclean \

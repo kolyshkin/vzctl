@@ -1,0 +1,86 @@
+#!/bin/sh
+# A few compatibility functions, to make it possible having the same
+# OpenVZ init scripts for Red Hat/Fedora/Debian/SUSE.
+
+VZCONF=@PKGCONFDIR@/vz.conf
+[ -f ${VZCONF} ] || exit 0
+. ${VZCONF}
+[ "${VIRTUOZZO}" = "no" ] && exit 0
+
+VZCTL=@SBINDIR@/vzctl
+[ -x ${VZCTL} ] || exit 0
+
+rc_done='..done'
+rc_failed='..failed'
+
+VARLOCK=/var/lock/subsys
+
+# Source function library.
+if [ -r /etc/init.d/functions ]; then
+	source /etc/init.d/functions
+	if [ -r /etc/redhat-release ] || [ -r /etc/centos-release ]; then
+		DISTR=redhat
+	fi
+elif [ -r /etc/rc.status ]; then
+	source /etc/rc.status
+	if [ -r /etc/SuSE-release ]; then
+		DISTR=suse
+	fi
+elif [ -r /etc/debian_version ]; then
+	DISTR=debian
+	VARLOCK=/var/lock
+fi
+
+print_success()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		echo_success
+	else
+		echo -n "$rc_done"
+	fi
+	echo
+}
+
+print_failure()
+{
+	echo -n "$1"
+	if [ "$DISTR" = "redhat" ]; then
+		failure $"$1"
+	else
+		echo -n "$rc_failed"
+	fi
+	echo
+}
+
+print_warning()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		echo -n "$1"
+		warning $"$1"
+	else
+		echo -n "- Warning: $1 "
+	fi
+	echo
+}
+
+# Calls either print_success or print_failure, depending on $?
+# Optional argument $1 -- an error string passed to print_failure.
+print_result()
+{
+	if [ $? -eq 0 ] ; then
+		print_success
+	else
+		print_failure "$1"
+	fi
+}
+
+__echo()
+{
+	if [ "$DISTR" = "redhat" ]; then
+		echo -n $"$1"
+	else
+		echo -n "$1"
+	fi
+}
+
+

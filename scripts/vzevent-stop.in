@@ -1,0 +1,57 @@
+#!/bin/sh
+#  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# This script is run by vzeventd after CT is stopped. In case it was stopped
+# not by vzctl, but from inside the CT itself (e.g. by running "halt" or
+# "shutdown", we need to unmount it and clean its network resources.
+
+VEINFO=/proc/vz/veinfo
+test -n "$VEID" || exit 1
+test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
+. @PKGLIBDIR@/scripts/vps-functions
+
+clear_ve_net()
+{
+	local ip ve_ips all_ips
+
+	all_ips=$(cat "$VEINFO" 2>/dev/null) || return
+	ve_ips=$(cat "$VE_STATE_DIR/$VEID" 2>/dev/null) || return
+	vzgetnetdev
+	for ip in $ve_ips; do
+		if ! echo "$all_ips" | fgrep -qw "$ip"; then
+			vzdelrouting "$ip"
+			vzarp del "$ip"
+		fi
+	done
+}
+
+I=1
+while vzctl --quiet status $VEID | fgrep -w running; do
+	sleep $I
+	I=$((I+1))
+	test $I -gt 10 && exit 1
+done
+
+if vzctl --quiet status $VEID | fgrep -w mounted; then
+	vzctl --quiet umount $VEID
+fi
+
+if test -f "$VE_STATE_DIR/$VEID"; then
+	clear_ve_net
+	rm -f "$VE_STATE_DIR/$VEID"
+fi
+exit 0

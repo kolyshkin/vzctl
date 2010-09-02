@@ -15,7 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-INITSCRIPTS = vz-redhat vz-gentoo
+INITSCRIPTS = vz-redhat vz-gentoo vzeventd-redhat vzeventd-gentoo vzfunctions
 
 EXTRA_DIST = $(INITSCRIPTS:%=%.in)
 
@@ -25,7 +25,9 @@ include $(top_srcdir)/pathsubst.am
 
 install-redhat: vz-redhat
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
+	$(INSTALL_SCRIPT) vzfunctions $(DESTDIR)$(initddir)/vzfunctions
 	$(INSTALL_SCRIPT) vz-redhat $(DESTDIR)$(initddir)/vz
+	$(INSTALL_SCRIPT) vzeventd-redhat $(DESTDIR)$(initddir)/vzeventd
 
 install-suse: install-redhat
 
@@ -34,3 +36,4 @@ install-debian: install-redhat
 install-gentoo: vz-gentoo
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
 	$(INSTALL_SCRIPT) vz-gentoo $(DESTDIR)$(initddir)/vz
+	$(INSTALL_SCRIPT) vzeventd-gentoo $(DESTDIR)$(initddir)/vzeventd

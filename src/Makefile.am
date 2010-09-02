@@ -32,7 +32,8 @@ sbin_PROGRAMS = arpsend \
                 vzctl \
                 vzlist \
                 vzmemcheck \
-                vzsplit
+                vzsplit \
+                vzeventd
 
 VZCTL_LIBS = $(top_builddir)/src/lib/libvzctl.la
 
@@ -62,3 +63,6 @@ vzmemcheck_LDADD = $(VZCTL_LIBS)
 
 vzsplit_SOURCES = vzsplit.c
 vzsplit_LDADD   = $(VZCTL_LIBS)
+
+vzeventd_SOURCES = vzeventd.c
+vzeventd_LDADD = $(VZCTL_LIBS)

@@ -25,10 +25,10 @@
 
 ### BEGIN INIT INFO
 # Provides: vz
-# required-start: $network $remote_fs $syslog
-# required-stop:  $network $remote_fs $syslog
-# Should-Start:  sshd
-# Should-Stop:  sshd
+# Required-start: $network $remote_fs $syslog
+# Required-stop:  $network $remote_fs $syslog
+# Should-Start:  sshd vzeventd
+# Should-Stop:  sshd vzeventd
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 # Short-Description: OpenVZ startup script
@@ -38,19 +38,12 @@
 
 # This line is needed to cheat /etc/init.d/rc who expects action word
 
-VZCONF=@PKGCONFDIR@/vz.conf
-
-[ -f ${VZCONF} ] || exit 0
-. ${VZCONF}
-[ "${VIRTUOZZO}" = "no" ] && exit 0
-
-VZCTL=@SBINDIR@/vzctl
-[ -x ${VZCTL} ] || exit 0
+. /etc/init.d/vzfunctions
 
 VZQUOTA=@SBINDIR@/vzquota
 CONFIG_DIR=@PKGCONFDIR@/conf
-LOCKFILE=/var/lock/subsys/vz_lock
-SUBSYS_VZ=/var/lock/subsys/vz
+LOCKFILE=$VARLOCK/vz_lock
+SUBSYS_VZ=$VARLOCK/vz
 VESTAT=/proc/vz/vestat
 VZDEV=venet0
 PRELOAD_MODULES=
@@ -77,25 +70,6 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 	VZFS_MODULES="simfs"
 fi
 
-
-rc_done='..done'
-rc_failed='..failed'
-# Source function library.
-if [ -r /etc/init.d/functions ]; then
-	source /etc/init.d/functions
-	if [ -r /etc/redhat-release ] || [ -r /etc/centos-release ]; then
-		DISTR=redhat
-	fi
-elif [ -r /etc/rc.status ]; then
-	source /etc/rc.status
-	if [ -r /etc/SuSE-release ]; then
-		DISTR=suse
-	fi
-elif [ -r /etc/debian_version ]; then
-	DISTR=debian
-	LOCKFILE=/var/lock/vz_lock
-	SUBSYS_VZ=/var/lock/vz
-fi
 
 VEINFO=""
 RETVAL=0
@@ -248,58 +222,6 @@ get_veinfo()
 		return 1
 	fi
 	return 0
-}
-
-print_success()
-{
-	if [ "$DISTR" = "redhat" ]; then
-		echo_success
-	else
-		echo -n "$rc_done"
-	fi
-	echo
-}
-
-print_failure()
-{
-	echo -n "$1"
-	if [ "$DISTR" = "redhat" ]; then
-		failure $"$1"
-	else
-		echo -n "$rc_failed"
-	fi
-	echo
-}
-
-print_warning()
-{
-	if [ "$DISTR" = "redhat" ]; then
-		echo -n "$1"
-		warning $"$1"
-	else
-		echo -n "- Warning: $1 "
-	fi
-	echo
-}
-
-# Calls either print_success or print_failure, depending on $?
-# Optional argument $1 -- an error string passed to print_failure.
-print_result()
-{
-	if [ $? -eq 0 ] ; then
-		print_success
-	else
-		print_failure "$1"
-	fi
-}
-
-__echo()
-{
-	if [ "$DISTR" = "redhat" ]; then
-		echo -n $"$1"
-	else
-		echo -n "$1"
-	fi
 }
 
 is_running()

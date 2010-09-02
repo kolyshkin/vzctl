@@ -1,0 +1,39 @@
+#!/sbin/runscript
+
+depend() {
+	use net
+	before vz
+}
+
+check_config() {
+# if we don't want openvz running, say so
+	[ "${VIRTUOZZO}" = "yes" ] || return 1
+	: ${VZEVENTD:=@SBINDIR@/vzeventd}
+}
+
+start() {
+	check_config || return
+	ebegin "Loading vzevent module"
+	modprobe -r vzevent >/dev/null 2>&1
+	modprobe vzevent reboot_event=1 >/dev/null 2>&1
+	rc=$?
+	if [ ${rc} -ne 0 ]; then
+		eend ${rc} "failed"
+		return ${rc}
+	fi
+	eend ${rc}
+
+	ebegin "Starting vzeventd"
+	start-stop-daemon --start --exec $VZEVENTD \
+		--pidfile /var/run/vzeventd.pid \
+		-- ${VZEVENTD_OPTS}
+	eend $?
+}
+
+stop() {
+	check_config || return
+	ebegin "Stopping vzeventd"
+		start-stop-daemon --stop --exec $VZEVENTD \
+		--pidfile /var/run/vzeventd.pid
+	eend $?
+}

@@ -30,6 +30,7 @@ Source: http://download.openvz.org/utils/%{name}/%{version}/src/%{name}-%{versio
 ExclusiveOS: Linux
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: vzkernel
+Requires: vzeventmod
 URL: http://openvz.org/
 # these reqs are for vz helper scripts
 Requires: bash
@@ -80,6 +81,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
+%attr(755,root,root) %{_initddir}/vzeventd
 %ghost /etc/cron.d/vz
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
@@ -95,6 +97,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(755,root,root) %{_distscriptdir}
 %dir %attr(755,root,root) %{_vzdir}
 %attr(755,root,root) %{_sbindir}/vzctl
+%attr(755,root,root) %{_sbindir}/vzeventd
 %attr(755,root,root) %{_sbindir}/arpsend
 %attr(755,root,root) %{_sbindir}/ndsend
 %attr(755,root,root) %{_sbindir}/vzsplit
@@ -155,6 +158,7 @@ if [ -f %{_configdir}/vz.conf ]; then
 	fi
 fi
 /sbin/chkconfig --add vz > /dev/null 2>&1
+/sbin/chkconfig --add vzeventd > /dev/null 2>&1
 
 if [ -f /etc/SuSE-release ]; then
 	NET_CFG='ifdown-venet ifup-venet'
@@ -185,6 +189,7 @@ fi
 %preun
 if [ $1 = 0 ]; then
 	/sbin/chkconfig --del vz >/dev/null 2>&1
+	/sbin/chkconfig --del vzeventd >/dev/null 2>&1
 fi
 
 %package lib
@@ -203,6 +208,9 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_add
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_del
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-create
+%attr(755,root,root) %{_pkglibdir}/scripts/vzevent-stop
+%attr(755,root,root) %{_pkglibdir}/scripts/vzevent-reboot
+
 
 %changelog
 * Wed Jun 13 2007 Andy Shevchenko <andriy@asplinux.com.ua> - 3.0.17-1
