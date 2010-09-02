@@ -99,11 +99,12 @@ function add_ip()
 	fi
 
 	for ip in ${IP_ADDR}; do
+		if [ "${ip#*:}" = "$ip" ]; then nm=32; else nm=0; fi
 		if ! grep -qw "config_${VENET_DEV}=\(.*\"${ip}[\"\/].*\)" ${IFCFG}; then
 			if ! is_baselayout1 ; then
-				add_param "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
+				add_param "${IFCFG}" "config_${VENET_DEV}" "${ip}/${nm}"
 			else
-				add_param3 "${IFCFG}" "config_${VENET_DEV}" "${ip}/32"
+				add_param3 "${IFCFG}" "config_${VENET_DEV}" "${ip}/${nm}"
 			fi
 		fi
 	done
