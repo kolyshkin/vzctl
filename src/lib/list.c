@@ -48,10 +48,11 @@ char *list2str_c(char *name, char c, list_head_t *head)
 	}
 	if (c)
 		sp += sprintf(sp, "%c", c);
-
-	if (list_empty(head))
+	if (list_empty(head)) {
+		if (c)
+			sprintf(sp, "%c", c);
 		return buf;
-
+	}
 	list_for_each(p, head, list) {
 		if (p->val == NULL)
 			continue;
