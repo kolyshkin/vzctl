@@ -78,6 +78,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
 %attr(755,root,root) %{_initddir}/vzeventd
+%attr(644,root,root) %{_initddir}/vzfunctions
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
 %dir %attr(700,root,root) %{_privdir}
@@ -105,8 +106,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/vzcfgvalidate
 %attr(755,root,root) %{_sbindir}/vzmigrate
 %attr(755,root,root) %{_sbindir}/vzifup-post
-%attr(755,root,root) %{_scriptdir}/vpsreboot
-%attr(755,root,root) %{_scriptdir}/vpsnetclean
 %attr(644,root,root) %{_logrdir}/vzctl
 %attr(644,root,root) %{_distconfdir}/distribution.conf-template
 %attr(644,root,root) %{_distconfdir}/default
