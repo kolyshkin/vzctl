@@ -26,7 +26,7 @@ prog=vzeventd
 lockfile=$VARLOCK/$prog
 
 load_module() {
-	modprobe vzeventd reboot_event=1
+	modprobe vzevent reboot_event=1
 }
 
 check() {
@@ -34,7 +34,7 @@ check() {
 
 	__echo "Checking vzevent kernel module ..."
 
-	if ! lsmod | fgrep -qw vzeventd; then
+	if ! lsmod | fgrep -qw vzevent; then
 		print_failure
 		return 1
 	fi
@@ -54,6 +54,7 @@ start() {
 	[ -x @SBINDIR@/vzeventd ] || exit 5
 	[ -r /etc/sysconfig/vzeventd ] && . /etc/sysconfig/vzeventd
 
+	load_module
 	check || exit 1
 
 	echo -n $"Starting $prog: "
