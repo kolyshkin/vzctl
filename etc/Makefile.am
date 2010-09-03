@@ -20,7 +20,6 @@ include $(top_srcdir)/paths.am
 SUBDIRS = \
 	bash_completion.d \
 	conf \
-	cron.d \
 	dists \
 	init.d \
 	logrotate.d \

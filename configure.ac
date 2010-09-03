@@ -20,7 +20,7 @@ AC_PREREQ(2.59)
 AC_INIT(vzctl, 3.0.24, devel@openvz.org)
 
 # Change sysconfdir default since otherwise some important files
-# (an initscript, files for logrotate, cron, and udev) will be installed
+# (an initscript, files for logrotate, and udev) will be installed
 # to some nonsence/non-working place like under /usr/local/etc/
 #
 # NOTE: this changes expected configure behavior: if you specify --prefix
@@ -95,17 +95,6 @@ AC_ARG_ENABLE([bashcomp],
               [enable_bashcomp="-bashcomp"])
 AM_CONDITIONAL(ENABLE_BASHCOMP, test "x$enable_bashcomp" = "x+bashcomp")
 
-AC_ARG_ENABLE([cron],
-              [AC_HELP_STRING([--disable-cron],
-                              [Disable cron support])],
-              [case "${enableval}" in
-                yes) enable_cron="+cron";;
-                no)  enable_cron="-cron";;
-                *)   AC_MSG_ERROR(bad value ${enableval} for --enable-cron);;
-              esac],
-              [enable_cron="+cron"])
-AM_CONDITIONAL(ENABLE_CRON, test "x$enable_cron" = "x+cron")
-
 AC_ARG_ENABLE([logrotate],
               [AC_HELP_STRING([--enable-logrotate],
                               [Enable logrotate support])],
@@ -139,14 +128,13 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
      target: $target
      prefix: $prefix
  sysconfdir: $sysconfdir
-   features: $enable_bashcomp $enable_cron $enable_logrotate $enable_udev
+   features: $enable_bashcomp $enable_logrotate $enable_udev
 "])
 
 # Output
 AC_CONFIG_FILES([bin/Makefile
                  etc/bash_completion.d/Makefile
                  etc/conf/Makefile
-                 etc/cron.d/Makefile
                  etc/dists/Makefile
                  etc/init.d/Makefile
                  etc/logrotate.d/Makefile

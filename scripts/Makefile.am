@@ -25,14 +25,8 @@ vzlib_SCRIPTS = \
 	vzevent-stop \
 	vzevent-reboot
 
-vzcron_SCRIPTS = \
-	vpsnetclean \
-	vpsreboot
-
 EXTRA_DIST = \
-	$(vzlib_SCRIPTS:%=%.in) \
-	$(vzcron_SCRIPTS:%=%.in)
+	$(vzlib_SCRIPTS:%=%.in)
 
 CLEANFILES = \
-	$(vzlib_SCRIPTS) \
-	$(vzcron_SCRIPTS)
+	$(vzlib_SCRIPTS)

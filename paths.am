@@ -19,11 +19,6 @@ if ENABLE_BASHCOMP
 bashcdir    = $(sysconfdir)/bash_completion.d
 endif
 
-if ENABLE_CRON
-cronddir    = $(pkgconfdir)/cron
-dst_cronddir= $(sysconfdir)/cron.d
-endif
-
 if ENABLE_LOGROTATE
 logrdir     = $(sysconfdir)/logrotate.d
 endif
@@ -42,4 +37,3 @@ distconfdir = $(pkgconfdir)/dists
 namesdir    = $(pkgconfdir)/names
 
 vzlibdir    = $(pkglibdir)/scripts
-vzcrondir   = $(pkgdatadir)/scripts

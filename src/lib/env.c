@@ -351,8 +351,6 @@ try:
 	fd = open("/fastboot", O_CREAT | O_RDONLY, 0644);
 	close(fd);
 
-	mk_reboot_script();
-
 	if (res->misc.wait == YES) {
 		if (add_reach_runlevel_mark()) {
 			ret = VZ_WAIT_FAILED;

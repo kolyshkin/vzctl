@@ -215,37 +215,6 @@ int run_pre_script(int veid, char *script)
 	return ret;
 }
 
-int mk_reboot_script()
-{
-	char buf[STR_SIZE];
-	char *rc;
-	int fd;
-#define REBOOT_MARK	"/reboot"
-#define VZREBOOT	"S00vzreboot"
-#define RC1		"/etc/rc.d/rc6.d"
-#define RC2		"/etc/rc6.d"
-#define REBOOT_SCRIPT	"#!/bin/bash\n>" REBOOT_MARK
-
-	/* remove reboot flag */
-	unlink(REBOOT_MARK);
-	rc = NULL;
-	if (stat_file(RC1))
-		rc = RC1;
-	if (stat_file(RC2))
-		rc = RC2;
-	if (rc == NULL)
-		return 1;
-	sprintf(buf, "%s/" VZREBOOT, rc);
-	if ((fd = open(buf, O_CREAT|O_WRONLY|O_TRUNC, 0755)) < 0) {
-		logger(-1, errno, "Unable to create %s", buf);
-		return 1;
-	}
-	write(fd, REBOOT_SCRIPT, sizeof(REBOOT_SCRIPT) - 1);
-	close(fd);
-
-	return 0;
-}
-
 #define PROC_QUOTA	"/proc/vz/vzaquota/"
 #define QUOTA_U		"/aquota.user"
 #define QUOTA_G		"/aquota.group"

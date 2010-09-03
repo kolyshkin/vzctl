@@ -12,7 +12,6 @@
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
 %define _netdir	%_sysconfdir/sysconfig/network-scripts
 %define _logrdir %_sysconfdir/logrotate.d
-%define _crondir %{_configdir}/cron
 %define _distconfdir %{_configdir}/dists
 %define _namesdir %{_configdir}/names
 %define _distscriptdir %{_distconfdir}/scripts
@@ -71,9 +70,6 @@ ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 # This could go to vzctl-lib-devel, but since we don't have it...
 rm -f  $RPM_BUILD_ROOT/%_libdir/libvzctl.{la,so}
-# Needed for ghost in files section below
-mkdir $RPM_BUILD_ROOT/etc/cron.d/
-touch $RPM_BUILD_ROOT/etc/cron.d/vz
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -82,7 +78,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %attr(755,root,root) %{_initddir}/vz
 %attr(755,root,root) %{_initddir}/vzeventd
-%ghost /etc/cron.d/vz
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
 %dir %attr(700,root,root) %{_privdir}
@@ -90,7 +85,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(755,root,root) %{_cachedir}
 %dir %attr(755,root,root) %{_veipdir}
 %dir %attr(755,root,root) %{_configdir}
-%dir %attr(755,root,root) %{_crondir}
 %dir %attr(755,root,root) %{_namesdir}
 %dir %attr(755,root,root) %{_vpsconfdir}
 %dir %attr(755,root,root) %{_distconfdir}
@@ -140,7 +134,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_distconfdir}/*.conf
-%attr(644,root,root) %config(noreplace) %{_crondir}/vz
 %config %{_vpsconfdir}/ve-basic.conf-sample
 %config %{_vpsconfdir}/ve-light.conf-sample
 %config %{_vpsconfdir}/ve-unlimited.conf-sample
