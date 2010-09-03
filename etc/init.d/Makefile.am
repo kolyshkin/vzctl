@@ -23,9 +23,9 @@ CLEANFILES = $(INITSCRIPTS)
 
 include $(top_srcdir)/pathsubst.am
 
-install-redhat: vz-redhat
+install-redhat: vzfunctions vz-redhat vzeventd-redhat
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
-	$(INSTALL_SCRIPT) vzfunctions $(DESTDIR)$(initddir)/vzfunctions
+	$(INSTALL_DATA) vzfunctions $(DESTDIR)$(initddir)/vzfunctions
 	$(INSTALL_SCRIPT) vz-redhat $(DESTDIR)$(initddir)/vz
 	$(INSTALL_SCRIPT) vzeventd-redhat $(DESTDIR)$(initddir)/vzeventd
 
@@ -33,7 +33,7 @@ install-suse: install-redhat
 
 install-debian: install-redhat
 
-install-gentoo: vz-gentoo
+install-gentoo: vz-gentoo vzeventd-gentoo
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
 	$(INSTALL_SCRIPT) vz-gentoo $(DESTDIR)$(initddir)/vz
 	$(INSTALL_SCRIPT) vzeventd-gentoo $(DESTDIR)$(initddir)/vzeventd
