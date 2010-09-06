@@ -23,6 +23,19 @@ LOOPBACK=lo
 CFGFILE=/etc/network/interfaces
 HOSTFILE=/etc/hosts
 
+function fix_networking_conf()
+{
+	local cfg="/etc/init/networking.conf"
+	local str="local-filesystems"
+
+	test -f ${cfg} || return 0
+	fgrep -q "udevtrigger" ${cfg} 2>/dev/null || return 0
+
+	fgrep -v "udevtrigger" ${cfg} | \
+		sed "s,(${str},${str},g" > ${cfg}.$$ && \
+		mv -f ${cfg}.$$ ${cfg}
+}
+
 function setup_network()
 {
 	echo "# This configuration file is auto-generated.
@@ -84,6 +97,7 @@ iface venet0 inet6 static
 		cat ${CFGFILE}.tail >> ${CFGFILE}
 	fi
 
+	fix_networking_conf
 }
 
 function create_config()
