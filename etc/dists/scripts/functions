@@ -337,12 +337,17 @@ function change_hostname()
 			for (i=2; i <= NF; i++) { EXTRANAMES[$i] = 1 }
 			next;
 		}
-		$1 == "127.0.0.1" { ate_localhost = 1; next; }
+		$1 == "127.0.0.1" {
+			for (i=2; i <= NF; i++) { if ($i != "localhost" && $i != "localhost.localdomain") { LOCALHOST_ALIASES[$i] = 1 } }
+			for (localhost_alias in LOCALHOST_ALIASES) { localhost_aliases = localhost_aliass " " localhost_alias }
+			ate_localhost = 1;
+			next;
+		}
 		{print}
 		END {
 			if (ip == "") { ip ="127.0.0.1" }
 			if (ate_localhost && ip != "127.0.0.1") {
-				print "127.0.0.1 localhost.localdomain localhost";
+				print "127.0.0.1 localhost.localdomain localhost" localhost_aliases;
 			}
 			print comm;
 			if ((i=index(host, ".")) > 1) {
@@ -358,6 +363,7 @@ function change_hostname()
 				if (! ("localhost.localdomain" in EXTRANAMES)) {
 					EXTRANAMES["localhost.localdomain"] = 1;
 				}
+				extranames = localhost_aliases;
 			}
 			for (extraname in EXTRANAMES) { extranames = extranames " " extraname }
 			print ip " " host extranames;
