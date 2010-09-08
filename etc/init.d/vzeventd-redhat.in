@@ -10,6 +10,8 @@
 
 ### BEGIN INIT INFO
 # Provides: vzeventd
+# Required-start: $remote_fs
+# Required-stop: $remote_fs
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 # X-Start-Before: vz
