@@ -15,7 +15,7 @@
 # X-Start-Before: vz
 # X-Stop-After: vz
 # Short-Description: start and stop vzeventd
-# Description: ntpd is the NTPv4 s OpenVZ events daemon.
+# Description: vzeventd is the OpenVZ events daemon.
 #              It takes care of events sent by the OpenVZ kernel
 #              and performs required actions associated with those events.
 ### END INIT INFO
