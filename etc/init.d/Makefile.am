@@ -15,17 +15,17 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-INITSCRIPTS = vz-redhat vz-gentoo vzeventd-redhat vzeventd-gentoo vzfunctions
+INITSCRIPTS = vz-redhat vz-gentoo vzeventd-redhat vzeventd-gentoo
+vzlib_DATA = initd-functions
 
-EXTRA_DIST = $(INITSCRIPTS:%=%.in)
+EXTRA_DIST = $(INITSCRIPTS:%=%.in) $(vzlib_DATA:%=%.in)
 
-CLEANFILES = $(INITSCRIPTS)
+CLEANFILES = $(INITSCRIPTS) $(vzlib_DATA)
 
 include $(top_srcdir)/pathsubst.am
 
-install-redhat: vzfunctions vz-redhat vzeventd-redhat
+install-redhat: vz-redhat vzeventd-redhat
 	$(mkinstalldirs) $(DESTDIR)$(initddir)
-	$(INSTALL_DATA) vzfunctions $(DESTDIR)$(initddir)/vzfunctions
 	$(INSTALL_SCRIPT) vz-redhat $(DESTDIR)$(initddir)/vz
 	$(INSTALL_SCRIPT) vzeventd-redhat $(DESTDIR)$(initddir)/vzeventd
 

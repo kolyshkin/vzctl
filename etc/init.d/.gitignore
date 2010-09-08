@@ -1,6 +1,6 @@
 vz-redhat
 vz-gentoo
-vzfunctions
+initd-functions
 vzeventd-redhat
 vzeventd-gentoo
 Makefile.in

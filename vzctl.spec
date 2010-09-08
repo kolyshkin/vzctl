@@ -76,9 +76,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
+%dir %{_pkglibdir}/scripts
+%attr(755,root,root) %{_pkglibdir}/scripts/initd-functions
 %attr(755,root,root) %{_initddir}/vz
 %attr(755,root,root) %{_initddir}/vzeventd
-%attr(644,root,root) %{_initddir}/vzfunctions
 %dir %attr(755,root,root) %{_lockdir}
 %dir %attr(755,root,root) %{_dumpdir}
 %dir %attr(700,root,root) %{_privdir}

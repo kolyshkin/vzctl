@@ -22,7 +22,7 @@
 #              and performs required actions associated with those events.
 ### END INIT INFO
 
-. /etc/init.d/vzfunctions
+. @VZLIBDIR@/vzfunctions
 
 prog=vzeventd
 lockfile=$VARLOCK/$prog
