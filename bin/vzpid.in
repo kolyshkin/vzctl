@@ -25,7 +25,7 @@ usage()
 
 header()
 {
-	printf '%s\t%s\t%s\n' 'Pid' 'VEID' 'Name'
+	printf '%s\t%s\t%s\n' 'Pid' 'CTID' 'Name'
 }
 
 getveid()
