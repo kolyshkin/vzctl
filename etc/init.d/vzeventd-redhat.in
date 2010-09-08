@@ -60,7 +60,7 @@ start() {
 	check || exit 1
 
 	echo -n $"Starting $prog: "
-	daemon $prog $OPTIONS
+	vzdaemon_start $prog $OPTIONS
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch $lockfile
@@ -70,7 +70,7 @@ start() {
 stop() {
 	[ "$EUID" != "0" ] && exit 4
 	echo -n $"Shutting down $prog: "
-	killproc $prog
+	vzdaemon_stop $prog
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && rm -f $lockfile

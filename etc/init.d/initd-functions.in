@@ -83,4 +83,29 @@ __echo()
 	fi
 }
 
+vzdaemon_start()
+{
+	case DISTR in
+	   redhat)
+		daemon $*
+		;;
+	   suse)
+		startproc $*
+		;;
+	   debian)
+		start-stop-daemon --start --quiet --exec $*
+		;;
+	esac
+}
 
+vzdaemon_stop()
+{
+	case DISTR in
+	   redhat|suse)
+		killproc $*
+		;;
+	   debian)
+		start-stop-daemon --stop --quiet --exec $*
+		;;
+	esac
+}
