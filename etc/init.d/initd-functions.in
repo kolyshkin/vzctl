@@ -1,4 +1,3 @@
-#!/bin/sh
 # A few compatibility functions, to make it possible having the same
 # OpenVZ init scripts for Red Hat/Fedora/Debian/SUSE.
 
