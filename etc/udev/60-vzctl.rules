@@ -1,1 +1,1 @@
-KERNEL=="vzctl", NAME="%k", MODE="0600"
+KERNEL=="vzctl", MODE="0600"
