@@ -55,6 +55,7 @@ start() {
 	[ "$EUID" != "0" ] && exit 4
 	[ -x @SBINDIR@/vzeventd ] || exit 5
 	[ -r /etc/sysconfig/vzeventd ] && . /etc/sysconfig/vzeventd
+	[ -r /etc/default/vzeventd ] && . /etc/default/vzeventd
 
 	load_module
 	check || exit 1
