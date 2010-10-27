@@ -22,42 +22,46 @@
 
 #include "iptables.h"
 
+#define IPTABLES_GEN(name, mask) { name, mask##_MOD, mask }
+#define IPTABLES_GEN_END {NULL, 0, 0}
+
 static struct iptables_s iptables[] = {
 #ifdef VZCTL_ENV_CREATE_DATA
-	{"ip_tables", VE_IP_IPTABLES_MOD, VE_IP_IPTABLES},
-	{"iptable_filter", VE_IP_FILTER_MOD, VE_IP_FILTER},
-	{"iptable_mangle", VE_IP_MANGLE_MOD, VE_IP_MANGLE},
-	{"ipt_limit", VE_IP_MATCH_LIMIT_MOD, VE_IP_MATCH_LIMIT},
-	{"ipt_multiport", VE_IP_MATCH_MULTIPORT_MOD, VE_IP_MATCH_MULTIPORT},
-	{"ipt_tos", VE_IP_MATCH_TOS_MOD, VE_IP_MATCH_TOS},
-	{"ipt_TOS", VE_IP_TARGET_TOS_MOD, VE_IP_TARGET_TOS},
-	{"ipt_REJECT", VE_IP_TARGET_REJECT_MOD, VE_IP_TARGET_REJECT},
-	{"ipt_TCPMSS", VE_IP_TARGET_TCPMSS_MOD, VE_IP_TARGET_TCPMSS},
-	{"ipt_tcpmss", VE_IP_MATCH_TCPMSS_MOD, VE_IP_MATCH_TCPMSS},
-	{"ipt_ttl", VE_IP_MATCH_TTL_MOD, VE_IP_MATCH_TTL},
-	{"ipt_LOG", VE_IP_TARGET_LOG_MOD, VE_IP_TARGET_LOG},
-	{"ipt_length", VE_IP_MATCH_LENGTH_MOD, VE_IP_MATCH_LENGTH},
-	{"ip_conntrack", VE_IP_CONNTRACK_MOD, VE_IP_CONNTRACK},
-	{"ip_conntrack_ftp", VE_IP_CONNTRACK_FTP_MOD, VE_IP_CONNTRACK_FTP},
-	{"ip_conntrack_irc", VE_IP_CONNTRACK_IRC_MOD, VE_IP_CONNTRACK_IRC},
-	{"ipt_conntrack", VE_IP_MATCH_CONNTRACK_MOD, VE_IP_MATCH_CONNTRACK},
-	{"ipt_state", VE_IP_MATCH_STATE_MOD, VE_IP_MATCH_STATE},
-	{"ipt_helper", VE_IP_MATCH_HELPER_MOD, VE_IP_MATCH_HELPER},
-	{"iptable_nat", VE_IP_NAT_MOD, VE_IP_NAT},
-	{"ip_nat_ftp", VE_IP_NAT_FTP_MOD, VE_IP_NAT_FTP},
-	{"ip_nat_irc", VE_IP_NAT_IRC_MOD, VE_IP_NAT_IRC},
+	IPTABLES_GEN("ip_tables",	VE_IP_IPTABLES),
+	IPTABLES_GEN("iptable_filter",	VE_IP_FILTER),
+	IPTABLES_GEN("iptable_mangle",	VE_IP_MANGLE),
+	IPTABLES_GEN("ipt_limit",	VE_IP_MATCH_LIMIT),
+	IPTABLES_GEN("ipt_multiport",	VE_IP_MATCH_MULTIPORT),
+	IPTABLES_GEN("ipt_tos",		VE_IP_MATCH_TOS),
+	IPTABLES_GEN("ipt_TOS",		VE_IP_TARGET_TOS),
+	IPTABLES_GEN("ipt_REJECT",	VE_IP_TARGET_REJECT),
+	IPTABLES_GEN("ipt_TCPMSS",	VE_IP_TARGET_TCPMSS),
+	IPTABLES_GEN("ipt_tcpmss",	VE_IP_MATCH_TCPMSS),
+	IPTABLES_GEN("ipt_ttl",		VE_IP_MATCH_TTL),
+	IPTABLES_GEN("ipt_LOG",		VE_IP_TARGET_LOG),
+	IPTABLES_GEN("ipt_length",	VE_IP_MATCH_LENGTH),
+	IPTABLES_GEN("ip_conntrack",	VE_IP_CONNTRACK),
+	IPTABLES_GEN("ip_conntrack_ftp",VE_IP_CONNTRACK_FTP),
+	IPTABLES_GEN("ip_conntrack_irc",VE_IP_CONNTRACK_IRC),
+	IPTABLES_GEN("ipt_conntrack",	VE_IP_MATCH_CONNTRACK),
+	IPTABLES_GEN("ipt_state",	VE_IP_MATCH_STATE),
+	IPTABLES_GEN("ipt_helper",	VE_IP_MATCH_HELPER),
+	IPTABLES_GEN("iptable_nat",	VE_IP_NAT),
+	IPTABLES_GEN("ip_nat_ftp",	VE_IP_NAT_FTP),
+	IPTABLES_GEN("ip_nat_irc",	VE_IP_NAT_IRC),
 #ifdef VE_IP_TARGET_REDIRECT
-	{"ipt_REDIRECT", VE_IP_TARGET_REDIRECT_MOD, VE_IP_TARGET_REDIRECT},
+	IPTABLES_GEN("ipt_REDIRECT",	VE_IP_TARGET_REDIRECT),
 #endif
 #ifdef VE_IP_MATCH_MAC
-	{"xt_mac", VE_IP_MATCH_MAC_MOD, VE_IP_MATCH_MAC},
+	IPTABLES_GEN("xt_mac",		VE_IP_MATCH_MAC),
 #endif
 #ifdef VE_IP_MATCH_RECENT
-	{"ipt_recent", VE_IP_MATCH_RECENT_MOD, VE_IP_MATCH_RECENT},
+	IPTABLES_GEN("ipt_recent",	VE_IP_MATCH_RECENT),
 #endif
 #endif /* VZCTL_ENV_CREATE_DATA */
-	{"ipt_owner", VE_IP_MATCH_OWNER_MOD, VE_IP_MATCH_OWNER},
-	{NULL, 0, 0}
+	IPTABLES_GEN("ipt_owner",	VE_IP_MATCH_OWNER),
+
+	IPTABLES_GEN_END
 };
 
 struct iptables_s *find_ipt(const char *name)
