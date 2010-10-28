@@ -86,4 +86,6 @@ size_t vz_strlcat(char *dst, const char *src, size_t count);
 #define for_each_strtok(p, str, sep)				\
 	for (p = strtok(str, sep); p; p = strtok(NULL, sep))
 
+#define ARRAY_SIZE(x) (sizeof(x)/sizeof((x)[0]))
+
 #endif
