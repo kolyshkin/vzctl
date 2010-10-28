@@ -378,13 +378,13 @@ static int parse_iptables(env_param *env, char *val)
 			ret = ERR_INVAL_SKIP;
 			continue;
 		}
-		env->ipt_mask |= (unsigned long)ipt->mask;
+		env->ipt_mask |= ipt->mask;
 	}
 
 	return ret;
 }
 
-static void store_iptables(unsigned long ipt_mask, vps_config *conf,
+static void store_iptables(unsigned long long ipt_mask, vps_config *conf,
 	list_head_t *conf_h)
 {
 	char buf[STR_SIZE];

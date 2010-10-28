@@ -33,7 +33,7 @@
 
 typedef struct {
 	envid_t veid;
-	unsigned long ipt_mask;
+	unsigned long long ipt_mask;
 
 	/*
 	 * features_known is the set of features that are present

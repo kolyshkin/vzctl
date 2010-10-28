@@ -72,7 +72,7 @@ struct iptables_s *find_ipt(const char *name)
 	return NULL;
 }
 
-void ipt_mask2str(unsigned long mask, char *buf, int size)
+void ipt_mask2str(unsigned long long mask, char *buf, int size)
 {
 	int i, r;
 	char *sp, *ep;
@@ -89,7 +89,7 @@ void ipt_mask2str(unsigned long mask, char *buf, int size)
 	}
 }
 
-unsigned long long get_ipt_mask(unsigned long ids)
+unsigned long long get_ipt_mask(unsigned long long ids)
 {
 	unsigned long long mask;
 	int i;

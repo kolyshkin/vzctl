@@ -20,12 +20,12 @@
 
 struct iptables_s {
 	char *name;
-	unsigned long id;
+	unsigned long long id;
 	unsigned long long mask;
 };
 
 struct iptables_s *find_ipt(const char *name);
-void ipt_mask2str(unsigned long mask, char *buf, int size);
-unsigned long long get_ipt_mask(unsigned long mask);
+void ipt_mask2str(unsigned long long mask, char *buf, int size);
+unsigned long long get_ipt_mask(unsigned long long mask);
 
 #endif //_IPTABLES_H_
