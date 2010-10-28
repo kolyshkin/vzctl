@@ -16,14 +16,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <linux/vzcalluser.h>
 #include <string.h>
 #include <stdio.h>
+#include <linux/vzcalluser.h>
 
+#include "util.h"
 #include "iptables.h"
 
 #define IPTABLES_GEN(name, mask) { name, mask##_MOD, mask }
-#define IPTABLES_GEN_END {NULL, 0, 0}
 
 static struct iptables_s iptables[] = {
 #ifdef VZCTL_ENV_CREATE_DATA
@@ -60,15 +60,13 @@ static struct iptables_s iptables[] = {
 #endif
 #endif /* VZCTL_ENV_CREATE_DATA */
 	IPTABLES_GEN("ipt_owner",	VE_IP_MATCH_OWNER),
-
-	IPTABLES_GEN_END
 };
 
 struct iptables_s *find_ipt(const char *name)
 {
 	int i;
 
-	for (i = 0; iptables[i].name != NULL; i++)
+	for (i = 0; i < (int)ARRAY_SIZE(iptables); i++)
 		if (!strcmp(name, iptables[i].name))
 			return &iptables[i];
 	return NULL;
@@ -81,7 +79,7 @@ void ipt_mask2str(unsigned long mask, char *buf, int size)
 
 	sp = buf;
 	ep = buf + size;
-	for (i = 0; iptables[i].name != NULL; i++) {
+	for (i = 0;  i < (int)ARRAY_SIZE(iptables); i++) {
 		if (!(mask & iptables[i].id))
 			continue;
 		r = snprintf(sp, ep - sp, "%s ", iptables[i].name);
@@ -99,7 +97,7 @@ unsigned long long get_ipt_mask(unsigned long ids)
 	if (!ids)
 		return VE_IP_DEFAULT;
 	mask = 0;
-	for (i = 0; iptables[i].name != NULL; i++) {
+	for (i = 0;  i < (int)ARRAY_SIZE(iptables); i++) {
 		if (iptables[i].id & ids)
 			mask |= iptables[i].mask;
 	}
