@@ -419,7 +419,7 @@ int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 			continue;
 		if (parse_int(token, &id))
 			continue;
-		if (veid != id)
+		if (veid != (envid_t)id)
 			continue;
 		if ((token = strtok(NULL, " ")) != NULL)
 			token = strtok(NULL, " ");
