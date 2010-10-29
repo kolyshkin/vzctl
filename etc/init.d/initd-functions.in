@@ -84,7 +84,7 @@ __echo()
 
 vzdaemon_start()
 {
-	case DISTR in
+	case $DISTR in
 	   redhat)
 		daemon $*
 		;;
@@ -99,7 +99,7 @@ vzdaemon_start()
 
 vzdaemon_stop()
 {
-	case DISTR in
+	case $DISTR in
 	   redhat|suse)
 		killproc $*
 		;;
