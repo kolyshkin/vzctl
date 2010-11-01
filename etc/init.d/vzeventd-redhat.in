@@ -87,14 +87,14 @@ case "$1" in
 	stop
 	;;
    status)
-	status $prog
+	vzdaemon_status $prog
 	;;
    restart|force-reload)
 	stop
 	start
 	;;
    try-restart|condrestart)
-	if status $prog > /dev/null; then
+	if vzdaemon_status $prog >/dev/null 2>&1; then
 		stop
 		start
 	fi

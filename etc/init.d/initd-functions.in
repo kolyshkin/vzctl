@@ -112,3 +112,26 @@ vzdaemon_stop()
 		;;
 	esac
 }
+
+vzdaemon_status()
+{
+	local p=$1
+	shift
+
+	case $DISTR in
+	   redhat|suse)
+		status $p
+		;;
+	   debian)
+		echo -n "Checking status of $p... "
+		start-stop-daemon --start -t --quiet --exec @SBINDIR@/$p -- $*
+		if [ $? -eq 0 ]; then
+			print_success "(running)"
+			return 0
+		else
+			print_failure "(not running)"
+			return 1
+		fi
+		;;
+	esac
+}
