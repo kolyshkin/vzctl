@@ -92,7 +92,9 @@ vzdaemon_start()
 		startproc $*
 		;;
 	   debian)
-		start-stop-daemon --start --quiet --exec $*
+		local p=$1
+		shift
+		start-stop-daemon --start --quiet --exec @SBINDIR@/$p -- $*
 		;;
 	esac
 }
@@ -104,7 +106,9 @@ vzdaemon_stop()
 		killproc $*
 		;;
 	   debian)
-		start-stop-daemon --stop --quiet --exec $*
+		local p=$1
+		shift
+		start-stop-daemon --stop --quiet --exec @SBINDIR@/$p -- $*
 		;;
 	esac
 }
