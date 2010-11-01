@@ -43,7 +43,7 @@ static int get_action_id(char *name)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(action2id) / sizeof(*action2id); i++)
+	for (i = 0; i < ARRAY_SIZE(action2id); i++)
 		if (!strcmp(name, action2id[i].name))
 			return action2id[i].id;
 	return -1;

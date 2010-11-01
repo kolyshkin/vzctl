@@ -26,6 +26,7 @@
 #include "res.h"
 #include "logger.h"
 #include "meminfo.h"
+#include "util.h"
 
 static struct {
 	char *mode_nm;
@@ -109,7 +110,7 @@ int get_meminfo_mode(char *name)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(mode_tbl_) / sizeof(mode_tbl_[0]); i++)
+	for (i = 0; i < ARRAY_SIZE(mode_tbl_); i++)
 		if (!strcmp(mode_tbl_[i].mode_nm, name))
 			return mode_tbl_[i].mode_id;
 
@@ -120,7 +121,7 @@ const char *get_meminfo_mode_nm(int id)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(mode_tbl_) / sizeof(mode_tbl_[0]); i++)
+	for (i = 0; i < ARRAY_SIZE(mode_tbl_); i++)
 		if (mode_tbl_[i].mode_id == id)
 			return mode_tbl_[i].mode_nm;
 	return NULL;

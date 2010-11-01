@@ -49,9 +49,7 @@ int action2id(char *mode)
 
 	if (mode == NULL)
 		return ACT_NONE;
-	for (i = 0; i < sizeof(validate_act2str) / sizeof(*validate_act2str);
-		i++)
-	{
+	for (i = 0; i < ARRAY_SIZE(validate_act2str); i++) {
 		if (!strcmp(validate_act2str[i].name, mode))
 			return validate_act2str[i].id;
 	}

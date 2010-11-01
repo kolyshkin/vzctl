@@ -1450,7 +1450,7 @@ int search_field(char *name)
 
 	if (name == NULL)
 		return -1;
-	for (i = 0; i < sizeof(field_names) / sizeof(*field_names); i++) {
+	for (i = 0; i < ARRAY_SIZE(field_names); i++) {
 		if (!strcmp(name, field_names[i].name))
 			return i;
 	}
@@ -1545,7 +1545,7 @@ void print_names()
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(field_names) / sizeof(*field_names); i++)
+	for (i = 0; i < ARRAY_SIZE(field_names); i++)
 		printf("%-15s %-15s\n", field_names[i].name,
 					field_names[i].hdr);
 	return;

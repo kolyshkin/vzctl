@@ -28,6 +28,7 @@
 #include "cap.h"
 #include "vzerror.h"
 #include "logger.h"
+#include "util.h"
 
 #ifndef	CAP_SETVEID
 #define	CAP_SETVEID	29
@@ -116,7 +117,7 @@ int get_cap_mask(char *name, unsigned long *mask)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(cap_names) / sizeof(*cap_names); i++) {
+	for (i = 0; i < ARRAY_SIZE(cap_names); i++) {
 		if (!strcasecmp(name, cap_names[i])) {
 			cap_raise(*mask, i);
 			return 0;
@@ -141,7 +142,7 @@ void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
 	sp = buf;
 	ep = buf + len;
 	sp += sprintf(sp, "\"");
-	for (i = 0; i < sizeof(cap_names) / sizeof(*cap_names); i++) {
+	for (i = 0; i < ARRAY_SIZE(cap_names); i++) {
 		int op = 0;
 
 		if (CAP_TO_MASK(i) & new->on)
