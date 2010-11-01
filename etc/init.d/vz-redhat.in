@@ -424,6 +424,14 @@ stop()
 {
 	local mod
 
+	# Avoid stop action inside a CT, check we are in CT0
+	if ! egrep -q '^[[:space:]]*0:[[:space:]]' \
+			/proc/user_beancounters; then
+		print_failure "Looks like we are inside a container!"
+		RETVAL=1
+		return 1
+	fi
+
 	if ! lockfile $LOCKFILE; then
 		__echo "OpenVZ is locked"
 		print_failure
