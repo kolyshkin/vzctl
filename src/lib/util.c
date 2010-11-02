@@ -580,6 +580,8 @@ int move_config(int veid, int action)
 	__move_config(veid, action, "conf");
 	__move_config(veid, action, MOUNT_PREFIX);
 	__move_config(veid, action, UMOUNT_PREFIX);
+	__move_config(veid, action, PRE_MOUNT_PREFIX);
+	__move_config(veid, action, POST_UMOUNT_PREFIX);
 	__move_config(veid, action, START_PREFIX);
 	__move_config(veid, action, STOP_PREFIX);
 
