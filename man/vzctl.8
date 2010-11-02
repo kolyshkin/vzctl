@@ -1,4 +1,4 @@
-.TH vzctl 8 "2 Mar 2010" "OpenVZ" "Containers"
+.TH vzctl 8 "2 Nov 2010" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- utility to control an OpenVZ container.
 .SH SYNOPSIS
@@ -573,18 +573,28 @@ the configuration file of this container.
 .IP "\fBstart\fR [\fB--wait\fR] [\fB--force\fR]" 4
 Mounts (if necessary) and starts a container. Unless \fB--wait\fR option
 is specified, \fBvzctl\fR will return immediately; otherwise an attempt to
-wait till the default runlevel is reached will be made by vzctl.
+wait till the default runlevel is reached will be made by \fBvzctl\fR.
 
 Specify \fB--force\fR if you want to start a container which is disabled
 (see \fB--disabled\fR).
+
+Note that this command can lead to execution of \fBpremount\fR, \fBmount\fR
+and \fBstart\fR action scripts (see \fBACTION SCRIPTS\fR below).
 .IP "\fBstop\fR [\fB--fast\fR]" 4
 Stops and unmounts a container. Normally, \fBhalt\fR(8) is executed
 inside a container; option \fB--fast\fR makes \fBvzctl\fR use
 \fBreboot\fR(2) syscall instead which is faster but can lead to
 unclean container shutdown.
+
+Note that this command can lead to execution of \fBstop\fR,
+\fBumount\fR and \fBpostumount\fR action scripts
+(see \fBACTION SCRIPTS\fR below).
 .IP \fBrestart\fR 4
 Restarts a container, i.e. stops it if it is running, and starts again.
 Accepts all the \fBstart\fR and \fBstop\fR options.
+
+Note that this command can lead to execution of some action scripts
+(see \fBACTION SCRIPTS\fR below).
 .IP \fBstatus\fR 4
 Shows a container status. This is a line with five words separated by spaces.
 First word is literally \fBCTID\fR. Second word is the numeric \fICT ID\fR.
@@ -597,10 +607,15 @@ it can be either \fBrunning\fR or \fBdown\fR.
 
 This command can also be usable from scripts.
 .IP \fBmount\fR 4
-Mounts container private area.
+Mounts container private area. Note that this command can lead
+to execution of \fBpremount\fR and \fBmount\fR action scripts
+(see \fBACTION SCRIPTS\fR below).
 .IP \fBumount\fR 4
-Unmounts container private area. Note that \fBstop\fR does \fBumount\fR
-automatically.
+Unmounts container private area. Note that this command can lead
+to execution of \fBumount\fR and \fBpostumount\fR action scripts
+(see \fBACTION SCRIPTS\fR below).
+
+Note that \fBstop\fR does \fBumount\fR automatically.
 .IP "\fBexec\fR \fICTID\fR \fIcommand\fR" 4
 Executes \fIcommand\fR in a container. Environment variables are not set
 inside the container.
@@ -628,6 +643,72 @@ You need to log out manually from the shell to finish session
 Prints help message with a brief list of possible options.
 .IP \fB--version\fR 4
 Prints \fBvzctl\fR version.
+.SH ACTION SCRIPTS
+\fBvzctl\fR has an ability to execute user-defined scripts when
+a specific \fBvzctl\fR command is run for a container. The following
+\fBvzctl\fR commands can trigger execution of action scripts:
+\fBstart\fR, \fBstop\fR, \fBrestart\fR, \fBmount\fR and \fBumount\fR.
+
+Action scripts are located in the \fB/etc/vz/conf/\fR directory. There
+are global and per-CT scripts. Global scripts have a literal prefix of
+\fBvps.\fR and are executed for all containers. Per-CT scripts have
+a \fICTID\fR numeric prefix and are executed for the given container
+only.
+
+There are 8 action scripts currently defined:
+.IP "\fBvps.premount\fR, \fICTID\fB.premount\fR"
+Global and per-CT mount scripts which are executed for a
+container before it is mounted. Scripts are executed in the host OS
+context, while a CT is not yet mounted or running. Global script,
+if exists, is executed first.
+.IP "\fBvps.mount\fR, \fICTID\fB.mount\fR"
+Global and per-CT mount scripts which are executed for a
+container right after it is mounted. Otherwise they are the same
+as \fB.premount\fR scripts.
+.IP \fICTID\fB.start\fR
+Right after \fBvzctl\fR has started a container, it executes this script
+in a container context.
+.IP \fICTID\fB.stop\fR
+Right before \fBvzctl\fR has stopped a container, it executes this script
+in a container context.
+.IP "\fBvps.umount\fR, \fICTID\fB.umount\fR"
+Global and per-CT umount scripts which are executed for a
+container before it is unmounted. Scripts are executed
+in the host OS context, while a CT is mounted. Global script,
+if exists, is executed first.
+.IP "\fBvps.postumount\fR, \fICTID\fB.postumount\fR"
+Global and per-CT umount scripts which are executed for a
+container right after it is unmounted. Otherwise they are the same
+as \fB.umount\fR scripts.
+
+The environment passed to all the \fB*mount\fR scripts is the standard
+environment of the parent (i.e. \fBvzctl\fR) with two additional
+variables: \fB$VEID\fR and \fB$VE_CONFFILE\fR. The first one holds
+the ID of the container, and the second one holds the full path
+to the container configuration file. If the script needs to get other
+CT configuration parameters, such as \fB$VE_ROOT\fR, it needs to get
+those from global and per-CT configuration files.
+
+Here is an example of a mount script, which makes host system's
+/mnt/disk available to container(s). Script name can either be
+\fB/etc/vz/conf/vps.mount\fR or \fB/etc/vz/conf/\fICTID\fB.mount\fR.
+
+\f(CR   # If one of these files does not exist then something
+.br
+   # is really broken
+.br
+   [ -f /etc/sysconfig/vz ] || exit 1
+.br
+   [ -f $VE_CONFFILE ] || exit 1
+.br
+   # Source both files. Note the order is important.
+.br
+   . /etc/vz/vz.conf
+.br
+   . $VE_CONFFILE
+.br
+   mount -n --bind /mnt/disk $VE_ROOT/mnt/disk
+\fR
 .SH EXIT STATUS
 Returns 0 upon success, or an appropriate error code in case of an error:
 .IP 1
@@ -822,6 +903,10 @@ To permanently remove this container:
 \fB\f(CR/etc/vz/vz.conf
 .br
 /etc/vz/conf/\fICTID\fB\f(CR.conf
+.br
+/etc/vz/conf/vps.{premount,mount,umount,postumount}
+.br
+/etc/vz/conf/\fICTID\fB\f(CR.{premount,mount,start,stop,umount,postumount}
 .br
 /proc/vz/veinfo
 .br
