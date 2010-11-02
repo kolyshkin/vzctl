@@ -596,14 +596,24 @@ Accepts all the \fBstart\fR and \fBstop\fR options.
 Note that this command can lead to execution of some action scripts
 (see \fBACTION SCRIPTS\fR below).
 .IP \fBstatus\fR 4
-Shows a container status. This is a line with five words separated by spaces.
-First word is literally \fBCTID\fR. Second word is the numeric \fICT ID\fR.
+Shows a container status. This is a line with five or six words,
+separated by spaces.
+
+First word is literally \fBCTID\fR.
+
+Second word is the numeric \fICT ID\fR.
+
 Third word is showing whether this container exists or not,
 it can be either \fBexist\fR or \fBdeleted\fR.
+
 Fourth word is showing the status of the container filesystem,
 it can be either \fBmounted\fR or \fBunmounted\fR.
+
 Fifth word shows if the container is running,
 it can be either \fBrunning\fR or \fBdown\fR.
+
+Sixth word, if exists, is \fBsuspended\fR. It appears if both a container
+and its dump file exist (see \fBchkpnt\fR).
 
 This command can also be usable from scripts.
 .IP \fBmount\fR 4
