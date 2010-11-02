@@ -563,34 +563,25 @@ void close_fds(int close_std, ...)
 	}
 }
 
-/* Renames (to "*.destroyed" if action == BACKUP) or removes config,
- * (if action == DESTR)
- * Also, appropriate mount/umount scripts are linked.
- */
-int move_config(int veid, int action)
+static void __move_config(int veid, int action, const char *prefix)
 {
 	char conf[PATH_LEN];
 	char newconf[PATH_LEN];
 
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d.conf", veid);
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d.%s", veid, prefix);
 	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
 	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+}
 
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." MOUNT_PREFIX, veid);
-	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
-	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
-
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." UMOUNT_PREFIX, veid);
-	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
-	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
-
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." START_PREFIX, veid);
-	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
-	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
-
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d." STOP_PREFIX, veid);
-	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
-	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
+/* Renames or removes CT config and various CT scripts.
+ */
+int move_config(int veid, int action)
+{
+	__move_config(veid, action, "conf");
+	__move_config(veid, action, MOUNT_PREFIX);
+	__move_config(veid, action, UMOUNT_PREFIX);
+	__move_config(veid, action, START_PREFIX);
+	__move_config(veid, action, STOP_PREFIX);
 
 	return 0;
 }
