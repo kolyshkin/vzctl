@@ -864,6 +864,9 @@ static int store_dq(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	dq_param *param = &vps_p->res.dq;
 
 	switch (conf->id) {
+	case PARAM_DISK_QUOTA:
+		conf_store_yesno(conf_h, conf->name, param->enable);
+		break;
 	case PARAM_DISKSPACE:
 		if (param->diskspace == NULL)
 			break;
