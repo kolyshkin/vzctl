@@ -438,6 +438,14 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 			found++;
 		}
 	}
+	/* Enabling/disabling DISK_QUOTA */
+	if ( (new_res->dq.enable) &&
+			(new_res->dq.enable != old_res->dq.enable) ) {
+		if (loud)
+			logger(-1, 0, "Unable to switch DISK_QUOTA on or off "
+					"on a running container");
+		found++;
+	}
 
 	if (!found)
 		return 0;
@@ -560,6 +568,7 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	{"setmode",	required_argument, NULL, PARAM_SETMODE},
 	{"disabled",	required_argument, NULL, PARAM_DISABLED},
 	/*	quota */
+	{"diskquota",	required_argument, NULL, PARAM_DISK_QUOTA},
 	{"diskspace",	required_argument, NULL, PARAM_DISKSPACE},
 	{"diskinodes",	required_argument, NULL, PARAM_DISKINODES},
 	{"quotatime",	required_argument, NULL, PARAM_QUOTATIME},

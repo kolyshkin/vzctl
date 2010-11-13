@@ -61,6 +61,7 @@ _vzctl()
 		--dcachesize --numiptent --physpages --swappages \
 		--cpuunits --cpulimit --cpus \
 		--iptables --netdev_add --netdev_del --netif_add --netif_del \
+		--diskquota \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--noatime --capability --devnodes --devices --applyconfig \
 		--name --ioprio --setmode --meminfo --bootorder --features"
@@ -121,7 +122,7 @@ _vzctl()
 						    sed -e "s#^$vztmpl/cache/##" -e 's#.tar.gz$##')" -- $cur ) )
 
 				;;
-			--onboot|--disabled|--noatime)
+			--onboot|--disabled|--noatime|--diskquota)
 				COMPREPLY=( $( compgen -W "yes no" -- $cur ) )
 				;;
 			--setmode)
