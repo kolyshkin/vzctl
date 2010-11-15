@@ -2606,7 +2606,6 @@ int merge_vps_param(vps_param *dst, vps_param *src)
 
 int merge_global_param(vps_param *dst, vps_param *src)
 {
-	MERGE_INT(res.dq.enable)
 	MERGE_INT(res.net.ipv6_net)
 	MERGE_INT(del_res.net.ipv6_net)
 	return 0;
