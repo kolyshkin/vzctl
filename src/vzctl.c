@@ -55,14 +55,18 @@ void usage(int rc)
 	FILE *fp = rc ? stderr : stdout;
 
 	version(fp);
-	fprintf(fp, "Copyright (C) 2000-2010, Parallels, Inc.\n");
-	fprintf(fp, "This program may be distributed under the terms of the GNU GPL License.\n\n");
-	fprintf(fp, "Usage: vzctl [options] <command> <ctid> [parameters]\n"
-"vzctl destroy | mount | umount | stop | restart | status\n"
-"vzctl enter <ctid> [--exec <command> [arg ...]]\n"
+	fprintf(fp,
+"Copyright (C) 2000-2010, Parallels, Inc.\n"
+"This program may be distributed under the terms of the GNU GPL License.\n"
+"\n"
+"Usage: vzctl [options] <command> <ctid> [parameters]\n"
+"\n"
 "vzctl create <ctid> [--ostemplate <name>] [--config <name>]\n"
 "   [--private <path>] [--root <path>] [--ipadd <addr>] | [--hostname <name>]\n"
 "vzctl start <ctid> [--force] [--wait]\n"
+"vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
+"vzctl quotaon | quotaoff | quotainit <ctid>\n"
+"vzctl enter <ctid> [--exec <command> [arg ...]]\n"
 "vzctl exec | exec2 <ctid> <command> [arg ...]\n"
 "vzctl runscript <ctid> <script>\n"
 "vzctl chkpnt <ctid> [--dumpfile <name>]\n"
@@ -77,14 +81,14 @@ void usage(int rc)
 "   [--noatime yes|no] [--capability <name>:on|off ...]\n"
 "   [--devices b|c:major:minor|all:r|w|rw]\n"
 "   [--devnodes device:r|w|rw|none]\n"
-"   [--netif_add <ifname[,mac,host_ifname,host_mac,bridge]]>] [--netif_del <ifname>]\n"
+"   [--netif_add <ifname[,mac,host_ifname,host_mac,bridge]]>]\n"
+"   [--netif_del <ifname>]\n"
 "   [--applyconfig <name>] [--applyconfig_map <name>]\n"
 "   [--features <name:on|off>] [--name <vename>]\n"
-"   [--ioprio <N>]\n");
-
-
-	fprintf(fp, "   [--iptables <name>] [--disabled <yes|no>]\n");
-	fprintf(fp, "   [UBC parameters]\n"
+"   [--ioprio <N>]\n"
+"   [--iptables <name>] [--disabled <yes|no>]\n"
+"   [UBC parameters]\n"
+"\n"
 "UBC parameters (N - items, P - pages, B - bytes):\n"
 "Two numbers divided by colon means barrier:limit.\n"
 "In case the limit is not given it is set to the same value as the barrier.\n"
