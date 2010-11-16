@@ -10,7 +10,7 @@ vzctl [\fIflags\fR] \fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR]
 .PP
 vzctl [\fIflags\fR] \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
 \fBstart\fR | \fBstop\fR | \fBrestart\fR |
-\fBstatus\fR \fICTID\fR
+\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR \fICTID\fR
 .PP
 vzctl [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
@@ -630,6 +630,15 @@ to execution of \fBumount\fR and \fBpostumount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
 
 Note that \fBstop\fR does \fBumount\fR automatically.
+.IP "\fBquotaon\fR \fIctid\fR" 4
+Turn disk quota on. Not that \fBmount\fR and \fBstart\fR does that
+automatically.
+.IP "\fBquotaoff\fR \fIctid\fR" 4
+Turn disk quota off. Not that \fBumount\fR and \fBstop\fR
+does that automatically.
+.IP "\fBquotainit\fR \fIctid\fR" 4
+Initialize disk quota (i.e. run \fBvzquota init\fR) with the parameters
+taken from the CT configuration file \fBctid.conf\fR(5).
 .IP "\fBexec\fR \fICTID\fR \fIcommand\fR" 4
 Executes \fIcommand\fR in a container. Environment variables are not set
 inside the container.
