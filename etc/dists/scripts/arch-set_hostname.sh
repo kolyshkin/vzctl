@@ -26,9 +26,9 @@ function set_host()
 	local host=
 
 	[ -z "${val}" ] && return 0
-        if grep -q -E "[[:space:]]${val}" ${cfgfile} 2>/dev/null; then
-                return;
-        fi
+	if grep -q -E "[[:space:]]${val}" ${cfgfile} 2>/dev/null; then
+		return;
+	fi
 	if echo "${val}" | grep "\." >/dev/null 2>&1; then
 		host=${val%%.*}
 	fi

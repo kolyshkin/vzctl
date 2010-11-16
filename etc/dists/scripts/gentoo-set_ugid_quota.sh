@@ -40,7 +40,7 @@ start() {
         echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
         mnt=`grep -v " / " /proc/mounts`
         if [ $? == 0 ]; then
-                echo "$mnt" >> /etc/mtab
+		echo "$mnt" >> /etc/mtab
         fi
 	quotaon -aug
         return

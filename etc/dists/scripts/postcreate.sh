@@ -34,7 +34,7 @@ BEGIN { srand(); }
 {
 	if ($0 ~ /^[ \t]*#/ || $0 ~ /^[ \t]+*$/) {
 		print $0;
-        	next;
+		next;
 	}
 	if ((n = split($0, ar, /[ \t]/)) < 7) {
 		print $0;
