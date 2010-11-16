@@ -1,4 +1,4 @@
-.TH vz.conf 5 "10 Dec 2009" "OpenVZ" "Containers"
+.TH vz.conf 5 "16 Nov 2010" "OpenVZ" "Containers"
 .SH NAME
 vz.conf \- global OpenVZ configuration file
 .SH SYNOPSIS
@@ -37,10 +37,6 @@ If the value of this parameter is set to \fByes\fR, no attempt to load
 OpenVZ kernel modules is made in vz initscript. This is helpful on systems
 which have OpenVZ-specific stuff compiled into the kernel (i. e. not
 as modules).
-.SS Disk quota parameters
-.IP \fBDISK_QUOTA\fR=\fByes\fR|\fBno\fR
-In case the value of this parameter is set to \fBno\fR, all disk
-quota operations are disabled.
 .IP \fBVZFASTBOOT\fR=\fByes\fR|\fBno\fR
 This parameter is used by \f(CR/etc/init.d/vz start\fR script. In case the value
 of this parameter is set to \fByes\fR, all containers with incorrectly shutdown
@@ -68,6 +64,9 @@ stored.
 .SS Defaults for containers
 Below parameters are defaults for containers, and can be overwritten by
 parameters in \fBctid.conf\fR(5) per-container configuration file.
+.IP \fBDISK_QUOTA\fR=\fByes\fR|\fBno\fR
+In case the value of this parameter is set to \fBno\fR, all disk
+quota operations are disabled.
 .IP \fBVE_ROOT\fR=\fIdirectory\fR
 Value of this parameter is the \fIdirectory\fR which serves as container root
 mount point. Value must contain literal string \fB$VEID\fR, which will be
@@ -90,4 +89,4 @@ configuration files.
 .BR vzctl (8),
 .BR ctid.conf (5).
 .SH LICENSE
-Copyright (C) 2000-2009, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2000-2010, Parallels, Inc. Licensed under GNU GPL.

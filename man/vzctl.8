@@ -1,4 +1,4 @@
-.TH vzctl 8 "2 Nov 2010" "OpenVZ" "Containers"
+.TH vzctl 8 "16 Nov 2010" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- utility to control an OpenVZ container.
 .SH SYNOPSIS
@@ -425,7 +425,7 @@ delete network device from a specified container
 .TP
 \fB--diskquota\fR \fByes\fR|\fBno\fR
 allows to enable or disable disk quota for a container. By default,
-a global value from \fBvz.conf\fR(5) is used.
+a global value (\fBDISK_QUOTA\fR) from \fBvz.conf\fR(5) is used.
 .TP
 \fB--diskspace\fR \fInum\fR[:\fInum\fR]
 sets soft and hard disk quota limits, in blocks. First parameter is soft limit,
