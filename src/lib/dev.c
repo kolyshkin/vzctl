@@ -38,7 +38,6 @@ static int dev_create(const char *root, dev_res *dev)
 	char buf1[STR_SIZE];
 	char buf2[STR_SIZE];
 	struct stat st, st2;
-	int ret;
 	const char* udev_paths[] = {
 		"/lib/udev/devices",
 		"/etc/udev/devices",
@@ -49,16 +48,9 @@ static int dev_create(const char *root, dev_res *dev)
 		return 0;
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
-	/* If device does not exist inside CT get
-	* information from CT0 and create it
-	*/
+
+	/* Get device information from CT0 and create it in CT */
 	snprintf(buf1, sizeof(buf1), "%s/dev/%s", root, dev->name);
-	ret = lstat(buf1, &st);
-	if (ret && errno != ENOENT) {
-		logger(-1, errno, "Unable to stat device %s", buf1);
-		return VZ_SET_DEVICES;
-	} else if (!ret)
-		return 0;
 	snprintf(buf2, sizeof(buf2), "/dev/%s", dev->name);
 	if (stat(buf2, &st)) {
 		if (errno == ENOENT)
@@ -74,6 +66,7 @@ static int dev_create(const char *root, dev_res *dev)
 	}
 	if (make_dir(buf1, 0))
 		return VZ_SET_DEVICES;
+	unlink(buf1);
 	if (mknod(buf1, st.st_mode, st.st_rdev)) {
 		logger(-1, errno, "Unable to create device %s", buf1);
 		return VZ_SET_DEVICES;
@@ -87,6 +80,7 @@ static int dev_create(const char *root, dev_res *dev)
 						root, udev_paths[i],
 						dev->name);
 				make_dir(buf1, 0);
+				unlink(buf1);
 				mknod(buf1, st.st_mode, st.st_rdev);
 				break;
 			}
