@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
  */
 int quota_on(envid_t veid, char *private, dq_param *param)
 {
-	int i, ret, retry = 0;
+	int i, ret, ret2 = 0, tried = 0;
 	char buf[64];
 	char *arg[24];
 
@@ -242,31 +242,37 @@ int quota_on(envid_t veid, char *private, dq_param *param)
 	} else
 		arg[i++] = strdup("0");
 	arg[i] = 0;
-/*	if (gparam->skipquotacheck == YES)
-		arg[i++] = strdup("--nocheck");
-*/
+
 retry:
 	if ((ret = run_script(VZQUOTA, arg, NULL, 0))) {
 		switch (ret) {
 		case EXITCODE_QUOTNOTEXIST:
-			ret = quota_init(veid, private, param);
-			if (!ret && !retry) {
-				retry++;
-				goto retry;
+			if (!tried) {
+				tried++;
+				/* Initialize the quota and retry */
+				ret2 = quota_init(veid, private, param);
+				if (!ret2)
+					goto retry;
 			}
 			break;
 		case EXITCODE_QUOTARUN:
-			ret = quota_set(veid, private, param);
+			/* Ignore the error, run quota set instead */
+			ret = 0;
+			ret2 = quota_set(veid, private, param);
 			break;
-		}
-		if (ret) {
-			logger(-1, 0, "vzquota on failed [%d]", ret);
-			ret = VZ_DQ_SET;
 		}
 	}
 	free_arg(arg);
 
-	return ret;
+	if (ret2)
+		return ret2;
+
+	if (ret) {
+		logger(-1, 0, "vzquota on failed [%d]", ret);
+		return VZ_DQ_ON;
+	}
+
+	return 0;
 }
 
 /** Turn disk quota off.
