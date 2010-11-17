@@ -294,6 +294,8 @@ int quota_off(envid_t veid, int force)
 			logger(-1, 0, "vzquota off failed [%d]", ret);
 			ret = VZ_DQ_OFF;
 		}
+		else
+			ret = 0;
 	}
 	free_arg(arg);
 
