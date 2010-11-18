@@ -32,6 +32,7 @@
  */
 #define EXITCODE_QUOTARUN	5
 #define EXITCODE_QUOTANOTRUN	6
+#define EXITCODE_UGID_NOTRUN	9
 #define EXITCODE_QUOTNOTEXIST	11
 
 /** Data structure for disk quota parameters.

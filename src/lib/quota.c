@@ -314,7 +314,6 @@ int quota_ctl(envid_t veid, int cmd)
 	char buf[64];
 	char *arg[6];
 	int quiet = 0;
-	int errcode = 0;
 
 	i = 0;
 	arg[i++] = strdup(VZQUOTA);
@@ -345,7 +344,6 @@ int quota_ctl(envid_t veid, int cmd)
 		arg[i++] = strdup(buf);
 		arg[i++] = strdup("-f");
 		arg[i++] = strdup("-t");
-		errcode = VZ_DQ_UGID_NOTINITIALIZED;
 		quiet = 1;
 		break;
 	case QUOTA_SHOW:
@@ -359,10 +357,7 @@ int quota_ctl(envid_t veid, int cmd)
 		return VZ_SYSTEM_ERROR;
 	}
 	arg[i] = NULL;
-	if ((ret = run_script(VZQUOTA, arg, NULL, quiet))) {
-		if (errcode)
-			ret = errcode;
-	}
+	ret = run_script(VZQUOTA, arg, NULL, quiet)
 	free_arg(arg);
 
 	return ret;
@@ -395,12 +390,10 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 	}
 	if (dq->ugidlimit != NULL) {
 		ret = quota_ctl(veid, QUOTA_STAT2);
-		if (ret && *dq->ugidlimit) {
+		if (ret == EXITCODE_UGID_NOTRUN && *dq->ugidlimit) {
 			logger(-1, 0, "Unable to apply new quota values:"
 				" ugid quota not initialized");
 			return VZ_DQ_UGID_NOTINITIALIZED;
-//			tmp_ugidlimit = dq->ugidlimit;
-//			dq->ugidlimit = NULL;
 		} else if (!ret && !*dq->ugidlimit) {
 			logger(-1, 0, "WARNING: Unable to turn ugid quota"
 				" off. New parameters will be applied"
