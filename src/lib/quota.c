@@ -49,8 +49,6 @@ int quota_set(envid_t veid, char *private, dq_param *param)
 	char buf[64];
 	char *arg[24];
 
-	if (param == NULL)
-		return -1;
 	if (param->diskspace == NULL &&
 		param->diskinodes == NULL &&
 		param->exptime == NULL &&
@@ -114,8 +112,6 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 	char buf[64];
 	char *arg[24];
 
-	if (param == NULL)
-		return -1;
 	if (check_var(private,
 		"Error: Not enough parameters, private not set"))
 	{
@@ -192,8 +188,6 @@ int quota_on(envid_t veid, char *private, dq_param *param)
 	char buf[64];
 	char *arg[24];
 
-	if (param == NULL)
-		return -1;
 	if (check_var(param->diskspace,
 		"Error: Not enough parameters, diskspace quota not set"))
 	{
