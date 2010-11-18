@@ -391,7 +391,7 @@ int vps_set_quota(envid_t veid, dq_param *dq)
 	if (quota_ctl(veid, QUOTA_STAT)) {
 		logger(-1, 0, "Error: Unable to apply new quota values:"
 			" quota not running");
-		return -1;
+		return VZ_DQ_SET;
 	}
 	if (dq->ugidlimit != NULL) {
 		ret = quota_ctl(veid, QUOTA_STAT2);
