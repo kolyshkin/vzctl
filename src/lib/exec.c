@@ -337,6 +337,7 @@ int vps_exec(vps_handler *h, envid_t veid, const char *root, int exec_mode,
 		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
+	/* Extra fork to skip UBC limit applying to the current process */
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Can not fork");
 		return VZ_RESOURCE_ERROR;
@@ -392,6 +393,7 @@ int vps_execFn(vps_handler *h, envid_t veid, const char *root,
 		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
+	/* Extra fork to skip UBC limit applying to the current process */
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Can not fork");
 		return VZ_RESOURCE_ERROR;
