@@ -2,7 +2,7 @@ vps-create
 vps-functions
 vps-net_add
 vps-net_del
-vpsreboot
-vpsnetclean
+vzevent-reboot
+vzevent-stop
 Makefile.in
 Makefile
