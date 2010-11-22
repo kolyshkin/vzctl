@@ -268,13 +268,6 @@ void parse_options (int argc, char **argv)
 	}
 }
 
-#define COMMON_ARP					\
-	frame_type :		htons(ETH_P_ARP),	\
-	hw_type :		htons(ARPHRD_ETHER),	\
-	prot_type :		htons(ETH_P_IP),	\
-	hw_addr_size :		ETH_ALEN,		\
-	prot_addr_size :	IP_ADDR_LEN
-
 u_char real_hwaddr[ETH_ALEN];
 struct in_addr real_ipaddr;
 
@@ -350,8 +343,12 @@ void create_arp_packet(struct arp_packet* pkt)
 #define set_hw(to, from) (memcpy(to, from, ETH_ALEN))
 #define check(check, two) (check##_flag ? check : two)
 
-	*pkt = ((struct arp_packet)
-		{COMMON_ARP, op : htons(cmd == AR_REPLY ? REPLY : REQUEST)});
+	pkt->frame_type = htons(ETH_P_ARP);
+	pkt->hw_type = htons(ARPHRD_ETHER);
+	pkt->prot_type = htons(ETH_P_IP);
+	pkt->hw_addr_size = ETH_ALEN;
+	pkt->prot_addr_size = IP_ADDR_LEN;
+	pkt->op = htons(cmd == AR_REPLY ? REPLY : REQUEST);
 
 	set_ip(pkt->sndr_ip_addr,
 		(src_ipaddr_flag ? &src_ipaddr : &real_ipaddr));
