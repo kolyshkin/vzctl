@@ -357,7 +357,7 @@ int quota_ctl(envid_t veid, int cmd)
 		return VZ_SYSTEM_ERROR;
 	}
 	arg[i] = NULL;
-	ret = run_script(VZQUOTA, arg, NULL, quiet)
+	ret = run_script(VZQUOTA, arg, NULL, quiet);
 	free_arg(arg);
 
 	return ret;
