@@ -76,6 +76,15 @@ struct vzctl_ve_meminfo {
 	unsigned long val;
 };
 
+struct vzctl_ve_configure {
+	unsigned int veid;
+	unsigned int key;
+#define VE_CONFIGURE_OS_RELEASE		2
+	unsigned int val;
+	unsigned int size;
+	char data[0];
+};
+
 /*
  * These masks represent iptables modules.
  *
@@ -272,6 +281,8 @@ struct vzctl_cpustatctl {
 					struct vzctl_ve_netdev)
 #define VZCTL_VE_MEMINFO	_IOW(VZCTLTYPE, 13,			\
 					struct vzctl_ve_meminfo)
+#define VZCTL_VE_CONFIGURE	_IOW(VZCTLTYPE, 15,			\
+					struct vzctl_ve_configure)
 
 #ifdef __KERNEL__
 #include <linux/compat.h>

@@ -20,6 +20,7 @@
 
 #define VZ_DIR			PKGCONFDIR "/"
 #define GLOBAL_CFG		VZ_DIR "vz.conf"
+#define OSRELEASE_CFG		VZ_DIR "osrelease.conf"
 #define VPS_CONF_DIR		VZ_DIR "conf/"
 #define LIB_SCRIPTS_DIR		PKGLIBDIR "/scripts/"
 #define DIST_DIR		VZ_DIR "dists"

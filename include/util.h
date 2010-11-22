@@ -18,8 +18,9 @@
 #ifndef _UTIL_H_
 #define	_UTIL_H_
 
-#include "types.h"
 #include <stdlib.h>
+#include "types.h"
+#include "res.h"
 #include "logger.h"
 
 #define BACKUP		0
@@ -60,6 +61,8 @@ int move_config(int veid, int action);
 void remove_names(envid_t veid);
 
 size_t vz_strlcat(char *dst, const char *src, size_t count);
+
+void get_osrelease(vps_res *res);
 
 #define logger_enomem(log_level, err, size, file, line)			\
 	logger(log_level, err, "%s:%i: Can't allocate %lu bytes",	\

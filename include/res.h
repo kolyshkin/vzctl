@@ -44,6 +44,7 @@ typedef struct {
 	 */
 	unsigned long long features_mask;
 	unsigned long long features_known;
+	char *osrelease;
 } env_param;
 
 typedef struct {

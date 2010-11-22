@@ -15,7 +15,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -30,6 +32,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <dirent.h>
+#include <sys/utsname.h>
 
 #include "util.h"
 #include "logger.h"
@@ -637,4 +640,104 @@ size_t vz_strlcat(char *dst, const char *src, size_t count)
 	dst[len] = 0;
 
 	return res;
+}
+
+#define MAX_OSREL_LEN 128
+
+static void read_osrelease_conf(const char *dist, char *osrelease)
+{
+	FILE *f;
+	char str[MAX_OSREL_LEN];
+	char var[MAX_OSREL_LEN];
+	char value[MAX_OSREL_LEN];
+	int dlen = strlen(dist);
+
+	if ((f = fopen(OSRELEASE_CFG, "r")) == NULL) {
+		logger(-1, errno, "Can't open file " OSRELEASE_CFG);
+		return;
+	}
+	while (fgets(str, sizeof(str) - 1, f) != NULL) {
+		if (str[0] == '#')
+			continue;
+		if (sscanf(str, " %s %s ", var, value) != 2)
+			continue;
+		if (strncmp(var, dist, strnlen(var, dlen)) == 0) {
+			strcpy(osrelease, value);
+			break;
+		}
+	}
+	fclose(f);
+	return;
+}
+
+#define KVER(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+int compare_osrelease(const char *cur, const char *min)
+{
+	int cur_a, cur_b, cur_c;
+	int min_a, min_b, min_c;
+	int ret;
+
+	ret = sscanf(cur, "%d.%d.%d", &cur_a, &cur_b, &cur_c);
+	if (ret != 3) {
+		logger(-1, 0, "Unable to parse kernel osrelease (%s)", cur);
+		return -1;
+	}
+
+	ret = sscanf(min, "%d.%d.%d", &min_a, &min_b, &min_c);
+	if (ret != 3) {
+		logger(-1, 0, "Unable to parse value (%s) from "
+				OSRELEASE_CFG, min);
+		return -1;
+	}
+
+	if (KVER(cur_a, cur_b, cur_c) < KVER(min_a, min_b, min_c))
+		return 1; /* Current version is too old */
+
+	return 0;
+}
+#undef KVER
+
+/** Find out if a container needs setting osrelease,
+  * and set it if needed. */
+void get_osrelease(vps_res *res)
+{
+	const char *dist;
+	char osrelease[MAX_OSREL_LEN] = "";
+	struct utsname uts;
+	char *suffix;
+	int len;
+
+	dist = get_dist_name(&res->tmpl);
+	if (!dist)
+		return;
+
+	read_osrelease_conf(dist, osrelease);
+	if (osrelease[0] == '\0')
+		return;
+
+	logger(1, 0, "Found osrelease %s for dist %s", osrelease, dist);
+
+	/* Check if current osrelease is sufficient */
+	if (uname(&uts) != 0) {
+		logger(-1, errno, "Error in uname()");
+		return;
+	}
+
+	if (compare_osrelease(uts.release, osrelease) < 1)
+		/* -1: error; 0: current version is good enough */
+		return;
+
+	/* Yes we need to set osrelease for this container */
+
+	/* Make version look like our kernel, i.e. add suffix
+	 * like -028stab078.10 to osrelease
+	 */
+	if ((suffix = strchr(uts.release, '-')) != NULL) {
+		len = sizeof(osrelease) - strlen(osrelease);
+		strncat(osrelease, suffix, len);
+		osrelease[sizeof(osrelease) - 1] = 0;
+	}
+
+	logger(1, 0, "Set osrelease=%s", osrelease);
+	res->env.osrelease = strdup(osrelease);
 }

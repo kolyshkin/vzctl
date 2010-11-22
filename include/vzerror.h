@@ -146,4 +146,6 @@
 #define VZ_WAIT_FAILED			133
 
 #define VZ_CONFIG_SAVE_ERROR		139
+
+#define VZ_SET_OSRELEASE		144
 #endif /* _VZ_ERROR_H_ */

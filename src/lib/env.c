@@ -272,6 +272,31 @@ int vz_setluid(envid_t veid)
 	return 0;
 }
 
+static int vz_env_configure(int fd, envid_t veid, const char *osrelease)
+{
+	int ret = 0;
+	struct vzctl_ve_configure *cparam;
+	int len;
+
+	len = strlen(osrelease) + 1;
+	cparam = calloc(1, sizeof(struct vzctl_ve_configure) + len);
+	if (cparam == NULL)
+		return VZ_RESOURCE_ERROR;
+
+	cparam->veid = veid;
+	cparam->key = VE_CONFIGURE_OS_RELEASE;
+	cparam->size = len;
+	strcpy(cparam->data, osrelease);
+
+	if (ioctl(fd, VZCTL_VE_CONFIGURE, cparam) != 0)
+		if (errno != ENOTTY)
+			ret = VZ_SET_OSRELEASE;
+
+	free(cparam);
+
+	return ret;
+}
+
 static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
@@ -346,6 +371,13 @@ try:
 		}
 		goto env_err;
 	}
+	if (res->env.osrelease != NULL) {
+		ret = vz_env_configure(h->vzfd, veid,
+				res->env.osrelease);
+		if (ret != 0)
+			goto env_err;
+	}
+
 	close(h->vzfd);
 	/* Create /fastboot to skip run fsck */
 	fd = open("/fastboot", O_CREAT | O_RDONLY, 0644);
@@ -446,6 +478,8 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	act.sa_flags = SA_NOCLDSTOP;
 	sigaction(SIGCHLD, &act, NULL);
 
+	get_osrelease(res);
+
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Can not fork");
 		ret =  VZ_RESOURCE_ERROR;
@@ -491,6 +525,10 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		case VZ_WAIT_FAILED:
 			logger(0, 0, "Unable to set"
 				" wait functionality");
+			break;
+		case VZ_SET_OSRELEASE:
+			logger(-1, 0, "Unable to set osrelease to %s",
+					res->env.osrelease);
 			break;
 		}
 	}
