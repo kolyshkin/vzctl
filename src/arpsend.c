@@ -48,7 +48,8 @@
 int debug_level = LOG_INFO;
 
 #define logger(level, fmt, args...) \
-	(debug_level < level ? (void)0 : fprintf(stderr, LOGGER_NAME fmt "\n", ##args))
+	(debug_level < level ? (void)0 : \
+		fprintf(stderr, LOGGER_NAME fmt "\n", ##args))
 
 #define IP_ADDR_LEN 4
 
@@ -58,14 +59,14 @@ int debug_level = LOG_INFO;
 struct arp_packet {
 	u_char targ_hw_addr[ETH_ALEN];	/* ethernet destination MAC address */
 	u_char src_hw_addr[ETH_ALEN];	/* ethernet source MAC address */
-	u_short frame_type;			/* ethernet packet type */
+	u_short frame_type;		/* ethernet packet type */
 
 	/* ARP packet */
-	u_short hw_type;			/* hardware adress type (ethernet) */
-	u_short prot_type;			/* resolve protocol address type (ip) */
+	u_short hw_type;		/* hardware address type (ethernet) */
+	u_short prot_type;		/* resolve protocol address type (ip) */
 	u_char hw_addr_size;
 	u_char prot_addr_size;
-	u_short op;				/* subtype */
+	u_short op;			/* subtype */
 	u_char sndr_hw_addr[ETH_ALEN];
 	u_char sndr_ip_addr[IP_ADDR_LEN];
 	u_char rcpt_hw_addr[ETH_ALEN];
@@ -124,13 +125,13 @@ char* print_arp_packet(struct arp_packet* pkt);
 int read_hw_addr(u_char* buf, const char* str);
 int read_ip_addr(struct in_addr* in_addr, const char* str);
 
-char* programm_name = NULL;
+char* program_name = NULL;
 
 void usage()
 {
 	fprintf(stderr, "Usage: %s <-U -i <src_ip_addr> | -D -e <trg_ip_addr> "
 		"[-e <trg_ip_addr>] ...> [-c <count>] [-w <timeout>] "
-		"interface_name\n", programm_name);
+		"interface_name\n", program_name);
 	exit(EXC_USAGE);
 }
 
@@ -171,7 +172,8 @@ void parse_options (int argc, char **argv)
 		{NULL, 0, NULL, 0}
 	};
 
-	while ((c = getopt_long(argc, argv, short_options, long_options, NULL)) != -1)
+	while ((c = getopt_long(argc, argv,
+				short_options, long_options, NULL)) != -1)
 	{
 		switch (c)
 		{
@@ -231,7 +233,8 @@ void parse_options (int argc, char **argv)
 			}
 			if (trg_ipaddr_count >= MAX_IPADDR_NUMBER)
 				usage();
-			if (read_ip_addr(&trg_ipaddr[trg_ipaddr_count++], optarg) < 0)
+			if (read_ip_addr(&trg_ipaddr[trg_ipaddr_count++],
+						optarg) < 0)
 				usage();
 			trg_ipaddr_flag = 1;
 			break;
@@ -359,16 +362,16 @@ void create_arp_packet(struct arp_packet* pkt)
 	set_hw(pkt->rcpt_hw_addr, check(trg_arp_hwaddr, pkt->targ_hw_addr));
 	set_hw(pkt->sndr_hw_addr, check(src_arp_hwaddr, pkt->src_hw_addr));
 
-	/* special case 'cause we support multiple receipient ip addresses
-	   we 'll setup 'pkt.rcpt_ip_addr' separately for each specified
-	   (-e option) 'trg_ipaddr'
+	/* Special case. Because we support multiple recipient IP addresses
+	   we set up 'pkt.rcpt_ip_addr' separately for each of the specified
+	   (using -e option) 'trg_ipaddr'
 	 */
 	if (trg_ipaddr_flag) {
 		/* at least one trg_ipaddr is specified */
 		set_ip(pkt->rcpt_ip_addr, &trg_ipaddr[0]);
 	} else {
 		set_ip(pkt->rcpt_ip_addr, &real_ipaddr);
-		/* set 'trg_ipaddr' for checking incomming packets */
+		/* set 'trg_ipaddr' for checking incoming packets */
 		set_ip(&trg_ipaddr[0], &real_ipaddr);
 		trg_ipaddr_count = 1;
 	}
@@ -377,9 +380,7 @@ void create_arp_packet(struct arp_packet* pkt)
 
 void set_trg_ipaddr(struct arp_packet* pkt, const struct in_addr ipaddr)
 {
-#define set_ip(to, from) (memcpy(to, &from, IP_ADDR_LEN))
-	set_ip(pkt->rcpt_ip_addr, ipaddr);
-#undef set_ip
+	memcpy(pkt->rcpt_ip_addr, &ipaddr, IP_ADDR_LEN);
 }
 
 int recv_response = 0;
@@ -407,21 +408,25 @@ int recv_pack(void *buf, int len, struct sockaddr_ll *from)
 	struct arp_packet * recv_pkt = (struct arp_packet*) buf;
 
 	if (recv_pkt->frame_type != htons(ETH_P_ARP)) {
-		logger(LOG_ERROR, "unknown eth frame type : %#x", recv_pkt->frame_type);
+		logger(LOG_ERROR, "unknown eth frame type : %#x",
+				recv_pkt->frame_type);
 		goto out;
 	}
 
 	if (recv_pkt->op != htons(REQUEST)
 	    && recv_pkt->op != htons(REPLY)) {
-		logger(LOG_ERROR, "unknown arp packet type : %#x", recv_pkt->op);
+		logger(LOG_ERROR, "unknown arp packet type : %#x",
+				recv_pkt->op);
 		goto out;
 	}
 
 	for (i = 0; i < trg_ipaddr_count; i ++) {
 		// check for all sent packets addresses
-		if (memcmp(&trg_ipaddr[i], recv_pkt->sndr_ip_addr, IP_ADDR_LEN))
+		if (memcmp(&trg_ipaddr[i], recv_pkt->sndr_ip_addr,
+					IP_ADDR_LEN))
 			continue;
-		logger(LOG_DEBUG, "recv packet %s", print_arp_packet(recv_pkt));
+		logger(LOG_DEBUG, "recv packet %s",
+				print_arp_packet(recv_pkt));
 		logger(LOG_INFO, "%s is detected on another computer : %s",
 			print_ip_addr((u_char*) &trg_ipaddr[i]),
 			print_hw_addr(recv_pkt->sndr_hw_addr));
@@ -432,7 +437,8 @@ int recv_pack(void *buf, int len, struct sockaddr_ll *from)
 	}
 
 	/* unknown packet */
-	logger(LOG_DEBUG, "recv unknown packet %s", print_arp_packet(recv_pkt));
+	logger(LOG_DEBUG, "recv unknown packet %s",
+			print_arp_packet(recv_pkt));
 	rc = 0;
 out:
 	return rc;
@@ -477,12 +483,13 @@ void set_signal(int signo, void (*handler)(void))
 int main(int argc,char** argv)
 {
 	sigset_t block_alarm;
-	programm_name = argv[0];
+	program_name = argv[0];
 	parse_options (argc, argv);
 
 	if (ip6_addr) {
 		if (cmd == AR_UPDATE)
-			execlp(SBINDIR "/ndsend", "ndsend", ip6_addr, iface, NULL);
+			execlp(SBINDIR "/ndsend", "ndsend",
+					ip6_addr, iface, NULL);
 		exit(0);
 	}
 
@@ -509,7 +516,8 @@ int main(int argc,char** argv)
 		socklen_t alen = sizeof(from);
 		int cc;
 
-		cc = recvfrom(sock, packet, sizeof(packet), 0, (struct sockaddr *)&from, &alen);
+		cc = recvfrom(sock, packet, sizeof(packet), 0,
+				(struct sockaddr *)&from, &alen);
 		if (cc < 0)
 		{
 			logger(LOG_ERROR, "recvfrom : %m");
@@ -533,12 +541,14 @@ static char* get_buf()
 char* print_arp_packet(struct arp_packet* pkt)
 {
 	char* point = get_buf();
-	sprintf(point, "eth '%s' -> eth '%s'; arp sndr '%s' '%s'; %s; arp recipient '%s' '%s'",
+	sprintf(point, "eth '%s' -> eth '%s'; "
+			"arp sndr '%s' '%s'; %s; arp recipient '%s' '%s'",
 		print_hw_addr(pkt->src_hw_addr),
 		print_hw_addr(pkt->targ_hw_addr),
 		print_hw_addr(pkt->sndr_hw_addr),
 		print_ip_addr(pkt->sndr_ip_addr),
-		(pkt->op == htons(REQUEST)) ? "request" : (pkt->op == htons(REPLY) ? "reply" : "unknown"),
+		(pkt->op == htons(REQUEST)) ? "request" :
+			(pkt->op == htons(REPLY) ? "reply" : "unknown"),
 		print_hw_addr(pkt->rcpt_hw_addr),
 		print_ip_addr(pkt->rcpt_ip_addr));
 	return point;
@@ -572,7 +582,7 @@ char* print_ip_addr(const u_char* addr)
 	return current;
 }
 
-/* trasform user -> computer freindly MAC address */
+/* Transform user -> computer friendly MAC address */
 int read_hw_addr(u_char* buf, const char* str)
 {
 	int rc = -1;
@@ -607,7 +617,7 @@ out:
 	return rc;
 }
 
-/* trasform user -> computer freindly IP address */
+/* Transform user -> computer friendly IP address */
 int read_ip_addr(struct in_addr* in_addr, const char* str)
 {
 	in_addr->s_addr=inet_addr(str);
