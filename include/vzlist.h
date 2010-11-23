@@ -76,6 +76,7 @@ struct Cquota {
 
 struct Ccpustat {
 	float la[3];			// load average
+	float uptime;
 };
 
 struct Ccpu {

@@ -67,6 +67,7 @@ static int show_hdr = 1;
 static int all_ve = 0;
 static int only_stopped_ve = 0;
 static int with_names = 0;
+static long __clk_tck = -1;
 
 char logbuf[32];
 char *plogbuf = logbuf;
@@ -144,6 +145,30 @@ static void print_laverage(struct Cveinfo *p, int index)
 	else
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%1.2f/%1.2f/%1.2f",
 			p->cpustat->la[0], p->cpustat->la[1], p->cpustat->la[2]);
+}
+
+static void print_uptime(struct Cveinfo *p, int index)
+{
+	if (p->cpustat == NULL)
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%15s", "-");
+	else
+	{
+		unsigned int days, hours, min, secs;
+
+		days  = (unsigned int)(p->cpustat->uptime / (60 * 60 * 24));
+		min = (unsigned int)(p->cpustat->uptime / 60);
+		hours = min / 60;
+		hours = hours % 24;
+		min = min % 60;
+		secs = (unsigned int)(p->cpustat->uptime -
+				(60ull * min + 60ull * 60 * hours +
+				 60ull * 60 * 24 * days));
+
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%.3dd%.2dh:%.2dm:%.2ds",
+				days, hours, min, secs);
+	}
 }
 
 static void print_cpulimit(struct Cveinfo *p, int index)
@@ -261,6 +286,17 @@ int laverage_sort_fn(const void *val1, const void *val2)
 	if (res != 0)
 		return res;
 	return (st1->la[2] - st2->la[2]) * 100;
+}
+
+int uptime_sort_fn(const void *val1, const void *val2)
+{
+	struct Ccpustat *st1 = ((const struct Cveinfo *)val1)->cpustat;
+	struct Ccpustat *st2 = ((const struct Cveinfo *)val2)->cpustat;
+	int res;
+
+	if ((res = check_empty_param(st1, st2)) != 2)
+		return res;
+	return (st2->uptime - st1->uptime);
 }
 
 int id_sort_fn(const void *val1, const void *val2)
@@ -527,6 +563,7 @@ struct Cfield field_names[] =
 {"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
 
 {"laverage", "LAVERAGE", "%14s", 0, RES_CPUSTAT, print_laverage, laverage_sort_fn},
+{"uptime", "UPTIME", "%15s", 1, RES_CPUSTAT, print_uptime, uptime_sort_fn},
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
@@ -1327,6 +1364,14 @@ int get_stop_quota_stats()
 	return 0;
 }
 
+static long get_clk_tck()
+{
+	if (__clk_tck != -1)
+		return __clk_tck;
+	__clk_tck = sysconf(_SC_CLK_TCK);
+	return __clk_tck;
+}
+
 int get_ve_cpustat(int veid)
 {
 	struct vz_cpu_stat stat;
@@ -1340,6 +1385,8 @@ int get_ve_cpustat(int veid)
 	st.la[0] = stat.avenrun[0].val_int + (stat.avenrun[0].val_frac * 0.01);
 	st.la[1] = stat.avenrun[1].val_int + (stat.avenrun[1].val_frac * 0.01);
 	st.la[2] = stat.avenrun[2].val_int + (stat.avenrun[2].val_frac * 0.01);
+
+	st.uptime = (float) stat.uptime_jif / get_clk_tck();
 
 	update_cpustat(veid, &st);
 	return 0;
