@@ -75,7 +75,7 @@ struct Cquota {
 };
 
 struct Cla {
-	double la[3];
+	float la[3];			// load average
 };
 
 struct Ccpu {
