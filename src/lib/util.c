@@ -266,11 +266,6 @@ void free_arg(char **arg)
 	while (*arg) free(*arg++);
 }
 
-inline double max(double val1, double val2)
-{
-	return (val1 > val2) ? val1 : val2;
-}
-
 inline unsigned long max_ul(unsigned long val1, unsigned long val2)
 {
 	return (val1 > val2) ? val1 : val2;
