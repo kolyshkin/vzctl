@@ -139,11 +139,11 @@ static void print_status(struct Cveinfo *p, int index)
 
 static void print_laverage(struct Cveinfo *p, int index)
 {
-	if (p->la == NULL)
+	if (p->cpustat == NULL)
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%14s", "-");
 	else
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%1.2f/%1.2f/%1.2f",
-			p->la->la[0], p->la->la[1], p->la->la[2]);
+			p->cpustat->la[0], p->cpustat->la[1], p->cpustat->la[2]);
 }
 
 static void print_cpulimit(struct Cveinfo *p, int index)
@@ -248,19 +248,19 @@ int none_sort_fn(const void *val1, const void *val2)
 
 int laverage_sort_fn(const void *val1, const void *val2)
 {
-	const struct Cla *la1 = ((const struct Cveinfo *)val1)->la;
-	const struct Cla *la2 = ((const struct Cveinfo *)val2)->la;
+	const struct Ccpustat *st1 = ((const struct Cveinfo *)val1)->cpustat;
+	const struct Ccpustat *st2 = ((const struct Cveinfo *)val2)->cpustat;
 	int res;
 
-	if ((res = check_empty_param(la1, la2)) == 2)
+	if ((res = check_empty_param(st1, st2)) == 2)
 		return res;
-	res = (la1->la[0] - la2->la[0]) * 100;
+	res = (st1->la[0] - st2->la[0]) * 100;
 	if (res != 0)
 		return res;
-	res = (la1->la[1] - la2->la[1]) * 100;
+	res = (st1->la[1] - st2->la[1]) * 100;
 	if (res != 0)
 		return res;
-	return (la1->la[2] - la2->la[2]) * 100;
+	return (st1->la[2] - st2->la[2]) * 100;
 }
 
 int id_sort_fn(const void *val1, const void *val2)
@@ -526,7 +526,7 @@ struct Cfield field_names[] =
 {"diskinodes.s", "DINODES.S", "%10s", 1, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
 {"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
 
-{"laverage", "LAVERAGE", "%14s", 0, RES_LA, print_laverage, laverage_sort_fn},
+{"laverage", "LAVERAGE", "%14s", 0, RES_CPUSTAT, print_laverage, laverage_sort_fn},
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
@@ -774,14 +774,14 @@ void update_cpu(int veid, unsigned long limit, unsigned long units)
 	return;
 }
 
-void update_la(int veid, struct Cla *la)
+void update_cpustat(int veid, struct Ccpustat *st)
 {
 	struct Cveinfo *tmp;
 
 	if ((tmp = find_ve(veid)) == NULL)
 		return;
-	tmp->la = x_malloc(sizeof(*la));
-	memcpy(tmp->la, la, sizeof(*la));
+	tmp->cpustat = x_malloc(sizeof(*st));
+	memcpy(tmp->cpustat, st, sizeof(*st));
 	return;
 }
 
@@ -1327,25 +1327,25 @@ int get_stop_quota_stats()
 	return 0;
 }
 
-int get_ve_la(int veid)
+int get_ve_cpustat(int veid)
 {
 	struct vz_cpu_stat stat;
 	struct vzctl_cpustatctl statctl;
-	struct Cla la;
+	struct Ccpustat st;
 
 	statctl.veid = veid;
 	statctl.cpustat = &stat;
 	if (ioctl(vzctlfd, VZCTL_GET_CPU_STAT, &statctl) != 0)
 		return 1;
-	la.la[0] = stat.avenrun[0].val_int + (stat.avenrun[0].val_frac * 0.01);
-	la.la[1] = stat.avenrun[1].val_int + (stat.avenrun[1].val_frac * 0.01);
-	la.la[2] = stat.avenrun[2].val_int + (stat.avenrun[2].val_frac * 0.01);
+	st.la[0] = stat.avenrun[0].val_int + (stat.avenrun[0].val_frac * 0.01);
+	st.la[1] = stat.avenrun[1].val_int + (stat.avenrun[1].val_frac * 0.01);
+	st.la[2] = stat.avenrun[2].val_int + (stat.avenrun[2].val_frac * 0.01);
 
-	update_la(veid, &la);
+	update_cpustat(veid, &st);
 	return 0;
 }
 
-int get_ves_la()
+int get_ves_cpustat()
 {
 	int i;
 
@@ -1354,7 +1354,7 @@ int get_ves_la()
 	for (i = 0; i < n_veinfo; i++) {
 		if (veinfo[i].hide)
 			continue;
-		get_ve_la(veinfo[i].veid);
+		get_ve_cpustat(veinfo[i].veid);
 	}
 	close(vzctlfd);
 	return 0;
@@ -1525,8 +1525,8 @@ int collect()
 	}
 	if (check_param(RES_QUOTA))
 		get_run_quota_stat();
-	if (check_param(RES_LA))
-		get_ves_la();
+	if (check_param(RES_CPUSTAT))
+		get_ves_cpustat();
 	if (check_param(RES_CPU))
 		if (!only_stopped_ve && (ret = get_ves_cpu()))
 			return ret;
@@ -1570,8 +1570,8 @@ void free_veinfo()
 			free(veinfo[i].ubc);
 		if (veinfo[i].quota != NULL)
 			free(veinfo[i].quota);
-		if (veinfo[i].la != NULL)
-			free(veinfo[i].la);
+		if (veinfo[i].cpustat != NULL)
+			free(veinfo[i].cpustat);
 		if (veinfo[i].cpu != NULL)
 			free(veinfo[i].cpu);
 		if (veinfo[i].ve_root != NULL)

@@ -74,7 +74,7 @@ struct Cquota {
 	unsigned long diskinodes[3];	// 0-usage 1-softlimit 2-hardlimit
 };
 
-struct Cla {
+struct Ccpustat {
 	float la[3];			// load average
 };
 
@@ -97,7 +97,7 @@ struct Cveinfo {
 	char *ve_root;
 	struct Cubc *ubc;
 	struct Cquota *quota;
-	struct Cla *la;
+	struct Ccpustat *cpustat;
 	struct Ccpu *cpu;
 	struct Cio io;
 	int status;
@@ -111,7 +111,7 @@ struct Cveinfo {
 #define RES_UBC		2
 #define RES_QUOTA	3
 #define RES_IP		4
-#define RES_LA		5
+#define RES_CPUSTAT	5
 #define RES_CPU		6
 
 struct Cfield {
