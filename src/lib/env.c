@@ -324,7 +324,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	create_param.feature_mask = res->env.features_mask;
 	create_param.known_features = res->env.features_known;
 	/* sysfs enabled by default, unless explicitly disabled */
-	if (! res->env.features_known & VE_FEATURE_SYSFS) {
+	if (! (res->env.features_known & VE_FEATURE_SYSFS)) {
 		create_param.feature_mask |= VE_FEATURE_SYSFS;
 		create_param.known_features |= VE_FEATURE_SYSFS;
 	}
