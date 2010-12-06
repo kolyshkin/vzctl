@@ -24,8 +24,10 @@
 #include <unistd.h>
 #include <linux/capability.h>
 #include <string.h>
+#include <linux/vzcalluser.h>
 
 #include "cap.h"
+#include "res.h"
 #include "vzerror.h"
 #include "logger.h"
 #include "util.h"
@@ -191,14 +193,12 @@ static inline cap_t make_cap_mask(cap_t on, cap_t off)
 	return (CAPDEFAULTMASK | on) & ~off;
 }
 
-/** Apply capability mask to CT.
- * @param veid		CT ID.
- * @param cap		capability mask.
- * @return		0 on success.
- */
-int vps_set_cap(envid_t veid, cap_param *cap)
+int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap)
 {
 	cap_t mask;
+
+	if ((env->features_known & env->features_mask) & VE_FEATURE_BRIDGE)
+		cap_raise(cap->on, CAP_NET_ADMIN);
 
 	mask = make_cap_mask(cap->on, cap->off);
 

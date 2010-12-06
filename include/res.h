@@ -31,7 +31,7 @@
 #include "meminfo.h"
 #include "veth.h"
 
-typedef struct {
+struct env_param {
 	envid_t veid;
 	unsigned long long ipt_mask;
 
@@ -45,7 +45,8 @@ typedef struct {
 	unsigned long long features_mask;
 	unsigned long long features_known;
 	char *osrelease;
-} env_param;
+};
+typedef struct env_param env_param_t;
 
 typedef struct {
 	list_head_t userpw;
@@ -74,7 +75,7 @@ typedef struct name_param {
 typedef struct vps_res {
 	fs_param fs;		/**< file system parameters. */
 	tmpl_param tmpl;	/**< template parameters. */
-	env_param env;		/**< environment parameters. */
+	env_param_t env;	/**< environment parameters. */
 	net_param net;		/**< network parameters. */
 	cpu_param cpu;		/**< cpu parameters. */
 	dev_param dev;		/**< device parameters. */

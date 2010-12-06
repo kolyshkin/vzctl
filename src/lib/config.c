@@ -302,7 +302,7 @@ static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
 }
 
 /******************** Features *************************/
-static int parse_features(env_param *env, char *val)
+static int parse_features(env_param_t *env, char *val)
 {
 	int ret = 0;
 	char *token;
@@ -364,7 +364,7 @@ static int store_ioprio(vps_param *old_p, vps_param *vps_p,
 }
 
 /******************** Iptables *************************/
-static int parse_iptables(env_param *env, char *val)
+static int parse_iptables(env_param_t *env, char *val)
 {
 	char *token;
 	struct iptables_s *ipt;
@@ -399,7 +399,7 @@ static void store_iptables(unsigned long long ipt_mask, vps_config *conf,
 static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
-	env_param *env = &vps_p->res.env;
+	env_param_t *env = &vps_p->res.env;
 
 	switch (conf->id) {
 	case PARAM_IPTABLES:
@@ -2535,7 +2535,7 @@ static void merge_cap(cap_param *dst, cap_param *src)
 	MERGE_INT(off)
 }
 
-static void merge_env(env_param *dst, env_param *src)
+static void merge_env(env_param_t *dst, env_param_t *src)
 {
 	MERGE_INT(veid)
 	MERGE_INT(ipt_mask)

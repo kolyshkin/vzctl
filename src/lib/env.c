@@ -444,7 +444,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		logger(-1, errno, "Unable to fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
-		if ((ret = vps_set_cap(veid, &res->cap)))
+		if ((ret = vps_set_cap(veid, &res->env, &res->cap)))
 			goto env_err;
 		if (fn == NULL) {
 			ret = _env_create(h, veid, wait_p, err_p, (void *)res);

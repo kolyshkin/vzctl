@@ -21,6 +21,7 @@
 #include <linux/types.h>
 #include "types.h"
 
+struct env_param;
 typedef __u32 cap_t;
 
 #undef CAP_TO_MASK
@@ -46,10 +47,11 @@ int get_cap_mask(char *name, unsigned long *mask);
 /** Apply capability mask to CT.
  *
  * @param veid		CT ID.
+ * @param env		CT environment parameters.
  * @param cap		capability mask.
  * @return		0 on success.
  */
-int vps_set_cap(envid_t veid, cap_param *cap);
+int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap);
 
 /** Merge capabilities and return in string format.
  *
