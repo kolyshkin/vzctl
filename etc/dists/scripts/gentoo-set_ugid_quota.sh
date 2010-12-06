@@ -42,6 +42,7 @@ start() {
         if [ $? == 0 ]; then
 		echo "$mnt" >> /etc/mtab
         fi
+	chmod 644 /etc/mtab
 	quotaon -aug
         return
 }
