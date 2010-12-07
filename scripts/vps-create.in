@@ -30,7 +30,7 @@ vzcheckvar VE_PRVT PRIVATE_TEMPLATE
 create_prvt()
 {
 	local TMP AVAIL NEEDED HEADER OPT
-	local TAR_OPT="--numeric-owner"
+	local TAR_OPT="--numeric-owner -Sp"
 
 	[ -d "$VE_PRVT" ] ||
 		vzerror "Destination directory does not exist: $VE_PRVT" ${VZ_FS_NEW_VE_PRVT}
