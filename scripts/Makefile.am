@@ -23,7 +23,8 @@ vzlib_SCRIPTS = \
 	vps-net_add \
 	vps-net_del \
 	vzevent-stop \
-	vzevent-reboot
+	vzevent-reboot \
+	vps-pci
 
 EXTRA_DIST = \
 	$(vzlib_SCRIPTS:%=%.in)

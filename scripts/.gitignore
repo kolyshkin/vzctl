@@ -4,5 +4,6 @@ vps-net_add
 vps-net_del
 vzevent-reboot
 vzevent-stop
+vps-pci
 Makefile.in
 Makefile

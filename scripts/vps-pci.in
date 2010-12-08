@@ -1,0 +1,95 @@
+#!/bin/sh
+#  Copyright (C) 2010, Parallels, Inc. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+# This script is executed in the CT0 context after moving
+# PCI devices into or out of CT (vzctl set $CTID --pci_add/--pci_del).
+# It is supposed to take care about actions needed to properly
+# add/remove certain PCI devices.
+#
+# Parameters are passed in environment variables:
+#   VEID	- container ID
+#   PCI		- list of PCI devices
+#   ADD		- boolean flag (1 - add, 0 - del)
+#
+# Currently this only supports adding/removing of NVidia video cards.
+
+VZCTL=vzctl
+SELF=$(basename $0)
+
+# Prepare nVidia video card for using in CT
+handle_nvidia_device()
+{
+	local pci major minor dev card dev_num PCI
+	local nv_proc=/proc/driver/nvidia
+	PCI=$1
+
+	lspci -s $PCI | grep -qi VGA.*nvidia || return
+
+	modprobe nvidia > /dev/null
+	if [ $? -ne 0 ]; then
+		echo "$SELF: can't load module nvidia" 1>&2
+		return
+	fi
+
+	major=$(cat /proc/devices | awk '/nvidia/ {print $1}')
+	for card in $(ls $nv_proc/cards/); do
+		pci=$(cat $nv_proc/cards/$card | awk '/Bus Location/ {print $3}')
+		unify_dev()
+		{
+			echo $1 | sed 's/:/./g' # I love debian!
+		}
+		if [ "$(unify_dev $pci)" = "$(unify_dev $PCI)" ]; then
+			dev_num=$card
+			break
+		fi
+	done
+
+	if [ -z "$dev_num" ]; then
+		echo "$SELF: Unknown device $PCI" 1>&2
+		return
+	fi
+
+	for dev in nvidiactl nvidia$dev_num; do
+		if [ ! -e /dev/$dev ]; then
+			if [ "nvidiactl" = "$dev" ]; then
+				minor=255
+			else
+				minor=$dev_num
+			fi
+			mknod /dev/$dev c $major $minor
+			if [ $? -ne 0 ]; then
+				echo "$SELF: Can't create device $dev" 1>&2
+				return
+			fi
+		fi
+		if [ "$ADD" = 1 ]; then
+			$VZCTL --quiet --skiplock set $VEID --devnodes $dev:rw
+		else
+			$VZCTL --quiet --skiplock set $VEID --devnodes $dev:none
+		fi
+		if [ $? -ne 0 ]; then
+			echo "$SELF: Can't give access to device $dev" 1>&2
+			return
+		fi
+	done
+}
+
+for dev in $PCI; do
+	handle_nvidia_device $dev
+done
+exit 0

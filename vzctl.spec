@@ -205,7 +205,7 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-create
 %attr(755,root,root) %{_pkglibdir}/scripts/vzevent-stop
 %attr(755,root,root) %{_pkglibdir}/scripts/vzevent-reboot
-
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-pci
 
 %changelog
 * Wed Jun 13 2007 Andy Shevchenko <andriy@asplinux.com.ua> - 3.0.17-1

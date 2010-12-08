@@ -32,6 +32,7 @@
 
 #define VPS_NET_ADD		LIB_SCRIPTS_DIR "vps-net_add"
 #define VPS_NET_DEL		LIB_SCRIPTS_DIR "vps-net_del"
+#define VPS_PCI			LIB_SCRIPTS_DIR "vps-pci"
 
 /* User-defined scripts are in VPS_CONF_DIR */
 #define USER_CREATE_SCRIPT	VPS_CONF_DIR "vps.create"

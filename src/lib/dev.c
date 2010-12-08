@@ -28,6 +28,7 @@
 #include <linux/vzcalluser.h>
 
 #include "vzerror.h"
+#include "script.h"
 #include "util.h"
 #include "dev.h"
 #include "env.h"
@@ -169,4 +170,31 @@ static void free_dev(list_head_t  *head)
 void free_dev_param(dev_param *dev)
 {
 	free_dev(&dev->dev);
+}
+
+int run_pci_script(envid_t veid, int op, list_head_t *pci_h)
+{
+	char *argv[3];
+	char *envp[10];
+	char *script;
+	int ret;
+	char buf[STR_SIZE];
+	int i = 0;
+
+	if (list_empty(pci_h))
+		return 0;
+	snprintf(buf, sizeof(buf), "VEID=%d", veid);
+	envp[i++] = strdup(buf);
+	snprintf(buf, sizeof(buf), "ADD=%d", op == ADD);
+	envp[i++] = strdup(buf);
+	envp[i++] = list2str("PCI", pci_h);
+	envp[i++] = strdup(ENV_PATH);
+	envp[i] = NULL;
+	script = VPS_PCI;
+	argv[0] = script;
+	argv[1] = NULL;
+	ret = run_script(script, argv, envp, 0);
+	free_arg(envp);
+
+	return ret;
 }
