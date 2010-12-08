@@ -1017,7 +1017,7 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
 	char buf[64];
 	struct stat st;
 
-	if ((ch = strchr(str, ':')) == NULL)
+	if ((ch = strrchr(str, ':')) == NULL)
 		return ERR_INVAL;
 	ch++;
 	len = ch - str;
