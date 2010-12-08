@@ -552,6 +552,8 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	/*	Devices	*/
 	{"devices",	required_argument, NULL, PARAM_DEVICES},
 	{"devnodes",	required_argument, NULL, PARAM_DEVNODES},
+	{"pci_add",	required_argument, NULL, PARAM_PCI_ADD},
+	{"pci_del",	required_argument, NULL, PARAM_PCI_DEL},
 	/*	fs param */
 	{"root",	required_argument, NULL, PARAM_ROOT},
 	{"private",	required_argument, NULL, PARAM_PRIVATE},

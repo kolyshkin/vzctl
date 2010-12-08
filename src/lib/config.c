@@ -103,6 +103,8 @@ static vps_config config[] = {
 /*	Devices	*/
 {"DEVICES",	NULL, PARAM_DEVICES},
 {"DEVNODES",	NULL, PARAM_DEVNODES},
+{"PCI",		NULL, PARAM_PCI_ADD},
+{"",		NULL, PARAM_PCI_DEL},
 /*	fs param */
 {"VE_ROOT",	NULL, PARAM_ROOT},
 {"VE_PRIVATE",	NULL, PARAM_PRIVATE},
@@ -1120,6 +1122,65 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
+static int parse_pci(vps_param *vps_p, char *val, int id)
+{
+	int domain;
+	unsigned int bus;
+	unsigned int slot;
+	unsigned int func;
+	char *token;
+
+	int ret;
+	pci_param *pci;
+	char buf[64];
+
+	if (id == PARAM_PCI_ADD)
+		pci = &vps_p->res.pci;
+	else if (id == PARAM_PCI_DEL)
+		pci = &vps_p->del_res.pci;
+	else
+		return 0;
+
+	for_each_strtok(token, val, " ") {
+		ret = sscanf(token, "%x:%x:%x.%d", &domain, &bus, &slot, &func);
+		if (ret != 4) {
+			domain = 0;
+			ret = sscanf(token, "%x:%x.%d", &bus, &slot, &func);
+			if (ret != 3)
+				return ERR_INVAL;
+		}
+		snprintf(buf, sizeof(buf), "%04x:%02x:%02x.%d",
+						domain, bus, slot, func);
+		if (!find_str(&pci->list, buf))
+			add_str_param(&pci->list, buf);
+	}
+
+	return 0;
+}
+
+static int store_pci(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+	list_head_t *conf_h)
+{
+	list_head_t pci;
+	int ret;
+
+	if (conf->id != PARAM_PCI_ADD)
+		return 0;
+
+	if (list_empty(&vps_p->res.pci.list) &&
+			list_empty(&vps_p->del_res.pci.list))
+		return 0;
+
+	list_head_init(&pci);
+	merge_str_list(0, &old_p->res.pci.list, &vps_p->res.pci.list,
+					&vps_p->del_res.pci.list, &pci);
+
+	ret = conf_store_strlist(conf_h, conf->name, &pci, 1);
+	free_str_param(&pci);
+
+	return ret;
+}
+
 static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
@@ -1838,6 +1899,10 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_DEVICES:
 		ret = parse_dev(vps_p, val);
 		break;
+	case PARAM_PCI_ADD:
+	case PARAM_PCI_DEL:
+		ret = parse_pci(vps_p, val, id);
+		break;
 	case PARAM_DEVNODES:
 		ret = parse_devnodes(vps_p, val);
 		break;
@@ -1951,6 +2016,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_dq(old_p, vps_p, conf, conf_h);
 		store_dev(old_p, vps_p, conf, conf_h);
 		store_devnodes(old_p, vps_p, conf, conf_h);
+		store_pci(old_p, vps_p, conf, conf_h);
 		store_misc(old_p, vps_p, conf, conf_h);
 		store_cpu(old_p, vps_p, conf, conf_h);
 		store_meminfo(old_p, vps_p, conf, conf_h);
@@ -2224,6 +2290,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->res.misc.nameserver);
 	list_head_init(&param->res.misc.searchdomain);
 	list_head_init(&param->res.dev.dev);
+	list_head_init(&param->res.pci.list);
 	list_head_init(&param->res.veth.dev);
 
 	list_head_init(&param->del_res.net.ip);
@@ -2233,6 +2300,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->del_res.misc.nameserver);
 	list_head_init(&param->del_res.misc.searchdomain);
 	list_head_init(&param->del_res.dev.dev);
+	list_head_init(&param->del_res.pci.list);
 	list_head_init(&param->del_res.veth.dev);
 	param->res.meminfo.mode = -1;
 	param->res.io.ioprio = -1;
@@ -2380,6 +2448,11 @@ static void free_dev(dev_param *dev)
 	free_dev_param(dev);
 }
 
+static void free_pci(pci_param *pci)
+{
+	free_str_param(&pci->list);
+}
+
 static void free_cpu(cpu_param *cpu)
 {
 	FREE_P(cpu->units)
@@ -2416,6 +2489,7 @@ static void free_vps_res(vps_res *res)
 	free_net(&res->net);
 	free_misc(&res->misc);
 	free_dev(&res->dev);
+	free_pci(&res->pci);
 	free_cpu(&res->cpu);
 	free_dq(&res->dq);
 	free_cpt(&res->cpt);
@@ -2550,6 +2624,11 @@ static void merge_dev(dev_param *dst, dev_param *src)
 	}
 }
 
+static void merge_pci(pci_param *dst, pci_param *src)
+{
+	MERGE_LIST(list)
+}
+
 static void merge_cap(cap_param *dst, cap_param *src)
 {
 	MERGE_INT(on)
@@ -2608,6 +2687,7 @@ static int merge_res(vps_res *dst, vps_res *src)
 	merge_cap(&dst->cap, &src->cap);
 	merge_dq(&dst->dq, &src->dq);
 	merge_dev(&dst->dev, &src->dev);
+	merge_pci(&dst->pci, &src->pci);
 	merge_env(&dst->env, &src->env);
 	merge_cpt(&dst->cpt, &src->cpt);
 	merge_meminfo(&dst->meminfo, &src->meminfo);

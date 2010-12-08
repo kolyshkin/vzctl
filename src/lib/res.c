@@ -81,6 +81,10 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 	if ((ret = vps_set_devperm(h, veid, fs->root, &res->dev)))
 		return ret;
+	if ((ret = vps_set_pci(h, veid, ADD, fs->root, &res->pci)))
+		return ret;
+	if ((ret = vps_set_pci(h, veid, DEL, fs->root, &param->del_res.pci)))
+		return ret;
 	if ((ret = vps_set_fs(fs, &res->fs)))
 		return ret;
 	if((ret = vps_meminfo_set(h, veid, &res->meminfo, param, vps_state)))

@@ -41,6 +41,10 @@ typedef struct {
 	list_head_t dev;
 } dev_param;
 
+typedef struct {
+	list_head_t list;
+} pci_param;
+
 /** Allow/disallow access to devices on host system from CT.
  *
  * @param h		CT handler.
@@ -54,5 +58,9 @@ int vps_set_devperm(vps_handler *h, envid_t veid, const char *root,
 int set_devperm(vps_handler *h, envid_t veid, dev_res *dev);
 int add_dev_param(dev_param *dev, dev_res *res);
 void free_dev_param(dev_param *dev);
+
+int vps_set_pci(vps_handler *h, envid_t veid, int op, const char *root,
+		pci_param *pci);
+void free_pci_param(pci_param *dev);
 
 #endif

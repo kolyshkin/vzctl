@@ -498,6 +498,20 @@ Give the container an access to a \fBb\fRlock or \fBc\fRharacter device
 designated by its \fImajor\fR and \fIminor\fR numbers. Device file have to be created manually.
 
 .TP
+\fBPCI device management\fR
+.TP
+\fB--pci_add\fR [\fIdomain\fB:\fR]\fIbus\fB:\fIslot\fB.\fIfunc\fR
+Give the container an access to a specified PCI device. All numbers are
+hexadecimal (as printed by \fBlspci\fR(8) in the first column).
+.TP
+\fB--pci_del\fR [\fIdomain\fB:\fR]\fIbus\fB:\fIslot\fB.\fIfunc\fR
+Delete a PCI device from the container.
+.TP
+Note that \fBvps-pci\fR configuration script is executed by \fBvzctl\fR
+then configuring PCI devices. The script is usually located at
+\fB/usr/lib[64]/vzctl/scripts/\fR.
+
+.TP
 \fBFeatures management\fR
 .TP
 \fB--features\fR \fIname\fB:on\fR|\fBoff\fR

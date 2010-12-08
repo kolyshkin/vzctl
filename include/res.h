@@ -88,6 +88,7 @@ typedef struct vps_res {
 	misc_param misc;
 	name_param name;
 	io_param io;
+	pci_param pci;
 } vps_res;
 
 enum {
