@@ -155,14 +155,11 @@ int add_dev_param(dev_param *dev, dev_res *res)
 
 static void free_dev(list_head_t  *head)
 {
-	dev_res *cur;
+	dev_res *cur, *tmp;
 
-	while(!list_empty(head)) {
-		list_for_each(cur, head, list) {
-			list_del(&cur->list);
-			free(cur);
-			break;
-		}
+	list_for_each_safe(cur, tmp, head, list) {
+		list_del(&cur->list);
+		free(cur);
 	}
 	list_head_init(head);
 }
