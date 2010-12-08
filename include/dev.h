@@ -28,7 +28,7 @@
  */
 typedef struct {
 	list_elem_t list;		/**< prev/next elements. */
-	char name[32];			/**< device name. */
+	char *name;			/**< device name. */
 	dev_t dev;			/**< device number. */
 	unsigned int type;		/**< S_IFBLK | S_IFCHR. */
 	unsigned int mask;		/**< access mode. */

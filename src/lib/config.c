@@ -955,8 +955,11 @@ static int parse_dev(vps_param *vps_p, char *val)
 	for_each_strtok(token, val, " ") {
 		if (parse_devices_str(token, &dev))
 			return ERR_INVAL;
-		if (add_dev_param(&vps_p->res.dev, &dev))
+		if (add_dev_param(&vps_p->res.dev, &dev)) {
+			if (dev.name)
+				free(dev.name);
 			return ERR_NOMEM;
+		}
 	}
 
 	return 0;
@@ -1013,36 +1016,51 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 static int parse_devnodes_str(const char *str, dev_res *dev)
 {
 	char *ch;
-	unsigned int len;
-	char buf[64];
+	unsigned int len, buf_len;
+	char *buf;
 	struct stat st;
+	int ret = ERR_INVAL;
 
 	if ((ch = strrchr(str, ':')) == NULL)
 		return ERR_INVAL;
 	ch++;
 	len = ch - str;
-	if (len > sizeof(dev->name))
-		return ERR_INVAL;
 	memset(dev, 0, sizeof(*dev));
+
+	dev->name = malloc(len);
+	if (dev->name == NULL)
+		return ERR_NOMEM;
 	snprintf(dev->name, len, "%s", str);
-	snprintf(buf, sizeof(buf), "/dev/%s", dev->name);
+
+	buf_len = 5 + len;
+	buf = alloca(buf_len);
+	if (buf == NULL) {
+		ret = ERR_NOMEM;
+		goto err;
+	}
+	snprintf(buf, buf_len, "/dev/%s", dev->name);
 	if (stat(buf, &st)) {
 		logger(-1, errno, "Incorrect device name %s", buf);
-		return ERR_INVAL;
+		goto err;
 	}
+
 	if (S_ISCHR(st.st_mode))
 		dev->type = S_IFCHR;
 	else if (S_ISBLK(st.st_mode))
 		dev->type = S_IFBLK;
 	else {
 		logger(-1, 0, "The %s is not block or character device", buf);
-		return ERR_INVAL;
+		goto err;
 	}
 	dev->dev = st.st_rdev;
 	dev->type |= VE_USE_MINOR;
 	if (parse_dev_perm(ch, &dev->mask))
-		return ERR_INVAL;
+		goto err;
 	return 0;
+err:
+	free(dev->name);
+	dev->name = NULL;
+	return ret;
 }
 
 static int parse_devnodes(vps_param *vps_p, char *val)
@@ -1053,8 +1071,11 @@ static int parse_devnodes(vps_param *vps_p, char *val)
 	for_each_strtok(token, val, " ") {
 		if (parse_devnodes_str(token, &dev))
 			return ERR_INVAL;
-		if (add_dev_param(&vps_p->res.dev, &dev))
+		if (add_dev_param(&vps_p->res.dev, &dev)) {
+			if (dev.name)
+				free(dev.name);
 			return ERR_NOMEM;
+		}
 	}
 
 	return 0;

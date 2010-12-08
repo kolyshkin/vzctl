@@ -149,6 +149,7 @@ int add_dev_param(dev_param *dev, dev_res *res)
 		return -1;
 	memcpy(tmp, res, sizeof(*tmp));
 	list_add_tail(&tmp->list, &dev->dev);
+	res->name = NULL;
 
 	return 0;
 }
@@ -159,6 +160,7 @@ static void free_dev(list_head_t  *head)
 
 	list_for_each_safe(cur, tmp, head, list) {
 		list_del(&cur->list);
+		free(cur->name);
 		free(cur);
 	}
 	list_head_init(head);
