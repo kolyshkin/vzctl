@@ -181,6 +181,15 @@ else # RedHat/Fedora/CentOS case
 	fi
 fi
 
+# (Upgrading from <= vzctl-3.0.24)
+# If vz is running and vzeventd is not, start it
+if %{_initddir}/vz status >/dev/null 2&>1; then
+	if ! %{_initddir}/vzeventd status >/dev/null 2&>1; then
+		%{_initddir}/vzeventd start
+	fi
+fi
+exit 0
+
 %preun
 if [ $1 = 0 ]; then
 	/sbin/chkconfig --del vz >/dev/null 2>&1
