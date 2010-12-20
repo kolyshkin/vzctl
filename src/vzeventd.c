@@ -165,6 +165,8 @@ static int read_events(int fd, struct sockaddr_nl *sa)
 	struct msghdr msg;
 	int ret;
 
+	logger(0, 0, "Started");
+
 	while (1) {
 		memset(&msg, 0, sizeof(msg));
 		msg.msg_name = (void *)&sa;
@@ -236,8 +238,6 @@ static int prepare_read_events(int daemonize)
 	act.sa_sigaction = child_handler;
 	act.sa_flags = SA_NOCLDSTOP | SA_SIGINFO;
 	sigaction(SIGCHLD, &act, NULL);
-
-	logger(0, 0, "Started");
 
 	if (daemonize != 0)
 		return daemon_read_events(fd, &sa);
