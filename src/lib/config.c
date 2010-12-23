@@ -986,7 +986,9 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		int major, minor, i = 0;
 		char mask[3];
 
-		if (res->name[0])
+		/* Devices with names (--devnodes) are handled by
+		 * store_devnodes(), so skip those here */
+		if (res->name)
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
@@ -1102,7 +1104,9 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	ep = buf + sizeof(buf) - 1;
 	list_for_each (res, &dev->dev, list) {
 		i = 0;
-		if (!res->name[0])
+		/* Devices with no names (--devices) are handled by
+		 * store_dev(), so skip those here */
+		if (!res->name)
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
