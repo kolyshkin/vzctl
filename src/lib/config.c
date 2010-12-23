@@ -986,7 +986,7 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		int major, minor, i = 0;
 		char mask[3];
 
-		if (! res->name)
+		if (res->name[0])
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
