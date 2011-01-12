@@ -28,27 +28,29 @@ Enables or disables logging. This parameter can be set to \fByes\fR or
 .IP \fBLOGFILE\fR=\fIfile\fR
 Set location of log file, default is \f(CR/var/log/vzctl.log\fR.
 .IP "\fBLOG_LEVEL\fR=\fInumber\fR"
-Set the logging level. The more \fInumber\fR is, the more information will be
-logged.
+Set the logging level. The greater the \fInumber\fR is,
+the more information will be logged to the \fBLOGFILE\fR.
 .IP "\fBVERBOSE\fR=\fInumber\fR"
-Set the output verbosity. Default is 0.
+Set the output verbosity of \fBvzctl\fR. Default is \fB0\fR.
 .IP "\fBMODULES_DISABLED\fR=\fByes\fR|\fBno\fR
 If the value of this parameter is set to \fByes\fR, no attempt to load
-OpenVZ kernel modules is made in vz initscript. This is helpful on systems
-which have OpenVZ-specific stuff compiled into the kernel (i. e. not
-as modules).
+OpenVZ kernel modules is made by the \fBvz\fR initscript. This is helpful
+on systems which have OpenVZ-specific features compiled into the kernel
+(i. e. not as modules).
 .IP \fBVZFASTBOOT\fR=\fByes\fR|\fBno\fR
-This parameter is used by \f(CR/etc/init.d/vz start\fR script. In case the value
-of this parameter is set to \fByes\fR, all containers with incorrectly shutdown
-quota state are started without quota check, and after all containers will be
-started, those marked containers are restarted (to fix quotas).
+If the value of this parameter is set to \fByes\fR, \fBvz\fR initscript called
+with \fBstart\fR argument will start the containers with uncleanly
+shutdown quota state without performing quota reinitialization
+(which is usually a time-consuming process). After all the containers are
+started, the initscript when restarts those containers with unclean quota
+in a normal way (to recalculate/fix quotas).
 .SS Network interface parameters
 .IP \fBVE_ROUTE_SRC_DEV\fR="\fIdevice\fR"
 This parameter specifies the network device name which IP address will be
 used as the source IP. This is helpful in case more than one network
 interface is configured on HN and there is a need to specify the source
 IP address. Default is the first device in the network device list.
-.IP \fBNEIGHBOUR_DEVS\fR[="\fBdetect\fR"]
+.IP \fBNEIGHBOUR_DEVS\fR="\fBdetect\fR"
 Controls on which interfaces to add/remove ARP records for a container IP, also
 which interfaces to use to query/announce ARP. If this is set to \fBdetect\fR,
 the right network interface (the one which is in the same subnet as a CT IP)
