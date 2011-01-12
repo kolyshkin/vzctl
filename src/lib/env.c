@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -410,7 +410,7 @@ try:
 	/* Now we wait until CT setup will be done
 	   If no error, then start init, otherwise exit.
 	*/
-	if (read(wait_p, &ret, sizeof(ret)) != 0)
+	if (read(wait_p, &ret, sizeof(ret)) == 0)
 		return 0;
 	if ((fd = open("/dev/null", O_RDWR)) != -1) {
 		dup2(fd, 0);
@@ -639,16 +639,21 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 			}
 		}
 	}
-	/* Close fd to start /sbin/init */
-	if (close(wait_p[1]))
-		logger(-1, errno, "Unable to close fd to start init");
+	/* Tell the child that it's time to start /sbin/init */
+	err = 0;
+	if (write(wait_p[1], &err, sizeof(err)) != sizeof(err))
+		logger(-1, errno, "Unable to write to waitfd to start init");
 err:
 	free_dist_actions(&actions);
 	if (ret) {
 		/* Kill environment */
 		logger(-1, 0, "Container start failed (try to check kernel "
 				"messages, e.g. \"dmesg | tail\")");
-		write(wait_p[1], &err, sizeof(err));
+		/* Close wait fd without writing anything to it
+		 * to signal the child that we have failed to configure
+		 * the environment, so it should not start /sbin/init
+		 */
+		close(wait_p[1]);
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
 			if (res->misc.wait == YES) {
