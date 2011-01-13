@@ -68,6 +68,8 @@ make DESTDIR=$RPM_BUILD_ROOT vpsconfdir=%{_vpsconfdir} \
 	install install-redhat-from-spec
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
 ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
+# Needed for %ghost in %files section below
+touch $RPM_BUILD_ROOT/etc/sysconfig/vzeventd
 # This could go to vzctl-lib-devel, but since we don't have it...
 rm -f  $RPM_BUILD_ROOT/%_libdir/libvzctl.{la,so}
 
@@ -143,6 +145,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %attr(777, root, root) /etc/vz/conf
 %config /etc/sysconfig/vz
+%ghost %config(missingok) /etc/sysconfig/vzeventd
 
 %post
 /bin/rm -rf /dev/vzctl
