@@ -49,13 +49,13 @@ static void child_handler(int signo)
 		if (WEXITSTATUS(status) != 0)
 			logger(-1, 0, "Child %d failed with exit code %d",
 					pid, WEXITSTATUS(status));
-		else if (WIFSIGNALED(status))
-			logger(-1, 0, "Child %d was terminated by signal %d",
-					pid, WTERMSIG(status));
 		else
 			logger(1, 0, "Child %d exited with success",
 					pid);
 	}
+	else if (WIFSIGNALED(status))
+		logger(-1, 0, "Child %d killed by signal %d",
+				pid, WTERMSIG(status));
 }
 
 static int run_event_script(envid_t ctid, const char *event)
