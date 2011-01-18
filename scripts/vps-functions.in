@@ -40,6 +40,18 @@ CONF_DIR="@PKGCONFDIR@/conf/"
 ARPSEND_CMD="arpsend -c 1 -w 1"
 IP_CMD="ip"
 
+# For 'ip' and 'arpsend' to work,
+# make sure these dirs are in $PATH
+for d in /sbin /usr/sbin @SBINDIR@; do
+	case ":${PATH}:" in
+		*:"${d}":*)
+			;;
+		*)
+			PATH=${d}:$PATH
+			;;
+	esac
+done
+
 # Prints error message and exits
 # Parameters:
 #   $1 - error message
