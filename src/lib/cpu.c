@@ -23,6 +23,7 @@
 #include <errno.h>
 
 #include "types.h"
+#include "bitmap.h"
 #include "cpu.h"
 #include "env.h"
 #include "vzerror.h"
@@ -58,6 +59,29 @@ static inline int fairsched_vcpus(unsigned int id, unsigned vcpus)
 		ret = 0;
 	return ret;
 }
+
+#if defined(__i386__) || defined(__x86_64__)
+static inline int fairsched_cpumask(unsigned int id,
+		unsigned int masksize, unsigned long *mask)
+{
+	int ret;
+
+	ret = syscall(__NR_fairsched_cpumask, id, masksize, mask);
+	if (ret && errno == ENOSYS)
+		ret = 0;
+	return ret;
+}
+#else
+/*
+ * fairsched_cpumask is available only in vz kernels based on linux 2.6.32
+ * or later which do not support platforms different from x86.
+ */
+static inline int fairsched_cpumask(unsigned int id,
+		unsigned int masksize, unsigned long *mask)
+{
+	return ENOTSUP;
+}
+#endif
 
 static int set_cpulimit(envid_t veid, unsigned int cpulimit)
 {
@@ -96,6 +120,20 @@ static int set_cpuunits(envid_t veid, unsigned int cpuunits)
 	logger(0, 0, "Setting CPU units: %d", cpuunits);
 	ret = set_cpuweight(veid, cpuweight);
 	return ret;
+}
+
+static int set_cpumask(envid_t veid, cpumask_t *mask)
+{
+	static char maskstr[CPUMASK_NBITS * 2];
+
+	bitmap_snprintf(maskstr, CPUMASK_NBITS * 2,
+			cpumask_bits(mask), CPUMASK_NBITS);
+	logger(0, 0, "Setting CPU mask: %s", maskstr);
+	if (fairsched_cpumask(veid, sizeof(cpumask_t), cpumask_bits(mask))) {
+		logger(-1, errno, "fairsched_cpumask");
+		return VZ_SETFSHD_ERROR;
+	}
+	return 0;
 }
 
 /** Change number of CPUs available in the running CT.
@@ -142,7 +180,8 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 	if (cpu->limit == NULL &&
 		cpu->units == NULL &&
 		cpu->weight == NULL &&
-		cpu->vcpus == NULL)
+		cpu->vcpus == NULL &&
+		cpu->mask == NULL)
 	{
 		return 0;
 	}
@@ -160,6 +199,9 @@ int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 		ret = set_cpuweight(veid, *cpu->weight);
 	if (cpu->vcpus != NULL) {
 		ret = env_set_vcpus(veid, *cpu->vcpus);
+	}
+	if (cpu->mask != NULL) {
+		ret = set_cpumask(veid, cpu->mask);
 	}
 
 	return ret;

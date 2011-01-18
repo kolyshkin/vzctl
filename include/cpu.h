@@ -21,6 +21,12 @@
 #define MAXCPUUNITS		500000
 #define MINCPUUNITS		8
 
+#define CPUMASK_NBITS		1024
+typedef struct {
+	unsigned long bits[CPUMASK_NBITS / (8 * sizeof(unsigned long))];
+} cpumask_t;
+#define cpumask_bits(maskp)	((maskp)->bits)
+
 /** Data structure for cpu parameters.
  */
 typedef struct {
@@ -28,6 +34,7 @@ typedef struct {
 	unsigned long *weight;
 	unsigned long *units;	/**< CPU weight for the CT, in units. */
 	unsigned long *vcpus;	/**< number of CPUs available in the running CT */
+	cpumask_t *mask;	/**< CT's CPU affinity mask */
 } cpu_param;
 
 /**  Apply cpu parameters on running CT.

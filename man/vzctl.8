@@ -367,6 +367,15 @@ limit is \fB0\fR (no CPU limit).
 .TP
 \fB--cpus\fR \fInum\fR
 sets number of CPUs available in the container.
+.TP
+\fB--cpumask\fR \fIcpus\fR | \fBall\fR
+sets list of allowed CPUs for the container.
+Input format is a comma-separated list of decimal numbers and ranges.
+Consecutively set bits are shown as two hyphen-separated decimal numbers,
+the smallest and largest bit numbers set in the range.
+For example, if you want the container to execute on CPUs 0, 1, 2, 7,
+you should pass \fB0-2,7\fR.
+Default value is \fBall\fR (the container can execute on any CPU).
 
 .TP
 \fBMemory output parameters\fR

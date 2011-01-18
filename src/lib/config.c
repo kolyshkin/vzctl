@@ -36,6 +36,7 @@
 
 #include "logger.h"
 #include "list.h"
+#include "bitmap.h"
 #include "config.h"
 #include "vzctl_param.h"
 #include "vzerror.h"
@@ -118,6 +119,7 @@ static vps_config config[] = {
 {"CPUUWEIGHT",	NULL, PARAM_CPUWEIGHT},
 {"CPULIMIT",	NULL, PARAM_CPULIMIT},
 {"CPUS",	NULL, PARAM_VCPUS},
+{"CPUMASK",	NULL, PARAM_CPUMASK},
 /* create param	*/
 {"ONBOOT",	NULL, PARAM_ONBOOT},
 {"CONFIGFILE",	NULL, PARAM_CONFIG},
@@ -252,6 +254,28 @@ static int conf_parse_ulong(unsigned long **dst, const char *valstr)
 	return 0;
 }
 
+static int conf_parse_bitmap(unsigned long **dst, int nmaskbits,
+			     const char *valstr)
+{
+	if (*dst != NULL)
+		return ERR_DUP;
+
+	*dst = alloc_bitmap(nmaskbits);
+	if (*dst == NULL)
+		return ERR_NOMEM;
+
+	if (!strcmp(valstr, "all")) {
+		bitmap_set_all(*dst, nmaskbits);
+		return 0;
+	}
+	if (bitmap_parse(valstr, *dst, nmaskbits) != 0) {
+		free(*dst);
+		*dst = NULL;
+		return ERR_INVAL;
+	}
+	return 0;
+}
+
 static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val,
 		int allow_empty)
 {
@@ -301,6 +325,32 @@ static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
 
 	snprintf(buf, sizeof(buf), "%lu", *val);
 	return conf_store_str(conf, name, buf);
+}
+
+static int conf_store_bitmap(list_head_t *conf, char *name,
+			     unsigned long *val, int nmaskbits)
+{
+	int ret;
+	char *buf;
+	unsigned int buflen = nmaskbits * 2;
+
+	if (val == NULL)
+		return 0;
+
+	if (bitmap_find_first_zero_bit(val, nmaskbits) == nmaskbits) {
+		conf_store_str(conf, name, "all");
+		return 0;
+	}
+
+	buf = malloc(buflen);
+	if (buf == NULL)
+		return ERR_NOMEM;
+
+	bitmap_snprintf(buf, buflen, val, nmaskbits);
+	ret = conf_store_str(conf, name, buf);
+
+	free(buf);
+	return ret;
 }
 
 /******************** Features *************************/
@@ -1251,6 +1301,16 @@ static int parse_cpulimit(unsigned long **param, const char *str)
 	return 0;
 }
 
+static inline int parse_cpumask(cpumask_t **dst, const char *str)
+{
+	return conf_parse_bitmap((unsigned long **)dst, CPUMASK_NBITS, str);
+}
+
+static inline int store_cpumask(list_head_t *conf, char *name, cpumask_t *val)
+{
+	return conf_store_bitmap(conf, name, cpumask_bits(val), CPUMASK_NBITS);
+}
+
 static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
@@ -1268,6 +1328,9 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		break;
 	case PARAM_VCPUS:
 		conf_store_ulong(conf_h, conf->name, cpu->vcpus);
+		break;
+	case PARAM_CPUMASK:
+		store_cpumask(conf_h, conf->name, cpu->mask);
 		break;
 	}
 	return 0;
@@ -1934,6 +1997,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_VCPUS:
 		ret = conf_parse_ulong(&vps_p->res.cpu.vcpus, val);
 		break;
+	case PARAM_CPUMASK:
+		ret = parse_cpumask(&vps_p->res.cpu.mask, val);
+		break;
 	case PARAM_MEMINFO:
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
 		break;
@@ -2463,6 +2529,7 @@ static void free_cpu(cpu_param *cpu)
 	FREE_P(cpu->weight)
 	FREE_P(cpu->limit)
 	FREE_P(cpu->vcpus)
+	FREE_P(cpu->mask);
 }
 
 static void free_dq(dq_param *dq)
@@ -2578,6 +2645,7 @@ static void merge_cpu(cpu_param *dst, cpu_param *src)
 	MERGE_P(weight)
 	MERGE_P(limit)
 	MERGE_P(vcpus)
+	MERGE_P(mask);
 }
 
 #define	MERGE_LIST(x)							\

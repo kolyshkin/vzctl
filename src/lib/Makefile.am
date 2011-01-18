@@ -27,7 +27,8 @@ LIB_VER = 0.0.3
 
 lib_LTLIBRARIES = libvzctl.la
 
-libvzctl_la_SOURCES = cap.c \
+libvzctl_la_SOURCES = bitmap.c \
+                      cap.c \
                       config.c \
                       cpt.c \
                       cpu.c \

@@ -565,6 +565,7 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	{"cpuweight",	required_argument, NULL, PARAM_CPUWEIGHT},
 	{"cpulimit",	required_argument, NULL, PARAM_CPULIMIT},
 	{"cpus",	required_argument, NULL, PARAM_VCPUS},
+	{"cpumask",	required_argument, NULL, PARAM_CPUMASK},
 	/*	create param	*/
 	{"onboot",	required_argument, NULL, PARAM_ONBOOT},
 	{"setmode",	required_argument, NULL, PARAM_SETMODE},
