@@ -45,7 +45,7 @@ NUMIPTENT="unlimited"
 
 # Disk quota parameters (in form of softlimit:hardlimit)
 DISKSPACE="1G"
-DISKINODES="200K"
+DISKINODES="200000"
 QUOTATIME="0"
 
 # CPU fair sheduler parameter
