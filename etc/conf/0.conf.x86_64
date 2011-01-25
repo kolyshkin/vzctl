@@ -1,9 +1,0 @@
-# This is configuration file for VE0.
-# Only UB parameters are processed
-#
-# Copyright (C) 2006-2008, Parallels, Inc. All rights reserved.
-
-ONBOOT="no"
-
-# UBC parameters (in form of barrier:limit)
-OOMGUARPAGES="9223372036854775807:9223372036854775807"
