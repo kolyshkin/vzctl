@@ -152,6 +152,18 @@ is_running()
 	[ -f $SUBSYS_VZ ] || return 1
 }
 
+modify_vzconf()
+{
+	# For vswap-enabled kernel (like RHEL6 042test or greater),
+	# use vswap config for CT. Don't do it if CONFIGFILE= is modified
+
+	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
+	if test $kv -ge 42; then
+		sed -i 's/^CONFIGFILE="basic"$/CONFIGFILE=vswap-256m/' $VZCONF
+		print_warning "CONFIGFILE is set to vswap-256m in $VZCONF"
+	fi
+}
+
 status()
 {
 	check_kernel
@@ -414,6 +426,7 @@ start()
 
 	start_net
 	setup_ve0
+	modify_vzconf
 	start_ves
 
 	rm -f $LOCKFILE

@@ -18,6 +18,7 @@ check_config() {
 	: ${VESTAT:=/proc/vz/vestat}
 	: ${VPSCONFDIR:=@VPSCONFDIR@}
 	: ${VZDEV:=venet0}
+	: ${VZCONF:=@PKGCONFDIR@/vz.conf}
 
 	if [ "${MODULES_DISABLED}" != "yes" ]; then
 		: ${PRELOAD_MODULES:="af_packet"}
@@ -214,6 +215,20 @@ stop_ve() {
 	done
 }
 
+modify_vzconf()
+{
+	# For vswap-enabled kernel (like RHEL6 042test or greater),
+	# use vswap config for CT. Don't do it if CONFIGFILE= is modified
+
+	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
+	if test $kv -ge 42; then
+		sed -i 's/^CONFIGFILE="basic"$/CONFIGFILE=vswap-256m/' $VZCONF
+		ewarn "CONFIGFILE is set to vswap-256m in $VZCONF"
+
+	fi
+}
+
+
 start() {
 	check_config || return
 
@@ -250,6 +265,7 @@ start() {
 
 	start_net
 	setup_ve0
+	modify_vzconf
 	start_ve
 }
 
