@@ -18,7 +18,13 @@
 include $(top_srcdir)/paths.am
 
 VE0CONFIG = 0.conf
-VECONFIG  = ve-light.conf-sample ve-basic.conf-sample ve-unlimited.conf-sample
+VECONFIG  = \
+	    ve-light.conf-sample \
+	    ve-basic.conf-sample \
+	    ve-unlimited.conf-sample \
+	    ve-vswap-256m.conf-sample \
+	    ve-vswap-512m.conf-sample \
+	    ve-vswap-1024m.conf-sample
 
 vpsconf_DATA = \
 	$(VE0CONFIG) \
