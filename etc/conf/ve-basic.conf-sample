@@ -45,5 +45,5 @@ DISKSPACE="1048576:1153024"
 DISKINODES="200000:220000"
 QUOTATIME="0"
 
-# CPU fair sheduler parameter
+# CPU fair scheduler parameter
 CPUUNITS="1000"
