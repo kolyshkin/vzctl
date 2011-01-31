@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -108,37 +108,6 @@ int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
 	return 0;
 }
 
-struct vzctl_ve_configure_pci {
-	struct vzctl_ve_configure conf;
-	struct vzctl_ve_pci_dev dev;
-};
-
-static int set_pci(vps_handler *h, envid_t veid, int op, char *dev_id)
-{
-	int ret;
-	struct vzctl_ve_configure_pci conf_pci;
-	struct vzctl_ve_configure *conf = &conf_pci.conf;
-	struct vzctl_ve_pci_dev *dev = &conf_pci.dev;
-
-	sscanf(dev_id, "%x:%x:%x.%d", &dev->domain, &dev->bus,
-					&dev->slot, &dev->func);
-	conf->veid = veid;
-	if (op == ADD)
-		conf->key = VE_CONFIGURE_ADD_PCI_DEVICE;
-	else
-		conf->key = VE_CONFIGURE_DEL_PCI_DEVICE;
-	conf->val = 0;
-	conf->size = sizeof(struct vzctl_ve_pci_dev);
-
-	if ((ret = ioctl(h->vzfd, VZCTL_VE_CONFIGURE, &conf_pci))) {
-		if (errno == EEXIST)
-			return 0;
-		logger(-1, errno, "Unable to move pci device %s", dev_id);
-	}
-
-	return ret;
-}
-
 /** Allow/disallow access to devices on host system from CT.
  *
  * @param h		CT handler.
@@ -206,7 +175,8 @@ void free_dev_param(dev_param *dev)
 	free_dev(&dev->dev);
 }
 
-int run_pci_script(envid_t veid, int op, list_head_t *pci_h)
+int run_pci_script(envid_t veid, int op, list_head_t *pci_h,
+		const char *ve_root)
 {
 	char *argv[3];
 	char *envp[10];
@@ -218,6 +188,8 @@ int run_pci_script(envid_t veid, int op, list_head_t *pci_h)
 	if (list_empty(pci_h))
 		return 0;
 	snprintf(buf, sizeof(buf), "VEID=%d", veid);
+	envp[i++] = strdup(buf);
+	snprintf(buf, sizeof(buf), "VE_ROOT=%s", ve_root);
 	envp[i++] = strdup(buf);
 	snprintf(buf, sizeof(buf), "ADD=%d", op == ADD);
 	envp[i++] = strdup(buf);
@@ -236,9 +208,7 @@ int run_pci_script(envid_t veid, int op, list_head_t *pci_h)
 int vps_set_pci(vps_handler *h, envid_t veid, int op, const char *root,
 		pci_param *pci)
 {
-	int ret = 0;
 	list_head_t *pci_h = &pci->list;
-	str_param *res;
 
 	if (list_empty(pci_h))
 		return 0;
@@ -250,10 +220,5 @@ int vps_set_pci(vps_handler *h, envid_t veid, int op, const char *root,
 	}
 	logger(0, 0, "Setting PCI devices");
 
-	list_for_each(res, pci_h, list)
-		if ((ret = set_pci(h, veid, op, res->val)))
-			break;
-	if (!ret)
-		ret = run_pci_script(veid, op, pci_h);
-	return ret;
+	return run_pci_script(veid, op, pci_h, root);
 }
