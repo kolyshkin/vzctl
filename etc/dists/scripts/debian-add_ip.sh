@@ -76,18 +76,16 @@ iface ${LOOPBACK} inet loopback" >> ${CFGFILE}
 		echo "
 # Auto generated ${VENET_DEV} interface
 auto ${VENET_DEV}
-iface ${VENET_DEV} inet static
-	address 127.0.0.1
-	netmask 255.255.255.255
-	broadcast 0.0.0.0
+iface ${VENET_DEV} inet manual
+	up ifconfig ${VENET_DEV} up
 	up route add default dev ${VENET_DEV}
+	down route del default dev ${VENET_DEV}
+	down ifconfig ${VENET_DEV} down
 " >> ${CFGFILE}
 
 		if [ "${IPV6}" = "yes" ]; then
 			echo "
-iface venet0 inet6 static
-	address ::1
-	netmask 128
+iface venet0 inet6 manual
 " >> ${CFGFILE}
 
 		fi
@@ -110,11 +108,10 @@ function create_config()
 iface ${VENET_DEV}:${ifnum} inet static
 	address ${ip}
 	netmask 255.255.255.255
-	broadcast 0.0.0.0
 " >> ${CFGFILE}.bak
 
 	else
-	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}\/0/" ${CFGFILE}.bak
+	    sed -i -e "s/iface ${VENET_DEV} inet6 manual/iface ${VENET_DEV} inet6 manual\n\tup ifconfig ${VENET_DEV} add ${ip}\/0\n\tdown ifconfig ${VENET_DEV} del ${ip}\/0/" ${CFGFILE}.bak
 	fi
 
 }

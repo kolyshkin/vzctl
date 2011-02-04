@@ -39,8 +39,8 @@ function del_ip()
 
 		else
 		    grep -v ${ip} /etc/network/interfaces > ${CFGFILE}.bak
+		    ifconfig ${VENET_DEV} del ${ip}/0
 		    mv ${CFGFILE}.bak ${CFGFILE}
-		    /etc/init.d/networking restart > /dev/null 2>&1
 		fi
 	done
 }
