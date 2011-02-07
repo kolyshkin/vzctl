@@ -531,10 +531,10 @@ static struct Cfield field_names[] =
 {"numothersock.f", "NOTHSOCK.F", "%10s", 4, RES_UBC,print_ubc_numothersock, numothersock_f_sort_fn},
 
 {"dcachesize", "DCACHESZ", "%10s", 0, RES_UBC,print_ubc_dcachesize, dcachesize_h_sort_fn},
-{"dcachesize.m", "DCACHESZ.M", "%10s", 1, RES_UBC,print_ubc_dcachesize, dcachesize_h_sort_fn},
-{"dcachesize.b", "DCACHESZ.B", "%10s", 2, RES_UBC,print_ubc_dcachesize, dcachesize_h_sort_fn},
-{"dcachesize.l", "DCACHESZ.L", "%10s", 3, RES_UBC,print_ubc_dcachesize, dcachesize_h_sort_fn},
-{"dcachesize.f", "DCACHESZ.F", "%10s", 4, RES_UBC,print_ubc_dcachesize, dcachesize_h_sort_fn},
+{"dcachesize.m", "DCACHESZ.M", "%10s", 1, RES_UBC,print_ubc_dcachesize, dcachesize_m_sort_fn},
+{"dcachesize.b", "DCACHESZ.B", "%10s", 2, RES_UBC,print_ubc_dcachesize, dcachesize_b_sort_fn},
+{"dcachesize.l", "DCACHESZ.L", "%10s", 3, RES_UBC,print_ubc_dcachesize, dcachesize_l_sort_fn},
+{"dcachesize.f", "DCACHESZ.F", "%10s", 4, RES_UBC,print_ubc_dcachesize, dcachesize_f_sort_fn},
 
 {"numfile", "NFILE", "%10s", 0, RES_UBC,print_ubc_numfile, numfile_h_sort_fn},
 {"numfile.m", "NFILE.M", "%10s", 1, RES_UBC,print_ubc_numfile, numfile_m_sort_fn},
@@ -559,8 +559,8 @@ static struct Cfield field_names[] =
 {"diskspace.h", "DSPACE.H", "%10s", 2, RES_QUOTA, print_diskspace, diskspace_h_sort_fn},
 
 {"diskinodes", "DINODES", "%10s", 0, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
-{"diskinodes.s", "DINODES.S", "%10s", 1, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
-{"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_diskinodes, diskinodes_u_sort_fn},
+{"diskinodes.s", "DINODES.S", "%10s", 1, RES_QUOTA, print_diskinodes, diskinodes_s_sort_fn},
+{"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_diskinodes, diskinodes_h_sort_fn},
 
 {"laverage", "LAVERAGE", "%14s", 0, RES_CPUSTAT, print_laverage, laverage_sort_fn},
 {"uptime", "UPTIME", "%15s", 1, RES_CPUSTAT, print_uptime, uptime_sort_fn},
