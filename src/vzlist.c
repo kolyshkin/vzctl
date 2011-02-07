@@ -822,20 +822,6 @@ static void update_cpustat(int veid, struct Ccpustat *st)
 	return;
 }
 
-static char *parse_var(char *var)
-{
-	char *sp, *ep;
-
-	if (var == NULL)
-		return NULL;
-	sp = var;
-	while (*sp && (*sp == '"' || isspace(*sp))) sp++;
-	ep = var + strlen(var) - 1;
-	while (ep > sp && (*ep == '"' || isspace(*ep))) *ep-- = 0;
-
-	return strdup(sp);
-}
-
 #define MERGE_QUOTA(name, quota, dq)				\
 do {								\
 	if (dq.name != NULL) {					\
@@ -1072,32 +1058,6 @@ static int get_ub()
 	return 0;
 }
 
-static char *remove_sp(char *str)
-{
-	char *sp, *ep, *tp;
-	int skip;
-
-	if (str == NULL)
-		return NULL;
-	tp = str;
-	sp = tp;
-	ep = str + strlen(str);
-	skip = 0;
-	while (sp < ep) {
-		*tp = *sp;
-		if (isspace(*sp)) {
-			*tp = ' ';
-			skip++;
-		} else
-			skip = 0;
-		if (skip <= 1)
-			tp++;
-		sp++;
-	}
-	*tp = 0;
-	return strdup(str);
-}
-
 static char *invert_ip(char *ips)
 {
 	char *tmp, *p, *ep, *tp;
@@ -1313,54 +1273,6 @@ static int get_run_quota_stat()
 	if (veid)
 		update_quota(veid, &quota);
 	fclose(fp);
-	return 0;
-}
-
-static int get_stop_quota_stat(int veid)
-{
-	char buf[255];
-	char res[16];
-	FILE *fp;
-	unsigned long usage, softlimit, hardlimit;
-	int status;
-	struct Cquota quota;
-
-	snprintf(buf, sizeof(buf), VZQUOTA " show %d 2>/dev/null", veid);
-	if ((fp = popen(buf, "r")) == NULL)
-		return 1;
-	memset(&quota, 0, sizeof(quota));
-	while(!feof(fp)) {
-		if (fgets(buf, sizeof(buf), fp) == NULL)
-			break;
-		if (sscanf(buf, "%15s %lu %lu %lu", res, &usage,
-				&softlimit, &hardlimit) != 4)
-		{
-			continue;
-		}
-		if (!strcmp(res, "1k-blocks")) {
-			quota.diskspace[0] = usage;
-			quota.diskspace[1] = softlimit;
-			quota.diskspace[2] = hardlimit;
-		} else if (!strcmp(res, "inodes")) {
-			quota.diskinodes[0] = usage;
-			quota.diskinodes[1] = softlimit;
-			quota.diskinodes[2] = hardlimit;
-		}
-	}
-	status = pclose(fp);
-	if (WEXITSTATUS(status))
-		return 1;
-	update_quota(veid, &quota);
-	return 0;
-}
-
-static int get_stop_quota_stats()
-{
-	int i;
-	for (i = 0; i < n_veinfo; i++) {
-		if (veinfo[i].status == VE_STOPPED && !veinfo[i].hide)
-			get_stop_quota_stat(veinfo[i].veid);
-	}
 	return 0;
 }
 
