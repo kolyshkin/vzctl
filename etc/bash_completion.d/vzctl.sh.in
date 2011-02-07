@@ -26,6 +26,13 @@ _get_ves()
 			@SBINDIR@/vzlist -H -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -oname 2>/dev/null | $rm_empty
 			;;
+		restore)
+			# suspended CTs
+			(@SBINDIR@/vzlist -HS -o status,ctid;
+			 @SBINDIR@/vzlist -HS -o status,name) 2>/dev/null | \
+				grep '^suspended ' | \
+				sed 's/^suspended *//' | $rm_empty
+			;;
 		*)
 			# All CTs
 			@SBINDIR@/vzlist -H -a -octid 2>/dev/null
