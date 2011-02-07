@@ -255,7 +255,7 @@ PRINT_DQ(diskinodes)
 
 /* Sort functions */
 
-inline int check_empty_param(const void *val1, const void *val2)
+static inline int check_empty_param(const void *val1, const void *val2)
 {
 	if (val1 == NULL && val2 == NULL)
 		return 0;
@@ -266,12 +266,12 @@ inline int check_empty_param(const void *val1, const void *val2)
 	return 2;
 }
 
-int none_sort_fn(const void *val1, const void *val2)
+static int none_sort_fn(const void *val1, const void *val2)
 {
 	return 0;
 }
 
-int laverage_sort_fn(const void *val1, const void *val2)
+static int laverage_sort_fn(const void *val1, const void *val2)
 {
 	const struct Ccpustat *st1 = ((const struct Cveinfo *)val1)->cpustat;
 	const struct Ccpustat *st2 = ((const struct Cveinfo *)val2)->cpustat;
@@ -288,7 +288,7 @@ int laverage_sort_fn(const void *val1, const void *val2)
 	return (st1->la[2] - st2->la[2]) * 100;
 }
 
-int uptime_sort_fn(const void *val1, const void *val2)
+static int uptime_sort_fn(const void *val1, const void *val2)
 {
 	struct Ccpustat *st1 = ((const struct Cveinfo *)val1)->cpustat;
 	struct Ccpustat *st2 = ((const struct Cveinfo *)val2)->cpustat;
@@ -299,7 +299,7 @@ int uptime_sort_fn(const void *val1, const void *val2)
 	return (st2->uptime - st1->uptime);
 }
 
-int id_sort_fn(const void *val1, const void *val2)
+static int id_sort_fn(const void *val1, const void *val2)
 {
 	int ret;
 	ret = (((const struct Cveinfo*)val1)->veid >
@@ -307,7 +307,7 @@ int id_sort_fn(const void *val1, const void *val2)
 	return ret;
 }
 
-int status_sort_fn(const void *val1, const void *val2)
+static int status_sort_fn(const void *val1, const void *val2)
 {
 	int res;
 	res = ((const struct Cveinfo*)val1)->status -
@@ -317,7 +317,7 @@ int status_sort_fn(const void *val1, const void *val2)
 	return res;
 }
 
-int bootorder_sort_fn(const void *val1, const void *val2)
+static int bootorder_sort_fn(const void *val1, const void *val2)
 {
 	int ret;
 	unsigned long *r1 = ((const struct Cveinfo*)val1)->bootorder;
@@ -339,14 +339,14 @@ int bootorder_sort_fn(const void *val1, const void *val2)
 	return (*r1 > *r2);
 }
 
-int ioprio_sort_fn(const void *val1, const void *val2)
+static int ioprio_sort_fn(const void *val1, const void *val2)
 {
 	return ((const struct Cveinfo *)val1)->io.ioprio >
 		((const struct Cveinfo *)val2)->io.ioprio;
 }
 
 #define SORT_STR_FN(name)						\
-int name ## _sort_fn(const void *val1, const void *val2)		\
+static int name ## _sort_fn(const void *val1, const void *val2)		\
 {									\
 	const char *h1 = ((const struct Cveinfo*)val1)->name;		\
 	const char *h2 = ((const struct Cveinfo*)val2)->name;		\
@@ -363,7 +363,7 @@ SORT_STR_FN(ostemplate)
 SORT_STR_FN(ip)
 
 #define SORT_UL_RES(fn, res, name, index)				\
-int fn(const void *val1, const void *val2)				\
+static int fn(const void *val1, const void *val2)			\
 {									\
 	const struct C ## res *r1 = ((const struct Cveinfo *)val1)->res;\
 	const struct C ## res *r2 = ((const struct Cveinfo *)val2)->res;\
@@ -413,7 +413,7 @@ SORT_DQ(diskinodes)
 SORT_UL_RES(cpulimit_sort_fn, cpu, limit, 0)
 SORT_UL_RES(cpuunits_sort_fn, cpu, limit, 1)
 
-struct Cfield field_names[] =
+static struct Cfield field_names[] =
 {
 /* ctid should have index 0 */
 {"ctid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
@@ -575,7 +575,7 @@ struct Cfield field_names[] =
 	print_bootorder, bootorder_sort_fn},
 };
 
-void *x_malloc(int size)
+static void *x_malloc(int size)
 {
 	void *p;
 	if ((p = malloc(size)) == NULL) {
@@ -585,7 +585,7 @@ void *x_malloc(int size)
 	return p;
 }
 
-void *x_realloc(void *ptr, int size)
+static void *x_realloc(void *ptr, int size)
 {
 	void *tmp;
 
@@ -596,7 +596,7 @@ void *x_realloc(void *ptr, int size)
 	return tmp;
 }
 
-void usage()
+static void usage()
 {
 	fprintf(stderr, "\n"
 "Usage:	vzlist	[-a|-S] [-n] [-H] [-o field[,field...]] [-s [-]field]\n"
@@ -618,17 +618,17 @@ void usage()
 	);
 }
 
-int id_search_fn(const void* val1, const void* val2)
+static int id_search_fn(const void* val1, const void* val2)
 {
 	return (*(const int *)val1 - ((const struct Cveinfo*)val2)->veid);
 }
 
-int veid_search_fn(const void* val1, const void* val2)
+static int veid_search_fn(const void* val1, const void* val2)
 {
 	return (*(const int *)val1 - *(const int *)val2);
 }
 
-char* trim_eol_space(char *sp, char *ep)
+static char* trim_eol_space(char *sp, char *ep)
 {
 /*	if (ep == NULL)
 		ep = sp + strlen(sp); */
@@ -639,7 +639,7 @@ char* trim_eol_space(char *sp, char *ep)
 	return sp;
 }
 
-void print_hdr()
+static void print_hdr()
 {
 	struct Cfield_order *p;
 	int f;
@@ -662,7 +662,7 @@ void print_hdr()
 	1 - match
 	0 - do not match
 */
-inline int check_pattern(char *str, char *pat)
+static inline int check_pattern(char *str, char *pat)
 {
 	if (pat == NULL)
 		return 1;
@@ -671,7 +671,7 @@ inline int check_pattern(char *str, char *pat)
 	return !fnmatch(pat, str, 0);
 }
 
-void filter_by_hostname()
+static void filter_by_hostname()
 {
 	int i;
 
@@ -681,7 +681,7 @@ void filter_by_hostname()
 	}
 }
 
-void filter_by_name()
+static void filter_by_name()
 {
 	int i;
 
@@ -691,7 +691,7 @@ void filter_by_name()
 	}
 }
 
-void filter_by_description()
+static void filter_by_description()
 {
 	int i;
 
@@ -701,7 +701,7 @@ void filter_by_description()
 	}
 }
 
-void print_ve()
+static void print_ve()
 {
 	struct Cfield_order *p;
 	int i, f, idx;
@@ -740,7 +740,7 @@ void print_ve()
 	}
 }
 
-void add_elem(struct Cveinfo *ve)
+static void add_elem(struct Cveinfo *ve)
 {
 	veinfo = (struct Cveinfo *)x_realloc(veinfo,
 				sizeof(struct Cveinfo) * ++n_veinfo);
@@ -748,13 +748,13 @@ void add_elem(struct Cveinfo *ve)
 	return;
 }
 
-inline struct Cveinfo *find_ve(int veid)
+static inline struct Cveinfo *find_ve(int veid)
 {
 	return (struct Cveinfo *) bsearch(&veid, veinfo, n_veinfo,
 			sizeof(struct Cveinfo), id_search_fn);
 }
 
-void update_ve(int veid, char *ip, int status)
+static void update_ve(int veid, char *ip, int status)
 {
 	struct Cveinfo *tmp, ve;
 
@@ -777,7 +777,7 @@ void update_ve(int veid, char *ip, int status)
 	return;
 }
 
-void update_ubc(int veid, struct Cubc *ubc)
+static void update_ubc(int veid, struct Cubc *ubc)
 {
 	struct Cveinfo *tmp;
 
@@ -786,7 +786,7 @@ void update_ubc(int veid, struct Cubc *ubc)
 	return ;
 }
 
-void update_quota(int veid, struct Cquota *quota)
+static void update_quota(int veid, struct Cquota *quota)
 {
 	struct Cveinfo *tmp;
 
@@ -797,7 +797,7 @@ void update_quota(int veid, struct Cquota *quota)
 	return;
 }
 
-void update_cpu(int veid, unsigned long limit, unsigned long units)
+static void update_cpu(int veid, unsigned long limit, unsigned long units)
 {
 	struct Cveinfo *tmp;
 	struct Ccpu *cpu;
@@ -811,7 +811,7 @@ void update_cpu(int veid, unsigned long limit, unsigned long units)
 	return;
 }
 
-void update_cpustat(int veid, struct Ccpustat *st)
+static void update_cpustat(int veid, struct Ccpustat *st)
 {
 	struct Cveinfo *tmp;
 
@@ -822,7 +822,7 @@ void update_cpustat(int veid, struct Ccpustat *st)
 	return;
 }
 
-char *parse_var(char *var)
+static char *parse_var(char *var)
 {
 	char *sp, *ep;
 
@@ -844,7 +844,7 @@ do {								\
 	}							\
 } while(0);
 
-void merge_conf(struct Cveinfo *ve, vps_res *res)
+static void merge_conf(struct Cveinfo *ve, vps_res *res)
 {
 	if (ve->ubc == NULL) {
 		ve->ubc = x_malloc(sizeof(struct Cubc));
@@ -927,7 +927,7 @@ do {								\
 	ve->io.ioprio = res->io.ioprio;
 }
 
-int read_ves_param()
+static int read_ves_param()
 {
 	int i;
 	char buf[128];
@@ -966,7 +966,7 @@ int read_ves_param()
 }
 
 
-int check_veid_restr(int veid)
+static int check_veid_restr(int veid)
 {
 	if (g_ve_list == NULL)
 		return 1;
@@ -985,7 +985,7 @@ do {						\
 	}					\
 } while(0);					\
 
-int get_ub()
+static int get_ub()
 {
 	char buf[256];
 	int veid, prev_veid;
@@ -1072,7 +1072,7 @@ int get_ub()
 	return 0;
 }
 
-char *remove_sp(char *str)
+static char *remove_sp(char *str)
 {
 	char *sp, *ep, *tp;
 	int skip;
@@ -1098,7 +1098,7 @@ char *remove_sp(char *str)
 	return strdup(str);
 }
 
-char *invert_ip(char *ips)
+static char *invert_ip(char *ips)
 {
 	char *tmp, *p, *ep, *tp;
 	size_t len;
@@ -1270,7 +1270,7 @@ error:
 }
 #endif
 
-int get_run_quota_stat()
+static int get_run_quota_stat()
 {
 	unsigned long usage, softlimit, hardlimit, time, exp;
 	int veid = 0, prev_veid = 0;
@@ -1316,7 +1316,7 @@ int get_run_quota_stat()
 	return 0;
 }
 
-int get_stop_quota_stat(int veid)
+static int get_stop_quota_stat(int veid)
 {
 	char buf[255];
 	char res[16];
@@ -1354,7 +1354,7 @@ int get_stop_quota_stat(int veid)
 	return 0;
 }
 
-int get_stop_quota_stats()
+static int get_stop_quota_stats()
 {
 	int i;
 	for (i = 0; i < n_veinfo; i++) {
@@ -1372,7 +1372,7 @@ static long get_clk_tck()
 	return __clk_tck;
 }
 
-int get_ve_cpustat(int veid)
+static int get_ve_cpustat(int veid)
 {
 	struct vz_cpu_stat stat;
 	struct vzctl_cpustatctl statctl;
@@ -1392,7 +1392,7 @@ int get_ve_cpustat(int veid)
 	return 0;
 }
 
-int get_ves_cpustat()
+static int get_ves_cpustat()
 {
 	int i;
 
@@ -1407,7 +1407,7 @@ int get_ves_cpustat()
 	return 0;
 }
 
-int get_mounted_status()
+static int get_mounted_status()
 {
 	int i;
 	char buf[512];
@@ -1432,7 +1432,7 @@ int get_mounted_status()
 	return 0;
 }
 
-int get_ves_cpu()
+static int get_ves_cpu()
 {
 	unsigned long tmp;
 	int veid, id, weight, rate;
@@ -1462,7 +1462,7 @@ int get_ves_cpu()
 	return 0;
 }
 
-int get_ve_list()
+static int get_ve_list()
 {
 	DIR *dp;
 	struct dirent *ep;
@@ -1491,7 +1491,7 @@ int get_ve_list()
 	return 0;
 }
 
-int search_field(char *name)
+static int search_field(char *name)
 {
 	unsigned int i;
 
@@ -1504,7 +1504,7 @@ int search_field(char *name)
 	return -1;
 }
 
-int build_field_order(char *fields)
+static int build_field_order(char *fields)
 {
 	struct Cfield_order *tmp, *prev = NULL;
 	char *sp, *ep, *p;
@@ -1553,7 +1553,7 @@ static inline int check_param(int res_type)
 	return 0;
 }
 
-int collect()
+static int collect()
 {
 	int update = 0;
 	int ret;
@@ -1588,7 +1588,7 @@ int collect()
 	return 0;
 }
 
-void print_names()
+static void print_names()
 {
 	unsigned int i;
 
@@ -1598,7 +1598,7 @@ void print_names()
 	return;
 }
 
-void free_veinfo()
+static void free_veinfo()
 {
 	int i;
 
