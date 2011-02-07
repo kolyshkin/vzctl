@@ -21,7 +21,7 @@ _get_ves()
 			@SBINDIR@/vzlist -H -S -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -S -oname 2>/dev/null | $rm_empty
 			;;
-		stop|enter|exec*)
+		stop|enter|exec*|chkpnt)
 			# running CTs
 			@SBINDIR@/vzlist -H -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -oname 2>/dev/null | $rm_empty
