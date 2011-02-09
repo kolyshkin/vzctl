@@ -21,7 +21,6 @@
 /* #include <linux/vzlist.h> */
 #define HAVE_VZLIST_IOCTL 0
 
-#define PROCVEINFO	"/proc/vz/veinfo"
 #define PROCVESTAT	"/proc/vz/vestat"
 #define PROCUBC		"/proc/user_beancounters"
 #define PROCQUOTA	"/proc/vz/vzquota"

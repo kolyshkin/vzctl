@@ -28,6 +28,7 @@
 
 #define PROCMEM		"/proc/meminfo"
 #define PROCTHR		"/proc/sys/kernel/threads-max"
+#define PROCVEINFO	"/proc/vz/veinfo"
 
 char *parse_line(char *str, char *ltoken, int lsz);
 int stat_file(const char *file);
@@ -63,6 +64,9 @@ void remove_names(envid_t veid);
 size_t vz_strlcat(char *dst, const char *src, size_t count);
 
 void get_osrelease(vps_res *res);
+
+int get_running_ve_list(envid_t **ves);
+int ve_in_list(envid_t *list, int size, envid_t ve);
 
 #define logger_enomem(log_level, err, size, file, line)			\
 	logger(log_level, err, "%s:%i: Can't allocate %lu bytes",	\

@@ -736,3 +736,57 @@ void get_osrelease(vps_res *res)
 	logger(1, 0, "Set osrelease=%s", osrelease);
 	res->env.osrelease = strdup(osrelease);
 }
+
+static int envid_sort_fn(const void *val1, const void *val2)
+{
+	const envid_t *r1 = (const envid_t *)val1;
+	const envid_t *r2 = (const envid_t *)val2;
+
+	return (*r1 - *r2);
+}
+
+/** Returns a sorted array of all running CTs.
+ * Caller needs to free() it after use
+ */
+int get_running_ve_list(envid_t **ves)
+{
+	FILE *fp;
+	int res;
+	envid_t veid;
+	int venum = 0;
+	int ves_size = 256;
+
+
+	*ves = malloc(ves_size * sizeof(envid_t));
+	if (*ves == NULL)
+		return -ENOMEM;
+
+	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
+		return -errno;
+	}
+	while (!feof(fp)) {
+		res = fscanf(fp, "%d %*[^\n]", &veid);
+		if (res != 1 || !veid)
+			continue;
+		if (venum >= ves_size)
+			ves_size *= 2;
+		*ves = realloc(*ves, ves_size * sizeof(envid_t));
+		if (*ves == NULL)
+		{
+			venum=-ENOMEM;
+			goto out;
+		}
+		(*ves)[venum++] = veid;
+	}
+	qsort(*ves, venum, sizeof(envid_t), envid_sort_fn);
+out:
+	fclose(fp);
+	return venum;
+}
+
+/* Searches for ve in velist */
+int ve_in_list(envid_t *list, int size, envid_t ve)
+{
+	return bsearch(&ve, list, size, sizeof(envid_t),
+			envid_sort_fn) != NULL;
+}
