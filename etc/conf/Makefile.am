@@ -29,3 +29,5 @@ VECONFIG  = \
 vpsconf_DATA = \
 	$(VE0CONFIG) \
 	$(VECONFIG)
+
+EXTRA_DIST = $(vpsconf_DATA)
