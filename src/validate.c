@@ -708,6 +708,8 @@ static int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 	ub_param ub;
 	struct ub_struct ub_s;
 	struct mem_struct mem;
+	int venum;
+	envid_t *velist;
 
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
 		logger(-1, errno, "Unable to open " PROCUBC);
@@ -719,11 +721,16 @@ static int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 		memset(ru_utl, 0, sizeof(*ru_utl));
 	memset(&ub, 0, sizeof(ub));
 	memset(&ub_s, 0, sizeof(ub_s));
+	venum = get_running_ve_list(&velist);
+	if (venum < 0) {
+		logger(-1, -venum, "Can't get list of running CTs");
+		return -1;
+	}
 	while (fgets(str, sizeof(str), fd)) {
 		if ((res = sscanf(str, "%d:", &id)) == 1) {
 			fmt =  "%*lu:%s%lu%lu%lu%lu";
 			found = 1;
-			if (veid) {
+			if (veid && ve_in_list(velist, venum, veid)) {
 				if (ru_utl != NULL) {
 					calc_ve_utilization(&ub_s, &utl, &mem, 0);
 					inc_rusage(ru_utl, &utl);
@@ -756,7 +763,7 @@ static int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 		}
 	}
 	/* Last CT in /proc/user_beancounters */
-	if (veid) {
+	if (veid && ve_in_list(velist, venum, veid)) {
 		if (ru_utl != NULL) {
 			calc_ve_utilization(&ub_s, &utl, &mem, 0);
 			inc_rusage(ru_utl, &utl);
@@ -769,6 +776,7 @@ static int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 		free_ub_param(&ub_s);
 	}
 	fclose(fd);
+	free(velist);
 	return 0;
 }
 
