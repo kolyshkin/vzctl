@@ -306,7 +306,7 @@ err:
 	return ret;
 }
 
-static int restrore_FN(vps_handler *h, envid_t veid, int wait_p, int err_p,
+static int restore_fn(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
 	int status, len, len1;
@@ -444,7 +444,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	param->rst_fd = rst_fd;
 	param->cmd = cmd;
 	ret = vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE,
-		NULL, restrore_FN, param);
+		NULL, restore_fn, param);
 	if (ret)
 		goto err;
 	/* Restore second-level quota links & quota device */
