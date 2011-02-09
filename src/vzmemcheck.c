@@ -171,7 +171,7 @@ int calculate(int numerator, int verbose)
 	fclose(fd);
 	free(velist);
 	if (verbose) {
-		printf("-------------------------------------------------------------------------\n");
+		printf("--------------------------------------------------------------------------\n");
 		printf("Summary:   ");
 	}
 	printf("%7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f\n",
@@ -188,7 +188,7 @@ int calculate(int numerator, int verbose)
 		r = mem.ram / (1024 * 1024);
 		rs = (mem.ram + mem.swap) / (1024 * 1024);
 		if (verbose)
-			 printf("        ");
+			printf("           ");
 		printf("%7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f\n",
 			lm, lm, r, rs, rs, rs, rs, rs);
 	}
