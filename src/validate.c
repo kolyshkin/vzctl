@@ -658,7 +658,7 @@ void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage)
 		rusagetotal->alloc_mem_max_lim = rusage->alloc_mem_max_lim;
 }
 
-void mul_rusage(struct CRusage *rusage, int k)
+static void mul_rusage(struct CRusage *rusage, int k)
 {
 	if (rusage == NULL)
 		return;
@@ -694,7 +694,7 @@ if (param->name != NULL) {						\
 	SHIFTPARAM(numpty)
 }
 
-int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
+static int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 {
 	FILE *fd;
 	struct CRusage utl, comm;
