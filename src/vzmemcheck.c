@@ -44,7 +44,7 @@ void header(int verbose, int param)
 	else
 		printf("Output values in %%\n");
 	if (verbose)
-		printf("veid       ");
+		printf("CTID       ");
 	printf(" LowMem  LowMem     RAM MemSwap MemSwap   Alloc   Alloc   Alloc\n");
 	if (verbose)
 		printf("           ");
