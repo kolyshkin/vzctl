@@ -710,7 +710,7 @@ int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
 	struct mem_struct mem;
 
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		logger(-1, errno, "Unable open " PROCUBC);
+		logger(-1, errno, "Unable to open " PROCUBC);
 		return -1;
 	}
 	if (ru_comm != NULL)
