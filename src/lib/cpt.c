@@ -149,11 +149,12 @@ int real_chkpnt(int cpt_fd, envid_t veid, const char *root, cpt_param *param,
 			goto err_out;
 		if (ioctl(cpt_fd, CPT_DUMP, 0) < 0) {
 			logger(-1, errno, "Can not dump container");
-			if (cmd == CMD_CHKPNT)
+			if (cmd == CMD_CHKPNT) {
 				clean_hardlink_dir("/");
 				if (ioctl(cpt_fd, CPT_RESUME, 0) < 0)
 					logger(-1, errno, "Can not "
 							"resume container");
+			}
 			goto err_out;
 		}
 	}
