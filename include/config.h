@@ -44,9 +44,6 @@ int check_ub(ub_param *ub);
 int merge_vps_param(vps_param *dst, vps_param *src);
 int merge_global_param(vps_param *dst, vps_param *src);
 void free_vps_param(vps_param *param);
-const vps_config *conf_get_by_name(const vps_config *conf, const char *name);
-const vps_config *conf_get_by_id(const vps_config *conf, int id);
-int opt_get_by_id(struct option *opt, int id);
 int get_veid_by_name(const char *name);
 int set_name(int veid, char *new_name, char *old_name);
 #endif

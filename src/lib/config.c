@@ -144,7 +144,8 @@ static vps_config config[] = {
 {NULL,		NULL, -1}
 };
 
-const vps_config *conf_get_by_name(const vps_config *conf, const char *name)
+static const vps_config *conf_get_by_name(const vps_config *conf,
+		const char *name)
 {
 	const vps_config *p;
 
@@ -160,7 +161,7 @@ const vps_config *conf_get_by_name(const vps_config *conf, const char *name)
 	return NULL;
 }
 
-const vps_config *conf_get_by_id(const vps_config *conf, int id)
+static const vps_config *conf_get_by_id(const vps_config *conf, int id)
 {
 	const vps_config *p;
 
@@ -172,7 +173,7 @@ const vps_config *conf_get_by_id(const vps_config *conf, int id)
 	return NULL;
 }
 
-int opt_get_by_id(struct option *opt, int id)
+static int opt_get_by_id(struct option *opt, int id)
 {
 	struct option *p;
 
@@ -387,7 +388,7 @@ static void store_features(unsigned long long mask, unsigned long long known,
 	add_str_param(conf_h, buf);
 }
 
-int parse_ioprio(int id, io_param *io, char *val)
+static int parse_ioprio(int id, io_param *io, char *val)
 {
 	if (parse_int(val, &io->ioprio))
 		return ERR_INVAL;
@@ -554,7 +555,7 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 }
 
 /******************** totalmem *************************/
-int parse_meminfo(meminfo_param *param, const char *val)
+static int parse_meminfo(meminfo_param *param, const char *val)
 {
 	int mode;
 	char mode_nm[32];
@@ -603,7 +604,7 @@ static int store_meminfo(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
-int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
+static int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 {
 	int ret;
 	ub_res res;
@@ -722,7 +723,7 @@ static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 /********************** Network ************************/
 
-int check_ip_dot(char *ip)
+static int check_ip_dot(char *ip)
 {
 	int i;
 	char *str = ip;
@@ -818,7 +819,7 @@ static int check_netdev(const char *devname)
 	return 0;
 }
 
-int add_netdev(net_param *net, char *val)
+static int add_netdev(net_param *net, char *val)
 {
 	char *token;
 
@@ -1353,7 +1354,8 @@ static int parse_mac_filter_cmd (veth_dev *dev, char *str)
 	return 0;
 }
 
-void generate_veth_name(int veid, char *dev_name_ve,  char *dev_name, int len)
+static void generate_veth_name(int veid, char *dev_name_ve,
+		char *dev_name, int len)
 {
 	char *name;
 	int id = 0;
@@ -2300,32 +2302,6 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 	free_vps_param(tmp_old_p);
 
 	return ret;
-}
-
-int vps_remove_cfg_param(envid_t veid, char *path, char *name)
-{
-	list_head_t conf;
-	conf_struct *line;
-	int ret, found;
-
-	list_head_init(&conf);
-	if ((ret = read_conf(path, &conf)))
-		return ret;
-	if (list_empty(&conf))
-		return 0;
-	found = 0;
-	while ((line = find_conf_line(&conf, name, '=')) != NULL) {
-		free(line->val);
-		list_del(&line->list);
-		free(line);
-		found++;
-	}
-	if (found)
-		ret = write_conf(path, &conf);
-	free_str_param(&conf);
-
-	return ret;
-
 }
 
 /********************************************************************/
