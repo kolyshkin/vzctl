@@ -79,6 +79,8 @@ static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
 		if (errno == ENOTTY) {
 			logger(-1, 0, "Error: veth feature is"
 				" not supported by kernel");
+			logger(-1, 0, "Please check that vzethdev"
+				" kernel module is loaded");
 		} else {
 			logger(-1, errno, "Unable to create veth");
 		}
