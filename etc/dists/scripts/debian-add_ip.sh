@@ -85,7 +85,7 @@ iface ${VENET_DEV} inet manual
 
 		if [ "${IPV6}" = "yes" ]; then
 			echo "
-iface venet0 inet6 manual
+iface ${VENET_DEV} inet6 manual
 " >> ${CFGFILE}
 
 		fi
@@ -157,7 +157,7 @@ function add_ip()
 	if [ "${IPDELALL}" = "yes" ]; then
 		ifdown ${VENET_DEV} >/dev/null 2>&1
 		remove_debian_interface "${VENET_DEV}:[0-9]*" ${CFGFILE}
-		grep -v "up ifconfig venet0 add" /etc/network/interfaces > ${CFGFILE}.bak
+		grep -v "up ifconfig ${VENET_DEV} add" ${CFGFILE} > ${CFGFILE}.bak
 		mv ${CFGFILE}.bak ${CFGFILE}
 	fi
 	if [ -n "${IP_ADDR}" ]; then
