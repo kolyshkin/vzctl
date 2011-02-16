@@ -157,8 +157,10 @@ function add_ip()
 	if [ "${IPDELALL}" = "yes" ]; then
 		ifdown ${VENET_DEV} >/dev/null 2>&1
 		remove_debian_interface "${VENET_DEV}:[0-9]*" ${CFGFILE}
-		grep -v "up ifconfig ${VENET_DEV} add" ${CFGFILE} > ${CFGFILE}.bak
-		mv ${CFGFILE}.bak ${CFGFILE}
+		# Remove IPv6 addresses (which are not aliases)
+		# Note the actual tab character in grep expression
+		grep -v "^	up ifconfig ${VENET_DEV} add " ${CFGFILE} > ${CFGFILE}.bak
+		grep -v "^	down ifconfig ${VENET_DEV} del " ${CFGFILE}.bak > ${CFGFILE}
 	fi
 	if [ -n "${IP_ADDR}" ]; then
 		cp -f ${CFGFILE} ${CFGFILE}.bak
