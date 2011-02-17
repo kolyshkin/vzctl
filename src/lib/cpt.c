@@ -307,10 +307,10 @@ err:
 	return ret;
 }
 
-static int restore_fn(vps_handler *h, envid_t veid, int wait_p, int err_p,
-	void *data)
+static int restore_fn(vps_handler *h, envid_t veid, int wait_p,
+		int old_wait_p, int err_p, void *data)
 {
-	int status, len, len1;
+	int status, len, len1, ret;
 	cpt_param *param = (cpt_param *) data;
 	char buf[PIPE_BUF];
 	int error_pipe[2];
@@ -319,7 +319,7 @@ static int restore_fn(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	if (param == NULL)
 		goto err;
 	/* Close all fds */
-	close_fds(0, wait_p, err_p, h->vzfd, param->rst_fd, -1);
+	close_fds(0, wait_p, old_wait_p, err_p, h->vzfd, param->rst_fd, -1);
 	if (ioctl(param->rst_fd, CPT_SET_VEID, veid) < 0) {
 		logger(-1, errno, "Can't set CT ID %d", param->rst_fd);
 		goto err;
@@ -335,10 +335,15 @@ static int restore_fn(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		goto err;
 	}
 	close(error_pipe[1]);
-	if (ioctl(param->rst_fd, CPT_SET_LOCKFD, wait_p) < 0) {
+
+	ret = ioctl(param->rst_fd, CPT_SET_LOCKFD2, wait_p);
+	if (ret < 0 && errno == EINVAL)
+		ret = ioctl(param->rst_fd, CPT_SET_LOCKFD, old_wait_p);
+	if (ret < 0) {
 		logger(-1, errno, "Can't set lockfd");
 		goto err;
 	}
+
 	if (ioctl(param->rst_fd, CPT_SET_STATUSFD, STDIN_FILENO) < 0) {
 		logger(-1, errno, "Can't set statusfd");
 		goto err;

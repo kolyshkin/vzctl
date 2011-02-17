@@ -429,7 +429,7 @@ env_err:
 }
 
 static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
-	int wait_p, int err_p, env_create_FN fn, void *data)
+	int wait_p, int old_wait_p, int err_p, env_create_FN fn, void *data)
 {
 	int ret, pid;
 
@@ -449,7 +449,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		if (fn == NULL) {
 			ret = _env_create(h, veid, wait_p, err_p, (void *)res);
 		} else {
-			ret = fn(h, veid, wait_p, err_p, data);
+			ret = fn(h, veid, wait_p, old_wait_p, err_p, data);
 		}
 env_err:
 		if (ret)
@@ -460,9 +460,11 @@ env_err:
 }
 
 int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
-	int wait_p[2], int err_p[2], env_create_FN fn, void *data)
+		int wait_p[2], int old_wait_p[2], int err_p[2],
+				env_create_FN fn, void *data)
 {
 	int ret, pid, errcode;
+	int old_wait_fd;
 	int status_p[2];
 	struct sigaction act, actold;
 
@@ -493,9 +495,15 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		close(err_p[0]);
 		fcntl(wait_p[0], F_SETFD, FD_CLOEXEC);
 		close(wait_p[1]);
+		if (old_wait_p) {
+			fcntl(old_wait_p[0], F_SETFD, FD_CLOEXEC);
+			close(old_wait_p[1]);
+			old_wait_fd = old_wait_p[0];
+		} else
+			old_wait_fd = -1;
 
-		ret = vz_real_env_create(h, veid, res, wait_p[0], err_p[1], fn,
-			data);
+		ret = vz_real_env_create(h, veid, res, wait_p[0],
+					old_wait_fd, err_p[1], fn, data);
 		if (ret)
 			write(STDIN_FILENO, &ret, sizeof(ret));
 		exit(ret);
@@ -503,6 +511,8 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	/* Wait for environment created */
 	close(status_p[1]);
 	close(wait_p[0]);
+	if (old_wait_p)
+		close(old_wait_p[0]);
 	close(err_p[1]);
 	ret = read(status_p[0], &errcode, sizeof(errcode));
 	if (ret > 0) {
@@ -570,6 +580,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	env_create_FN fn, void *data)
 {
 	int wait_p[2];
+	int old_wait_p[2];
 	int err_p[2];
 	int ret, err;
 	char buf[64];
@@ -608,6 +619,17 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
+	/* old_wait_p is needed for backward compatibily with old kernels.
+	 * Now we use wait_p for this purpose. If old_wait_p is closed without
+	 * writing any data, it's "OK to go" signal and if data are received
+	 * from old_wait_p it's "no go" signal". It doesn't work if vzctl
+	 * segfaults, because in this case the decriptor will be closed without
+	 * sending data.
+	 */
+	if (pipe(old_wait_p) < 0) {
+		logger(-1, errno, "Can not create pipe");
+		return VZ_RESOURCE_ERROR;
+	}
 	if (pipe(err_p) < 0) {
 		close(wait_p[0]);
 		close(wait_p[1]);
@@ -620,8 +642,12 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	sigaction(SIGPIPE, &act, NULL);
 	fix_numiptent(&res->ub);
 	fix_cpu(&res->cpu);
-	if ((ret = vz_env_create(h, veid, res, wait_p, err_p, fn, data)))
+
+	ret = vz_env_create(h, veid, res, wait_p,
+				old_wait_p, err_p, fn, data);
+	if (ret)
 		goto err;
+
 	if ((ret = vps_setup_res(h, veid, &actions, &res->fs, param,
 		STATE_STARTING, skip, mod)))
 	{
@@ -643,6 +669,8 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	err = 0;
 	if (write(wait_p[1], &err, sizeof(err)) != sizeof(err))
 		logger(-1, errno, "Unable to write to waitfd to start init");
+	close(wait_p[1]);
+	close(old_wait_p[1]);
 err:
 	free_dist_actions(&actions);
 	if (ret) {
@@ -654,6 +682,8 @@ err:
 		 * the environment, so it should not start /sbin/init
 		 */
 		close(wait_p[1]);
+		write(old_wait_p[1], &err, sizeof(err));
+		close(old_wait_p[1]);
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
 			if (res->misc.wait == YES) {
