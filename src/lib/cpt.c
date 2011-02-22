@@ -356,7 +356,7 @@ static int restore_fn(vps_handler *h, envid_t veid, int wait_p,
 	ioctl(param->rst_fd, CPT_HARDLNK_ON);
 
 	logger(0, 0, "\tundump...");
-	if (ioctl(param->rst_fd, CPT_UNDUMP, 0) < 0) {
+	if (ioctl(param->rst_fd, CPT_UNDUMP, 0) != 0) {
 		logger(-1, errno, "Error: undump failed");
 		goto err_undump;
 	}
