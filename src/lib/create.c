@@ -188,8 +188,16 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	} else if (vps_p->opt.config != NULL) {
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			vps_p->opt.config);
+		/* Bail out if CONFIGFILE is wrong in /etc/vz/vz.conf */
+		if (!stat_file(src)) {
+			logger(-1, errno, "File %s not found", src);
+			logger(-1, 0, "Fix the value of CONFIGFILE in "
+					GLOBAL_CFG);
+			ret = VZ_CP_CONFIG;
+			goto err;
+		}
 		/* Do not use config if CT config exists */
-		if (!cfg_exists && stat_file(src))
+		if (!cfg_exists)
 			sample_config = vps_p->opt.config;
 	}
 	if (sample_config != NULL) {
