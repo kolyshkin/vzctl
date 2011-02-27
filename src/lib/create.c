@@ -199,6 +199,14 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		/* Do not use config if CT config exists */
 		if (!cfg_exists)
 			sample_config = vps_p->opt.config;
+		else {
+			logger(0, 0, "Warning: CT config file already "
+				"exists, not applying a default config "
+				"sample.");
+			logger(0, 0, "It might lead to incomplete CT "
+				"configuration, you can use --applyconfig "
+				"to fix.");
+		}
 	}
 	if (sample_config != NULL) {
 		if (cp_file(dst, src))
