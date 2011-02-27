@@ -157,10 +157,14 @@ modify_vzconf()
 	# For vswap-enabled kernel (like RHEL6 042test or greater),
 	# use vswap config for CT. Don't do it if CONFIGFILE= is modified
 
+	local cfg_old='^CONFIGFILE="basic"$'
+	local cfg_new='CONFIGFILE="vswap-256m"'
 	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
 	if test $kv -ge 42; then
-		sed -i 's/^CONFIGFILE="basic"$/CONFIGFILE=vswap-256m/' $VZCONF
-		print_warning "CONFIGFILE is set to vswap-256m in $VZCONF"
+		if grep -q $cfg_old $VZCONF; then
+			sed -i "s/${cfg_old}/${cfg_new}/" $VZCONF
+			print_warning "Set $cfg_new in $VZCONF"
+		fi
 	fi
 }
 
