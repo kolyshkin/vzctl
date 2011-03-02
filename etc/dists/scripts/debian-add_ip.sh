@@ -78,6 +78,7 @@ iface ${LOOPBACK} inet loopback" >> ${CFGFILE}
 auto ${VENET_DEV}
 iface ${VENET_DEV} inet manual
 	up ifconfig ${VENET_DEV} up
+	up ifconfig ${VENET_DEV} 0
 	up route add default dev ${VENET_DEV}
 	down route del default dev ${VENET_DEV}
 	down ifconfig ${VENET_DEV} down
