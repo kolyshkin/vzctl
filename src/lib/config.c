@@ -2204,7 +2204,7 @@ static int write_conf(char *fname, list_head_t *head)
 	if (file == NULL) {
 		if (errno != ENOENT) {
 			logger(-1, errno, "Unable to resolve path %s", fname);
-			return 1;
+			return ret;
 		}
 		file = vz_strdup(fname);
 		if (!file)
