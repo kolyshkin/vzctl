@@ -1052,9 +1052,6 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 					fname);
 			ret = vps_save_config(veid, fname,
 					cmd_p, vps_p, &g_action);
-			if (ret == 0)
-				logger(0, 0, "Saved parameters "
-						"for CT %d", veid);
 		} else if (cmd_p->opt.save != NO) {
 			if (list_empty(&cmd_p->res.misc.userpw)) {
 				logger(0, 0, "WARNING: Settings were not saved"

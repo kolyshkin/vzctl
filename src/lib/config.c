@@ -2281,7 +2281,7 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 {
 	vps_param *tmp_old_p = NULL;
 	list_head_t conf, new_conf;
-	int ret, n;
+	int ret = VZ_CONFIG_SAVE_ERROR;
 
 	list_head_init(&conf);
 	list_head_init(&new_conf);
@@ -2290,15 +2290,27 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 		vps_parse_config(veid, path, tmp_old_p, action);
 		old_p = tmp_old_p;
 	}
-	if ((ret = read_conf(path, &conf)))
-		return ret;
-	n = store(old_p, new_p, &new_conf);
+	if (read_conf(path, &conf) != 0)
+		goto err_read;
+	store(old_p, new_p, &new_conf);
 	if (action != NULL)
 		mod_save_config(action, &new_conf);
-	if ((ret = vps_merge_conf(&conf, &new_conf)) > 0)
-		ret = write_conf(path, &conf);
+	if (vps_merge_conf(&conf, &new_conf) == 0)
+	{
+		/* Nothing to save */
+		logger(0, 0, "No changes in CT configuration, not saving");
+		ret = 0;
+		goto out;
+	}
+
+	ret = write_conf(path, &conf);
+	if (ret == 0)
+		logger(0, 0, "Saved parameters "
+				"for CT %d", veid);
+out:
 	free_str_param(&conf);
 	free_str_param(&new_conf);
+err_read:
 	free_vps_param(tmp_old_p);
 
 	return ret;
