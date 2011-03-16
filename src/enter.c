@@ -308,6 +308,11 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 			dup2(slave, 2);
 			/* Close the extra descriptor for the pseudo tty. */
 			close(slave);
+			/* Close other ends of our pipes */
+			close(in[0]);
+			close(out[1]);
+			close(st[1]);
+			close(info[0]);
 			if ((term = getenv("TERM")) != NULL) {
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
 				env[sizeof(env)/sizeof(env[0]) - 2] = buf;
