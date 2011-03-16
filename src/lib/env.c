@@ -619,11 +619,13 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
-	/* old_wait_p is needed for backward compatibily with old kernels.
-	 * Now we use wait_p for this purpose. If old_wait_p is closed without
-	 * writing any data, it's "OK to go" signal and if data are received
-	 * from old_wait_p it's "no go" signal". It doesn't work if vzctl
-	 * segfaults, because in this case the decriptor will be closed without
+	/* old_wait_p is needed for backward compatibility with older kernels,
+	 * while for recent ones (that support CPT_SET_LOCKFD2) we use wait_p.
+	 *
+	 * If old_wait_p is closed without writing any data, it's "OK to go"
+	 * signal, and if data are received from old_wait_p it's "no go"
+	 * signal". Note that such thing doesn't work if vzctl segfaults,
+	 * because in this case the descriptor will be closed without
 	 * sending data.
 	 */
 	if (pipe(old_wait_p) < 0) {
