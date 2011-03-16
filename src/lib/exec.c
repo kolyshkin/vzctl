@@ -489,5 +489,9 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		if (!is_mounted)
 			fsumount(veid, root);
 	}
+	close(rd_p[0]);
+	close(rd_p[1]);
+	close(wr_p[0]);
+	close(wr_p[1]);
 	return ret;
 }
