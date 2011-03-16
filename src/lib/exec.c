@@ -470,8 +470,8 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 				return ret;
 			}
 		}
-		if ((ret = vz_env_create(h, veid, &vps_p->res, rd_p, wr_p,
-					NULL, NULL, NULL)))
+		if ((ret = vz_env_create(h, veid, &vps_p->res, rd_p, NULL,
+					wr_p, NULL, NULL)))
 		{
 			return ret;
 		}
