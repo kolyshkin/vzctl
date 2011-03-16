@@ -481,7 +481,8 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	ret = vps_exec_script(h, veid, root, argv, NULL, script,
 		NULL, 0);
 	if (!is_run) {
-		write(rd_p[1], &ret, sizeof(ret));
+		/* Close w/o writing to signal we don't want to start init */
+		close(rd_p[1]);
 		retry = 0;
 		while (retry++ < 10 && vps_is_run(h, veid))
 			usleep(500000);
