@@ -84,7 +84,7 @@ int vz_mount(fs_param *fs, int remount)
 	{
 		logger(-1, errno, "Can't mount: %s %s", fs->root, fs->private);
 		if (errno == ENODEV)
-			logger(-1, errno, "Kernel lacks simfs support. Please "
+			logger(-1, 0, "Kernel lacks simfs support. Please "
 				"compile it in, or load simfs module.");
 		return VZ_FS_CANTMOUNT;
 	}
