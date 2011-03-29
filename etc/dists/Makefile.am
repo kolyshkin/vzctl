@@ -31,109 +31,78 @@ EXTRA_DIST = \
 	$(distconf_DATA) \
 	$(wildcard *.conf)
 
+# Some older versions of distros require specific conf files
 ALT_2x_VER    = 2.4
-ALT_VER       = 3.0 4.0
-ARCH_VER      = 0.7 0.8
-CENTOS_VER    = 3 4
-DEBIAN_VER    = 3.0 3.1 4.0
-FC_VER        = 1 2 3 4 5 6 7
-FEDORA_VER    = 7 8 9 10 11 12 13
 REDHAT_7x_VER = 7.0 7.1 7.2 7.3
-REDHAT_VER    = 8.0 9
-RHEL_VER      = 3 4
 SLACK_9x_VER  = 9.0 9.1
-SLACK_VER     = 10.0 10.1
-SLES_VER      = 9
 SUSE_7x_VER   = 7.3
 SUSE_8x_VER   = 8.0 8.1 8.2
-SUSE_VER      = 9.0 9.1 9.2 9.3
-UBUNTU_VER    = 5.1
 
 altlinux:
-	$(INSTALL_DATA) $(srcdir)/altlinux.conf $(DESTDIR)$(distconfdir)/altlinux.conf
+	$(INSTALL_DATA) $(srcdir)/altlinux.conf \
+		$(DESTDIR)$(distconfdir)/altlinux.conf
 	for ver in $(ALT_2x_VER); do \
 		$(INSTALL_DATA) $(srcdir)/redhat-7.3.conf \
 		    $(DESTDIR)$(distconfdir)/altlinux-$$ver.conf; \
 	done
-	for ver in $(ALT_VER); do \
-		$(INSTALL_DATA) $(srcdir)/altlinux.conf \
-		    $(DESTDIR)$(distconfdir)/altlinux-$$ver.conf; \
-	done
+
+arch:
+	$(INSTALL_DATA) $(srcdir)/arch.conf \
+		$(DESTDIR)$(distconfdir)/arch.conf
 
 centos:
-	$(INSTALL_DATA) $(srcdir)/centos.conf $(DESTDIR)$(distconfdir)/centos.conf
-	for ver in $(CENTOS_VER); do \
-		$(INSTALL_DATA) $(srcdir)/centos.conf \
-		    $(DESTDIR)$(distconfdir)/centos-$$ver.conf; \
-	done
+	$(INSTALL_DATA) $(srcdir)/centos.conf \
+		$(DESTDIR)$(distconfdir)/centos.conf
 
 debian:
-	for ver in $(DEBIAN_VER); do \
-		$(INSTALL_DATA) $(srcdir)/debian.conf \
-		    $(DESTDIR)$(distconfdir)/debian-$$ver.conf; \
-	done
-	$(INSTALL_DATA) $(srcdir)/debian.conf $(DESTDIR)$(distconfdir)/debian.conf
-
-fc:
-	$(INSTALL_DATA) $(srcdir)/fedora-core.conf $(DESTDIR)$(distconfdir)/fedora-core.conf
-	for ver in $(FC_VER); do \
-		$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
-		    $(DESTDIR)$(distconfdir)/fedora-core-$$ver.conf; \
-	done
+	$(INSTALL_DATA) $(srcdir)/debian.conf \
+		$(DESTDIR)$(distconfdir)/debian.conf
 
 fedora:
-	for ver in $(FEDORA_VER); do \
-		$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
-			$(DESTDIR)$(distconfdir)/fedora-$$ver.conf; \
-	done
+	$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
+		$(DESTDIR)$(distconfdir)/fedora-core.conf
 	$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
 		$(DESTDIR)$(distconfdir)/fedora.conf
 
 gentoo:
-	$(INSTALL_DATA) $(srcdir)/gentoo.conf $(DESTDIR)$(distconfdir)/gentoo.conf
+	$(INSTALL_DATA) $(srcdir)/gentoo.conf \
+		$(DESTDIR)$(distconfdir)/gentoo.conf
 
 mandrake:
-	$(INSTALL_DATA) $(srcdir)/mandrake.conf $(DESTDIR)$(distconfdir)/mandrake.conf
+	$(INSTALL_DATA) $(srcdir)/mandrake.conf \
+		$(DESTDIR)$(distconfdir)/mandrake.conf
 
 owl:
-	$(INSTALL_DATA) $(srcdir)/redhat-7.3.conf $(DESTDIR)$(distconfdir)/owl.conf
+	$(INSTALL_DATA) $(srcdir)/redhat-7.3.conf \
+		$(DESTDIR)$(distconfdir)/owl.conf
 
 redhat:
-	$(INSTALL_DATA) $(srcdir)/redhat.conf $(DESTDIR)$(distconfdir)/redhat.conf
+	$(INSTALL_DATA) $(srcdir)/redhat.conf \
+		$(DESTDIR)$(distconfdir)/redhat.conf
 	for ver in $(REDHAT_7x_VER); do \
 		$(INSTALL_DATA) $(srcdir)/redhat-7.3.conf \
 			$(DESTDIR)$(distconfdir)/redhat-$$ver.conf; \
 	done
-	for ver in $(REDHAT_VER); do \
-		$(INSTALL_DATA) $(srcdir)/redhat.conf \
-		    $(DESTDIR)$(distconfdir)/redhat-$$ver.conf; \
-	done
 
 rhel:
-	for ver in $(RHEL_VER); do \
-		$(INSTALL_DATA) $(srcdir)/rhel-3.conf \
-		    $(DESTDIR)$(distconfdir)/rhel-$$ver.conf; \
-	done
+	$(INSTALL_DATA) $(srcdir)/centos.conf \
+		$(DESTDIR)$(distconfdir)/rhel.conf
 
 slack:
+	$(INSTALL_DATA) $(srcdir)/slackware.conf \
+		$(DESTDIR)$(distconfdir)/slackware.conf
 	for ver in $(SLACK_9x_VER); do \
 		$(INSTALL_DATA) $(srcdir)/slackware-9.0.conf \
-		$(DESTDIR)$(distconfdir)/slackware-$$ver.conf; \
+			$(DESTDIR)$(distconfdir)/slackware-$$ver.conf; \
 	done
-	for ver in $(SLACK_VER); do \
-		$(INSTALL_DATA) $(srcdir)/slackware.conf \
-		    $(DESTDIR)$(distconfdir)/slackware-$$ver.conf; \
-	done
-	$(INSTALL_DATA) $(srcdir)/slackware.conf $(DESTDIR)$(distconfdir)/slackware.conf
-
-sles:
-	for ver in $(SLES_VER); do \
-		$(INSTALL_DATA) $(srcdir)/sles.conf \
-		    $(DESTDIR)$(distconfdir)/sles-$$ver.conf; \
-	done
-	$(INSTALL_DATA) $(srcdir)/sles.conf $(DESTDIR)$(distconfdir)/sles.conf
 
 suse:
+	$(INSTALL_DATA) $(srcdir)/suse.conf \
+		$(DESTDIR)$(distconfdir)/suse.conf
+	$(INSTALL_DATA) $(srcdir)/suse.conf \
+		$(DESTDIR)$(distconfdir)/opensuse.conf
+	$(INSTALL_DATA) $(srcdir)/suse.conf \
+		$(DESTDIR)$(distconfdir)/sles.conf
 	for ver in $(SUSE_7x_VER); do \
 		$(INSTALL_DATA) $(srcdir)/suse-7.3.conf \
 		    $(DESTDIR)$(distconfdir)/suse-$$ver.conf; \
@@ -142,32 +111,15 @@ suse:
 		$(INSTALL_DATA) $(srcdir)/suse-8.0.conf \
 		    $(DESTDIR)$(distconfdir)/suse-$$ver.conf; \
 	done
-	for ver in $(SUSE_VER); do \
-		$(INSTALL_DATA) $(srcdir)/suse.conf \
-		    $(DESTDIR)$(distconfdir)/suse-$$ver.conf; \
-	done
-	$(INSTALL_DATA) $(srcdir)/suse.conf $(DESTDIR)$(distconfdir)/suse.conf
-	$(INSTALL_DATA) $(srcdir)/suse.conf $(DESTDIR)$(distconfdir)/opensuse.conf
 
 ubuntu:
-	for ver in $(UBUNTU_VER); do \
-		$(INSTALL_DATA) $(srcdir)/debian.conf \
-		    $(DESTDIR)$(distconfdir)/ubuntu-$$ver.conf; \
-	done
-	$(INSTALL_DATA) $(srcdir)/debian.conf $(DESTDIR)$(distconfdir)/ubuntu.conf
-
-arch:
-	$(INSTALL_DATA) $(srcdir)/arch.conf $(DESTDIR)$(distconfdir)/arch.conf
-	for ver in $(ARCH_VER); do \
-		$(INSTALL_DATA) $(srcdir)/arch.conf \
-		    $(DESTDIR)$(distconfdir)/arch-$$ver.conf; \
-	done
+	$(INSTALL_DATA) $(srcdir)/debian.conf \
+		$(DESTDIR)$(distconfdir)/ubuntu.conf
 
 install-data-hook: altlinux \
                    arch \
                    centos \
                    debian \
-                   fc \
                    fedora \
                    gentoo \
                    mandrake \
@@ -175,6 +127,5 @@ install-data-hook: altlinux \
                    redhat \
                    rhel \
                    slack \
-                   sles \
                    suse \
                    ubuntu
