@@ -35,7 +35,8 @@ ALT_2x_VER    = 2.4
 ALT_VER       = 3.0 4.0
 ARCH_VER      = 0.7 0.8
 CENTOS_VER    = 3 4
-DEBIAN_VER    = 3.0 3.1 4.0
+DEBIAN_VER    = 4.0
+DEBIAN_3x_VER = 3.0 3.1
 FC_VER        = 1 2 3 4 5 6 7
 FEDORA_VER    = 7 8 9 10 11 12 13
 REDHAT_7x_VER = 7.0 7.1 7.2 7.3
@@ -68,6 +69,10 @@ centos:
 	done
 
 debian:
+	for ver in $(DEBIAN_3x_VER); do \
+		$(INSTALL_DATA) $(srcdir)/debian-3.conf \
+		    $(DESTDIR)$(distconfdir)/debian-$$ver.conf; \
+	done
 	for ver in $(DEBIAN_VER); do \
 		$(INSTALL_DATA) $(srcdir)/debian.conf \
 		    $(DESTDIR)$(distconfdir)/debian-$$ver.conf; \
