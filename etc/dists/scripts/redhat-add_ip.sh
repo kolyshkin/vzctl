@@ -59,7 +59,6 @@ BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK
 	put_param $NETFILE GATEWAYDEV ${VENET_DEV}
 	# Remove old (obsoleted) fake route
 	del_param $NETFILE GATEWAY
-	[ -f "${IFCFG_DIR}/route-venet0" ] && rm -f ${IFCFG_DIR}/route-venet0
 	# setup ipv6
 	setup6_network
 
