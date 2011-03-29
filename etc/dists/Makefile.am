@@ -33,6 +33,7 @@ EXTRA_DIST = \
 
 # Some older versions of distros require specific conf files
 ALT_2x_VER    = 2.4
+DEBIAN_3x_VER = 3.0 3.1
 REDHAT_7x_VER = 7.0 7.1 7.2 7.3
 SLACK_9x_VER  = 9.0 9.1
 SUSE_7x_VER   = 7.3
@@ -47,14 +48,17 @@ altlinux:
 	done
 
 arch:
-	$(INSTALL_DATA) $(srcdir)/arch.conf \
-		$(DESTDIR)$(distconfdir)/arch.conf
+	$(INSTALL_DATA) $(srcdir)/arch.conf $(DESTDIR)$(distconfdir)/arch.conf
 
 centos:
 	$(INSTALL_DATA) $(srcdir)/centos.conf \
 		$(DESTDIR)$(distconfdir)/centos.conf
 
 debian:
+	for ver in $(DEBIAN_3x_VER); do \
+		$(INSTALL_DATA) $(srcdir)/debian-3.conf \
+		    $(DESTDIR)$(distconfdir)/debian-$$ver.conf; \
+	done
 	$(INSTALL_DATA) $(srcdir)/debian.conf \
 		$(DESTDIR)$(distconfdir)/debian.conf
 
