@@ -97,7 +97,7 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 	if (ret < 0) {
 		if (errno == ENOTTY) {
 			logger(0, 0, "Warning: meminfo feature is not supported"
-				" by kernel. skipped meminfo configure");
+				" by kernel, skipped meminfo configure");
 		} else {
 			logger(-1, errno, "Unable to set meminfo");
 			return VZ_SET_MEMINFO_ERROR;
