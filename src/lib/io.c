@@ -52,6 +52,7 @@ int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param)
 		}
 		else
 			logger(-1, errno, "Unable to set ioprio");
+			return VZ_SET_IO;
 	}
-	return ret;
+	return 0;
 }

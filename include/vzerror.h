@@ -148,4 +148,5 @@
 #define VZ_CONFIG_SAVE_ERROR		139
 
 #define VZ_SET_OSRELEASE		144
+#define VZ_SET_IO			148
 #endif /* _VZ_ERROR_H_ */
