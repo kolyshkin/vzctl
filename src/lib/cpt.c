@@ -455,7 +455,8 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		goto err;
 	/* Restore second-level quota links & quota device */
 	if ((cmd == CMD_RESTORE || cmd == CMD_UNDUMP) &&
-		vps_p->res.dq.ugidlimit != NULL && vps_p->res.dq.ugidlimit)
+		vps_p->res.dq.ugidlimit != NULL &&
+		*vps_p->res.dq.ugidlimit != 0)
 	{
 		logger(0, 0, "Restore second-level quota");
 		if (vps_execFn(h, veid, vps_p->res.fs.root, mk_quota_link, NULL,
