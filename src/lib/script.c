@@ -134,7 +134,8 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 	}
 	if (quiet && pipe(out) < 0) {
 		logger(-1, errno, "run_script: unable to create pipe");
-		return -1;
+		ret = VZ_RESOURCE_ERROR;
+		goto err;
 	}
 	i = 0;
 	if (env != NULL) {
