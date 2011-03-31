@@ -143,14 +143,13 @@ static int set_cpumask(envid_t veid, cpumask_t *mask)
  */
 int env_set_vcpus(envid_t veid, unsigned int vcpus)
 {
-	int ret;
-
 	logger(0, 0, "Setting CPUs: %d", vcpus);
-	ret = fairsched_vcpus(veid, vcpus);
-	if (ret)
+	if (fairsched_vcpus(veid, vcpus) != 0)
 		logger(-1, errno, "Unable to set cpus");
+		return VZ_SETFSHD_ERROR;
+	}
 
-	return ret;
+	return 0;
 }
 
 
