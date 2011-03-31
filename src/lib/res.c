@@ -51,6 +51,31 @@ int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
 	return 0;
 }
 
+/** Give Container permissions to do quotactl operations on its root.
+ *
+ */
+static int vps_2quota_perm(vps_handler *h, int veid,
+				const char *root, dq_param *dq)
+{
+	dev_res dev;
+	struct stat st;
+
+	if (dq->enable == NO || dq->ugidlimit == NULL ||  *dq->ugidlimit == 0)
+		return 0;
+
+	if (stat(root, &st)) {
+		logger(-1, errno, "Unable to stat %s", root);
+		return VZ_ERROR_SET_USER_QUOTA;
+	}
+
+	memset(&dev, 0, sizeof(dev));
+	dev.dev = st.st_dev;
+	dev.type = S_IFBLK | VE_USE_MINOR;
+	dev.mask = S_IXGRP;
+	return set_devperm(h, veid, &dev);
+}
+
+
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
 	struct mod_action *action)
@@ -90,6 +115,8 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if((ret = vps_meminfo_set(h, veid, &res->meminfo, param, vps_state)))
 		return ret;
 	if ((ret = ve_ioprio_set(h, veid, &res->io)))
+		return ret;
+	if ((ret = vps_2quota_perm(h, veid, fs->root, &res->dq)))
 		return ret;
 
 	if (!(skip & SKIP_CONFIGURE))

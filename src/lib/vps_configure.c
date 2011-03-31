@@ -190,7 +190,6 @@ int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	char buf[64];
 	const char *str_state;
 	struct stat st;
-	dev_res dev;
 	const char *fs_name;
 
 	if (dq->enable == NO)
@@ -207,12 +206,6 @@ int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		logger(-1, errno, "Unable to stat %s", root);
 		return -1;
 	}
-	memset(&dev, 0, sizeof(dev));
-	dev.dev = st.st_dev;
-	dev.type = S_IFBLK | VE_USE_MINOR;
-	dev.mask = S_IXGRP;
-	if ((ret = set_devperm(h, veid, &dev)))
-		return ret;
 	i = 0;
 	str_state = state2str(state);
 	snprintf(buf, sizeof(buf), "VE_STATE=%s", str_state);
