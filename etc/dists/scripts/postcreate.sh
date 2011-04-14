@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 function randcrontab()
 {
-	file=${VE_ROOT}"/etc/crontab"
+	local file=${VE_ROOT}"/etc/crontab"
 
 	[ -f "${file}" ] || return 0
 
@@ -67,7 +67,7 @@ BEGIN { srand(); }
 
 function disableroot()
 {
-	file=${VE_ROOT}"/etc/passwd"
+	local file=${VE_ROOT}"/etc/passwd"
 
 	[ -f "$file" ] || return 0
 
