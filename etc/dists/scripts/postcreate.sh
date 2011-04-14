@@ -20,7 +20,8 @@
 # 1. Randomizes crontab for given container so all crontab tasks
 #    of all containers will not start at the same time.
 # 2. Disables root password if it is empty.
-#
+# 3. Seeds /etc/hosts with localhost entries for IPv4 and IPv6
+# 4. Creates empty /etc/resolv.conf
 
 function randcrontab()
 {
@@ -78,8 +79,27 @@ function disableroot()
 	fi
 }
 
+function set_network()
+{
+	local file=${VE_ROOT}"/etc/hosts"
+	if ! grep -qw '127.0.0.1' ${file} 2>/dev/null; then
+		echo '127.0.0.1 localhost.localdomain localhost' >> ${file}
+	fi
+	if ! grep -qw '::1' ${file} 2>/dev/null; then
+		echo "::1 localhost.localdomain localhost" >> ${file}
+	fi
+
+	# Some distros' network scripts emit ugly warnings about non-existing
+	# /etc/resolv.conf, so it won't hurt to create an empty one
+	file=${VE_ROOT}"/etc/resolv.conf"
+	if [ ! -e "${file}" ]; then
+		touch ${file}
+	fi
+}
+
 [ -z "${VE_ROOT}" ] && return 1
 randcrontab
 disableroot
+set_network
 
 exit 0
