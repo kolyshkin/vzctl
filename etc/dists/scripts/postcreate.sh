@@ -36,7 +36,7 @@ BEGIN { srand(); }
 		print $0;
 		next;
 	}
-	if ((n = split($0, ar, /[ \t]/)) < 7) {
+	if ((n = split($0, ar)) < 7) {
 		print $0;
 		next;
 	}
