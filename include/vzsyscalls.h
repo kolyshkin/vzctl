@@ -29,7 +29,7 @@
 #ifndef __NR_ioprio_set
 #define __NR_ioprio_set		1274
 #endif
-#elif __x86_64__
+#elif defined(__x86_64__) || defined(__tile__)
 #define __NR_fairsched_cpumask	498
 #define __NR_fairsched_vcpus	499
 #define __NR_setluid		501
