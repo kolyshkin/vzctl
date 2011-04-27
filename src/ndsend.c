@@ -64,14 +64,15 @@ int init_device_addresses(int sock, const char* device)
 	strncpy(ifr.ifr_name, device, IFNAMSIZ-1);
 
 	if (ioctl(sock, SIOCGIFINDEX, &ifr) != 0) {
-		fprintf(stderr, "unknown iface %s : %m", device);
+		fprintf(stderr, "Unknown network inteface %s: %m", device);
 		return -1;
 	}
 	ifindex = ifr.ifr_ifindex;
 
 	/* get interface HW address */
 	if (ioctl(sock, SIOCGIFHWADDR, &ifr) != 0) {
-		fprintf(stderr, "can't get iface '%s' HW address : %m", device);
+		fprintf(stderr, "Can not get the MAC address of "
+				"network interface %s: %m", device);
 		return -1;
 	}
 	memcpy(real_hwaddr, ifr.ifr_hwaddr.sa_data, 6);
@@ -112,14 +113,29 @@ void sender(void)
 
 	if (sendto(sock, &pkt, sizeof(pkt), 0,
 	    (struct sockaddr*) &to, sizeof(to)) < 0) {
-		fprintf(stderr, "sendto : %m");
+		fprintf(stderr, "Error in sendto(): %m");
 		exit(EXC_SYS);
 	}
+}
+
+void usage()
+{
+	printf(
+"ndsend sends an unsolicited Neighbor Advertisement ICMPv6 multicast packet\n"
+"announcing a given IPv6 address to all IPv6 nodes as per RFC4861.\n\n"
+"Usage: ndsend <address> <interface> (example: ndsend 2001:DB8::1 eth0)\n\n"
+"Note: ndsend is called by arpsend -U -i, see arpsend(8) man page.\n"
+	);
 }
 
 int main(int argc,char** argv)
 {
 	int value;
+
+	if (argc != 3) {
+		usage();
+		exit(EXC_USAGE);
+	}
 
 	if (inet_pton(AF_INET6, argv[1], &src_ipaddr) <= 0)
 		return -1;
@@ -127,7 +143,7 @@ int main(int argc,char** argv)
 
 	sock = socket(PF_INET6, SOCK_RAW, IPPROTO_ICMPV6);
 	if (sock < 0) {
-		fprintf(stderr, "socket : %m");
+		fprintf(stderr, "Error in socket(): %m");
 		exit(EXC_SYS);
 	}
 
