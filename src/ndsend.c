@@ -34,6 +34,8 @@
 #define EXC_RECV	3
 #define EXC_NORECV	4
 
+#define NAME "ndsend: "
+
 char* iface = NULL;
 
 struct in6_addr src_ipaddr;
@@ -64,15 +66,16 @@ int init_device_addresses(int sock, const char* device)
 	strncpy(ifr.ifr_name, device, IFNAMSIZ-1);
 
 	if (ioctl(sock, SIOCGIFINDEX, &ifr) != 0) {
-		fprintf(stderr, "Unknown network inteface %s: %m", device);
+		fprintf(stderr, NAME "Unknown network interface %s: %m\n",
+				device);
 		return -1;
 	}
 	ifindex = ifr.ifr_ifindex;
 
 	/* get interface HW address */
 	if (ioctl(sock, SIOCGIFHWADDR, &ifr) != 0) {
-		fprintf(stderr, "Can not get the MAC address of "
-				"network interface %s: %m", device);
+		fprintf(stderr, NAME "Can not get the MAC address of "
+				"network interface %s: %m\n", device);
 		return -1;
 	}
 	memcpy(real_hwaddr, ifr.ifr_hwaddr.sa_data, 6);
@@ -113,7 +116,7 @@ void sender(void)
 
 	if (sendto(sock, &pkt, sizeof(pkt), 0,
 	    (struct sockaddr*) &to, sizeof(to)) < 0) {
-		fprintf(stderr, "Error in sendto(): %m");
+		fprintf(stderr, NAME "Error in sendto(): %m\n");
 		exit(EXC_SYS);
 	}
 }
@@ -143,7 +146,7 @@ int main(int argc,char** argv)
 
 	sock = socket(PF_INET6, SOCK_RAW, IPPROTO_ICMPV6);
 	if (sock < 0) {
-		fprintf(stderr, "Error in socket(): %m");
+		fprintf(stderr, NAME "Error in socket(): %m\n");
 		exit(EXC_SYS);
 	}
 
