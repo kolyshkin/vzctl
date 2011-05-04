@@ -121,6 +121,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzeventd.8.*
 %attr(644, root, root) %{_mandir}/man8/vzmigrate.8.*
 %attr(644, root, root) %{_mandir}/man8/arpsend.8.*
+%attr(644, root, root) %{_mandir}/man8/ndsend.8.*
 %attr(644, root, root) %{_mandir}/man8/vzsplit.8.*
 %attr(644, root, root) %{_mandir}/man8/vzcfgvalidate.8.*
 %attr(644, root, root) %{_mandir}/man8/vzmemcheck.8.*

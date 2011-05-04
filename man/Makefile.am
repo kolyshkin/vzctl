@@ -17,6 +17,7 @@
 
 man_MANS = arpsend.8 \
            ctid.conf.5 \
+           ndsend.8 \
            vzcalc.8 \
            vzcfgvalidate.8 \
            vz.conf.5 \

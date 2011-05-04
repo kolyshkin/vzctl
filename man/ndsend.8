@@ -1,0 +1,37 @@
+.TH ndsend 8 "4 May 2011" "OpenVZ" "Containers"
+.SH NAME
+ndsend \- sends an unsolicited Neighbor Advertisement ICMPv6 multicast packet.
+.SH SYNOPSIS
+ndsend \fIaddress\fR \fIinterface\fR
+.SH DESCRIPTION
+The \fBndsend\fR utility is called by \fBarpsend\fR(8) for IPv6 addresses
+to send an unsolicited Neighbor Advertisement ICMPv6 multicast packet
+announcing a given IPv6 address to all IPv6 nodes as per RFC4861.
+.SH OPTIONS
+.TP
+\fIaddress\fR
+Specify the IPv6 address to be advertised.
+.TP
+\fIinterface\fR
+Specify the network interface to send an advertisement from.
+.SH DIAGNOSTICS
+\fBndsend\fR returns 0 upon successful execution. If something goes wrong, it
+returns an appropriate error code.
+.IP "1  EXC_USAGE"
+Usage error
+.IP "2  EXC_SYSTEM"
+System error
+.SH EXAMPLES
+To send a Neighbor Advertisement ICMPv6 on interface \fBeth0\fR with IPv6
+address \fB2001:DB8::1\fR:
+.PP
+\fB\f(CWndsend 2001:DB8::1 eth0\fR
+.SH SEE ALSO
+.BR arpsend (8),
+.BR vzctl (8).
+.SH LICENSE
+Copyright (C) 2000-2011, Parallels, Inc. Licensed under GNU GPL.
+.SH "AUTHOR"
+.PP
+This manual page was written by Thorsten Schifferdecker <tsd@debian.systs.org>
+for the \fBDebian GNU/Linux\fP system (but may be used by others).
