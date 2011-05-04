@@ -117,7 +117,7 @@ vzgetnetdev()
 		if ($2 !~ /^veth[0-9]+/)
 			dev=$2;
 	}
-	/^[\ \t]+inet6? / {
+	/^[\ \t]+inet6? / && !/ scope link/ {
 		if (dev != "") print (dev);
 		dev="";
 	}' | sed -e 's/:$//' -e 's/@.*$//'`
