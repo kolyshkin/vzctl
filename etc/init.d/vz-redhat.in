@@ -63,6 +63,7 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 	if [ "${VZWDOG}" = "yes" ]; then
 		MODULES="${MODULES} vzwdog"
 	fi
+	test -z "$IPTABLES_MODULES" && IPTABLES_MODULES="$IPTABLES"
 	IPT_MODULES="ip_tables ${IPTABLES} xt_tcpudp"
 	if [ "${IPV6}" = "yes" ]; then
 		IPT_MODULES="${IPT_MODULES} ${IP6TABLES}"

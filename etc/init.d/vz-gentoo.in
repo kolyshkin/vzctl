@@ -21,6 +21,8 @@ check_config() {
 	: ${VZCONF:=@PKGCONFDIR@/vz.conf}
 
 	if [ "${MODULES_DISABLED}" != "yes" ]; then
+		: ${IPTABLES_MODULES:="${IPTABLES}"}
+		IPTABLES_MODULES="ip_tables ${IPTABLES_MODULES} xt_tcpudp"
 		: ${PRELOAD_MODULES:="af_packet"}
 		: ${MODULES:="vzmon vzdquota vzdev"}
 		: ${MIGRATE_MODULES:="vzcpt vzrst"}
@@ -240,6 +242,10 @@ start() {
 	local mod rc
 
 	ebegin "Loading OpenVZ modules"
+	for mod in ${IPTABLES_MODULES}; do
+		/sbin/modprobe ${mod} >/dev/null 2>&1
+	done
+
 	for mod in ${PRELOAD_MODULES}; do
 		/sbin/modprobe -r ${mod} >/dev/null 2>&1
 		/sbin/modprobe ${mod} >/dev/null 2>&1

@@ -37,6 +37,10 @@ If the value of this parameter is set to \fByes\fR, no attempt to load
 kernel modules is made by the \fBvz\fR initscript. This is helpful
 on systems which have OpenVZ-specific features compiled into the kernel
 (i. e. not as modules).
+.IP \fBIPTABLES_MODULES\fR="\fImodule\ module\ ...\fR"
+List of iptables kernel modules to be loaded by \fBvz\fR initscript
+before loading OpenVZ modules (which is required for iptables
+to work inside containers). If not set, value of \fBIPTABLES\fR is used.
 .IP \fBVZFASTBOOT\fR=\fByes\fR|\fBno\fR
 If the value of this parameter is set to \fByes\fR, \fBvz\fR initscript called
 with \fBstart\fR argument will start the containers with uncleanly
@@ -81,6 +85,9 @@ numeric CT ID.
 .IP \fBCONFIGFILE\fR=\fIname\fR
 Default configuration file for \fBcreate\fR action, corresponds to
 \fB--config\fR option.
+.IP \fBIPTABLES\fR="\fImodule\ module\ ...\fR"
+List of iptables modules to be enabled for containers, corresponds
+to \fB--iptables\fR option.
 .PP
 Most of the other parameters that appear in per-container configuration files
 \fBctid.conf\fR(5) can be also set here. Still, it is recommended to keep
