@@ -28,6 +28,16 @@ if [ -z "$MAJOR" ]; then
 	exit 0
 fi
 echo '#!/bin/sh
+### BEGIN INIT INFO
+# Provides: vzquota
+# Required-Start: $local_fs $time $syslog
+# Required-Stop: $local_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start vzquota at the end of boot
+# Description: Configure OpenVZ disk quota for a container.
+### END INIT INFO
+
 start() {
 	[ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'
 	rm -f /etc/mtab >/dev/null 2>&1
