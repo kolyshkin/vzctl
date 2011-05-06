@@ -41,8 +41,8 @@ start() {
 }
 case "$1" in
   start)
-        start
-        ;;
+	start
+	;;
   *)
 	exit
 esac ' > ${SCRIPTANAME} || {
