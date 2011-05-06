@@ -60,17 +60,17 @@ setup_ve0() {
 start_net() {
 	local mod
 
-	# we don't operate on a running interface
-	if /sbin/ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
-		return 0
-	fi
-
 	# load necessary modules
 	for mod in ${NET_MODULES}; do
 		/sbin/modprobe ${mod} 2>/dev/null
 	done
 
 	if [ ! -f ${VZVEINFO} ]; then
+		return 0
+	fi
+
+	# we don't operate on a running interface
+	if /sbin/ip addr list | grep -q "venet0:.*UP" 2>/dev/null; then
 		return 0
 	fi
 
