@@ -1,10 +1,10 @@
-.TH vz.conf 5 "12 Jan 2011" "OpenVZ" "Containers"
+.TH vz.conf 5 "6 May 2011" "OpenVZ" "Containers"
 .SH NAME
 vz.conf \- global OpenVZ configuration file
 .SH SYNOPSIS
 /etc/vz/vz.conf
 .SH DESCRIPTION
-This is global configuration file for OpenVZ.
+This is the global configuration file for OpenVZ.
 It consists of lines in the form
 .PP
 \fBPARAMETER\fR="\fIvalue\fR"
@@ -32,9 +32,9 @@ Set the logging level. The greater the \fInumber\fR is,
 the more information will be logged to the \fBLOGFILE\fR.
 .IP "\fBVERBOSE\fR=\fInumber\fR"
 Set the output verbosity of \fBvzctl\fR. Default is \fB0\fR.
-.IP "\fBMODULES_DISABLED\fR=\fByes\fR|\fBno\fR
+.IP "\fBMODULES_DISABLED\fR=\fByes\fR|\fBno\fR"
 If the value of this parameter is set to \fByes\fR, no attempt to load
-OpenVZ kernel modules is made by the \fBvz\fR initscript. This is helpful
+kernel modules is made by the \fBvz\fR initscript. This is helpful
 on systems which have OpenVZ-specific features compiled into the kernel
 (i. e. not as modules).
 .IP \fBVZFASTBOOT\fR=\fByes\fR|\fBno\fR
@@ -79,7 +79,7 @@ files and directories specific to that container are stored. Value must contain
 literal string \fB$VEID\fR, which will be substituted with the actual
 numeric CT ID.
 .IP \fBCONFIGFILE\fR=\fIname\fR
-Specified default configuration file on \fBcreate\fR action, corresponds to
+Default configuration file for \fBcreate\fR action, corresponds to
 \fB--config\fR option.
 .PP
 Most of the other parameters that appear in per-container configuration files
@@ -91,4 +91,4 @@ configuration files.
 .BR vzctl (8),
 .BR ctid.conf (5).
 .SH LICENSE
-Copyright (C) 2000-2010, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2000-2011, Parallels, Inc. Licensed under GNU GPL.
