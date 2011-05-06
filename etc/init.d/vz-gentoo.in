@@ -24,7 +24,7 @@ check_config() {
 		: ${PRELOAD_MODULES:="af_packet"}
 		: ${MODULES:="vzmon vzdquota vzdev"}
 		: ${MIGRATE_MODULES:="vzcpt vzrst"}
-		: ${NET_MODULES="vznetdev vznet"}
+		: ${NET_MODULES="vznetdev vznet vzethdev"}
 
 		# check if you should load vzwdog module
 		[ "${VZWDOG}" = "yes" ] && MODULES="${MODULES} vzwdog"
