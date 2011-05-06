@@ -53,6 +53,11 @@ MIG_ERR_RESTORE_VPS=$MIG_ERR_START_VPS
 MIG_ERR_OVZ_NOT_RUNNING=14
 MIG_ERR_APPLY_CONFIG=15
 
+# For local vzctl to work, make sure @SBINDIR@ is in $PATH
+if ! echo ":${PATH}:" | fgrep -q ':@SBINDIR@:'; then
+	PATH="@SBINDIR@:$PATH"
+fi
+
 usage() {
 	cat >&2 <<EOF
 This program is used for container migration to another node.
