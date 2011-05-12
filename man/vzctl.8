@@ -18,7 +18,7 @@ vzctl [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 vzctl [\fIflags\fR] \fBenter\fR \fICTID\fR [\fB--exec \fIcommand\fR
 [\fIarg\fR ...]]
 .PP
-vzctl \fBrunscript\fR \fICTID\fR \fIscript\fR
+vzctl [\fIflags\fR] \fBrunscript\fR \fICTID\fR \fIscript\fR
 .PP
 vzctl \fB--help\fR | \fB--version\fR
 .SH DESCRIPTION
@@ -32,11 +32,17 @@ OpenVZ internal purposes.
 
 .SS Flags
 
-These flags can be used with almost any option.
+These flags come before a command, and can be used with any command.
+They affect logging to console (terminal) only, and do not affect logging
+to a log file.
 .IP \fB--quiet\fR 4
-Disables logging to log file and screen.
+Disables output. Note that scripts run by vzctl are still able to produce
+some output.
 .IP \fB--verbose\fR 4
-Sets logging level to maximum value.
+Increments logging level up from the default. Can be used multiple times.
+Default value is set to the value of \fBVERBOSE\fR parameter in the global
+configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
+\fBVERBOSE\fR parameter.
 
 .SS Setting container parameters
 
