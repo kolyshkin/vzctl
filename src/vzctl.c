@@ -171,7 +171,7 @@ int main(int argc, char *argv[], char *envp[])
 	if (argc <= 1)
 		usage(VZ_INVALID_PARAMETER_SYNTAX);
 	action_nm = argv[1];
-	init_log(NULL, 0, 1, verbose, 0, NULL);
+	init_log(NULL, 0, 1, verbose, quiet, NULL);
 	if (!strcmp(argv[1], "set")) {
 		init_modules(&g_action, "set");
 		action = ACTION_SET;
