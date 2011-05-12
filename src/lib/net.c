@@ -297,7 +297,7 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 	sigaction(SIGCHLD, &act, NULL);
 
 	if ((pid1 = fork()) < 0) {
-		logger(0, errno, "Can't fork");
+		logger(-1, errno, "Can't fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid1 == 0) {
 		int pid2;
@@ -310,7 +310,7 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		}
 		/* Create another process for proper accounting */
 		if ((pid2 = fork()) < 0) {
-			logger(0, errno, "Can't fork");
+			logger(-1, errno, "Can't fork");
 			exit(VZ_RESOURCE_ERROR);
 		} else if (pid2 == 0) {
 			if ((ret = set_netdev(h, veid,
@@ -327,15 +327,15 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 			if (WIFEXITED(status))
 				ret = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-				logger(0, 0, "Got signal %d",
+				logger(-1, 0, "Got signal %d",
 						WTERMSIG(status));
 			} else if (pid < 0)
-				logger(0, errno, "Error in waitpid()");
+				logger(-1, errno, "Error in waitpid()");
 		exit(ret);
 		}
 	while ((pid = waitpid(pid1, &status, 0)) == -1)
 		if (errno != EINTR) {
-			logger(0, errno, "Error in waitpid()");
+			logger(-1, errno, "Error in waitpid()");
 			break;
 		}
 	ret = VZ_SYSTEM_ERROR;
@@ -345,7 +345,7 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		else if (WIFSIGNALED(status))
 			logger(0, 0, "Got signal %d", WTERMSIG(status));
 	} else if (pid < 0)
-		logger(0, errno, "Error in waitpid()");
+		logger(-1, errno, "Error in waitpid()");
 
 	return ret;
 }

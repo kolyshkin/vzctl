@@ -244,7 +244,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		}
 	} else {
 		if (ioctl(cpt_fd, CPT_SET_VEID, veid) < 0) {
-			logger(0, errno, "Can not set CT ID");
+			logger(-1, errno, "Can not set CT ID");
 			goto err;
 		}
 	}

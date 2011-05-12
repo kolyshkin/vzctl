@@ -63,7 +63,7 @@ static int set_personality(unsigned long mask)
 	per = personality(0xffffffff) | mask;
 	logger(3, 0, "Set personality %#10.8lx", per);
 	if (personality(per) == -1) {
-		logger(2, errno, "Unable to set personality PER_LINUX32");
+		logger(-1, errno, "Unable to set personality PER_LINUX32");
 		return  -1;
 	}
 	return 0;
