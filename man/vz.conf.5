@@ -28,10 +28,14 @@ Enables or disables logging. This parameter can be set to \fByes\fR or
 .IP \fBLOGFILE\fR=\fIfile\fR
 Set location of log file, default is \f(CR/var/log/vzctl.log\fR.
 .IP "\fBLOG_LEVEL\fR=\fInumber\fR"
-Set the logging level. The greater the \fInumber\fR is,
-the more information will be logged to the \fBLOGFILE\fR.
+Set the logging level for the log file (does not affect console output).
+The greater the \fInumber\fR is, the more information will be logged
+to the \fBLOGFILE\fR. Default is \fB0\fR, which means to log normal messages
+and errors. If set to \fB-1\fR, only errors will be logged.
 .IP "\fBVERBOSE\fR=\fInumber\fR"
-Set the output verbosity of \fBvzctl\fR. Default is \fB0\fR.
+Set the logging level for console/terminal output (does not affect log file).
+Default is \fB0\fR, which means to log normal messages and errors.
+Increasing the \fBnumber\fR makes \fBvzctl\fR(8) more verbose.
 .IP "\fBMODULES_DISABLED\fR=\fByes\fR|\fBno\fR"
 If the value of this parameter is set to \fByes\fR, no attempt to load
 kernel modules is made by the \fBvz\fR initscript. This is helpful
