@@ -280,59 +280,29 @@ int set_netdev(vps_handler *h, envid_t veid, int cmd, net_param *net)
 int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		net_param *net_add, net_param *net_del)
 {
-	struct sigaction act;
 	int ret, pid, pid1, status;
 
 	if (list_empty(&net_add->dev) && list_empty(&net_del->dev))
 		return 0;
-	if (!vps_is_run(h, veid)){
+	if (!vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to setup network devices: "
 			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 
-	sigemptyset(&act.sa_mask);
-	act.sa_handler = SIG_DFL;
-	act.sa_flags = SA_NOCLDSTOP;
-	sigaction(SIGCHLD, &act, NULL);
+	if ((ret = set_netdev(h, veid, VE_NETDEV_DEL, net_del)))
+		return ret;
 
+	/* Adding device(s) to CT should be done under setluid() */
 	if ((pid1 = fork()) < 0) {
 		logger(-1, errno, "Can't fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid1 == 0) {
-		int pid2;
 
-		if ((ret = vz_setluid(veid))) {
+		if ((ret = vz_setluid(veid)))
 			exit(ret);
-		}
-		if ((ret = vps_set_ublimit(h, veid, ub))) {
-			exit(ret);
-		}
-		/* Create another process for proper accounting */
-		if ((pid2 = fork()) < 0) {
-			logger(-1, errno, "Can't fork");
-			exit(VZ_RESOURCE_ERROR);
-		} else if (pid2 == 0) {
-			if ((ret = set_netdev(h, veid,
-					VE_NETDEV_DEL, net_del)))
-				exit(ret);
-			ret = set_netdev(h, veid, VE_NETDEV_ADD, net_add);
-			exit(ret);
-		}
-		while ((pid = waitpid(pid2, &status, 0)) == -1)
-			if (errno != EINTR)
-				break;
-		ret = VZ_SYSTEM_ERROR;
-		if (pid == pid2) {
-			if (WIFEXITED(status))
-				ret = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				logger(-1, 0, "Got signal %d",
-						WTERMSIG(status));
-			} else if (pid < 0)
-				logger(-1, errno, "Error in waitpid()");
-		exit(ret);
-		}
+		exit(set_netdev(h, veid, VE_NETDEV_ADD, net_add));
+	}
 	while ((pid = waitpid(pid1, &status, 0)) == -1)
 		if (errno != EINTR) {
 			logger(-1, errno, "Error in waitpid()");
@@ -343,7 +313,7 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
-			logger(0, 0, "Got signal %d", WTERMSIG(status));
+			logger(-1, 0, "Got signal %d", WTERMSIG(status));
 	} else if (pid < 0)
 		logger(-1, errno, "Error in waitpid()");
 
