@@ -297,6 +297,18 @@ static int vz_env_configure(int fd, envid_t veid, const char *osrelease)
 	return ret;
 }
 
+static int configure_sysctl()
+{
+	int fd;
+
+	fd = open("/proc/sys/net/ipv6/conf/all/forwarding", O_WRONLY);
+	if (fd == -1)
+		return -1;
+	write(fd, "0", 1);
+	close(fd);
+	return 0;
+}
+
 static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 	void *data)
 {
@@ -399,7 +411,7 @@ try:
 		make_dir("/var/lib/nfs/rpc_pipefs", 1);
 		mount("sunrpc", "/var/lib/nfs/rpc_pipefs", "rpc_pipefs", 0, 0);
 	}
-
+	configure_sysctl();
 	if (res->dq.ugidlimit != NULL)
 		mk_quota_link();
 
