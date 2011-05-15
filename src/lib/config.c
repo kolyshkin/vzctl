@@ -1795,7 +1795,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	if (!_page_size) {
 		_page_size = get_pagesize();
 		if (_page_size < 0)
-			return -1;
+			return ERR_OTHER;
 	}
 	switch (id) {
 	case PARAM_CONFIG:
