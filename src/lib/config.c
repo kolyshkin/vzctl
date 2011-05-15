@@ -1671,8 +1671,8 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		}
 		err = parse_hwaddr(tmp, dev->dev_addr_ve);
 		if (err) {
-		  logger(-1, 0, "Invalid container MAC address format");
-		  return ERR_INVAL;
+			logger(-1, 0, "Invalid container MAC address format");
+			return ERR_INVAL;
 		}
 	} else {
 		generate_mac(veid, dev->dev_name_ve, dev->dev_addr_ve);
