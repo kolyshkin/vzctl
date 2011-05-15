@@ -2144,29 +2144,39 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 		if (!ret) {
 			continue;
 		} else if (ret == ERR_INVAL_SKIP) {
+			/* Warning is printed by parse() */
 			continue;
 		} else if (ret == ERR_LONG_TRUNC) {
-			logger(-1, 0, "Warning: too large value for %s=%s"
-				" was truncated", ltoken, rtoken);
+			logger(-1, 0, "Warning at %s:%d: too large value "
+				"for %s (\"%s\"), truncated",
+				path, line, ltoken, rtoken);
 		} else if (ret == ERR_DUP) {
-			logger(-1, 0, "Warning: dup for %s=%s in line %d"
-				" is ignored", ltoken, rtoken, line);
+			logger(-1, 0, "Warning at %s:%d: duplicate "
+				"for %s (\"%s\"), ignored",
+				path, line, ltoken, rtoken);
 		} else if (ret == ERR_INVAL) {
-			logger(-1, 0, "Invalid value for %s=%s, skipped",
-				ltoken, rtoken);
+			logger(-1, 0, "Warning at %s:%d: invalid value "
+				"for %s (\"%s\"), skipped",
+				path, line, ltoken, rtoken);
 		} else if (ret == ERR_UNK) {
-			logger(-1, 0, "Unknown parameter %s, skipped", ltoken);
+			logger(-1, 0, "Warning at %s:%d: unknown parameter "
+				"%s (\"%s\"), skipped",
+				path, line, ltoken, rtoken);
 		} else if (ret == ERR_NOMEM) {
-			logger(-1, 0, "Not enough memory");
+			logger(-1, ENOMEM, "Error while parsing %s:%d",
+				path, line);
 			err = VZ_RESOURCE_ERROR;
 			break;
 		} else if (ret == ERR_OTHER) {
-			logger(-1, 0, "Error parsing configuration");
+			logger(-1, 0, "System error while parsing %s:%d",
+				path, line);
 			err = VZ_SYSTEM_ERROR;
 			break;
 		} else {
-			logger(-1, 0, "Unknown exit code %d on parse %s",
-				ret, ltoken);
+			logger(-1, 0, "Internal error at %s:%d: "
+				"bad return value %d from parse(), "
+				"parameter %s (\"%s\")", path, line,
+				ret, ltoken, rtoken);
 		}
 	}
 	fclose(fp);
