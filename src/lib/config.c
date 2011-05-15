@@ -2160,6 +2160,10 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 			logger(-1, 0, "Not enough memory");
 			err = VZ_RESOURCE_ERROR;
 			break;
+		} else if (ret == ERR_OTHER) {
+			logger(-1, 0, "Error parsing configuration");
+			err = VZ_SYSTEM_ERROR;
+			break;
 		} else {
 			logger(-1, 0, "Unknown exit code %d on parse %s",
 				ret, ltoken);

@@ -153,28 +153,37 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 		if (c == '?')
 			return VZ_INVALID_PARAMETER_VALUE;
 		ret = vps_parse_opt(veid, opt, param, c, optarg, &g_action);
-		if (!ret)
-			continue;
-		else if (ret == ERR_INVAL || ret == ERR_INVAL_SKIP ||
-			ret == ERR_LONG_TRUNC)
-		{
-			if (option_index < 0) {
-				logger(-1, 0, "Bad parameter for"
-					" -%c : %s", c, optarg);
-				return VZ_INVALID_PARAMETER_VALUE;
-			} else {
-				logger(-1, 0, "Bad parameter for"
-					" --%s: %s",
-					opt[option_index].name, optarg);
-				return VZ_INVALID_PARAMETER_VALUE;
-			}
-		} else if (ret == ERR_UNK) {
-			if (option_index < 0)
-				logger(-1, 0, "Invalid option -%c", c);
-			else
-				logger(-1, 0, "Invalid option --%s",
-					opt[option_index].name);
-			return VZ_INVALID_PARAMETER_SYNTAX;
+		switch (ret) {
+			case 0:
+			case ERR_DUP:
+				continue;
+			case ERR_INVAL:
+			case ERR_INVAL_SKIP:
+			case ERR_LONG_TRUNC:
+				if (option_index < 0) {
+					logger(-1, 0, "Bad parameter for"
+						" -%c : %s", c, optarg);
+					return VZ_INVALID_PARAMETER_VALUE;
+				} else {
+					logger(-1, 0, "Bad parameter for"
+						" --%s: %s",
+						opt[option_index].name,
+						optarg);
+					return VZ_INVALID_PARAMETER_VALUE;
+				}
+			case ERR_UNK:
+				if (option_index < 0)
+					logger(-1, 0, "Invalid option -%c", c);
+				else
+					logger(-1, 0, "Invalid option --%s",
+						opt[option_index].name);
+				return VZ_INVALID_PARAMETER_SYNTAX;
+			case ERR_NOMEM:
+				logger(-1, 0, "Not enough memory");
+				return VZ_RESOURCE_ERROR;
+			case ERR_OTHER:
+				logger(-1, 0, "Error parsing options");
+				return VZ_SYSTEM_ERROR;
 		}
 	}
 	if (optind < argc) {
