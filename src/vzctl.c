@@ -114,7 +114,6 @@ int main(int argc, char *argv[], char *envp[])
 {
 	act_t action = -1;
 	int verbose = 0;
-	int verbose_tmp;
 	int verbose_custom = 0;
 	int quiet = 0;
 	int veid, ret, skiplock = 0;
@@ -140,22 +139,7 @@ int main(int argc, char *argv[], char *envp[])
 		opt = argv[1];
 
 		if (!strcmp(opt, "--verbose")) {
-			if (argc > 2 &&
-			    !parse_int(argv[2], &verbose_tmp))
-			{
-				verbose += verbose_tmp;
-				argc--; argv++;
-			} else {
-				verbose++;
-			}
-			verbose_custom = 1;
-		} else if (!strncmp(opt, "--verbose=", 10)) {
-			if (parse_int(opt + 10, &verbose_tmp)) {
-				fprintf(stderr, "Invalid value for"
-					" --verbose\n");
-				exit(VZ_INVALID_PARAMETER_VALUE);
-			}
-			verbose += verbose_tmp;
+			verbose++;
 			verbose_custom = 1;
 		} else if (!strcmp(opt, "--quiet"))
 			quiet = 1;
