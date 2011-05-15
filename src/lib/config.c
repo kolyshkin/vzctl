@@ -1870,7 +1870,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 			break;
 		vps_p->log.verbose = malloc(sizeof(*vps_p->log.verbose));
 		if (vps_p->log.verbose == NULL)
-			return VZ_RESOURCE_ERROR;
+			return ERR_NOMEM;
 		*vps_p->log.verbose = int_id;
 		break;
 	case PARAM_IPTABLES:
