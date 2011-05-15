@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -234,7 +234,7 @@ int main(int argc, char *argv[], char *envp[])
 	if (parse_int(argv[2], &veid)) {
 		name = strdup(argv[2]);
 		veid = get_veid_by_name(name);
-		if (veid < 0 || veid == INT_MAX) {
+		if (veid < 0 || veid > VEID_MAX) {
 			fprintf(stderr, "Bad CT ID %s\n", argv[2]);
 			ret = VZ_INVALID_PARAMETER_VALUE;
 			goto error;

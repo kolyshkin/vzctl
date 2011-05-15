@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -91,5 +91,8 @@ typedef enum {
 } skipFlags;
 
 typedef int (* execFn)(void *data);
+
+/* Some kernels use a few IDs close to INT_MAX (2147483647) */
+#define VEID_MAX	2147483644
 
 #endif
