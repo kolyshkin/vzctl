@@ -1860,14 +1860,14 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_LOGLEVEL:
 		if (parse_int(val, &int_id))
-			break;
+			return ERR_INVAL;
 		vps_p->log.level = int_id;
 		break;
 	case PARAM_VERBOSE:
 		if (vps_p->log.verbose != NULL)
-			break;
+			return ERR_DUP;
 		if (parse_int(val, &int_id))
-			break;
+			return ERR_INVAL;
 		vps_p->log.verbose = malloc(sizeof(*vps_p->log.verbose));
 		if (vps_p->log.verbose == NULL)
 			return ERR_NOMEM;
@@ -1949,15 +1949,15 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_DISKSPACE:
 		if (vps_p->res.dq.diskspace != NULL)
-			break;
+			return ERR_DUP;
 		if (parse_dq(&vps_p->res.dq.diskspace, val, 1))
-			ret = ERR_INVAL;
+			return ERR_INVAL;
 		break;
 	case PARAM_DISKINODES:
 		if (vps_p->res.dq.diskinodes != NULL)
-			break;
+			return ERR_DUP;
 		if (parse_dq(&vps_p->res.dq.diskinodes, val, 0))
-			ret = ERR_INVAL;
+			return ERR_INVAL;
 		break;
 	case PARAM_QUOTATIME:
 		ret = conf_parse_ulong(&vps_p->res.dq.exptime, val);
@@ -1993,7 +1993,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_CPULIMIT:
 		if (vps_p->res.cpu.limit != NULL)
-			break;
+			return ERR_DUP;
 		ret = parse_cpulimit(&vps_p->res.cpu.limit, val);
 		break;
 	case PARAM_VCPUS:
@@ -2011,7 +2011,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_NETIF_ADD:
 		if (!list_empty(&vps_p->res.veth.dev))
-			break;
+			return ERR_DUP;
 		ret = parse_netif(veid, &vps_p->res.veth, val);
 		break;
 	case PARAM_NETIF_ADD_CMD:
@@ -2046,7 +2046,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_NAME:
 		if (vps_p->res.name.name != NULL)
-			break;
+			return ERR_DUP;
 		if (check_name(val))
 			return ERR_INVAL;
 		ret = conf_parse_str(&vps_p->res.name.name, val);
