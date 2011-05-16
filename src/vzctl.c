@@ -225,6 +225,9 @@ int main(int argc, char *argv[], char *envp[])
 		}
 	}
 	argc -= 2; argv += 2;
+	/* getopt_long() prints argv[0] when reporting errors */
+	argv[0] = _proc_title;
+
 	/* Read global config file */
 	if (vps_parse_config(veid, GLOBAL_CFG, gparam, &g_action)) {
 		fprintf(stderr, "Global configuration file %s not found\n",
