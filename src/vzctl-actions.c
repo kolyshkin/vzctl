@@ -172,6 +172,9 @@ int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 					return VZ_INVALID_PARAMETER_VALUE;
 				}
 			case ERR_UNK:
+				/* This shouldn't happen -- getopt_long()
+				 * should have catched this already
+				 */
 				if (option_index < 0)
 					logger(-1, 0, "Invalid option -%c", c);
 				else

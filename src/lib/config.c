@@ -2139,8 +2139,12 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 			ret = parse(veid, vps_p, rtoken, conf->id);
 		} else if (action != NULL)
 			ret = mod_parse(veid, action, ltoken, -1, rtoken);
-		else
+		else {
+			logger(1, 0, "Warning at %s:%d: unknown parameter "
+				"%s (\"%s\"), ignored",
+				path, line, ltoken, rtoken);
 			continue;
+		}
 		if (!ret) {
 			continue;
 		} else if (ret == ERR_INVAL_SKIP) {
@@ -2159,8 +2163,8 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 				"for %s (\"%s\"), skipped",
 				path, line, ltoken, rtoken);
 		} else if (ret == ERR_UNK) {
-			logger(-1, 0, "Warning at %s:%d: unknown parameter "
-				"%s (\"%s\"), skipped",
+			logger(1, 0, "Warning at %s:%d: unknown parameter "
+				"%s (\"%s\"), ignored",
 				path, line, ltoken, rtoken);
 		} else if (ret == ERR_NOMEM) {
 			logger(-1, ENOMEM, "Error while parsing %s:%d",

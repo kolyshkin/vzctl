@@ -32,10 +32,7 @@ int mod_parse(envid_t veid, struct mod_action *action, const char *name,
 
 	if (action == NULL)
 		return 0;
-	if (name == NULL)
-		ret = ERR_UNK;	// unknown option
-	else
-		ret = 0;	// skip unknown parameters in config
+	ret = ERR_UNK;
 	for (i = 0, mod = action->mod_list; i < action->mod_count; i++, mod++) {
 		mod_info = mod->mod_info;
 		if (mod_info == NULL)
