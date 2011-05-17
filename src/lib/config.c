@@ -141,6 +141,18 @@ static vps_config config[] = {
 {"IOPRIO",	NULL, PARAM_IOPRIO},
 {"BOOTORDER",	NULL, PARAM_BOOTORDER},
 
+/* These ones are known parameters for global config file,
+ * it's just vzctl is not interested in those
+ */
+{"VIRTUOZZO",		NULL, PARAM_IGNORED},
+{"VE0CPUUNITS",		NULL, PARAM_IGNORED},
+{"VZFASTBOOT",		NULL, PARAM_IGNORED},
+{"NEIGHBOUR_DEVS",	NULL, PARAM_IGNORED},
+{"ERROR_ON_ARPFAIL",	NULL, PARAM_IGNORED},
+{"VZWDOG",		NULL, PARAM_IGNORED},
+{"IPTABLES_MODULES",	NULL, PARAM_IGNORED},
+{"IP6TABLES",		NULL, PARAM_IGNORED},
+
 {NULL,		NULL, -1}
 };
 
@@ -2065,6 +2077,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_BOOTORDER:
 		ret = conf_parse_ulong(&vps_p->res.misc.bootorder, val);
+		break;
+	case PARAM_IGNORED:
+		/* Well known but ignored parameter */
 		break;
 	default:
 		logger(10, 0, "Not handled parameter %d %s", id, val);

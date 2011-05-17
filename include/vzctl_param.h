@@ -18,6 +18,7 @@
 #ifndef _VZCTL_PARAM_H_
 #define _VZCTL_PARAM_H_
 
+#define PARAM_IGNORED		-1
 /*	UB	*/
 #define PARAM_KMEMSIZE		'k'
 #define PARAM_LOCKEDPAGES	'l'
