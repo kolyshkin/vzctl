@@ -11,6 +11,11 @@ Q_HELD=0.8
 Q_MAXHELD=0.5
 # Directory to store previous failcnt values for relative mode
 STOREDIR=/tmp/vzubc.store
+# Colors
+C_BRIGHT="\\033[1;32m"
+C_ERROR="\\033[1;31m"
+C_WARNING="\\033[1;33m"
+C_NORMAL="\\033[0;39m"
 
 usage() {
 	cat << EOF
@@ -28,6 +33,8 @@ Usage: vzubc [option ...] [<filename>] [<ctid> ...]
      Relative mode (show fail counters delta to previous run).
      -rc: clear all saved fail counter data for relative mode
      -rd <dir>: directory for relative data (default: $STOREDIR)
+ -c, --color:
+     Enable color highlighting. Not compatible with --watch.
 
  <filename>: file to read UBC values from (defaults are
              /proc/bc/resources or /proc/user_beancounters)
@@ -102,6 +109,14 @@ while test $# -gt 0; do
 		relative=1
 		STOREDIR=$2
 		;;
+	-c|--color)
+		if ! test -z "$watch"; then
+			echo "Error: can't use --watch and --color together"
+			usage 1
+		fi
+		color=1
+		AWK_COLORS="-v c_h=$C_BRIGHT -v c_n=$C_NORMAL -v c_w=$C_WARNING -v c_e=$C_ERROR"
+		;;
 	-h|--help)
 		usage 0
 		;;
@@ -158,6 +173,7 @@ test -z "$watch" || exec watch $WATCH_ARGS -- $0 $ARGV -W
 cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " -v quiet="$quiet"  \
 	-v qheld="$Q_HELD" -v qmaxheld="$Q_MAXHELD" \
 	-v rel="$relative" -v storedir="$STOREDIR" \
+	$AWK_COLORS \
 '
 BEGIN {
 	if (qmaxheld > qheld)
@@ -231,11 +247,11 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 		bcid=""
 		next
 	}
-	header=sprintf( \
+	header=sprintf( c_h \
 "-------------------------------------------------------------------\n" \
 "CT %-10s| HELD  Bar%%  Lim%%| MAXH  Bar%%  Lim%%| BAR | LIM |%cFAIL\n" \
-"-------------+-----------------+-----------------+-----+-----+-----",
-bcid, rel ? "+" : " ")
+"-------------+-----------------+-----------------+-----+-----+-----" \
+c_n, bcid, rel ? "+" : " ")
 	id=$2
 	held=$3
 	maxheld=$4
@@ -273,7 +289,13 @@ bcid, rel ? "+" : " ")
 		printed=1
 		header=""
 	}
-	printf "%13s|%5s %5s %5s|%5s %5s %5s|%5s|%5s| %5s\n",
+	if (imp == 2)
+		printf c_e;
+	else if (imp == 1)
+		printf c_w;
+	else
+		printf c_n;
+	printf "%13s|%5s %5s %5s|%5s %5s %5s|%5s|%5s| %5s\n" c_n,
 		id,
 		hr(id, held), dp(held, barrier), dp(held, limit),
 		hr(id, maxheld), dp(maxheld, barrier), dp(maxheld, limit),
