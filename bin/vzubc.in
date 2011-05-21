@@ -133,7 +133,7 @@ done
 if test -z "$FILE"; then
 	# No file name given, substitute sane default
 	FILE=/proc/bc/resources
-	test -f $FILE || file=/proc/user_beancounters
+	test -f $FILE || FILE=/proc/user_beancounters
 fi
 
 # Test that input file is readable
