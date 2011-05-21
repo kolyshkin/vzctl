@@ -15,15 +15,17 @@ STOREDIR=/tmp/vzubc.store
 usage() {
 	cat << EOF
 Usage: vzubc [option ...] [<filename>] [<ctid> ...]
- -w: run under watch(1) (a la top mode, Ctrl-C to exit)
+
+ -w, --watch:
+     Run itself under watch(1) (a la top mode, Ctrl-C to exit).
      -wd: show differences between runs
      -wn <time>: refresh every <time> seconds
-
- -q: quiet mode (only show beancounters with fails and close to limits)
+ -q, --quiet:
+     Quiet mode (only show beancounters with fails and close to limits).
      -qh <ratio>: quiet watermark for held/limit ratio (default: $Q_HELD)
      -qm <ratio>: quiet watermark for maxheld/limit ratio (default: $Q_MAXHELD)
-
- -r: relative mode (show fail counters delta to previous run)
+ -r, --relative:
+     Relative mode (show fail counters delta to previous run).
      -rc: clear all saved fail counter data for relative mode
      -rd <dir>: directory for relative data (default: $STOREDIR)
 
@@ -56,7 +58,7 @@ while test $# -gt 0; do
 	-W)	# Internal use only
 		watch=
 		;;
-	-w)
+	-w|--watch)
 		if ! which watch >/dev/null; then
 			echo "Error: watch binary not found" 1>&2
 			exit 1
@@ -73,7 +75,7 @@ while test $# -gt 0; do
 		WATCH_ARGS="$WATCH_ARGS -n $2"
 		shift
 		;;
-	-q)
+	-q|--quiet)
 		quiet=1
 		;;
 	-qh)
@@ -88,7 +90,7 @@ while test $# -gt 0; do
 		Q_MAXHELD=$2
 		shift
 		;;
-	-r)
+	-r|--relative)
 		relative=1
 		;;
 	-rc)
