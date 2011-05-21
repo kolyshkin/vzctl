@@ -193,11 +193,13 @@ function dp(p, d) {
 
 function important(id, held, maxheld, barrier, limit, failcnt) {
 	if (failcnt > 0)
-		return 1;
+		return 2;
 	if (barrier == 0)
 		barrier = limit;
 	if ((barrier == 9223372036854775807) || (barrier == 2147483647))
 		return 0;
+	if (held > barrier)
+		return 2;
 	if (held > barrier * qheld)
 		return 1;
 	if (maxheld > barrier * qmaxheld)
@@ -248,8 +250,9 @@ bcid, cumul ? "+" : " ")
 	failcnt=$6
 }
 ((id!="")  && (bcid!="")) {
+	imp=important(id, held, maxheld, barrier, limit, failcnt)
 	if (quiet)
-		if (!important(id, held, maxheld, barrier, limit)) {
+		if (!imp) {
 			id=""
 			next
 		}
