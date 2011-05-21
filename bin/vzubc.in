@@ -9,7 +9,7 @@ umask 0077
 Q_HELD=0.8
 # Ratio of maxheld/limit to bypass quiet
 Q_MAXHELD=0.5
-# Directory to store previous failcnt values for cumulative mode
+# Directory to store previous failcnt values for relative mode
 STOREDIR=/tmp/vzubc.store
 
 usage() {
@@ -23,9 +23,9 @@ Usage: vzubc [option ...] [<filename>] [<ctid> ...]
      -qh <ratio>: quiet watermark for held/limit ratio (default: $Q_HELD)
      -qm <ratio>: quiet watermark for maxheld/limit ratio (default: $Q_MAXHELD)
 
- -c: cumulative mode (show fail counters relative to previous run)
-     -cc: clear all saved fail counter data for cumulative mode
-     -cd <dir>: directory for cumulative data (default: $STOREDIR)
+ -r: relative mode (show fail counters delta to previous run)
+     -rc: clear all saved fail counter data for relative mode
+     -rd <dir>: directory for relative data (default: $STOREDIR)
 
  <filename>: file to read UBC values from (defaults are
              /proc/bc/resources or /proc/user_beancounters)
@@ -88,16 +88,16 @@ while test $# -gt 0; do
 		Q_MAXHELD=$2
 		shift
 		;;
-	-c)
-		cumulative=1
+	-r)
+		relative=1
 		;;
-	-cc)
-		cumulative=1
+	-rc)
+		relative=1
 		rm -fr $STOREDIR/
 		;;
-	-cd)
+	-rd)
 		chk_zeroarg $1 $2
-		cumulative=1
+		relative=1
 		STOREDIR=$2
 		;;
 	-h|--help)
@@ -140,7 +140,7 @@ if test "$FILE" != "-"; then
 fi
 
 # Cumulative mode preparations and sanity checks
-if ! test -z "$cumulative"; then
+if ! test -z "$relative"; then
 	# Create dir if needed
 	if ! test -d $STOREDIR; then
 		mkdir $STOREDIR || exit 1
@@ -155,7 +155,7 @@ test -z "$watch" || exec watch $WATCH_ARGS -- $0 $ARGV -W
 
 cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " -v quiet="$quiet"  \
 	-v qheld="$Q_HELD" -v qmaxheld="$Q_MAXHELD" \
-	-v cumul="$cumulative" -v storedir="$STOREDIR" \
+	-v rel="$relative" -v storedir="$STOREDIR" \
 '
 BEGIN {
 	if (qmaxheld > qheld)
@@ -233,7 +233,7 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 "-------------------------------------------------------------------\n" \
 "CT %-10s| HELD  Bar%%  Lim%%| MAXH  Bar%%  Lim%%| BAR | LIM |%cFAIL\n" \
 "-------------+-----------------+-----------------+-----+-----+-----",
-bcid, cumul ? "+" : " ")
+bcid, rel ? "+" : " ")
 	id=$2
 	held=$3
 	maxheld=$4
@@ -251,7 +251,7 @@ bcid, cumul ? "+" : " ")
 }
 ((id!="")  && (bcid!="")) {
 	newfc=failcnt
-	if ( (cumul) && (failcnt > 0) ) {
+	if ( (rel) && (failcnt > 0) ) {
 		storefile=storedir "/" bcid "." id
 		getline oldfc < storefile
 		if (oldfc > 0)
@@ -277,7 +277,7 @@ bcid, cumul ? "+" : " ")
 		hr(id, maxheld), dp(maxheld, barrier), dp(maxheld, limit),
 		hr(id, barrier), hr(id, limit), hr(id, failcnt)
 	# Save failcnt to store file
-	if ( (cumul) && (newfc > 0) )
+	if ( (rel) && (newfc > 0) )
 		print newfc > storefile
 	id=""
 }
