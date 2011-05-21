@@ -36,6 +36,7 @@ load_module() {
 }
 
 start() {
+	[ -d /proc/vz ] || return
 	check_config || return
 	load_module || return
 
