@@ -250,19 +250,6 @@ bcid, cumul ? "+" : " ")
 	failcnt=$6
 }
 ((id!="")  && (bcid!="")) {
-	imp=important(id, held, maxheld, barrier, limit, failcnt)
-	if (quiet)
-		if (!imp) {
-			id=""
-			next
-		}
-	if (header != "") {
-		if (printed)
-			print ""
-		print header
-		printed=1
-		header=""
-	}
 	newfc=failcnt
 	if ( (cumul) && (failcnt > 0) ) {
 		storefile=storedir "/" bcid "." id
@@ -271,6 +258,18 @@ bcid, cumul ? "+" : " ")
 			failcnt=failcnt-oldfc
 		if (failcnt < 0)
 			failcnt=newfc
+	}
+	imp=important(id, held, maxheld, barrier, limit, failcnt)
+	if ((quiet) && (!imp)) {
+		id=""
+		next
+	}
+	if (header != "") {
+		if (printed)
+			print ""
+		print header
+		printed=1
+		header=""
 	}
 	printf "%13s|%5s %5s %5s|%5s %5s %5s|%5s|%5s| %5s\n",
 		id,
