@@ -82,6 +82,14 @@ __echo()
 	fi
 }
 
+check_vzkernel()
+{
+	if ! test -d /proc/vz ; then
+		echo "Running kernel is not an OpenVZ kernel"
+		exit 6
+	fi
+}
+
 vzdaemon_start()
 {
 	case $DISTR in

@@ -79,14 +79,6 @@ RETVAL=0
 PARALLEL=
 cd /
 
-check_kernel()
-{
-	if ! test -d /proc/vz ; then
-		print_failure "Running kernel is not OpenVZ kernel."
-		exit 1
-	fi
-}
-
 get_kernel_version()
 {
 	[ ! -z "$KERNEL_MAJOR" ] && return
@@ -173,7 +165,7 @@ modify_vzconf()
 
 status()
 {
-	check_kernel
+	check_vzkernel
 
 	if is_running; then
 		echo "OpenVZ is running..."
@@ -389,7 +381,7 @@ start()
 	local msg
 	local mod
 
-	check_kernel
+	check_vzkernel
 	check_kernel_config
 
 	if ! lockfile $LOCKFILE; then

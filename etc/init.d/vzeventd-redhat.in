@@ -54,6 +54,7 @@ check() {
 start() {
 	[ "$EUID" != "0" ] && exit 4
 	[ -x @SBINDIR@/vzeventd ] || exit 5
+	check_vzkernel > /dev/null
 	[ -r /etc/sysconfig/vzeventd ] && . /etc/sysconfig/vzeventd
 	[ -r /etc/default/vzeventd ] && . /etc/default/vzeventd
 
