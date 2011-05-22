@@ -27,8 +27,8 @@ Usage: vzubc [option ...] [<filename>] [<ctid> ...]
      -wn <time>: refresh every <time> seconds
  -q, --quiet:
      Quiet mode (only show beancounters with fails and close to limits).
-     -qh <ratio>: quiet watermark for held/limit ratio (default: $Q_HELD)
-     -qm <ratio>: quiet watermark for maxheld/limit ratio (default: $Q_MAXHELD)
+     -qh <ratio>: quiet threshold for held/limit ratio (default: $Q_HELD)
+     -qm <ratio>: quiet threshold for maxheld/limit ratio (default: $Q_MAXHELD)
  -r, --relative:
      Relative mode (show fail counters delta to previous run).
      -rc: clear all saved fail counter data for relative mode
