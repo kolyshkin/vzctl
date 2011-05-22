@@ -205,10 +205,10 @@ function hr(res, v) {
 function dp(p, d) {
 	if ((d == 0) || (d == 9223372036854775807) || (d == 2147483647))
 		return "- "
-	r = sprintf("%.2f", p / d * 100);
+	r = sprintf("%.1f", p / d * 100);
 	fmt="%d"
 	if (r < 10)
-		fmt="%.2g"
+		fmt="%.1g"
 	r = sprintf(fmt, r)
 	if (r == 0)
 		return "- "
@@ -254,9 +254,9 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 		next
 	}
 	header=sprintf( c_h \
-"-------------------------------------------------------------------\n" \
-"CT %-10s| HELD  Bar%%  Lim%%| MAXH  Bar%%  Lim%%| BAR | LIM |%cFAIL\n" \
-"-------------+-----------------+-----------------+-----+-----+-----" \
+"---------------------------------------------------------------\n" \
+"CT %-10s| HELD Bar%% Lim%%| MAXH Bar%% Lim%%| BAR | LIM |%cFAIL\n" \
+"-------------+--------------+----------------+-----+-----+-----" \
 c_n, bcid, rel ? "+" : " ")
 	id=$2
 	held=$3
@@ -301,7 +301,7 @@ c_n, bcid, rel ? "+" : " ")
 		printf c_w;
 	else
 		printf c_n;
-	printf "%13s|%5s %5s %5s|%5s %5s %5s|%5s|%5s| %5s\n" c_n,
+	printf "%13s|%5s %4s %4s|%5s %4s %4s|%5s|%5s| %5s\n" c_n,
 		id,
 		hr(id, held), dp(held, barrier), dp(held, limit),
 		hr(id, maxheld), dp(maxheld, barrier), dp(maxheld, limit),
@@ -313,6 +313,6 @@ c_n, bcid, rel ? "+" : " ")
 }
 END {
 	if (printed)
-		printf "-------------------------------------------------------------------\n"
+		printf "---------------------------------------------------------------\n"
 }
 '
