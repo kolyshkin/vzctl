@@ -102,7 +102,7 @@ while test $# -gt 0; do
 		;;
 	-rc)
 		relative=1
-		rm -fr $STOREDIR/
+		rm -f $STOREDIR/ubc.*
 		;;
 	-rd)
 		chk_zeroarg $1 $2
@@ -163,8 +163,8 @@ if ! test -z "$relative"; then
 		mkdir $STOREDIR || exit 1
 	fi
 	# Check we can write to it
-	touch $STOREDIR/test || exit 1
-	rm -f $STOREDIR/test || exit 1
+	touch $STOREDIR/ubc.test || exit 1
+	rm -f $STOREDIR/ubc.test || exit 1
 fi
 
 # Re-exec ourselves under watch
@@ -270,7 +270,7 @@ c_n, bcid, rel ? "+" : " ")
 ((id!="")  && (bcid!="")) {
 	newfc=failcnt
 	if ( (rel) && (failcnt > 0) ) {
-		storefile=storedir "/" bcid "." id
+		storefile=storedir "/ubc." bcid "." id
 		getline oldfc < storefile
 		if (oldfc > 0)
 			failcnt=failcnt-oldfc
