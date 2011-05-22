@@ -29,7 +29,8 @@ man_MANS = arpsend.8 \
            vzpid.8 \
            vzsplit.8 \
            vzifup-post.8 \
-           vzeventd.8
+           vzeventd.8 \
+           vzubc.8
 
 
 EXTRA_DIST = $(man_MANS)

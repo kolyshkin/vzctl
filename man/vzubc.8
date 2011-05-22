@@ -1,0 +1,75 @@
+.TH vzctl 8 "22 May 2011" "OpenVZ" "Containers"
+.SH NAME
+vzubc \- show User Beancounters in a human-readable format.
+.SH SYNOPSIS
+vzubc [\fIoption\fR ...] [\fIfile\fR] [\fICTID\fR ...]
+.SH DESCRIPTION
+This utility aims to show current values for User Beancounter in
+a human-readable format. Values that are in pages are converted into bytes,
+then long values are converted into kilo-, mega- gigabytes etc.
+For held and maxheld, it shows how close the values are to the barrier and
+to the limit. Zero and unlimited values are shown as \fB-\fR.
+
+One can specify a \fIfile\fR to read User Beancounters from, by default this is
+\fB/proc/bc/resources\fR or, if that one is not available,
+\fB/proc/user_beancounters\fR. Use \fB-\fR to read from standard input.
+
+One or several \fICTID\fRs can be specified to limit the output to the given
+containers. Each \fICTID\fR can be  either a name or a numeric ID.
+
+The utility can also be used from inside the container, in this case it only
+shows the values for that container (and it doesn't make sense to specify
+\fBCTID\fR.
+.SH OPTIONS
+.TP
+.BR -w , \ --watch
+Watch mode: run itself under \fBwatch\fR(1), redisplaying the output
+every 2 seconds (by default) until interrupted by Ctrl-C.
+.TP
+.B -wd
+Make \fBwatch\fR highlight the differences between current and previous
+output (corresponds to \fBwatch -d\fR option).
+.TP
+.BI -wn \ time
+Refresh interval for \fBwatch\fR(8), in seconds (corresponds to \fBwatch -n \fItime\fR).
+.TP
+.BR -q , \ --quiet
+Quiet mode. In this mode, \fBvzubc\fR only shows beancounters with fails and
+those with held/maxheld values close to limits.
+.TP
+.BI -qh \ ratio
+Quiet threshold for held to limit ratio. Default is \fB0.5\fR (50%).
+.TP
+.BI -qm \ ratio
+Quiet threshold for maxheld to limit ratio. Default is \fB0.8\fR (80%).
+.TP
+.BR -r , \ --relative
+Relative mode: for fail counters, instead of showing the absolute value,
+calculate the difference from the previous run. This mode is denoted by
+a \fB+\fR sign before the \fBFAIL\fR column header.
+.TP
+.BI -rd \ dir
+Set a directory for saving fail counters to \fIdir\fR (default is
+\fB/tmp/vzubc.store\fR).
+.TP
+.B -rc
+Clear all saved fail counter data.
+.TP
+.BR -c , \ --color
+Enable color highlighting. Not compatible with \fB--watch\fR. Same thresholds
+as for quiet mode are used to highlight "more important" lines, plus the
+lines with non-zero fail counters are highlighted.
+.SH FILES
+.ad l
+\fB\f(CR/proc/bc/resources
+.br
+/proc/user_beancounters
+.br
+/tmp/vzubc.store/ubc.*\fR
+.SH SEE ALSO
+.BR watch (1),
+.BR vzmemcheck (8),
+.BR vzcfgvalidate (8),
+.BR http://wiki.openvz.org/UBC .
+.SH LICENSE
+Copyright (C) 2011, Parallels, Inc. Licensed under GNU GPL.

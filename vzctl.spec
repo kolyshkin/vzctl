@@ -129,7 +129,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzcalc.8.*
 %attr(644, root, root) %{_mandir}/man8/vzpid.8.*
 %attr(644, root, root) %{_mandir}/man8/vzcpucheck.8.*
-#%attr(644, root, root) %{_mandir}/man8/vzcheckovr.8.*
+%attr(644, root, root) %{_mandir}/man8/vzubc.8.*
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man8/vzifup-post.8.*
 %attr(644, root, root) %{_mandir}/man5/ctid.conf.5.*
