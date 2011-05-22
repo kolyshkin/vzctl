@@ -34,7 +34,8 @@ Usage: vzubc [option ...] [<filename>] [<ctid> ...]
      -rc: clear all saved fail counter data for relative mode
      -rd <dir>: directory for relative data (default: $STOREDIR)
  -c, --color:
-     Enable color highlighting. Not compatible with --watch.
+     Enable color highlighting (using same thresholds as for --quiet).
+     Color mode is not compatible with --watch.
 
  <filename>: file to read UBC values from (defaults are
              /proc/bc/resources or /proc/user_beancounters)
@@ -87,13 +88,13 @@ while test $# -gt 0; do
 		;;
 	-qh)
 		chk_zeroarg $1 $2
-		quiet=1
+		thr=1
 		Q_HELD=$2
 		shift
 		;;
 	-qm)
 		chk_zeroarg $1 $2
-		quiet=1
+		thr=1
 		Q_MAXHELD=$2
 		shift
 		;;
@@ -144,6 +145,11 @@ while test $# -gt 0; do
 	esac
 	shift
 done
+
+if test -n "$thr" -a -z "$color" -a -z "$quiet"; then
+	echo "Error: -qh and -qm only make sense with --quiet or --color"
+	usage 1
+fi
 
 if test -z "$FILE"; then
 	# No file name given, substitute sane default
