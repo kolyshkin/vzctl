@@ -326,7 +326,7 @@ function change_hostname()
 		}
 		$1 == "127.0.0.1" {
 			for (i=2; i <= NF; i++) { if ($i != "localhost" && $i != "localhost.localdomain") { LOCALHOST_ALIASES[$i] = 1 } }
-			for (localhost_alias in LOCALHOST_ALIASES) { localhost_aliases = localhost_aliass " " localhost_alias }
+			for (localhost_alias in LOCALHOST_ALIASES) { localhost_aliases = localhost_aliases " " localhost_alias }
 			ate_localhost = 1;
 			next;
 		}
