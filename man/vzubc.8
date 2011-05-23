@@ -15,11 +15,13 @@ One can specify a \fIfile\fR to read User Beancounters from, by default this is
 \fB/proc/user_beancounters\fR. Use \fB-\fR to read from standard input.
 
 One or several \fICTID\fRs can be specified to limit the output to the given
-containers. Each \fICTID\fR can be  either a name or a numeric ID.
+containers. Each \fICTID\fR can be either a name or a numeric ID. Note that
+names can only be used if there is a container on the system with that name
+(\fBvzlist -o ctid\fI name\fR command is used for name to ID conversion).
 
 The utility can also be used from inside the container, in this case it only
 shows the values for that container (and it doesn't make sense to specify
-\fBCTID\fR.
+\fBCTID\fR).
 .SH OPTIONS
 .TP
 .BR -w , \ --watch
@@ -80,6 +82,7 @@ lines with non-zero fail counters are highlighted.
 /tmp/vzubc.store/ubc.*\fR
 .SH SEE ALSO
 .BR watch (1),
+.BR vzlist (8),
 .BR vzmemcheck (8),
 .BR vzcfgvalidate (8),
 .BR http://wiki.openvz.org/UBC .
