@@ -30,9 +30,14 @@ Usage: vzubc [option ...] [<filename>] [<ctid> ...]
      -qh <ratio>: quiet threshold for held/limit ratio (default: $Q_HELD)
      -qm <ratio>: quiet threshold for maxheld/limit ratio (default: $Q_MAXHELD)
  -r, --relative:
-     Relative mode (show fail counters delta to previous run).
+     Relative mode, show fail counters delta compared to previous run.
      -rc: clear all saved fail counter data for relative mode
-     -rd <dir>: directory for relative data (default: $STOREDIR)
+     -rd <dir>: directory for storing data (default: $STOREDIR)
+ -i, --incremental:
+     Incremental mode, add held value delta compared to previous run.
+     If used together with -q, beancounters with changed values are also shown.
+     -ic: clear all saved held data for incremental mode
+     -id <dir>: synonym for -rd
  -c, --color:
      Enable color highlighting (using same thresholds as for --quiet).
      Color mode is not compatible with --watch.
@@ -102,13 +107,17 @@ while test $# -gt 0; do
 		relative=1
 		;;
 	-rc)
-		relative=1
-		rm -f $STOREDIR/ubc.*
+		rm -f $STOREDIR/ubc.*.failcnt
 		;;
-	-rd)
+	-rd|-id)
 		chk_zeroarg $1 $2
-		relative=1
 		STOREDIR=$2
+		;;
+	-i|--incremental)
+		incremental=1
+		;;
+	-ic)
+		rm -f $STOREDIR/ubc.*.held
 		;;
 	-c|--color)
 		if ! test -z "$watch"; then
@@ -162,8 +171,8 @@ if test "$FILE" != "-"; then
 	cat < "$FILE" > /dev/null || exit 1
 fi
 
-# Cumulative mode preparations and sanity checks
-if ! test -z "$relative"; then
+# Relative/incremental mode preparations and sanity checks
+if test -n "$relative" -o -n "$incremental"; then
 	# Create dir if needed
 	if ! test -d $STOREDIR; then
 		mkdir $STOREDIR || exit 1
@@ -179,7 +188,7 @@ test -z "$watch" || exec watch $WATCH_ARGS -- $0 $ARGV -W
 cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " -v quiet="$quiet"  \
 	-v qheld="$Q_HELD" -v qmaxheld="$Q_MAXHELD" \
 	-v rel="$relative" -v storedir="$STOREDIR" \
-	$AWK_COLORS \
+	-v inc="$incremental" $AWK_COLORS \
 '
 BEGIN {
 	if (qmaxheld > qheld)
@@ -254,10 +263,11 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 		next
 	}
 	header=sprintf( c_h \
-"---------------------------------------------------------------\n" \
-"CT %-10s| HELD Bar%% Lim%%| MAXH Bar%% Lim%%| BAR | LIM |%cFAIL\n" \
-"-------------+--------------+----------------+-----+-----+-----" \
-c_n, bcid, rel ? "+" : " ")
+"----------------------------------------------------------------%s\n" \
+"CT %-10s| HELD %s Bar%% Lim%%| MAXH Bar%% Lim%%| BAR | LIM |%cFAIL\n" \
+"-------------+--%s--------------+---------------+-----+-----+-----" \
+c_n, inc ? "------" : "",
+bcid, inc ? " +/-  " : "", rel ? "+" : " ", inc ? "------" : "")
 	id=$2
 	held=$3
 	maxheld=$4
@@ -275,16 +285,36 @@ c_n, bcid, rel ? "+" : " ")
 }
 ((id!="")  && (bcid!="")) {
 	newfc=failcnt
+	store=storedir "/ubc." bcid "." id
 	if ( (rel) && (failcnt > 0) ) {
-		storefile=storedir "/ubc." bcid "." id
-		getline oldfc < storefile
+		f_file=store ".failcnt"
+		getline oldfc < f_file
 		if (oldfc > 0)
 			failcnt=failcnt-oldfc
 		if (failcnt < 0)
 			failcnt=newfc
 	}
+	save_held=0
+	dh=0
+	if (inc) {
+		d_held="       "
+		h_file=store ".held"
+		save_held=1
+		getline o_held < h_file
+		if (o_held >= 0) {
+			dh=held - o_held
+			sig="+"
+			if (dh < 0) {
+				dh=-dh; sig="-"
+			}
+			if (dh != 0)
+				d_held = sprintf("%7s", sig hr(id, dh))
+			else
+				save_held=0
+		}
+	}
 	imp=important(id, held, maxheld, barrier, limit, failcnt)
-	if ((quiet) && (!imp)) {
+	if ((quiet) && (!imp) && (dh==0)) {
 		id=""
 		next
 	}
@@ -301,18 +331,23 @@ c_n, bcid, rel ? "+" : " ")
 		printf c_w;
 	else
 		printf c_n;
-	printf "%13s|%5s %4s %4s|%5s %4s %4s|%5s|%5s| %5s\n" c_n,
+	printf "%13s|%5s%s %4s %4s|%5s %4s %4s|%5s|%5s| %5s\n" c_n,
 		id,
-		hr(id, held), dp(held, barrier), dp(held, limit),
+		hr(id, held), d_held, dp(held, barrier), dp(held, limit),
 		hr(id, maxheld), dp(maxheld, barrier), dp(maxheld, limit),
 		hr(id, barrier), hr(id, limit), hr(id, failcnt)
-	# Save failcnt to store file
-	if ( (rel) && (newfc > 0) )
-		print newfc > storefile
+	if ( (rel) && (newfc > 0) ) {
+		print newfc > f_file
+		close(f_file)
+	}
+	if (save_held) {
+		print held > h_file
+		close(h_file)
+	}
 	id=""
 }
 END {
 	if (printed)
-		printf "---------------------------------------------------------------\n"
+		printf "-----------------------------------------------------------------%s\n", inc ? "------" : ""
 }
 '

@@ -55,6 +55,18 @@ Set a directory for saving fail counters to \fIdir\fR (default is
 .B -rc
 Clear all saved fail counter data.
 .TP
+.BR -i , \ --incremental
+Incremental mode. Shows an additional column with a difference in held
+value from the previous run. This option also affects quiet mode: all
+lines with changed held values are shown. Held data is saved to the same
+directory as fail counter data.
+.TP
+.BI -id \ dir
+A synonym for \fB-rd\fR.
+.TP
+.B -ic
+Clear all saved held data.
+.TP
 .BR -c , \ --color
 Enable color highlighting. Not compatible with \fB--watch\fR. Same thresholds
 as for quiet mode are used to highlight "more important" lines, plus the
