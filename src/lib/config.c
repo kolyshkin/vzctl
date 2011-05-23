@@ -1030,6 +1030,20 @@ static int parse_dev(vps_param *vps_p, char *val)
 	return 0;
 }
 
+static const char* devperm2str(unsigned long perms)
+{
+	static char mask[4];
+	int i=0;
+	if (perms & S_IROTH)
+		mask[i++] = 'r';
+	if (perms & S_IWOTH)
+		mask[i++] = 'w';
+	if (perms & S_IXGRP)
+		mask[i++] = 'q';
+	mask[i] = 0;
+	return mask;
+}
+
 static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
@@ -1046,8 +1060,7 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	sp = buf;
 	ep = buf + sizeof(buf) - 1;
 	list_for_each(res, &dev->dev, list) {
-		int major, minor, i = 0;
-		char mask[3];
+		int major, minor;
 
 		/* Devices with names (--devnodes) are handled by
 		 * store_devnodes(), so skip those here */
@@ -1057,18 +1070,14 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
 		major = major(res->dev);
 		minor = minor(res->dev);
-		if (res->mask & S_IROTH)
-			mask[i++] = 'r';
-		if (res->mask & S_IWOTH)
-			mask[i++] = 'w';
-		mask[i] = 0;
 		if (res->use_major) {
 			r = snprintf(sp, ep - sp,"%c:%d:all:%s ",
-				S_ISBLK(res->type) ? 'b' : 'c', major, mask);
+				S_ISBLK(res->type) ? 'b' : 'c', major,
+				devperm2str(res->mask));
 		} else {
 			r = snprintf(sp, ep - sp,"%c:%d:%d:%s ",
 				S_ISBLK(res->type) ? 'b' : 'c', major, minor,
-				mask);
+				devperm2str(res->mask));
 		}
 		sp += r;
 		if ((r < 0) || (sp >= ep))
@@ -1154,9 +1163,8 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	char buf[STR_SIZE];
 	dev_param *dev = &vps_p->res.dev;
 	dev_res *res;
-	int r, i;
+	int r;
 	char *sp, *ep;
-	char mask[3];
 
 	if (conf->id != PARAM_DEVNODES)
 		return 0;
@@ -1166,19 +1174,14 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	*sp = 0;
 	ep = buf + sizeof(buf) - 1;
 	list_for_each (res, &dev->dev, list) {
-		i = 0;
 		/* Devices with no names (--devices) are handled by
 		 * store_dev(), so skip those here */
 		if (!res->name)
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
-		if (res->mask & S_IROTH)
-			mask[i++] = 'r';
-		if (res->mask & S_IWOTH)
-			mask[i++] = 'w';
-		mask[i] = 0;
-		r = snprintf(sp, ep - sp,"%s:%s ", res->name, mask);
+		r = snprintf(sp, ep - sp,"%s:%s ", res->name,
+			devperm2str(res->mask));
 		sp += r;
 		if ((r < 0) || (sp >= ep))
 			break;
