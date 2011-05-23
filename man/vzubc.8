@@ -73,6 +73,37 @@ Clear all saved held data.
 Enable color highlighting. Not compatible with \fB--watch\fR. Same thresholds
 as for quiet mode are used to highlight "more important" lines, plus the
 lines with non-zero fail counters are highlighted.
+.SH EXAMPLES
+.TP
+\fBvzubc 101 web dns\fR
+Show all beancounters for CTID 101 and for CTs named \fBweb\fR and \fRdns\fR.
+.TP
+\fBvzubc myubc mail\fR
+Show beancounters for CT named \fBmail\fR from the file \fBmyubc\fR.
+.TP
+\fBvzubc -w -wd -wn 10 101\fR
+Display beancounters for CT 101 every 10 seconds, highlighting the changes.
+Interrupt with Control-C.
+.TP
+\fBvzubc -q -c\fR
+Show beancounters with held or maxheld close to limits, plus those with
+non-zero fail counters, with colors.
+.TP
+\fBvzubc -q -qh 0.8 -qm 1\fR
+Show beancounters with held value equal to or more than 80% of a limit,
+and/or with maxheld value equal or more than a limit, plus those with
+non-zero fail counters.
+.TP
+\fBvzubc -w -q -r\fR
+Display beancounters with held and maxheld close to limits, plus those with
+increasing fail counters.
+.TP
+\fBvzubc -r -q -qh 2 -qm 2\fR
+Only show beancounters with increased (since the last run) fail counters.
+.TP
+\fBvzubc -rc -ic\fR
+Show all beancounters, and clear all saved data for relative and incremental
+mode (i.e. saved values for fail counter and held).
 .SH FILES
 .ad l
 \fB\f(CR/proc/bc/resources
