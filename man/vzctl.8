@@ -675,9 +675,17 @@ Signal handlers may differ from default settings. If \fIcommand\fR is \fB-\fR,
 commands are read from stdin.
 .IP "\fBexec2\fR \fICTID\fR \fIcommand\fR" 4
 The same as \fBexec\fR, but return code is that of \fIcommand\fR.
-.IP \fBrunscript\fR 4
-Run specified shell script in a container, if the container is not running
-it will be started.
+.IP "\fBrunscript\fR \fICTID\fR \fIscript\fR" 4
+Run specified shell script in the container. Argument \fIscript\fR is a file
+on the host system which contents is read by vzctl and executed in the
+context of the container. For a running container, the command jumps
+into the container and executes the script. For a stopped container, it
+enters the container, mounts container's root filesystem, executes the
+script, and unmounts CT root. In the latter case, the container is not
+really started, no file systems other than root (such as \fB/proc\fR)
+are mounted, no startup scripts are executed etc. Thus the environment
+in which the script is running is far from normal and is only usable for
+very basic operations.
 .IP "\fBenter\fR [\fB--exec \fIcommand\fR [\fIarg\fR ...]]" 4
 Enters into a container (giving a container's root shell). This option
 is a back-door for host root only. The proper way to have CT root shell
