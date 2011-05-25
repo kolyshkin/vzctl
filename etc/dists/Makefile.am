@@ -92,6 +92,10 @@ rhel:
 	$(INSTALL_DATA) $(srcdir)/redhat.conf \
 		$(DESTDIR)$(distconfdir)/rhel.conf
 
+scientific:
+	$(INSTALL_DATA) $(srcdir)/redhat.conf \
+		$(DESTDIR)$(distconfdir)/scientific.conf
+
 slack:
 	$(INSTALL_DATA) $(srcdir)/slackware.conf \
 		$(DESTDIR)$(distconfdir)/slackware.conf
@@ -130,6 +134,7 @@ install-data-hook: altlinux \
                    owl \
                    redhat \
                    rhel \
+                   scientific \
                    slack \
                    suse \
                    ubuntu
