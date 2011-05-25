@@ -19,7 +19,7 @@ C_NORMAL="\\033[0;39m"
 
 usage() {
 	cat << EOF
-Usage: vzubc [option ...] [<filename>] [<ctid> ...]
+Usage: vzubc [option ...] [<ctid> ...]
 
  -w, --watch:
      Run itself under watch(1) (a la top mode, Ctrl-C to exit).
@@ -41,9 +41,10 @@ Usage: vzubc [option ...] [<filename>] [<ctid> ...]
  -c, --color:
      Enable color highlighting (using same thresholds as for --quiet).
      Color mode is not compatible with --watch.
+ -f, --file <file>:
+     File to read UBC values from. Defaults are /proc/bc/resources or
+     /proc/user_beancounters. Use - to read from stdin.
 
- <filename>: file to read UBC values from (defaults are
-             /proc/bc/resources or /proc/user_beancounters)
  <ctid>: container name/ID to show info about (can be used multiple times)
 EOF
 	exit $1
@@ -131,25 +132,22 @@ while test $# -gt 0; do
 	-h|--help)
 		usage 0
 		;;
-	-)
-		# Use stdin for input
-		FILE="-"
+	-f|--file)
+		chk_zeroarg $1 $2
+		FILE=$2
+		shift
 		;;
 	-*)
 		echo "Unrecognized option: $1" 1>&2
 		usage 1
 		;;
-	0)
-		# CTID 0, i.e. host system, vzlist doesn't know it
-		CTIDS=$(echo $CTIDS 0)
-		;;
 	*)
-		# A file name or CT id/name? Check CT first
+		# Try to convert CT name to ID
 		ID=$(vzlist -H -o ctid "$1" 2>/dev/null)
 		if test $? -eq 0; then
 			CTIDS=$(echo $CTIDS $ID)
 		else
-			FILE="$1"
+			CTIDS=$(echo $CTIDS $1)
 		fi
 		;;
 	esac
