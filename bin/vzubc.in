@@ -335,7 +335,7 @@ bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
 		id,
 		hr(id, held), d_held, dp(held, barrier), dp(held, limit),
 		hr(id, maxheld), dp(maxheld, barrier), dp(maxheld, limit),
-		hr(id, barrier), hr(id, limit), hr(id, failcnt)
+		hr(id, barrier), hr(id, limit), hr("", failcnt)
 	if ( (rel) && (newfc > 0) ) {
 		print newfc > f_file
 		close(f_file)
