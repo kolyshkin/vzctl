@@ -186,7 +186,11 @@ function add_ip()
 		if [ "${ip#*:}" = "${ip}" ]; then
 			/sbin/ifup -a --force 2>/dev/null
 		else
-			/etc/init.d/networking restart > /dev/null 2>&1
+			if [ -x /usr/sbin/invoke-rc.d ] ; then
+				/usr/sbin/invoke-rc.d networking restart > /dev/null 2>&1
+			else
+				/etc/init.d/networking restart > /dev/null 2>&1
+			fi
 		fi
 	fi
 }
