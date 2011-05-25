@@ -112,6 +112,7 @@ while test $# -gt 0; do
 	-rd|-id)
 		chk_zeroarg $1 $2
 		STOREDIR=$2
+		shift
 		;;
 	-i|--incremental)
 		incremental=1
