@@ -97,7 +97,7 @@ function set_network()
 	fi
 }
 
-[ -z "${VE_ROOT}" ] && return 1
+[ -z "${VE_ROOT}" ] && exit 1
 randcrontab
 disableroot
 set_network
