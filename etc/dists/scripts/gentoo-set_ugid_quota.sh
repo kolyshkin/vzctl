@@ -36,23 +36,23 @@ echo '#!/sbin/runscript
 
 start() {
 	[ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'
-        rm -f /etc/mtab >/dev/null 2>&1
-        echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
-        mnt=`grep -v " / " /proc/mounts`
-        if [ $? == 0 ]; then
+	rm -f /etc/mtab >/dev/null 2>&1
+	echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
+	mnt=`grep -v " / " /proc/mounts`
+	if [ $? = 0 ]; then
 		echo "$mnt" >> /etc/mtab
-        fi
+	fi
 	chmod 644 /etc/mtab
 	quotaon -aug
-        return
+	return
 }
 
 stop() {
-        return
+	return
 }
 
 ' > ${SCRIPTANAME} || {
-	echo "Unable to create ${SCRIPTNAME}"
+	echo "Unable to create ${SCRIPTANAME}"
 	exit 1
 }
 chmod 755 ${SCRIPTANAME}

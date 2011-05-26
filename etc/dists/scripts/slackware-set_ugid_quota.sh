@@ -33,7 +33,7 @@ start() {
 	rm -f /etc/mtab >/dev/null 2>&1
 	echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
 	mnt=`grep -v " / " /proc/mounts`
-	if [ $? == 0 ]; then
+	if [ $? = 0 ]; then
 		echo "$mnt" >> /etc/mtab
 	fi
 	chmod 644 /etc/mtab
@@ -41,12 +41,12 @@ start() {
 }
 case "$1" in
   start)
-        start
-        ;;
+	start
+	;;
   *)
 	exit
 esac ' > ${SCRIPTANAME} || {
-	echo "Unable to create ${SCRIPTNAME}"
+	echo "Unable to create ${SCRIPTANAME}"
 	exit 1
 }
 chmod 755 ${SCRIPTANAME}
