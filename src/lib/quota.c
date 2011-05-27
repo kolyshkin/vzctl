@@ -58,7 +58,7 @@ int quota_set(envid_t veid, char *private, dq_param *param)
 		return 0;
 	}
 	i = 0;
-	arg[i++] = strdup("vzquota");
+	arg[i++] = strdup(VZQUOTA);
 	arg[i++] = strdup("setlimit");
 	snprintf(buf, sizeof(buf), "%d", veid);
 	arg[i++] = strdup(buf);
