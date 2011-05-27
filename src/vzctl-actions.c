@@ -531,19 +531,19 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 					"on a running container");
 		found++;
 	}
-	/* Setting/changing quotaugidlimit */
-	if (new_res->dq.ugidlimit) {
-		if (!old_res->dq.ugidlimit) {
-			if (loud)
-				logger(-1, 0, "Unable to turn on second-level"
-					" disk quota on a running container");
-			found++;
-		} else if (*new_res->dq.ugidlimit != *old_res->dq.ugidlimit) {
-			if (loud)
-				logger(-1, 0, "Unable to change quota ugid "
-					"limit on a running container");
-			found++;
-		}
+	/* Turning quota ugid limit on/off */
+	if ( (new_res->dq.ugidlimit && *new_res->dq.ugidlimit != 0) &&
+		(!old_res->dq.ugidlimit || *old_res->dq.ugidlimit == 0) ) {
+		if (loud)
+			logger(-1, 0, "Unable to turn on second-level"
+				" disk quota on a running container");
+		found++;
+	} else if ( (old_res->dq.ugidlimit && *old_res->dq.ugidlimit != 0) &&
+			(*new_res->dq.ugidlimit == 0) ) {
+		if (loud)
+			logger(-1, 0, "Unable to turn off second-level"
+				" disk quota on a running container");
+		found++;
 	}
 	/* Enabling/disabling DISK_QUOTA */
 	if ( (new_res->dq.enable) &&
