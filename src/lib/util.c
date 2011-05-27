@@ -367,7 +367,7 @@ int get_mem(unsigned long long *mem)
 	}
 	if ((pagesize = get_pagesize()) < 0)
 		return -1;
-	*mem = pages * pagesize;
+	*mem = (unsigned long long) pages * pagesize;
 	return 0;
 }
 
