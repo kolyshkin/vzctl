@@ -17,8 +17,6 @@
 
 VERSION="2"
 
-ONBOOT="no"
-
 # UBC parameters (in form of barrier:limit)
 # Primary parameters
 AVNUMPROC="unlimited"
