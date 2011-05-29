@@ -57,19 +57,6 @@ and the sorting order (\fB-s\fR, \fB--sort\fR).
 allbox center;
 lB lB
 lI l.
-Suffix	Description
-_
- .m	maxheld
- .b	barrier
- .l	limit
- .f	failcnt
- .s	softlimit
- .h	hardlimit
-.TE
-.TS
-allbox center;
-lB lB
-lI l.
 Value	Header
 _
 ctid	CTID
@@ -80,116 +67,28 @@ ostemplate	OSTEMPLATE
 ip	IP_ADDR
 status	STATUS
 kmemsize	KMEMSIZE
-kmemsize.m	KMEMSIZE.M
-kmemsize.b	KMEMSIZE.B
-kmemsize.l	KMEMSIZE.L
-kmemsize.f	KMEMSIZE.F
 lockedpages	LOCKEDP
-lockedpages.m	LOCKEDP.M
-lockedpages.b	LOCKEDP.B
-lockedpages.l	LOCKEDP.L
-lockedpages.f	LOCKEDP.F
 privvmpages	PRIVVMP
-privvmpages.m	PRIVVMP.M
-privvmpages.b	PRIVVMP.B
-privvmpages.l	PRIVVMP.L
-privvmpages.f	PRIVVMP.F
 shmpages	SHMP
-shmpages.m	SHMP.M
-shmpages.b	SHMP.B
-shmpages.l	SHMP.L
-shmpages.f	SHMP.F
 numproc	NPROC
-numproc.m	NPROC.M
-numproc.b	NPROC.B
-numproc.l	NPROC.L
-numproc.f	NPROC.F
 physpages	PHYSP
-physpages.m	PHYSP.M
-physpages.b	PHYSP.B
-physpages.l	PHYSP.L
-physpages.f	PHYSP.F
 vmguarpages	VMGUARP
-vmguarpages.m	VMGUARP.M
-vmguarpages.b	VMGUARP.B
-vmguarpages.l	VMGUARP.L
-vmguarpages.f	VMGUARP.F
 oomguarpages	OOMGUARP
-oomguarpages.m	OOMGUARP.M
-oomguarpages.b	OOMGUARP.B
-oomguarpages.l	OOMGUARP.L
-oomguarpages.f	OOMGUARP.F
 numtcpsock	NTCPSOCK
-numtcpsock.m	NTCPSOCK.M
-numtcpsock.b	NTCPSOCK.B
-numtcpsock.l	NTCPSOCK.L
-numtcpsock.f	NTCPSOCK.F
 numflock	NFLOCK
-numflock.m	NFLOCK.M
-numflock.b	NFLOCK.B
-numflock.l	NFLOCK.L
-numflock.f	NFLOCK.F
 numpty	NPTY
-numpty.m	NPTY.M
-numpty.b	NPTY.B
-numpty.l	NPTY.L
-numpty.f	NPTY.F
 numsiginfo	NSIGINFO
-numsiginfo.m	NSIGINFO.M
-numsiginfo.b	NSIGINFO.B
-numsiginfo.l	NSIGINFO.L
-numsiginfo.f	NSIGINFO.F
 tcpsndbuf	TCPSNDB
-tcpsndbuf.m	TCPSNDB.M
-tcpsndbuf.b	TCPSNDB.B
-tcpsndbuf.l	TCPSNDB.L
-tcpsndbuf.f	TCPSNDB.F
 tcprcvbuf	TCPRCVB
-tcprcvbuf.m	TCPRCVB.M
-tcprcvbuf.b	TCPRCVB.B
-tcprcvbuf.l	TCPRCVB.L
-tcprcvbuf.f	TCPRCVB.F
 othersockbuf	OTHSOCKB
-othersockbuf.m	OTHSOCKB.M
-othersockbuf.b	OTHSOCKB.B
-othersockbuf.l	OTHSOCKB.L
-othersockbuf.f	OTHSOCKB.F
 dgramrcvbuf	DGRAMRRB
-dgramrcvbuf.m	DGRAMRRB.M
-dgramrcvbuf.b	DGRAMRRB.B
-dgramrcvbuf.l	DGRAMRRB.L
-dgramrcvbuf.f	DGRAMRRB.F
 numothersock	NOTHSOCK
-numothersock.m	NOTHSOCK.M
-numothersock.b	NOTHSOCK.B
-numothersock.l	NOTHSOCK.L
-numothersock.f	NOTHSOCK.F
 dcachesize	DCACHESZ
-dcachesize.m	DCACHESZ.M
-dcachesize.b	DCACHESZ.B
-dcachesize.l	DCACHESZ.L
-dcachesize.f	DCACHESZ.F
 numfile	NFILE
-numfile.m	NFILE.M
-numfile.b	NFILE.B
-numfile.l	NFILE.L
-numfile.f	NFILE.F
 numiptent	NIPTENT
-numiptent.m	NIPTENT.M
-numiptent.b	NIPTENT.B
-numiptent.l	NIPTENT.L
-numiptent.f	NIPTENT.F
 swappages	SWAPP
-swappages.m	SWAPP.M
-swappages.b	SWAPP.B
-swappages.l	SWAPP.L
-swappages.f	SWAPP.F
 diskspace	DSPACE
-diskspace.s	DSPACE.S
-diskspace.h	DSPACE.H
 diskinodes	DINODES
-diskinodes.s	DINODES.S
-diskinodes.h	DINODES.H
 laverage	LAVERAGE
 uptime	UPTIME
 cpulimit	CPULIM
@@ -198,8 +97,32 @@ ioprio	IOP
 onboot	ONBOOT
 bootorder	BOOTORDER
 .TE
+.P
+For the user beancounter fields above, one can use the following suffixes:
+.TS
+allbox center;
+lB lB lB
+lI l l.
+Suffix	Header	Description
+_
+ .m	.M	maxheld
+ .b	.B	barrier
+ .l	.L	limit
+ .f	.F	failcnt
+.TE
+.P
+For the disk quota fields above, one can use the following suffixes:
+.TS
+allbox center;
+lB lB lB
+lI l l.
+Suffix  Header  Description
+_
+ .s	.S	softlimit
+ .h	.H	hardlimit
+.TE
 .SH EXAMPLES
-\f(CW	vzlist -o ctid,kmemsize,kmemsize.l -s kmemsize\fR
+\fBvzlist -o ctid,kmemsize,kmemsize.l -s kmemsize\fR
 .SH RETURN CODE
 Returns 0 upon success.
 .SH COPYRIGHT
