@@ -68,6 +68,9 @@ fedora:
 	$(INSTALL_DATA) $(srcdir)/fedora-core.conf \
 		$(DESTDIR)$(distconfdir)/fedora.conf
 
+funtoo:
+	$(INSTALL_DATA) $(srcdir)/funtoo.conf $(DESTDIR)$(distconfdir)/funtoo.conf
+
 gentoo:
 	$(INSTALL_DATA) $(srcdir)/gentoo.conf \
 		$(DESTDIR)$(distconfdir)/gentoo.conf
@@ -129,6 +132,7 @@ install-data-hook: altlinux \
                    centos \
                    debian \
                    fedora \
+                   funtoo \
                    gentoo \
                    mandrake \
                    owl \

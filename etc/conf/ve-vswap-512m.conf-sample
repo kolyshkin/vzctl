@@ -18,8 +18,6 @@
 # This config is valid for VSwap-enabled kernel (which currently means
 # any RHEL6-based kernel, i.e. 042test* or 042stab*).
 
-ONBOOT="yes"
-
 # UBC parameters (in form of barrier:limit)
 PHYSPAGES="0:512M"
 SWAPPAGES="0:1G"
