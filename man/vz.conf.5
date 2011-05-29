@@ -13,7 +13,9 @@ All parameter names and values are case-sensitive.
 Quotes surrounding \fIvalue\fR are required if value contains spaces, and
 are optional otherwise. Extra spaces are not allowed. All unrecognized lines
 will be ignored.
+
 .SS Global parameters
+
 .IP \fBVIRTUOZZO\fR=\fByes\fR|\fBno\fR
 This parameter can be set to \fByes\fR or \fBno\fR, and used by
 the \fBvz\fR init script. In case it is not
@@ -55,7 +57,9 @@ in a normal way (to recalculate/fix quotas).
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
 Value of this parameter is a directory in which all container template data are
 stored.
+
 .SS Network interface parameters
+
 .IP \fBVE_ROUTE_SRC_DEV\fR="\fIdevice\fR"
 This parameter specifies the network device name which IP address will be
 used as the source IP. This is helpful in case more than one network
@@ -71,7 +75,9 @@ or older) behavior, when all the possible interfaces were used.
 In case the value of this parameter is set to \fByes\fR, vzctl will fail to
 start a container if there is another host with the same IP in the subnet.
 The value of \fBno\fR makes vzctl to only print the warning.
+
 .SS Defaults for containers
+
 Below parameters are defaults for containers, and can be overwritten by
 parameters in \fBctid.conf\fR(5) per-container configuration file.
 .IP \fBDISK_QUOTA\fR=\fByes\fR|\fBno\fR
