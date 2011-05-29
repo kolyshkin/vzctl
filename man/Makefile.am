@@ -15,25 +15,32 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-man_MANS = arpsend.8 \
-           ctid.conf.5 \
-           ndsend.8 \
-           vzcalc.8 \
-           vzcfgvalidate.8 \
-           vz.conf.5 \
-           vzcpucheck.8 \
-           vzctl.8 \
-           vzlist.8 \
-           vzmemcheck.8 \
-           vzmigrate.8 \
-           vzpid.8 \
-           vzsplit.8 \
-           vzifup-post.8 \
-           vzeventd.8 \
-           vzubc.8
+man_MANS = \
+ vzctl.8 \
+ vzlist.8 \
+ vzcpucheck.8 \
+ vzmemcheck.8 \
+ vzcfgvalidate.8 \
+ vzcalc.8 \
+ vzsplit.8 \
+ vzubc.8 \
+ vzmigrate.8 \
+ arpsend.8 \
+ ndsend.8 \
+ vzpid.8 \
+ vzifup-post.8 \
+ vzeventd.8 \
+ vz.conf.5 \
+ ctid.conf.5
 
+PSS=$(man_MANS:%=%.ps)
+PDFS=$(man_MANS:%=%.pdf)
 
-EXTRA_DIST = $(man_MANS)
+GROFF=groff
+PAPER=$(shell paperconf || echo letter)
+GROFF_OPTS=-Tps -t -dpaper=$(PAPER) -P-p$(PAPER) -man -msafer -rC1 -rD1 -rS11
+
+EXTRA_DIST = $(man_MANS) toc.man.in toc.sh
 
 check-man-dates:
 	for FILE in $(man_MANS); do \
@@ -43,3 +50,28 @@ check-man-dates:
 		sed -e "1s%\(\.TH \w\w* [0-9] \"\)[0-9]* \w\w* [0-9][0-9][0-9][0-9]%\1$${DATE}%" -i $${FILE}; \
 	done
 	git diff $(man_MANS)
+
+%.5.ps:	%.5
+	$(GROFF) $(GROFF_OPTS) $^ > $@
+%.8.ps:	%.8
+	$(GROFF) $(GROFF_OPTS) $^ > $@
+
+all.ps: $(man_MANS)
+	 $(GROFF) $(GROFF_OPTS) $^ > $@
+
+toc.man: toc.man.in toc.sh all.ps
+	sed -ne '/^__TOC__$$/,$$!p' $< | \
+		sed 's/__PKG__/$(PACKAGE_STRING)/' > $@
+	$(srcdir)/toc.sh all.ps >> $@
+	sed -ne '1,/^__TOC__$$/!p' $< >> $@
+
+manual.ps: toc.man $(man_MANS)
+	$(GROFF) $(GROFF_OPTS) $^ > $@
+
+# to create a PDF from a PS
+%.pdf: %.ps
+	ps2pdf $< $@
+
+pdfs: manual.pdf $(PDFS)
+
+CLEANFILES=all.ps all.pdf toc.man manual.ps manual.pdf $(PSS) $(PDFS)
