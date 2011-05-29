@@ -35,12 +35,14 @@ man_MANS = \
 
 PSS=$(man_MANS:%=%.ps)
 PDFS=$(man_MANS:%=%.pdf)
+WIKIS=$(man_MANS:%=%.wiki)
 
 GROFF=groff
 PAPER=$(shell paperconf || echo letter)
 GROFF_OPTS=-Tps -t -dpaper=$(PAPER) -P-p$(PAPER) -man -msafer -rC1 -rD1 -rS11
+GROFF_HTML_OPTS=-Thtml -t -man -msafer
 
-EXTRA_DIST = $(man_MANS) toc.man.in toc.sh
+EXTRA_DIST = $(man_MANS) toc.man.in toc.sh html2wiki.sh
 
 check-man-dates:
 	for FILE in $(man_MANS); do \
@@ -74,4 +76,17 @@ manual.ps: toc.man $(man_MANS)
 
 pdfs: manual.pdf $(PDFS)
 
-CLEANFILES=all.ps all.pdf toc.man manual.ps manual.pdf $(PSS) $(PDFS)
+%.8.wiki: %.8 html2wiki.sh
+	sed 's/^\.SS\(.*$$\)/.in 0\n=== \1 ===/' $< | \
+	$(GROFF) $(GROFF_HTML_OPTS) | \
+		MANS="$(man_MANS)" $(srcdir)/html2wiki.sh > $@
+	rm -f grohtml-*.png
+%.5.wiki: %.5 html2wiki.sh
+	sed 's/^\.SS\(.*$$\)/.in 0\n=== \1 ===/' $< | \
+	$(GROFF) $(GROFF_HTML_OPTS) | \
+		MANS="$(man_MANS)" $(srcdir)/html2wiki.sh > $@
+	rm -f grohtml-*.png
+
+wikis: $(WIKIS)
+
+CLEANFILES=all.ps all.pdf toc.man manual.ps manual.pdf $(PSS) $(PDFS) $(WIKIS)
