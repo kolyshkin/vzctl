@@ -84,8 +84,8 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 		snprintf(tarball, sizeof(tarball), "%s/%s.tar%s",
 				fs->tmpl, tar_nm, ext[i]);
 		logger(1, 0, "Looking for %s", tarball);
-		if (!stat_file(tarball))
-			continue;
+		if (stat_file(tarball))
+			break;
 	}
 	if (ext[i] == NULL) {
 		logger(-1, 0, "Cached OS template %s/%s.tar%s not found",
