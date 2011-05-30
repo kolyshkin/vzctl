@@ -59,10 +59,10 @@ The following parameters can be used with \fBset\fR command.
 .TP
 \fBMiscellaneous\fR
 .TP
-\fB--onboot\fR \fByes\fR|\fBno\fR
+\fB--onboot\fR \fByes\fR | \fBno\fR
 Sets whether the container will be started during system boot.
 The container will not be auto-started unless this parameter
-is set to \fIyes\fR.
+is set to \fByes\fR.
 .TP
 \fB--bootorder\fR \fInumber\fR
 Sets the boot order priority for this CT. The higher the \fInumber\fR is,
@@ -89,7 +89,7 @@ then all the appropriate file changes are applied, then it is unmounted.
 
 Note that container should be created before using this option.
 .TP
-\fB--disabled\fR \fIyes\fR|\fIno\fR
+\fB--disabled\fR \fByes\fR | \fBno\fR
 Disable container start. To force the start of a disabled container,
 use \fBvzctl start --force\fR.
 .TP
@@ -165,7 +165,7 @@ MAC address of interface in the host system.
 Bridge name. Custom network start scripts can use this value to automatically
 add the interface to a bridge.
 .TP
-\fB--mac_filter\fR \fIon|off\fR
+\fB--mac_filter\fR \fBon\fR | \fBoff\fR
 Enables/disables MAC address filtering for the Container veth device and
 the possibility of configuring the MAC address of this device from inside
 the Container. If the filtering is turned on:
@@ -436,9 +436,9 @@ move network device from the host system to a specified container
 delete network device from a specified container
 
 .TP
-\fBDisk quota parameters\fR
+.B Disk quota parameters
 .TP
-\fB--diskquota\fR \fByes\fR|\fBno\fR
+\fB--diskquota\fR \fByes\fR | \fBno\fR
 allows to enable or disable disk quota for a container. By default,
 a global value (\fBDISK_QUOTA\fR) from \fBvz.conf\fR(5) is used.
 .TP
@@ -501,25 +501,25 @@ inability to start it.
 .TP
 \fBDevice access management\fR
 .TP
-\fB--devnodes\fR \fIdevice\fR:\fB[r][w][q]|none\fR
+\fB--devnodes\fR \fIdevice\fR:[\fBr\fR][\fBw\fR][\fBq\fR]|\fBnone\fR
 Give the container an access (\fBr\fR - read, \fBw\fR - write,
 \fBq\fR - disk quota management, \fBnone\fR - no access)
 to a device designated by the special file /dev/\fIdevice\fR. Device file
 is created in a container by \fBvzctl\fR. Example:
 \fBvzctl set 777 --devnodes sdb:rwq\fR.
 .TP
-\fB--devices\fR \fBb|c\fR:\fImajor\fR:\fIminor\fR|\fBall\fR:\fB[r][w][q]|none\fR
+\fB--devices\fR \fBb\fR|\fBc\fR:\fImajor\fR:\fIminor\fR|\fBall\fR:[\fBr\fR][\fBw\fR][\fBq\fR]|\fBnone\fR
 Give the container an access to a \fBb\fRlock or \fBc\fRharacter device
 designated by its \fImajor\fR and \fIminor\fR numbers. Device file have to be created manually.
 
 .TP
 \fBPCI device management\fR
 .TP
-\fB--pci_add\fR [\fIdomain\fB:\fR]\fIbus\fB:\fIslot\fB.\fIfunc\fR
+\fB--pci_add\fR [\fIdomain\fR:]\fIbus\fR:\fIslot\fR.\fIfunc\fR
 Give the container an access to a specified PCI device. All numbers are
 hexadecimal (as printed by \fBlspci\fR(8) in the first column).
 .TP
-\fB--pci_del\fR [\fIdomain\fB:\fR]\fIbus\fB:\fIslot\fB.\fIfunc\fR
+\fB--pci_del\fR [\fIdomain\fR:]\fIbus\fR:\fIslot\fR.\fIfunc\fR
 Delete a PCI device from the container.
 
 Note that \fBvps-pci\fR configuration script is executed by \fBvzctl\fR
@@ -529,7 +529,7 @@ then configuring PCI devices. The script is usually located at
 .TP
 \fBFeatures management\fR
 .TP
-\fB--features\fR \fIname\fB:on\fR|\fBoff\fR
+\fB--features\fR \fIname\fR:\fBon\fR|\fBoff\fR
 Enable or disable a specific container feature.
 Known features are: \fBsysfs\fR, \fBnfs\fR, \fBsit\fR, \fBipip\fR, \fBppp\fR,
 \fBipgre\fR, \fBbridge\fR, \fBnfsd\fR.
