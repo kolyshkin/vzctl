@@ -41,13 +41,37 @@ create_prvt()
 	TMP="$(df -P "$VE_PRVT")" ||
 		vzerror "Failed to calculate available disk space on $VE_PRVT" ${VZ_FS_NEW_VE_PRVT}
 	AVAIL="$(echo "$TMP" | awk 'END{print $4}')"
-	if [ "$HEADER" = ' 1f 8b' ]; then
-		NEEDED="$(gzip -l "$PRIVATE_TEMPLATE" | awk 'END{print int($2/1024)}')"
-		OPT=-z
-	else
-		NEEDED="$(find "$PRIVATE_TEMPLATE" -maxdepth 0 -path "$PRIVATE_TEMPLATE" -printf %k)"
-		OPT=
+
+	case $HEADER in
+		' 1f 8b') # gzip
+			OPT=-z
+			NEEDED="$(gzip -l "$PRIVATE_TEMPLATE" | \
+				awk 'END{print int($2/1024)}')"
+			;;
+		' 42 5a') # bzip2
+			OPT=-j
+			# No way to get uncompressed size, so guess
+			NEEDED="$(ls -lk "$PRIVATE_TEMPLATE" | \
+				awk 'END{print int($5*3)')"
+			;;
+		' fd 37') # xz
+			OPT=-J
+			NEEDED="$(xz -l --robot "$PRIVATE_TEMPLATE" \
+				2>/dev/null | \
+				awk 'END{print int($5/1024)}')"
+			# Not all xz versions implement -l, so guess
+			if [ "$NEEDED" = "0" ] ; then
+				NEEDED="$(ls -lk "$PRIVATE_TEMPLATE" \
+					awk 'END{print int($5*4.7)')"
+			fi
+
+			;;
+	esac
+	# For the uncompressed case
+	if [ -z "$NEEDED" ] ; then
+		NEEDED="$(ls -lk "$PRIVATE_TEMPLATE" | awk 'END{print $5}')"
 	fi
+
 	[ "$AVAIL" -ge "$NEEDED" ] ||
 		vzerror "Insufficient disk space in $VE_PRVT; available: $AVAIL, needed: $NEEDED" ${VZ_FS_NO_DISK_SPACE}
 	chmod 700 "$VE_PRVT"

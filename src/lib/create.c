@@ -76,12 +76,20 @@ int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
 	char *arg[2];
 	char *env[4];
 	int quota = 0;
+	int i;
+	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
+	const char *errmsg_ext = "[.gz|.bz2|.xz]";
 
-	snprintf(tarball, sizeof(tarball), "%s/%s.tar", fs->tmpl, tar_nm);
-	if (!stat_file(tarball))
-		snprintf(tarball, sizeof(tarball), "%s/%s.tar.gz", fs->tmpl, tar_nm);
-	if (!stat_file(tarball)) {
-		logger(-1, 0, "Cached OS template %s not found", tarball);
+	for (i = 0; ext[i] != NULL; i++) {
+		snprintf(tarball, sizeof(tarball), "%s/%s.tar%s",
+				fs->tmpl, tar_nm, ext[i]);
+		logger(1, 0, "Looking for %s", tarball);
+		if (!stat_file(tarball))
+			continue;
+	}
+	if (ext[i] == NULL) {
+		logger(-1, 0, "Cached OS template %s/%s.tar%s not found",
+				fs->tmpl, tar_nm, errmsg_ext);
 		return VZ_OSTEMPLATE_NOT_FOUND;
 	}
 	/* Lock CT area */
