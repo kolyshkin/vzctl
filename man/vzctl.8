@@ -755,22 +755,19 @@ Here is an example of a mount script, which makes host system's
 /mnt/disk available to container(s). Script name can either be
 \fB/etc/vz/conf/vps.mount\fR or \fB/etc/vz/conf/\fICTID\fB.mount\fR.
 
-\f(CR   # If one of these files does not exist then something
-.br
+.nf
+.ps -1
+.ft CR
+   # If one of these files does not exist then something
    # is really broken
-.br
    [ -f /etc/sysconfig/vz ] || exit 1
-.br
    [ -f $VE_CONFFILE ] || exit 1
-.br
    # Source both files. Note the order is important.
-.br
    . /etc/vz/vz.conf
-.br
    . $VE_CONFFILE
-.br
    mount -n --bind /mnt/disk $VE_ROOT/mnt/disk
-\fR
+.ft
+.fi
 .SH EXIT STATUS
 Returns 0 upon success, or an appropriate error code in case of an error:
 .IP 1
