@@ -57,7 +57,7 @@ to the container.
 The following parameters can be used with \fBset\fR command.
 
 .TP
-\fBMiscellaneous\fR
+.B Miscellaneous
 .TP
 \fB--onboot\fR \fByes\fR | \fBno\fR
 Sets whether the container will be started during system boot.
@@ -105,7 +105,7 @@ Whether to restart a container after applying parameters that require
 the container to be restarted in order to take effect.
 
 .TP
-\fBNetworking\fR
+.B Networking
 .TP
 \fB--ipadd\fR \fIaddr\fR
 Adds IP address to a given container. Note that this option is incremental, so
@@ -146,7 +146,7 @@ Removes virtual Ethernet device from a container. If you want to remove all
 devices, use \fBall\fR.
 
 .TP
-\fBVeth interface configuration\fR
+.B veth interface configuration
 .PP
 The following options can be used to reconfigure the already-created virtual
 Ethernet interface. To select the interface to configure, use
@@ -180,8 +180,8 @@ By default, this functionality is enabled for all veth devices existing
 inside the Container.
 
 .TP
-\fBResource limits\fR
-
+.B Resource limits
+.PP
 The following options sets barrier and limit for various user beancounters.
 Each option requires one or two arguments. In case of one argument,
 \fBvzctl\fR sets barrier and limit to the same value. In case of
@@ -351,8 +351,8 @@ Note that in order for the value to be shown as total swap space,
 \fB--meminfo\fR parameter should be set to value other than \fBnone\fR.
 
 .TP
-\fBCPU fair scheduler parameters\fR
-
+.B CPU fair scheduler parameters
+.PP
 These parameters control CPU usage by container.
 .TP
 \fB--cpuunits\fR \fInum\fR
@@ -384,8 +384,8 @@ you should pass \fB0-2,7\fR.
 Default value is \fBall\fR (the container can execute on any CPU).
 
 .TP
-\fBMemory output parameters\fR
-
+.B Memory output parameters
+.PP
 This parameter control output of /proc/meminfo inside a container.
 .TP
 \fB--meminfo\fR \fBnone\fR
@@ -406,7 +406,7 @@ You can use the following modes for \fImode\fR:
 Default is \fBprivvmpages:1\fR.
 
 .TP
-\fBIptables control parameters\fR
+.B iptables control parameters
 .TP
 \fB--iptables\fR \fIname\fR
 Allow to use the functionality of \fIname\fR iptables module inside
@@ -427,7 +427,7 @@ You can use the following values for \fIname\fR:
 \fBipt_REDIRECT\fR, \fBxt_mac\fR, \fBipt_recent\fR, \fBipt_owner\fR.
 
 .TP
-\fBNetwork devices control parameters\fR
+.B Network devices control parameters
 .TP
 \fB--netdev_add\fR \fIname\fR
 move network device from the host system to a specified container
@@ -466,13 +466,13 @@ Note that if you have previously set value of this parameter to \fB0\fR,
 changing it while the container is running will not take effect.
 
 .TP
-\fBMount option\fR
+.B Mount option
 .TP
 \fB--noatime\fR \fByes\fR | \fBno\fR
 Sets noatime flag (do not update inode access times) on filesystem.
 
 .TP
-\fBCapability option\fR
+.B Capability option
 .TP
 \fB--capability\fR \fIcapname\fR:\fBon\fR|\fBoff\fR
 Sets a capability for a container. Note that setting capability when
@@ -499,7 +499,7 @@ that setting \fBsetpcap:on\fR for a container will most probably lead to
 inability to start it.
 
 .TP
-\fBDevice access management\fR
+.B Device access management
 .TP
 \fB--devnodes\fR \fIdevice\fR:[\fBr\fR][\fBw\fR][\fBq\fR]|\fBnone\fR
 Give the container an access (\fBr\fR - read, \fBw\fR - write,
@@ -513,7 +513,7 @@ Give the container an access to a \fBb\fRlock or \fBc\fRharacter device
 designated by its \fImajor\fR and \fIminor\fR numbers. Device file have to be created manually.
 
 .TP
-\fBPCI device management\fR
+.B PCI device management
 .TP
 \fB--pci_add\fR [\fIdomain\fR:]\fIbus\fR:\fIslot\fR.\fIfunc\fR
 Give the container an access to a specified PCI device. All numbers are
@@ -527,7 +527,7 @@ then configuring PCI devices. The script is usually located at
 \fB/usr/lib[64]/vzctl/scripts/\fR.
 
 .TP
-\fBFeatures management\fR
+.B Features management
 .TP
 \fB--features\fR \fIname\fR:\fBon\fR|\fBoff\fR
 Enable or disable a specific container feature.
@@ -535,7 +535,7 @@ Known features are: \fBsysfs\fR, \fBnfs\fR, \fBsit\fR, \fBipip\fR, \fBppp\fR,
 \fBipgre\fR, \fBbridge\fR, \fBnfsd\fR.
 
 .TP
-\fBApply config\fR
+.B Apply config
 .TP
 \fB--applyconfig\fR \fIname\fR
 Read container parameters from the container sample configuration file
@@ -551,7 +551,7 @@ to restore container name based on \fBNAME\fR
 variable in container configuration file.
 
 .TP
-\fBI/O priority management\fR
+.B I/O priority management
 .TP
 \fB--ioprio\fR \fIpriority\fR
 Assigns I/O priority to container. \fIPriority\fR range is \fB0-7\fR.
