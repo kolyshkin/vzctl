@@ -188,27 +188,30 @@ Each option requires one or two arguments. In case of one argument,
 two colon-separated arguments, the first is a barrier,
 and the second is a limit. Each argument is either a number, a number
 with a suffix, or a special value \fBunlimited\fR.
-
+.PP
 Arguments are in items, pages or bytes. Note that page size
 is architecture-specific, it is 4096 bytes on x86 and x86_64 platforms.
-
+.PP
 You can also specify different suffixes for \fBset\fR parameters
 (except for the parameters which names start with \fBnum\fR).
 For example, \fBvzctl set\fR \fICTID\fR \fB--privvmpages 5M:6M\fR
 should set \fBprivvmpages\fR' barrier to 5 megabytes and its limit
 to 6 megabytes.
-
+.PP
 Available suffixes are:
-.br
-\fBg\fR, \fBG\fR -- gigabytes.
-.br
-\fBm\fR, \fBM\fR -- megabytes.
-.br
-\fBk\fR, \fBK\fR -- kilobytes.
-.br
-\fBp\fR, \fBP\fR -- pages (page is 4096 bytes on x86 architecture,
-other architectures may differ).
-
+.TP
+\fBG\fR, \fBg\fR
+gigabytes;
+.TP
+\fBM\fR, \fBm\fR
+megabytes;
+.TP
+\fBK\fR, \fBk\fR
+kilobytes;
+.TP
+\fBP\fR, \fBp\fR
+memory pages (arch-specific).
+.PP
 You can also specify the literal word \fBunlimited\fR in place of a number.
 In that case the corresponding value will be set to \fBLONG_MAX\fR, i. e.
 the maximum possible value.
