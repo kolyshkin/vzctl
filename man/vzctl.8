@@ -964,24 +964,17 @@ To permanently remove this container:
 \f(CR	vzctl destroy 1000
 \fR
 .SH FILES
-.ad l
+.nf
 \fB\f(CR/etc/vz/vz.conf
-.br
 /etc/vz/conf/\fICTID\fB\f(CR.conf
-.br
 /etc/vz/conf/vps.{premount,mount,umount,postumount}
-.br
 /etc/vz/conf/\fICTID\fB\f(CR.{premount,mount,start,stop,umount,postumount}
-.br
 /proc/vz/veinfo
-.br
 /proc/vz/vzquota
-.br
 /proc/user_beancounters
-.br
 /proc/bc/*
-.br
 /proc/fairsched\fR
+.fi
 .SH SEE ALSO
 .BR vz.conf (5),
 .BR ctid.conf (5),
