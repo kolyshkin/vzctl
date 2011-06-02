@@ -80,10 +80,6 @@ if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
 	CFLAGS="${CFLAGS} -m64"
 fi
 
-# Site settings
-AM_CONDITIONAL(ARCH_IA64,   test x$build_cpu = xia64)
-AM_CONDITIONAL(ARCH_X86_64, test x$build_cpu = xx86_64)
-
 AC_ARG_ENABLE([bashcomp],
               [AC_HELP_STRING([--enable-bashcomp],
                               [Enable bashcompletion support])],
