@@ -485,9 +485,12 @@ static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 
 /********************** UB **************************************/
-static int get_mul(char c)
+static long get_mul(char c)
 {
 	switch (c) {
+	case 'T':
+	case 't':
+		return 1024l * 1024 * 1024 * 1024;
 	case 'G':
 	case 'g':
 		return 1024 * 1024 * 1024;
@@ -511,7 +514,7 @@ static int get_mul(char c)
  */
 static const char *parse_ul_sfx(const char *str, unsigned long long *val, int divisor)
 {
-	int n;
+	long n;
 	char *tail;
 
 	if (!str || !val)
