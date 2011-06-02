@@ -516,6 +516,7 @@ static const char *parse_ul_sfx(const char *str, unsigned long long *val, int di
 {
 	long n;
 	char *tail;
+	long double v = 0;
 
 	if (!str || !val)
 		return NULL;
@@ -527,12 +528,24 @@ static const char *parse_ul_sfx(const char *str, unsigned long long *val, int di
 	*val = strtoull(str, &tail, 10);
 	if (errno == ERANGE)
 		return NULL;
+	v = *val;
+	if (*tail == '.') { /* Floating point */
+		errno = 0;
+		v = strtold(str, &tail);
+		if (errno == ERANGE)
+			return NULL;
+		*val = (unsigned long long) v;
+	}
 	if (*tail != ':' && *tail != '\0') {
 		if (!divisor)
 			return NULL;
 		if ((n = get_mul(*tail)) < 0)
 			return NULL;
-		*val = (*val) * n / divisor;
+		v = v * n / divisor;
+		if (v > (long double) LONG_MAX)
+			*val = LONG_MAX + 1UL; /* Overflow */
+		else
+			*val = (unsigned long long) v;
 		++tail;
 	}
 	return tail;
