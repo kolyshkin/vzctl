@@ -47,9 +47,7 @@ function setup_network()
     if ! grep -qe "^venet0=" ${CFGFILE}.bak 2>/dev/null; then
 	put_param "${CFGFILE}.bak" "venet0" "venet0 127.0.0.1 netmask 255.255.255.255 broadcast 0.0.0.0"
 	add_param3 "${CFGFILE}.bak" "INTERFACES" "venet0"
-	put_param "${CFGFILE}.bak" "rt_venet0" "-net 191.255.255.1 netmask 255.255.255.255 dev venet0"
-	put_param "${CFGFILE}.bak" "rt_default" "default gw 191.255.255.1"
-	add_param3 "${CFGFILE}.bak" "ROUTES" "rt_venet0"
+	put_param "${CFGFILE}.bak" "rt_default" "default dev venet0"
 	add_param3 "${CFGFILE}.bak" "ROUTES" "rt_default"
     fi
 }
