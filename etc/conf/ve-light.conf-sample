@@ -43,7 +43,7 @@ PHYSPAGES="0:unlimited"
 NUMIPTENT="16:16"
 
 # Disk quota parameters (in form of softlimit:hardlimit)
-DISKSPACE="512000:512000"
+DISKSPACE="1G:1.1G"
 DISKINODES="80000:88000"
 QUOTATIME="0"
 

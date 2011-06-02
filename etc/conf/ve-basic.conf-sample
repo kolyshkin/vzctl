@@ -39,7 +39,7 @@ AVNUMPROC="180:180"
 NUMIPTENT="128:128"
 
 # Disk quota parameters (in form of softlimit:hardlimit)
-DISKSPACE="1048576:1153024"
+DISKSPACE="2G:2.2G"
 DISKINODES="200000:220000"
 QUOTATIME="0"
 
