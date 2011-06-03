@@ -53,6 +53,7 @@ check-man-dates:
 		sed -e "1s%\(\.TH \w\w* [0-9] \"\)[0-9]* \w\w* [0-9][0-9][0-9][0-9]%\1$${DATE}%" -i $${FILE}; \
 	done
 	git diff $(man_MANS)
+.PHONY: check-man-dates
 
 %.5.ps:	%.5
 	$(GROFF) $(GROFF_OPTS) $^ > $@
@@ -76,6 +77,7 @@ manual.ps: toc.man $(man_MANS)
 	ps2pdf $< $@
 
 pdfs: manual.pdf $(PDFS)
+.PHONY: pdfs
 
 %.8.wiki: %.8 html2wiki.sh
 	sed 's/^\.SS \(.*$$\)/.in 0\n=== \1 ===/' $< | \
@@ -90,5 +92,6 @@ pdfs: manual.pdf $(PDFS)
 	rm -f grohtml-*.png
 
 wikis: $(WIKIS)
+.PHONY: wikis
 
 CLEANFILES=all.ps all.pdf toc.man manual.ps manual.pdf $(PSS) $(PDFS) $(WIKIS)
