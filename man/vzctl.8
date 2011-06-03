@@ -343,9 +343,13 @@ Setting the barrier and
 the limit to different values does not make practical sense.
 .TP
 \fB--physpages\fR \fIpages\fR[:\fIpages\fR]
-This is currently an accounting-only parameter. It shows the usage of RAM
-by this container. Barrier should be set to 0, and limit should be set to
-\fBunlimited\fR.
+On VSwap-enabled kernels, this limits the amount of physical memory
+(RAM) available to a container. The barrier should be set to \fB0\fR,
+and the limit to a total size of RAM that can be used used by a container.
+
+For older kernels, this is an accounting-only parameter, showing the usage
+of RAM by this container. Barrier should be set to \fB0\fR, and limit
+should be set to \fBunlimited\fR.
 .TP
 \fB--swappages\fR \fIpages\fR[:\fIpages\fR]
 The limit, if set, is used to show a total amount of swap space available
@@ -410,6 +414,10 @@ You can use the following modes for \fImode\fR:
 \fBprivvmpages\fR * \fIvalue\fR.
 
 Default is \fBprivvmpages:1\fR.
+
+Note that if \fB--physpages\fR is set on a VSwap-enabled kernel, it takes
+a precedence over \fB--meminfo\fR, i.e. setting \fB--meminfo\fR does not
+take any effect.
 
 .TP
 .B iptables control parameters
