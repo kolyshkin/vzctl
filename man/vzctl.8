@@ -10,25 +10,125 @@
 .SH NAME
 vzctl \- utility to control an OpenVZ container.
 .SH SYNOPSIS
-vzctl [\fIflags\fR] \fBcreate\fR \fICTID\fR
-[\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR]
-[\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]
-.PP
-vzctl [\fIflags\fR] \fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR]
-.PP
-vzctl [\fIflags\fR] \fBdestroy\fR | \fBmount\fR | \fBumount\fR |
-\fBstart\fR | \fBstop\fR | \fBrestart\fR |
+.SY vzctl
+[\fIflags\fR] \fBcreate\fR \fICTID\fR
+.OP --ostemplate name
+.OP --config name
+.OP --root path
+.OP --private path
+.OP --ipadd addr
+.OP --hostname name
+.SY vzctl
+[\fIflags\fR] \fBstart\fR \fICTID\fR
+.OP --wait
+.OP --force
+.SY vzctl
+[\fIflags\fR] \fBstop\fR \fICTID\fR
+.OP --fast
+.SY vzctl
+[\fIflags\fR] \fBrestart\fR \fICTID\fR
+.OP --wait
+.OP --force
+.OP --fast
+.SY vzctl
+[\fIflags\fR] \fBset\fR \fICTID\fR
+.OP --save
+.OP --setmode \fBrestart\fR|\fBignore
+.\" Miscellaneous
+.OP --onboot \fByes\fR|\fBno
+.OP --bootorder number
+.OP --root path
+.OP --private path
+.OP --userpasswd user\fR:\fIpass
+.OP --disabled \fByes\fR|\fBno
+.OP --name name
+.OP --description string
+.\" Networking
+.OP --ipadd addr
+.OP --ipdel addr\fR|\fBall\fR
+.OP --hostname name
+.OP --nameserver addr
+.OP --searchdomain name
+.OP --netif_add dev\fR[,\fIparams\fR...]
+.OP --netif_del dev
+.\" veth interface configuration
+[\fB--ifname \fIdev\fR
+.OP --mac hwaddr
+.OP --host_ifname dev
+.OP --host_mac hwaddr
+.OP --bridge name
+.OP --mac_filter \fBon\fR|\fBoff\fR]
+.\" Resource limits
+.OP --numproc items
+.OP --numtcpsock items
+.OP --numothersock items
+.OP --vmguarpages pages
+.OP --kmemsize bytes
+.OP --tcpsndbuf bytes
+.OP --tcprcvbuf bytes
+.OP --othersockbuf bytes
+.OP --dgramrcvbuf bytes
+.OP --oomguarpages pages
+.OP --lockedpages pages
+.OP --privvmpages pages
+.OP --shmpages pages
+.OP --numfile items
+.OP --numflock items
+.OP --numpty items
+.OP --numsiginfo items
+.OP --dcachesize bytes
+.OP --numiptent num
+.OP --physpages pages
+.OP --swappages pages
+.\" CPU fair scheduler
+.OP --cpuunits num
+.OP --cpulimit num
+.OP --cpus num
+.OP --cpumask cpus\fR|\fBall
+.\" Meminfo
+.OP --meminfo \fBnone\fR|\fImode\fR:\fIvalue
+.\" iptables control
+.OP --iptables name
+.\" Network device control
+.OP --netdev_add ifname
+.OP --netdev_del ifname
+.\" Disk quota
+.OP --diskquota \fByes\fR|\fBno
+.OP --diskspace num
+.OP --diskinodes num
+.OP --quotatime seconds
+.OP --quotaugidlimit num
+.\" Mount option
+.OP --noatime \fByes\fR|\fBno
+.\" Capability
+.OP --capability capname\fR:\fBon\fR|\fBoff
+.\" Device access management
+.OP --devnodes param
+.OP --devices param
+.\" PCI devices
+.OP --pci_add dev
+.OP --pci_del dev
+.\" Features
+.OP --features param\fR:\fBon\fR|\fBoff
+.\" Apply config
+.OP --applyconfig name
+.OP --applyconfig_map group
+.\" I/O prio
+.OP --ioprio num
+.SY vzctl
+[\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
 \fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR \fICTID\fR
-.PP
-vzctl [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
+.SY vzctl
+[\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
-.PP
-vzctl [\fIflags\fR] \fBenter\fR \fICTID\fR [\fB--exec \fIcommand\fR
-[\fIarg\fR ...]]
-.PP
-vzctl [\fIflags\fR] \fBrunscript\fR \fICTID\fR \fIscript\fR
-.PP
-vzctl \fB--help\fR | \fB--version\fR
+.SY vzctl
+[\fIflags\fR] \fBenter\fR \fICTID\fR
+.OP --exec command\ \fR[\fIarg\fR\ ...]
+.SY vzctl
+[\fIflags\fR] \fBrunscript\fR \fICTID\fR \fIscript\fR
+.SY vzctl
+\fB--help\fR | \fB--version\fR
+.YS
 .SH DESCRIPTION
 Utility \fBvzctl\fR runs on the host system (otherwise known as Hardware Node,
 or HN) and performs direct manipulations with containers (CTs).
