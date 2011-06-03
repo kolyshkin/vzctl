@@ -1,4 +1,4 @@
-.TH vzctl 8 "25 May 2011" "OpenVZ" "Containers"
+.TH vzubc 8 "3 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
 vzubc \- show User Beancounters in a human-readable format.
 .SH SYNOPSIS
@@ -104,12 +104,11 @@ Only show beancounters with increased (since the last run) fail counters.
 Show all beancounters, and clear all saved data for relative and incremental
 mode (i.e. saved values for fail counter and held).
 .SH FILES
-.ad l
+.nf
 \fB\f(CR/proc/bc/resources
-.br
 /proc/user_beancounters
-.br
 /tmp/vzubc.store/ubc.*\fR
+.fi
 .SH SEE ALSO
 .BR watch (1),
 .BR vzlist (8),
