@@ -184,15 +184,11 @@ fi
 # Re-exec ourselves under watch
 test -z "$watch" || exec watch $WATCH_ARGS -- $0 $ARGV -W
 
-cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " -v quiet="$quiet"  \
+cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " -v quiet="$quiet" \
 	-v qheld="$Q_HELD" -v qmaxheld="$Q_MAXHELD" \
 	-v rel="$relative" -v storedir="$STOREDIR" \
 	-v inc="$incremental" $AWK_COLORS \
 '
-BEGIN {
-	if (qmaxheld > qheld)
-		qmaxheld=qheld
-}
 function hr(res, v) {
 	if ((v == 9223372036854775807) || (v == 2147483647) || (v == 0))
 		return "- ";
@@ -239,6 +235,20 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 	return 0;
 }
 
+function prepare_header() {
+	header=sprintf( c_h \
+"----------------------------------------------------------------%s\n" \
+"CT %-10s| HELD%s Bar%% Lim%%| MAXH Bar%% Lim%%| BAR | LIM |%cFAIL\n" \
+"-------------+-%s--------------+---------------+-----+-----+------" \
+c_n, inc ? "-------" : "",
+bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
+}
+
+BEGIN {
+	if (qmaxheld > qheld)
+		qmaxheld=qheld
+	prepare_header()
+}
 /^Version: / {
 	if ($2 != "2.5") {
 		print "Error: unknown version:",
@@ -258,15 +268,13 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 	header=""
 	bcid=strtonum($1)
 	if ((CTIDS !~ /^[ ]*$/) && (CTIDS !~ " " bcid " ")) {
-		bcid=""
+		skip=1
 		next
 	}
-	header=sprintf( c_h \
-"----------------------------------------------------------------%s\n" \
-"CT %-10s| HELD%s Bar%% Lim%%| MAXH Bar%% Lim%%| BAR | LIM |%cFAIL\n" \
-"-------------+-%s--------------+---------------+-----+-----+------" \
-c_n, inc ? "-------" : "",
-bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
+	skip=0
+
+	prepare_header()
+
 	id=$2
 	held=$3
 	maxheld=$4
@@ -282,7 +290,12 @@ bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
 	limit=$5
 	failcnt=$6
 }
-((id!="")  && (bcid!="")) {
+((id!="") && (!skip)) {
+	if ((bcid <= 0) && (rel || inc)) {
+		print "Error: can not use relative/incremental" \
+			" modes: BCID is unknown" > "/dev/stderr"
+		exit 1
+	}
 	newfc=failcnt
 	store=storedir "/ubc." bcid "." id
 	if ( (rel) && (failcnt > 0) ) {
