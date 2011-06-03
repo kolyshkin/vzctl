@@ -77,7 +77,8 @@ manual.ps: toc.man $(man_MANS)
 pdfs: manual.pdf $(PDFS)
 
 %.8.wiki: %.8 html2wiki.sh
-	sed 's/^\.SS\(.*$$\)/.in 0\n=== \1 ===/' $< | \
+	sed 's/^\.SS \(.*$$\)/.in 0\n=== \1 ===/' $< | \
+	sed 's/^\.SS3 \(.*$$\)/.in 0\n==== \1 ====/' | \
 	$(GROFF) $(GROFF_HTML_OPTS) | \
 		MANS="$(man_MANS)" $(srcdir)/html2wiki.sh > $@
 	rm -f grohtml-*.png
