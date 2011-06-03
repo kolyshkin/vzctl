@@ -78,11 +78,16 @@ parameter is unset, which is considered to be the lowest priority, so
 containers with unset \fBbootorder\fR will start last.
 .TP
 \fB--root\fR \fIpath\fR
-Sets the path to root directory for this container. This is essentially a mount
-point for container's root directory. Argument can contain literal string
-\fB$VEID\fR, which will be substituted with the numeric CT ID.
-Changing this parameter is not recommended, better edit
-\fBvz.conf\fR(5) global configuration file.
+Sets the path to root directory (\fBVE_ROOT\fR) for this container.
+This is essentially a mount point for container's root directory.
+Argument can contain literal string \fB$VEID\fR, which will be
+substituted with the numeric CT ID.
+.TP
+\fB--private\fR \fIpath\fR
+Sets the path to private directory (\fBVE_PRIVATE\fR) for this container.
+This is a directory in which all the container's files are stored.
+Argument can contain literal string \fB$VEID\fR, which will be
+substituted with the numeric CT ID.
 .TP
 \fB--userpasswd\fR \fIuser\fR:\fIpassword\fR
 Sets password for the given user in a container, creating the user if
