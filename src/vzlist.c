@@ -598,10 +598,10 @@ static void *x_realloc(void *ptr, int size)
 
 static void usage()
 {
-	fprintf(stderr, "\n"
-"Usage:	vzlist	[-a|-S] [-n] [-H] [-o field[,field...]] [-s [-]field]\n"
-"		[-h pattern] [-N pattern] [-d pattern] [CTID [CTID ...]|-1]\n"
-"	vzlist -L\n"
+	fprintf(stderr,
+"Usage:	vzlist [-a | -S] [-n] [-H] [-o field[,field...] | -1] [-s [-]field]\n"
+"	       [-h pattern] [-N pattern] [-d pattern] [CTID [CTID ...]]\n"
+"	vzlist -L | --list\n"
 "\n"
 "Options:\n"
 "	-a, --all		list all containers\n"
@@ -609,6 +609,7 @@ static void usage()
 "	-n, --name		display containers' names\n"
 "	-H, --no-header		suppress columns header\n"
 "	-o, --output		output only specified fields\n"
+"	-1			synonym for -H -octid\n"
 "	-s, --sort		sort by the specified field\n"
 "				('-field' to reverse sort order)\n"
 "	-h, --hostname		filter CTs by hostname pattern\n"
