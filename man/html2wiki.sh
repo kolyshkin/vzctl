@@ -3,7 +3,7 @@
 # Post-process filter for groff -Thtml for our wiki
 
 # Prepare sed expression to replace known man pages refs with wiki links
-for M in $MANS vzquota.8; do
+for M in $MANS; do
 	MM=$(echo $M | sed -e 's/^/<b>/' -e 's/.\([58]\)/<\/b>(\1)/')
 	REPL="$REPL -e s#$MM#[[Man/$M|$MM]]#"
 done

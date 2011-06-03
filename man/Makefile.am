@@ -30,6 +30,7 @@ man_MANS = \
  vzpid.8 \
  vzifup-post.8 \
  vzeventd.8 \
+ $(extra_MANS) \
  vz.conf.5 \
  ctid.conf.5
 
