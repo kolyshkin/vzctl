@@ -90,8 +90,11 @@ pdfs: manual.pdf $(PDFS)
 	$(GROFF) $(GROFF_HTML_OPTS) | \
 		MANS="$(man_MANS)" $(srcdir)/html2wiki.sh > $@
 	rm -f grohtml-*.png
+toc.wiki: $(man_MANS) wikitoc.sh
+	$(srcdir)/wikitoc.sh $(man_MANS) > $@
 
-wikis: $(WIKIS)
+wikis: $(WIKIS) toc.wiki
 .PHONY: wikis
 
-CLEANFILES=all.ps all.pdf toc.man manual.ps manual.pdf $(PSS) $(PDFS) $(WIKIS)
+CLEANFILES=all.ps all.pdf toc.man toc.wiki \
+	   manual.ps manual.pdf $(PSS) $(PDFS) $(WIKIS)
