@@ -760,10 +760,8 @@ those from global and per-CT configuration files.
 Here is an example of a mount script, which makes host system's
 /mnt/disk available to container(s). Script name can either be
 \fB/etc/vz/conf/vps.mount\fR or \fB/etc/vz/conf/\fICTID\fB.mount\fR.
-
-.nf
-.ps -1
-.ft CR
+.PP
+.EX
    # If one of these files does not exist then something
    # is really broken
    [ -f /etc/sysconfig/vz ] || exit 1
@@ -772,8 +770,7 @@ Here is an example of a mount script, which makes host system's
    . /etc/vz/vz.conf
    . $VE_CONFFILE
    mount -n --bind /mnt/disk $VE_ROOT/mnt/disk
-.ft
-.fi
+.EE
 .SH EXIT STATUS
 Returns 0 upon success, or an appropriate error code in case of an error:
 .IP 1
@@ -913,62 +910,69 @@ Error setting container IO parameters (ioprio)
 .SH EXAMPLES
 To create and start "basic" container with ID of 1000 using
 \fBcentos-5\fR OS template and IP address of 192.168.10.200:
-.br
-\f(CR	vzctl create 1000 --ostemplate centos-5 --config basic
-.br
-\f(CR	vzctl set 1000 --ipadd 192.168.10.200 --save
-.br
-\f(CR	vzctl start 1000
-\fR
-.P
+.PP
+.EX
+   vzctl create 1000 --ostemplate centos-5 --config basic
+   vzctl set 1000 --ipadd 192.168.10.200 --save
+   vzctl start 1000
+.EE
+
 To set number of processes barrier/limit to 80/100, and
 PTY barrier/limit to 16/20 PTYs:
-.br
-\f(CR	vzctl set 1000 --numproc 80:100 -t 16:20 --save
-\fR
-.P
+.PP
+.EX
+   vzctl set 1000 --numproc 80:100 -t 16:20 --save
+.EE
+
 To execute command \fBls -la\fR in this container:
-.br
-\f(CR	vzctl exec 1000 /bin/ls -la
-\fR
-.P
+.PP
+.EX
+   vzctl exec 1000 /bin/ls -la
+.EE
+
 To execute command pipe \fBls -l / | sort\fR in this container:
-.br
-\f(CR	vzctl exec 1000 'ls -l / | sort'
-\fR
-.P
+.PP
+.EX
+   vzctl exec 1000 'ls -l / | sort'
+.EE
+
 To enter this container and execute command \fBapt-get install vim\fR:
-.br
-\f(CR	vzctl enter 1000 --exec apt-get install vim
-\fR
-.P
+.PP
+.EX
+   vzctl enter 1000 --exec apt-get install vim
+.EE
+.PP
 Note that in the above example you will need to log out from the
 container's shell after apt-get finishes.
-.P
+
 To enter this container, execute command \fBapt-get install vim\fR and
 logout after successful installation (or stay inside the container
 if installation process failed) use \fB&&\fR:
-.br
-\f(CR	vzctl enter 1000 --exec "apt-get install vim && logout"
-\fR
-.P
+.PP
+.EX
+   vzctl enter 1000 --exec "apt-get install vim && logout"
+.EE
+
 To enter this container, execute command \fBapt-get install vim\fR and logout
 independently of exit code of installation process use \fB;\fR:
-.br
-\f(CR	vzctl enter 1000 --exec "apt-get install vim ; logout"
-\fR
-.P
+.PP
+.EX
+   vzctl enter 1000 --exec "apt-get install vim ; logout"
+.EE
+.PP
 Note that you need to quote the command if you use \fB&&\fR or \fB;\fR.
-.P
+
 To stop this container:
-.br
-\f(CR	vzctl stop 1000
-\fR
-.P
+.PP
+.EX
+   vzctl stop 1000
+.EE
+
 To permanently remove this container:
-.br
-\f(CR	vzctl destroy 1000
-\fR
+.PP
+.EX
+   vzctl destroy 1000
+.EE
 .SH FILES
 .nf
 \fB\f(CR/etc/vz/vz.conf
