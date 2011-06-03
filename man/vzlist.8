@@ -1,18 +1,27 @@
-.TH vzlist 8 "7 Feb 2011" "OpenVZ" "Containers"
+.TH vzlist 8 "4 Jul 2011" "OpenVZ" "Containers"
 .SH NAME
 vzlist \- containers listing utility
 .SH SYNOPSIS
-vzlist [\fB-a\fR|\fB-S\fR] [\fB-n\fR] [\fB-H\fR] \
-[\fB-o\fR \fIname\fR[,\fIname\fR...]] [\fB-s\fR [\fB-\fR]\fIname\fR] \
-[\fB-h\fR \fIpattern\fR] [\fB-N\fR \fIpattern\fR] [\fB-d\fR \fIpattern\fR] \
-[\fICTID\fR [\fICTID\fR ...] | \fB-1\fR]
-.PP
-vzlist \fB-L\fR
+.SY vzlist
+[\fB-a\fR | \fB-S\fR]
+.OP -n
+.OP -H
+.OP -o "name\fR[,\fIname\fR...] | \fB-1\fR"
+.OP -s \fR[\fB-\fR]\fIname
+.OP -h pattern
+.OP -N pattern
+.OP -d pattern
+[\fICTID\fR [\fICTID\fR ...]]
+.SY vzlist
+\fB-L\fR | \fB--list\fR
+.SY vzlist
+.B --help
+.YS
 .SH DESCRIPTION
 This utility is used for listing containers and their parameters.
 By default only running containers are listed.
 If one or more \fICTID\fRs are specified, only specified containers are
-displayed. CTID of \fB-1\fR is used to output CT IDs only, one per line.
+displayed.
 .PP
 For the fields that can have many values (e.g. \fBip\fR),
 all the values are displayed only for the last (i.e. leftmost) column;
@@ -30,6 +39,8 @@ Suppress displaying the header row.
 .IP "\fB-o\fR, \fB--output\fR \fIfield\fR[,\fIfield\fR...]"
 Display only the specified \fIfield\fRs (see \fBStandard fields\fR
 subsection below).
+.IP \fB-1\fR
+Synonym for \fB-H -octid\fR, i.e. only show container IDs, one per line.
 .IP "\fB-s\fR, \fB--sort\fR [\fB-\fR]\fIfield\fR"
 Sort by the value of \fIfield\fR (possible arguments are the same
 as for \fB-o\fR). The \fB-\fR before the field name means sorting
@@ -53,82 +64,40 @@ List only containers with descriptions matching the \fIpattern\fR.
 .SS Possible fields
 
 .IP "\fB-L\fR, \fB--list\fR"
-list all available format specifiers.
+list all available format specifiers that can be used for both output
+both output (\fB-o\fR, \fB--output\fR) and the sorting order
+(\fB-s\fR, \fB--sort\fR).
 
-.SS Standard fields
-
-These may be used to control both output (\fB-o\fR, \fB--output\fR)
-and the sorting order (\fB-s\fR, \fB--sort\fR).
-.TS
-allbox center;
-lB lB
-lI l.
-Value	Header
-_
-ctid	CTID
-hostname	HOSTNAME
-name	NAME
-description	DESCRIPTION
-ostemplate	OSTEMPLATE
-ip	IP_ADDR
-status	STATUS
-kmemsize	KMEMSIZE
-lockedpages	LOCKEDP
-privvmpages	PRIVVMP
-shmpages	SHMP
-numproc	NPROC
-physpages	PHYSP
-vmguarpages	VMGUARP
-oomguarpages	OOMGUARP
-numtcpsock	NTCPSOCK
-numflock	NFLOCK
-numpty	NPTY
-numsiginfo	NSIGINFO
-tcpsndbuf	TCPSNDB
-tcprcvbuf	TCPRCVB
-othersockbuf	OTHSOCKB
-dgramrcvbuf	DGRAMRRB
-numothersock	NOTHSOCK
-dcachesize	DCACHESZ
-numfile	NFILE
-numiptent	NIPTENT
-swappages	SWAPP
-diskspace	DSPACE
-diskinodes	DINODES
-laverage	LAVERAGE
-uptime	UPTIME
-cpulimit	CPULIM
-cpuunits	CPUUNI
-ioprio	IOP
-onboot	ONBOOT
-bootorder	BOOTORDER
-.TE
-.P
-For the user beancounter fields above, one can use the following suffixes:
-.TS
-allbox center;
-lB lB lB
-lI l l.
-Suffix	Header	Description
-_
- .m	.M	maxheld
- .b	.B	barrier
- .l	.L	limit
- .f	.F	failcnt
-.TE
-.P
-For the disk quota fields above, one can use the following suffixes:
-.TS
-allbox center;
-lB lB lB
-lI l l.
-Suffix  Header  Description
-_
- .s	.S	softlimit
- .h	.H	hardlimit
-.TE
+For the user beancounter fields, if suffix is not specified, current usage
+(a.k.a. "held") value is show. One can also use the following suffixes:
+.RS
+.TP
+.B .m
+maxheld
+.TP
+.B .b
+barrier
+.TP
+.B .l
+limit
+.TP
+.B .f
+fail counter
+.PP
+For the disk quota fields, if suffix is not specified, current usage
+is shown. One can also use the following suffixes:
+.TP
+.B .s
+soft limit
+.TP
+.B .h
+hard limit
+.RE
 .SH EXAMPLES
-\fBvzlist -o ctid,kmemsize,kmemsize.l -s kmemsize\fR
+.TP
+.B vzlist -o ctid,kmemsize,kmemsize.l -s kmemsize
+Show CTIDs, kmemsize usage, and kmemsize limit for all running containers,
+sorted by the kmemsize usage.
 .SH RETURN CODE
 Returns 0 upon success.
 .SH COPYRIGHT
