@@ -1,8 +1,12 @@
-.TH vzsplit 8 "6 Apr 2010" "OpenVZ" "Containers"
+.TH vzsplit 8 "4 Jun 2010" "OpenVZ" "Containers"
 .SH NAME
 vzsplit \- generate a sample container configuration file with a certain set of system resource control parameters.
 .SH SYNOPSIS
-vzsplit [\fB-n\fR \fInumve\fR] [\fB-f\fR \fIconf_name\fR] [\fB-s\fR \fIswapsize\fR]
+.SY vzsplit
+.OP -n numve
+.OP -f conf_name
+.OP -s swapsize
+.YS
 .SH DESCRIPTION
 The \fBvzsplit\fR utility is used to split the Hardware Node into equal parts.
 It generates a full set of system resource control parameters for the
