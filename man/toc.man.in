@@ -7,7 +7,7 @@
 .sp 7v
 .ps +10 \" point size
 .fam H \" helvetica
-\fBOpenVZ: __PKG__ manual pages\fR
+\fBOpenVZ: manual pages\fR
 .br
 .ps -6
 \fICopyright (C) 2000 - 2011, Parallels, Inc.\fR
