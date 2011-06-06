@@ -1,8 +1,9 @@
 for FILE in $*; do
-	NAME=$(echo $FILE | sed 's/\.\([0-9]\)$/\&nbsp;(\1)/')
+	NAME=$(echo $FILE | awk -F . '{print $1}')
+	SECT=$(echo $FILE | awk -F . '{print $2}')
 	HDR=$(grep -A1 '^\.SH NAME$' $FILE | tail -1 | \
 		sed 's/^.*\\- //' | sed 's/\.$//')
 	echo "|-"
-	echo "|| [[/$FILE/|$NAME]]"
+	echo "|| {{Man|$NAME|$SECT}}"
 	echo "|| $HDR"
 done
