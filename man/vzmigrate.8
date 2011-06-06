@@ -4,11 +4,15 @@
 vzmigrate \- migrate a container between two OpenVZ servers
 
 .SH SYNOPSIS
-.TP
-\fBvzmigrate\fR [\fB-r\fR|\fB--remove-area\fR \fByes\fR|\fBno\fR] \
-[\fB--ssh=\fIssh_options\fR] [\fB--rsync=\fIrsync_options\fR] \
-[\fB--keep-dst\fR] [\fB--online\fR] [\fB-v\fR] \fIdestination_address\fR \fICTID\fR
-
+.SY vzmigrate
+.OP -r\fR|\fB--remove-area\ \fByes\fR|\fBno
+.OP --ssh=\fIssh_options
+.OP --rsync=\fIrsync_options
+.OP --keep-dst
+.OP --online
+.OP -v
+.I destination_address CTID
+.YS
 .SH DESCRIPTION
 This utility is used to migrate a container from one (source) Hardware Node (HN)
 to another (destination) HN. The utility can migrate either stopped or running
