@@ -1,6 +1,6 @@
 for FILE in $*; do
-	NAME=$(echo $FILE | awk -F . '{print $1}')
-	SECT=$(echo $FILE | awk -F . '{print $2}')
+	NAME=$(echo $FILE | sed 's/\.[0-9]$//')
+	SECT=$(echo $FILE | sed 's/^.*\.\([0-9]\)$/\1/')
 	HDR=$(grep -A1 '^\.SH NAME$' $FILE | tail -1 | \
 		sed 's/^.*\\- //' | sed 's/\.$//')
 	echo "|-"
