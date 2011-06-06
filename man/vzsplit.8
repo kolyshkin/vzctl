@@ -1,6 +1,6 @@
-.TH vzsplit 8 "4 Jun 2010" "OpenVZ" "Containers"
+.TH vzsplit 8 "6 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
-vzsplit \- generate a sample container configuration file with a certain set of system resource control parameters.
+vzsplit \- generate a sample container configuration file
 .SH SYNOPSIS
 .SY vzsplit
 .OP -n numve
@@ -23,19 +23,20 @@ containers, an appropriate message is shown and the sample configuration file
 is not generated.
 .SH OPTIONS
 .TP
-\fB-n\fR \fInumve\fR
+.BI -n numve
 Specify the number of containers.
 .TP
-\fB-f\fR \fIconf_name\fR
+.BI -f conf_name
 Specify the configuration file name. The program output is placed to
 /etc/vz/conf/ve-\fIconf_name\fR.conf-sample.
 .TP
-\fB-s\fR \fIswapsize\fR
-Specify the swap size in Kbytes. If not provided in the option, the swap size will be read from /proc/meminfo.
+.BI -s swapsize
+Specify the swap size in Kbytes. If this option is not given,
+the swap size is read from \fB/proc/meminfo\fR.
 .SH DIAGNOSTICS
 \fBvzsplit\fR returns 0 upon a successful execution. If anything goes wrong, it
 returns 1.
 .SH SEE ALSO
 .BR ctid.conf (5).
 .SH LICENSE
-Copyright (C) 2000-2010, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2000-2011, Parallels, Inc. Licensed under GNU GPL.
