@@ -1,16 +1,19 @@
-.TH vzcpucheck 8 "22 Feb 2008" "OpenVZ" "Containers"
+.TH vzcpucheck 8 "6 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
 vzcpucheck \- show information about the CPU power and utilization.
 .SH SYNOPSIS
-vzcpucheck [\fI-v\fR]
+.SY vzcpucheck
+.OP -v
+.YS
 .SH DESCRIPTION
 This script outputs information on the CPU power and utilization.
 .SH OPTIONS
-.IP \fB-v\fR
+.TP
+.B -v
 Display information for each container.
 .SH RETURN CODE
 Returns 0 upon success.
 .SH SEE ALSO
 .BR vzctl (8).
 .SH LICENSE
-Copyright (C) 2000-2008, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2000-2011, Parallels, Inc. Licensed under GNU GPL.
