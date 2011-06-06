@@ -1,26 +1,37 @@
-.TH vzmemcheck 8 "3 Jun 2011" "OpenVZ" "Containers"
+.TH vzmemcheck 8 "6 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
-vzmemcheck \- utility to display information of node memory parameters
+vzmemcheck \- show information about host memory parameters
 .SH SYNOPSIS
-vzmemcheck [\fB-v\fR] [\fB-A\fR]
-.SH OPTIONS
-.IP \fB-v\fR 4
-Display information for each container.
-.IP \fB-A\fR 4
-Display absolute values (in megabytes).
+.SY vzmemcheck
+.OP -v
+.OP -A
+.YS
 .SH DESCRIPTION
-This utility shows node memory parameters:
-\fBlow memory utilization\fR, \fBlow memory commitment\fR, \fBRAM utilization\fR
-,\fBmem+swap utilization\fR, \fBmem+swap commitment\fR,
-\fBallocmem utilization\fR, \fBallocmem commitment\fR, \fBallocmem limit\fR.
-.P
-With \fB-A\fR option it show absolute values (in megabytes).
-Without \fB-v\fR option, it will be 1 more line: header line(s),
-the numerator and the denominator of the corresponding fraction.
+This utility shows host system memory parameters:
+.nf
+.B \(bu low memory utilization;
+.B \(bu low memory commitment;
+.B \(bu RAM utilization;
+.B \(bu mem+swap utilization;
+.B \(bu mem+swap commitment;
+.B \(bu allocmem utilization;
+.B \(bu allocmem commitment;
+.B \(bu allocmem limit.
+.fi
+.SH OPTIONS
+.TP
+.B -v
+Display information for each container.
+.TP
+.B -A
+Display absolute values (in megabytes). In this mode, the last
+two lines are the numerator and the denominator of the corresponding
+field.
 .SH DIAGNOSTICS
 Normally, exit status is 0. On error, exit status is 1.
 .SH SEE ALSO
 .BR vzcfgvalidate (8),
-.BR vzubc (8).
+.BR vzubc (8),
+.BR http://wiki.openvz.org/UBC_systemwide_configuration .
 .SH LICENSE
 Copyright (C) 2000-2011, Parallels, Inc. Licensed under GNU GPL.
