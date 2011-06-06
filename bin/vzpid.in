@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ namemark='Name:'
 
 usage()
 {
-	echo 'Usage: vzpid [pid ...] [-h]'
+	echo 'Usage: vzpid <pid> ...'
+	echo '       vzpid -'
 }
 
 header()
