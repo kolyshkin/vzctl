@@ -81,7 +81,7 @@ if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
 fi
 
 AC_ARG_ENABLE([bashcomp],
-              [AC_HELP_STRING([--enable-bashcomp],
+              [AS_HELP_STRING([--enable-bashcomp],
                               [Enable bashcompletion support])],
               [case "${enableval}" in
                 yes) enable_bashcomp="+bashcomp";;
@@ -92,7 +92,7 @@ AC_ARG_ENABLE([bashcomp],
 AM_CONDITIONAL(ENABLE_BASHCOMP, test "x$enable_bashcomp" = "x+bashcomp")
 
 AC_ARG_ENABLE([logrotate],
-              [AC_HELP_STRING([--enable-logrotate],
+              [AS_HELP_STRING([--enable-logrotate],
                               [Enable logrotate support])],
               [case "${enableval}" in
                 yes) enable_logrotate="+logrotate";;
@@ -103,7 +103,7 @@ AC_ARG_ENABLE([logrotate],
 AM_CONDITIONAL(ENABLE_LOGROTATE, test "x$enable_logrotate" = "x+logrotate")
 
 AC_ARG_ENABLE([udev],
-              [AC_HELP_STRING([--disable-udev],
+              [AS_HELP_STRING([--disable-udev],
                               [Disable udev support])],
               [case "${enableval}" in
                 yes) enable_udev="+udev";;
