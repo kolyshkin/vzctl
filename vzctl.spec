@@ -47,6 +47,9 @@ Requires: rsync
 Requires: gawk
 Requires: openssh
 
+# Virtual provides for newer RHEL6 kernel
+Provides: virtual-vzkernel-install
+
 %description
 This utility allows system administator to control OpenVZ containers,
 i.e. create, start, shutdown, set various options and limits etc.
