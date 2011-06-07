@@ -35,7 +35,6 @@ URL: http://openvz.org/
 Requires: bash
 Requires: gawk
 Requires: sed
-Requires: ed
 Requires: grep
 Requires: /sbin/chkconfig
 Requires: vzquota >= 2.7.0-4
