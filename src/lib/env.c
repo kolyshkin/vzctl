@@ -589,10 +589,48 @@ static void fix_cpu(cpu_param *cpu)
 }
 
 #define SBIN_INIT "/sbin/init"
+#define UPSTART_INIT "/lib/upstart/init"
 #define UPSTART "upstart"
+#define SYSTEMD "systemd"
 #define FEDORA_RELEASE "/etc/fedora-release"
 #define DEV_CONSOLE "/dev/console"
 #define DEV_NULL "/dev/null"
+
+static int fix_ve_systemd(const char *root)
+{
+	struct stat st;
+	char file[STR_SIZE];
+	char dest[STR_SIZE];
+
+	/* If kernel support cgroups, systemd should work fine */
+	if (access("/proc/cgroups", F_OK) == 0)
+		return 0;
+
+	/* Check if init is systemd */
+	snprintf(file, STR_SIZE - 1, "%s/" SBIN_INIT, root);
+	if (lstat(file, &st) != 0)
+		return 0; /* Some error -- giving up */
+	if (!S_ISLNK(st.st_mode))
+		return 0; /* Not a symlink, so not systemd */
+	if (readlink(file, dest, STR_SIZE - 1) < 0)
+		return 0; /* Some error -- giving up */
+	if (strstr(dest, SYSTEMD) == NULL)
+		return 0; /* Not systemd */
+
+	logger(2, 0, "systemd init found, changing to upstart");
+	snprintf(dest, STR_SIZE - 1, "%s/" UPSTART_INIT, root);
+	if (stat(dest, &st) != 0)
+		goto err;
+	if (unlink(file) != 0)
+		goto err;
+	if (symlink(UPSTART_INIT, file) != 0)
+		goto err;
+
+	return 0;
+err:
+	logger(-1, errno, "Failed to set upstart as init");
+	return -1;
+}
 
 static int fix_ve_devconsole(const char *root)
 {
@@ -678,8 +716,11 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 			return ret;
 		quota_inc(&res->dq, -100);
 	}
-	/* Fedora 14/15 hack */
-	fix_ve_devconsole(res->fs.root);
+	/* Fedora 14/15 hacks */
+	if (fix_ve_devconsole(res->fs.root) != 0)
+		return VZ_FS_BAD_TMPL;
+	if (fix_ve_systemd(res->fs.root) != 0)
+		return VZ_FS_BAD_TMPL;
 
 	if (pipe(wait_p) < 0) {
 		logger(-1, errno, "Can not create pipe");
