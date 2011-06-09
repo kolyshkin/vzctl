@@ -48,7 +48,7 @@ Requires: gawk
 Requires: openssh
 
 # Virtual provides for newer RHEL6 kernel
-Provides: virtual-vzkernel-install
+Provides: virtual-vzkernel-install = 2.0.0
 
 %description
 This utility allows system administator to control OpenVZ containers,
