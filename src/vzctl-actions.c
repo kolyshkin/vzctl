@@ -492,6 +492,34 @@ err_syntax:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
+static int check_set_ugidlimit(unsigned long *cur, unsigned long *old,
+		int loud)
+{
+	unsigned long c, o = 0;
+
+	if (!cur)
+		return 0;
+	c = *cur;
+	if (old)
+		o = *old;
+
+	if (c != 0 && o == 0) {
+		if (loud)
+			logger(-1, 0, "Unable to turn on second-level"
+				" disk quota on a running container");
+		return 1;
+	}
+
+	if (c == 0 && o != 0) {
+		if (loud)
+			logger(-1, 0, "Unable to turn off second-level"
+				" disk quota on a running container");
+		return 1;
+	}
+
+	return 0;
+}
+
 /* Check parameters that can't be set on running CT */
 int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	vps_res *new_res, vps_res *old_res)
@@ -532,19 +560,8 @@ int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 		found++;
 	}
 	/* Turning quota ugid limit on/off */
-	if ( (new_res->dq.ugidlimit && *new_res->dq.ugidlimit != 0) &&
-		(!old_res->dq.ugidlimit || *old_res->dq.ugidlimit == 0) ) {
-		if (loud)
-			logger(-1, 0, "Unable to turn on second-level"
-				" disk quota on a running container");
-		found++;
-	} else if ( (old_res->dq.ugidlimit && *old_res->dq.ugidlimit != 0) &&
-			(*new_res->dq.ugidlimit == 0) ) {
-		if (loud)
-			logger(-1, 0, "Unable to turn off second-level"
-				" disk quota on a running container");
-		found++;
-	}
+	found += check_set_ugidlimit(new_res->dq.ugidlimit,
+			old_res->dq.ugidlimit, loud);
 	/* Enabling/disabling DISK_QUOTA */
 	if ( (new_res->dq.enable) &&
 			(new_res->dq.enable != old_res->dq.enable) ) {
