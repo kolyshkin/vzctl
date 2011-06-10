@@ -138,6 +138,7 @@ AC_CONFIG_FILES([bin/Makefile
                  etc/network-scripts/Makefile
                  etc/udev/Makefile
                  etc/Makefile
+                 include/version.h
                  man/Makefile
                  scripts/Makefile
                  src/lib/Makefile

@@ -24,7 +24,7 @@ SUBDIRS = bin \
 noinst_HEADERS = $(wildcard include/*.h) \
                  $(wildcard include/linux/*.h)
 
-EXTRA_DIST = vzctl.spec
+EXTRA_DIST = vzctl.spec include/version.h.in
 
 vzdir       = /vz
 vzcachedir  = $(vzdir)/template/cache

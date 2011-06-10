@@ -23,6 +23,7 @@
 #include <signal.h>
 #include <limits.h>
 
+#include "version.h"
 #include "vzctl.h"
 #include "env.h"
 #include "logger.h"
