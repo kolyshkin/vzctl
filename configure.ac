@@ -18,6 +18,7 @@
 # Generic configuration
 AC_PREREQ(2.59)
 AC_INIT(vzctl, 3.0.28, devel@openvz.org)
+AC_CONFIG_SRCDIR([src/vzctl.c])
 
 # Change sysconfdir default since otherwise some important files
 # (an initscript, files for logrotate, and udev) will be installed
@@ -47,10 +48,21 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_DISABLE_STATIC
 
 # Checks for programs.
+m4_ifdef([AC_USE_SYSTEM_EXTENSIONS], [AC_USE_SYSTEM_EXTENSIONS])
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+# Compiler settings
+CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline -Wextra"
+CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
+CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
+
+if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
+	CFLAGS="${CFLAGS} -m64"
+fi
 
 # Checks for libraries.
 AC_CHECK_LIB(dl, dlopen,
@@ -64,21 +76,33 @@ AC_CHECK_LIB(util, openpty,
 AC_SUBST(UTIL_LIBS)
 
 # Checks for header files.
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h \
+	sys/file.h sys/ioctl.h sys/mount.h sys/param.h sys/socket.h \
+	sys/vfs.h termios.h],,
+	AC_MSG_ERROR([some needed header(s) not found]))
+#AC_HEADER_MAJOR
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
 AC_C_INLINE
+AC_CHECK_MEMBERS([struct stat.st_rdev],,
+	AC_MSG_ERROR([no st_rdev member in struct stat]))
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
+m4_ifdef([AC_TYPE_UINT16_T], [AC_TYPE_UINT16_T])
+m4_ifdef([AC_TYPE_UINT32_T], [AC_TYPE_UINT32_T])
+m4_ifdef([AC_TYPE_UINT8_T], [AC_TYPE_UINT8_T])
 
 # Checks for library functions.
-
-# Compiler settings
-CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline -Wextra"
-CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
-CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
-
-if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
-	CFLAGS="${CFLAGS} -m64"
-fi
+AC_FUNC_ALLOCA
+AC_FUNC_FORK
+AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_FUNC_STRNLEN
+AC_CHECK_FUNCS([alarm bzero dup2 endgrent endpwent memset mkdir mkfifo \
+	realpath rmdir select socket strcasecmp strchr strdup strerror \
+	strrchr strstr strtol strtoul strtoull uname],,
+	AC_MSG_ERROR([some needed function(s) not found]))
 
 AC_ARG_ENABLE([bashcomp],
               [AS_HELP_STRING([--enable-bashcomp],
