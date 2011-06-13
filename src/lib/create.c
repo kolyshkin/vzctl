@@ -39,7 +39,10 @@
 #include "create.h"
 #include "destroy.h"
 
+#define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
 #define VZOSTEMPLATE	"/usr/bin/vzosname"
+
+static int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl);
 
 static char *get_ostemplate_name(char *ostmpl)
 {
@@ -66,8 +69,8 @@ static char *get_ostemplate_name(char *ostmpl)
 	return strdup(buf);
 }
 
-int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
-	char *tar_nm)
+static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
+	dq_param *dq, char *tar_nm)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
@@ -339,7 +342,7 @@ err:
 	return ret;
 }
 
-int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
+static int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
 {
 	char buf[STR_SIZE];
 	dist_actions actions;

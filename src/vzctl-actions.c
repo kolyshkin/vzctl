@@ -34,6 +34,7 @@
 #include "config.h"
 #include "vzerror.h"
 #include "create.h"
+#include "destroy.h"
 #include "util.h"
 #include "lock.h"
 #include "vps_configure.h"

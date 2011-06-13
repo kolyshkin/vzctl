@@ -19,15 +19,9 @@
 #define	_CREATE_H_
 #include "res.h"
 
-#define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
-
 struct mod_action;
 
-int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl);
 int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	struct mod_action *action);
-int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs);
-int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl, dq_param *dq,
-	char *tar_nm);
 #endif
 
