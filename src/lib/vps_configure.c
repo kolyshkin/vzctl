@@ -74,8 +74,9 @@ static const char *get_local_ip(vps_param *param)
 	return NULL;
 }
 
-int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	const char *root, char *hostname, const char *ip, int state)
+static int vps_hostnm_configure(vps_handler *h, envid_t veid,
+	dist_actions *actions, const char *root,
+	char *hostname,	const char *ip, int state)
 {
 	char *envp[5];
 	const char *script;
@@ -112,8 +113,8 @@ int vps_hostnm_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	return ret;
 }
 
-int vps_dns_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	const char *root, misc_param *net, int state)
+static int vps_dns_configure(vps_handler *h, envid_t veid,
+	dist_actions *actions, const char *root, misc_param *net, int state)
 {
 	char *envp[10];
 	char *str;
@@ -181,8 +182,8 @@ int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	return ret;
 }
 
-int vps_quota_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	const char *root, dq_param *dq, int state)
+static int vps_quota_configure(vps_handler *h, envid_t veid,
+	dist_actions *actions, const char *root, dq_param *dq, int state)
 {
 	char *envp[6];
 	const char *script;
