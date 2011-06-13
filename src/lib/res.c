@@ -120,7 +120,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 
 	if (!(skip & SKIP_CONFIGURE))
-		vps_configure(h, veid, actions, fs->root, ADD, param, vps_state);
+		vps_configure(h, veid, actions, fs->root, param, vps_state);
 	/* Setup quota limits after configure steps */
 	if ((ret = vps_set_quota(veid, &res->dq)))
 		return ret;

@@ -31,7 +31,7 @@
 int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	const char *root, list_head_t *pw);
 int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	const char *root, int op, vps_param *param, int state);
+	const char *root, vps_param *param, int state);
 int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	const char *root, int op, net_param *net, int state);
 const char *state2str(int state);
