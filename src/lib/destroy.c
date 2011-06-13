@@ -111,27 +111,6 @@ static char *get_destroy_root(const char *dir)
 	return NULL;
 }
 
-char *maketmpdir(const char *dir)
-{
-	char buf[STR_SIZE];
-	char *tmp;
-	char *tmp_dir;
-	int len;
-
-	snprintf(buf, sizeof(buf), "%s/%sXXXXXXX", dir, destroy_dir_magic);
-	if ((tmp = mkdtemp(buf)) == NULL) {
-		logger(-1, errno, "Error in mkdtemp(%s)", buf);
-		return NULL;
-	}
-	len = strlen(dir);
-	tmp_dir = (char *)malloc(strlen(tmp) - len);
-	if (tmp_dir == NULL)
-		return NULL;
-	strcpy(tmp_dir, tmp + len + 1);
-
-	return tmp_dir;
-}
-
 /* Removes all the directories under 'root'
  * those names start with 'destroy_dir_magic'
  */
@@ -184,7 +163,6 @@ static int destroydir(char *dir)
 	char buf[STR_SIZE];
 	char tmp[STR_SIZE];
 	char *root;
-	char *tmp_nm;
 	int fd_lock, pid;
 	struct sigaction act, actold;
 	int ret = 0;
@@ -234,12 +212,12 @@ static int destroydir(char *dir)
 		}
 	}
 	/* Fast/async removal -- first move to tmp dir */
-	if ((tmp_nm = maketmpdir(tmp)) == NULL)	{
-		logger(-1, 0, "Unable to generate temporary name in %s", tmp);
+	snprintf(buf, sizeof(buf), "%s/%sXXXXXX", tmp, destroy_dir_magic);
+	if (mkdtemp(buf) == NULL) {
+		logger(-1, errno, "Unable to create temporary directory, "
+				"mkdtemp(%s) failed", buf);
 		return VZ_FS_DEL_PRVT;
 	}
-	snprintf(buf, sizeof(buf), "%s/%s", tmp, tmp_nm);
-	free(tmp_nm);
 	if (rename(dir, buf)) {
 		rmdir(buf);
 		if (errno == EXDEV) {
