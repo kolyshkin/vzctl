@@ -171,20 +171,6 @@ int parse_ul(const char *str, unsigned long *val)
 	return 0;
 }
 
-void str_tolower(const char *from, char *to)
-{
-	if (from == NULL || to == NULL)
-		return;
-	while ((*to++ = tolower(*from++)));
-}
-
-void str_toupper(const char *from, char *to)
-{
-	if (from == NULL || to == NULL)
-		return;
-	while ((*to++ = toupper(*from++)));
-}
-
 int check_var(const void *val, const char *message)
 {
 	if (val != NULL)
@@ -295,13 +281,6 @@ int get_netaddr(const char *ip_str, void *ip)
 	if (inet_pton(AF_INET, ip_str, ip) <= 0)
 		return -1;
 	return AF_INET;
-}
-
-const char *get_netname(unsigned int *ip, int family)
-{
-	static char buf[INET6_ADDRSTRLEN];
-
-	return inet_ntop(family, ip, buf, sizeof(buf));
 }
 
 char *subst_VEID(envid_t veid, char *src)
@@ -456,51 +435,6 @@ int get_lowmem(unsigned long long *mem)
 	}
 	*mem *= 1024;
 	return 0;
-}
-
-char *get_file_name(char *str)
-{
-	char *p;
-	int len;
-
-	len = strlen(str) - sizeof(".conf") + 1;
-	if (len <= 0)
-	return NULL;
-	if (strcmp(str + len, ".conf"))
-		return NULL;
-	if ((p = malloc(len + 1)) == NULL)
-		return NULL;
-	strncpy(p, str, len);
-	p[len] = 0;
-
-	return p;
-}
-
-const char *get_vps_state_str(int vps_state)
-{
-	const char *p = NULL;
-
-	switch (vps_state) {
-	case STATE_RUNNING:
-		p = "running";
-		break;
-	case STATE_STARTING:
-		p = "starting";
-		break;
-	case STATE_STOPPED:
-		p = "stopped";
-		break;
-	case STATE_STOPPING:
-		p = "stopping";
-		break;
-	case STATE_RESTORING:
-		p = "restoring";
-		break;
-	case STATE_CHECKPOINTING:
-		p = "checkpointing";
-		break;
-	}
-	return p;
 }
 
 int get_dump_file(unsigned veid, const char *dumpdir, char *buf, int size)
