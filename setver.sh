@@ -26,8 +26,14 @@ if test "$GIT_VR" != "$SPEC_VR"; then
 	sed -i -e "s/^\(Version:[[:space:]]*\).*\$/\1$GIT_V/" \
 	       -e "s/^\(%define rel[[:space:]]*\).*\$/\1$GIT_R/" \
 		vzctl.spec
+	if test "$GIT_R" != "1"; then
+		NVR='%{name}-%{version}-%{rel}'
+		sed -i -e "s/^\(Source:[[:space:]]*\).*\$/\1${NVR}.tar.bz2/" \
+		       -e "s/^%setup[[:space:]]*.*\$/%setup -n ${NVR}/" \
+			vzctl.spec
+	fi
 fi
-#grep -E -H '^Version:|%define rel' vzctl.spec
+#grep -E -H '^Version:|^%define rel|^Source:|^%setup' vzctl.spec
 
 # Set version in configure.ac from spec
 read_spec
