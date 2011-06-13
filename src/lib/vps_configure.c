@@ -106,7 +106,6 @@ static int vps_hostnm_configure(vps_handler *h, envid_t veid,
 		envp[3] = ipnm;
 	}
 	envp[4] = NULL;
-	logger(0, 0, "Set hostname: %s", hostname);
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
 
@@ -146,7 +145,6 @@ static int vps_dns_configure(vps_handler *h, envid_t veid,
 	envp[i] = NULL;
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
-	logger(0, 0, "File resolv.conf was modified");
 	free_arg(envp);
 
 	return ret;
@@ -222,7 +220,6 @@ static int vps_quota_configure(vps_handler *h, envid_t veid,
 	}
 	envp[i++] = strdup(ENV_PATH);
 	envp[i] = NULL;
-	logger(0, 0, "Setting quota ugidlimit: %ld", *dq->ugidlimit);
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
 	free_arg(envp);
