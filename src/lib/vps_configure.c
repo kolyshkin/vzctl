@@ -50,7 +50,7 @@ const char *state2str(int state)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(vps_states) / sizeof(*vps_states); i++)
+	for (i = 0; i < ARRAY_SIZE(vps_states); i++)
 		if (vps_states[i].id == state)
 			return vps_states[i].name;
 

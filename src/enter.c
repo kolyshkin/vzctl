@@ -315,7 +315,7 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 			close(info[0]);
 			if ((term = getenv("TERM")) != NULL) {
 				snprintf(buf, sizeof(buf), "TERM=%s", term);
-				env[sizeof(env)/sizeof(env[0]) - 2] = buf;
+				env[ARRAY_SIZE(env) - 2] = buf;
 			}
 			arg[0] = "-bash";
 			execve("/bin/bash", arg, env);
