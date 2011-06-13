@@ -22,7 +22,8 @@
 Summary: OpenVZ containers control utility
 Name: vzctl
 Version: 3.0.28
-Release: 1%{?dist}
+%define rel 1
+Release: %{rel}%{?dist}
 License: GPL
 Group: System Environment/Kernel
 Source: http://download.openvz.org/utils/%{name}/%{version}/src/%{name}-%{version}.tar.bz2

@@ -13,8 +13,7 @@ CONF_V=$(grep AC_INIT configure.ac | \
 
 read_spec() {
 	SPEC_V=$(awk '($1 == "Version:") {print $2}' vzctl.spec)
-	SPEC_R=$(awk '($1 == "Release:") {print $2}' vzctl.spec | \
-		sed 's/%.*$//')
+	SPEC_R=$(awk '($1 " " $2 == "%define rel") {print $3}' vzctl.spec)
 	SPEC_VR="${SPEC_V}-${SPEC_R}"
 }
 read_spec
@@ -25,10 +24,10 @@ if test "$GIT_VR" != "$SPEC_VR"; then
 	# Version: 3.0.28
 	# Release: 1%{?dist}
 	sed -i -e "s/^\(Version:[[:space:]]*\).*\$/\1$GIT_V/" \
-	       -e "s/^\(Release:[[:space:]]*\)[^%]*\(%.*\)\$/\1$GIT_R\2/" \
+	       -e "s/^\(%define rel[[:space:]]*\).*\$/\1$GIT_R/" \
 		vzctl.spec
 fi
-#grep -E -H '^Version:|^Release:' vzctl.spec
+#grep -E -H '^Version:|%define rel' vzctl.spec
 
 # Set version in configure.ac from spec
 read_spec
