@@ -175,7 +175,7 @@ void free_dev_param(dev_param *dev)
 	free_dev(&dev->dev);
 }
 
-int run_pci_script(envid_t veid, int op, list_head_t *pci_h,
+static int run_pci_script(envid_t veid, int op, list_head_t *pci_h,
 		const char *ve_root)
 {
 	char *argv[3];

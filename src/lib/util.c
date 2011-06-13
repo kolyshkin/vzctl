@@ -42,7 +42,7 @@
 #define NR_OPEN 1024
 #endif
 
-char *unescapestr(char *src)
+static const char *unescapestr(char *src)
 {
 	char *p1, *p2;
 	int fl;

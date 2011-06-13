@@ -86,7 +86,7 @@ static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
 	return ioctl(h->vzfd, VENETCTL_VE_IP_MAP, &ip_map);
 }
 
-int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
+static int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
 {
 	int ret;
 	int family;
@@ -227,7 +227,7 @@ int vps_del_ip(vps_handler *h, envid_t veid,
 	return ret;
 }
 
-int vps_set_ip(vps_handler *h, envid_t veid,
+static int vps_set_ip(vps_handler *h, envid_t veid,
 	net_param *net, int state)
 {
 	int ret;
@@ -258,7 +258,7 @@ static int netdev_ctl(vps_handler *h, int veid, int op, char *name)
 	return 0;
 }
 
-int set_netdev(vps_handler *h, envid_t veid, int cmd, net_param *net)
+static int set_netdev(vps_handler *h, envid_t veid, int cmd, net_param *net)
 {
 	int ret = 0;
 	list_head_t *dev_h = &net->dev;
@@ -369,7 +369,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 }
 
 #define	PROC_VEINFO	"/proc/vz/veinfo"
-int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
+static int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 {
 	FILE *fd;
 	char str[16384];
@@ -422,7 +422,7 @@ int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 	((unsigned char *)&addr)[3]
 #endif
 
-int get_vps_ip_ioctl(vps_handler *h, envid_t veid,
+static int get_vps_ip_ioctl(vps_handler *h, envid_t veid,
 	list_head_t *ip_h)
 {
 	int ret = -1;

@@ -141,7 +141,7 @@ static int set_cpumask(envid_t veid, cpumask_t *mask)
  * @param veid		CT ID
  * @param vcpu		number of CPUs
  */
-int env_set_vcpus(envid_t veid, unsigned int vcpus)
+static int env_set_vcpus(envid_t veid, unsigned int vcpus)
 {
 	logger(0, 0, "Setting CPUs: %d", vcpus);
 	if (fairsched_vcpus(veid, vcpus) != 0) {

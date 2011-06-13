@@ -115,8 +115,8 @@ err:
 	return ret ? err : 0;
 }
 
-int real_chkpnt(int cpt_fd, envid_t veid, const char *root, cpt_param *param,
-	int cmd)
+static int real_chkpnt(int cpt_fd, envid_t veid, const char *root,
+		cpt_param *param, int cmd)
 {
 	int ret, len, len1;
 	char buf[PIPE_BUF];

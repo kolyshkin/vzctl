@@ -353,7 +353,7 @@ int vps_exec(vps_handler *h, envid_t veid, const char *root, int exec_mode,
 	return ret;
 }
 
-int _real_execFn(vps_handler *h, envid_t veid, const char *root,
+static int _real_execFn(vps_handler *h, envid_t veid, const char *root,
 		execFn fn, void *data, int flags)
 {
 	int ret, pid;

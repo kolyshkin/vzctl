@@ -78,7 +78,7 @@ static int set_personality32()
 }
 #endif
 
-int vz_env_create_data_ioctl(vps_handler *h,
+static int vz_env_create_data_ioctl(vps_handler *h,
 	struct vzctl_env_create_data *data)
 {
 	int errcode;
