@@ -141,8 +141,10 @@ static vps_config config[] = {
 {"IOPRIO",	NULL, PARAM_IOPRIO},
 {"BOOTORDER",	NULL, PARAM_BOOTORDER},
 
-/* These ones are known parameters for global config file,
- * it's just vzctl is not interested in those
+/* These ones are either known parameters for global config file,
+ * or some obsoleted parameters used in the past. In both cases
+ * vzctl is not interested in those, but it doesn't make sense to
+ * report those as being unknown.
  */
 {"VIRTUOZZO",		NULL, PARAM_IGNORED},
 {"VE0CPUUNITS",		NULL, PARAM_IGNORED},
@@ -152,6 +154,7 @@ static vps_config config[] = {
 {"VZWDOG",		NULL, PARAM_IGNORED},
 {"IPTABLES_MODULES",	NULL, PARAM_IGNORED},
 {"IP6TABLES",		NULL, PARAM_IGNORED},
+{"CONFIG_CUSTOMIZED",	NULL, PARAM_IGNORED},
 
 {NULL,		NULL, -1}
 };
