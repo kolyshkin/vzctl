@@ -49,7 +49,7 @@ start() {
 	if test -z "\$dev"; then
 		dev="/dev/${DEVFS}"
 		rm -f /etc/mtab >/dev/null 2>&1
-		echo "/dev/${DEVFS} / ${DEVFS} rw,usrquota,grpquota 0 0" > /etc/mtab
+		echo "/dev/${DEVFS} / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
 		grep -v " / " /proc/mounts >> /etc/mtab 2>/dev/null
 		chmod 644 /etc/mtab
 	fi
