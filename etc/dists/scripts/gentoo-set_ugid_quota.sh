@@ -32,17 +32,19 @@ if [ -z "$MAJOR" ]; then
 	exit 0
 fi
 
-echo '#!/sbin/runscript
+cat << EOF > ${SCRIPTANAME} || exit 1
+#!/sbin/runscript
 
 start() {
-	[ -e "/dev/'${DEVFS}'" ] || mknod /dev/'${DEVFS}' b '$MAJOR' '$MINOR'
-	rm -f /etc/mtab >/dev/null 2>&1
-	echo "/dev/'${DEVFS}' / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
-	mnt=`grep -v " / " /proc/mounts`
-	if [ $? = 0 ]; then
-		echo "$mnt" >> /etc/mtab
+	dev=\$(awk '(\$2 == "/") && (\$4 ~ /usrquota/) && (\$4 ~ /grpquota/) {print \$1}' /etc/mtab)
+	if test -z "\$dev"; then
+		dev="/dev/${DEVFS}"
+		rm -f /etc/mtab >/dev/null 2>&1
+		echo "/dev/${DEVFS} / reiserfs rw,usrquota,grpquota 0 0" > /etc/mtab
+		grep -v " / " /proc/mounts >> /etc/mtab 2>/dev/null
+		chmod 644 /etc/mtab
 	fi
-	chmod 644 /etc/mtab
+	[ -e "\$dev" ] || mknod \$dev b $MAJOR $MINOR
 	quotaon -aug
 	return
 }
@@ -50,11 +52,7 @@ start() {
 stop() {
 	return
 }
-
-' > ${SCRIPTANAME} || {
-	echo "Unable to create ${SCRIPTANAME}"
-	exit 1
-}
+EOF
 chmod 755 ${SCRIPTANAME}
 
 rc-update add vzquota default
