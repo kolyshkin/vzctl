@@ -40,7 +40,18 @@ function set_dns()
 	chmod 644 ${cfgfile}
 }
 
+gen_resolvconf() {
+	local ns
+	[ -n "${SEARCHDOMAIN}" ] && echo "search ${SEARCHDOMAIN}"
+	for ns in ${NAMESERVER}; do
+		echo "nameserver $ns"
+	done
+}
 
-set_dns /etc/resolv.conf "${NAMESERVER}" "${SEARCHDOMAIN}"
+if which resolvconf >/dev/null 2>&1; then
+	gen_resolvconf | resolvconf -a venet0
+else
+	set_dns /etc/resolv.conf "${NAMESERVER}" "${SEARCHDOMAIN}"
+fi
 
 exit 0
