@@ -42,8 +42,7 @@ check() {
 	fi
 	if ! cat $param | fgrep -qw 1; then
 		print_failure
-		print_warning "vzevent module should be loaded with " \
-				"reboot_event=1 parameter"
+		print_warning "vzevent module should be loaded with reboot_event=1 parameter"
 		echo
 		return 1
 	fi
