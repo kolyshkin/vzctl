@@ -14,11 +14,11 @@ One or several \fICTID\fRs can be specified to limit the output to the given
 containers. Each \fICTID\fR can be either a name or a numeric ID. Note that
 names can only be used if there is a container on the system with that name
 (\fBvzlist -o ctid\fI name\fR command is used for name to ID conversion).
-Unknown CTIDs are ignored.
+Unknown \fICTID\fRs are ignored.
 
 The utility can also be used from inside the container, in this case it only
 shows the values for that container (and it doesn't make sense to specify
-\fBCTID\fR).
+\fICTID\fR argument).
 .SH OPTIONS
 .TP
 .BR -w , \ --watch
@@ -77,38 +77,38 @@ Read User Beancounters from \fIfilename\fR. By default this is
 \fB/proc/user_beancounters\fR. Use \fB-\fR to read from standard input.
 .SH EXAMPLES
 .TP
-\fBvzubc 101 web dns\fR
+.B vzubc 101 web dns
 Show all beancounters for CTID 101 and for CTs named \fBweb\fR and \fBdns\fR.
 .TP
-\fBvzubc -w -wd -wn 10 101\fR
+.B vzubc -w -wd -wn 10 101
 Display beancounters for CT 101 every 10 seconds, highlighting the changes.
 Interrupt with Control-C.
 .TP
-\fBvzubc -q -c\fR
+.B vzubc -q -c
 Show beancounters with held or maxheld close to limits, plus those with
 non-zero fail counters, with colors.
 .TP
-\fBvzubc -q -qh 0.8 -qm 1\fR
+.B vzubc -q -qh 0.8 -qm 1
 Show beancounters with held value equal to or more than 80% of a limit,
 and/or with maxheld value equal or more than a limit, plus those with
 non-zero fail counters.
 .TP
-\fBvzubc -w -q -r\fR
+.B vzubc -w -q -r
 Display beancounters with held and maxheld close to limits, plus those with
 increasing fail counters.
 .TP
-\fBvzubc -r -q -qh 2 -qm 2\fR
+.B vzubc -r -q -qh 2 -qm 2
 Only show beancounters with increased (since the last run) fail counters.
 .TP
-\fBvzubc -rc -ic\fR
+.B vzubc -rc -ic
 Show all beancounters, and clear all saved data for relative and incremental
 mode (i.e. saved values for fail counter and held).
 .SH FILES
-.nf
-\fB\f(CR/proc/bc/resources
+.EX
+/proc/bc/resources
 /proc/user_beancounters
-/tmp/vzubc.store/ubc.*\fR
-.fi
+/tmp/vzubc.store/ubc.*
+.EE
 .SH EXIT STATUS
 Returns 0 upon successful execution, 1 otherwise.
 .SH SEE ALSO
