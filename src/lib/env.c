@@ -602,10 +602,6 @@ static int fix_ve_systemd(const char *root)
 	char file[STR_SIZE];
 	char dest[STR_SIZE];
 
-	/* If kernel support cgroups, systemd should work fine */
-	if (access("/proc/cgroups", F_OK) == 0)
-		return 0;
-
 	/* Check if init is systemd */
 	snprintf(file, STR_SIZE - 1, "%s/" SBIN_INIT, root);
 	if (lstat(file, &st) != 0)
