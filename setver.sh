@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Try to figure out version from git
-GIT_DESC=$(git describe | sed s'/^vzctl-//')
+GIT_DESC=$(git describe --tags | sed s'/^[^0-9]*-\([0-9].*\)$/\1/')
 GIT_V=$(echo $GIT_DESC | sed 's/-.*$//')
 				# 3.0.28-1-gf784152
 GIT_R=$(echo $GIT_DESC | sed 's/^[^-]*-\([1-9][0-9]*\)-g/git.\1./')
