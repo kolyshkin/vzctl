@@ -856,7 +856,7 @@ if exists, is executed first.
 Global and per-CT umount scripts which are executed for a
 container right after it is unmounted. Otherwise they are the same
 as \fB.umount\fR scripts.
-
+.PP
 The environment passed to all the \fB*mount\fR scripts is the standard
 environment of the parent (i.e. \fBvzctl\fR) with two additional
 variables: \fB$VEID\fR and \fB$VE_CONFFILE\fR. The first one holds
@@ -864,7 +864,7 @@ the ID of the container, and the second one holds the full path
 to the container configuration file. If the script needs to get other
 CT configuration parameters, such as \fB$VE_ROOT\fR, it needs to get
 those from global and per-CT configuration files.
-
+.PP
 Here is an example of a mount script, which makes host system's
 /mnt/disk available to container(s). Script name can either be
 \fB/etc/vz/conf/vps.mount\fR or \fB/etc/vz/conf/\fICTID\fB.mount\fR.
