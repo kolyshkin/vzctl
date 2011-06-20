@@ -46,7 +46,6 @@
 
 #define PROCMEM		"/proc/meminfo"
 #define PROCTHREADS	"/proc/sys/kernel/threads-max"
-#define PROCCPU		"/proc/cpuinfo"
 
 #define MAX_SL		3
 
@@ -201,32 +200,9 @@ void header(FILE *fp)
 	return;
 }
 
-int get_cpupower(int *cpuunits)
-{
-	FILE *fd;
-	char str[1024];
-	int val, total = 0;
-
-	*cpuunits = DEF_CPUUNITS;
-	if ((fd = fopen(PROCCPU, "r")) == NULL) {
-		logger(-1, errno, "Cannot open " PROCCPU);
-		return 1;
-	}
-	while (fgets(str, sizeof(str), fd))
-		if (sscanf(str, "bogomips\t: %u", &val) == 1)
-			total += val;
-	fclose(fd);
-	if (total) {
-		total *= 25;
-		*cpuunits = total / (num_ve + 1);
-		return 0;
-	}
-	return 1;
-}
-
 int lconv(char *name)
 {
-	int i, cpuunits;
+	int i;
 	FILE *fp;
 
 	if (name != NULL) {
@@ -249,8 +225,7 @@ int lconv(char *name)
 				(unsigned long) params[i].bar,
 				(unsigned long)	params[i].lim);
 	}
-	get_cpupower(&cpuunits);
-	fprintf(fp, "CPUUNITS=\"%d\"\n", cpuunits);
+	fprintf(fp, "CPUUNITS=\"%d\"\n", DEF_CPUUNITS);
 	if (name) {
 		fclose(fp);
 		logger(-1, 0, "Config %s was created", name);
