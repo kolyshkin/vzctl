@@ -35,7 +35,7 @@
  * Instead of including a file which is not present in all environments,
  * we copy-paste reiserfs magic from it
  */
-#define REISERFS_SUPER_MAGIC    0x52654973
+#define REISERFS_SUPER_MAGIC	0x52654973
 
 #define SYSRSRV		52428800
 #define MEMPERVE	5542912
@@ -216,7 +216,7 @@ int lconv(char *name)
 	header(fp);
 
 	fprintf(fp, "# Primary parameters\n");
-	for (i = 0;  i < NUMUBC; i++) {
+	for (i = 0; i < NUMUBC; i++) {
 		if (i == KMEM)
 			fprintf(fp, "\n# Secondary parameters\n");
 		else if (i ==LOCKPG)
@@ -239,15 +239,15 @@ int calculate_values()
 	long long kmem, numproc, avnproc, sockbuf, tcpbuf, iptent, numfile;
 	long long dcache, numflock;
 	long long lockedpages, numpty, guarpg, privvm, shmpg, di_pve, ds_pve;
-	int sl = 0;
+	int sl;
 
-	avnproc = tcpbuf = 0;
+	sl = avnproc = tcpbuf = 0;
 	tot_pve = (mem_total + swap_total - SYSRSRV) / num_ve;
 	for (osl = 0; osl < MAX_SL; osl++) {
 		numproc = k_nproc[osl] * proc_calc / num_ve;
 		low_pve = low_total * 0.4 * k_kmem[osl] / num_ve;
 		guarpg = (tot_pve - low_pve) / pagesize;
-		if  (guarpg < MIN_GUARPG) {
+		if (guarpg < MIN_GUARPG) {
 			guarpg = MIN_GUARPG;
 			low_pve = tot_pve - guarpg * pagesize;
 		}
@@ -260,7 +260,7 @@ int calculate_values()
 		if (avnproc < MINPROC / 2)
 			continue;
 
-		if (numproc <  avnproc)
+		if (numproc < avnproc)
 			numproc = avnproc;
 		if ((numproc < 2 * avnproc) && (osl < MAX_SL))
 			numproc = 2 * avnproc;
@@ -281,7 +281,7 @@ int calculate_values()
 		numproc = k_nproc[sl] * proc_calc / num_ve;
 		low_pve = low_total * 0.4 * K_KMEM_MAX / num_ve;
 		guarpg = (tot_pve - low_pve) / pagesize;
-		if  (guarpg < MIN_GUARPG) {
+		if (guarpg < MIN_GUARPG) {
 			guarpg = MIN_GUARPG;
 			low_pve = tot_pve - guarpg * pagesize;
 		}
@@ -294,7 +294,7 @@ int calculate_values()
 			sockbuf = 2 * (MINDGRAMBUF + MINTCPBUF + delta);
 			kmem = low_pve - sockbuf;
 			rest = kmem - avnproc * k_kpp[sl];
-		} while  ((rest < 0) && (numproc > MINPROC));
+		} while ((rest < 0) && (numproc > MINPROC));
 
 		if (rest < 0) {
 			logger(-1, 0, "Fatal resource shortage, try to "
