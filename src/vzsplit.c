@@ -178,10 +178,10 @@ char *level_string[MAX_SL + 1] = {
 void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout, "Usage: vzsplit [-f config_name] "
-		"| [-n numves] | [-s swap_size]\n"
-		"\t -f specified config name\n"
-		"\t -n specified number of containers\n"
-		"\t -s specified swap in Kbytes\n");
+		"[-n num_CTs] [-s swap_size]\n"
+		"\t -f\tconfiguration file name\n"
+		"\t -n\tnumber of containers\n"
+		"\t -s\tswap space, Kbytes\n");
 	exit(rc);
 }
 
