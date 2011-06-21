@@ -42,7 +42,7 @@
 #define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
 #define VZOSTEMPLATE	"/usr/bin/vzosname"
 
-static int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl);
+static int vps_postcreate(envid_t veid, vps_res *res);
 
 static char *get_ostemplate_name(char *ostmpl)
 {
@@ -295,7 +295,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			goto err_private;
 	}
 
-	if ((ret = vps_postcreate(veid, &vps_p->res.fs, &vps_p->res.tmpl)))
+	if ((ret = vps_postcreate(veid, &vps_p->res)))
 		goto err_root;
 	move_config(veid, DESTR);
 	/* store root, private, ostemplate in case default used */
@@ -342,7 +342,7 @@ err:
 	return ret;
 }
 
-static int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
+static int vps_postcreate(envid_t veid, vps_res *res)
 {
 	char buf[STR_SIZE];
 	dist_actions actions;
@@ -351,9 +351,9 @@ static int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
 	char *env[3];
 	int ret;
 
-	if (check_var(fs->root, "VE_ROOT is not set"))
+	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
-	dist_name = get_dist_name(tmpl);
+	dist_name = get_dist_name(&res->tmpl);
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
 	free(dist_name);
 	if (ret)
@@ -362,18 +362,18 @@ static int vps_postcreate(envid_t veid, fs_param *fs, tmpl_param *tmpl)
 		ret = 0;
 		goto err;
 	}
-	ret = fsmount(veid, fs, NULL);
+	ret = fsmount(veid, &res->fs, &res->dq);
 	if (ret)
 		goto err;
 	arg[0] = actions.post_create;
 	arg[1] = NULL;
-	snprintf(buf, sizeof(buf), "VE_ROOT=%s", fs->root);
+	snprintf(buf, sizeof(buf), "VE_ROOT=%s", res->fs.root);
 	env[0] = buf;
 	env[1] = ENV_PATH;
 	env[2] = NULL;
 	logger(0, 0, "Performing postcreate actions");
 	ret = run_script(actions.post_create, arg, env, 0);
-	fsumount(veid, fs->root);
+	fsumount(veid, res->fs.root);
 err:
 	free_dist_actions(&actions);
 	return ret;
