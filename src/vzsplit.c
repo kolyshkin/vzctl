@@ -367,7 +367,9 @@ int calculate_values()
 	params[NPHYPG].bar = 0; params[NPHYPG].lim = MAXVAL;
 
 	privvm = guarpg * k_privvm[sl];
-	if (privvm > PRIVVM_PVE * mem_total) {
+	if (privvm > tot_pve / pagesize)
+		privvm = guarpg;
+	if (num_ve > 1 && privvm > PRIVVM_PVE * mem_total) {
 		privvm = PRIVVM_PVE * mem_total;
 		if (guarpg > privvm)
 			guarpg = privvm;
