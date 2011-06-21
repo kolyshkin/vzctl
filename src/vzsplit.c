@@ -601,8 +601,9 @@ int main(int argc, char **argv)
 	if (low_total == 0)
 		low_total = mem_total;
 	if (mem_total < SYSRSRV) {
-		logger(-1, 0, "At least 128 Mb of RAM should be "
-				"installed on Hardware Node");
+		logger(-1, 0, "At least %d Mb of RAM should be "
+				"installed on Hardware Node",
+				SYSRSRV / 1024 / 1024);
 		exit(1);
 	}
 
