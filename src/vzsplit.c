@@ -475,8 +475,8 @@ int check_disk_space() {
 	}
 	if (rec)
 		logger(-1, 0, "WARNING: Recommended minimal size "
-			"of partition holding %s is 20Gb!",
-				ve_private);
+				"of partition holding %s is %llu Gb!",
+				ve_private, HOST_DS / 1024 / 1024 * 2);
 
 	ve_ds = ds_total / DEF_DS;
 	ve_di = di_total / DEF_DI;
