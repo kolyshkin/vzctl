@@ -90,7 +90,7 @@ static void close_dlib(void *h)
 	dlclose(h);
 }
 
-int add_module(char *fname, struct mod_action *action, const char *name)
+static int add_module(char *fname, struct mod_action *action, const char *name)
 {
 	void *h;
 	void *(*fn) (void);

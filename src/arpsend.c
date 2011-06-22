@@ -119,15 +119,15 @@ struct in_addr zero = {0x00000000};
 
 struct sockaddr_ll iaddr;
 
-char* print_hw_addr(const u_char* addr);
-char* print_ip_addr(const u_char* addr);
-char* print_arp_packet(struct arp_packet* pkt);
-int read_hw_addr(u_char* buf, const char* str);
-int read_ip_addr(struct in_addr* in_addr, const char* str);
+static char* print_hw_addr(const u_char* addr);
+static char* print_ip_addr(const u_char* addr);
+static char* print_arp_packet(struct arp_packet* pkt);
+static int read_hw_addr(u_char* buf, const char* str);
+static int read_ip_addr(struct in_addr* in_addr, const char* str);
 
 char* program_name = NULL;
 
-void usage()
+static void usage()
 {
 	fprintf(stderr, "Usage: %s <-U -i <src_ip_addr> | -D -e <trg_ip_addr> "
 		"[-e <trg_ip_addr>] ...> [-c <count>] [-w <timeout>] "
@@ -135,7 +135,7 @@ void usage()
 	exit(EXC_USAGE);
 }
 
-void parse_options (int argc, char **argv)
+static void parse_options (int argc, char **argv)
 {
 #define read_hw(addr)						\
 	({							\
@@ -274,7 +274,7 @@ void parse_options (int argc, char **argv)
 u_char real_hwaddr[ETH_ALEN];
 struct in_addr real_ipaddr;
 
-int init_device_addresses(int sock, const char* device)
+static int init_device_addresses(int sock, const char* device)
 {
 	struct ifreq ifr;
 	int ifindex;
@@ -340,7 +340,7 @@ int sock;
 /* sent packet */
 struct arp_packet pkt;
 
-void create_arp_packet(struct arp_packet* pkt)
+static void create_arp_packet(struct arp_packet* pkt)
 {
 #define set_ip(to, from) (memcpy(to, from, IP_ADDR_LEN))
 #define set_hw(to, from) (memcpy(to, from, ETH_ALEN))
@@ -378,14 +378,14 @@ void create_arp_packet(struct arp_packet* pkt)
 #undef set_ip
 }
 
-void set_trg_ipaddr(struct arp_packet* pkt, const struct in_addr ipaddr)
+static void set_trg_ipaddr(struct arp_packet* pkt, const struct in_addr ipaddr)
 {
 	memcpy(pkt->rcpt_ip_addr, &ipaddr, IP_ADDR_LEN);
 }
 
 int recv_response = 0;
 
-void finish()
+static void finish()
 {
 	switch (cmd)
 	{
@@ -401,7 +401,7 @@ void finish()
 	}
 }
 
-int recv_pack(void *buf, int len, struct sockaddr_ll *from)
+static int recv_pack(void *buf, int len, struct sockaddr_ll *from)
 {
 	int rc = -1;
 	int i;
@@ -444,7 +444,7 @@ out:
 	return rc;
 }
 
-void sender(void)
+static void sender(void)
 {
 	int i;
 
@@ -470,7 +470,7 @@ void sender(void)
 	alarm(timeout);
 }
 
-void set_signal(int signo, void (*handler)(void))
+static void set_signal(int signo, void (*handler)(void))
 {
 	struct sigaction sa;
 
@@ -538,7 +538,7 @@ static char* get_buf()
 	return buf[num = (num+1) % 10];
 }
 
-char* print_arp_packet(struct arp_packet* pkt)
+static char* print_arp_packet(struct arp_packet* pkt)
 {
 	char* point = get_buf();
 	sprintf(point, "eth '%s' -> eth '%s'; "
@@ -555,7 +555,7 @@ char* print_arp_packet(struct arp_packet* pkt)
 }
 
 /* get MAC address in user form */
-char* print_hw_addr(const u_char* addr)
+static char* print_hw_addr(const u_char* addr)
 {
 	int i;
 	char* point = get_buf();
@@ -569,7 +569,7 @@ char* print_hw_addr(const u_char* addr)
 }
 
 /* get IP address in user form */
-char* print_ip_addr(const u_char* addr)
+static char* print_ip_addr(const u_char* addr)
 {
 	int i;
 	char* point = get_buf();
@@ -583,7 +583,7 @@ char* print_ip_addr(const u_char* addr)
 }
 
 /* Transform user -> computer friendly MAC address */
-int read_hw_addr(u_char* buf, const char* str)
+static int read_hw_addr(u_char* buf, const char* str)
 {
 	int rc = -1;
 	int i;
@@ -618,7 +618,7 @@ out:
 }
 
 /* Transform user -> computer friendly IP address */
-int read_ip_addr(struct in_addr* in_addr, const char* str)
+static int read_ip_addr(struct in_addr* in_addr, const char* str)
 {
 	in_addr->s_addr=inet_addr(str);
 	if(in_addr->s_addr == INADDR_NONE)

@@ -31,13 +31,13 @@
 
 extern int page_size;
 
-void usage(int rc)
+static void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout, "Usage: vzmemcheck [-v] [-A]\n");
 	exit(rc);
 }
 
-void header(int verbose, int param)
+static void header(int verbose, int param)
 {
 	if (param)
 		printf("Output values in Mbytes\n");
@@ -52,7 +52,7 @@ void header(int verbose, int param)
 	return;
 }
 
-int calculate(int numerator, int verbose)
+static int calculate(int numerator, int verbose)
 {
 	struct CRusage rutotal_comm, rutotal_utl;
 	struct CRusage ru_comm, ru_utl;

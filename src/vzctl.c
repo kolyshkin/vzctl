@@ -45,12 +45,12 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p, int argc, char **argv, int skiplock);
 
-void version(FILE *fp)
+static void version(FILE *fp)
 {
 	fprintf(fp, "vzctl version " VERSION "\n");
 }
 
-void usage(int rc)
+static void usage(int rc)
 {
 	struct mod_action mod;
 	FILE *fp = rc ? stderr : stdout;

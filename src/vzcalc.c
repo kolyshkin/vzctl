@@ -26,7 +26,7 @@
 #include "config.h"
 #include "util.h"
 
-void usage(int rc)
+static void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout, "Usage: vzcalc [-v] <veid>\n");
 	exit(rc);
@@ -52,7 +52,7 @@ if (param->name == NULL) { \
 	return ret;
 }
 
-int calculate(int veid, ub_param *ub, int verbose)
+static int calculate(int veid, ub_param *ub, int verbose)
 {
 	ub_param ub_cur;
 	char tmp[STR_SIZE];

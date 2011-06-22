@@ -58,7 +58,7 @@ struct nd_packet {
 	__u8		obits[6];
 };
 
-int init_device_addresses(int sock, const char* device)
+static int init_device_addresses(int sock, const char* device)
 {
 	struct ifreq ifr;
 
@@ -86,7 +86,7 @@ int init_device_addresses(int sock, const char* device)
 int sock;
 struct nd_packet pkt;
 
-void create_nd_packet(struct nd_packet* pkt)
+static void create_nd_packet(struct nd_packet* pkt)
 {
 	pkt->icmp6_type = ND_NEIGHBOR_ADVERT;
 	pkt->icmp6_code = 0;
@@ -102,7 +102,7 @@ void create_nd_packet(struct nd_packet* pkt)
 	memcpy(&pkt->obits, real_hwaddr, 6);
 }
 
-void sender(void)
+static void sender(void)
 {
 	struct sockaddr_in6 to;
 
@@ -121,7 +121,7 @@ void sender(void)
 	}
 }
 
-void usage()
+static void usage()
 {
 	printf(
 "ndsend sends an unsolicited Neighbor Advertisement ICMPv6 multicast packet\n"

@@ -140,7 +140,7 @@ static struct option set_opt[] = {
 	{NULL, 0, NULL, 0}
 };
 
-int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
+static int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 	vps_param *param)
 {
 	int c, ret;
@@ -522,7 +522,7 @@ static int check_set_ugidlimit(unsigned long *cur, unsigned long *old,
 }
 
 /* Check parameters that can't be set on running CT */
-int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
+static int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	vps_res *new_res, vps_res *old_res)
 {
 	int found = 0;

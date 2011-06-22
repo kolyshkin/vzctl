@@ -30,7 +30,7 @@
 const char progname[] = "vzcfgvalidate";
 extern int page_size;
 
-void usage(int rc)
+static void usage(int rc)
 {
 	FILE *fp = rc ? stderr : stdout;
 	fprintf(fp, "Usage: %s [-r|-i] <configfile>\n", progname);
