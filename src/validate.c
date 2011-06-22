@@ -33,31 +33,6 @@
 
 int page_size = -1;
 
-static struct {
-	char *name;
-	int id;
-} validate_act2str[] = {
-	{"none",	ACT_NONE},
-	{"warning",	ACT_WARN},
-	{"error",	ACT_ERROR},
-	{"fix",		ACT_FIX},
-};
-
-int action2id(char *mode)
-{
-	unsigned int i;
-
-	if (mode == NULL)
-		return ACT_NONE;
-	for (i = 0; i < ARRAY_SIZE(validate_act2str); i++) {
-		if (!strcmp(validate_act2str[i].name, mode))
-			return validate_act2str[i].id;
-	}
-	return ACT_NONE;
-}
-
-
-
 static int read_yn()
 {
 	char buf[1024];
@@ -547,19 +522,6 @@ if (ub->name != NULL) {							\
 	return ret;
 }
 
-int vps_validate(vps_res *param, int mode)
-{
-	int ret;
-
-	if (mode == ACT_NONE)
-		return 0;
-	logger(0, 0, "Validating container:");
-	ret  = validate(param, mode == ACT_FIX, 0);
-	if (mode == ACT_ERROR && ret)
-		return VZ_VALIDATE_ERROR;
-	return 0;
-}
-
 int calc_ve_utilization(struct ub_struct *param, struct CRusage *rusage,
 	struct mem_struct *mem, int numerator)
 {
@@ -658,17 +620,6 @@ void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage)
 		rusagetotal->alloc_mem_max_lim = rusage->alloc_mem_max_lim;
 }
 
-static void mul_rusage(struct CRusage *rusage, int k)
-{
-	if (rusage == NULL)
-		return;
-	rusage->low_mem *= k;
-	rusage->total_ram *= k;
-	rusage->mem_swap *= k;
-	rusage->alloc_mem *= k;
-	rusage->alloc_mem_lim *= k;
-	rusage->alloc_mem_max_lim *= k;
-}
 
 void shift_ubs_param(struct ub_struct *param)
 {
@@ -692,160 +643,4 @@ if (param->name != NULL) {						\
 	SHIFTPARAM(dcachesize);
 	SHIFTPARAM(physpages)
 	SHIFTPARAM(numpty)
-}
-
-static int calc_hn_rusage(struct CRusage *ru_comm, struct CRusage *ru_utl)
-{
-	FILE *fd;
-	struct CRusage utl, comm;
-	char str[STR_SIZE];
-	char name[STR_SIZE];
-	const char *fmt;
-	unsigned long held, maxheld, barrier, limit;
-	int found = 0;
-	int id, res;
-	int veid = 0;
-	ub_param ub;
-	struct ub_struct ub_s;
-	struct mem_struct mem;
-	int venum;
-	envid_t *velist;
-
-	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		logger(-1, errno, "Unable to open " PROCUBC);
-		return -1;
-	}
-	if (ru_comm != NULL)
-		memset(ru_comm, 0, sizeof(*ru_comm));
-	if (ru_utl != NULL)
-		memset(ru_utl, 0, sizeof(*ru_utl));
-	memset(&ub, 0, sizeof(ub));
-	memset(&ub_s, 0, sizeof(ub_s));
-	venum = get_running_ve_list(&velist);
-	if (venum < 0) {
-		logger(-1, -venum, "Can't get list of running CTs");
-		return -1;
-	}
-	while (fgets(str, sizeof(str), fd)) {
-		if ((res = sscanf(str, "%d:", &id)) == 1) {
-			fmt =  "%*lu:%s%lu%lu%lu%lu";
-			found = 1;
-			if (veid && ve_in_list(velist, venum, veid)) {
-				if (ru_utl != NULL) {
-					calc_ve_utilization(&ub_s, &utl, &mem, 0);
-					inc_rusage(ru_utl, &utl);
-				}
-				if (ru_comm != NULL) {
-					shift_ubs_param(&ub_s);
-					calc_ve_commitment(&ub_s, &comm, &mem, 0);
-					inc_rusage(ru_comm, &comm);
-				}
-			}
-			veid = id;
-			free_ub_param(&ub_s);
-		} else {
-			fmt = "%s%lu%lu%lu%lu";
-		}
-		if (found) {
-			if ((res = sscanf(str, fmt, name, &held, &maxheld,
-				&barrier, &limit)) != 5)
-			{
-				continue;
-			}
-			if ((res = get_ub_resid(name)) >= 0) {
-				unsigned long *par;
-				par = malloc(sizeof(*par) * 3);
-				par[0] = held;
-				par[1] = barrier;
-				par[2] = limit;
-				add_ub_limit(&ub_s, res, par);
-			}
-		}
-	}
-	/* Last CT in /proc/user_beancounters */
-	if (veid && ve_in_list(velist, venum, veid)) {
-		if (ru_utl != NULL) {
-			calc_ve_utilization(&ub_s, &utl, &mem, 0);
-			inc_rusage(ru_utl, &utl);
-		}
-		if (ru_comm != NULL) {
-			shift_ubs_param(&ub_s);
-			calc_ve_commitment(&ub_s, &comm, &mem, 0);
-			inc_rusage(ru_comm, &comm);
-		}
-		free_ub_param(&ub_s);
-	}
-	fclose(fd);
-	free(velist);
-	return 0;
-}
-
-int check_hn_overcommitment(int veid, struct ub_struct *param,
-	struct ovrc *ovrc)
-{
-	struct CRusage ru_comm;
-	struct CRusage rusage_ve;
-	int actid;
-	int ret = 0;
-	struct mem_struct mem;
-
-	if (param == NULL)
-		return 0;
-	actid = ovrc->action;
-	if (ovrc->action == ACT_NONE)
-		return 0;
-	memset(&ru_comm, 0, sizeof(ru_comm));
-	/* Calculate current HN overcommitment */
-	if (calc_hn_rusage(&ru_comm, NULL))
-		return 0;
-	/* Add CT resource usage */
-	calc_ve_commitment(param, &rusage_ve, &mem, 0);
-	inc_rusage(&ru_comm, &rusage_ve);
-	/* Convert to % */
-	mul_rusage(&ru_comm, 100);
-	if (ovrc->level_low_mem != NULL &&
-		ru_comm.low_mem > *ovrc->level_low_mem)
-	{
-		logger(0, 0, "%s: node is overcommited.",
-				actid == ACT_ERROR ? "Error" : "Warning");
-		logger(0, 0, "\tLow Memory commitment level (%.3f%%)"
-				" exceeds configured (%.3f%%)",
-				ru_comm.low_mem, *ovrc->level_low_mem);
-		ret = 1;
-	}
-	if (ovrc->level_mem_swap != NULL &&
-		ru_comm.mem_swap > *ovrc->level_mem_swap)
-	{
-		if (!ret)
-			logger(0, 0, "%s: node is overcommited.",
-				actid == ACT_ERROR ? "Error" : "Warning");
-		logger(0, 0, "\tMemory and Swap commitment level (%.3f%%)"
-				" exceeds configured (%.3f%%)",
-				ru_comm.mem_swap, *ovrc->level_mem_swap);
-		ret = 1;
-	}
-	if (ovrc->level_alloc_mem != NULL &&
-		ru_comm.alloc_mem > *ovrc->level_alloc_mem)
-	{
-		if (!ret)
-			logger(0, 0, "%s: node is overcommited.",
-				actid == ACT_ERROR ? "Error" : "Warning");
-		logger(0, 0, "\tAllocated Memory commitment level (%.3f%%)"
-				" exceeds configured (%.3f%%)",
-				ru_comm.alloc_mem, *ovrc->level_alloc_mem);
-		ret = 1;
-	}
-	if (ovrc->level_alloc_mem_lim != NULL &&
-		ru_comm.alloc_mem_lim > *ovrc->level_alloc_mem_lim)
-	{
-		if (!ret)
-			logger(0, 0, "%s: node is overcommited.",
-				actid == ACT_ERROR ? "Error" : "Warning");
-		logger(0, 0, "\tTotal Alloc Limit commitment level (%.3f%%)"
-				" exceeds configured (%.3f%%)",
-				ru_comm.alloc_mem_lim,
-				*ovrc->level_alloc_mem_lim);
-		ret = 1;
-	}
-	return actid == ACT_ERROR ? VZ_OVERCOMMIT_ERROR : 0;
 }
