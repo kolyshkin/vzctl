@@ -23,7 +23,7 @@
 
 #include "bitmap.h"
 
-int bitmap_find_first_bit(const unsigned long *maskp, int nmaskbits)
+static int bitmap_find_first_bit(const unsigned long *maskp, int nmaskbits)
 {
 	int i, n;
 	int nmasklongs = BITS_TO_LONGS(nmaskbits);
@@ -44,7 +44,7 @@ int bitmap_find_first_bit(const unsigned long *maskp, int nmaskbits)
 	return i;
 }
 
-int bitmap_find_next_bit(const unsigned long *maskp, int nmaskbits, int offset)
+static int bitmap_find_next_bit(const unsigned long *maskp, int nmaskbits, int offset)
 {
 	int n;
 
@@ -84,7 +84,7 @@ int bitmap_find_first_zero_bit(const unsigned long *maskp, int nmaskbits)
 	return i;
 }
 
-int bitmap_find_next_zero_bit(const unsigned long *maskp,
+static int bitmap_find_next_zero_bit(const unsigned long *maskp,
 			      int nmaskbits, int offset)
 {
 	int n;

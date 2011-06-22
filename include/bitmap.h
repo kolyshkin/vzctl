@@ -70,12 +70,7 @@ static inline void bitmap_clear_bit(int nr, unsigned long *maskp)
 	maskp[BIT_WORD(nr)] &= ~BIT_MASK(nr);
 }
 
-int bitmap_find_first_bit(const unsigned long *maskp, int nmaskbits);
-int bitmap_find_next_bit(const unsigned long *maskp, int nmaskbits, int offset);
 int bitmap_find_first_zero_bit(const unsigned long *maskp, int nmaskbits);
-int bitmap_find_next_zero_bit(const unsigned long *maskp,
-			      int nmaskbits, int offset);
-
 int bitmap_parse(const char *str, unsigned long *maskp, int nmaskbits);
 int bitmap_snprintf(char *buf, unsigned int buflen,
 		    const unsigned long *maskp, int nmaskbits);
