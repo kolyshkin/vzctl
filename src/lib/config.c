@@ -662,8 +662,8 @@ static int store_ub(vps_param *old_p, vps_param *vps_p,
 #define ADD_UB_PARAM(res, id)						\
 if (ub->res != NULL) {							\
 	conf = conf_get_by_id(config, id);				\
-	snprintf(buf, sizeof(buf), "%s=\"%lu:%lu\"", conf->name,	\
-		ub->res[0], ub->res[1]);				\
+	snprintf(buf, sizeof(buf), "%s=\"%s\"", conf->name,		\
+		ubcstr(ub->res[0], ub->res[1]));			\
 	if (add_str_param(conf_h, buf))					\
 		return ERR_NOMEM;					\
 }

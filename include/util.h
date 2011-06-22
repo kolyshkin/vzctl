@@ -64,6 +64,8 @@ void get_osrelease(vps_res *res);
 int get_running_ve_list(envid_t **ves);
 int ve_in_list(envid_t *list, int size, envid_t ve);
 
+const char* ubcstr(unsigned long bar, unsigned long lim);
+
 #define logger_enomem(log_level, err, size, file, line)			\
 	logger(log_level, err, "%s:%i: Can't allocate %lu bytes",	\
 		file, line, (unsigned long)size)

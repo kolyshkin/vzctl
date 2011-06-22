@@ -221,9 +221,10 @@ int lconv(char *name)
 			fprintf(fp, "\n# Secondary parameters\n");
 		else if (i ==LOCKPG)
 			fprintf(fp, "\n# Auxiliary parameters\n");
-		fprintf(fp, "%s=\"%lu:%lu\"\n", ubcnames[i],
-				(unsigned long) params[i].bar,
-				(unsigned long)	params[i].lim);
+		fprintf(fp, "%s=\"%s\"\n",
+				ubcnames[i], ubcstr(
+				(unsigned long)params[i].bar,
+				(unsigned long)params[i].lim));
 	}
 	fprintf(fp, "CPUUNITS=\"%d\"\n", DEF_CPUUNITS);
 	if (name) {

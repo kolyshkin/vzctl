@@ -724,3 +724,27 @@ int ve_in_list(envid_t *list, int size, envid_t ve)
 	return bsearch(&ve, list, size, sizeof(envid_t),
 			envid_sort_fn) != NULL;
 }
+
+
+const char* ubcstr(unsigned long bar, unsigned long lim)
+{
+	static char str[64];
+	char *p = str;
+	char *e = p + sizeof(str) - 1;
+
+#define PRINT_UBC(val) \
+	if (val == LONG_MAX) \
+		p += snprintf(p, e - p, "unlimited"); \
+	else \
+		p += snprintf(p, e - p, "%lu", val)
+
+	PRINT_UBC(bar);
+
+	if (bar == lim)
+		return str;
+
+	*p++=':';
+	PRINT_UBC(lim);
+
+	return str;
+}
