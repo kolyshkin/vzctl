@@ -188,7 +188,7 @@ static int vps_ip_ctl(vps_handler *h, envid_t veid, int op,
 	return ret;
 }
 
-int vps_add_ip(vps_handler *h, envid_t veid,
+static int vps_add_ip(vps_handler *h, envid_t veid,
 	net_param *net, int state)
 {
 	char *str;
@@ -208,7 +208,7 @@ int vps_add_ip(vps_handler *h, envid_t veid,
 	return ret;
 }
 
-int vps_del_ip(vps_handler *h, envid_t veid,
+static int vps_del_ip(vps_handler *h, envid_t veid,
 	net_param *net, int state)
 {
 	char *str;
