@@ -62,8 +62,6 @@ int calc_ve_utilization(struct ub_struct *param, struct CRusage *rusage,
 	struct mem_struct *mem, int numerator);
 int calc_ve_commitment(struct ub_struct *param, struct CRusage *rusage,
 	struct mem_struct *mem, int numerator);
-void add_ubs_limit(struct ub_struct *ubs, int res_id, unsigned long *limit);
-void free_ubs_limit(struct ub_struct *ubs);
 void shift_ubs_param(struct ub_struct *param);
 void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage);
 #endif
