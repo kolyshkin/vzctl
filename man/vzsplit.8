@@ -6,6 +6,7 @@ vzsplit \- generate a sample container configuration file
 .OP -n numve
 .OP -f conf_name
 .OP -s swapsize
+.RB [ -v\ yes | no ]
 .YS
 .SH DESCRIPTION
 The \fBvzsplit\fR utility is used to split the Hardware Node into equal parts.
@@ -36,6 +37,11 @@ standard output. The file created will be named
 .BI -s \ swapsize
 Specify the swap size in Kbytes. If this option is not given,
 the swap size is read from \fB/proc/meminfo\fR.
+.TP
+.BR -v\ yes | no
+Whether to generate VSwap enabled configuration. Default is auto-detect by
+checking if running kernel is VSwap capable; this option overrides
+auto-detection.
 .SH EXIT STATUS
 \fBvzsplit\fR returns 0 upon a successful execution. If anything goes wrong, it
 returns 1.

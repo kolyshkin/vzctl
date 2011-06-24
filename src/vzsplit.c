@@ -154,7 +154,7 @@ struct par_limits params[NUMUBC];
 /* Global variables */
 unsigned long long mem_total, low_total, swap_total, ds_total, di_total;
 long pagesize, proc_calc;
-int num_ve, ve_allowed, osl;
+int num_ve, ve_allowed, osl, vswap;
 
 float	k_kmem[MAX_SL]		= {1, 1.2, 1.8};
 float	k_nproc[MAX_SL]		= {1, 1.5, 2};
@@ -178,10 +178,11 @@ char *level_string[MAX_SL + 1] = {
 static void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout,
-"Usage: vzsplit [-f config_name] [-n num_CTs] [-s swap_size]\n"
+"Usage: vzsplit [-f config_name] [-n num_CTs] [-s swap_size] [-v yes|no]\n"
 "	-f		configuration sample name\n"
 "	-n		number of containers\n"
 "	-s		swap space, Kbytes\n"
+"	-v yes|no	generate VSwap config (overrides auto-detection)\n"
 );
 	exit(rc);
 }
@@ -201,6 +202,12 @@ static void header(FILE *fp)
 	return;
 }
 
+#define PRINT_PARAM(i) \
+	fprintf(fp, "%s=\"%s\"\n", \
+		ubcnames[i], ubcstr( \
+			(unsigned long) params[i].bar, \
+			(unsigned long) params[i].lim) )
+
 static int lconv(char *name)
 {
 	int i;
@@ -216,16 +223,49 @@ static int lconv(char *name)
 	}
 	header(fp);
 
-	fprintf(fp, "# Primary parameters\n");
-	for (i = 0; i < NUMUBC; i++) {
-		if (i == KMEM)
-			fprintf(fp, "\n# Secondary parameters\n");
-		else if (i ==LOCKPG)
-			fprintf(fp, "\n# Auxiliary parameters\n");
-		fprintf(fp, "%s=\"%s\"\n",
-				ubcnames[i], ubcstr(
-				(unsigned long)params[i].bar,
-				(unsigned long)params[i].lim));
+	if (vswap)
+	{
+		unsigned long mem = params[PRIVVMPG].bar;
+
+		fprintf(fp, "\n# This is VSwap-enabled configuration\n\n");
+		fprintf(fp, "PHYSPAGES=\"0:%lu\"\n", mem);
+		fprintf(fp, "SWAPPAGES=\"%lu\"\n", mem * 2);
+		fprintf(fp, "KMEMSIZE=\"%lu:%lu\"\n",
+				(unsigned long) ((double)mem/2./KMEM_DELTA),
+				mem / 2);
+		fprintf(fp, "LOCKEDPAGES=\"%lu\"\n", mem / 2);
+		fprintf(fp,	"\n"
+				"PRIVVMPAGES=\"unlimited\"\n"
+				"SHMPAGES=\"unlimited\"\n"
+				"NUMPROC=\"unlimited\"\n"
+				"VMGUARPAGES=\"0:unlimited\"\n"
+				"OOMGUARPAGES=\"0:unlimited\"\n"
+				"NUMTCPSOCK=\"unlimited\"\n"
+				"NUMFLOCK=\"unlimited\"\n"
+				"NUMPTY=\"unlimited\"\n"
+				"NUMSIGINFO=\"unlimited\"\n"
+				"TCPSNDBUF=\"unlimited\"\n"
+				"TCPRCVBUF=\"unlimited\"\n"
+				"OTHERSOCKBUF=\"unlimited\"\n"
+				"DGRAMRCVBUF=\"unlimited\"\n"
+				"NUMOTHERSOCK=\"unlimited\"\n"
+				"DCACHESIZE=\"unlimited\"\n"
+				"NUMFILE=\"unlimited\"\n"
+				"NUMIPTENT=\"unlimited\"\n"
+				"\n");
+		PRINT_PARAM(DISKSPACE);
+		PRINT_PARAM(DISKINODES);
+	}
+	else {
+		fprintf(fp, "# Primary parameters\n");
+		for (i = 0;  i < NUMUBC; i++) {
+			if (i == KMEM)
+				fprintf(fp, "\n# Secondary parameters\n");
+			else if (i ==LOCKPG)
+				fprintf(fp, "\n# Auxiliary parameters\n");
+
+			PRINT_PARAM(i);
+		}
 	}
 	fprintf(fp, "CPUUNITS=\"%d\"\n", DEF_CPUUNITS);
 	if (name) {
@@ -530,8 +570,24 @@ int main(int argc, char **argv)
 
 	init_log(NULL, 0, 1, 0, 0, "vzsplit");
 
-	while ((opt = getopt(argc, argv, "f:n:s:h")) > 0) {
+	vswap = is_vswap_mode();
+
+	while ((opt = getopt(argc, argv, "f:n:s:h:v:")) > 0) {
 		switch(opt) {
+		case 'v':
+			switch (yesno2id(optarg)) {
+				case YES:
+					vswap = 1;
+					break;
+				case NO:
+					vswap = 0;
+					break;
+				default:
+					logger(-1, 0, "Invalid argument "
+							"for -v: %s", optarg);
+					usage(1);
+			}
+			break;
 		case 'f':
 			len = strlen(optarg) + strlen(VPS_CONF_DIR) +
 				strlen("ve-.conf-sample");
