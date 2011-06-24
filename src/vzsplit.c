@@ -549,13 +549,13 @@ int main(int argc, char **argv)
 			if (*tail != '\0') {
 				logger(-1, 0, "Invalid argument "
 						"for -n: %s", optarg);
-				exit(1);
+				usage(1);
 			}
 			break;
 		case 's':
 			if (optarg[0] == '-') {
 				logger(-1, 0, "Negative value for -s");
-				exit(-1);
+				usage(1);
 			}
 			swp = 1;
 			swap_total = strtoll(optarg, &tail, 10);
@@ -563,7 +563,7 @@ int main(int argc, char **argv)
 			if (*tail != '\0') {
 				logger(-1, 0, "Invalid argument "
 						"for -s: %s", optarg);
-				exit(1);
+				usage(1);
 			}
 			break;
 		case 'h':
