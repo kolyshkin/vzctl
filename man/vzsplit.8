@@ -15,9 +15,11 @@ the total physical memory of the Hardware Node the utility runs on, and
 the number of containers the Hardware Node shall be able
 to run even if the given number of containers consume all
 the resources available.
+.P
 Without any option given, \fBvzsplit\fR prompts for the desired number
 of containers and outputs the resulting resource control
 parameters to stdout.
+.P
 If there are not enough system resources to run the specified number of
 containers, an appropriate message is shown and the sample configuration file
 is not generated.
@@ -27,7 +29,8 @@ is not generated.
 Specify the number of containers.
 .TP
 .BI -f \ conf_name
-Specify the configuration file name. The program output is placed to
+Specify the configuration sample name to write configuration to, instead of
+standard output. The file created will be named
 /etc/vz/conf/ve-\fIconf_name\fR.conf-sample.
 .TP
 .BI -s \ swapsize
