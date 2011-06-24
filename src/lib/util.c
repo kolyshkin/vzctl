@@ -725,7 +725,6 @@ int ve_in_list(envid_t *list, int size, envid_t ve)
 			envid_sort_fn) != NULL;
 }
 
-
 const char* ubcstr(unsigned long bar, unsigned long lim)
 {
 	static char str[64];
@@ -747,4 +746,9 @@ const char* ubcstr(unsigned long bar, unsigned long lim)
 	PRINT_UBC(lim);
 
 	return str;
+}
+
+int is_vswap_mode(void)
+{
+	return (access("/proc/vz/vswap", F_OK) == 0);
 }
