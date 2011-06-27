@@ -271,16 +271,23 @@ int yesno2id(const char *str)
 	return -1;
 }
 
+int get_addr_family(const char *addr)
+{
+	if (strchr(addr, ':'))
+		return AF_INET6;
+	else
+		return AF_INET;
+}
+
 int get_netaddr(const char *ip_str, void *ip)
 {
-	if (strchr(ip_str, ':')) {
-		if (inet_pton(AF_INET6, ip_str, ip) <= 0)
-			return -1;
-		return AF_INET6;
-	}
-	if (inet_pton(AF_INET, ip_str, ip) <= 0)
+	int family;
+
+	family = get_addr_family(ip_str);
+
+	if (inet_pton(family, ip_str, ip) <= 0)
 		return -1;
-	return AF_INET;
+	return family;
 }
 
 char *subst_VEID(envid_t veid, char *src)

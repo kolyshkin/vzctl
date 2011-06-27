@@ -328,7 +328,7 @@ static int remove_ipv6_addr(net_param *net)
 
 	cnt = 0;
 	list_for_each_safe(ip, tmp, head, list) {
-		if (strchr(ip->val, ':')) {
+		if (get_addr_family(ip->val) == AF_INET6) {
 			free(ip->val);
 			list_del(&ip->list);
 			free(ip);
@@ -396,10 +396,12 @@ static int get_vps_ip_proc(envid_t veid, list_head_t *ip_h)
 		if (token == NULL)
 			break;
 		while ((token = strtok(NULL, " \t\n")) != NULL) {
-			if (strchr(token, ':') &&
+			/* Canonicalize IPv6 addresses */
+			if ((get_addr_family(token) == AF_INET6) &&
 			    inet_pton(AF_INET6, token, data) > 0 &&
 			    !inet_ntop(AF_INET6, data, token, strlen(token)+1))
 				break;
+
 			if (add_str_param(ip_h, token)) {
 				free_str_param(ip_h);
 				cnt = -1;
