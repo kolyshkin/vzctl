@@ -705,20 +705,14 @@ static int parse_cap(char *str, cap_param *cap)
 	unsigned long *mask;
 
 	for_each_strtok(token, str, "\t ") {
-		if ((p = strrchr(token, ':')) == NULL) {
-			logger(-1, 0, "Invalid syntaxes in %s:"
-				" capname:on|off", token);
-			return ERR_INVAL;
-		}
+		if ((p = strrchr(token, ':')) == NULL)
+			goto err;
 		if (!strcmp(p + 1, "off"))
 			mask = &cap->off;
 		else if (!strcmp(p + 1, "on"))
 			mask = &cap->on;
-		else {
-			logger(-1, 0, "Invalid syntaxes in %s:"
-				" capname:on|off", token);
-			return ERR_INVAL;
-		}
+		else
+			goto err;
 		len = p - token;
 		strncpy(cap_nm, token,
 			len < sizeof(cap_nm) ? len : sizeof(cap_nm));
@@ -730,6 +724,10 @@ static int parse_cap(char *str, cap_param *cap)
 	}
 
 	return 0;
+err:
+	logger(-1, 0, "Can't parse capability %s (expecting capname:on|off)",
+			token);
+	return ERR_INVAL;
 }
 
 static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
