@@ -140,10 +140,10 @@ int add_str_param(list_head_t *head, const char *str)
 
 	if (str == NULL)
 		return 0;
-	if (list_is_init(head))
-		list_head_init(head);
 	if ((str_p = new_str_struct(str)) == NULL)
 		return -1;
+	if (list_is_init(head))
+		list_head_init(head);
 	list_add_tail(&str_p->list, head);
 
 	return 0;
@@ -156,12 +156,12 @@ int add_str_param2(list_head_t *head, char *str)
 
 	if (str == NULL)
 		return 0;
-	if (list_is_init(head))
-		list_head_init(head);
 	str_p = malloc(sizeof(*str_p));
 	if (str_p == NULL)
 		return -1;
 	str_p->val = str;
+	if (list_is_init(head))
+		list_head_init(head);
 	list_add_tail(&str_p->list, head);
 
 	return 0;

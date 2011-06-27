@@ -146,11 +146,11 @@ int add_dev_param(dev_param *dev, dev_res *res)
 {
 	dev_res *tmp;
 
-	if (list_is_init(&dev->dev))
-		list_head_init(&dev->dev);
 	tmp = malloc(sizeof(*tmp));
 	if (tmp == NULL)
 		return -1;
+	if (list_is_init(&dev->dev))
+		list_head_init(&dev->dev);
 	memcpy(tmp, res, sizeof(*tmp));
 	list_add_tail(&tmp->list, &dev->dev);
 	res->name = NULL;

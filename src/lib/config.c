@@ -818,7 +818,6 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t ip;
 	int ret;
 
-	list_head_init(&ip);
 	if (conf->id != PARAM_IP_ADD)
 		return 0;
 	if (!vps_p->res.net.delall &&
@@ -827,6 +826,7 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	{
 		return 0;
 	}
+	list_head_init(&ip);
 	merge_str_list(vps_p->res.net.delall, &old_p->res.net.ip,
 		&vps_p->res.net.ip, &vps_p->del_res.net.ip, &ip);
 	ret = conf_store_strlist(conf_h, conf->name, &ip, 1);
@@ -869,7 +869,6 @@ static int store_netdev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t dev;
 	int ret;
 
-	list_head_init(&dev);
 	if (conf->id != PARAM_NETDEV_ADD)
 		return 0;
 	if (list_empty(&vps_p->res.net.dev) &&
@@ -877,6 +876,7 @@ static int store_netdev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	{
 		return 0;
 	}
+	list_head_init(&dev);
 	merge_str_list(0, &old_p->res.net.dev, &vps_p->res.net.dev,
 		 &vps_p->del_res.net.dev, &dev);
 	ret = conf_store_strlist(conf_h, conf->name, &dev, 1);

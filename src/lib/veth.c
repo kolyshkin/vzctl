@@ -268,12 +268,12 @@ int add_veth_param(veth_param *veth, veth_dev *dev)
 {
 	veth_dev *tmp;
 
-	if (list_is_init(&veth->dev))
-		list_head_init(&veth->dev);
 	tmp = malloc(sizeof(*tmp));
 	if (tmp == NULL)
 		return -1;
 	memcpy(tmp, dev, sizeof(*tmp));
+	if (list_is_init(&veth->dev))
+		list_head_init(&veth->dev);
 	list_add_tail(&tmp->list, &veth->dev);
 
 	return 0;
