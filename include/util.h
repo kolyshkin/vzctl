@@ -44,6 +44,7 @@ unsigned long min_ul(unsigned long val1, unsigned long val2);
 int yesno2id(const char *str);
 int get_addr_family(const char *addr);
 int get_netaddr(const char *ip_str, void *ip);
+char *canon_ip(const char *str);
 char *subst_VEID(envid_t veid, char *src);
 int get_pagesize();
 int get_mem(unsigned long long *mem);

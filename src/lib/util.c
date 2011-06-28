@@ -290,6 +290,53 @@ int get_netaddr(const char *ip_str, void *ip)
 	return family;
 }
 
+static inline int max_netmask(int family)
+{
+	if (family == AF_INET)
+		return 32;
+	else if (family == AF_INET6)
+		return 128;
+	else
+		return -1;
+}
+
+/* Check and "canonicalize" an IP address with optional netmask
+ * (in CIDR notation). Basically */
+char *canon_ip(const char *str)
+{
+	const char *ipstr, *maskstr;
+	int mask, family;
+	unsigned int ip[4];
+	static char dst[INET6_ADDRSTRLEN + sizeof("/128")];
+
+	maskstr = strchr(str, '/');
+	if (maskstr) {
+		ipstr = strndupa(str, maskstr - str);
+		maskstr++;
+	}
+	else {
+		ipstr = str;
+	}
+	family = get_netaddr(ipstr, ip);
+	if (family < 0)
+		return NULL;
+	if ((inet_ntop(family, ip, dst, sizeof(dst))) == NULL)
+		return NULL;
+
+	if (maskstr == NULL)
+		goto out;
+
+	/* Parse netmask */
+	if (parse_int(maskstr, &mask) != 0)
+		return NULL;
+	if (mask > max_netmask(family) || mask < 0)
+		return NULL;
+	sprintf(dst + strlen(dst), "/%d", mask);
+
+out:
+	return dst;
+}
+
 char *subst_VEID(envid_t veid, char *src)
 {
 	char *srcp;

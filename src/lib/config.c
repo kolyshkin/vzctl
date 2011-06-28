@@ -752,28 +752,10 @@ static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 /********************** Network ************************/
 
-static int check_ip_dot(char *ip)
-{
-	int i;
-	char *str = ip;
-	char *p;
-
-	for (i = 0; i < 5; i++) {
-		if ((p = strchr(str, '.')) == NULL)
-			break;
-		str = p + 1;
-	}
-	if (i != 3)
-		return VZ_BADIP;
-	return 0;
-}
-
 static int parse_ip(vps_param *vps_p, char *val, int id)
 {
 	char *token;
-	char dst[INET6_ADDRSTRLEN];
-	unsigned char ip[sizeof(struct in6_addr)];
-	int family;
+	char *dst;
 	net_param *net;
 
 	if (id == PARAM_IP_ADD)
@@ -795,13 +777,8 @@ static int parse_ip(vps_param *vps_p, char *val, int id)
 			continue;
 		if (!strcmp(token, "::0"))
 			continue;
-		if (!strchr(token, ':')) {
-			if (check_ip_dot(token))
-				return ERR_INVAL;
-		}
-		if ((family = get_netaddr(token, ip)) < 0)
-			return ERR_INVAL;
-		if (inet_ntop(family, ip, dst, sizeof(dst)) == NULL)
+		dst = canon_ip(token);
+		if (dst == NULL)
 			return ERR_INVAL;
 		if (!find_ip(&net->ip, dst))
 			add_str_param(&net->ip, dst);
