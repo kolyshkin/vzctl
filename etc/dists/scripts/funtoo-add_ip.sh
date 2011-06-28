@@ -46,7 +46,7 @@ function comment_line_regex()
 		mv -f ${IFCFG}.$$ ${IFCFG} 2>/dev/null
 	if [ $? -ne 0 ]; then
 		rm -f ${IFCFG}.$$ 2>/dev/null
-		error "Failed to comment ${1}: unable to create ${IFCFG}."
+		error "Failed to comment ${1}: unable to create ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
 	fi
 }
 
@@ -90,7 +90,7 @@ function add_ip()
 			return 0
 		fi
 	fi
-	
+
 	local ips=""
 	if [ "${VENET_DEV}" = "venet0" ]
 	then
