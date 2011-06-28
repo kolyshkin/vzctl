@@ -1,4 +1,4 @@
-.TH ndsend 8 "4 May 2011" "OpenVZ" "Containers"
+.TH ndsend 8 "28 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
 ndsend \- send a Neighbor Advertisement NDP packet
 .SH SYNOPSIS
@@ -25,7 +25,9 @@ System error
 To send a Neighbor Advertisement ICMPv6 on interface \fBeth0\fR with IPv6
 address \fB2001:DB8::1\fR:
 .PP
-\fB\f(CWndsend 2001:DB8::1 eth0\fR
+.EX
+   ndsend 2001:DB8::1 eth0
+.EE
 .SH SEE ALSO
 .BR arpsend (8),
 .BR vzctl (8).
