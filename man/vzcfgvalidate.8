@@ -1,8 +1,12 @@
-.TH vzcfgvalidate 8 "6 Jun 2011" "OpenVZ" "Containers"
+.TH vzcfgvalidate 8 "28 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
 vzcfgvalidate \- validate a container configuration file
 .SH SYNOPSIS
-vzcfgvalidate [\fB-r\fR | \fB-i\fR] \fIconfigfile\fR
+.SY vzcfgvalidate
+.OP -r
+.OP -i
+.I configfile
+.YS
 .SH DESCRIPTION
 This utility checks validity of resource control parameters in a container
 configuration file \fIconfigfile\fR. Some of the User Beancounter
@@ -13,10 +17,10 @@ There are three severity levels in the output: Error, Warning,
 and Recommendation.
 .SH OPTIONS
 .TP
-\fB-r\fR
+.B \-r
 Repair mode (corrects \fIconfigfile\fR).
 .TP
-\fB-i\fR
+.B \-i
 Interactive repair mode.
 .SH EXIT STATUS
 Normally, exit status is 0. On program execution error, exit status is 1.
