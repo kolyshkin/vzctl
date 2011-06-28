@@ -1,36 +1,48 @@
-.TH arpsend 8 "27 Apr 2011" "OpenVZ" "Containers"
+.TH arpsend 8 "28 Jun 2011" "OpenVZ" "Containers"
 .SH NAME
 arpsend \- send ARP requests
 .SH SYNOPSIS
-arpsend < \fB-U\fR \fB-i\fR\ \fIsource_ip\fR |\ \fB-D\fR
-\fB-e\fR\ \fItarget_ip\fR [\fB-e\fR\ \fItarget_ip\fR]\ ... >
-[\fB-c\fR \fIcount\fR] [\fB-w\fR \fItimeout\fR]
-\fIinterface\fR
+.SY arpsend
+.B -D
+.BI \-e\  target_ip
+[
+.BI \-e\  target_ip \fR\ ...]
+.OP \-c count
+.OP \-w timeout
+.I interface
+.YS
+.SY arpsend
+.B \-U
+.BI \-i\  source_ip
+.OP \-c count
+.OP \-w timeout
+.I interface
+.YS
 .SH DESCRIPTION
 Utility \fBarpsend\fR sends ARP packets on device \fIinterface\fR to detect
 or update neighbours' ARP caches with a given IP.
 .SH COMMANDS
 Run utility with one of the following commands:
 .TP
-\fB-D\fR
+.B \-D
 Send broadcast ARP request to detect neighbours with
 \fItarget_ip\fR. You have to specify \fItarget_ip\fR (\fB-e\fR option).
 .TP
-\fB-U\fR
+.B \-U
 Send broadcast ARP request to update neighbours' ARP caches with
 \fIsource_ip\fR. You have to specify \fIsource_ip\fR (\fB-i\fR option).
 .SH OPTIONS
 .TP
-\fB-c\fR \fIcount\fR
+.BI \-c\ count
 Number of packets to send. Default is infinity.
 .TP
-\fB-w\fR \fIinterval\fR
+.BI \-w\ interval
 Interval between packets, in seconds. Default is 1 second.
 .TP
-\fB-i\fR \fIsource_ip_address\fR
+.BI \-i\ source_ip_address
 Set source IP address field in ARP packet.
 .TP
-\fB-e\fR \fItarget_ip_address\fR
+.BI \-e\ target_ip_address
 Set target IP address field in ARP packet. Note that you can specify
 \fB-e\fR option multiple times to detect many IP addresses in one utility call.
 .SH EXIT STATUS
@@ -43,19 +55,23 @@ System error
 .IP "3	EXC_RECV"
 ARP reply was received
 .SH EXAMPLES
-To send request on interface \fIeth0\fR to detect any neighbour
-computers with IP \fI192.168.10.200\fR:
-.br
-\f(CW	arpsend -D -e 192.168.10.200 eth0\fR
-.P
-To send request on interface \fIeth0\fR to update neighbours'
-ARP caches with IP \fI192.168.10.200\fR:
-.br
-\f(CW	arpsend -U -i 192.168.10.200 eth0\fR
+To send request on interface \fBeth0\fR to detect any neighbour
+computers with IP \fB192.168.10.200\fR:
+.PP
+.EX
+   arpsend -D -e 192.168.10.200 eth0\fR
+.EE
+.PP
+To send request on interface \fBeth0\fR to update neighbours'
+ARP caches with IP \fB192.168.10.200\fR:
+.PP
+.EX
+   arpsend -U -i 192.168.10.200 eth0
+.EE
 .SH NOTES
 Interface you use have to be arpable and not be loopback (i.e.
 \fB/sbin/ip link show \fIinterface\fR should show neither \fBNOARP\fR
-not \fBLOOPBACK\fR flags in interface parameters).
+nor \fBLOOPBACK\fR flags in interface parameters).
 .SH SEE ALSO
 .BR vzctl (8).
 .SH LICENSE
