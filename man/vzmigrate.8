@@ -1,4 +1,4 @@
-.TH vzmigrate 8 "6 Jul 2010" "OpenVZ" "Containers"
+.TH vzmigrate 8 "28 Jun 2011" "OpenVZ" "Containers"
 
 .SH NAME
 vzmigrate \- migrate a container between two OpenVZ servers
@@ -61,17 +61,17 @@ its progress.  Multiple \fB-v\fR options increase the verbosity.
 The maximum is 3.
 
 .SH EXAMPLES
-Migration of CT #101 to \fI192.168.1.130\fR with downtime:
-.br
-\f(CR	vzmigrate 192.168.1.130 101
-\fR
-.br
+Migration of CT #101 to \fB192.168.1.130\fR with downtime:
+.PP
+.EX
+   vzmigrate 192.168.1.130 101
+.EE
 
-Online migration of CT #102 to \fI192.168.1.130\fR:
-.br
-\f(CR	vzmigrate --online 192.168.1.130 102
-\fR
-
+Online migration of CT #102 to \fB192.168.1.130\fR:
+.PP
+.EX
+   vzmigrate --online 192.168.1.130 102
+.EE
 .SH EXIT STATUS
 .TP
 .B 0 EXIT_OK
@@ -107,7 +107,6 @@ on the destination node.
 .TP
 .B 13 EXIT_QUOTA
 Operation with CT quota failed.
-
 
 .SH SEE ALSO
 .BR rsync (1).
