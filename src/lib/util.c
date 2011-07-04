@@ -147,27 +147,29 @@ int make_dir(char *path, int full)
 int parse_int(const char *str, int *val)
 {
 	char *tail;
+	long res;
 
-	errno = 0;
-	*val = (int)strtol(str, (char **)&tail, 10);
-	if (*tail != '\0' || errno == ERANGE)
+	res = strtol(str, &tail, 10);
+	if (*tail != '\0' || res < INT_MIN || res > INT_MAX)
 		return 1;
+	*val = (int)res;
 	return 0;
 }
 
 int parse_ul(const char *str, unsigned long *val)
 {
 	char *tail;
+	unsigned long res;
 
 	if (!strcmp(str, "unlimited")) {
 		*val = LONG_MAX;
 		return 0;
 	}
 
-	errno = 0;
-	*val = (int)strtoul(str, (char **)&tail, 10);
-	if (*tail != '\0' || errno == ERANGE)
+	res = strtoul(str, &tail, 10);
+	if (*tail != '\0' || res > LONG_MAX)
 		return ERR_INVAL;
+	*val = res;
 	return 0;
 }
 
