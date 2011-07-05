@@ -26,7 +26,7 @@ function remove_all_ve_aliases()
 	local ve_if_name
 	local ve_if
 
-	ve_if_name=`grep "^venet0_" ${CFGFILE}.bak | cut -d'=' -f1`
+	ve_if_name=`grep "^${VENET_DEV}_" ${CFGFILE}.bak | cut -d'=' -f1`
 
 	for ve_if in ${ve_if_name}; do
 	    /etc/rc.d/network ifdown ${ve_if} 2>/dev/null
@@ -44,10 +44,10 @@ function setup_network()
     fi
 
     # create venet0 and routes
-    if ! grep -qe "^venet0=" ${CFGFILE}.bak 2>/dev/null; then
-	put_param "${CFGFILE}.bak" "venet0" "venet0 127.0.0.1 netmask 255.255.255.255 broadcast 0.0.0.0"
-	add_param3 "${CFGFILE}.bak" "INTERFACES" "venet0"
-	put_param "${CFGFILE}.bak" "rt_default" "default dev venet0"
+    if ! grep -qe "^${VENET_DEV}=" ${CFGFILE}.bak 2>/dev/null; then
+	put_param "${CFGFILE}.bak" "${VENET_DEV}" "${VENET_DEV} 127.0.0.1 netmask 255.255.255.255 broadcast 0.0.0.0"
+	add_param3 "${CFGFILE}.bak" "INTERFACES" "${VENET_DEV}"
+	put_param "${CFGFILE}.bak" "rt_default" "default dev ${VENET_DEV}"
 	add_param3 "${CFGFILE}.bak" "ROUTES" "rt_default"
     fi
 }
