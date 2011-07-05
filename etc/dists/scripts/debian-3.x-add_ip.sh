@@ -127,7 +127,6 @@ function get_free_aliasid()
 function add_ip()
 {
 	local ip
-	local found
 	local add
 	local iface
 
@@ -152,7 +151,6 @@ function add_ip()
 	if [ -n "${IP_ADDR}" ]; then
 		cp -f ${CFGFILE} ${CFGFILE}.bak
 		for ip in ${IP_ADDR}; do
-			found=
 			if grep -w "${ip}" >/dev/null 2>&1 ${CFGFILE}.bak; then
 				continue
 			fi
