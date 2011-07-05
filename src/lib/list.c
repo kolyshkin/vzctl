@@ -214,6 +214,8 @@ int __merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	if (!delall && !list_empty(old)) {
 		/* add old values */
 		list_for_each(str, old, list) {
+			if (find_fn(add, str->val))
+				continue;
 			if (find_fn(del, str->val))
 				continue;
 			add_str_param(merged, str->val);
@@ -221,8 +223,6 @@ int __merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	}
 	if (!list_empty(add)) {
 		list_for_each(str, add, list) {
-			if (find_fn(merged, str->val))
-				continue;
 			if (find_fn(del, str->val))
 				continue;
 			add_str_param(merged, str->val);
