@@ -78,6 +78,7 @@ function add_ip()
 {
 	local ip
 	local ifnum=-1
+	local found
 
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		init_config
