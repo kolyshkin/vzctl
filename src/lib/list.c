@@ -172,7 +172,7 @@ char *find_str(list_head_t *head, const char *val)
 	str_param *str;
 
 	if (list_empty(head))
-		return 0;
+		return NULL;
 	list_for_each(str, head, list) {
 		if (!strcmp(str->val, val))
 			return str->val;
