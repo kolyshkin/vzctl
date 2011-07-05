@@ -222,7 +222,9 @@ the container to be restarted in order to take effect.
 .SS3 Networking
 .TP
 \fB--ipadd\fR \fIaddr\fR
-Adds IP address to a given container. Note that this option is incremental, so
+Adds an IP address \fIaddr\fR to a given container. Address can optionally
+have a netmask specified in the CIDR notation (e.g. \fB10.1.2.3/25\fR).
+Note that this option is incremental, so
 \fIaddr\fR are added to already existing ones.
 .TP
 \fB--ipdel\fR \fIaddr\fR | \fBall\fR
