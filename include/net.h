@@ -67,7 +67,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		net_param *net_add, net_param *net_del);
 
-int find_ip(list_head_t *ip_h,  char *ipaddr);
+char *find_ip(list_head_t *ip_h,  const char *ipaddr);
 
 /** Obtain list of IP addresses belonging to the CT.
  *

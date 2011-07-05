@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -43,17 +43,38 @@
 #include "vps_configure.h"
 
 
-int find_ip(list_head_t *ip_h, char *ipaddr)
+char *find_ip(list_head_t *ip_h, const char *ipaddr)
 {
 	ip_param *ip;
+	char *slash, *ip_slash, *ip_only;
+	int len;
 
 	if (list_empty(ip_h))
-		return 0;
-	list_for_each(ip, ip_h, list) {
-		if (!strcmp(ip->val, ipaddr))
-			return 1;
+		return NULL;
+
+	slash = strchr(ipaddr, '/');
+	if (slash) {
+		len = slash - ipaddr + 1;
+		ip_slash = strndupa(ipaddr, len);
+		ip_only = strndupa(ipaddr, len - 1);
 	}
-	return 0;
+	else {
+		ip_only = NULL;
+		len = asprintf(&ip_slash, "%s/", ipaddr);
+	}
+
+	list_for_each(ip, ip_h, list) {
+		/* Match complete IP or IP/mask string */
+		if (!strcmp(ip->val, ipaddr))
+			return ip->val;
+		/* Match only IP */
+		if ((ip_only != NULL) && (!strcmp(ip->val, ip_only)))
+			return ip->val;
+		/* Match IP/ (same IP, different mask) */
+		if (!strncmp(ip->val, ip_slash, len))
+			return ip->val;
+	}
+	return NULL;
 }
 
 static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
