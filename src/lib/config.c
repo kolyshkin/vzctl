@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@
 #include "meminfo.h"
 #include "vzfeatures.h"
 #include "io.h"
+#include "net.h"
 
 static int _page_size;
 static int check_name(char *name);
@@ -802,7 +803,7 @@ static int store_ip(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		return 0;
 	}
 	list_head_init(&ip);
-	merge_str_list(vps_p->res.net.delall, &old_p->res.net.ip,
+	merge_ip_list(vps_p->res.net.delall, &old_p->res.net.ip,
 		&vps_p->res.net.ip, &vps_p->del_res.net.ip, &ip);
 	ret = conf_store_strlist(conf_h, conf->name, &ip, 1);
 	free_str_param(&ip);

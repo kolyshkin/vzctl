@@ -77,6 +77,12 @@ char *find_ip(list_head_t *ip_h, const char *ipaddr)
 	return NULL;
 }
 
+int merge_ip_list(int delall, list_head_t *old, list_head_t *add,
+		list_head_t *del, list_head_t *merged)
+{
+	return __merge_str_list(delall, old, add, del, merged, find_ip);
+}
+
 static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
 			  unsigned int *ip, int family)
 {

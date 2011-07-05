@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -68,6 +68,8 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		net_param *net_add, net_param *net_del);
 
 char *find_ip(list_head_t *ip_h,  const char *ipaddr);
+int merge_ip_list(int delall, list_head_t *old, list_head_t *add,
+	list_head_t *del, list_head_t *merged);
 
 /** Obtain list of IP addresses belonging to the CT.
  *
