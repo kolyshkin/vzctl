@@ -55,10 +55,11 @@ function setup_network()
 function create_config()
 {
 	local ip=$1
-	local ifnum=$2
+	local netmask=$2
+	local ifnum=$3
 	# add venet0 alias to rc.conf
 	put_param "${CFGFILE}.bak" "${VENET_DEV}_${ifnum}" \
-		"${VENET_DEV}:${ifnum} ${ip} netmask 255.255.255.255 broadcast 0.0.0.0"
+		"${VENET_DEV}:${ifnum} ${ip} netmask ${netmask} broadcast 0.0.0.0"
 
 	# add venet0 alias to INTERFACES array
 	add_param3 "${CFGFILE}.bak" "INTERFACES" "${VENET_DEV}_${ifnum}"
@@ -86,8 +87,7 @@ function get_free_aliasid()
 
 function add_ip()
 {
-	local ip
-	local found
+	local ipm
 	local add
 	local iface
 
@@ -99,13 +99,13 @@ function add_ip()
 
 	setup_network
 
-	for ip in ${IP_ADDR}; do
-		found=
-		if grep -e "\\<${ip}\\>" >/dev/null 2>&1  ${CFGFILE}.bak; then
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if grep -e "\\<${_IP}\\>" >/dev/null 2>&1  ${CFGFILE}.bak; then
 			continue
 		fi
 		get_free_aliasid
-		create_config ${ip} ${IFNUM}
+		create_config "${_IP}" "${_NETMASK}" "${IFNUM}"
 	done
 
 	mv -f ${CFGFILE}.bak ${CFGFILE}

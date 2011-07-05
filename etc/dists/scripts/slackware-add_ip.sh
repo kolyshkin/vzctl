@@ -47,13 +47,14 @@ function setup_network()
 function create_config()
 {
 	local ip=${1}
+	local netmask=${2}
 
 	echo "# /etc/rc.d/rc.inet1.conf
 #
 # This file contains the configuration settings for network interfaces.
 
 IPADDR[0]=\"${ip}\"
-NETMASK[0]=\"255.255.255.255\"
+NETMASK[0]=\"${netmask}\"
 
 # Default gateway IP address:
 GATEWAY=\"${FAKEGATEWAY}\"
@@ -66,14 +67,16 @@ function add_ip()
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		setup_network
 	fi
-	for ip in ${IP_ADDR}; do
+	local ipm
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
 		if [ "${IPDELALL}" != "yes" ]; then
-			if grep -qw "${ip}" ${IFCFG} 2>/dev/null; then
+			if grep -qw "${_IP}" ${IFCFG} 2>/dev/null; then
 				break
 			fi
 		fi
 		${IFCFG_DIR}/rc.inet1 stop >/dev/null 2>&1
-		create_config ${ip}
+		create_config ${_IP} ${_NETMASK}
 		${IFCFG_DIR}/rc.inet1 start >/dev/null 2>&1
 		break
 	done

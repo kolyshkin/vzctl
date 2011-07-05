@@ -82,7 +82,7 @@ function init_netconfig()
 
 function add_ip()
 {
-	local ip
+	local ipm
 	if [ "x${VE_STATE}" = "xstarting" -o "x${IPDELALL}" = "xyes" ]; then
 		init_netconfig
 		if [ "x${IPDELALL}" = "xyes" ]; then
@@ -97,9 +97,9 @@ function add_ip()
 		ips="127.0.0.1/32"
 		put_param "${IFCFG}" "route" "default dev venet0"
 	fi
-	for ip in ${IP_ADDR}; do
-		if [ "${ip#*:}" = "$ip" ]; then nm=32; else nm=0; fi
-		ips="$ips $ip/$nm"
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		ips="$ips $_IP/$_MASK"
 	done
 	put_param "${IFCFG}" "template" "interface"
 	put_param "${IFCFG}" "ipaddrs" "$ips"

@@ -108,7 +108,7 @@ function move_configs()
 
 function add_ip()
 {
-	local ip
+	local ipm
 	local new_ips
 	local if_restart=
 
@@ -125,19 +125,21 @@ function add_ip()
 	new_ips="${IP_ADDR}"
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		new_ips=
-		for ip in ${IP_ADDR}; do
-			get_aliasid_by_ip "${ip}"
+		for ipm in ${IP_ADDR}; do
+			ip_conv $ipm
+			get_aliasid_by_ip "${_IP}"
 			if [ -n "${IFNUM}" ]; then
 				# ip already exists just create it in bak
-				create_config "${ip}" "${IFNUM}"
+				create_config "${_IP}" "${IFNUM}"
 			else
-				new_ips="${new_ips} ${ip}"
+				new_ips="${new_ips} ${ipm}"
 			fi
 		done
 	fi
-	for ip in ${new_ips}; do
+	for ipm in ${new_ips}; do
+		ip_conv $ipm
 		get_free_aliasid
-		create_config "${ip}" "${IFNUM}"
+		create_config "${_IP}" "${IFNUM}"
 	done
 	move_configs
 	if [ "x${VE_STATE}" = "xrunning" ]; then

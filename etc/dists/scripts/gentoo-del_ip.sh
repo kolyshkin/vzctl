@@ -37,13 +37,14 @@ function is_baselayout1()
 
 function del_ip()
 {
-	local ip
-	for ip in ${IP_ADDR}; do
-		if grep -qw "${ip}" ${CFGFILE}; then
+	local ipm
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if grep -qw "${_IP}/${_MASK}" ${CFGFILE}; then
 			if ! is_baselayout1 ; then
-				del_param "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
+				del_param "${CFGFILE}" "config_${VENET_DEV}" "${_IP}/${_MASK}"
 			else
-				del_param3 "${CFGFILE}" "config_${VENET_DEV}" "${ip}/32"
+				del_param3 "${CFGFILE}" "config_${VENET_DEV}" "${_IP}/${_MASK}"
 			fi
 			if [ "x${VE_STATE}" = "xrunning" ]; then
 				/etc/init.d/net.${VENET_DEV} restart >/dev/null 2>&1

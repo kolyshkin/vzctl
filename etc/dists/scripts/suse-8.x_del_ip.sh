@@ -23,7 +23,7 @@ IFCFG_DIR=/etc/sysconfig/network/
 
 function del_ip()
 {
-	local ip
+	local ipm
 	local filetodel
 	local file
 	local aliasid
@@ -35,9 +35,10 @@ function del_ip()
 		rm -f ${VENET_DEV_CFG} ${VENET_DEV_CFG}:* >/dev/null 2>&1
 		return 0;
 	fi
-	for ip in ${IP_ADDR}; do
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
 		# find and delete a file with this alias
-		filetodel=`grep -l "IPADDR=${ip}$" \
+		filetodel=`grep -l "IPADDR=${_IP}$" \
 			${VENET_DEV_CFG}:* 2>/dev/null`
 		for file in ${filetodel}; do
 			rm -f "${file}"

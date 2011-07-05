@@ -362,3 +362,44 @@ function change_hostname()
 	fi
 	mv -f ${cfg}.$$ ${cfg}
 }
+
+function cidr2mask() {
+	local i mask=""
+	local full_octets=$(($1/8))
+	local partial_octet=$(($1%8))
+
+	for i in 0 1 2 3; do
+		if [ $i -lt $full_octets ]; then
+			mask="${mask}255"
+		elif [ $i -eq $full_octets ]; then
+			mask="${mask}$((256 - (1 << (8 - $partial_octet))))"
+		else
+			mask="${mask}0"
+		fi
+		test $i -lt 3 && mask="${mask}."
+	done
+
+	echo $mask
+}
+
+function ip_conv() {
+	local ipm=$1
+	_IP=${ipm%%/*}
+	_MASK=''
+	_NETMASK=''
+	_IPV6ADDR=''
+	if if [ "${_IP#*:}" != "${_IP}" ]; then
+		_IPV6_ADDR=yes
+	fi
+	if echo "${ipm}" | grep -q '/'; then
+		_MASK=${ipm##*/}
+	else
+		if [ -z "$IPV6_ADDR" ]; then
+			_MASK=24
+		else
+			_MASK=128
+		fi
+	fi
+	echo $ipm | grep -q ':' && return
+	_NETMASK=$(cidr2mask $_MASK)
+}

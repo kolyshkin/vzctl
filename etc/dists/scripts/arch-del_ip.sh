@@ -24,11 +24,12 @@ CFGFILE=/etc/rc.conf
 function del_ip()
 {
 	local ifname
-	local ip
+	local ipm
 
 	echo ${IP_ADDR}
-	for ip in ${IP_ADDR}; do
-		ifname=`grep -B 1 -e "\\<${ip}\\>" ${CFGFILE} |
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		ifname=`grep -B 1 -e "\\<${_IP}\\>" ${CFGFILE} |
 			grep "${VENET_DEV}_" | cut -d'=' -f1`
 		if [ -n "${ifname}" ]; then
 		    # shutdown interface venet0_x

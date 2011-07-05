@@ -26,7 +26,7 @@ IFCFG=${IFCFG_DIR}${VENET_DEV_CFG}
 # Function to delete IP address for RedHat like systems
 function del_ip()
 {
-	local ip
+	local ipm
 	local filetodel
 	local file
 	local aliasid
@@ -39,15 +39,16 @@ function del_ip()
 		del_param ${IFCFG} IPV6ADDR_SECONDARIES ""
 		return 0;
 	fi
-	for ip in ${IP_ADDR}; do
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
 		# IPV6 processing
-		if [ "${ip#*:}" != "${ip}" ]; then
-			del_param ${IFCFG} IPV6ADDR_SECONDARIES "${ip}\\/128"
-			ifconfig ${VENET_DEV} del ${ip}/128
+		if [ -n "$_IPV6ADDR" ]; then
+			del_param ${IFCFG} IPV6ADDR_SECONDARIES "${_IP}\\/${_MASK}"
+			ifconfig ${VENET_DEV} del ${_IP}/${_MASK}
 			continue
 		fi
 		# find and delete a file with this alias
-		filetodel=`grep -l "IPADDR=${ip}$" \
+		filetodel=`grep -l "IPADDR=${_IP}$" \
 			${VENET_DEV_CFG}:* 2>/dev/null`
 		for file in ${filetodel}; do
 			rm -f "${file}"
@@ -57,7 +58,7 @@ function del_ip()
 			fi
 		done
 		# Even if file not found, try to delete IP
-		for aliasid in $(ifconfig | grep -B1 "\\<inet addr:${ip}\\>" |
+		for aliasid in $(ifconfig | grep -B1 "\\<inet addr:${_IP}\\>" |
 				awk "/^${VENET_DEV}:/ {print \$1}"); do
 			ifconfig ${aliasid} down >/dev/null 2>&1
 		done

@@ -89,18 +89,20 @@ iface venet0 inet6 static
 function create_config()
 {
 	local ip=$1
-	local ifnum=$2
+	local netmask=$2
+	local mask=$3
+	local ifnum=$4
 
 	if [ "${ip#*:}" = "${ip}" ]; then
 	    echo "auto ${VENET_DEV}:${ifnum}
 iface ${VENET_DEV}:${ifnum} inet static
 	address ${ip}
-	netmask 255.255.255.255
+	netmask ${netmask}
 	broadcast 0.0.0.0
 " >> ${CFGFILE}.bak
 
 	else
-	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}\/0/" ${CFGFILE}.bak
+	    sed -i -e "s/netmask\ 128/netmask\ 128\n\tup ifconfig venet0 add ${ip}\/${mask}/" ${CFGFILE}.bak
 	fi
 
 }
@@ -126,7 +128,7 @@ function get_free_aliasid()
 
 function add_ip()
 {
-	local ip
+	local ipm
 	local add
 	local iface
 
@@ -150,12 +152,13 @@ function add_ip()
 	fi
 	if [ -n "${IP_ADDR}" ]; then
 		cp -f ${CFGFILE} ${CFGFILE}.bak
-		for ip in ${IP_ADDR}; do
-			if grep -w "${ip}" >/dev/null 2>&1 ${CFGFILE}.bak; then
+		for ipm in ${IP_ADDR}; do
+			ip_conv $ipm
+			if grep -w "${_IP}" >/dev/null 2>&1 ${CFGFILE}.bak; then
 				continue
 			fi
 			get_free_aliasid
-			create_config ${ip} ${IFNUM}
+			create_config "${_IP}" "${_NETMASK}" "${_MASK}" "${IFNUM}"
 		done
 		mv -f ${CFGFILE}.bak ${CFGFILE}
 	fi

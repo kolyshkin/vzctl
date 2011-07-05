@@ -22,11 +22,12 @@ IFCFG=/etc/rc.d/rc.inet1.conf
 
 function del_ip()
 {
-	local ip
+	local ipm
 
 	[ -f ${IFCFG}  ] || return 0
-	for ip in ${IP_ADDR}; do
-		if grep -wq "${ip}" ${IFCFG} 2>/dev/null; then
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if grep -wq "${_IP}" ${IFCFG} 2>/dev/null; then
 			/etc/rc.d/rc.inet1 stop
 			break
 		fi

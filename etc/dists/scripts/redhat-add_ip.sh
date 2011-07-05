@@ -86,13 +86,14 @@ function setup6_network()
 function create_config()
 {
 	local ip=$1
-	local ifnum=$2
+	local netmask=$2
+	local ifnum=$3
 	local file=${IFCFG_DIR}/bak/${VENET_DEV_CFG}:${ifnum}
 
 	echo "DEVICE=${VENET_DEV}:${ifnum}
 ONBOOT=yes
 IPADDR=${ip}
-NETMASK=255.255.255.255" > $file ||
+NETMASK=${netmask}" > $file ||
 	error "Can't write to file $file" ${VZ_FS_NO_DISK_SPACE}
 }
 
@@ -101,8 +102,8 @@ function add_ip6()
 	[ "${IPV6}" != "yes" ] && return
 	if ! grep -qw "$1" ${IFCFG} 2>/dev/null; then
 		setup6_network
-		add_param ${IFCFG} IPV6ADDR_SECONDARIES "$1/128"
-		ifconfig ${VENET_DEV} add "$1/128"
+		add_param ${IFCFG} IPV6ADDR_SECONDARIES "$1/$2"
+		ifconfig ${VENET_DEV} add "$1/$2"
 	fi
 }
 
@@ -162,7 +163,7 @@ function move_configs()
 
 function add_ip()
 {
-	local ip
+	local ipm
 	local new_ips
 	local if_restart=
 
@@ -184,25 +185,27 @@ function add_ip()
 	new_ips="${IP_ADDR}"
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		new_ips=
-		for ip in ${IP_ADDR}; do
-			get_aliasid_by_ip "${ip}"
+		for ipm in ${IP_ADDR}; do
+			ip_conv $ipm
+			get_aliasid_by_ip "${_IP}"
 			if [ -n "${IFNUM}" ]; then
 				# ip already exists just create it in bak
-				create_config "${ip}" "${IFNUM}"
+				create_config "${_IP}" "${_NETMASK}" "${IFNUM}"
 			else
-				new_ips="${new_ips} ${ip}"
+				new_ips="${new_ips} ${ipm}"
 			fi
 		done
 	fi
-	for ip in ${new_ips}; do
-		if [ "${ip#*:}" = "${ip}" ]; then
+	for ipm in ${new_ips}; do
+		ip_conv $ipm
+		if [ -z "$_IPV6ADDR" ]; then
 			get_free_aliasid
-			create_config "${ip}" "${IFNUM}"
+			create_config "${_IP}" "${_NETMASK}" "${IFNUM}"
 		else
 			if [ "x${IPDELALL}" = "xyes" ]; then
 				del_param ${IFCFG} IPV6ADDR_SECONDARIES ""
 			fi
-			add_ip6 "${ip}"
+			add_ip6 "${_IP}" "${_MASK}"
 		fi
 	done
 	move_configs

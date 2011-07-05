@@ -77,9 +77,10 @@ setup_network()
 create_alias()
 {
 	local ip="$1"; shift
+	local mask="$1"; shift
 	local ifnum="$1"; shift
 
-	echo "$ip/32 label $VENET_DEV:$ifnum" >>".tmp/$VENET_DEV/ipv4address" ||
+	echo "$ip/$mask label $VENET_DEV:$ifnum" >>".tmp/$VENET_DEV/ipv4address" ||
 		error "Cannot create .tmp/$VENET_DEV/ipv4address" ${VZ_FS_NO_DISK_SPACE}
 }
 
@@ -121,10 +122,11 @@ add_ip()
 	if [ $# -gt 0 ]; then
 		backup_configs
 
-		local i=0 ip
-		for ip; do
+		local i=0 ipm
+		for ipm; do
+			ip_conv $ipm
 			i="$(find_unused_alias "$(($i+1))")"
-			create_alias "$ip" "$i"
+			create_alias "$_IP" "$_MASK" "$i"
 		done
 
 		move_configs

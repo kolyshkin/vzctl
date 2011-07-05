@@ -31,10 +31,11 @@ CFGFILE=/etc/conf.d/netif.${VENET_DEV}
 
 function del_ip()
 {
-	local ip
-	for ip in ${IP_ADDR}; do
-		if grep -qw "${ip}" ${CFGFILE}; then
-			del_param "${CFGFILE}" "ipaddrs" "${ip}/32"
+	local ipm
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if grep -qw "${_IP}" ${CFGFILE}; then
+			del_param "${CFGFILE}" "ipaddrs" "${_IP}/${_MASK}"
 			if [ "x${VE_STATE}" = "xrunning" ]; then
 				/etc/init.d/netif.${VENET_DEV} restart >/dev/null 2>&1
 			fi

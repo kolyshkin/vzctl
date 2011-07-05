@@ -55,7 +55,8 @@ function get_net_ids()
 
 function add_ip()
 {
-	local ip netconfig aliasid
+	local ip ipm id netconfig aliasid
+	local IP_NUM=0
 
 	# In case we are starting CT
 	if [ "x$VE_STATE" = "xstarting" -o "${IPDELALL}" = "yes" ]; then
@@ -64,22 +65,22 @@ function add_ip()
 		get_net_ids
 	fi
 	# create NETCONFIG, IPADDR_x, NETDEV_x and IFCONFIG_x strings
-	let IP_NUM=0
 	# Get last id
 	for id in ${NETCONFIG_ID}; do
 		netconfig="${netconfig} _${id}"
 		IP_NUM=${id}
 	done
 	# create appropriate records for each given IP addr
-	for ip in ${IP_ADDR}; do
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
 		aliasid=${IP_NUM}
 		let IP_NUM=IP_NUM+1
 		# build 'IPADDR_x' records
-		put_param ${CFGFILE} IPADDR_${IP_NUM} "${ip}"
+		put_param ${CFGFILE} IPADDR_${IP_NUM} "${_IP}"
 		# build 'NETDEV_x' records
 		put_param ${CFGFILE} NETDEV_${IP_NUM} "venet0:${aliasid}"
 		# build 'IFCONFIG_x' records
-		put_param ${CFGFILE} IFCONFIG_${IP_NUM} "${ip} up"
+		put_param ${CFGFILE} IFCONFIG_${IP_NUM} "${_IP} up"
 		netconfig="${netconfig} _${IP_NUM}"
 	done
 	put_param ${CFGFILE} NETCONFIG "${netconfig}"

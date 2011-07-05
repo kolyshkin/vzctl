@@ -76,7 +76,7 @@ LABEL_${ifnum}=${ifnum}" >> ${IFCFG} ||
 
 function add_ip()
 {
-	local ip
+	local ipm
 	local ifnum=-1
 	local found
 
@@ -89,9 +89,10 @@ function add_ip()
 	fi
 
 	get_aliases
-	for ip in ${IP_ADDR}; do
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
 		found=
-		if grep -q -w "${ip}" ${IFCFG}; then
+		if grep -q -w "${_IP}" ${IFCFG}; then
 			continue
 		fi
 		while test -z ${found}; do
@@ -100,7 +101,7 @@ function add_ip()
 				found=1
 			fi
 		done
-		create_config ${ip} ${ifnum}
+		create_config ${_IP} ${ifnum}
 	done
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		ifdown $VENET_DEV  >/dev/null 2>&1

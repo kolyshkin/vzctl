@@ -25,12 +25,12 @@ CFGFILE=/etc/network/interfaces
 function del_ip()
 {
 	local ifname
-	local ip
+	local ipm
 
-	for ip in ${IP_ADDR}; do
-		if [ "${ip#*:}" = "${ip}" ]; then
-
-		    ifname=`grep -B 1 -w "${ip}" ${CFGFILE} |
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if [ -z "$_IPV6ADDR ]; then
+		    ifname=`grep -B 1 -w "${_IP}" ${CFGFILE} |
 				grep "${VENET_DEV}:" | cut -d' ' -f2`
 		    if [ -n "${ifname}" ]; then
 				ifdown "${ifname}" 2>/dev/null
@@ -38,8 +38,8 @@ function del_ip()
 		    fi
 
 		else
-		    grep -v ${ip} ${CFGFILE} > ${CFGFILE}.bak
-		    ifconfig ${VENET_DEV} del ${ip}/0
+		    grep -v ${_IP} ${CFGFILE} > ${CFGFILE}.bak
+		    ifconfig ${VENET_DEV} del ${_IP}/${_MASK}
 		    mv ${CFGFILE}.bak ${CFGFILE}
 		fi
 	done

@@ -56,11 +56,12 @@ del_ip()
 		return 0
 	fi
 
-	local ip quoted
-	for ip; do
-		quoted="$(quote_sed_regexp "$ip")"
-		sed -i -e "/^$quoted\/32/d" "$VENET_DEV/ipv4address"
-		ip addr del dev "$VENET_DEV" "$ip/32"
+	local ipm quoted
+	for ipm; do
+		ip_conv $ipm
+		quoted="$(quote_sed_regexp "$_IP/$_MASK")"
+		sed -i -e "/^$quoted/d" "$VENET_DEV/ipv4address"
+		ip addr del dev "$VENET_DEV" "$_IP/$_MASK"
 	done
 
 	if [ $# -gt 0 -a -d /etc/hooks/del_ip.d ] &&
