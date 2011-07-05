@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -203,8 +203,9 @@ int add_str2list(list_head_t *head, const char *val)
 	return ret;
 }
 
-int merge_str_list(int delall, list_head_t *old, list_head_t *add,
-	list_head_t *del, list_head_t *merged)
+int __merge_str_list(int delall, list_head_t *old, list_head_t *add,
+	list_head_t *del, list_head_t *merged,
+	char* (*find_fn)(list_head_t*, const char*))
 {
 	str_param *str;
 
@@ -213,19 +214,25 @@ int merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	if (!delall && !list_empty(old)) {
 		/* add old values */
 		list_for_each(str, old, list) {
-			if (find_str(del, str->val))
+			if (find_fn(del, str->val))
 				continue;
 			add_str_param(merged, str->val);
 		}
 	}
 	if (!list_empty(add)) {
 		list_for_each(str, add, list) {
-			if (find_str(merged, str->val))
+			if (find_fn(merged, str->val))
 				continue;
-			if (find_str(del, str->val))
+			if (find_fn(del, str->val))
 				continue;
 			add_str_param(merged, str->val);
 		}
 	}
 	return 0;
+}
+
+int merge_str_list(int delall, list_head_t *old, list_head_t *add,
+		list_head_t *del, list_head_t *merged)
+{
+	return __merge_str_list(delall, old, add, del, merged, find_str);
 }

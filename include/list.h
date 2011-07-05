@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -133,6 +133,9 @@ int add_str2list(list_head_t *head, const char *val);
 void free_str_param(list_head_t *head);
 int copy_str_param(list_head_t *dst, list_head_t *src);
 char *find_str(list_head_t *head, const char *val);
+int __merge_str_list(int delall, list_head_t *old, list_head_t *add,
+	list_head_t *del, list_head_t *merged,
+	char* (*find_fn)(list_head_t*, const char*));
 int merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	list_head_t *del, list_head_t *merged);
 int list_size(list_head_t *head);
