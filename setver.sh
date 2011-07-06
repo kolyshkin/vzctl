@@ -4,7 +4,7 @@
 GIT_DESC=$(git describe --tags | sed s'/^[^0-9]*-\([0-9].*\)$/\1/')
 GIT_V=$(echo $GIT_DESC | sed 's/-.*$//')
 				# 3.0.28-1-gf784152
-GIT_R=$(echo $GIT_DESC | sed 's/^[^-]*-\([1-9][0-9]*\)-g/git.\1./')
+GIT_R=$(echo $GIT_DESC | sed 's/^[^-]*-\([1-9][0-9]*\)-g/\1.git./')
 test "$GIT_V" = "$GIT_R" && GIT_R="1"
 GIT_VR="${GIT_V}-${GIT_R}"
 
