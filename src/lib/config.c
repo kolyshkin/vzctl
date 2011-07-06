@@ -975,6 +975,16 @@ static int parse_dev_perm(const char *str, unsigned int *perms)
 	return 0;
 }
 
+/* Do not allow devices with specific majors */
+static int dev_major_denied(int major)
+{
+	/* loop device */
+	if (major == 7)
+		return 1;
+
+	return 0;
+}
+
 static int parse_devices_str(const char *str, dev_res *dev)
 {
 	int minor, major;
@@ -984,6 +994,8 @@ static int parse_devices_str(const char *str, dev_res *dev)
 
 	if (sscanf(str, "%c:%d:%15[^:]:%5s",
 			&type, &major, minor_str, mode) != 4)
+		return -1;
+	if (dev_major_denied(major))
 		return -1;
 	memset(dev, 0, sizeof(*dev));
 	if (type == 'b')
@@ -1122,6 +1134,12 @@ static int parse_devnodes_str(const char *str, dev_res *dev)
 		dev->type = S_IFBLK;
 	else {
 		logger(-1, 0, "The %s is not block or character device", buf);
+		goto err;
+	}
+	if (dev_major_denied(major(st.st_rdev))) {
+		logger(-1, 0, "Device %s is not allowed "
+				"to be assigned to a CT",
+				dev->name);
 		goto err;
 	}
 	dev->dev = st.st_rdev;
