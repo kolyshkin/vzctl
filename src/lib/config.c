@@ -977,30 +977,30 @@ static int parse_dev_perm(const char *str, unsigned int *perms)
 
 static int parse_devices_str(const char *str, dev_res *dev)
 {
-	unsigned long val, major;
-	char type[2];
-	char minor[32];
-	char mode[3];
+	int minor, major;
+	char type;
+	char minor_str[16];
+	char mode[6];
 
-	if (sscanf(str, "%1[^:]:%lu:%16[^:]:%2s",
-			type, &major, minor, mode) != 4)
+	if (sscanf(str, "%c:%d:%15[^:]:%5s",
+			&type, &major, minor_str, mode) != 4)
 		return -1;
 	memset(dev, 0, sizeof(*dev));
-	if (!strcmp(type, "b"))
+	if (type == 'b')
 		dev->type = S_IFBLK;
-	else if (!strcmp(type, "c"))
+	else if (type == 'c')
 		dev->type = S_IFCHR;
 	else
 		return -1;
-	if (!strcmp(minor, "all")) {
+	if (!strcmp(minor_str, "all")) {
 		dev->use_major = VE_USE_MAJOR;
 		dev->type |= VE_USE_MAJOR;
 		dev->dev = makedev(major, 0);
 	} else {
 		dev->type |= VE_USE_MINOR;
-		if (parse_ul(minor, &val))
+		if (parse_int(minor_str, &minor))
 			return -1;
-		dev->dev = makedev(major, val);
+		dev->dev = makedev(major, minor);
 	}
 	if (parse_dev_perm(mode, &dev->mask) != 0)
 		return -1;
