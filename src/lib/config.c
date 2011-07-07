@@ -975,6 +975,20 @@ static int parse_dev_perm(const char *str, unsigned int *perms)
 	return 0;
 }
 
+static const char* devperm2str(unsigned long perms)
+{
+	static char mask[4];
+	int i=0;
+	if (perms & S_IROTH)
+		mask[i++] = 'r';
+	if (perms & S_IWOTH)
+		mask[i++] = 'w';
+	if (perms & S_IXGRP)
+		mask[i++] = 'q';
+	mask[i] = 0;
+	return mask;
+}
+
 /* Do not allow devices with specific majors */
 static int dev_major_denied(int major)
 {
@@ -1036,20 +1050,6 @@ static int parse_dev(vps_param *vps_p, char *val)
 	}
 
 	return 0;
-}
-
-static const char* devperm2str(unsigned long perms)
-{
-	static char mask[4];
-	int i=0;
-	if (perms & S_IROTH)
-		mask[i++] = 'r';
-	if (perms & S_IWOTH)
-		mask[i++] = 'w';
-	if (perms & S_IXGRP)
-		mask[i++] = 'q';
-	mask[i] = 0;
-	return mask;
 }
 
 static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
