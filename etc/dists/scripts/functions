@@ -388,7 +388,7 @@ function ip_conv() {
 	_MASK=''
 	_NETMASK=''
 	_IPV6ADDR=''
-	if if [ "${_IP#*:}" != "${_IP}" ]; then
+	if [ "${_IP#*:}" != "${_IP}" ]; then
 		_IPV6_ADDR=yes
 	fi
 	if echo "${ipm}" | grep -q '/'; then
