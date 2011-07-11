@@ -883,7 +883,9 @@ Here is an example of a mount script, which makes host system's
    # Source both files. Note the order is important.
    . /etc/vz/vz.conf
    . $VE_CONFFILE
-   mount -n --bind /mnt/disk $VE_ROOT/mnt/disk
+   SRC=/mnt/disk
+   DST=/mnt/disk
+   mount -n -t simfs $SRC ${VE_ROOT}${DST} -o $SRC
 .EE
 .SH EXIT STATUS
 Returns 0 upon success, or an appropriate error code in case of an error:
