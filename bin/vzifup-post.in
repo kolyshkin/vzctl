@@ -1,9 +1,9 @@
 #!/bin/bash
-# Copyright (C) 2008-2010, Parallels, Inc. All rights reserved.
+# Copyright (C) 2008-2011, Parallels, Inc. All rights reserved.
 #
 # Update ARP table for all containers on interface up
 
-[ ! -f /proc/vz/veinfo ] && exit 0
+[ ! -f /proc/vz/veip ] && exit 0
 
 usage()
 {
