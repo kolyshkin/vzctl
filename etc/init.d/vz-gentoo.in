@@ -45,8 +45,28 @@ check_config() {
 	return 0
 }
 
+mount_cgroups()
+{
+	local g
+	for g in beancounter container fairsched ; do
+		if [ -d /proc/vz/$g ]; then
+			mount -t cgroup $g /proc/vz/$g -o name=$g 2>/dev/null
+		fi
+	done
+}
+
+umount_cgroups()
+{
+	local g
+	for g in beancounter container fairsched ; do
+		umount /proc/vz/$g 2>/dev/null
+	done
+}
+
 setup_ve0() {
 	local msg ve0conf="${VPSCONFDIR}/0.conf"
+
+	mount_cgroups
 
 	msg=$(${VZCTL} set 0 --cpuunits ${VE0CPUUNITS} 2>&1)
 	[ $? -ne 0 ] && ewarn "vzctl set 0 --cpuunits ${VE0CPUUNITS} failed: ${msg}"
@@ -293,6 +313,7 @@ stop() {
 	local mod
 
 	stop_ve
+	umount_cgroups
 	stop_net
 
 	for mod in ${MIGRATE_MODULES}; do

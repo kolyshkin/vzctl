@@ -118,6 +118,24 @@ check_kernel_config()
 	fi
 }
 
+mount_cgroups()
+{
+	local g
+	for g in beancounter container fairsched ; do
+		if [ -d /proc/vz/$g ]; then
+			mount -t cgroup $g /proc/vz/$g -o name=$g 2>/dev/null
+		fi
+	done
+}
+
+umount_cgroups()
+{
+	local g
+	for g in beancounter container fairsched ; do
+		umount /proc/vz/$g 2>/dev/null
+	done
+}
+
 get_parallel()
 {
 	[ -n "${PARALLEL}" ] && return
@@ -222,6 +240,8 @@ stop_net()
 
 setup_ve0()
 {
+	mount_cgroups
+
 	if test -z "${VE0CPUUNITS}"; then
 		echo "Warning: VE0CPUUNITS is not set in ${VZCONF}; using value of 1000"
 		VE0CPUUNITS=1000
@@ -452,6 +472,7 @@ stop()
 	fi
 
 	stop_ves
+	umount_cgroups
 	stop_net
 	__echo "Stopping OpenVZ: "
 	for mod in ${MODULES_OTHER} ${MODULES} ${PRELOAD_MODULES} ${IPT_MODULES} ${VZFS_MODULES}; do
