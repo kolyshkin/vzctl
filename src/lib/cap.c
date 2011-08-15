@@ -38,6 +38,9 @@
 #ifndef	CAP_VE_ADMIN
 #define	CAP_VE_ADMIN	30
 #endif
+#ifndef	CAP_SETFCAP
+#define	CAP_SETFCAP	31
+#endif
 
 #define CAPDEFAULTMASK	(CAP_TO_MASK(CAP_CHOWN)		| \
 	CAP_TO_MASK(CAP_DAC_OVERRIDE)			| \
@@ -62,7 +65,8 @@
 	CAP_TO_MASK(CAP_MKNOD)				| \
 	CAP_TO_MASK(CAP_LEASE)				| \
 	CAP_TO_MASK(CAP_VE_ADMIN)			| \
-	CAP_TO_MASK(CAP_SETVEID))
+	CAP_TO_MASK(CAP_SETVEID))			| \
+	CAP_TO_MASK(CAP_SETFCAP)
 
 static char *cap_names[] = {
 "CHOWN",		/*	0	*/
@@ -96,6 +100,7 @@ static char *cap_names[] = {
 "LEASE",		/*	28	*/
 "SETVEID",		/*	29	*/
 "VE_ADMIN",		/*	30	*/
+"SETFCAP",		/*	31	*/
 
 "FS_MASK"		/*	0x1f	*/
 };
