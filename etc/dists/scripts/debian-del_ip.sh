@@ -1,5 +1,5 @@
-#!/bin/bash
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#!/bin/sh
+#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ VENET_DEV=venet0
 CFGFILE=/etc/network/interfaces
 
 # Function to delete IP address for Debian template
-function del_ip()
+del_ip()
 {
 	local ifname
 	local ipm

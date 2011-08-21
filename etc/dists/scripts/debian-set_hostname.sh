@@ -1,5 +1,5 @@
-#!/bin/bash
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#!/bin/sh
+#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #
 # Sets hostname in a container running Debian-like distro.
 
-function set_hostname()
+set_hostname()
 {
 	local cfgfile=$1
 	local hostname=$2
