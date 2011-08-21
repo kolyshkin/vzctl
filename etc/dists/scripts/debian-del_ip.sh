@@ -29,7 +29,7 @@ function del_ip()
 
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
-		if [ -z "$_IPV6ADDR ]; then
+		if [ -z "$_IPV6ADDR" ]; then
 		    ifname=`grep -B 1 -w "${_IP}" ${CFGFILE} |
 				grep "${VENET_DEV}:" | cut -d' ' -f2`
 		    if [ -n "${ifname}" ]; then
