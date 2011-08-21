@@ -25,12 +25,12 @@
 
 function randcrontab()
 {
-	local file=${VE_ROOT}"/etc/crontab"
+	local file
+	for file in ${VE_ROOT}/etc/crontab ${VE_ROOT}/etc/cron.d/*; do
+		[ -f "${file}" ] || continue
 
-	[ -f "${file}" ] || return 0
-
-	/bin/cp -fp ${file} ${file}.$$
-	cat ${file} | awk '
+		/bin/cp -fp ${file} ${file}.$$
+		cat ${file} | awk '
 BEGIN { srand(); }
 {
 	if ($0 ~ /^[ \t]*#/ || $0 ~ /^[ \t]+*$/) {
@@ -61,9 +61,9 @@ BEGIN { srand(); }
 		line = line " "  ar[i];
 	}
 	print line;
-}
-' > ${file}.$$ && /bin/mv -f ${file}.$$ ${file}
-	/bin/rm -f ${file}.$$ 2>/dev/null
+}' >		${file}.$$ && /bin/mv -f ${file}.$$ ${file}
+		/bin/rm -f ${file}.$$ 2>/dev/null
+	done
 }
 
 function disableroot()
