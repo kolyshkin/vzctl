@@ -1,5 +1,5 @@
-#!/bin/bash
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#!/bin/sh
+#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ FAKEGATEWAYNET=192.0.2.0
 #   $2 - exit code
 # Example of usage:
 #   error "Fatal error" 1
-function error()
+error()
 {
 	# print errors to stdout too
 	ERR=$?
@@ -57,7 +57,7 @@ function error()
 # $1 - config file
 # $2 - NAME
 # $3 - value
-function put_param()
+put_param()
 {
 	local file="$1"
 	local name="$2"
@@ -88,7 +88,7 @@ function put_param()
 # $1 - config file
 # $2 - NAME
 # $3 - value
-function add_param()
+add_param()
 {
 	local file=$1
 	local name=$2
@@ -113,7 +113,7 @@ function add_param()
 	fi
 }
 
-function del_param()
+del_param()
 {
 	local file=$1
 	local name=$2
@@ -148,12 +148,12 @@ function del_param()
 # $1 - config file
 # $2 - NAME
 # $3 - value
-function put_param2()
+put_param2()
 {
 	local file="$1"
 	local name="$2"
 	local value="$3"
-	local path;
+	local path
 
 	path=${file%/*}
 	if [ ! -d "${path}" ]; then
@@ -180,7 +180,7 @@ function put_param2()
 # $1 - config file
 # $2 - NAME
 # $3 - value
-function put_param3() {
+put_param3() {
 	local file=$1
 	local name=$2
 	local value=$3
@@ -218,7 +218,7 @@ function put_param3() {
 # $1 - config file
 # $2 - NAME
 # $3 - value
-function add_param3() {
+add_param3() {
 	local file=$1
 	local name=$2
 	local value=$3
@@ -248,7 +248,7 @@ function add_param3() {
 # $1 - config file
 # $2 - NAME
 # $3 - value
-function del_param3() {
+del_param3() {
 	local file=$1
 	local name=$2
 	local value=$3
@@ -268,7 +268,7 @@ function del_param3() {
 	fi
 }
 
-function remove_debian_interface()
+remove_debian_interface()
 {
 	local dev="$1"
 	local cfg="$2"
@@ -287,7 +287,7 @@ function remove_debian_interface()
 	rm -f ${cfg}.$$ 2>/dev/null
 }
 
-function change_hostname()
+change_hostname()
 {
 	local cfg="$1"
 	local host="$2"
@@ -363,7 +363,7 @@ function change_hostname()
 	mv -f ${cfg}.$$ ${cfg}
 }
 
-function cidr2mask() {
+cidr2mask() {
 	local i mask=""
 	local full_octets=$(($1/8))
 	local partial_octet=$(($1%8))
@@ -382,7 +382,7 @@ function cidr2mask() {
 	echo $mask
 }
 
-function ip_conv() {
+ip_conv() {
 	local ipm=$1
 	_IP=${ipm%%/*}
 	_MASK=''
