@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 # 3. Seeds /etc/hosts with localhost entries for IPv4 and IPv6
 # 4. Creates empty /etc/resolv.conf
 
-function randcrontab()
+randcrontab()
 {
 	local file
 	for file in ${VE_ROOT}/etc/crontab ${VE_ROOT}/etc/cron.d/*; do
@@ -66,7 +66,7 @@ BEGIN { srand(); }
 	done
 }
 
-function disableroot()
+disableroot()
 {
 	local file=${VE_ROOT}"/etc/passwd"
 
@@ -79,7 +79,7 @@ function disableroot()
 	fi
 }
 
-function set_network()
+set_network()
 {
 	local file=${VE_ROOT}"/etc/hosts"
 	if ! grep -qw '127.0.0.1' ${file} 2>/dev/null; then
