@@ -223,8 +223,6 @@ int __merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	}
 	if (!list_empty(add)) {
 		list_for_each(str, add, list) {
-			if (find_fn(del, str->val))
-				continue;
 			add_str_param(merged, str->val);
 		}
 	}
