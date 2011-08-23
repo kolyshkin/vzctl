@@ -341,7 +341,7 @@ static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
 		create_param.feature_mask |= VE_FEATURE_SYSFS;
 		create_param.known_features |= VE_FEATURE_SYSFS;
 	}
-	logger(3, 0, "Set features mask %016Lx/%016Lx",
+	logger(3, 0, "Set features mask %016llx/%016llx",
 			create_param.feature_mask,
 			create_param.known_features);
 
