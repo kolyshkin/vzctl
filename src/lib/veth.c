@@ -519,7 +519,7 @@ int check_veth_param(envid_t veid, veth_param *veth_old, veth_param *veth_new,
 		return 0;
 	if (dev_t->dev_name_ve[0] == 0) {
 		logger(-1, 0, "Invalid usage.  Option --ifname not specified");
-		return -1;
+		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 	/* merge --netif_add & --ifname */
 	merge = 0;
@@ -544,7 +544,7 @@ int check_veth_param(envid_t veid, veth_param *veth_old, veth_param *veth_new,
 		logger(-1, 0, "Invalid usage: veth device %s is"
 			" not configured, use --netif_add option first",
 			dev_t->dev_name_ve);
-		return -1;
+		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 	return 0;
 }
