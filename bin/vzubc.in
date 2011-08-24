@@ -266,7 +266,7 @@ BEGIN {
 }
 /^[[:space:]]*[0-9]+:/ {
 	header=""
-	bcid=strtonum($1)
+	bcid=int($1)
 	if ((CTIDS !~ /^[ ]*$/) && (CTIDS !~ " " bcid " ")) {
 		skip=1
 		next
