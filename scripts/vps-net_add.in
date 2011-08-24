@@ -23,9 +23,9 @@
 #   VEID	- container ID
 # Optional parameters:
 #   IP_ADDR	- IP address(es) to add
-#                   (several addresses should be divided by space)
+#		  (several addresses should be divided by space)
 #   VE_STATE	- state of CT; could be one of:
-#		  starting | stopping | running
+#		  starting | running
 
 . @PKGCONFDIR@/vz.conf
 . @PKGLIBDIR@/scripts/vps-functions
