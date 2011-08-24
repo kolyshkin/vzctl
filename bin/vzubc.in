@@ -248,6 +248,7 @@ BEGIN {
 	if (qmaxheld > qheld)
 		qmaxheld=qheld
 	prepare_header()
+	bcid=-1
 }
 /^Version: / {
 	if ($2 != "2.5") {
@@ -291,7 +292,7 @@ BEGIN {
 	failcnt=$6
 }
 ((id!="") && (!skip)) {
-	if ((bcid <= 0) && (rel || inc)) {
+	if ((bcid < 0) && (rel || inc)) {
 		print "Error: can not use relative/incremental" \
 			" modes: BCID is unknown" > "/dev/stderr"
 		exit 1
