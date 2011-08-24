@@ -667,15 +667,40 @@ static int set_ve0(vps_handler *h, vps_param *g_p,
 	return 0;
 }
 
+/* If we are adding an IP, and the same IP is already in config,
+ * add it to 'del' list as well, meaning we will remove and add it again.
+ * This is mostly helpful when we do --ipadd with the same IP but
+ * different netmask (note that find_ip() is discarding netmask).
+ */
+static int fix_ip_param(vps_param *conf, vps_param *cmd)
+{
+	ip_param *ip;
+	char *found;
+	list_head_t *cur = &conf->res.net.ip;
+	list_head_t *add = &cmd->res.net.ip;
+	list_head_t *del = &cmd->del_res.net.ip;
+
+	if (list_empty(add))
+		return 0;
+
+	list_for_each(ip, add, list) {
+		found = find_ip(cur, ip->val);
+		if ((found) && (!find_ip(del, ip->val))) {
+			add_str_param(del, found);
+		}
+	}
+
+	return 0;
+}
+
 static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p)
 {
-	int ret, is_run;
+	int ret = 0, is_run;
 	dist_actions *actions = NULL;
 	char *dist_name;
 
-	ret = 0;
-
+	fix_ip_param(g_p, cmd_p);
 	if (!list_empty(&cmd_p->res.veth.dev) ||
 	    !list_empty(&cmd_p->del_res.veth.dev))
 	{
