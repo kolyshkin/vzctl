@@ -33,7 +33,8 @@ vzcheckvar IP_ADDR VEID
 
 vzgetnetdev
 
-for IP in $IP_ADDR; do
+for IPM in $IP_ADDR; do
+	IP=${IPM%%/*}
 	vzdelrouting "$IP"
 	vzarp del "$IP"
 	# Update ip address information
