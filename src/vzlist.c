@@ -563,12 +563,12 @@ static struct Cfield field_names[] =
 {"diskinodes.h", "DINODES.H", "%10s", 2, RES_QUOTA, print_diskinodes, diskinodes_h_sort_fn},
 
 {"laverage", "LAVERAGE", "%14s", 0, RES_CPUSTAT, print_laverage, laverage_sort_fn},
-{"uptime", "UPTIME", "%15s", 1, RES_CPUSTAT, print_uptime, uptime_sort_fn},
+{"uptime", "UPTIME", "%15s", 0, RES_CPUSTAT, print_uptime, uptime_sort_fn},
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
 
-{"ioprio", "IOP", "%3s", 1, RES_NONE, print_ioprio, ioprio_sort_fn},
+{"ioprio", "IOP", "%3s", 0, RES_NONE, print_ioprio, ioprio_sort_fn},
 
 {"onboot", "ONBOOT", "%6s", 0, RES_NONE, print_onboot, none_sort_fn},
 {"bootorder", "BOOTORDER", "%10s", 0, RES_NONE,
