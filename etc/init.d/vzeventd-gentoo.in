@@ -42,7 +42,6 @@ start() {
 
 	ebegin "Starting vzeventd"
 	start-stop-daemon --start --exec ${VZEVENTD} \
-		--pidfile /var/run/vzeventd.pid \
 		-- ${VZEVENTD_OPTS}
 	eend $?
 }
@@ -50,7 +49,6 @@ start() {
 stop() {
 	check_config || return
 	ebegin "Stopping vzeventd"
-	start-stop-daemon --stop --exec ${VZEVENTD} \
-		--pidfile /var/run/vzeventd.pid
+	start-stop-daemon --stop --exec ${VZEVENTD}
 	eend $?
 }
