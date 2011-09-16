@@ -485,7 +485,7 @@ stop()
 
 load_modules()
 {
-	local modules=$1
+	local modules="$1"
 	local mod
 
 	for mod in ${modules}; do
