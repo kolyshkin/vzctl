@@ -277,7 +277,7 @@ static int laverage_sort_fn(const void *val1, const void *val2)
 	const struct Ccpustat *st2 = ((const struct Cveinfo *)val2)->cpustat;
 	int res;
 
-	if ((res = check_empty_param(st1, st2)) == 2)
+	if ((res = check_empty_param(st1, st2)) != 2)
 		return res;
 	res = (st1->la[0] - st2->la[0]) * 100;
 	if (res != 0)
