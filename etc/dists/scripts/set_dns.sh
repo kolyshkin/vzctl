@@ -30,7 +30,7 @@ set_dns()
 	fi
 	if [ -n "${server}" ]; then
 		[ -f ${cfgfile} ] || touch ${cfgfile}
-		grep -v '^\s*nameserver\s' ${cfgfile} > ${cfgfile}.$$ &&
+		sed '/^\s*nameserver\s/d' ${cfgfile} > ${cfgfile}.$$ &&
 			mv -f ${cfgfile}.$$ ${cfgfile} ||
 			error "Can't change file ${cfgfile}" ${VZ_FS_NO_DISK_SPACE}
 		for srv in ${server}; do
