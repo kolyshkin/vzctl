@@ -38,6 +38,7 @@ REDHAT_7x_VER = 7.0 7.1 7.2 7.3
 SLACK_9x_VER  = 9.0 9.1
 SUSE_7x_VER   = 7.3
 SUSE_8x_VER   = 8.0 8.1 8.2
+UBUNTU_6x_VER = 6.06
 
 altlinux:
 	$(INSTALL_DATA) $(srcdir)/altlinux.conf \
@@ -124,6 +125,10 @@ suse:
 	done
 
 ubuntu:
+	for ver in $(UBUNTU_6x_VER); do \
+		$(INSTALL_DATA) $(srcdir)/debian-3.conf \
+		    $(DESTDIR)$(distconfdir)/ubuntu-$$ver.conf; \
+	done
 	$(INSTALL_DATA) $(srcdir)/debian.conf \
 		$(DESTDIR)$(distconfdir)/ubuntu.conf
 
