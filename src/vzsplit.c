@@ -231,8 +231,8 @@ static int lconv(char *name)
 		fprintf(fp, "PHYSPAGES=\"0:%lu\"\n", mem);
 		fprintf(fp, "SWAPPAGES=\"%lu\"\n", mem * 2);
 		fprintf(fp, "KMEMSIZE=\"%lu:%lu\"\n",
-				(unsigned long) ((double)mem/2./KMEM_DELTA),
-				mem / 2);
+				(unsigned long) ((double)mem * pagesize / 2. /KMEM_DELTA),
+				mem * pagesize / 2);
 		fprintf(fp, "LOCKEDPAGES=\"%lu\"\n", mem / 2);
 		fprintf(fp,	"\n"
 				"PRIVVMPAGES=\"unlimited\"\n"
