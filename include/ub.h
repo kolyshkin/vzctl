@@ -21,6 +21,7 @@
 #include "types.h"
 
 #define PROCUBC		"/proc/user_beancounters"
+#define PROC_BC_RES	"/proc/bc/resources"
 
 #ifndef UB_KMEMSIZE
 #define UB_KMEMSIZE	0	/* Unswappable kernel memory size including

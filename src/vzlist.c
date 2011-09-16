@@ -982,10 +982,13 @@ static int get_ub()
 	char *s;
 	struct Cveinfo ve;
 
-	if ((fp = fopen(PROCUBC, "r")) == NULL) {
-		fprintf(stderr, "Unable to open %s\n", PROCUBC);
-		return 1;
+	if ((fp = fopen(PROC_BC_RES, "r")) == NULL) {
+		if ((fp = fopen(PROCUBC, "r")) == NULL) {
+			fprintf(stderr, "Unable to open %s\n", PROCUBC);
+			return 1;
+		}
 	}
+
 	veid = 0;
 	memset(&ve, 0, sizeof(struct Cveinfo));
 	while (!feof(fp)) {
