@@ -24,7 +24,8 @@ VECONFIG  = \
 	    ve-unlimited.conf-sample \
 	    ve-vswap-256m.conf-sample \
 	    ve-vswap-512m.conf-sample \
-	    ve-vswap-1024m.conf-sample
+	    ve-vswap-1024m.conf-sample \
+	    ve-vswap-1g.conf-sample
 
 vpsconf_DATA = \
 	$(VE0CONFIG) \

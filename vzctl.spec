@@ -149,6 +149,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_vpsconfdir}/ve-vswap-256m.conf-sample
 %config %{_vpsconfdir}/ve-vswap-512m.conf-sample
 %config %{_vpsconfdir}/ve-vswap-1024m.conf-sample
+%config %{_vpsconfdir}/ve-vswap-1g.conf-sample
 %config %{_vpsconfdir}/0.conf
 
 %attr(777, root, root) /etc/vz/conf
