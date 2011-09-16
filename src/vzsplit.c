@@ -233,6 +233,8 @@ static int lconv(char *name)
 		fprintf(fp, "SWAPPAGES=\"0:%lu\"\n", mem * 2);
 		fprintf(fp, "KMEMSIZE=\"%lu:%lu\"\n",
 				(unsigned long)(kmem/KMEM_DELTA), kmem);
+		fprintf(fp, "DCACHESIZE=\"%lu:%lu\"\n",
+				(unsigned long)(kmem/2./KMEM_DELTA), kmem/2);
 		fprintf(fp, "LOCKEDPAGES=\"%lu\"\n", mem / 2);
 		fprintf(fp,	"\n"
 				"PRIVVMPAGES=\"unlimited\"\n"
@@ -249,7 +251,6 @@ static int lconv(char *name)
 				"OTHERSOCKBUF=\"unlimited\"\n"
 				"DGRAMRCVBUF=\"unlimited\"\n"
 				"NUMOTHERSOCK=\"unlimited\"\n"
-				"DCACHESIZE=\"unlimited\"\n"
 				"NUMFILE=\"unlimited\"\n"
 				"NUMIPTENT=\"unlimited\"\n"
 				"\n");
