@@ -364,7 +364,8 @@ change_hostname()
 }
 
 cidr2mask() {
-	local i mask=""
+	local i
+	local mask=""
 	local full_octets=$(($1/8))
 	local partial_octet=$(($1%8))
 
