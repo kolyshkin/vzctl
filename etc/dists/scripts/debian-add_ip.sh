@@ -179,7 +179,7 @@ add_ip()
 				continue
 			fi
 			get_free_aliasid
-			create_config ${_IP} ${_NETMASK} ${_MASK} ${IFNUM}
+			create_config "${_IP}" "${_NETMASK}" "${_MASK}" "${IFNUM}"
 		done
 		mv -f ${CFGFILE}.bak ${CFGFILE}
 	fi
