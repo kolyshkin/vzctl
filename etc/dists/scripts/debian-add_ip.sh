@@ -184,14 +184,10 @@ add_ip()
 		mv -f ${CFGFILE}.bak ${CFGFILE}
 	fi
 	if [ "x${VE_STATE}" = "xrunning" ]; then
-		if [ "${ip#*:}" = "${ip}" ]; then
-			/sbin/ifup -a --force 2>/dev/null
+		if [ -x /usr/sbin/invoke-rc.d ] ; then
+			/usr/sbin/invoke-rc.d networking restart > /dev/null 2>&1
 		else
-			if [ -x /usr/sbin/invoke-rc.d ] ; then
-				/usr/sbin/invoke-rc.d networking restart > /dev/null 2>&1
-			else
-				/etc/init.d/networking restart > /dev/null 2>&1
-			fi
+			/etc/init.d/networking restart > /dev/null 2>&1
 		fi
 	fi
 }
