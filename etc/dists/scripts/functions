@@ -90,9 +90,9 @@ put_param()
 # $3 - value
 add_param()
 {
-	local file=$1
-	local name=$2
-	local value=$3
+	local file="$1"
+	local name="$2"
+	local value="$3"
 	local path
 
 	path=${file%/*}
@@ -115,9 +115,9 @@ add_param()
 
 del_param()
 {
-	local file=$1
-	local name=$2
-	local value=$3
+	local file="$1"
+	local name="$2"
+	local value="$3"
 	local path
 
 	path=${file%/*}
@@ -181,9 +181,9 @@ put_param2()
 # $2 - NAME
 # $3 - value
 put_param3() {
-	local file=$1
-	local name=$2
-	local value=$3
+	local file="$1"
+	local name="$2"
+	local value="$3"
 	local path
 
 	path=${file%/*}
@@ -219,9 +219,9 @@ put_param3() {
 # $2 - NAME
 # $3 - value
 add_param3() {
-	local file=$1
-	local name=$2
-	local value=$3
+	local file="$1"
+	local name="$2"
+	local value="$3"
 	local path
 
 	path=${file%/*}
@@ -249,9 +249,9 @@ add_param3() {
 # $2 - NAME
 # $3 - value
 del_param3() {
-	local file=$1
-	local name=$2
-	local value=$3
+	local file="$1"
+	local name="$2"
+	local value="$3"
 
 	[ ! -f $file ] && return
 
