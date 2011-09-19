@@ -21,12 +21,30 @@
 VENET_DEV=venet0
 CFGFILE=/etc/rc.conf
 
+function remove_all_ve_aliases()
+{
+	local ve_if_name
+	local ve_if
+
+	ve_if_name=`grep "^${VENET_DEV}_" ${CFGFILE} | cut -d'=' -f1`
+
+	for ve_if in ${ve_if_name}; do
+	    /etc/rc.d/network ifdown ${ve_if} 2>/dev/null
+	    del_param "${CFGFILE}" "${ve_if}"
+	    del_param3 "${CFGFILE}" "INTERFACES" "${ve_if}"
+	done
+}
+
 function del_ip()
 {
 	local ifname
 	local ipm
 
-	echo ${IP_ADDR}
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		remove_all_ve_aliases
+		return 0
+	fi
+
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
 		ifname=`grep -B 1 -e "\\<${_IP}\\>" ${CFGFILE} |

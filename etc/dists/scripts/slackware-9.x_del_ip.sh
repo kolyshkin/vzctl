@@ -25,6 +25,13 @@ function del_ip()
 	local ipm
 
 	[ -f ${IFCFG}  ] || return 0
+
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		/sbin/ifconfig venet0 down
+		mv -f ${IFCFG} ${IFCFG}.bak
+		return 0
+	fi
+
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
 		if grep -wq "${_IP}" ${IFCFG} 2>/dev/null; then

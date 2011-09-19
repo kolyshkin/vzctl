@@ -27,6 +27,13 @@ del_ip()
 	local ifname
 	local ipm
 
+	if [ "${IPDELALL}" = "yes" ]; then
+		ifdown ${VENET_DEV} 2>/dev/null
+		grep -v ${VENET_DEV} ${CFGFILE} > ${CFGFILE}.bak && \
+			mv ${CFGFILE}.bak ${CFGFILE}
+		return 0
+	fi
+
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
 		if [ -z "$_IPV6ADDR" ]; then

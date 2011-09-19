@@ -29,9 +29,24 @@
 VENET_DEV=venet0
 CFGFILE=/etc/conf.d/netif.${VENET_DEV}
 
+unset_rc()
+{
+	# used for disabling venet if we are using veth and no IPs are specified
+	rc-update del netif.${VENET_DEV} default &>/dev/null
+	rm -f /etc/init.d/netif.${VENET_DEV}
+	rm -f /etc/conf.d/netif.${VENET_DEV}
+	ip link set ${VENET_DEV} down > /dev/null 2>&1
+}
+
 function del_ip()
 {
 	local ipm
+
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		unset_rc
+		return 0
+	fi
+
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
 		if grep -qw "${_IP}" ${CFGFILE}; then

@@ -38,6 +38,15 @@ function is_baselayout1()
 function del_ip()
 {
 	local ipm
+
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		/etc/init.d/net.${VENET_DEV} stop >/dev/null 2>&1
+		rc-update del net.${VENET_DEV} default &>/dev/null
+		rm -f /etc/init.d/net.${VENET_DEV}
+		sed -i -e '/_${VENET_DEV}/d' $CFGFILE
+		return 0
+	fi
+
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
 		if grep -qw "${_IP}/${_MASK}" ${CFGFILE}; then
