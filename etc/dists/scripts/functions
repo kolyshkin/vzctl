@@ -389,12 +389,12 @@ ip_conv() {
 	_NETMASK=''
 	_IPV6ADDR=''
 	if [ "${_IP#*:}" != "${_IP}" ]; then
-		_IPV6_ADDR=yes
+		_IPV6ADDR=yes
 	fi
 	if echo "${ipm}" | grep -q '/'; then
 		_MASK=${ipm##*/}
 	else
-		if [ -z "$IPV6_ADDR" ]; then
+		if [ -z "$_IPV6ADDR" ]; then
 			_MASK=24
 		else
 			_MASK=128
