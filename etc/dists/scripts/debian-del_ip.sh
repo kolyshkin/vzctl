@@ -29,8 +29,8 @@ del_ip()
 
 	if [ "${IPDELALL}" = "yes" ]; then
 		ifdown ${VENET_DEV} 2>/dev/null
-		grep -v ${VENET_DEV} ${CFGFILE} > ${CFGFILE}.bak && \
-			mv ${CFGFILE}.bak ${CFGFILE}
+		remove_debian_interface "${VENET_DEV}.*" ${CFGFILE}
+		sed -i -e 's/^# Auto generated venet0 interface$//' ${CFGFILE}
 		return 0
 	fi
 
