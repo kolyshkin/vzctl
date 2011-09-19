@@ -122,8 +122,8 @@ function get_aliasid_by_ip()
 	local idlist
 
 	cd ${IFCFG_DIR} || return 1
-	IFNUM=`grep -l "IPADDR=${ip}$" ${VENET_DEV_CFG}:* | head -n 1 |
-		sed -e 's/.*:\([0-9]*\)$/\1/'`
+	IFNUM=`grep -l "IPADDR=${ip}$" ${VENET_DEV_CFG}:* 2>/dev/null | \
+		head -n 1 | sed -e 's/.*:\([0-9]*\)$/\1/'`
 }
 
 function get_free_aliasid()
