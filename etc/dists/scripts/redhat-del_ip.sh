@@ -36,8 +36,7 @@ function del_ip()
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		ifdown ${VENET_DEV} >/dev/null 2>&1
 		rm -f ${VENET_DEV_CFG} ${VENET_DEV_CFG}:* 2>/dev/null
-		del_param ${IFCFG} IPV6ADDR_SECONDARIES ""
-		return 0;
+		return 0
 	fi
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
