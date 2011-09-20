@@ -45,7 +45,7 @@ del_ip()
 		    fi
 
 		else
-		    grep -v ${_IP} ${CFGFILE} > ${CFGFILE}.bak
+		    grep -vwF ${_IP} ${CFGFILE} > ${CFGFILE}.bak
 		    ifconfig ${VENET_DEV} del ${_IP}/${_MASK}
 		    mv ${CFGFILE}.bak ${CFGFILE}
 		fi
