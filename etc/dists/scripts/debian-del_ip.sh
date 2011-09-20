@@ -28,7 +28,12 @@ del_ip()
 	local ipm
 
 	if [ "${IPDELALL}" = "yes" ]; then
-		ifdown ${VENET_DEV} 2>/dev/null
+		# Try hard to remove all IPs
+		for ifname in $(ifconfig -a | grep "^${VENET_DEV}:" |
+				awk '{print $1}'); do
+			ifconfig "${ifname}" down 2>/dev/null
+		done
+		ifconfig ${VENET_DEV} down 2>/dev/null
 		remove_debian_interface "${VENET_DEV}.*" ${CFGFILE}
 		sed -i -e 's/^# Auto generated venet0 interface$//' ${CFGFILE}
 		return 0
@@ -40,7 +45,7 @@ del_ip()
 		    ifname=`grep -B 1 -w "${_IP}" ${CFGFILE} |
 				grep "${VENET_DEV}:" | cut -d' ' -f2`
 		    if [ -n "${ifname}" ]; then
-				ifdown "${ifname}" 2>/dev/null
+				ifconfig "${ifname}" down 2>/dev/null
 				remove_debian_interface "${ifname}" ${CFGFILE}
 		    fi
 
