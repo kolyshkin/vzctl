@@ -242,33 +242,21 @@ static int vps_del_ip(vps_handler *h, envid_t veid,
 	int ret;
 	list_head_t *ip_h = &net->ip;
 
-	if ((str = list2str(NULL, ip_h)) != NULL) {
-		if (str[0] != '\0')
-			logger(0, 0, "Deleting IP address(es): %s", str);
+	if (net->delall)
+		/* Add existing VE IPs to the list */
+		if (get_vps_ip(h, veid, ip_h) < 0)
+			return VZ_GET_IP_ERROR;
+
+	str = list2str(NULL, ip_h);
+	if ((str != NULL) || (net->delall)) {
+		logger(0, 0, "Deleting %sIP address(es): %s",
+				(net->delall) ? "all " : "",
+				str ? str : "");
 		free(str);
 	}
 	if ((ret = vps_ip_ctl(h, veid, VE_IP_DEL, ip_h, 1)))
 		return ret;
 	run_net_script(veid, DEL, ip_h, state, net->skip_arpdetect);
-
-	return ret;
-}
-
-static int vps_set_ip(vps_handler *h, envid_t veid,
-	net_param *net, int state)
-{
-	int ret;
-	net_param oldnet;
-
-	bzero(&oldnet, sizeof(oldnet));
-	list_head_init(&oldnet.ip);
-	if (get_vps_ip(h, veid, &oldnet.ip) < 0)
-		return VZ_GET_IP_ERROR;
-	if (!(ret = vps_del_ip(h, veid, &oldnet, state))) {
-		if ((ret = vps_add_ip(h, veid, net, state)))
-			vps_add_ip(h, veid, &oldnet, state);
-	}
-	free_str_param(&oldnet.ip);
 
 	return ret;
 }
@@ -388,10 +376,7 @@ int vps_net_ctl(vps_handler *h, envid_t veid, int op, net_param *net,
 			logger(0, 0, "WARNING: IPv6 support is disabled");
 	}
 	if (op == ADD) {
-		if (net->delall == YES)
-			ret = vps_set_ip(h, veid, net, state);
-		else
-			ret = vps_add_ip(h, veid, net, state);
+		ret = vps_add_ip(h, veid, net, state);
 	} else if (op == DEL) {
 		ret = vps_del_ip(h, veid, net, state);
 	}
