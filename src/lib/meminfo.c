@@ -27,6 +27,7 @@
 #include "logger.h"
 #include "meminfo.h"
 #include "util.h"
+#include "ub.h"
 
 static struct {
 	char *mode_nm;
@@ -47,6 +48,9 @@ int vps_meminfo_set(vps_handler *h, envid_t veid, meminfo_param *gparam,
 	meminfo_param default_param = {
 		VE_MEMINFO_PRIVVMPAGES, 1
 	};
+
+	if (is_vswap_config(&vps_p->res.ub))
+			return 0;
 
 	if (state != STATE_STARTING) {
 		/* update meminfo on --privvmpages, --meminfo */
