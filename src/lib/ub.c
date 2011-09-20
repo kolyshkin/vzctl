@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <limits.h>
 
 #include "types.h"
 #include "ub.h"
@@ -395,4 +396,12 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 	}
 	fclose(fd);
 	return !found;
+}
+
+int is_vswap_config(const ub_param *param)
+{
+	return  (param != NULL) &&
+		(param->physpages != NULL) &&
+		(param->physpages[1] != LONG_MAX);
+
 }
