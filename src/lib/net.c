@@ -113,12 +113,21 @@ static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
 	return ioctl(h->vzfd, VENETCTL_VE_IP_MAP, &ip_map);
 }
 
-static int ip_ctl(vps_handler *h, envid_t veid, int op, char *ip)
+static int ip_ctl(vps_handler *h, envid_t veid, int op, char *str)
 {
 	int ret;
 	int family;
 	unsigned int ipaddr[4];
+	const char *ip, *mask;
 
+	mask = strchr(str, '/');
+	if (mask) {
+		ip = strndupa(str, mask - str);
+		mask++;
+	}
+	else {
+		ip = str;
+	}
 	if ((family = get_netaddr(ip, ipaddr)) < 0)
 		return 0;
 	ret = _ip_ctl(h, veid, op, ipaddr, family);
