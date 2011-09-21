@@ -448,7 +448,7 @@ else
 fi
 
 log 1 "Syncing private"
-$RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"
+$RSYNC --sparse "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"
 # Ignore rsync error 24 "Partial transfer due to vanished source files"
 if [ $? != 24 ] && [ $? != 0 ]; then
 	log 0 "Failed to sync container private areas"
