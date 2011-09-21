@@ -301,7 +301,7 @@ static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val,
 	if (list_empty(val) && !allow_empty)
 		return 0;
 	if ((str = list2str_c(name, '"', val)) == NULL)
-		return ERR_NOMEM;;
+		return ERR_NOMEM;
 	if (add_str_param2(conf, str)) {
 		free(str);
 		return ERR_NOMEM;

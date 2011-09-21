@@ -1090,7 +1090,7 @@ static char *invert_ip(char *ips)
 		strncpy(ip_str, p, len);
 		ip_str[len] = 0;
 		if ((family = get_netaddr(ip_str, ip)) == -1)
-			continue;;
+			continue;
 		if ((inet_ntop(family, ip, ip_str, sizeof(ip_str) - 1)) == NULL)
 			continue;
 		rc = sprintf(tp, "%s ", ip_str);
