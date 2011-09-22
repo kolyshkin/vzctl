@@ -45,6 +45,10 @@ cat << EOF > ${SCRIPTANAME} || exit 1
 ### END INIT INFO
 
 start() {
+	if [ ! -L /etc/mtab ]; then
+		rm -f /etc/mtab >/dev/null 2>&1
+		ln -sf /proc/mounts /etc/mtab
+	fi
 	dev=\$(awk '(\$2 == "/") && (\$4 ~ /usrquota/) && (\$4 ~ /grpquota/) {print \$1}' /etc/mtab)
 	if test -z "\$dev"; then
 		dev="/dev/${DEVFS}"
