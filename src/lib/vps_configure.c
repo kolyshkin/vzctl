@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <netinet/in.h>
 #include <linux/vzcalluser.h>
 
 #include "vzerror.h"
@@ -60,18 +61,22 @@ const char *state2str(int state)
 static const char *get_local_ip(vps_param *param)
 {
 	list_head_t *h = &param->res.net.ip;
-	ip_param *ip;
+	const char *ip, *mask;
+	static char dst[INET6_ADDRSTRLEN];
 
 	/* Use first IP in the CT config */
 	if (param->g_param != NULL && !param->res.net.delall)
 		h = &param->g_param->res.net.ip;
 	if (list_empty(h))
 		h = &param->res.net.ip;
-	if (!list_empty(h)) {
-		ip = list_first_entry(h, ip_param, list);
-		return ip->val;
-	}
-	return NULL;
+	if (list_empty(h))
+		return NULL;
+
+	ip = list_first_entry(h, ip_param, list)->val;
+	mask = strchr(ip, '/');
+	if (!mask)
+		return ip;
+	return strncpy(dst, ip, mask - ip);
 }
 
 static int vps_hostnm_configure(vps_handler *h, envid_t veid,
