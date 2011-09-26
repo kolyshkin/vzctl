@@ -396,7 +396,7 @@ ip_conv() {
 		_MASK=${ipm##*/}
 	else
 		if [ -z "$_IPV6ADDR" ]; then
-			_MASK=24
+			_MASK=32
 		else
 			_MASK=128
 		fi
