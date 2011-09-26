@@ -839,7 +839,6 @@ static int umount(vps_handler *h, envid_t veid, vps_param *g_p,
 static int enter(vps_handler *h, envid_t veid, const char *root,
 		int argc, char **argv)
 {
-	set_log_file(NULL);
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (!vps_is_run(h, veid)) {
@@ -850,6 +849,7 @@ static int enter(vps_handler *h, envid_t veid, const char *root,
 		/* omit "--exec" argument */
 		argc -= 1; argv += 1;
 	}
+	logger(1, 0, "Entering CT");
 	return do_enter(h, veid, root, argc, argv);
 }
 
@@ -863,30 +863,30 @@ static int exec(vps_handler *h, act_t action, envid_t veid, const char *root,
 	int i, ret;
 	int len, totallen = 0;
 
-	/* disable logging on terminal  */
-	set_log_verbose(0);
 	mode = MODE_BASH;
+	/* Unroll argv */
+	for (i = 0; i < argc; i++) {
+		len = strlen(argv[i]);
+		if (len) {
+			buf = (char*)realloc(buf, totallen + len + 2);
+			sprintf(buf + totallen, "%s ", argv[i]);
+		} else {
+			/* set empty argument */
+			len = 2;
+			buf = (char*)realloc(buf, totallen + len + 2);
+			sprintf(buf + totallen, "\'\' ");
+		}
+		totallen += len + 1;
+		buf[totallen] = 0;
+	}
 	if (action == ACTION_EXEC3) {
 		arg = argv;
 		mode = MODE_EXEC;
 	} else if (argc && strcmp(argv[0], "-")) {
-		for (i = 0; i < argc; i++) {
-			len = strlen(argv[i]);
-			if (len) {
-				buf = (char*)realloc(buf, totallen + len + 2);
-				sprintf(buf + totallen, "%s ", argv[i]);
-			} else {
-				/* set empty argument */
-				len = 2;
-				buf = (char*)realloc(buf, totallen + len + 2);
-				sprintf(buf + totallen, "\'\' ");
-			}
-			totallen += len + 1;
-			buf[totallen] = 0;
-		}
 		argv_bash[2] = buf;
 		arg = argv_bash;
 	}
+	logger(1, 0, "Executing command: %s", buf);
 	ret = vps_exec(h, veid, root, mode, arg, NULL, NULL, 0);
 
 	return ret;
