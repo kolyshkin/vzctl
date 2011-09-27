@@ -235,6 +235,17 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 	int in[2], out[2], st[2], info[2];
 	struct sigaction act;
 	int i;
+	int fd_flags[2];
+
+	/* Save stdin and stdout file descriptor flags */
+	for (i = 0; i < 2; i++)
+	{
+		fd_flags[i] = fcntl(i, F_GETFL);
+		if (fd_flags[i] < 0) {
+			logger(-1, errno, "Unable to get fd%d flags", i);
+			return VZ_SYSTEM_ERROR;
+		}
+	}
 
 	if (pipe(in) < 0 || pipe(out) < 0 || pipe(st) < 0 || pipe(info) < 0) {
 		logger(-1, errno, "Unable to create pipe");
@@ -391,5 +402,9 @@ err:
 		fprintf(stdout, "exited from CT %d\n", veid);
 	}
 	close(in[1]); close(out[0]);
+	/* Restore fd flags */
+	for (i = 0; i < 2; i++)
+		fcntl(i, F_SETFL, fd_flags[i]);
+
 	return ret ? status : 0;
 }
