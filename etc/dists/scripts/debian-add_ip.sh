@@ -89,6 +89,8 @@ iface ${VENET_DEV} inet manual
 		if [ "${IPV6}" = "yes" ]; then
 			echo "
 iface ${VENET_DEV} inet6 manual
+	up route -A inet6 add default dev ${VENET_DEV}
+	down route -A inet6 del default dev ${VENET_DEV}
 " >> ${CFGFILE}
 
 		fi
