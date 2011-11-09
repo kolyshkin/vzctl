@@ -22,6 +22,8 @@
 # 2. Disables root password if it is empty.
 # 3. Seeds /etc/hosts with localhost entries for IPv4 and IPv6
 # 4. Creates empty /etc/resolv.conf
+# 5. Sets file caps for recent Fedora releases, as they can
+#    not be saved in a template tarball.
 
 randcrontab()
 {
@@ -97,9 +99,30 @@ set_network()
 	fi
 }
 
+_sc()
+{
+	local val=$1
+	shift
+	local file
+	for file in $*; do
+		setfattr -n security.capability -v $val ${VE_ROOT}${file}
+	done
+}
+
+set_file_caps()
+{
+	# Perform this only for Fedora 15 to 19
+	grep -qEw '1[5-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
+
+	_sc 0sAQAAAgkAAAAAAAAAAAAAAAAAAAA= /usr/libexec/pt_chown
+	_sc 0sAQAAAsIAAAAAAAAAAAAAAAAAAAA= /usr/sbin/suexec
+	_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
+}
+
 [ -z "${VE_ROOT}" ] && exit 1
 randcrontab
 disableroot
 set_network
+set_file_caps
 
 exit 0
