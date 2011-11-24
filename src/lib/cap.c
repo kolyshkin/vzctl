@@ -32,8 +32,8 @@
 #include "logger.h"
 #include "util.h"
 
-#ifndef	CAP_SETVEID
-#define	CAP_SETVEID	29
+#ifndef	CAP_AUDIT_WRITE
+#define	CAP_AUDIT_WRITE	29
 #endif
 #ifndef	CAP_VE_ADMIN
 #define	CAP_VE_ADMIN	30
@@ -65,7 +65,8 @@
 	CAP_TO_MASK(CAP_MKNOD)				| \
 	CAP_TO_MASK(CAP_LEASE)				| \
 	CAP_TO_MASK(CAP_VE_ADMIN)			| \
-	CAP_TO_MASK(CAP_SETVEID))			| \
+	CAP_TO_MASK(CAP_AUDIT_WRITE))			| \
+	CAP_TO_MASK(CAP_SETPCAP)			| \
 	CAP_TO_MASK(CAP_SETFCAP)
 
 static char *cap_names[] = {
@@ -98,7 +99,7 @@ static char *cap_names[] = {
 "SYS_TTY_CONFIG",	/*	26	*/
 "MKNOD",		/*	27	*/
 "LEASE",		/*	28	*/
-"SETVEID",		/*	29	*/
+"AUDIT_WRITE",		/*	29	*/
 "VE_ADMIN",		/*	30	*/
 "SETFCAP",		/*	31	*/
 
