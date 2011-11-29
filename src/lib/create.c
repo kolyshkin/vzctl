@@ -81,7 +81,7 @@ static int download_template(char *tmpl)
 }
 
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
-	dq_param *dq, char *tar_nm)
+	dq_param *dq)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
@@ -96,17 +96,17 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 
 find:
 	for (i = 0; ext[i] != NULL; i++) {
-		snprintf(tarball, sizeof(tarball), "%s/%s.tar%s",
-				fs->tmpl, tar_nm, ext[i]);
+		snprintf(tarball, sizeof(tarball), "%s/cache/%s.tar%s",
+				fs->tmpl, tmpl->ostmpl, ext[i]);
 		logger(1, 0, "Looking for %s", tarball);
 		if (stat_file(tarball))
 			break;
 	}
 	if (ext[i] == NULL) {
-		if (download_template(tar_nm) == 0)
+		if (download_template(tmpl->ostmpl) == 0)
 			goto find;
-		logger(-1, 0, "Cached OS template %s/%s.tar%s not found",
-				fs->tmpl, tar_nm, errmsg_ext);
+		logger(-1, 0, "Cached OS template %s/cache/%s.tar%s not found",
+				fs->tmpl, tmpl->ostmpl, errmsg_ext);
 		return VZ_OSTEMPLATE_NOT_FOUND;
 	}
 	/* Lock CT area */
@@ -179,7 +179,6 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	struct mod_action *action)
 {
 	int ret = 0;
-	char tar_nm[256];
 	char src[STR_SIZE];
 	char dst[STR_SIZE];
 	const char *sample_config;
@@ -302,10 +301,9 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		snprintf(tar_nm, sizeof(tar_nm), "cache/%s", tmpl->ostmpl);
 		logger(0, 0, "Creating container private area (%s)",
 				tmpl->ostmpl);
-		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, tar_nm)))
+		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq)))
 			goto err_private;
 	}
 
