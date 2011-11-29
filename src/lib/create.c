@@ -40,6 +40,7 @@
 #include "destroy.h"
 
 #define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
+#define VPS_DOWNLOAD	LIB_SCRIPTS_DIR "vps-download"
 #define VZOSTEMPLATE	"/usr/bin/vzosname"
 
 static int vps_postcreate(envid_t veid, vps_res *res);
@@ -69,6 +70,16 @@ static char *get_ostemplate_name(char *ostmpl)
 	return strdup(buf);
 }
 
+static int download_template(char *tmpl)
+{
+	char *arg[3];
+
+	arg[0] = VPS_DOWNLOAD;
+	arg[1] = tmpl;
+	arg[2] = NULL;
+	return run_script(VPS_DOWNLOAD, arg, NULL, 0);
+}
+
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	dq_param *dq, char *tar_nm)
 {
@@ -83,6 +94,7 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
 
+find:
 	for (i = 0; ext[i] != NULL; i++) {
 		snprintf(tarball, sizeof(tarball), "%s/%s.tar%s",
 				fs->tmpl, tar_nm, ext[i]);
@@ -91,6 +103,8 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 			break;
 	}
 	if (ext[i] == NULL) {
+		if (download_template(tar_nm) == 0)
+			goto find;
 		logger(-1, 0, "Cached OS template %s/%s.tar%s not found",
 				fs->tmpl, tar_nm, errmsg_ext);
 		return VZ_OSTEMPLATE_NOT_FOUND;

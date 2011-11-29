@@ -1,0 +1,85 @@
+#!/bin/sh
+#  Copyright (C) 2011, Parallels, Inc. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+# Download a precreated container tarball (a template cache).
+#
+# Argument:
+#  $* -- OS template name (like centos-6-x86_64), can specify a few
+#
+# Exit codes:
+#  0 -- template downloaded succesfully
+#  1 -- download error
+#  2 -- local template file already present, not overwriting
+#  3 -- error in usage (no argument provided)
+
+. @PKGLIBDIR@/scripts/vps-functions
+. @PKGCONFDIR@/vz.conf
+
+vzcheckvar TEMPLATE
+
+# Prefix to template cache repository URL
+TMPL_REPO_PREFIX="http://download.openvz.org/template/precreated"
+# What directories to use
+TEMPLATE_REPOS="${TMPL_REPO_PREFIX}/"
+# Uncomment this to enable 'beta' (new) templates
+#TEMPLATE_REPOS="${TEMPLATE_REPOS} ${TMPL_REPO_PREFIX}/beta/"
+# Uncomment this to enable 'unsupported' (old) templates
+#TEMPLATE_REPOS="${TEMPLATE_REPOS} ${TMPL_REPO_PREFIX}/unsupported"
+
+TMPL_SUFFIXES="tar.gz"
+TCACHEDIR=$TEMPLATE/cache
+
+download()
+{
+	local prefix suffix src dst
+	local tmpl=$1
+	for prefix in $TEMPLATE_REPOS; do
+		for suffix in $TMPL_SUFFIXES; do
+			src=${prefix}/${tmpl}.${suffix}
+			dst=$TCACHEDIR/${tmpl}.${suffix}
+			if test -f $dst; then
+				echo "File $dst is already present, " \
+					"not overwriting."
+				exit 2
+			fi
+			# Check if the file is there
+			if wget -q --spider -P $TCACHEDIR ${src}; then
+				echo "Found ${tmpl}.${suffix} at $src"
+				echo "Downloading..."
+				if wget -P $TCACHEDIR ${src}; then
+					echo "Success!"
+					exit 0
+				else
+					echo "Failed to download ${src}!" 1>&2
+					rm -f $dst
+				fi
+			fi
+		done
+	done
+	echo "Template $tmpl not found!" 1>&2
+	exit 1
+}
+
+if [ $# -lt 1 ]; then
+	echo "Usage: $0 template-name [template-name-2 ...]" 1>&2
+	exit 3
+fi
+
+for f in $*; do
+	download $f
+done

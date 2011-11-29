@@ -19,6 +19,7 @@ include $(top_srcdir)/pathsubst.am
 
 vzlib_SCRIPTS = \
 	vps-create \
+	vps-download \
 	vps-functions \
 	vps-net_add \
 	vps-net_del \
