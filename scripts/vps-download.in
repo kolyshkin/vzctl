@@ -63,8 +63,6 @@ download()
 			fi
 			# Check if the file is there
 			if wget -q --spider -P $TCACHEDIR ${src}; then
-				echo "Found ${tmpl}.${suffix} at $src"
-				echo "Downloading..."
 				if wget -P $TCACHEDIR ${src}; then
 					echo "Success!"
 					exit 0
