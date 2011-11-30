@@ -17,14 +17,12 @@
 #
 #
 # Download a precreated container tarball (a template cache).
-#
-# Argument:
-#  $* -- OS template name (like centos-6-x86_64), can specify a few
+# Usage: please see usage() below.
 #
 # Exit codes:
 #  0 -- template downloaded succesfully
 #  1 -- download error
-#  2 -- local template file already present, not overwriting
+#  2 -- local template file already present, not updating
 #  3 -- error in usage (no argument provided)
 #  4 -- wget binary not found
 #  5 -- GPG signature check failed
@@ -54,24 +52,119 @@ wget -V >/dev/null || exit 4
 
 : ${TMPL_SUFFIXES="tar.gz"}
 : ${GPG_KEY="security@openvz.org"}
+: ${CHECK_TEMPLATE_SIG="yes"}
+: ${UPDATE_TEMPLATE="yes"}
 
 vzcheckvar TEMPLATE
 TCACHEDIR=$TEMPLATE/cache
+SELF=$(basename $0)
 
-if test "x${CHECK_TEMPLATE_SIG}" = "x"; then
-	# Check if gpg is installed and our key is there
-	if gpg -k "$GPG_KEY" >/dev/null 2>&1; then
-		CHECK_TEMPLATE_SIG=1
+usage()
+{
+	cat << -EOF- 1>&2
+Usage:
+  $SELF [option ...] template [template ...]
+  $SELF --config | --help
+Options:
+  --no-gpg-check	Do not check GPG signatures
+  --no-update		Do not try to update existing templates
+  --config		Output current configuration
+  --help		Print this help
+Arguments:
+  template		An OS template name (like centos-6-x86_64)
+-EOF-
+	exit $1
+}
+
+gpg_working()
+{
+	test "x$CHECK_TEMPLATE_SIG" != "yes" && return 0
+
+	# Check if gpg is installed
+	if ! gpg --version >/dev/null; then
+		CHECK_TEMPLATE_SIG=no
+		echo "$SELF WARNING: gpg binary not found," \
+			"signature check disabled" 1>&2
+		return 1
 	fi
+
+	# ... and our key is there
+	if ! gpg -k "$GPG_KEY" >/dev/null 2>&1; then
+		CHECK_TEMPLATE_SIG=no
+		cat << -EOF- 1>&2
+
+$SELF WARNING: no public gpg key $GPG_KEY found,
+disabling signature check. To import the public key, see
+http://wiki.openvz.org/Package_signatures#Importing_the_public_key
+
+-EOF-
+		return 2
+	fi
+}
+
+show_config()
+{
+	local url
+
+	gpg_working
+
+	cat << -EOF-
+Current $SELF configuration is below. Defaults are built-in and can be
+overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
+
+* Try to update template files (\$UPDATE_TEMPLATE): $UPDATE_TEMPLATE
+* Check template signatures (\$CHECK_TEMPLATE_SIG): $CHECK_TEMPLATE_SIG
+* GPG public key name to check (\$GPG_KEY):         $GPG_KEY
+* List of template suffixes (\$TMPL_SUFFIXES):      $TMPL_SUFFIXES
+* Prefix to template cache repository URL (\$TMPL_REPO_PREFIX):
+  $TMPL_REPO_PREFIX
+* List of template URLs to try (\$TEMPLATE_REPOS):
+-EOF-
+
+	for url in $TEMPLATE_REPOS; do
+		echo "  ${url}"
+	done
+}
+
+# Parse arguments
+while echo $1 | grep -q '^-'; do
+	case $1 in
+	   --no-gpg-check)
+		CHECK_TEMPLATE_SIG=no
+		shift
+		;;
+	   --no-update)
+		UPDATE_TEMPLATE=no
+		shift
+		;;
+	   --config)
+		show_config
+		exit 0
+		;;
+	   --help)
+		usage 0
+		;;
+	   -*)
+		echo "$SELF ERROR: unknown option: $1" 1>&2
+		usage 3
+		;;
+	esac
+done
+
+if [ $# -lt 1 ]; then
+	echo "$SELF ERROR: no arguments" 1>&2
+	usage 3
 fi
 
 check_sig()
 {
-	test "x${CHECK_TEMPLATE_SIG}" = "x" && return 0
+	test "x${CHECK_TEMPLATE_SIG}" = "xyes" || return 0
 
 	local sig=$1.asc
 	local file=$2
 	local ret
+
+	echo "Checking template signature..."
 
 	wget -q $sig || return 1
 	sig=$(basename $sig)
@@ -80,57 +173,66 @@ check_sig()
 	ret=$?
 	rm -f $sig
 
-	return $ret
+	if test "$ret" != "0"; then
+		echo "$SELF ERROR: signature check failed!" 1>&2
+		return 5
+	else
+		echo "Signature check passed."
+		return 0
+	fi
+}
+
+do_download()
+{
+	local src=$1
+	local dst=$2
+	local ret
+
+	trap "rm -f ${dst}" INT TERM
+	wget -P $TCACHEDIR -N ${src}
+	ret=$?
+	trap - INT TERM
+	if test $ret -eq 0; then
+		check_sig $src $dst
+		return
+	else
+		echo "$SELF ERROR: failed to download ${src}!" 1>&2
+		rm -f $dst
+		return 1
+	fi
 }
 
 download()
 {
 	local prefix suffix src dst
 	local tmpl=$1
-	local ret
 
 	for prefix in $TEMPLATE_REPOS; do
 		for suffix in $TMPL_SUFFIXES; do
 			src=${prefix}/${tmpl}.${suffix}
 			dst=$TCACHEDIR/${tmpl}.${suffix}
-			if test -f $dst; then
-				echo "File $dst is already present," \
-					"not overwriting." 1>&2
-				exit 2
+			# Check for local copy
+			if test -f $dst -a "$UPDATE_TEMPLATE" = "no"; then
+				echo "$SELF ERROR: file $dst is present," \
+					"not updating." 1>&2
+				return 2
 			fi
 			# Check if the file is there
 			if wget -q --spider -P $TCACHEDIR ${src}; then
-				trap "rm -f ${dst}" INT TERM
-				wget -P $TCACHEDIR ${src}
-				ret=$?
-				trap - INT TERM
-				if test $ret -eq 0; then
-					echo "Downloaded succesfully."
-					if ! check_sig $src $dst; then
-						echo "Signature check" \
-							"failed!" 1>&2
-						exit 5
-					else
-						echo "Signature check passed."
-						exit 0
-					fi
-				else
-					echo "Failed to download ${src}!" 1>&2
-					rm -f $dst
-					exit 1
-				fi
+				# Download it
+				do_download "$src" "$dst"
+				return
 			fi
 		done
 	done
-	echo "Template $tmpl not found!" 1>&2
-	exit 1
+	echo "$SELF ERROR: template $tmpl not found!" 1>&2
+	return 1
 }
 
-if [ $# -lt 1 ]; then
-	echo "Usage: $0 template-name [template-name-2 ...]" 1>&2
-	exit 3
-fi
+gpg_working
 
-for f in $*; do
-	download $f
+for TMPL in $*; do
+	download $TMPL
+	RET=$?
+	test $RET -eq 0 || exit $RET
 done
