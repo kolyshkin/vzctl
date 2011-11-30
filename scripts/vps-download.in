@@ -27,6 +27,15 @@
 #  2 -- local template file already present, not overwriting
 #  3 -- error in usage (no argument provided)
 #  4 -- wget binary not found
+#  5 -- GPG signature check failed
+#
+# If you want this script to do automatic GPG signature checking, you need
+# to have gpg binary installed, and OpenVZ public key to be in your keyring.
+# The latter can be achieved by running the following command as root:
+#   gpg --search-keys security@openvz.org
+# For more details, see gpg(1) man page and the following link:
+#   http://wiki.openvz.org/Package_signatures#Importing_the_public_key
+
 
 # Wget is required for this script to function
 wget -V >/dev/null || exit 4
@@ -44,9 +53,35 @@ wget -V >/dev/null || exit 4
 #TEMPLATE_REPOS="${TEMPLATE_REPOS} ${TMPL_REPO_PREFIX}/unsupported"
 
 : ${TMPL_SUFFIXES="tar.gz"}
+: ${GPG_KEY="security@openvz.org"}
 
 vzcheckvar TEMPLATE
 TCACHEDIR=$TEMPLATE/cache
+
+if test "x${CHECK_TEMPLATE_SIG}" = "x"; then
+	# Check if gpg is installed and our key is there
+	if gpg -k "$GPG_KEY" >/dev/null 2>&1; then
+		CHECK_TEMPLATE_SIG=1
+	fi
+fi
+
+check_sig()
+{
+	test "x${CHECK_TEMPLATE_SIG}" = "x" && return 0
+
+	local sig=$1.asc
+	local file=$2
+	local ret
+
+	wget -q $sig || return 1
+	sig=$(basename $sig)
+
+	gpg --verify $sig $file
+	ret=$?
+	rm -f $sig
+
+	return $ret
+}
 
 download()
 {
@@ -70,8 +105,15 @@ download()
 				ret=$?
 				trap - SIGINT SIGTERM
 				if test $ret -eq 0; then
-					echo "Success!"
-					exit 0
+					echo "Downloaded succesfully."
+					if ! check_sig $src $dst; then
+						echo "Signature check" \
+							"failed!" 1>&2
+						exit 5
+					else
+						echo "Signature check passed."
+						exit 0
+					fi
 				else
 					echo "Failed to download ${src}!" 1>&2
 					rm -f $dst
