@@ -26,6 +26,10 @@
 #  1 -- download error
 #  2 -- local template file already present, not overwriting
 #  3 -- error in usage (no argument provided)
+#  4 -- wget binary not found
+
+# Wget is required for this script to function
+wget -V >/dev/null || exit 4
 
 . @PKGLIBDIR@/scripts/vps-functions
 . @PKGCONFDIR@/vz.conf
