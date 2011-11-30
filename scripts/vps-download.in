@@ -100,10 +100,10 @@ download()
 			fi
 			# Check if the file is there
 			if wget -q --spider -P $TCACHEDIR ${src}; then
-				trap "rm -f ${dst}" SIGINT SIGTERM
+				trap "rm -f ${dst}" INT TERM
 				wget -P $TCACHEDIR ${src}
 				ret=$?
-				trap - SIGINT SIGTERM
+				trap - INT TERM
 				if test $ret -eq 0; then
 					echo "Downloaded succesfully."
 					if ! check_sig $src $dst; then
