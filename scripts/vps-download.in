@@ -69,6 +69,7 @@ download()
 				else
 					echo "Failed to download ${src}!" 1>&2
 					rm -f $dst
+					exit 1
 				fi
 			fi
 		done
