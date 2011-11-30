@@ -57,8 +57,8 @@ download()
 			src=${prefix}/${tmpl}.${suffix}
 			dst=$TCACHEDIR/${tmpl}.${suffix}
 			if test -f $dst; then
-				echo "File $dst is already present, " \
-					"not overwriting."
+				echo "File $dst is already present," \
+					"not overwriting." 1>&2
 				exit 2
 			fi
 			# Check if the file is there
