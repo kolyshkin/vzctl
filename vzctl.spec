@@ -142,6 +142,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_configdir}/osrelease.conf
+%config(noreplace) %{_configdir}/download.conf
 %config(noreplace) %{_distconfdir}/*.conf
 %config %{_vpsconfdir}/ve-basic.conf-sample
 %config %{_vpsconfdir}/ve-light.conf-sample

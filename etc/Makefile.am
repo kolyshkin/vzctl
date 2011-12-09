@@ -27,7 +27,7 @@ SUBDIRS = \
 	network-scripts \
 	udev
 
-pkgconf_DATA = vz.conf osrelease.conf
+pkgconf_DATA = vz.conf osrelease.conf download.conf
 
 EXTRA_DIST = $(pkgconf_DATA)
 

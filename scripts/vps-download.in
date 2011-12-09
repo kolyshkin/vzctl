@@ -18,6 +18,8 @@
 #
 # Download a precreated container tarball (a template cache).
 # Usage: please see usage() below.
+# There are some built-in defaults in this script, those can be changed
+# by editing @PKGCONFDIR@/download.conf
 #
 # Exit codes:
 #  0 -- template downloaded succesfully
@@ -40,6 +42,7 @@ wget -V >/dev/null || exit 4
 
 . @PKGLIBDIR@/scripts/vps-functions
 . @PKGCONFDIR@/vz.conf
+test -r @PKGCONFDIR@/download.conf && source @PKGCONFDIR@/download.conf
 
 # Prefix to template cache repository URL
 : ${TMPL_REPO_PREFIX="http://download.openvz.org/template/precreated"}
