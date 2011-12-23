@@ -29,6 +29,9 @@ set_serrpasswd()
 	if [ -z "${user}" -o  -z "${passwd}" ]; then
 		exit $VZ_CHANGEPASS
 	fi
+	if [ ! -c /dev/urandom ]; then
+		mknod /dev/urandom c 1 9 > /dev/null
+	fi
 	if ! grep -E "^${user}:" ${CFGFILE} 2>&1 >/dev/null; then
 		useradd -m "${user}" 2>&1 || exit $VZ_CHANGEPASS
 	fi
