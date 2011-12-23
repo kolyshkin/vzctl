@@ -226,17 +226,17 @@ static int lconv(char *name)
 	if (vswap)
 	{
 		unsigned long mem = params[PRIVVMPG].bar;
-		unsigned long kmem = mem * pagesize / 2;
 
-		fprintf(fp, "\n# This is VSwap-enabled configuration\n\n");
+		fprintf(fp, "\n# This is VSwap-enabled configuration\n");
+		fprintf(fp, "# NOTE this configuration needs OpenVZ kernel "
+				"042stab042 or newer!\n\n");
 		fprintf(fp, "PHYSPAGES=\"0:%lu\"\n", mem);
 		fprintf(fp, "SWAPPAGES=\"0:%lu\"\n", mem * 2);
-		fprintf(fp, "KMEMSIZE=\"%lu:%lu\"\n",
-				(unsigned long)(kmem/KMEM_DELTA), kmem);
-		fprintf(fp, "DCACHESIZE=\"%lu:%lu\"\n",
-				(unsigned long)(kmem/2./KMEM_DELTA), kmem/2);
-		fprintf(fp, "LOCKEDPAGES=\"%lu\"\n", mem / 2);
+
 		fprintf(fp,	"\n"
+				"KMEMSIZE=\"unlimited\"\n"
+				"DCACHESIZE=\"unlimited\"\n"
+				"LOCKEDPAGES=\"unlimited\"\n"
 				"PRIVVMPAGES=\"unlimited\"\n"
 				"SHMPAGES=\"unlimited\"\n"
 				"NUMPROC=\"unlimited\"\n"
