@@ -55,7 +55,7 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 	const char *file;
 
 	if (!vps_is_run(h, veid)) {
-		logger(0, 0, "Container is not running");
+		logger(-1, 0, "Container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
 	if (action == CMD_CHKPNT) {
