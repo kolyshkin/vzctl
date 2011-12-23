@@ -81,6 +81,14 @@ if (ub->name == NULL) {							\
 	ret = VZ_NOTENOUGHUBCPARAMS;					\
 }
 
+	if (is_vswap_config(ub))
+	{
+		CHECK_UB(physpages);
+		CHECK_UB(swappages);
+		return ret;
+	}
+	/* else
+	 * non-vswap case, require all params except swappages */
 	CHECK_UB(kmemsize)
 	CHECK_UB(lockedpages)
 	CHECK_UB(privvmpages)
