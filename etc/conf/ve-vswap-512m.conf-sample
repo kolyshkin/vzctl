@@ -15,31 +15,14 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-# This config is valid for VSwap-enabled kernel (which currently means
-# any RHEL6-based kernel, i.e. 042test* or 042stab*).
+# This config is only valid for decent VSwap-enabled kernel
+# (version 042stab042 or later).
 
-# UBC parameters (in form of barrier:limit)
+# RAM
 PHYSPAGES="0:512M"
+
+# Swap
 SWAPPAGES="0:1G"
-KMEMSIZE="233M:256M"
-DCACHESIZE="116M:128M"
-LOCKEDPAGES="256M"
-PRIVVMPAGES="unlimited"
-SHMPAGES="unlimited"
-NUMPROC="unlimited"
-VMGUARPAGES="0:unlimited"
-OOMGUARPAGES="0:unlimited"
-NUMTCPSOCK="unlimited"
-NUMFLOCK="unlimited"
-NUMPTY="unlimited"
-NUMSIGINFO="unlimited"
-TCPSNDBUF="unlimited"
-TCPRCVBUF="unlimited"
-OTHERSOCKBUF="unlimited"
-DGRAMRCVBUF="unlimited"
-NUMOTHERSOCK="unlimited"
-NUMFILE="unlimited"
-NUMIPTENT="unlimited"
 
 # Disk quota parameters (in form of softlimit:hardlimit)
 DISKSPACE="2G:2.2G"
