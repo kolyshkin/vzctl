@@ -136,6 +136,8 @@
 #define PARAM_BOOTORDER		364
 #define PARAM_PCI_ADD		365
 #define PARAM_PCI_DEL		366
+#define PARAM_RAM		367
+#define PARAM_SWAP		368
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

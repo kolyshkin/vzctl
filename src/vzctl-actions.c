@@ -137,6 +137,10 @@ static struct option set_opt[] = {
 	{"description",	required_argument, NULL, PARAM_DESCRIPTION},
 	{"bootorder",	required_argument, NULL, PARAM_BOOTORDER},
 
+	/* New "easy" VSwap parameters */
+	{"ram",		required_argument, NULL, PARAM_RAM},
+	{"swap",	required_argument, NULL, PARAM_SWAP},
+
 	{NULL, 0, NULL, 0}
 };
 

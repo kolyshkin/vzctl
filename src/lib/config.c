@@ -652,6 +652,47 @@ static int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 	return ret;
 }
 
+static int parse_vswap(ub_param *ub, const char *val, int id)
+{
+	int ret;
+	ub_res res;
+	const char *tail;
+	unsigned long long tmp;
+
+	/* Translate from VSwap ('easy') to UBC parameter */
+	switch(id) {
+		case PARAM_RAM:
+			id = PARAM_PHYSPAGES;
+			break;
+		case PARAM_SWAP:
+			id = PARAM_SWAPPAGES;
+			break;
+		default:
+			return ERR_OTHER;
+	}
+
+	if (conf_get_by_id(config, id) == NULL)
+		return ERR_OTHER;
+
+	tail = parse_ul_sfx(val, &tmp, _page_size);
+	if (tail == NULL)
+		return ERR_INVAL;
+	if (*tail != '\0')
+		return ERR_INVAL;
+	if (tmp > LONG_MAX) {
+		tmp = LONG_MAX;
+		ret = ERR_LONG_TRUNC;
+	}
+
+	res.res_id = id;
+	res.limit[0] = 0;
+	res.limit[1] = tmp;
+	if (add_ub_param(ub, &res))
+		return ERR_NOMEM;
+
+	return ret;
+}
+
 static int store_ub(vps_param *old_p, vps_param *vps_p,
 	list_head_t *conf_h)
 {
@@ -1931,6 +1972,10 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_DGRAMRCVBUF:
 	case PARAM_DCACHESIZE:
 		ret = parse_ub(vps_p, val, id, 1);
+		break;
+	case PARAM_RAM:
+	case PARAM_SWAP:
+		ret = parse_vswap(&vps_p->res.ub, val, id);
 		break;
 	case PARAM_CAP:
 		ret = parse_cap(val, &vps_p->res.cap);

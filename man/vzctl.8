@@ -61,7 +61,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --host_mac hwaddr
 .OP --bridge name
 .OP --mac_filter \fBon\fR|\fBoff\fR]
-.\" Resource limits
+.\" User Beancounter limits
 .OP --numproc items
 .OP --numtcpsock items
 .OP --numothersock items
@@ -83,6 +83,8 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --numiptent num
 .OP --physpages pages
 .OP --swappages pages
+.OP --ram bytes
+.OP --swap bytes
 .\" CPU fair scheduler
 .OP --cpuunits num
 .OP --cpulimit num
@@ -294,9 +296,53 @@ and multicast packets);
 By default, this functionality is enabled for all veth devices existing
 inside the Container.
 
-.SS3 Resource limits
+.SS3 VSwap limits
+.PP
+The following options sets memory and swap limits for VSwap-enabled kernels
+(kernel version 042stab042 or greater).
+.PP
+Argument is in bytes, with an optional suffix. Available suffixes are:
+.TP
+\fBT\fR, \fBt\fR
+terabytes;
+.TP
+\fBG\fR, \fBg\fR
+gigabytes;
+.TP
+\fBM\fR, \fBm\fR
+megabytes;
+.TP
+\fBK\fR, \fBk\fR
+kilobytes;
+.TP
+\fBP\fR, \fBp\fR
+memory pages (arch-specific).
+.PP
+.TP
+\fB--ram\fR \fIbytes\fR
+Sets physical memory (RAM) available to a container.
+Actually, the option is a shortcut for setting \fB--physpages\fR limit
+(the barrier is set to 0).
+.TP
+\fB--swap\fR \fIbytes\fR
+Set swap space available to a container.
+Actually, the option is a shortcut for setting \fB--swappages\fR limit
+(the barrier is set to 0).
+.PP
+Here is an example of setting container 777 to have
+512 megabytes of RAM and 1 gigabyte of swap:
+.EX
+   vzctl set 777 --ram 512M --swap 1G --save
+.EE
+
+.SS3 User Beancounter limits
 .PP
 The following options sets barrier and limit for various user beancounters.
+.PP
+Note that for VSwap-enabled kernels (version 042stab042 or greater) these
+limits are optional, you must only set \fB--ram\fR and \fR--swap\fR
+(see above). For older kernels, these limits are obligatory.
+.PP
 Each option requires one or two arguments. In case of one argument,
 \fBvzctl\fR sets barrier and limit to the same value. In case of
 two colon-separated arguments, the first is a barrier,
