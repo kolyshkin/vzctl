@@ -625,7 +625,9 @@ Give the container an access (\fBr\fR - read, \fBw\fR - write,
 \fBq\fR - disk quota management, \fBnone\fR - no access)
 to a device designated by the special file /dev/\fIdevice\fR. Device file
 is created in a container by \fBvzctl\fR. Example:
-\fBvzctl set 777 --devnodes sdb:rwq\fR.
+.EX
+   vzctl set 777 --devnodes sdb:rwq
+.EE
 .TP
 \fB--devices\fR \fBb\fR|\fBc\fR:\fImajor\fR:\fIminor\fR|\fBall\fR:[\fBr\fR][\fBw\fR][\fBq\fR]|\fBnone\fR
 Give the container an access to a \fBb\fRlock or \fBc\fRharacter device
