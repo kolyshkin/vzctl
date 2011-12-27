@@ -466,13 +466,15 @@ of RAM by this container. Barrier should be set to \fB0\fR, and limit
 should be set to \fBunlimited\fR.
 .TP
 \fB--swappages\fR \fIpages\fR[:\fIpages\fR]
-The limit, if set, is used to show a total amount of swap space available
-inside the container. The barrier of this parameter is currently ignored.
-The default value is \fBunlimited\fR, meaning total swap will be reported
-as 0.
+For VSwap-enabled kernels (042stab042 or greater), this parameter limits
+the amount of swap space available to a container. The barrier should
+be set to \fB0\fR, and the limit to a total size of swap that can be used
+by a container.
 
-Note that in order for the value to be shown as total swap space,
-\fB--meminfo\fR parameter should be set to value other than \fBnone\fR.
+For older (pre-VSwap) kernels, the limit is used to show a total amount
+of swap space available inside the container. The barrier of this parameter
+is ignored. The default value is \fBunlimited\fR, meaning total swap will
+be reported as 0.
 
 .SS3 CPU fair scheduler parameters
 .PP
@@ -508,7 +510,8 @@ Default value is \fBall\fR (the container can execute on any CPU).
 
 .SS3 Memory output parameters
 .PP
-This parameter control output of /proc/meminfo inside a container.
+For VSwap-enabled kernels (042stab042 or greater), this parameter is ignored.
+For older kernels, it controls the output of /proc/meminfo inside a container.
 .TP
 \fB--meminfo\fR \fBnone\fR
 No /proc/meminfo virtualization (the same as on host system).
@@ -526,10 +529,6 @@ You can use the following modes for \fImode\fR:
 \fBprivvmpages\fR * \fIvalue\fR.
 
 Default is \fBprivvmpages:1\fR.
-
-Note that if \fB--physpages\fR is set on a VSwap-enabled kernel, it takes
-a precedence over \fB--meminfo\fR, i.e. setting \fB--meminfo\fR does not
-take any effect.
 
 .SS3 iptables control parameters
 .TP
