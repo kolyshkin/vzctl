@@ -32,7 +32,7 @@
 #include "vzsyscalls.h"
 
 static inline int setublimit(uid_t uid, unsigned long resource,
-	unsigned long *rlim)
+	const unsigned long *rlim)
 {
 	return syscall(__NR_setublimit, uid, resource, rlim);
 }
@@ -166,12 +166,18 @@ const char *get_ub_name(unsigned int res_id)
 
 int set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 {
+	int vswap = is_vswap_config(ub);
+	const unsigned long unlim_ub[2] = {LONG_MAX, LONG_MAX};
+	const unsigned long *res;
 
 #define SET_UB_LIMIT(name, id)						\
-if (ub->name != NULL) {							\
-	if (setublimit(veid, id, ub->name)) {				\
+res = ub->name;								\
+if (vswap && !res)							\
+	res = unlim_ub;							\
+if (res != NULL) {							\
+	if (setublimit(veid, id, res)) {				\
 		logger(-1, errno, "setublimit %s %lu:%lu failed",	\
-			get_ub_name(id), ub->name[0], ub->name[1]);	\
+			get_ub_name(id), res[0], res[1]);		\
 		return VZ_SETUBC_ERROR;					\
 	}								\
 }
