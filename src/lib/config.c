@@ -654,7 +654,7 @@ static int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 
 static int parse_vswap(ub_param *ub, const char *val, int id)
 {
-	int ret;
+	int ret=0;
 	ub_res res;
 	const char *tail;
 	unsigned long long tmp;
