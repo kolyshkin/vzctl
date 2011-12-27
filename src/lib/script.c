@@ -284,7 +284,8 @@ int mk_quota_link()
 
 int add_reach_runlevel_mark()
 {
-	int fd, found, len, ret;
+	int fd, found, ret;
+	ssize_t len, w;
 	char buf[4096];
 	struct stat st;
 
@@ -303,9 +304,15 @@ int add_reach_runlevel_mark()
 				strerror(errno));
 			return -1;
 		}
-		write(fd, EVENTS_SCRIPT_UBUNTU,
-			sizeof(EVENTS_SCRIPT_UBUNTU) - 1);
+		len = sizeof(EVENTS_SCRIPT_UBUNTU) - 1;
+		w = write(fd, EVENTS_SCRIPT_UBUNTU, len);
 		close(fd);
+		if (len != w) {
+			fprintf(stderr, "Error writing "
+					EVENTS_FILE_UBUNTU ": %s\n",
+					strerror(errno));
+			return -1;
+		}
 		return 0;
 	} else if (!stat(EVENTS_DIR, &st)) {
 		fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644);
@@ -314,8 +321,14 @@ int add_reach_runlevel_mark()
 				": %s\n", strerror(errno));
 			return -1;
 		}
-		write(fd, EVENTS_SCRIPT, sizeof(EVENTS_SCRIPT) - 1);
+		len = sizeof(EVENTS_SCRIPT) - 1;
+		w = write(fd, EVENTS_SCRIPT, len);
 		close(fd);
+		if (len != w) {
+			fprintf(stderr, "Error writing " EVENTS_FILE ": %s\n",
+					strerror(errno));
+			return -1;
+		}
 		return 0;
 	}
 	/* Add a line to /etc/inittab */
