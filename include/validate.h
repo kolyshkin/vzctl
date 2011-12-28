@@ -57,7 +57,7 @@ struct mem_struct {
 struct ub_struct;
 struct vps_res;
 
-int validate(struct vps_res *param, int recover, int ask);
+int validate(struct vps_res *param, int recover, int ask, int vswap);
 int calc_ve_utilization(struct ub_struct *param, struct CRusage *rusage,
 	struct mem_struct *mem, int numerator);
 int calc_ve_commitment(struct ub_struct *param, struct CRusage *rusage,

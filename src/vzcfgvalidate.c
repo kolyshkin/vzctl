@@ -94,7 +94,8 @@ int main(int argc, char **argv)
 	/* Merge configs (needed for DISK_QUOTA value, maybe others) */
 	merge_vps_param(gparam, param);
 
-	if (!(ret = validate(&param->res, recover, ask))) {
+	if (!(ret = validate(&param->res, recover, ask,
+				is_vswap_config(&param->res.ub)))) {
 		if (recover || ask)
 			if (vps_save_config(0, infile, param, NULL, NULL))
 				goto err;

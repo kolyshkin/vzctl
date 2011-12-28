@@ -79,7 +79,76 @@ static int check_param(struct ub_struct *param, int log)
 	return ret;
 }
 
-int validate(vps_res *param, int recover, int ask)
+#define SET_MES(val)	logger(0, 0, "set to %lu", val);
+#define SET2_MES(val1, val2) logger(0, 0,"set to %lu:%lu", val1, val2);
+
+/** Validate vswap config
+ * Current ideas are:
+ * 1. only check physpages and swappages
+ * 2. barrier should be zero for both
+ * 3. physpages.limit should not exceed host RAM
+ * 4. swappages.limit should not exceed host swap
+ */
+static int validate_vswap(vps_res *param, int recover, int ask)
+{
+	struct ub_struct *ub = &param->ub;
+	int changed = 0;
+	int ret = 0;
+	unsigned long long tmp;
+	unsigned long ram, swap;
+
+#define CHECK_VSWAP(name, limit)					\
+	if (ub->name != NULL) {						\
+		if (ub->name[0] != 0) {					\
+			logger(-1, 0, "Error: " #name ".bar should be "	\
+					"= 0 (currently, %lu)",		\
+					ub->name[0]);			\
+			if (ask || recover) {				\
+				SET_MES((unsigned long) 0);		\
+				if (ask)				\
+					recover = read_yn();		\
+				if (recover) {				\
+					ub->name[0] = 0;		\
+					changed++;			\
+				}					\
+			}						\
+			if (!recover) ret = 1;				\
+		}							\
+		if (ub->name[1] > limit) {				\
+			logger(-1, 0, "Warning: " #name ".lim should "	\
+					"be <= %lu (currently, %lu)",	\
+					limit, ub->name[1]);		\
+			if (ask || recover) {				\
+				SET_MES((unsigned long) limit);		\
+				if (ask)				\
+					recover = read_yn();		\
+				if (recover) {				\
+					ub->name[1] = limit;		\
+					changed++;			\
+				}					\
+			}						\
+			if (!recover) ret = 1;				\
+		}							\
+	} else {							\
+		logger(-1, 0, "Error: parameter " #name " not found");	\
+		ret = 1;						\
+	}
+
+	if (get_mem(&tmp) < 0)
+		return -1;
+	ram = tmp / page_size;
+
+	if (get_swap(&tmp) < 0)
+		return -1;
+	swap = tmp / page_size;
+
+	CHECK_VSWAP(physpages, ram);
+	CHECK_VSWAP(swappages, swap);
+
+	return ret;
+}
+
+int validate(vps_res *param, int recover, int ask, int vswap)
 {
 	unsigned long avnumproc;
 	int ret = 0;
@@ -88,8 +157,8 @@ int validate(vps_res *param, int recover, int ask)
 	int changed = 0;
 	struct ub_struct *ub;
 
-#define SET_MES(val)	logger(0, 0, "set to %lu", val);
-#define SET2_MES(val1, val2) logger(0, 0,"set to %lu:%lu", val1, val2);
+	if (vswap)
+		return validate_vswap(param, recover, ask);
 
 #define CHECK_BL(x, name)						\
 if (x != NULL) {							\
