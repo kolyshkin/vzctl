@@ -1113,9 +1113,11 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 					cmd_p, vps_p, &g_action);
 		} else if (cmd_p->opt.save != NO) {
 			if (list_empty(&cmd_p->res.misc.userpw)) {
+				int is_run = h != NULL && vps_is_run(h, veid);
 				logger(0, 0, "WARNING: Settings were not saved"
-				" and will be reset to original values at the"
-				" next start (use --save flag)");
+				" to config %s(use --save flag)",
+				is_run ? "and will be lost after CT restart "
+					: "");
 			}
 		}
 		break;
