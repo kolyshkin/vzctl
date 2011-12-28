@@ -2399,8 +2399,7 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 
 	ret = write_conf(path, &conf);
 	if (ret == 0)
-		logger(0, 0, "Saved parameters "
-				"for CT %d", veid);
+		logger(0, 0, "CT configuration saved to %s", path);
 out:
 	free_str_param(&conf);
 	free_str_param(&new_conf);
