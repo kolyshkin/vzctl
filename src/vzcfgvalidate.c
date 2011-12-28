@@ -32,10 +32,12 @@ extern int page_size;
 
 static void usage(int rc)
 {
-	FILE *fp = rc ? stderr : stdout;
-	fprintf(fp, "Usage: %s [-r|-i] <configfile>\n", progname);
-	fprintf(fp, "	-r repair mode\n");
-	fprintf(fp, "	-i interactive repair mode\n");
+	fprintf(rc ? stderr : stdout,
+"Usage: %s [-r|-i] <configfile>\n"
+"	-r		repair mode\n"
+"	-i		interactive repair mode\n"
+		progname);
+
 	exit(rc);
 }
 
