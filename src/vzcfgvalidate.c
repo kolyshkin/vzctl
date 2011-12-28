@@ -102,8 +102,10 @@ int main(int argc, char **argv)
 			if (vps_save_config(0, infile, param, NULL, NULL))
 				goto err;
 		logger(-1, 0, "Validation completed: success");
+		ret = 0;
 	}
-	ret = 0;
+	else
+		ret = 2;
 
 err:
 	free(infile);
