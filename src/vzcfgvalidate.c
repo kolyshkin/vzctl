@@ -33,9 +33,10 @@ extern int page_size;
 static void usage(int rc)
 {
 	fprintf(rc ? stderr : stdout,
-"Usage: %s [-r|-i] <configfile>\n"
+"Usage: %s [-r|-i] [-v yes|no] <configfile>\n"
 "	-r		repair mode\n"
 "	-i		interactive repair mode\n"
+"	-v yes|no	force VSwap/non-VSwap mode (auto-detect by default)\n",
 		progname);
 
 	exit(rc);
@@ -48,8 +49,11 @@ int main(int argc, char **argv)
 	char *infile = NULL;
 	int opt, recover = 0, ask = 0;
 	int ret = 1;
+	int vswap = -1;
 
-	while ((opt = getopt(argc, argv, "rih")) > 0) {
+	init_log(NULL, 0, 1, 0, 0, progname);
+
+	while ((opt = getopt(argc, argv, "rihv:")) > 0) {
 		switch(opt) {
 		case 'r'	:
 			recover = 1;
@@ -59,14 +63,26 @@ int main(int argc, char **argv)
 			break;
 		case 'h'	:
 			usage(0);
+		case 'v':
+			switch (yesno2id(optarg)) {
+				case YES:
+					vswap = 1;
+					break;
+				case NO:
+					vswap = 0;
+					break;
+				default:
+					logger(-1, 0, "Invalid argument "
+							"for -v: %s", optarg);
+					usage(1);
+			}
+			break;
 		default	:
 			usage(1);
 		}
 	}
 	if (optind >= argc)
 		usage(1);
-
-	init_log(NULL, 0, 1, 0, 0, progname);
 
 	if ((page_size = get_pagesize()) < 0)
 		return 1;
@@ -96,8 +112,10 @@ int main(int argc, char **argv)
 	/* Merge configs (needed for DISK_QUOTA value, maybe others) */
 	merge_vps_param(gparam, param);
 
-	if (!(ret = validate(&param->res, recover, ask,
-				is_vswap_config(&param->res.ub)))) {
+	if (vswap == -1)
+		vswap = is_vswap_config(&param->res.ub);
+
+	if (!(ret = validate(&param->res, recover, ask, vswap))) {
 		if (recover || ask)
 			if (vps_save_config(0, infile, param, NULL, NULL))
 				goto err;

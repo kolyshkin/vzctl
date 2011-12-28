@@ -5,6 +5,7 @@ vzcfgvalidate \- validate a container configuration file
 .SY vzcfgvalidate
 .OP -r
 .OP -i
+.RB [ -v\ yes | no ]
 .I configfile
 .YS
 .SH DESCRIPTION
@@ -22,6 +23,11 @@ Repair mode (corrects \fIconfigfile\fR).
 .TP
 .B \-i
 Interactive repair mode.
+.TP
+.BR -v\ yes | no
+Whether to treat \fIconfigfile\fR as VSwap enabled configuration.
+Default is auto-detect by checking if physpages.limit is not set to unlimited;
+this option overrides the auto-detection.
 .SH EXIT STATUS
 Normally, exit status is 0. On program execution error, exit status is 1.
 If the validation fails, exit status is 2.
