@@ -413,6 +413,13 @@ SORT_DQ(diskinodes)
 SORT_UL_RES(cpulimit_sort_fn, cpu, limit, 0)
 SORT_UL_RES(cpuunits_sort_fn, cpu, limit, 1)
 
+#define UBC_FIELD(name, header) \
+{#name,      #header,      "%10s", 0, RES_UBC, print_ubc_ ## name, name ## _h_sort_fn},	\
+{#name ".m", #header ".M", "%10s", 1, RES_UBC, print_ubc_ ## name, name ## _m_sort_fn},	\
+{#name ".b", #header ".B", "%10s", 2, RES_UBC, print_ubc_ ## name, name ## _b_sort_fn},	\
+{#name ".l", #header ".L", "%10s", 3, RES_UBC, print_ubc_ ## name, name ## _l_sort_fn},	\
+{#name ".f", #header ".F", "%10s", 4, RES_UBC, print_ubc_ ## name, name ## _f_sort_fn}
+
 static struct Cfield field_names[] =
 {
 /* ctid should have index 0 */
@@ -429,130 +436,27 @@ static struct Cfield field_names[] =
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"status", "STATUS", "%-9s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
-{"kmemsize", "KMEMSIZE", "%10s", 0, RES_UBC, print_ubc_kmemsize, kmemsize_h_sort_fn},
-{"kmemsize.m", "KMEMSIZE.M", "%10s", 1, RES_UBC, print_ubc_kmemsize, kmemsize_m_sort_fn},
-{"kmemsize.b", "KMEMSIZE.B", "%10s", 2, RES_UBC, print_ubc_kmemsize, kmemsize_b_sort_fn},
-{"kmemsize.l", "KMEMSIZE.L", "%10s", 3, RES_UBC, print_ubc_kmemsize, kmemsize_l_sort_fn},
-{"kmemsize.f", "KMEMSIZE.F", "%10s", 4, RES_UBC, print_ubc_kmemsize, kmemsize_f_sort_fn},
-
-{"lockedpages", "LOCKEDP", "%10s", 0, RES_UBC, print_ubc_lockedpages, lockedpages_h_sort_fn},
-{"lockedpages.m", "LOCKEDP.M", "%10s", 1, RES_UBC, print_ubc_lockedpages, lockedpages_m_sort_fn},
-{"lockedpages.b", "LOCKEDP.B", "%10s", 2, RES_UBC, print_ubc_lockedpages, lockedpages_b_sort_fn},
-{"lockedpages.l", "LOCKEDP.L", "%10s", 3, RES_UBC, print_ubc_lockedpages, lockedpages_l_sort_fn},
-{"lockedpages.f", "LOCKEDP.F", "%10s", 4, RES_UBC, print_ubc_lockedpages, lockedpages_f_sort_fn},
-
-{"privvmpages", "PRIVVMP", "%10s", 0, RES_UBC, print_ubc_privvmpages, privvmpages_h_sort_fn},
-{"privvmpages.m", "PRIVVMP.M", "%10s", 1, RES_UBC, print_ubc_privvmpages, privvmpages_m_sort_fn},
-{"privvmpages.b", "PRIVVMP.B", "%10s", 2, RES_UBC, print_ubc_privvmpages, privvmpages_b_sort_fn},
-{"privvmpages.l", "PRIVVMP.L", "%10s", 3, RES_UBC, print_ubc_privvmpages, privvmpages_l_sort_fn},
-{"privvmpages.f", "PRIVVMP.F", "%10s", 4, RES_UBC, print_ubc_privvmpages, privvmpages_f_sort_fn},
-
-{"shmpages", "SHMP", "%10s", 0, RES_UBC, print_ubc_shmpages, shmpages_h_sort_fn},
-{"shmpages.m", "SHMP.M", "%10s", 1, RES_UBC, print_ubc_shmpages, shmpages_m_sort_fn},
-{"shmpages.b", "SHMP.B", "%10s", 2, RES_UBC, print_ubc_shmpages, shmpages_b_sort_fn},
-{"shmpages.l", "SHMP.L", "%10s", 3, RES_UBC, print_ubc_shmpages, shmpages_l_sort_fn},
-{"shmpages.f", "SHMP.F", "%10s", 4, RES_UBC, print_ubc_shmpages, shmpages_f_sort_fn},
-{"numproc", "NPROC", "%10s", 0, RES_UBC, print_ubc_numproc, numproc_h_sort_fn},
-{"numproc.m", "NPROC.M", "%10s", 1, RES_UBC, print_ubc_numproc, numproc_m_sort_fn},
-{"numproc.b", "NPROC.B", "%10s", 2, RES_UBC, print_ubc_numproc, numproc_b_sort_fn},
-{"numproc.l", "NPROC.L", "%10s", 3, RES_UBC, print_ubc_numproc, numproc_l_sort_fn},
-{"numproc.f", "NPROC.F", "%10s", 4, RES_UBC, print_ubc_numproc, numproc_f_sort_fn},
-
-{"physpages", "PHYSP", "%10s", 0, RES_UBC, print_ubc_physpages, physpages_h_sort_fn},
-{"physpages.m", "PHYSP.M", "%10s", 1, RES_UBC, print_ubc_physpages, physpages_m_sort_fn},
-{"physpages.b", "PHYSP.B", "%10s", 2, RES_UBC, print_ubc_physpages, physpages_b_sort_fn},
-{"physpages.l", "PHYSP.L", "%10s", 3, RES_UBC, print_ubc_physpages, physpages_l_sort_fn},
-{"physpages.f", "PHYSP.F", "%10s", 4, RES_UBC, print_ubc_physpages, physpages_f_sort_fn},
-
-{"vmguarpages", "VMGUARP", "%10s", 0, RES_UBC, print_ubc_vmguarpages, vmguarpages_h_sort_fn},
-{"vmguarpages.m", "VMGUARP.M", "%10s", 1, RES_UBC,print_ubc_vmguarpages, vmguarpages_m_sort_fn},
-{"vmguarpages.b", "VMGUARP.B", "%10s", 2, RES_UBC,print_ubc_vmguarpages, vmguarpages_b_sort_fn},
-{"vmguarpages.l", "VMGUARP.L", "%10s", 3, RES_UBC,print_ubc_vmguarpages, vmguarpages_l_sort_fn},
-{"vmguarpages.f", "VMGUARP.F", "%10s", 4, RES_UBC,print_ubc_vmguarpages, vmguarpages_f_sort_fn},
-
-{"oomguarpages", "OOMGUARP", "%10s", 0, RES_UBC,print_ubc_oomguarpages, oomguarpages_h_sort_fn},
-{"oomguarpages.m", "OOMGUARP.M", "%10s", 1, RES_UBC,print_ubc_oomguarpages, oomguarpages_m_sort_fn},
-{"oomguarpages.b", "OOMGUARP.B", "%10s", 2, RES_UBC,print_ubc_oomguarpages, oomguarpages_b_sort_fn},
-{"oomguarpages.l", "OOMGUARP.L", "%10s", 3, RES_UBC,print_ubc_oomguarpages, oomguarpages_l_sort_fn},
-{"oomguarpages.f", "OOMGUARP.F", "%10s", 4, RES_UBC,print_ubc_oomguarpages, oomguarpages_f_sort_fn},
-
-{"numtcpsock", "NTCPSOCK", "%10s", 0, RES_UBC,print_ubc_numtcpsock, numtcpsock_h_sort_fn},
-{"numtcpsock.m", "NTCPSOCK.M", "%10s", 1, RES_UBC,print_ubc_numtcpsock, numtcpsock_m_sort_fn},
-{"numtcpsock.b", "NTCPSOCK.B", "%10s", 2, RES_UBC,print_ubc_numtcpsock, numtcpsock_b_sort_fn},
-{"numtcpsock.l", "NTCPSOCK.L", "%10s", 3, RES_UBC,print_ubc_numtcpsock, numtcpsock_l_sort_fn},
-{"numtcpsock.f", "NTCPSOCK.F", "%10s", 4, RES_UBC,print_ubc_numtcpsock, numtcpsock_f_sort_fn},
-
-{"numflock", "NFLOCK", "%10s", 0, RES_UBC,print_ubc_numflock, numflock_h_sort_fn},
-{"numflock.m", "NFLOCK.M", "%10s", 1, RES_UBC,print_ubc_numflock, numflock_m_sort_fn},
-{"numflock.b", "NFLOCK.B", "%10s", 2, RES_UBC,print_ubc_numflock, numflock_b_sort_fn},
-{"numflock.l", "NFLOCK.L", "%10s", 3, RES_UBC,print_ubc_numflock, numflock_l_sort_fn},
-{"numflock.f", "NFLOCK.F", "%10s", 4, RES_UBC,print_ubc_numflock, numflock_f_sort_fn},
-
-{"numpty", "NPTY", "%10s", 0, RES_UBC,print_ubc_numpty, numpty_h_sort_fn},
-{"numpty.m", "NPTY.M", "%10s", 1, RES_UBC,print_ubc_numpty, numpty_m_sort_fn},
-{"numpty.b", "NPTY.B", "%10s", 2, RES_UBC,print_ubc_numpty, numpty_b_sort_fn},
-{"numpty.l", "NPTY.L", "%10s", 3, RES_UBC,print_ubc_numpty, numpty_l_sort_fn},
-{"numpty.f", "NPTY.F", "%10s", 4, RES_UBC,print_ubc_numpty, numpty_f_sort_fn},
-
-{"numsiginfo", "NSIGINFO", "%10s", 0, RES_UBC,print_ubc_numsiginfo, numsiginfo_h_sort_fn},
-{"numsiginfo.m", "NSIGINFO.M", "%10s", 1, RES_UBC,print_ubc_numsiginfo, numsiginfo_m_sort_fn},
-{"numsiginfo.b", "NSIGINFO.B", "%10s", 2, RES_UBC,print_ubc_numsiginfo, numsiginfo_b_sort_fn},
-{"numsiginfo.l", "NSIGINFO.L", "%10s", 3, RES_UBC,print_ubc_numsiginfo, numsiginfo_l_sort_fn},
-{"numsiginfo.f", "NSIGINFO.F", "%10s", 4, RES_UBC,print_ubc_numsiginfo, numsiginfo_f_sort_fn},
-
-{"tcpsndbuf", "TCPSNDB", "%10s", 0, RES_UBC,print_ubc_tcpsndbuf, tcpsndbuf_h_sort_fn},
-{"tcpsndbuf.m", "TCPSNDB.M", "%10s", 1, RES_UBC,print_ubc_tcpsndbuf, tcpsndbuf_m_sort_fn},
-{"tcpsndbuf.b", "TCPSNDB.B", "%10s", 2, RES_UBC,print_ubc_tcpsndbuf, tcpsndbuf_b_sort_fn},
-{"tcpsndbuf.l", "TCPSNDB.L", "%10s", 3, RES_UBC,print_ubc_tcpsndbuf, tcpsndbuf_l_sort_fn},
-{"tcpsndbuf.f", "TCPSNDB.F", "%10s", 4, RES_UBC,print_ubc_tcpsndbuf, tcpsndbuf_f_sort_fn},
-
-{"tcprcvbuf", "TCPRCVB", "%10s", 0, RES_UBC,print_ubc_tcprcvbuf, tcprcvbuf_h_sort_fn},
-{"tcprcvbuf.m", "TCPRCVB.M", "%10s", 1, RES_UBC,print_ubc_tcprcvbuf, tcprcvbuf_m_sort_fn},
-{"tcprcvbuf.b", "TCPRCVB.B", "%10s", 2, RES_UBC,print_ubc_tcprcvbuf, tcprcvbuf_b_sort_fn},
-{"tcprcvbuf.l", "TCPRCVB.L", "%10s", 3, RES_UBC,print_ubc_tcprcvbuf, tcprcvbuf_l_sort_fn},
-{"tcprcvbuf.f", "TCPRCVB.F", "%10s", 4, RES_UBC,print_ubc_tcprcvbuf, tcprcvbuf_f_sort_fn},
-
-{"othersockbuf", "OTHSOCKB", "%10s", 0, RES_UBC,print_ubc_othersockbuf, othersockbuf_h_sort_fn},
-{"othersockbuf.m", "OTHSOCKB.M", "%10s", 1, RES_UBC,print_ubc_othersockbuf, othersockbuf_m_sort_fn},
-{"othersockbuf.b", "OTHSOCKB.B", "%10s", 2, RES_UBC,print_ubc_othersockbuf, othersockbuf_b_sort_fn},
-{"othersockbuf.l", "OTHSOCKB.L", "%10s", 3, RES_UBC,print_ubc_othersockbuf, othersockbuf_l_sort_fn},
-{"othersockbuf.f", "OTHSOCKB.F", "%10s", 4, RES_UBC,print_ubc_othersockbuf, othersockbuf_f_sort_fn},
-
-{"dgramrcvbuf", "DGRAMRB", "%10s", 0, RES_UBC,print_ubc_dgramrcvbuf, dgramrcvbuf_h_sort_fn},
-{"dgramrcvbuf.m", "DGRAMRB.M", "%10s", 1, RES_UBC,print_ubc_dgramrcvbuf, dgramrcvbuf_m_sort_fn},
-{"dgramrcvbuf.b", "DGRAMRB.B", "%10s", 2, RES_UBC,print_ubc_dgramrcvbuf, dgramrcvbuf_b_sort_fn},
-{"dgramrcvbuf.l", "DGRAMRB.L", "%10s", 3, RES_UBC,print_ubc_dgramrcvbuf, dgramrcvbuf_l_sort_fn},
-{"dgramrcvbuf.f", "DGRAMRB.F", "%10s", 4, RES_UBC,print_ubc_dgramrcvbuf, dgramrcvbuf_f_sort_fn},
-
-{"numothersock", "NOTHSOCK", "%10s", 0, RES_UBC,print_ubc_numothersock, numothersock_h_sort_fn},
-{"numothersock.m", "NOTHSOCK.M", "%10s", 1, RES_UBC,print_ubc_numothersock, numothersock_m_sort_fn},
-{"numothersock.b", "NOTHSOCK.B", "%10s", 2, RES_UBC,print_ubc_numothersock, numothersock_b_sort_fn},
-{"numothersock.l", "NOTHSOCK.L", "%10s", 3, RES_UBC,print_ubc_numothersock, numothersock_l_sort_fn},
-{"numothersock.f", "NOTHSOCK.F", "%10s", 4, RES_UBC,print_ubc_numothersock, numothersock_f_sort_fn},
-
-{"dcachesize", "DCACHESZ", "%10s", 0, RES_UBC,print_ubc_dcachesize, dcachesize_h_sort_fn},
-{"dcachesize.m", "DCACHESZ.M", "%10s", 1, RES_UBC,print_ubc_dcachesize, dcachesize_m_sort_fn},
-{"dcachesize.b", "DCACHESZ.B", "%10s", 2, RES_UBC,print_ubc_dcachesize, dcachesize_b_sort_fn},
-{"dcachesize.l", "DCACHESZ.L", "%10s", 3, RES_UBC,print_ubc_dcachesize, dcachesize_l_sort_fn},
-{"dcachesize.f", "DCACHESZ.F", "%10s", 4, RES_UBC,print_ubc_dcachesize, dcachesize_f_sort_fn},
-
-{"numfile", "NFILE", "%10s", 0, RES_UBC,print_ubc_numfile, numfile_h_sort_fn},
-{"numfile.m", "NFILE.M", "%10s", 1, RES_UBC,print_ubc_numfile, numfile_m_sort_fn},
-{"numfile.b", "NFILE.B", "%10s", 2, RES_UBC,print_ubc_numfile, numfile_b_sort_fn},
-{"numfile.l", "NFILE.L", "%10s", 3, RES_UBC,print_ubc_numfile, numfile_l_sort_fn},
-{"numfile.f", "NFILE.F", "%10s", 4, RES_UBC,print_ubc_numfile, numfile_f_sort_fn},
-
-{"numiptent", "NIPTENT", "%10s", 0, RES_UBC,print_ubc_numiptent, numiptent_h_sort_fn},
-{"numiptent.m", "NIPTENT.M", "%10s", 1, RES_UBC,print_ubc_numiptent, numiptent_m_sort_fn},
-{"numiptent.b", "NIPTENT.B", "%10s", 2, RES_UBC,print_ubc_numiptent, numiptent_b_sort_fn},
-{"numiptent.l", "NIPTENT.L", "%10s", 3, RES_UBC,print_ubc_numiptent, numiptent_l_sort_fn},
-{"numiptent.f", "NIPTENT.F", "%10s", 4, RES_UBC,print_ubc_numiptent, numiptent_f_sort_fn},
-
-{"swappages", "SWAPP", "%10s", 0, RES_UBC,print_ubc_swappages, swappages_h_sort_fn},
-{"swappages.m", "SWAPP.M", "%10s", 1, RES_UBC,print_ubc_swappages, swappages_m_sort_fn},
-{"swappages.b", "SWAPP.B", "%10s", 2, RES_UBC,print_ubc_swappages, swappages_b_sort_fn},
-{"swappages.l", "SWAPP.L", "%10s", 3, RES_UBC,print_ubc_swappages, swappages_l_sort_fn},
-{"swappages.f", "SWAPP.F", "%10s", 4, RES_UBC,print_ubc_swappages, swappages_f_sort_fn},
+UBC_FIELD(kmemsize, KMEMSIZE),
+UBC_FIELD(lockedpages, LOCKEDP),
+UBC_FIELD(privvmpages, PRIVVMP),
+UBC_FIELD(shmpages, SHMP),
+UBC_FIELD(numproc, NPROC),
+UBC_FIELD(physpages, PHYSP),
+UBC_FIELD(vmguarpages, VMGUARP),
+UBC_FIELD(oomguarpages, OOMGUARP),
+UBC_FIELD(numtcpsock, NTCPSOCK),
+UBC_FIELD(numflock, NFLOCK),
+UBC_FIELD(numpty, NPTY),
+UBC_FIELD(numsiginfo, NSIGINFO),
+UBC_FIELD(tcpsndbuf, TCPSNDB),
+UBC_FIELD(tcprcvbuf, TCPRCVB),
+UBC_FIELD(othersockbuf, OTHSOCKB),
+UBC_FIELD(dgramrcvbuf, DGRAMRB),
+UBC_FIELD(numothersock, NOTHSOCK),
+UBC_FIELD(dcachesize, DCACHESZ),
+UBC_FIELD(numfile, NFILE),
+UBC_FIELD(numiptent, NIPTENT),
+UBC_FIELD(swappages, SWAPP),
 
 {"diskspace", "DSPACE", "%10s", 0, RES_QUOTA, print_diskspace, diskspace_u_sort_fn},
 {"diskspace.s", "DSPACE.S", "%10s", 1, RES_QUOTA, print_diskspace, diskspace_s_sort_fn},
