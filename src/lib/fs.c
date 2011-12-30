@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
+#include <mntent.h>
+#include <string.h>
 #include <sys/mount.h>
+#include <sys/param.h>
 
 #include "fs.h"
 #include "util.h"
@@ -65,32 +68,6 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	return ret;
 }
 
-static int real_umount(envid_t veid, const char *root)
-{
-	int i, ret, n;
-
-	n = 0;
-	for (i = 0; i < 2; i++) {
-		while (1) {
-			ret = umount2(root, MNT_DETACH);
-			if (ret < 0) {
-				if (n > 0 && errno == EINVAL)
-					ret = 0;
-				break;
-			}
-			n++;
-		}
-		if (ret == 0 || (ret < 0 && errno != EBUSY))
-			break;
-		sleep(1);
-	}
-	if (ret) {
-		logger(-1, errno, "Can't umount: %s", root);
-		ret = VZ_FS_CANTUMOUNT;
-	}
-	return ret;
-}
-
 /** Unmount CT.
  *
  * @param veid		CT ID.
@@ -99,13 +76,15 @@ static int real_umount(envid_t veid, const char *root)
  */
 int fsumount(envid_t veid, const char *root)
 {
-	int ret;
-
-	if (!(ret = real_umount(veid, root))) {
-		if (!quota_ctl(veid, QUOTA_STAT))
-			ret = quota_off(veid, 0);
+	if (umount(root) != 0) {
+		logger(-1, errno, "Can't umount %s", root);
+		return VZ_FS_CANTUMOUNT;
 	}
-	return ret;
+
+	if (!quota_ctl(veid, QUOTA_STAT))
+		return quota_off(veid, 0);
+
+	return 0;
 }
 
 /** Mount CT and run mount action script if exists.
@@ -173,6 +152,35 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	return 0;
 }
 
+static int umount_submounts(const char *root)
+{
+	FILE *fp;
+	struct mntent *mnt;
+	int len;
+	char path[MAXPATHLEN + 1];
+
+	if (realpath(root, path) == NULL) {
+		logger(-1, errno, "realpath(%s) failed", root);
+		return -1;
+	}
+	if ((fp = setmntent("/proc/mounts", "r")) == NULL) {
+		logger(-1, errno, "Unable to open /proc/mounts");
+		return -1;
+	}
+	strcat(path, "/"); /* skip base mountpoint */
+	len = strlen(path);
+	while ((mnt = getmntent(fp)) != NULL) {
+		if (strncmp(path, mnt->mnt_dir, len) == 0) {
+			if (umount(mnt->mnt_dir))
+				logger(-1, errno, "Cannot umount %s",
+						mnt->mnt_dir);
+		}
+	}
+	endmntent(fp);
+
+	return 0;
+}
+
 /** Unmount CT and run unmount action script if exists.
  *
  * @param h		CT handler.
@@ -207,6 +215,7 @@ int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip)
 				UMOUNT_PREFIX);
 		}
 	}
+	umount_submounts(root);
 	if (!(ret = fsumount(veid, root)))
 		logger(0, 0, "Container is unmounted");
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
