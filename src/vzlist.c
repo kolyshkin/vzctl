@@ -716,17 +716,6 @@ static void update_cpu(int veid, unsigned long limit, unsigned long units)
 	return;
 }
 
-static void update_cpustat(int veid, struct Ccpustat *st)
-{
-	struct Cveinfo *tmp;
-
-	if ((tmp = find_ve(veid)) == NULL)
-		return;
-	tmp->cpustat = x_malloc(sizeof(*st));
-	memcpy(tmp->cpustat, st, sizeof(*st));
-	return;
-}
-
 #define MERGE_QUOTA(name, quota, dq)				\
 do {								\
 	if (dq.name != NULL) {					\
@@ -1192,13 +1181,13 @@ static long get_clk_tck()
 	return __clk_tck;
 }
 
-static int get_ve_cpustat(int veid)
+static int get_ve_cpustat(struct Cveinfo *ve)
 {
 	struct vz_cpu_stat stat;
 	struct vzctl_cpustatctl statctl;
 	struct Ccpustat st;
 
-	statctl.veid = veid;
+	statctl.veid = ve->veid;
 	statctl.cpustat = &stat;
 	if (ioctl(vzctlfd, VZCTL_GET_CPU_STAT, &statctl) != 0)
 		return 1;
@@ -1208,7 +1197,8 @@ static int get_ve_cpustat(int veid)
 
 	st.uptime = (float) stat.uptime_jif / get_clk_tck();
 
-	update_cpustat(veid, &st);
+	ve->cpustat = x_malloc(sizeof(st));
+	memcpy(ve->cpustat, &st, sizeof(st));
 	return 0;
 }
 
@@ -1221,7 +1211,7 @@ static int get_ves_cpustat()
 	for (i = 0; i < n_veinfo; i++) {
 		if (veinfo[i].hide)
 			continue;
-		get_ve_cpustat(veinfo[i].veid);
+		get_ve_cpustat(&veinfo[i]);
 	}
 	close(vzctlfd);
 	return 0;
