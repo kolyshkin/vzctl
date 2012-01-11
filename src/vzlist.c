@@ -500,7 +500,7 @@ static void *x_malloc(int size)
 {
 	void *p;
 	if ((p = malloc(size)) == NULL) {
-		printf("Error: unable to allocate %d bytes\n", size);
+		fprintf(stderr, "Error: unable to allocate %d bytes\n", size);
 		exit(1);
 	}
 	return p;
@@ -511,7 +511,7 @@ static void *x_realloc(void *ptr, int size)
 	void *tmp;
 
 	if ((tmp = realloc(ptr, size)) == NULL) {
-		printf("Error: unable to allocate %d bytes\n", size);
+		fprintf(stderr, "Error: unable to allocate %d bytes\n", size);
 		exit(1);
 	}
 	return tmp;
@@ -519,7 +519,7 @@ static void *x_realloc(void *ptr, int size)
 
 static void usage()
 {
-	fprintf(stderr,
+	printf(
 "Usage:	vzlist [-a | -S] [-n] [-H] [-o field[,field...] | -1] [-s [-]field]\n"
 "	       [-h pattern] [-N pattern] [-d pattern] [CTID [CTID ...]]\n"
 "	vzlist -L | --list\n"
@@ -896,7 +896,8 @@ static int get_ub()
 
 	if ((fp = fopen(PROC_BC_RES, "r")) == NULL) {
 		if ((fp = fopen(PROCUBC, "r")) == NULL) {
-			fprintf(stderr, "Unable to open %s\n", PROCUBC);
+			fprintf(stderr, "Unable to open %s: %s\n",
+					PROCUBC, strerror(errno));
 			return 1;
 		}
 	}
@@ -1022,7 +1023,8 @@ static int get_run_ve_proc(int update)
 	int res, veid, classid, nproc;
 
 	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
-		fprintf(stderr, "Unable to open %s\n", PROCVEINFO);
+		fprintf(stderr, "Unable to open %s: %s\n",
+				PROCVEINFO, strerror(errno));
 		return 1;
 	}
 	memset(&ve, 0, sizeof(struct Cveinfo));
@@ -1305,7 +1307,8 @@ static int get_ves_cpu()
 	char buf[128];
 
 	if ((fp = fopen(PROCFSHED, "r")) == NULL) {
-		fprintf(stderr, "Unable to open %s\n", PROCFSHED);
+		fprintf(stderr, "Unable to open %s: %s\n",
+				PROCFSHED, strerror(errno));
 		return 1;
 	}
 	veid = 0;
@@ -1557,7 +1560,8 @@ int main(int argc, char **argv)
 				sort_rev = 1;
 			}
 			if ((g_sort_field = search_field(p)) < 0) {
-				printf("Invalid sort field name: %s\n", optarg);
+				fprintf(stderr, "Invalid sort field name: "
+						"%s\n", optarg);
 				return 1;
 			}
 			break;
@@ -1573,6 +1577,7 @@ int main(int argc, char **argv)
 			name_pattern = strdup(optarg);
 			break;
 		default		:
+			/* "Unknown option" error msg is printed by getopt */
 			usage();
 			return 1;
 		}
