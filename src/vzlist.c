@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -205,6 +205,16 @@ static void print_bootorder(struct Cveinfo *p, int index)
 				"%10lu", p->bootorder[index]);
 }
 
+static void print_cpunum(struct Cveinfo *p, int index)
+{
+	if (p->cpunum <= 0)
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%5s", "-");
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%5d", p->cpunum);
+}
+
 #define PRINT_UBC(name)							\
 static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 {									\
@@ -345,6 +355,12 @@ static int ioprio_sort_fn(const void *val1, const void *val2)
 		((const struct Cveinfo *)val2)->io.ioprio;
 }
 
+static int cpunum_sort_fn(const void *val1, const void *val2)
+{
+	return ((const struct Cveinfo *)val1)->cpunum >
+		((const struct Cveinfo *)val2)->cpunum;
+}
+
 #define SORT_STR_FN(name)						\
 static int name ## _sort_fn(const void *val1, const void *val2)		\
 {									\
@@ -471,6 +487,7 @@ UBC_FIELD(swappages, SWAPP),
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
 {"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
+{"cpus", "CPUS", "%5s", 0, RES_CPUNUM, print_cpunum, cpunum_sort_fn},
 
 {"ioprio", "IOP", "%3s", 0, RES_NONE, print_ioprio, ioprio_sort_fn},
 
@@ -805,6 +822,8 @@ do {								\
 		*ve->bootorder = *res->misc.bootorder;
 	}
 	ve->io.ioprio = res->io.ioprio;
+	if (res->cpu.vcpus != NULL)
+		ve->cpunum = *res->cpu.vcpus;
 }
 
 static int read_ves_param()
@@ -1242,6 +1261,42 @@ static int get_mounted_status()
 	return 0;
 }
 
+static int get_ve_cpunum(struct Cveinfo *ve) {
+	char path[] = "/proc/vz/fairsched/2147483647/cpu.nr_cpus";
+	int veid = ve->veid;
+	FILE *fp;
+	int ret = -1;
+
+	snprintf(path, sizeof(path),
+			"/proc/vz/fairsched/%d/cpu.nr_cpus", veid);
+	fp = fopen(path, "r");
+	if (fp == NULL) {
+		fprintf(stderr, "Unable to open %s: %s\n",
+				path, strerror(errno));
+		return -1;
+	}
+	if (fscanf(fp, "%d", &ve->cpunum) != 1)
+		goto out;
+
+	ret = 0;
+out:
+	fclose(fp);
+
+	return ret;
+}
+
+static int get_ves_cpunum()
+{
+	int i;
+
+	for (i = 0; i < n_veinfo; i++) {
+		if ((veinfo[i].hide) || (veinfo[i].status != VE_RUNNING))
+			continue;
+		get_ve_cpunum(&veinfo[i]);
+	}
+	return 0;
+}
+
 static int get_ves_cpu()
 {
 	unsigned long tmp;
@@ -1386,6 +1441,9 @@ static int collect()
 		get_ves_cpustat();
 	if (check_param(RES_CPU))
 		if (!only_stopped_ve && (ret = get_ves_cpu()))
+			return ret;
+	if (check_param(RES_CPUNUM))
+		if (!only_stopped_ve && (ret = get_ves_cpunum()))
 			return ret;
 	read_ves_param();
 	get_mounted_status();

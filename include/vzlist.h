@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -103,6 +103,7 @@ struct Cveinfo {
 	int status;
 	int hide;
 	int onboot;
+	int cpunum;
 	unsigned long *bootorder;
 };
 
@@ -113,6 +114,7 @@ struct Cveinfo {
 #define RES_IP		4
 #define RES_CPUSTAT	5
 #define RES_CPU		6
+#define RES_CPUNUM	7
 
 struct Cfield {
 	char *name;
