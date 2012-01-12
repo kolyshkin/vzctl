@@ -42,7 +42,8 @@
 #define	CAP_SETFCAP	31
 #endif
 
-#define CAPDEFAULTMASK	(CAP_TO_MASK(CAP_CHOWN)		| \
+#define CAPDEFAULTMASK_OLD				  \
+	CAP_TO_MASK(CAP_CHOWN)				| \
 	CAP_TO_MASK(CAP_DAC_OVERRIDE)			| \
 	CAP_TO_MASK(CAP_DAC_READ_SEARCH)		| \
 	CAP_TO_MASK(CAP_FOWNER)				| \
@@ -65,7 +66,10 @@
 	CAP_TO_MASK(CAP_MKNOD)				| \
 	CAP_TO_MASK(CAP_LEASE)				| \
 	CAP_TO_MASK(CAP_VE_ADMIN)			| \
-	CAP_TO_MASK(CAP_AUDIT_WRITE))			| \
+	CAP_TO_MASK(CAP_AUDIT_WRITE)
+
+#define CAPDEFAULTMASK					  \
+	CAPDEFAULTMASK_OLD				| \
 	CAP_TO_MASK(CAP_SETPCAP)			| \
 	CAP_TO_MASK(CAP_SETFCAP)
 
@@ -187,16 +191,12 @@ static int set_cap(envid_t veid, cap_t mask, int pid)
 	data.permitted = mask;
 	data.inheritable = mask;
 
-	if (capset(&header, &data) < 0)	{
-		logger(-1, errno, "Unable to set capability");
-		return VZ_SET_CAP;
-	}
-	return 0;
+	return capset(&header, &data);
 }
 
-static inline cap_t make_cap_mask(cap_t on, cap_t off)
+static inline cap_t make_cap_mask(cap_t def, cap_t on, cap_t off)
 {
-	return (CAPDEFAULTMASK | on) & ~off;
+	return (def | on) & ~off;
 }
 
 int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap)
@@ -206,7 +206,15 @@ int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap)
 	if ((env->features_known & env->features_mask) & VE_FEATURE_BRIDGE)
 		cap_raise(cap->on, CAP_NET_ADMIN);
 
-	mask = make_cap_mask(cap->on, cap->off);
+	mask = make_cap_mask(CAPDEFAULTMASK, cap->on, cap->off);
+	if (set_cap(veid, mask, 0) == 0)
+		return 0;
 
-	return set_cap(veid, mask, 0);
+	/* Probably old kernel -- retry with old default mask */
+	mask = make_cap_mask(CAPDEFAULTMASK_OLD, cap->on, cap->off);
+	if (set_cap(veid, mask, 0) == 0)
+		return 0;
+
+	logger(-1, errno, "Unable to set capability");
+	return VZ_SET_CAP;
 }
