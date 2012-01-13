@@ -414,8 +414,12 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 
 int is_vswap_config(const ub_param *param)
 {
+	/* Dirty hack: treat INT_MAX (i.e. 32 bit LONG_MAX) as unlimited.
+	 * Required for old CTs migrated from 32 bit to 64 bit host.
+	 */
 	return  (param != NULL) &&
 		(param->physpages != NULL) &&
-		(param->physpages[1] != LONG_MAX);
+		(param->physpages[1] != LONG_MAX) &&
+		(param->physpages[1] != INT_MAX);
 
 }
