@@ -81,7 +81,7 @@ Arguments:
 
 gpg_working()
 {
-	test "x$CHECK_TEMPLATE_SIG" != "yes" && return 0
+	test "x$CHECK_TEMPLATE_SIG" != "xyes" && return 0
 
 	# Check if gpg is installed
 	if ! gpg --version >/dev/null; then
