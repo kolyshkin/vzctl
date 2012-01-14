@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -87,15 +87,27 @@ function init_netconfig()
 	fi
 }
 
+function have_ips()
+{
+	[ -n "${IP_ADDR}" ]
+}
+
+function venet_configured()
+{
+	grep -q "^routes_${VENET_DEV}" ${IFCFG} >/dev/null 2>&1
+}
+
 function add_ip()
 {
 	local ipm
 	if [ "x${VE_STATE}" = "xstarting" -o "x${IPDELALL}" = "xyes" ]; then
-		init_netconfig
+		have_ips && init_netconfig
 		if [ "x${IPDELALL}" = "xyes" ]; then
 			/etc/init.d/net.${VENET_DEV} stop >/dev/null 2>&1
 			return 0
 		fi
+	else
+		have_ips && venet_configured || set_config
 	fi
 
 	for ipm in ${IP_ADDR}; do
