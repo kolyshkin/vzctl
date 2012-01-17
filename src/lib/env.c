@@ -624,7 +624,8 @@ static int fix_ve_systemd(const char *root)
 
 	return 0;
 err:
-	logger(-1, errno, "Failed to set upstart as init");
+	logger(-1, errno, "Failed to set upstart as init. "
+			"Please install upstart into this CT.");
 	return -1;
 }
 
