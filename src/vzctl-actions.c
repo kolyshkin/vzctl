@@ -854,6 +854,7 @@ static int enter(vps_handler *h, envid_t veid, const char *root,
 		argc -= 1; argv += 1;
 	}
 	logger(1, 0, "Entering CT");
+	set_log_file(NULL);
 	return do_enter(h, veid, root, argc, argv);
 }
 
