@@ -1608,8 +1608,15 @@ int main(int argc, char **argv)
 		fprintf(stderr, "This program can only be run under root.\n");
 		return 1;
 	}
-	if ((ret = collect()))
-		return ret;
+	if ((ret = collect())) {
+		/* If no specific CTIDs are specified in arguments,
+		 * 'no containers found' is not an error (bug #2149)
+		 */
+		if (g_ve_list == NULL)
+			return 0;
+		else
+			return ret;
+	}
 	print_ve();
 	free_veinfo();
 	free(host_pattern);
