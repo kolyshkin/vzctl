@@ -345,7 +345,7 @@ static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 {
 	int ret;
 
-	ret = vps_destroy(h, veid, &g_p->res.fs);
+	ret = vps_destroy(h, veid, &g_p->res.fs, &g_p->res.cpt);
 	if (!ret)
 		remove_names(veid);
 	return ret;

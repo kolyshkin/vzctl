@@ -275,7 +275,19 @@ static int destroydir(char *dir)
 	return ret;
 }
 
-int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
+static int destroy_dumpfile(envid_t veid, const char *dumpdir)
+{
+	char buf[128];
+
+	get_dump_file(veid, dumpdir, buf, sizeof(buf));
+	if (unlink(buf) == 0)
+		return 0;
+	else if (errno == ENOENT)
+		return 0;
+	else return -1;
+}
+
+int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 {
 	int ret;
 
@@ -296,6 +308,8 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs)
 	if ((ret = vps_destroy_dir(veid, fs->private)))
 		return ret;
 	move_config(veid, BACKUP);
+	if (destroy_dumpfile(veid, cpt != NULL ? cpt->dumpdir : NULL) < 0)
+		logger(-1, errno, "Warning: failed to remove dump file");
 	if (rmdir(fs->root) < 0)
 		logger(-1, errno, "Warning: failed to remove %s", fs->root);
 	logger(0, 0, "Container private area was destroyed");
