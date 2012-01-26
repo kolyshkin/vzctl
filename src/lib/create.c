@@ -73,11 +73,19 @@ static char *get_ostemplate_name(char *ostmpl)
 static int download_template(char *tmpl)
 {
 	char *arg[3];
+	char *env[] = { NULL, NULL };
+	char *val;
+	char buf[64];
 
 	arg[0] = VPS_DOWNLOAD;
 	arg[1] = tmpl;
 	arg[2] = NULL;
-	return run_script(VPS_DOWNLOAD, arg, NULL, 0);
+	val = getenv("HOME");
+	if (val != NULL) {
+		snprintf(buf, sizeof(buf), "HOME=%s", val);
+		env[0] = buf;
+	}
+	return run_script(VPS_DOWNLOAD, arg, env, 0);
 }
 
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
