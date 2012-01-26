@@ -430,8 +430,8 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			goto err;
 		}
 
-			get_dump_file(veid, vps_p->res.cpt.dumpdir,
-					dumpfile, sizeof(dumpfile));
+		get_dump_file(veid, vps_p->res.cpt.dumpdir,
+				dumpfile, sizeof(dumpfile));
 	}
 	if (cmd == CMD_RESTORE || cmd == CMD_UNDUMP) {
 		dump_fd = open(param->dumpfile ? : dumpfile, O_RDONLY);
