@@ -138,12 +138,11 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		goto err;
 	}
 	i = 0;
-	if (env != NULL) {
-		for (i = 0; i < ENV_SIZE - 1 && env[i] != NULL; i++)
-			envp[i] = env[i];
-	}
-	for (j = 0; i < ENV_SIZE - 1 && envp_bash[j] != NULL; i++, j++)
-		envp[i] = envp_bash[j];
+	for (i = 0; i < ENV_SIZE - 1 && envp_bash[i] != NULL; i++)
+			envp[i] = envp_bash[i];
+	if (env != NULL)
+		for (j = 0; i < ENV_SIZE - 1 && env[j] != NULL; i++, j++)
+			envp[i] = env[j];
 	envp[i] = NULL;
 	if ((child = fork()) == 0) {
 		fd = open("/dev/null", O_WRONLY);
