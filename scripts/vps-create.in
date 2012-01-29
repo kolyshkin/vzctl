@@ -74,9 +74,12 @@ create_prvt()
 
 	[ "$AVAIL" -ge "$NEEDED" ] ||
 		vzerror "Insufficient disk space in $VE_PRVT; available: $AVAIL, needed: $NEEDED" ${VZ_FS_NO_DISK_SPACE}
+	CAT=cat
+	# Use pv to show nice progress bar if we can
+	pv -V >/dev/null 2>&1 && CAT=pv
 	chmod 700 "$VE_PRVT"
-	tar -C "$VE_PRVT" ${TAR_OPT} ${OPT} -xf "$PRIVATE_TEMPLATE" ||
-		vzerror "Error in tar ${TAR_OPT} ${OPT} -xf $PRIVATE_TEMPLATE" ${VZ_FS_NEW_VE_PRVT}
+	$CAT "$PRIVATE_TEMPLATE" | tar -C "$VE_PRVT" ${TAR_OPT} ${OPT} -x ||
+		vzerror "Unpack $PRIVATE_TEMPLATE failed" ${VZ_FS_NEW_VE_PRVT}
 	chmod 755 "$VE_PRVT"
 }
 
