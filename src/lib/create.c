@@ -154,6 +154,7 @@ find:
 	env[1] = strdup(buf);
 	env[2] = strdup(ENV_PATH);
 	env[3] = NULL;
+	logger(0, 0, "Creating container private area (%s)", tmpl->ostmpl);
 	ret = run_script(VPS_CREATE, arg, env, 0);
 	free_arg(env);
 	if (ret)
@@ -309,8 +310,6 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		logger(0, 0, "Creating container private area (%s)",
-				tmpl->ostmpl);
 		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq)))
 			goto err_private;
 	}
