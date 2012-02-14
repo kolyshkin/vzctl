@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,18 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# runs on the host system and performs these postinstall tasks:
-# 1. Randomizes crontab for given container so all crontab tasks
+# Runs on the host system and performs these postinstall tasks
+# for a particular container (specified by $VE_ROOT environment):
+#
+# 1. Randomizes /etc/crontab and /etc/cron.d/* files so all crontab tasks
 #    of all containers will not start at the same time.
+#
 # 2. Disables root password if it is empty.
+#
 # 3. Seeds /etc/hosts with localhost entries for IPv4 and IPv6
+#
 # 4. Creates empty /etc/resolv.conf
+#
 # 5. Sets file caps for recent Fedora releases, as they can
 #    not be saved in a template tarball.
 
