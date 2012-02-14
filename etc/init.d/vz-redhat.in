@@ -170,7 +170,7 @@ modify_vzconf()
 
 	egrep -q 'test|stab' /proc/vz/version 2>/dev/null || return 0
 
-	local cfg_old='^CONFIGFILE="basic"$'
+	local cfg_old='^CONFIGFILE="basic" # Use vswap-256m on RHEL6 kernel$'
 	local cfg_new='CONFIGFILE="vswap-256m"'
 	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
 	if test $kv -ge 42; then
