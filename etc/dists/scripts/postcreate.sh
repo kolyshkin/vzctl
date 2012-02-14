@@ -21,6 +21,8 @@
 #
 # 1. Randomizes /etc/crontab and /etc/cron.d/* files so all crontab tasks
 #    of all containers will not start at the same time.
+#    NOTE: if you don't want a particular file to be randomized,
+#    make sure it contains the word VZCTL_POSTCREATE_SKIP somewhere.
 #
 # 2. Disables root password if it is empty.
 #
@@ -36,6 +38,7 @@ randcrontab()
 	local file
 	for file in ${VE_ROOT}/etc/crontab ${VE_ROOT}/etc/cron.d/*; do
 		[ -f "${file}" ] || continue
+		grep -wq VZCTL_POSTCREATE_SKIP "${file}" && continue
 
 		/bin/cp -fp ${file} ${file}.$$
 		cat ${file} | awk '
