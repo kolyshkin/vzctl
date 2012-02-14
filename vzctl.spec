@@ -162,11 +162,6 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /bin/rm -rf /dev/vzctl
 /bin/mknod -m 600 /dev/vzctl c 126 0
-if [ -f %{_configdir}/vz.conf ]; then
-	if ! grep "IPTABLES=" %{_configdir}/vz.conf >/dev/null 2>&1; then
-		echo 'IPTABLES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length"' >> %{_configdir}/vz.conf
-	fi
-fi
 /sbin/chkconfig --add vz > /dev/null 2>&1
 /sbin/chkconfig --add vzeventd > /dev/null 2>&1
 
