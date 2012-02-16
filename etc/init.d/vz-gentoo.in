@@ -304,10 +304,12 @@ stop() {
 	check_config || return
 
 	# Avoid stop action inside a CT, check we are in CT0
-	if ! egrep -q '^[[:space:]]*0:[[:space:]]' \
-			/proc/user_beancounters; then
-		eerror "Looks like we are inside a container!"
-		return 1
+	if test -r /proc/user_beancounters; then
+		if ! egrep -q '^[[:space:]]*0:[[:space:]]' \
+				/proc/user_beancounters; then
+			eerror "Looks like we are inside a container!"
+			return 1
+		fi
 	fi
 
 	local mod
