@@ -87,7 +87,6 @@ struct vzctl_ve_configure {
 	unsigned int veid;
 	unsigned int key;
 #define VE_CONFIGURE_OS_RELEASE		2
-#define VE_CONFIGURE_CREATE_PROC_LINK	5
 	unsigned int val;
 	unsigned int size;
 	char data[0];
