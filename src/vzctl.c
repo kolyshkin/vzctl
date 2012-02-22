@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ static void usage(int rc)
 
 	version(fp);
 	fprintf(fp,
-"Copyright (C) 2000-2010, Parallels, Inc.\n"
+"Copyright (C) 2000-2012, Parallels, Inc.\n"
 "This program may be distributed under the terms of the GNU GPL License.\n"
 "\n"
 "Usage: vzctl [options] <command> <ctid> [parameters]\n"
@@ -67,6 +67,7 @@ static void usage(int rc)
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
+"vzctl attach <ctid>\n"
 "vzctl enter <ctid> [--exec <command> [arg ...]]\n"
 "vzctl exec | exec2 <ctid> <command> [arg ...]\n"
 "vzctl runscript <ctid> <script>\n"
@@ -187,6 +188,8 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_RUNSCRIPT;
 	} else if (!strcmp(argv[1], "enter")) {
 		action = ACTION_ENTER;
+	} else if (!strcmp(argv[1], "attach")) {
+		action = ACTION_ATTACH;
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
 		quiet = 1;

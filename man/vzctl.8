@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "3 Jun 2011" "OpenVZ" "Containers"
+.TH vzctl 8 "23 Feb 2012" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -122,7 +122,8 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --ioprio num
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
-\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR \fICTID\fR
+\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
+\fBattach\fR \fICTID\fR
 .SY vzctl
 [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
@@ -861,6 +862,12 @@ some reason you can not use \fBssh\fR(1).
 
 You need to log out manually from the shell to finish session
 (even if you specified \fB--exec\fR).
+.IP "\fBattach\fR"
+Attach to the container's console. Note that the console is persistent,
+meaning it can be attached to even if the container is not running,
+and there is no automatic detachment when the container is stopped.
+
+Type \fBEsc\fR then \fB.\fR to detach from the console.
 
 .SS Other options
 

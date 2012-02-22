@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include <pty.h>
 #include <grp.h>
 #include <pwd.h>
+#include <err.h>
 
 #include "vzerror.h"
 #include "logger.h"
@@ -407,4 +408,103 @@ err:
 		fcntl(i, F_SETFL, fd_flags[i]);
 
 	return ret ? status : 0;
+}
+
+/* CT console implementation */
+
+static int tty;
+
+static void console_winch(int sig)
+{
+	struct winsize ws;
+
+	if (ioctl(0, TIOCGWINSZ, &ws))
+		warn("Unable to get window size");
+	else if (ioctl(tty, TIOCSWINSZ, &ws))
+		warn("Unable to set window size");
+}
+
+int console_attach(vps_handler *h, envid_t veid)
+{
+	struct vzctl_ve_configure c;
+	struct sigaction act;
+	int pid;
+	char buf;
+	const char esc = 27;
+	int ret = VZ_SYSTEM_ERROR;
+
+	child_term = 0;
+	c.veid = veid;
+	c.key = VE_CONFIGURE_OPEN_TTY;
+	c.val = 0;
+	c.size = 0;
+
+	tty = ioctl(h->vzfd, VZCTL_VE_CONFIGURE, &c);
+	if (tty < 0) {
+		fprintf(stderr, "Error in VE_CONFIGURE_OPEN_TTY: %s\n",
+				strerror(errno));
+		return VZ_SYSTEM_ERROR;
+	}
+
+	sigaction(SIGPIPE, &act, NULL);
+
+	signal(SIGCHLD, child_handler);
+	signal(SIGWINCH, console_winch);
+	console_winch(SIGWINCH);
+
+	fprintf(stderr, "Attached to CT %d (ESC . to detach)\n", veid);
+	if ((pid = fork()) < 0) {
+		fprintf(stderr, "Unable to fork: %s\n", strerror(errno));
+		return VZ_RESOURCE_ERROR;
+	}
+
+	if (pid == 0) {
+		while (1) {
+			if (read(tty, &buf, sizeof buf) <= 0)
+				err(1, "tty read error");
+			if (write(1, &buf, sizeof buf) <= 0)
+				err(1, "stdout write error");
+		}
+		exit(0);
+	}
+	raw_on();
+
+#define TREAD(buf)						\
+	do {							\
+		if (read(0, &buf, sizeof buf) <= 0) {		\
+			warn("stdin read error");		\
+			goto err;				\
+		}						\
+	} while (0)
+
+#define TWRITE(buf)						\
+	do {							\
+		if (write(tty, &buf, sizeof buf) <= 0)	{	\
+			warn("tty write error");		\
+			goto err;				\
+		}						\
+	} while (0)
+
+	while (!child_term) {
+		TREAD(buf);
+		if (buf == esc) {
+			TREAD(buf);
+			switch (buf) {
+				case '.':
+					goto out;
+				default:
+					TWRITE(esc);
+					break;
+			}
+		}
+		TWRITE(buf);
+	}
+out:
+	ret = 0;
+err:
+	kill(pid, SIGKILL);
+	raw_off();
+	fprintf(stderr, "\nDetached from CT %d\n", veid);
+
+	return ret;
 }

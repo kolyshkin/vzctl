@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ struct vzctl_ve_configure {
 	unsigned int veid;
 	unsigned int key;
 #define VE_CONFIGURE_OS_RELEASE		2
+#define VE_CONFIGURE_OPEN_TTY		5
 	unsigned int val;
 	unsigned int size;
 	char data[0];

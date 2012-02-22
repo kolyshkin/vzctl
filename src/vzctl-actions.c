@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
 			int argc, char **argv);
+extern int console_attach(vps_handler *h, envid_t veid);
 
 static struct option set_opt[] = {
 	{"save",	no_argument, NULL, PARAM_SAVE},
@@ -1023,6 +1024,8 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_RESTORE:
 		ret = parse_restore_opt(argc, argv, param);
 		break;
+	case ACTION_ATTACH:
+		break;
 	default :
 		if ((argc - 1) > 0) {
 			fprintf (stderr, "Invalid options: ");
@@ -1058,6 +1061,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		action != ACTION_EXEC2 &&
 		action != ACTION_EXEC3 &&
 		action != ACTION_ENTER &&
+		action != ACTION_ATTACH &&
 		action != ACTION_STATUS)
 	{
 		if (skiplock != YES) {
@@ -1127,6 +1131,9 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 	case ACTION_ENTER:
 		ret = enter(h, veid, g_p->res.fs.root, argc, argv);
+		break;
+	case ACTION_ATTACH:
+		ret = console_attach(h, veid);
 		break;
 	case ACTION_EXEC:
 	case ACTION_EXEC2:
