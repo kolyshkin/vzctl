@@ -111,7 +111,7 @@ int stat_file(const char *file)
 	return 1;
 }
 
-int make_dir(char *path, int full)
+int make_dir_mode(char *path, int full, int mode)
 {
 	char buf[4096];
 	char *ps, *p;
@@ -126,7 +126,7 @@ int make_dir(char *path, int full)
 		snprintf(buf, len, "%s", path);
 		ps = p + 1;
 		if (!stat_file(buf)) {
-			if (mkdir(buf, 0755)) {
+			if (mkdir(buf, mode)) {
 				logger(-1, errno, "Can't create directory %s",
 					buf);
 				return 1;
@@ -136,12 +136,17 @@ int make_dir(char *path, int full)
 	if (!full)
 		return 0;
 	if (!stat_file(path)) {
-		if (mkdir(path, 0755)) {
+		if (mkdir(path, mode)) {
 			logger(-1, errno, "Can't create directory %s", path);
 			return 1;
 		}
 	}
 	return 0;
+}
+
+int make_dir(char *path, int full)
+{
+	return make_dir_mode(path, full, 0755);
 }
 
 int parse_int(const char *str, int *val)
