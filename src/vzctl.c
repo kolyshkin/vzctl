@@ -234,8 +234,6 @@ int main(int argc, char *argv[], char *envp[])
 
 	/* Read global config file */
 	if (vps_parse_config(veid, GLOBAL_CFG, gparam, &g_action)) {
-		fprintf(stderr, "Global configuration file %s not found\n",
-			GLOBAL_CFG);
 		ret = VZ_NOCONFIG;
 		goto error;
 	}
@@ -269,8 +267,6 @@ int main(int argc, char *argv[], char *envp[])
 	get_vps_conf_path(veid, buf, sizeof(buf));
 	if (stat_file(buf)) {
 		if (vps_parse_config(veid, buf, vps_p, &g_action)) {
-			logger(-1, 0, "Error in config file %s",
-				buf);
 			ret = VZ_NOCONFIG;
 			goto error;
 		}

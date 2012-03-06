@@ -2205,6 +2205,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 		str = alloca(len);
 	if (str == NULL) {
 		fclose(fp);
+		logger(-1, ENOMEM, "Error parsing %s", path);
 		return VZ_RESOURCE_ERROR;
 	}
 	while (fgets(str, len, fp)) {
