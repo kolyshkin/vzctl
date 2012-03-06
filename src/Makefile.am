@@ -49,6 +49,7 @@ vzcfgvalidate_SOURCES = validate.c \
 vzcfgvalidate_LDADD   = $(VZCTL_LIBS)
 
 vzctl_SOURCES = enter.c \
+                image.c \
                 modules.c \
                 vzctl-actions.c \
                 vzctl.c
