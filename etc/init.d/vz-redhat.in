@@ -69,6 +69,7 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 		IPT_MODULES="${IPT_MODULES} ${IP6TABLES}"
 	fi
 	VZFS_MODULES="simfs"
+	PLOOP_MODULES="ploop pfmt_ploop1 pfmt_raw pio_direct pio_nfs"
 fi
 
 
@@ -428,7 +429,7 @@ start()
 			return $RETVAL
 		fi
 	done
-	load_modules "${MODULES_OTHER} ${VZFS_MODULES}"
+	load_modules "${MODULES_OTHER} ${VZFS_MODULES} ${PLOOP_MODULES}"
 	print_success "loading OpenVZ modules"
 
 	if [ ! -e /dev/vzctl ]; then
@@ -477,7 +478,8 @@ stop()
 	umount_cgroups
 	stop_net
 	__echo "Stopping OpenVZ: "
-	for mod in ${MODULES_OTHER} ${MODULES} ${PRELOAD_MODULES} ${IPT_MODULES} ${VZFS_MODULES}; do
+	for mod in ${MODULES_OTHER} ${MODULES} ${PRELOAD_MODULES} \
+			${IPT_MODULES} ${VZFS_MODULES} ${PLOOP_MODULES}; do
 		/sbin/modprobe -r ${mod} > /dev/null 2>&1
 	done
 	rm -f $LOCKFILE

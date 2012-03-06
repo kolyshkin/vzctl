@@ -27,6 +27,7 @@ check_config() {
 		: ${MODULES:="vzmon vzdquota vzdev"}
 		: ${MIGRATE_MODULES:="vzcpt vzrst"}
 		: ${NET_MODULES="vznetdev vznet vzethdev"}
+		: ${PLOOP_MODULES="ploop pfmt_ploop1 pfmt_raw pio_direct pio_nfs"}
 
 		# check if you should load vzwdog module
 		[ "${VZWDOG}" = "yes" ] && MODULES="${MODULES} vzwdog"
@@ -280,7 +281,7 @@ start() {
 		fi
 	done
 
-	for mod in ${MIGRATE_MODULES}; do
+	for mod in ${MIGRATE_MODULES} ${PLOOP_MODULES}; do
 		/sbin/modprobe ${mod} >/dev/null 2>&1
 	done
 	eend
@@ -318,7 +319,7 @@ stop() {
 	umount_cgroups
 	stop_net
 
-	for mod in ${MIGRATE_MODULES}; do
+	for mod in ${MIGRATE_MODULES} ${PLOOP_MODULES}; do
 		/sbin/modprobe -r ${mod} > /dev/null 2>&1
 	done
 
