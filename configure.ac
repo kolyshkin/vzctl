@@ -75,6 +75,10 @@ AC_CHECK_LIB(util, openpty,
 
 AC_SUBST(UTIL_LIBS)
 
+AC_CHECK_LIB(ploop, ploop_mount_image,
+	PLOOP_LIBS="-lploop", AC_MSG_ERROR([ploop lib not found]),)
+AC_SUBST(PLOOP_LIBS)
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h \
 	sys/file.h sys/ioctl.h sys/mount.h sys/param.h sys/socket.h \
