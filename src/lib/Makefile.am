@@ -40,6 +40,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       exec.c \
                       fs.c \
                       fs_simfs.c \
+                      image.c \
                       iptables.c \
                       list.c \
                       lock.c \
@@ -59,3 +60,4 @@ libvzctl_la_SOURCES = bitmap.c \
                       io.c
 
 libvzctl_la_LDFLAGS = -release $(LIB_VER)
+libvzctl_la_LIBADD = $(PLOOP_LIBS)

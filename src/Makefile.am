@@ -49,11 +49,10 @@ vzcfgvalidate_SOURCES = validate.c \
 vzcfgvalidate_LDADD   = $(VZCTL_LIBS)
 
 vzctl_SOURCES = enter.c \
-                image.c \
                 modules.c \
                 vzctl-actions.c \
                 vzctl.c
-vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS) $(PLOOP_LIBS)
+vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS)
 
 vzlist_SOURCES = vzlist.c
 vzlist_LDADD   = $(VZCTL_LIBS)
