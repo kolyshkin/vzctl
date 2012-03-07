@@ -131,7 +131,7 @@ int vzctl_create_image(const char *ve_private,
 	logger(0, 0, "Creating image: %s size=%luK", image, param->size);
 	create_param.mode = param->mode;
 	create_param.fstype = DEFAULT_FSTYPE;
-	create_param.size = param->size * 2;
+	create_param.size = param->size * 2; /* Kb to 512b sectors */
 	create_param.image = image;
 	ret = ploop_create_image(&create_param);
 	if (ret) {
@@ -191,7 +191,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 		ploop_free_diskdescriptor(di);
 		return VZCTL_E_RESIZE_IMAGE;
 	}
-	param.size = newsize * 2; //1k -> 512
+	param.size = newsize * 2; /* Kb to 512b sectors */
 	ret = ploop_resize_image(di, &param);
 	if (ret) {
 		logger(-1, 0, "Failed to resize image: %s [%d]",
