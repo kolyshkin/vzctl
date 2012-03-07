@@ -43,6 +43,11 @@ void quota_inc(dq_param *param, int delta)
 	}
 }
 
+int is_2nd_level_quota_on(const dq_param *param)
+{
+	return (param->ugidlimit != NULL && *param->ugidlimit != 0);
+}
+
 int quota_set(envid_t veid, char *private, dq_param *param)
 {
 	int i, ret;
@@ -91,7 +96,7 @@ int quota_set(envid_t veid, char *private, dq_param *param)
 		arg[i++] = strdup(buf);
 	}
 	/* Set ugid limit */
-	if (param->ugidlimit != NULL && *param->ugidlimit) {
+	if (is_2nd_level_quota_on(param)) {
 		arg[i++] = strdup("-u");
 		snprintf(buf, sizeof(buf), "%lu", *param->ugidlimit);
 		arg[i++] = strdup(buf);
@@ -158,7 +163,7 @@ int quota_init(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup(buf);
 	/* ugid limit */
 	arg[i++] = strdup("-s");
-	if (param->ugidlimit != NULL && *param->ugidlimit) {
+	if (is_2nd_level_quota_on(param)) {
 		arg[i++] = strdup("1");
 		arg[i++] = strdup("-u");
 		snprintf(buf, sizeof(buf), "%lu", *param->ugidlimit);
@@ -228,7 +233,7 @@ int quota_on(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup(buf);
 	/* ugid limit */
 	arg[i++] = strdup("-s");
-	if (param->ugidlimit != NULL && *param->ugidlimit) {
+	if (is_2nd_level_quota_on(param)) {
 		arg[i++] = strdup("1");
 		arg[i++] = strdup("-u");
 		snprintf(buf, sizeof(buf), "%lu", *param->ugidlimit);
