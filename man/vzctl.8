@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "23 Feb 2012" "OpenVZ" "Containers"
+.TH vzctl 8 "7 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -123,7 +123,7 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
 \fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
-\fBattach\fR \fICTID\fR
+\fBattach\fR | \fBconvert\fR \fICTID\fR
 .SY vzctl
 [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
@@ -823,6 +823,10 @@ to execution of \fBumount\fR and \fBpostumount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
 
 Note that \fBstop\fR does \fBumount\fR automatically.
+.IP "\fBconvert\fR \fICTID\fR" 4
+Convert CT private area to reside on a ploop device (available
+since 042stab052.6 kernel). Conversion should be performed when
+a container is stopped, plus disk space quota should be set.
 .IP "\fBquotaon\fR \fIctid\fR" 4
 Turn disk quota on. Not that \fBmount\fR and \fBstart\fR does that
 automatically.

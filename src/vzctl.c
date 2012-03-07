@@ -190,6 +190,8 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_ENTER;
 	} else if (!strcmp(argv[1], "attach")) {
 		action = ACTION_ATTACH;
+	} else if (!strcmp(argv[1], "convert")) {
+		action = ACTION_CONVERT;
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
 		quiet = 1;

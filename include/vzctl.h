@@ -39,7 +39,8 @@ typedef enum {
 	ACTION_QUOTAON,
 	ACTION_QUOTAOFF,
 	ACTION_QUOTAINIT,
-	ACTION_ATTACH
+	ACTION_ATTACH,
+	ACTION_CONVERT,
 } act_t;
 
 /* default cpu units values */

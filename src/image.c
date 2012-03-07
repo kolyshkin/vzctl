@@ -33,6 +33,8 @@
 #include "util.h"
 #include "vzerror.h"
 #include "vzctl.h"
+#include "env.h"
+#include "destroy.h"
 
 #define DEFAULT_FSTYPE		"ext4"
 #define VZCTL_VE_ROOTHDD_DIR	"root.hdd"
@@ -305,4 +307,82 @@ err:
 	ploop_free_diskdescriptor(di);
 
 	return (ret = 0) ? 0: VZCTL_E_MERGE_SNAPSHOT;
+}
+
+int ve_private_is_ploop(const char *private)
+{
+	char image[MAXPATHLEN];
+
+	snprintf(image, sizeof(image), "%s/%s/root.hdd",
+			private, VZCTL_VE_ROOTHDD_DIR);
+	return stat_file(image);
+}
+
+/* Convert a CT to ploop layout
+ * 1) mount CT
+ * 2) create & mount image
+ * 3) cp VE_ROOT -> image
+ * 4) update ve_layout
+ */
+int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
+		fs_param *fs, dq_param *dq)
+{
+	struct vzctl_create_image_param param = {};
+	struct vzctl_mount_param mount_param = {};
+	int ploop_mounted = 0;
+	int ret;
+	char cmd[STR_SIZE];
+	char new_private[STR_SIZE];
+
+	if (ve_private_is_ploop(fs->private)) {
+		logger(0, 0, "CT is already on ploop");
+		return 0;
+	}
+	if (vps_is_run(h, veid)) {
+		logger(-1, 0, "CT is running (stop it first)");
+		return VZ_VE_RUNNING;
+	}
+	if (vps_is_mounted(fs->root)) {
+		ret = vps_umount(h, veid, fs->root, 0);
+		if (ret)
+			return ret;
+	}
+
+	snprintf(new_private, sizeof(new_private), "%s.ploop", fs->private);
+	if (make_dir_mode(new_private, 1, 0600) != 0)
+		return VZ_CANT_CREATE_DIR;
+
+	param.mode = PLOOP_EXPANDED_MODE;
+	param.size = dq->diskspace[1]; // limit
+	ret = vzctl_create_image(new_private, &param);
+	if (ret)
+		goto err;
+
+	mount_param.target = fs->root;
+
+	ret = vzctl_mount_image(new_private, &mount_param);
+	if (ret)
+		goto err;
+	ploop_mounted = 1;
+	// Copy VE_ROOT -> image
+	logger(0, 0, "Copying content to ploop...");
+	snprintf(cmd, sizeof(cmd), "/bin/cp -ax %s/. %s",
+			fs->private, fs->root);
+	logger(1, 0, "Executing %s", cmd);
+	ret = system(cmd);
+	if (ret) {
+		ret = VZ_SYSTEM_ERROR;
+		goto err;
+	}
+	/* Finally, del the old private and replace it with the new one */
+	del_dir(fs->private);
+	rename(new_private, fs->private);
+	logger(0, 0, "Container was successfully converted "
+			"to the ploop layout");
+err:
+	if (ploop_mounted)
+		vzctl_umount_image(fs->private, fs->root);
+	if (ret != 0)
+		del_dir(new_private);
+	return ret;
 }

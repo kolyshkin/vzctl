@@ -40,6 +40,7 @@
 #include "vps_configure.h"
 #include "modules.h"
 #include "io.h"
+#include "image.h"
 
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
@@ -1102,6 +1103,10 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 	case ACTION_RESTART:
 		ret = restart(h, veid, g_p, cmd_p);
+		break;
+	case ACTION_CONVERT:
+		ret = vzctl_env_convert_ploop(h, veid,
+				&g_p->res.fs, &g_p->res.dq);
 		break;
 	case ACTION_SET:
 		if (veid == 0)

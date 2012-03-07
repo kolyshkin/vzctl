@@ -16,7 +16,7 @@ _get_ves()
 			[ -n "$veids" ] || veids=100
 			echo $((veids+1))
 			;;
-		start|mount|umount|destroy|delete)
+		start|mount|umount|destroy|delete|convert)
 			# stopped CTs
 			@SBINDIR@/vzlist -H -S -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -S -oname 2>/dev/null | $rm_empty
@@ -56,7 +56,7 @@ _vzctl()
 	local vzctl_common_opts="--quiet --verbose --help --version"
 	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status quotaon quotaoff quotainit \
-		enter exec exec2 runscript"
+		enter exec exec2 runscript convert"
 	local vzctl_create_opts="--ostemplate --config --private --root \
 		--ipadd --hostname --name --description"
 	local vzctl_set_opts="--save --onboot --root --private \
