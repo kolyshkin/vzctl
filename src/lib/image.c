@@ -343,9 +343,8 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		return VZ_VE_RUNNING;
 	}
 	if (vps_is_mounted(fs->root)) {
-		ret = vps_umount(h, veid, fs->root, 0);
-		if (ret)
-			return ret;
+		logger(-1, 0, "CT is mounted (umount it first)");
+		return VZ_FS_MOUNTED;
 	}
 
 	snprintf(new_private, sizeof(new_private), "%s.ploop", fs->private);
