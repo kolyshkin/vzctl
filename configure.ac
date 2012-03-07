@@ -58,6 +58,7 @@ AC_PROG_MAKE_SET
 # Compiler settings
 CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline -Wextra"
 CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
+CFLAGS="${CFLAGS} -Wno-missing-field-initializers"
 CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
 
 if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
