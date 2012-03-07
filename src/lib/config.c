@@ -2191,6 +2191,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 	struct stat st;
 	int len = 4096;
 	int err = 0;
+	char *parse_err;
 	const vps_config *conf;
 
 	if ((fp = fopen(path, "r")) == NULL) {
@@ -2210,8 +2211,14 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 	}
 	while (fgets(str, len, fp)) {
 		line++;
-		if ((rtoken = parse_line(str, ltoken, sizeof(ltoken))) == NULL)
+		rtoken = parse_line(str, ltoken, sizeof(ltoken), &parse_err);
+		if (rtoken == NULL) {
+			if (parse_err != NULL)
+				logger(-1, 0, "Warning: can't parse "
+						"%s:%d (%s), skipping",
+						path, line, parse_err);
 			continue;
+		}
 		if ((conf = conf_get_by_name(config, ltoken)) != NULL) {
 			ret = parse(veid, vps_p, rtoken, conf->id);
 		} else if (action != NULL)

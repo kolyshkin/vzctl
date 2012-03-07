@@ -67,31 +67,42 @@ static const char *unescapestr(char *src)
 	return src;
 }
 
-char *parse_line(char *str, char *ltoken, int lsz)
+char *parse_line(char *str, char *ltoken, int lsz, char **err)
 {
 	char *sp = str;
-	char *ep, *p;
+	char *ep, *p, *ret;
 	int len;
 
+	*err = NULL;
 	unescapestr(str);
 	while (*sp && isspace(*sp)) sp++;
 	if (!*sp || *sp == '#')
 		return NULL;
 	ep = sp + strlen(sp) - 1;
 	while (isspace(*ep) && ep >= sp) *ep-- = '\0';
-	if (*ep == '"')
-		*ep = 0;
-	if (!(p = strchr(sp, '=')))
+	if (!(p = strchr(sp, '='))) {
+		*err = "'=' not found";
 		return NULL;
+	}
 	len = p - sp;
-	if (len >= lsz)
+	if (len >= lsz) {
+		*err = "too long value";
 		return NULL;
+	}
 	strncpy(ltoken, sp, len);
 	ltoken[len] = 0;
-	if (*(++p) == '"')
-		p++;
+	if (*(++p) != '"')
+		return p;
+	/* Quoted argument requires some additional processing */
+	ret = ++p; /* skip opening quote */
+	/* Find the matching closing quote */
+	if (!(p = strrchr(p, '"'))) {
+		*err="unmatched quotes";
+		return NULL;
+	}
+	*p = '\0';
 
-	return p;
+	return ret;
 }
 
 /*

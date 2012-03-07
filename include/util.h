@@ -30,7 +30,7 @@
 #define PROCTHR		"/proc/sys/kernel/threads-max"
 #define PROCVEINFO	"/proc/vz/veinfo"
 
-char *parse_line(char *str, char *ltoken, int lsz);
+char *parse_line(char *str, char *ltoken, int lsz, char **errstr);
 int stat_file(const char *file);
 int make_dir(char *path, int full);
 int make_dir_mode(char *path, int full, int mode);

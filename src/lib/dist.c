@@ -173,6 +173,8 @@ int read_dist_actions(char *dist_name, char *dir, dist_actions *actions)
 	char *rtoken;
 	FILE *fp;
 	int ret = 0;
+	int line = 0;
+	char *parse_err;
 
 	memset(actions, 0, sizeof(*actions));
 	if ((ret = get_dist_conf_name(dist_name, dir, file, sizeof(file))))
@@ -185,8 +187,15 @@ int read_dist_actions(char *dist_name, char *dir, dist_actions *actions)
 		buf[0] = 0;
 		if (fgets(buf, sizeof(buf), fp) == NULL)
 			break;
-		if ((rtoken = parse_line(buf, ltoken, sizeof(ltoken))) == NULL)
+		line++;
+		rtoken = parse_line(buf, ltoken, sizeof(ltoken), &parse_err);
+		if (rtoken == NULL) {
+			if (parse_err != NULL)
+				logger(-1, 0, "Warning: can't parse "
+						"%s:%d (%s), skipping",
+						file, line, parse_err);
 			continue;
+		}
 		if ((ret = add_dist_action(actions, ltoken, rtoken, dir))) {
 			free_dist_actions(actions);
 			break;
