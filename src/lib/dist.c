@@ -178,7 +178,7 @@ int read_dist_actions(char *dist_name, char *dir, dist_actions *actions)
 	if ((ret = get_dist_conf_name(dist_name, dir, file, sizeof(file))))
 		return ret;
 	if ((fp = fopen(file, "r")) == NULL) {
-		logger(-1, errno, "unable to open %s", file);
+		logger(-1, errno, "Unable to open %s", file);
 		return VZ_NO_DISTR_CONF;
 	}
 	while (!feof(fp)) {

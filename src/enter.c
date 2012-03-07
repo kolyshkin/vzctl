@@ -333,7 +333,7 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 			execve("/bin/bash", arg, env);
 			arg[0] = "-sh";
 			execve("/bin/sh", arg, env);
-			logger(-1, errno, "enter failed: unable to exec sh");
+			logger(-1, errno, "Enter failed: unable to exec sh");
 			exit(1);
 		} else if (pid < 0) {
 			logger(-1, errno, "Unable to fork");
