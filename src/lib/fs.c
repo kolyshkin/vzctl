@@ -30,6 +30,7 @@
 #include "vzerror.h"
 #include "script.h"
 #include "quota.h"
+#include "image.h"
 
 int vps_is_run(vps_handler *h, envid_t veid);
 
@@ -61,10 +62,20 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 		logger(-1, 0, "Can't create mount point %s", fs->root);
 		return VZ_FS_MPOINTCREATE;
 	}
-	if ((ret = vps_quotaon(veid, fs->private, dq)))
-		return ret;
-	if ((ret = vz_mount(fs, 0)))
-		vps_quotaoff(veid, dq);
+	if (ve_private_is_ploop(fs->private)) {
+		struct vzctl_mount_param param = {};
+
+		param.target = fs->root;
+		param.quota = is_2nd_level_quota_on(dq);
+
+		ret = vzctl_mount_image(fs->private, &param);
+	}
+	else {
+		if ((ret = vps_quotaon(veid, fs->private, dq)))
+			return ret;
+		if ((ret = vz_mount(fs, 0)))
+			vps_quotaoff(veid, dq);
+	}
 	return ret;
 }
 
