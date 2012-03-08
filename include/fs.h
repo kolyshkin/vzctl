@@ -80,20 +80,21 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 /** Unmount CT.
  *
  * @param veid		CT ID.
- * @param root		CT root.
+ * @param fs		file system parameters.
  * @return		0 on success.
  */
-int fsumount(envid_t veid, const char *root);
+int fsumount(envid_t veid, const fs_param *fs);
 
 /** Unmount CT and run unmount action script if exists.
  *
  * @param h		CT handler.
  * @param veid		CT ID.
- * @param root		CT root.
+ * @param fs		file system parameters.
  * @param skip		skip unmount action scrips
  * @return		0 on success.
  */
-int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip);
+int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
+		skipFlags skip);
 
 int vps_set_fs(fs_param *g_fs, fs_param *fs);
 

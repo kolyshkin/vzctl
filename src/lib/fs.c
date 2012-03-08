@@ -65,10 +65,10 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	return ret;
 }
 
-int fsumount(envid_t veid, const char *root)
+int fsumount(envid_t veid, const fs_param *fs)
 {
-	if (umount(root) != 0) {
-		logger(-1, errno, "Can't umount %s", root);
+	if (umount(fs->root) != 0) {
+		logger(-1, errno, "Can't umount %s", fs->root);
 		return VZ_FS_CANTUMOUNT;
 	}
 
@@ -105,7 +105,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 			if (run_pre_script(veid, buf)) {
 				logger(-1, 0, "Error executing mount script %s",
 					buf);
-				fsumount(veid, fs->root);
+				fsumount(veid, fs);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
 			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
@@ -122,7 +122,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 			if (run_pre_script(veid, buf)) {
 				logger(-1, 0, "Error executing mount script %s",
 					buf);
-				fsumount(veid, fs->root);
+				fsumount(veid, fs);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
 			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
@@ -163,12 +163,13 @@ static int umount_submounts(const char *root)
 	return 0;
 }
 
-int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip)
+int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
+		skipFlags skip)
 {
 	char buf[PATH_LEN];
 	int ret, i;
 
-	if (!vps_is_mounted(root)) {
+	if (!vps_is_mounted(fs->root)) {
 		logger(-1, 0, "CT is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
@@ -189,8 +190,8 @@ int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip)
 				UMOUNT_PREFIX);
 		}
 	}
-	umount_submounts(root);
-	if (!(ret = fsumount(veid, root)))
+	umount_submounts(fs->root);
+	if (!(ret = fsumount(veid, fs)))
 		logger(0, 0, "Container is unmounted");
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,

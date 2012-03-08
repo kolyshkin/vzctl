@@ -487,7 +487,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		while (retry++ < 10 && vps_is_run(h, veid))
 			usleep(500000);
 		if (!is_mounted)
-			fsumount(veid, root);
+			fsumount(veid, &vps_p->res.fs);
 	}
 	close(rd_p[0]);
 	close(rd_p[1]);

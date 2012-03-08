@@ -392,7 +392,7 @@ static int vps_postcreate(envid_t veid, vps_res *res)
 	env[2] = NULL;
 	logger(0, 0, "Performing postcreate actions");
 	ret = run_script(actions.post_create, arg, env, 0);
-	fsumount(veid, res->fs.root);
+	fsumount(veid, &res->fs);
 err:
 	free_dist_actions(&actions);
 	return ret;

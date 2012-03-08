@@ -288,7 +288,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		run_net_script(veid, DEL, &vps_p->res.net.ip, STATE_RUNNING,
 			vps_p->res.net.skip_arpdetect);
 		if (cmd == CMD_CHKPNT)
-			vps_umount(h, veid, root, 0);
+			vps_umount(h, veid, &vps_p->res.fs, 0);
 	}
 	ret = 0;
 	logger(0, 0, "Checkpointing completed succesfully");

@@ -839,7 +839,7 @@ static int mount(vps_handler *h, envid_t veid, vps_param *g_p,
 static int umount(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
-	return vps_umount(h, veid, g_p->res.fs.root, 0);
+	return vps_umount(h, veid, &g_p->res.fs, 0);
 }
 
 static int enter(vps_handler *h, envid_t veid, const char *root,

@@ -704,7 +704,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	logger(0, 0, "Starting container ...");
 	if (vps_is_mounted(res->fs.root)) {
 		/* if CT is mounted -- umount first, to cleanup mount state */
-		vps_umount(h, veid, res->fs.root, skip);
+		vps_umount(h, veid, &res->fs, skip);
 	}
 	if (!vps_is_mounted(res->fs.root)) {
 		/* increase quota to perform setup */
@@ -822,7 +822,7 @@ err:
 		/* restore original quota values */
 		vps_set_quota(veid, &res->dq);
 		if (vps_is_mounted(res->fs.root))
-			vps_umount(h, veid, res->fs.root, skip);
+			vps_umount(h, veid, &res->fs, skip);
 	}
 	close(wait_p[0]);
 	close(wait_p[1]);
@@ -989,7 +989,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	/* Cleanup CT IPs */
 	run_net_script(veid, DEL, &param->del_res.net.ip,
 			STATE_STOPPING, param->res.net.skip_arpdetect);
-	ret = vps_umount(h, veid, res->fs.root, skip);
+	ret = vps_umount(h, veid, &res->fs, skip);
 
 end:
 	free_str_param(&param->del_res.net.ip);
