@@ -67,6 +67,9 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 
 int fsumount(envid_t veid, const fs_param *fs)
 {
+	if (ve_private_is_ploop(fs->private))
+		return vzctl_umount_image(fs->private);
+	/* simfs case */
 	if (umount(fs->root) != 0) {
 		logger(-1, errno, "Can't umount %s", fs->root);
 		return VZ_FS_CANTUMOUNT;
