@@ -34,25 +34,11 @@
 
 int vps_is_run(vps_handler *h, envid_t veid);
 
-/** Get CT mount status.
- *
- * @param root		CT root.
- * @return		 1 - CT mounted
- *			 0 - CT unmounted.
- *			-1 - error
- */
 int vps_is_mounted(const char *root)
 {
 	return vz_fs_is_mounted(root);
 }
 
-/** Mount CT.
- *
- * @param veid		CT ID.
- * @param fs		file system parameters.
- * @param dq		disk quota parameters.
- * @return		0 on success.
- */
 int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 {
 	int ret;
@@ -79,12 +65,6 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	return ret;
 }
 
-/** Unmount CT.
- *
- * @param veid		CT ID.
- * @param root		CT root.
- * @return		0 on success.
- */
 int fsumount(envid_t veid, const char *root)
 {
 	if (umount(root) != 0) {
@@ -98,15 +78,6 @@ int fsumount(envid_t veid, const char *root)
 	return 0;
 }
 
-/** Mount CT and run mount action script if exists.
- *
- * @param h		CT handler.
- * @param veid		CT ID.
- * @param fs		file system parameters.
- * @param dq		disk quota parameters.
- * @param skip		skip mount action scrips
- * @return		0 on success.
- */
 int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	skipFlags skip)
 {
@@ -192,14 +163,6 @@ static int umount_submounts(const char *root)
 	return 0;
 }
 
-/** Unmount CT and run unmount action script if exists.
- *
- * @param h		CT handler.
- * @param veid		CT ID.
- * @param root		CT root.
- * @param skip		skip unmount action scrips
- * @return		0 on success.
- */
 int vps_umount(vps_handler *h, envid_t veid, const char *root, skipFlags skip)
 {
 	char buf[PATH_LEN];
