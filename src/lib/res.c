@@ -36,6 +36,7 @@
 #include "quota.h"
 #include "vps_configure.h"
 #include "io.h"
+#include "image.h"
 
 /** Function called on CT start to setup resource management
  *
@@ -122,8 +123,16 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (!(skip & SKIP_CONFIGURE))
 		vps_configure(h, veid, actions, fs->root, param, vps_state);
 	/* Setup quota limits after configure steps */
-	if ((ret = vps_set_quota(veid, &res->dq)))
-		return ret;
+	if (ve_private_is_ploop(fs->private) && res->dq.diskspace)
+	{
+		if ((ret = vzctl_resize_image(fs->private,
+						res->dq.diskspace[1])))
+				return ret;
+	}
+	else {
+		if ((ret = vps_set_quota(veid, &res->dq)))
+			return ret;
+	}
 	if ((ret = vps_setup_veth(h, veid, actions,  fs->root, &res->veth,
 			&param->del_res.veth, vps_state, skip)))
 	{
