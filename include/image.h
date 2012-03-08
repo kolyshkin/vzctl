@@ -47,7 +47,7 @@ struct vzctl_mount_param {
 int get_ploop_type(const char *type);
 int vzctl_create_image(const char *ve_private, struct vzctl_create_image_param *param);
 int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param);
-int vzctl_umount_image(const char *ve_private, const char *target);
+int vzctl_umount_image(const char *ve_private);
 int vzctl_convert_image(const char *ve_private, int mode);
 int vzctl_resize_image(const char *ve_private, unsigned long long newsize);
 int vzctl_get_ploop_dev(const char *mnt, char *out, int len);

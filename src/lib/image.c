@@ -86,7 +86,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	return ret;
 }
 
-int vzctl_umount_image(const char *ve_private, const char *target)
+int vzctl_umount_image(const char *ve_private)
 {
 	int ret;
 	char fname[MAXPATHLEN];
@@ -384,7 +384,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 			"to the ploop layout");
 err:
 	if (ploop_mounted)
-		vzctl_umount_image(fs->private, fs->root);
+		vzctl_umount_image(fs->private);
 	if (ret != 0)
 		del_dir(new_private);
 	return ret;
