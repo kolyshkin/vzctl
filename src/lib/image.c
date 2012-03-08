@@ -346,6 +346,10 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		logger(-1, 0, "CT is mounted (umount it first)");
 		return VZ_FS_MOUNTED;
 	}
+	if (!dq->diskspace || dq->diskspace[1] <= 0) {
+		logger(-1, 0, "Error: diskspace not set");
+		return VZ_DISKSPACE_NOT_SET;
+	}
 
 	snprintf(new_private, sizeof(new_private), "%s.ploop", fs->private);
 	if (make_dir_mode(new_private, 1, 0600) != 0)
