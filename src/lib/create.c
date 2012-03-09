@@ -38,6 +38,7 @@
 #include "modules.h"
 #include "create.h"
 #include "destroy.h"
+#include "image.h"
 
 #define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
 #define VPS_DOWNLOAD	LIB_SCRIPTS_DIR "vps-download"
@@ -89,7 +90,7 @@ static int download_template(char *tmpl)
 }
 
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
-	dq_param *dq)
+	dq_param *dq, int ploop)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
@@ -99,9 +100,14 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	char *env[4];
 	int quota = 0;
 	int i;
+	char *dst;
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
 
+	if (ploop && (!dq->diskspace || dq->diskspace[1] <= 0)) {
+		logger(-1, 0, "Error: diskspace not set (required for ploop)");
+		return VZ_DISKSPACE_NOT_SET;
+	}
 find:
 	for (i = 0; ext[i] != NULL; i++) {
 		snprintf(tarball, sizeof(tarball), "%s/cache/%s.tar%s",
@@ -134,7 +140,32 @@ find:
 		ret = VZ_FS_NEW_VE_PRVT;
 		goto err;
 	}
-	if (dq != NULL &&
+	dst = tmp_dir;
+	if (ploop) {
+		/* Create and mount ploop image */
+		struct vzctl_create_image_param param = {};
+		struct vzctl_mount_param mount_param = {};
+
+		param.mode = PLOOP_EXPANDED_MODE;
+		param.size = dq->diskspace[1]; // limit
+		ret = vzctl_create_image(tmp_dir, &param);
+		if (ret)
+			goto err;
+
+		if (make_dir(fs->root, 1)) {
+			logger(-1, 0, "Can't create mount point %s", fs->root);
+			ret = VZ_FS_MPOINTCREATE;
+			goto err;
+		}
+		mount_param.target = fs->root;
+		ret = vzctl_mount_image(tmp_dir, &mount_param);
+		if (ret)
+			goto err;
+
+		dst = fs->root;
+	}
+	if (!ploop &&
+		dq != NULL &&
 		dq->enable == YES &&
 		dq->diskspace != NULL &&
 		dq->diskinodes != NULL)
@@ -150,13 +181,15 @@ find:
 	arg[1] = NULL;
 	snprintf(buf, sizeof(buf), "PRIVATE_TEMPLATE=%s", tarball);
 	env[0] = strdup(buf);
-	snprintf(buf, sizeof(buf), "VE_PRVT=%s", tmp_dir);
+	snprintf(buf, sizeof(buf), "VE_PRVT=%s", dst);
 	env[1] = strdup(buf);
 	env[2] = strdup(ENV_PATH);
 	env[3] = NULL;
 	logger(0, 0, "Creating container private area (%s)", tmpl->ostmpl);
 	ret = run_script(VPS_CREATE, arg, env, 0);
 	free_arg(env);
+	if (ploop)
+		vzctl_umount_image(tmp_dir);
 	if (ret)
 		goto err;
 	if (quota) {
@@ -310,7 +343,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq)))
+		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, 1)))
 			goto err_private;
 	}
 
