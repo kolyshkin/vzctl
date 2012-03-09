@@ -353,6 +353,13 @@ static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	return ret;
 }
 
+static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
+		vps_param *cmd_p)
+{
+	return vzctl_env_convert_ploop(h, veid,
+			&g_p->res.fs, &g_p->res.dq);
+}
+
 static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 {
 	int c, ret;
@@ -1105,8 +1112,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = restart(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_CONVERT:
-		ret = vzctl_env_convert_ploop(h, veid,
-				&g_p->res.fs, &g_p->res.dq);
+		ret = convert(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_SET:
 		if (veid == 0)
