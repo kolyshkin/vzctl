@@ -178,7 +178,7 @@ err:
 		quota_off(veid, 0);
 		quota_ctl(veid, QUOTA_DROP);
 	}
-	rmdir(fs->private);
+	rmdir(fs->private); /* remove VE_PRIVATE if empty */
 	rmdir(tmp_dir);
 
 	return ret;
