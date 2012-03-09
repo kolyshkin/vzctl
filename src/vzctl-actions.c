@@ -1168,6 +1168,12 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = r;							\
 		logger(0, 0, "Disk quota is not enabled, skipping operation");	\
 		break;								\
+	}									\
+	if (ve_private_is_ploop(g_p->res.fs.private)) {				\
+		ret = 0;							\
+		logger(0, 0, "CT is on ploop, disk quota is obsoleted, "	\
+				"skipping operation");				\
+		break;								\
 	}
 
 	case ACTION_QUOTAON:
