@@ -66,8 +66,46 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	return ret;
 }
 
+static int umount_submounts(const char *root)
+{
+	FILE *fp;
+	struct mntent *mnt;
+	int len;
+	char path[MAXPATHLEN + 1];
+	list_head_t head;
+	str_param *it;
+
+	if (realpath(root, path) == NULL) {
+		logger(-1, errno, "realpath(%s) failed", root);
+		return -1;
+	}
+	if ((fp = setmntent("/proc/mounts", "r")) == NULL) {
+		logger(-1, errno, "Unable to open /proc/mounts");
+		return -1;
+	}
+	list_head_init(&head);
+	strcat(path, "/"); /* skip base mountpoint */
+	len = strlen(path);
+	while ((mnt = getmntent(fp)) != NULL) {
+		if (strncmp(path, mnt->mnt_dir, len) == 0)
+			add_str_param(&head, mnt->mnt_dir);
+	}
+	endmntent(fp);
+
+	list_for_each_prev(it, &head, list) {
+		if (umount(it->val))
+			logger(-1, errno, "Cannot umount %s",
+						it->val);
+	}
+	free_str_param(&head);
+
+	return 0;
+}
+
 int fsumount(envid_t veid, const fs_param *fs)
 {
+	umount_submounts(fs->root);
+
 	if (ve_private_is_ploop(fs->private))
 		return vzctl_umount_image(fs->private);
 	/* simfs case */
@@ -137,42 +175,6 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	return 0;
 }
 
-static int umount_submounts(const char *root)
-{
-	FILE *fp;
-	struct mntent *mnt;
-	int len;
-	char path[MAXPATHLEN + 1];
-	list_head_t head;
-	str_param *it;
-
-	if (realpath(root, path) == NULL) {
-		logger(-1, errno, "realpath(%s) failed", root);
-		return -1;
-	}
-	if ((fp = setmntent("/proc/mounts", "r")) == NULL) {
-		logger(-1, errno, "Unable to open /proc/mounts");
-		return -1;
-	}
-	list_head_init(&head);
-	strcat(path, "/"); /* skip base mountpoint */
-	len = strlen(path);
-	while ((mnt = getmntent(fp)) != NULL) {
-		if (strncmp(path, mnt->mnt_dir, len) == 0)
-			add_str_param(&head, mnt->mnt_dir);
-	}
-	endmntent(fp);
-
-	list_for_each_prev(it, &head, list) {
-		if (umount(it->val))
-			logger(-1, errno, "Cannot umount %s",
-						it->val);
-	}
-	free_str_param(&head);
-
-	return 0;
-}
-
 int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 		skipFlags skip)
 {
@@ -200,7 +202,6 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 				UMOUNT_PREFIX);
 		}
 	}
-	umount_submounts(fs->root);
 	if (!(ret = fsumount(veid, fs)))
 		logger(0, 0, "Container is unmounted");
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
