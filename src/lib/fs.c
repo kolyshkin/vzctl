@@ -31,6 +31,7 @@
 #include "script.h"
 #include "quota.h"
 #include "image.h"
+#include "list.h"
 
 int vps_is_run(vps_handler *h, envid_t veid);
 
@@ -143,6 +144,8 @@ static int umount_submounts(const char *root)
 	struct mntent *mnt;
 	int len;
 	char path[MAXPATHLEN + 1];
+	list_head_t head;
+	str_param *it;
 
 	if (realpath(root, path) == NULL) {
 		logger(-1, errno, "realpath(%s) failed", root);
@@ -152,16 +155,21 @@ static int umount_submounts(const char *root)
 		logger(-1, errno, "Unable to open /proc/mounts");
 		return -1;
 	}
+	list_head_init(&head);
 	strcat(path, "/"); /* skip base mountpoint */
 	len = strlen(path);
 	while ((mnt = getmntent(fp)) != NULL) {
-		if (strncmp(path, mnt->mnt_dir, len) == 0) {
-			if (umount(mnt->mnt_dir))
-				logger(-1, errno, "Cannot umount %s",
-						mnt->mnt_dir);
-		}
+		if (strncmp(path, mnt->mnt_dir, len) == 0)
+			add_str_param(&head, mnt->mnt_dir);
 	}
 	endmntent(fp);
+
+	list_for_each_prev(it, &head, list) {
+		if (umount(it->val))
+			logger(-1, errno, "Cannot umount %s",
+						it->val);
+	}
+	free_str_param(&head);
 
 	return 0;
 }
