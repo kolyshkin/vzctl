@@ -109,7 +109,6 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 			if (run_pre_script(veid, buf)) {
 				logger(-1, 0, "Error executing mount script %s",
 					buf);
-				fsumount(veid, fs);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
 			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
