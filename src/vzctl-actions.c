@@ -1032,7 +1032,7 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_RESTORE:
 		ret = parse_restore_opt(argc, argv, param);
 		break;
-	case ACTION_ATTACH:
+	case ACTION_CONSOLE:
 		break;
 	default :
 		if ((argc - 1) > 0) {
@@ -1069,7 +1069,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		action != ACTION_EXEC2 &&
 		action != ACTION_EXEC3 &&
 		action != ACTION_ENTER &&
-		action != ACTION_ATTACH &&
+		action != ACTION_CONSOLE &&
 		action != ACTION_STATUS)
 	{
 		if (skiplock != YES) {
@@ -1143,7 +1143,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	case ACTION_ENTER:
 		ret = enter(h, veid, g_p->res.fs.root, argc, argv);
 		break;
-	case ACTION_ATTACH:
+	case ACTION_CONSOLE:
 		ret = console_attach(h, veid);
 		break;
 	case ACTION_EXEC:

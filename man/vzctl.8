@@ -123,7 +123,7 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
 \fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
-\fBattach\fR | \fBconvert\fR \fICTID\fR
+\fBconsole\fR | \fBconvert\fR \fICTID\fR
 .SY vzctl
 [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
@@ -866,7 +866,7 @@ some reason you can not use \fBssh\fR(1).
 
 You need to log out manually from the shell to finish session
 (even if you specified \fB--exec\fR).
-.IP "\fBattach\fR"
+.IP "\fBconsole\fR"
 Attach to the container's console. Note that the console is persistent,
 meaning it can be attached to even if the container is not running,
 and there is no automatic detachment when the container is stopped.

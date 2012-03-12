@@ -67,7 +67,7 @@ static void usage(int rc)
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
-"vzctl attach <ctid>\n"
+"vzctl console <ctid>\n"
 "vzctl enter <ctid> [--exec <command> [arg ...]]\n"
 "vzctl exec | exec2 <ctid> <command> [arg ...]\n"
 "vzctl runscript <ctid> <script>\n"
@@ -188,8 +188,8 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_RUNSCRIPT;
 	} else if (!strcmp(argv[1], "enter")) {
 		action = ACTION_ENTER;
-	} else if (!strcmp(argv[1], "attach")) {
-		action = ACTION_ATTACH;
+	} else if (!strcmp(argv[1], "console")) {
+		action = ACTION_CONSOLE;
 	} else if (!strcmp(argv[1], "convert")) {
 		action = ACTION_CONVERT;
 	} else if (!strcmp(argv[1], "status")) {
