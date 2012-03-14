@@ -431,6 +431,8 @@ int console_attach(vps_handler *h, envid_t veid)
 	int pid;
 	char buf;
 	const char esc = 27;
+	const char enter = 13;
+	int after_enter = 0;
 	int ret = VZ_SYSTEM_ERROR;
 
 	child_term = 0;
@@ -487,7 +489,7 @@ int console_attach(vps_handler *h, envid_t veid)
 
 	while (!child_term) {
 		TREAD(buf);
-		if (buf == esc) {
+		if (buf == esc && after_enter) {
 			TREAD(buf);
 			switch (buf) {
 				case '.':
@@ -498,6 +500,7 @@ int console_attach(vps_handler *h, envid_t veid)
 			}
 		}
 		TWRITE(buf);
+		after_enter = (buf == enter);
 	}
 out:
 	ret = 0;
