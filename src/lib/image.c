@@ -379,7 +379,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	ret = vzctl_mount_image(new_private, &mount_param);
 	if (ret)
 		goto err;
-	// Copy VE_ROOT -> image
+
 	logger(0, 0, "Copying content to ploop...");
 	snprintf(cmd, sizeof(cmd), "/bin/cp -ax %s/. %s",
 			fs->private, fs->root);
