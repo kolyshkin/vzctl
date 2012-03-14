@@ -129,16 +129,15 @@ int vzctl_create_image(const char *ve_private,
 {
 	int ret = 0;
 	struct ploop_create_param create_param = {};
+	char dir[MAXPATHLEN];
 	char image[MAXPATHLEN];
 
-	snprintf(image, sizeof(image), "%s/" VZCTL_VE_ROOTHDD_DIR, ve_private);
-	if (mkdir(image, 0700) && errno != EEXIST) {
-		logger(-1, errno, "Failed to create image %s", image);
-		return VZCTL_E_CREATE_IMAGE;
-	}
+	snprintf(dir, sizeof(dir), "%s/" VZCTL_VE_ROOTHDD_DIR, ve_private);
+	ret = make_dir_mode(dir, 1, 0700);
+	if (ret)
+		return ret;
 
-	snprintf(image, sizeof(image), "%s/%s/root.hdd",
-			ve_private, VZCTL_VE_ROOTHDD_DIR);
+	snprintf(image, sizeof(image), "%s/root.hdd", dir);
 
 	logger(0, 0, "Creating image: %s size=%luK", image, param->size);
 	create_param.mode = param->mode;
@@ -147,6 +146,7 @@ int vzctl_create_image(const char *ve_private,
 	create_param.image = image;
 	ret = ploop_create_image(&create_param);
 	if (ret) {
+		rmdir(dir);
 		logger(-1, 0, "Failed to create image: %s [%d]",
 				ploop_get_last_error(), ret);
 		return VZCTL_E_CREATE_IMAGE;
