@@ -63,7 +63,7 @@ static void usage(int rc)
 "Usage: vzctl [options] <command> <ctid> [parameters]\n"
 "\n"
 "vzctl create <ctid> [--ostemplate <name>] [--config <name>]\n"
-"   [--private <path>] [--root <path>] [--ipadd <addr>] | [--hostname <name>]\n"
+"   [--private <path>] [--root <path>] [--ipadd <addr>] [--hostname <name>]\n"
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
