@@ -53,6 +53,16 @@ int get_ploop_type(const char *type)
 	return -1;
 }
 
+int is_ploop_supported(void)
+{
+	int minor;
+	/* Use ploop_getdevice because it's a call that
+	 * - doesn't change anything
+	 * - fails if ploop is not available
+	 */
+	return (ploop_getdevice(&minor) == 0);
+}
+
 int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 {
 	int ret;
