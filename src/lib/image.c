@@ -348,6 +348,10 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		logger(0, 0, "CT is already on ploop");
 		return 0;
 	}
+	if (!is_ploop_supported()) {
+		logger(-1, 0, "No ploop support in the kernel");
+		return VZ_BAD_KERNEL;
+	}
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "CT is running (stop it first)");
 		return VZ_VE_RUNNING;
