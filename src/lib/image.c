@@ -339,7 +339,6 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 {
 	struct vzctl_create_image_param param = {};
 	struct vzctl_mount_param mount_param = {};
-	int ploop_mounted = 0;
 	int ret;
 	char cmd[STR_SIZE];
 	char new_private[STR_SIZE];
@@ -380,13 +379,13 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	ret = vzctl_mount_image(new_private, &mount_param);
 	if (ret)
 		goto err;
-	ploop_mounted = 1;
 	// Copy VE_ROOT -> image
 	logger(0, 0, "Copying content to ploop...");
 	snprintf(cmd, sizeof(cmd), "/bin/cp -ax %s/. %s",
 			fs->private, fs->root);
 	logger(1, 0, "Executing %s", cmd);
 	ret = system(cmd);
+	vzctl_umount_image(new_private);
 	if (ret) {
 		ret = VZ_SYSTEM_ERROR;
 		goto err;
@@ -397,8 +396,6 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	logger(0, 0, "Container was successfully converted "
 			"to the ploop layout");
 err:
-	if (ploop_mounted)
-		vzctl_umount_image(fs->private);
 	if (ret != 0)
 		del_dir(new_private);
 	return ret;
