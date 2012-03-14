@@ -339,7 +339,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 {
 	struct vzctl_create_image_param param = {};
 	struct vzctl_mount_param mount_param = {};
-	int ret;
+	int ret, ret2;
 	char cmd[STR_SIZE];
 	char new_private[STR_SIZE];
 
@@ -385,9 +385,14 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 			fs->private, fs->root);
 	logger(1, 0, "Executing %s", cmd);
 	ret = system(cmd);
-	vzctl_umount_image(new_private);
+	ret2 = vzctl_umount_image(new_private);
 	if (ret) {
 		ret = VZ_SYSTEM_ERROR;
+		goto err;
+	}
+	if (ret2) {
+		/* Error message already printed by vzctl_umount_image() */
+		ret = ret2;
 		goto err;
 	}
 	/* Finally, del the old private and replace it with the new one */
