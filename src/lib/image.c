@@ -240,8 +240,9 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 		ploop_free_diskdescriptor(di);
 		return VZCTL_E_CREATE_SNAPSHOT;
 	}
-	param.guid = (char *)guid;
+	param.guid = strdup(guid);
 	ret = ploop_create_snapshot(di, &param);
+	free(param.guid);
 	if (ret) {
 		logger(-1, 0, "Failed to create snapshot: %s [%d]",
 				ploop_get_last_error(), ret);
@@ -306,7 +307,7 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
 	}
-	param.guid = (char *)guid;
+	param.guid = guid;
 	ret = ploop_merge_snapshot(di, &param);
 	if (ret) {
 		logger(-1, 0, "Failed to merge snapshot %s: %s [%d]",
