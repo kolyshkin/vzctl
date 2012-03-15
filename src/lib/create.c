@@ -351,7 +351,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		}
 		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
 						vps_p->opt.layout)))
-			goto err_private;
+			goto err_root;
 	}
 
 	if ((ret = vps_postcreate(veid, &vps_p->res)))
