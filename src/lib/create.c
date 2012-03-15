@@ -297,17 +297,17 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		ret = VZ_VE_TMPL_NOTSET;
 		goto err_cfg;
 	}
-	else if (check_var(fs->private, "VE_PRIVATE is not set"))
+	if (check_var(fs->private, "VE_PRIVATE is not set"))
 	{
 		ret = VZ_VE_PRIVATE_NOTSET;
 		goto err_cfg;
 	}
-	else if (check_var(fs->root, "VE_ROOT is not set"))
+	if (check_var(fs->root, "VE_ROOT is not set"))
 	{
 		ret = VZ_VE_ROOT_NOTSET;
 		goto err_cfg;
 	}
-	else if (stat_file(fs->private)) {
+	if (stat_file(fs->private)) {
 		logger(-1, 0, "Private area already exists in %s", fs->private);
 		ret = VZ_FS_PRVT_AREA_EXIST;
 		goto err_cfg;
