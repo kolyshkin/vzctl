@@ -31,6 +31,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <err.h>
+#include <sys/ioctl.h>
 
 #include "vzerror.h"
 #include "logger.h"
@@ -38,6 +39,10 @@
 #include "util.h"
 
 #define DEV_TTY		"/dev/tty"
+
+#ifndef TIOSAK
+#define TIOSAK _IO('T', 0x66)  /* "Secure Attention Key" */
+#endif
 
 static volatile sig_atomic_t child_term;
 static volatile sig_atomic_t win_changed;
@@ -424,6 +429,11 @@ static void console_winch(int sig)
 		warn("Unable to set window size");
 }
 
+static void sak(void)
+{
+	ioctl(tty, TIOSAK);
+}
+
 int console_attach(vps_handler *h, envid_t veid)
 {
 	struct vzctl_ve_configure c;
@@ -493,6 +503,9 @@ int console_attach(vps_handler *h, envid_t veid)
 			TREAD(buf);
 			switch (buf) {
 				case '.':
+					sak();
+					goto out;
+				case ',':
 					goto out;
 				default:
 					TWRITE(esc);
