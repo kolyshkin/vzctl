@@ -93,8 +93,10 @@ files and directories specific to that container are stored. Value must contain
 literal string \fB$VEID\fR, which will be substituted with the actual
 numeric CT ID.
 .IP \fBCONFIGFILE\fR=\fIname\fR
-Default configuration file for \fBcreate\fR action, corresponds to
-\fB--config\fR option.
+Default configuration file
+(\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR)
+used to create a new container. Corresponds to \fB--config\fR
+option of \fBvzctl create\fR.
 .IP \fBIPTABLES\fR="\fImodule\ module\ ...\fR"
 List of iptables modules to be enabled for containers, corresponds
 to \fB--iptables\fR option.

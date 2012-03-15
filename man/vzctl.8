@@ -742,11 +742,15 @@ This command restores a container from the dump file created by the
 Creates a new container area. This operation should be done once, before
 the first start of the container.
 
-If the \fB--config\fR option is specified, values from
-example configuration file
-\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR
-are put into the container configuration file. If this container configuration
-file already exists, it will be removed.
+By default, a new container configuration file is created from a sample
+configuration denoted by value of \fBCONFIGFILE\fR parameter of
+\fBvz.conf\fR(5). If the container configuration file already exists,
+it will not be modified.
+
+The value of \fBCONFIGFILE\fR can be overwritten by using the
+.BI --config name
+option. This option can not be used if the container configuration file
+already exists.
 
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
 point for the container root directory (default is \fBVE_ROOT\fR specified in
