@@ -95,6 +95,11 @@ enum {
 	APPCONF_MAP_NAME = 0x01,
 };
 
+enum {
+	VE_LAYOUT_SIMFS = 1,
+	VE_LAYOUT_PLOOP = 2,
+};
+
 typedef struct {
 	int save;
 	int save_force;
@@ -107,6 +112,7 @@ typedef struct {
 	char *config;
 	char *origin_sample;
 	char *lockdir;
+	int layout; /* VE_LAYOUT_* */
 	char *apply_cfg;
 	int apply_cfg_map;
 	int reset_ub;

@@ -320,6 +320,8 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	{"hostname",	required_argument, NULL, PARAM_HOSTNAME},
 	{"name",	required_argument, NULL, PARAM_NAME},
 	{"description",	required_argument, NULL, PARAM_DESCRIPTION},
+	{"layout",	required_argument, NULL, PARAM_VE_LAYOUT},
+	{"ve_layout",	required_argument, NULL, PARAM_VE_LAYOUT},
 	{ NULL, 0, NULL, 0 }
 };
 

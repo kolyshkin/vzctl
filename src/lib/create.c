@@ -90,7 +90,7 @@ static int download_template(char *tmpl)
 }
 
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
-	dq_param *dq, int ploop)
+	dq_param *dq, int layout)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
@@ -103,6 +103,7 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	char *dst;
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
+	int ploop = (layout == VE_LAYOUT_PLOOP);
 
 	if (ploop && (!dq->diskspace || dq->diskspace[1] <= 0)) {
 		logger(-1, 0, "Error: diskspace not set (required for ploop)");
@@ -312,6 +313,11 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		ret = VZ_FS_PRVT_AREA_EXIST;
 		goto err_cfg;
 	}
+	if (vps_p->opt.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
+		logger(-1, 0, "No ploop support in the kernel");
+		ret = VZ_BAD_KERNEL;
+		goto err_cfg;
+	}
 
 	if (cmd_p->res.name.name) {
 		if ((ret = set_name(veid, cmd_p->res.name.name,
@@ -343,7 +349,8 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq, 1)))
+		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
+						vps_p->opt.layout)))
 			goto err_private;
 	}
 

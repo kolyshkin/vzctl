@@ -138,6 +138,7 @@
 #define PARAM_PCI_DEL		366
 #define PARAM_RAM		367
 #define PARAM_SWAP		368
+#define PARAM_VE_LAYOUT		369
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

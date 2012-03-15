@@ -58,7 +58,7 @@ _vzctl()
 		set start stop restart status quotaon quotaoff quotainit \
 		enter exec exec2 runscript convert console"
 	local vzctl_create_opts="--ostemplate --config --private --root \
-		--ipadd --hostname --name --description"
+		--layout --ipadd --hostname --name --description"
 	local vzctl_set_opts="--save --onboot --root --private \
 		--userpasswd --disabled --ipadd --ipdel \
 		--hostname --nameserver --searchdomain \
@@ -141,6 +141,9 @@ _vzctl()
 						    cut -d "-" -f 2- | sed -e 's#.conf-sample$##')
 
 				COMPREPLY=( $( compgen -W "$configs" -- $cur ) )
+				;;
+			--layout)
+				COMPREPLY=( $( compgen -W "ploop simfs" -- $cur ) )
 				;;
 			--iptables)
 				COMPREPLY=( $( compgen -W "$iptables_names" -- $cur ) )

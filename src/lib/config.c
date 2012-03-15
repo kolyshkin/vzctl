@@ -112,6 +112,7 @@ static vps_config config[] = {
 {"VE_PRIVATE",	NULL, PARAM_PRIVATE},
 {"TEMPLATE",	NULL, PARAM_TEMPLATE},
 {"NOATIME",	NULL, PARAM_NOATIME},
+{"VE_LAYOUT",	NULL, PARAM_VE_LAYOUT},
 /*	template     */
 {"OSTEMPLATE",	NULL, PARAM_OSTEMPLATE},
 {"DEF_OSTEMPLATE", NULL, PARAM_DEF_OSTEMPLATE},
@@ -1855,6 +1856,19 @@ static int store_name(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
+static int parse_ve_layout(int *layout, const char *val)
+{
+	if (!strcmp(val, "simfs")) {
+		*layout = VE_LAYOUT_SIMFS;
+		return 0;
+	}
+	else if (!strcmp(val, "ploop")) {
+		*layout = VE_LAYOUT_PLOOP;
+		return 0;
+	}
+	return ERR_INVAL;
+}
+
 static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 {
 	int ret;
@@ -2010,6 +2024,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_NOATIME:
 		ret = conf_parse_yesno(&vps_p->res.fs.noatime, val);
+		break;
+	case PARAM_VE_LAYOUT:
+		ret = parse_ve_layout(&vps_p->opt.layout, val);
 		break;
 	case PARAM_DEF_OSTEMPLATE:
 		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val);
@@ -2705,6 +2722,7 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_INT(start_force)
 	MERGE_INT(setmode)
 	MERGE_INT(apply_cfg_map)
+	MERGE_INT(layout)
 
 	MERGE_STR(config)
 	MERGE_STR(origin_sample)

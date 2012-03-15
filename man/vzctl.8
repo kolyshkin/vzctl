@@ -14,6 +14,7 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBcreate\fR \fICTID\fR
 .OP --ostemplate name
 .OP --config name
+.OP --layout \fBploop\fR|\fBsimfs
 .OP --root path
 .OP --private path
 .OP --ipadd addr
@@ -755,6 +756,11 @@ The value of \fBCONFIGFILE\fR can be overwritten by using the
 .BI --config name
 option. This option can not be used if the container configuration file
 already exists.
+
+A new container can either be created using \fBsimfs\fR filesystem or
+on a \fBploop\fR device. The default is set by value of \fBVE_LAYOUT\fR
+parameter of \fBvz.conf\fR(5) and can be overwritten by \fB--layout\fR
+option.
 
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
 point for the container root directory (default is \fBVE_ROOT\fR specified in
