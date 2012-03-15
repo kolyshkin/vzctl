@@ -76,6 +76,19 @@ In case the value of this parameter is set to \fByes\fR, vzctl will fail to
 start a container if there is another host with the same IP in the subnet.
 The value of \fBno\fR makes vzctl to only print the warning.
 
+.SS Defaults for vzctl create
+
+These parameters are defaults for \fBvzctl create\fR and can be overwritten
+by its appropriate command line options.
+.IP \fBDEF_OSTEMPLATE\fR=\fIname\fR
+Default OS template to create a container from. Corresponds to
+\fB--ostemplate\fR option of \fBvzctl create\fR.
+.IP \fBCONFIGFILE\fR=\fIname\fR
+Default configuration file
+(\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR)
+used to create a new container. Corresponds to \fB--config\fR
+option of \fBvzctl create\fR.
+
 .SS Defaults for containers
 
 Below parameters are defaults for containers, and can be overwritten by
@@ -92,11 +105,6 @@ Value of this parameter is the \fIdirectory\fR in which all the
 files and directories specific to that container are stored. Value must contain
 literal string \fB$VEID\fR, which will be substituted with the actual
 numeric CT ID.
-.IP \fBCONFIGFILE\fR=\fIname\fR
-Default configuration file
-(\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR)
-used to create a new container. Corresponds to \fB--config\fR
-option of \fBvzctl create\fR.
 .IP \fBIPTABLES\fR="\fImodule\ module\ ...\fR"
 List of iptables modules to be enabled for containers, corresponds
 to \fB--iptables\fR option.

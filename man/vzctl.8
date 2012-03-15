@@ -742,6 +742,10 @@ This command restores a container from the dump file created by the
 Creates a new container area. This operation should be done once, before
 the first start of the container.
 
+By default, an OS template denoted by \fBDEF_OSTEMPLATE\fR parameter
+of \fBvz.conf\fR(5) is used to create a container. This can be overwritten
+by \fB--ostemplate\fR option.
+
 By default, a new container configuration file is created from a sample
 configuration denoted by value of \fBCONFIGFILE\fR parameter of
 \fBvz.conf\fR(5). If the container configuration file already exists,
