@@ -6,20 +6,12 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "7 Mar 2012" "OpenVZ" "Containers"
+.TH vzctl 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
 .SY vzctl
-[\fIflags\fR] \fBcreate\fR \fICTID\fR
-.OP --ostemplate name
-.OP --config name
-.OP --layout \fBploop\fR|\fBsimfs
-.OP --root path
-.OP --private path
-.OP --ipadd addr
-.OP --hostname name
-.OP --name name
+[\fIflags\fR] \fBcreate\fR \fICTID\fR \fI--parameter value [\.\.\.]
 .SY vzctl
 [\fIflags\fR] \fBstart\fR \fICTID\fR
 .OP --wait
@@ -36,9 +28,51 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBchkpnt\fR | \fBrestore\fR
 .OP --dumpfile name
 .SY vzctl
-[\fIflags\fR] \fBset\fR \fICTID\fR
+[\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value [\.\.\.]
 .OP --save
+.OP --force
 .OP --setmode \fBrestart\fR|\fBignore
+.SY vzctl
+[\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
+\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
+\fBconsole\fR | \fBconvert\fR \fICTID\fR
+.SY vzctl
+[\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
+\fIcommand\fR [\fIarg\fR ...]
+.SY vzctl
+[\fIflags\fR] \fBenter\fR \fICTID\fR
+.OP --exec command\ \fR[\fIarg\fR\ ...]
+.SY vzctl
+[\fIflags\fR] \fBrunscript\fR \fICTID\fR \fIscript\fR
+.SY vzctl
+\fB--help\fR | \fB--version\fR
+.YS
+.SH DESCRIPTION
+Utility \fBvzctl\fR runs on the host system (otherwise known as Hardware Node,
+or HN) and performs direct manipulations with containers (CTs).
+.PP
+Containers can be referred to by either numeric \fICTID\fR or
+by name (see \fB--name\fR option). Note that CT ID <= 100 are reserved for
+OpenVZ internal purposes.
+.SH OPTIONS
+
+.SS Flags
+
+These flags come before a command, and can be used with any command.
+They affect logging to console (terminal) only, and do not affect logging
+to a log file.
+.IP \fB--quiet\fR 4
+Disables output. Note that scripts run by vzctl are still able to produce
+some output.
+.IP \fB--verbose\fR 4
+Increments logging level up from the default. Can be used multiple times.
+Default value is set to the value of \fBVERBOSE\fR parameter in the global
+configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
+\fBVERBOSE\fR parameter.
+
+.SS Setting container parameters
+.SY set
+.I CTID
 .\" Miscellaneous
 .OP --onboot \fByes\fR|\fBno
 .OP --bootorder number
@@ -122,53 +156,26 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --applyconfig_map group
 .\" I/O prio
 .OP --ioprio num
-.SY vzctl
-[\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
-\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
-\fBconsole\fR | \fBconvert\fR \fICTID\fR
-.SY vzctl
-[\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
-\fIcommand\fR [\fIarg\fR ...]
-.SY vzctl
-[\fIflags\fR] \fBenter\fR \fICTID\fR
-.OP --exec command\ \fR[\fIarg\fR\ ...]
-.SY vzctl
-[\fIflags\fR] \fBrunscript\fR \fICTID\fR \fIscript\fR
-.SY vzctl
-\fB--help\fR | \fB--version\fR
+.\" Options
+.OP --save
+.OP --force
+.OP --setmode \fBrestart\fR|\fBignore
 .YS
-.SH DESCRIPTION
-Utility \fBvzctl\fR runs on the host system (otherwise known as Hardware Node,
-or HN) and performs direct manipulations with containers (CTs).
-.PP
-Containers can be referred to by either numeric \fICTID\fR or
-by name (see \fB--name\fR option). Note that CT ID <= 100 are reserved for
-OpenVZ internal purposes.
-.SH OPTIONS
+.IP "" 4
+This command sets various container parameters.
 
-.SS Flags
-
-These flags come before a command, and can be used with any command.
-They affect logging to console (terminal) only, and do not affect logging
-to a log file.
-.IP \fB--quiet\fR 4
-Disables output. Note that scripts run by vzctl are still able to produce
-some output.
-.IP \fB--verbose\fR 4
-Increments logging level up from the default. Can be used multiple times.
-Default value is set to the value of \fBVERBOSE\fR parameter in the global
-configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
-\fBVERBOSE\fR parameter.
-
-.SS Setting container parameters
-
-.IP "\fBset\fR \fICTID\fR \fIparameters\fR [\fB--save\fR] [\fB--force\fR]" 4
-This command sets various container parameters. If a \fB--save\fR flag is given,
+If a \fB--save\fR flag is given,
 parameters are saved in container configuration file \fBctid.conf\fR(5).
 Use \fB--force\fR to save the parameters even if the current kernel
 doesn't support OpenVZ.
+
 If the container is currently running, \fBvzctl\fR applies these parameters
 to the container.
+
+Note that a few parameters can only be applied by restarting the container.
+By default, \fBvzctl\fR warns if such parameters are present and a container
+is running. Use \fB--setmode restart\fR to restart a container in such a case,
+or \fB--setmode ignore\fR to suppress the above mentioned warning.
 
 The following parameters can be used with \fBset\fR command.
 
@@ -219,10 +226,6 @@ subsequent calls to \fBvzctl\fR in place of \fICTID\fR.
 .TP
 \fB--description\fR \fIstring\fR
 Add a textual description for a container.
-.TP
-\fB--setmode\fR \fBrestart\fR|\fBignore\fR
-Whether to restart a container after applying parameters that require
-the container to be restarted in order to take effect.
 
 .SS3 Networking
 .TP
@@ -740,7 +743,18 @@ This command restores a container from the dump file created by the
 
 .SS Performing container actions
 
-.IP "\fBcreate\fR \fICTID\fR [\fB--ostemplate\fR \fIname\fR] [\fB--config\fR \fIname\fR] [\fB--private\fR \fIpath\fR] [\fB--root\fR \fIpath\fR] [\fB--ipadd\fR \fIaddr\fR] [\fB--hostname\fR \fIname\fR]" 4
+.SY create
+.I CTID
+.OP --ostemplate name
+.OP --config name
+.OP --layout \fBsimfs\fR|\fBploop
+.OP --private path
+.OP --root path
+.OP --ipadd addr
+.OP --hostname name
+.OP --name name
+.YS
+.IP "" 4
 Creates a new container area. This operation should be done once, before
 the first start of the container.
 
