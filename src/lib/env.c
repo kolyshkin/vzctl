@@ -686,6 +686,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	struct sigaction act;
 	vps_res *res = &param->res;
 	dist_actions actions;
+	int ploop;
 
 	memset(&actions, 0, sizeof(actions));
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
@@ -696,6 +697,9 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	if ((ret = check_ub(&res->ub)))
 		return ret;
+
+	ploop = ve_private_is_ploop(res->fs.private);
+
 	dist_name = get_dist_name(&res->tmpl);
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
 	free(dist_name);
@@ -708,10 +712,12 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	if (!vps_is_mounted(res->fs.root)) {
 		/* increase quota to perform setup */
-		quota_inc(&res->dq, 100);
+		if (!ploop)
+			quota_inc(&res->dq, 100);
 		if ((ret = vps_mount(h, veid, &res->fs, &res->dq, skip)))
 			return ret;
-		quota_inc(&res->dq, -100);
+		if (!ploop)
+			quota_inc(&res->dq, -100);
 	}
 	/* Fedora 14/15 hacks */
 	if (fix_ve_devconsole(res->fs.root) != 0)
@@ -820,7 +826,8 @@ err:
 		if (vps_is_run(h, veid))
 			env_stop(h, veid, res->fs.root, M_KILL);
 		/* restore original quota values */
-		vps_set_quota(veid, &res->dq);
+		if (!ploop)
+			vps_set_quota(veid, &res->dq);
 		if (vps_is_mounted(res->fs.root))
 			vps_umount(h, veid, &res->fs, skip);
 	}
