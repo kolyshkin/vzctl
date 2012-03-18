@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/file.h>
+#include <ploop/libploop.h>
 
 #include "types.h"
 #include "logger.h"
@@ -93,6 +94,7 @@ int set_log_file(char *file)
 			return -1;
 		g_log.fp = fp;
 	}
+	ploop_set_log_file(file);
 	return 0;
 }
 
@@ -106,11 +108,13 @@ void free_log()
 void set_log_level(int level)
 {
 	g_log.level = level;
+	ploop_set_log_level(level);
 }
 
 void set_log_verbose(int level)
 {
 	g_log.verbose = level;
+	ploop_set_verbose_level(level);
 }
 
 void set_log_ctid(envid_t id) {
@@ -119,6 +123,7 @@ void set_log_ctid(envid_t id) {
 
 void set_log_quiet(int quiet) {
 	g_log.quiet = quiet;
+	ploop_set_verbose_level(PLOOP_LOG_NOCONSOLE);
 }
 
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
@@ -138,6 +143,11 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 		snprintf(g_log.prog, sizeof(g_log.prog), "%s", progname);
 	else
 		g_log.prog[0] = 0;
+
+	ploop_set_log_file(file);
+	ploop_set_log_level(level);
+	if (!quiet)
+		ploop_set_verbose_level(level);
 
 	return 0;
 }
