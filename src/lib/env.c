@@ -45,6 +45,7 @@
 #include "readelf.h"
 #include "vzsyscalls.h"
 #include "cpt.h"
+#include "image.h"
 
 #define ENVRETRY	3
 
