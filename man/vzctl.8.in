@@ -793,10 +793,10 @@ a container. Note that this option can be used multiple times.
 
 You can use \fB--hostname\fR \fIname\fR option to set a host name for
 a container.
-.IP "\fBdestroy\fR | \fBdelete\fR" 4
+.IP "\fBdestroy\fR | \fBdelete\fR \fICTID\fR" 4
 Removes a container private area by deleting all files, directories and
 the configuration file of this container.
-.IP "\fBstart\fR [\fB--wait\fR] [\fB--force\fR]" 4
+.IP "\fBstart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR]" 4
 Mounts (if necessary) and starts a container. Unless \fB--wait\fR option
 is specified, \fBvzctl\fR will return immediately; otherwise an attempt to
 wait till the default runlevel is reached will be made by \fBvzctl\fR.
@@ -806,7 +806,7 @@ Specify \fB--force\fR if you want to start a container which is disabled
 
 Note that this command can lead to execution of \fBpremount\fR, \fBmount\fR
 and \fBstart\fR action scripts (see \fBACTION SCRIPTS\fR below).
-.IP "\fBstop\fR [\fB--fast\fR]" 4
+.IP "\fBstop\fR \fICTID\fR [\fB--fast\fR]" 4
 Stops and unmounts a container. Normally, \fBhalt\fR(8) is executed
 inside a container; option \fB--fast\fR makes \fBvzctl\fR use
 \fBreboot\fR(2) syscall instead which is faster but can lead to
@@ -815,13 +815,13 @@ unclean container shutdown.
 Note that this command can lead to execution of \fBstop\fR,
 \fBumount\fR and \fBpostumount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
-.IP "\fBrestart\fR [\fB--wait\fR] [\fB--force\fR] [\fB--fast\fR]" 4
+.IP "\fBrestart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR] [\fB--fast\fR]" 4
 Restarts a container, i.e. stops it if it is running, and starts again.
 Accepts all the \fBstart\fR and \fBstop\fR options.
 
 Note that this command can lead to execution of some action scripts
 (see \fBACTION SCRIPTS\fR below).
-.IP \fBstatus\fR 4
+.IP "\fBstatus\fR \fICTID\fR" 4
 Shows a container status. This is a line with five or six words,
 separated by spaces.
 
@@ -842,11 +842,11 @@ Sixth word, if exists, is \fBsuspended\fR. It appears if both a container
 and its dump file exist (see \fBchkpnt\fR).
 
 This command can also be usable from scripts.
-.IP \fBmount\fR 4
+.IP "\fBmount\fR \fICTID\fR" 4
 Mounts container private area. Note that this command can lead
 to execution of \fBpremount\fR and \fBmount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
-.IP \fBumount\fR 4
+.IP "\fBumount\fR \fICTID\fR" 4
 Unmounts container private area. Note that this command can lead
 to execution of \fBumount\fR and \fBpostumount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
@@ -856,13 +856,13 @@ Note that \fBstop\fR does \fBumount\fR automatically.
 Convert CT private area to reside on a ploop device (available in kernel
 version 042stab052.8 and greater). Conversion should be performed when
 a container is stopped, plus disk space quota should be set.
-.IP "\fBquotaon\fR \fIctid\fR" 4
+.IP "\fBquotaon\fR \fICTID\fR" 4
 Turn disk quota on. Not that \fBmount\fR and \fBstart\fR does that
 automatically.
-.IP "\fBquotaoff\fR \fIctid\fR" 4
+.IP "\fBquotaoff\fR \fICTID\fR" 4
 Turn disk quota off. Not that \fBumount\fR and \fBstop\fR
 does that automatically.
-.IP "\fBquotainit\fR \fIctid\fR" 4
+.IP "\fBquotainit\fR \fICTID\fR" 4
 Initialize disk quota (i.e. run \fBvzquota init\fR) with the parameters
 taken from the CT configuration file \fBctid.conf\fR(5).
 .IP "\fBexec\fR \fICTID\fR \fIcommand\fR" 4
@@ -883,7 +883,7 @@ really started, no file systems other than root (such as \fB/proc\fR)
 are mounted, no startup scripts are executed etc. Thus the environment
 in which the script is running is far from normal and is only usable for
 very basic operations.
-.IP "\fBenter\fR [\fB--exec \fIcommand\fR [\fIarg\fR ...]]" 4
+.IP "\fBenter\fR \fICTID\fR [\fB--exec \fIcommand\fR [\fIarg\fR ...]]" 4
 Enters into a container (giving a container's root shell). This option
 is a back-door for host root only. The proper way to have CT root shell
 is to use \fBssh\fR(1).
@@ -895,7 +895,7 @@ some reason you can not use \fBssh\fR(1).
 
 You need to log out manually from the shell to finish session
 (even if you specified \fB--exec\fR).
-.IP "\fBconsole\fR"
+.IP "\fBconsole\fR \fICTID\fR" 4
 Attach to the container's console. Note that the console is persistent,
 meaning it can be attached to even if the container is not running,
 and there is no automatic detachment when the container is stopped.
