@@ -90,7 +90,7 @@ static int download_template(char *tmpl)
 }
 
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
-	dq_param *dq, int layout)
+	dq_param *dq, int layout, int ploop_mode)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
@@ -147,7 +147,9 @@ find:
 		struct vzctl_create_image_param param = {};
 		struct vzctl_mount_param mount_param = {};
 
-		param.mode = PLOOP_EXPANDED_MODE;
+		if (ploop_mode < 0)
+			ploop_mode = PLOOP_EXPANDED_MODE;
+		param.mode = ploop_mode;
 		param.size = dq->diskspace[1]; // limit
 		ret = vzctl_create_image(tmp_dir, &param);
 		if (ret)
@@ -350,7 +352,8 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			}
 		}
 		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
-						vps_p->opt.layout)))
+						vps_p->opt.layout,
+						vps_p->opt.mode)))
 			goto err_root;
 	}
 

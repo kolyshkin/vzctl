@@ -113,6 +113,7 @@ typedef struct {
 	char *origin_sample;
 	char *lockdir;
 	int layout; /* VE_LAYOUT_* */
+	int mode; /* PLOOP_*_MODE */
 	char *apply_cfg;
 	int apply_cfg_map;
 	int reset_ub;

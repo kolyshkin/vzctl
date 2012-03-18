@@ -88,9 +88,14 @@ Default configuration file
 (\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR)
 used to create a new container. Corresponds to \fB--config\fR
 option of \fBvzctl create\fR.
-.IP \fBVE_LAYOUT\fR=\fBploop\fR|\fBsimfs\fR
+.IP \fBVE_LAYOUT\fR=\fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBplain\fR|\fBexpanded\fR|\fBraw\fR}]
 Default CT filesystem layout for a new container, can either be
-\fBploop\fR or \fBsimfs\fR.
+\fBploop\fR or \fBsimfs\fR. In case \fBploop\fR is used, one can
+additionally specify ploop disk image format after a colon.
+Possible ploop formats are \fBexpanded\fR, \fBplain\fR and \fBraw\fR.
+Default is \fBexpanded\fR. Using \fBraw\fR is not recommended and is
+not supported.
+
 Corresponds to \fB--layout\fR option of \fBvzctl create\fR.
 
 .SS Defaults for containers

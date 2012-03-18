@@ -49,6 +49,7 @@
 #include "vzfeatures.h"
 #include "io.h"
 #include "net.h"
+#include "image.h"
 
 static int _page_size;
 static int check_name(char *name);
@@ -1856,15 +1857,27 @@ static int store_name(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	return 0;
 }
 
-static int parse_ve_layout(int *layout, const char *val)
+static int parse_ve_layout(int *layout, int *mode, const char *val)
 {
 	if (!strcmp(val, "simfs")) {
 		*layout = VE_LAYOUT_SIMFS;
 		return 0;
 	}
-	else if (!strcmp(val, "ploop")) {
-		*layout = VE_LAYOUT_PLOOP;
-		return 0;
+	else if (!strncmp(val, "ploop", 5)) {
+		if (val[5] == '\0') {
+			*layout = VE_LAYOUT_PLOOP;
+			*mode = -1; /* unset */
+			return 0;
+		}
+		else if (val[5] == ':') {
+			int ret;
+			ret = get_ploop_type(val + 6);
+			if (ret < 0)
+				return ERR_INVAL;
+			*layout = VE_LAYOUT_PLOOP;
+			*mode = ret;
+			return 0;
+		}
 	}
 	return ERR_INVAL;
 }
@@ -2026,7 +2039,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = conf_parse_yesno(&vps_p->res.fs.noatime, val);
 		break;
 	case PARAM_VE_LAYOUT:
-		ret = parse_ve_layout(&vps_p->opt.layout, val);
+		ret = parse_ve_layout(&vps_p->opt.layout,
+				&vps_p->opt.mode, val);
 		break;
 	case PARAM_DEF_OSTEMPLATE:
 		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val);
@@ -2480,6 +2494,7 @@ vps_param *init_vps_param()
 	list_head_init(&param->del_res.veth.dev);
 	param->res.meminfo.mode = -1;
 	param->res.io.ioprio = -1;
+	param->opt.mode = -1;
 
 	return param;
 }
@@ -2723,6 +2738,7 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_INT(setmode)
 	MERGE_INT(apply_cfg_map)
 	MERGE_INT(layout)
+	MERGE_INT2(mode)
 
 	MERGE_STR(config)
 	MERGE_STR(origin_sample)

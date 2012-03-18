@@ -143,7 +143,7 @@ _vzctl()
 				COMPREPLY=( $( compgen -W "$configs" -- $cur ) )
 				;;
 			--layout)
-				COMPREPLY=( $( compgen -W "ploop simfs" -- $cur ) )
+				COMPREPLY=( $( compgen -W "ploop ploop:expanded ploop:plain ploop:raw simfs" -- $cur ) )
 				;;
 			--iptables)
 				COMPREPLY=( $( compgen -W "$iptables_names" -- $cur ) )
