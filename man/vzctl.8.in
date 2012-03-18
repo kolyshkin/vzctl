@@ -19,6 +19,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --private path
 .OP --ipadd addr
 .OP --hostname name
+.OP --name name
 .SY vzctl
 [\fIflags\fR] \fBstart\fR \fICTID\fR
 .OP --wait
