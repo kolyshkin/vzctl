@@ -34,6 +34,7 @@ man_MANS = \
  vz.conf.5 \
  ctid.conf.5
 
+SRCS=$(man_MANS:%=%.in)
 PSS=$(man_MANS:%=%.ps)
 PDFS=$(man_MANS:%=%.pdf)
 WIKIS=$(man_MANS:%=%.wiki)
@@ -43,7 +44,10 @@ PAPER=$(shell paperconf || echo letter)
 GROFF_OPTS=-Tps -t -dpaper=$(PAPER) -P-p$(PAPER) -man -msafer -rC1 -rD1 -rS11
 GROFF_HTML_OPTS=-Thtml -t -man -msafer
 
-EXTRA_DIST = $(man_MANS) toc.man.in toc.sh html2wiki.sh
+EXTRA_DIST = $(SRCS) toc.man.in toc.sh html2wiki.sh macros.tmac
+
+%: %.in macros.tmac
+	cat macros.tmac $< > $@
 
 check-man-dates:
 	for FILE in $(man_MANS); do \
@@ -97,4 +101,4 @@ wikis: $(WIKIS) toc.wiki
 .PHONY: wikis
 
 CLEANFILES=all.ps all.pdf toc.man toc.wiki \
-	   manual.ps manual.pdf $(PSS) $(PDFS) $(WIKIS)
+	   manual.ps manual.pdf $(PSS) $(PDFS) $(WIKIS) $(man_MANS)

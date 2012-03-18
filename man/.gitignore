@@ -3,3 +3,5 @@
 *.wiki
 toc.man
 toc.wiki
+*.8
+*.5
