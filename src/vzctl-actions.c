@@ -810,6 +810,14 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			goto err;
 		}
 	}
+	/* Resize ploop image if --diskspace is supplied */
+	if (ve_private_is_ploop(g_p->res.fs.private) &&
+			cmd_p->res.dq.diskspace)
+	{
+		if ((ret = vzctl_resize_image(g_p->res.fs.private,
+						cmd_p->res.dq.diskspace[1])))
+			return ret;
+	}
 	/* Skip applying parameters on stopped CT */
 	if (cmd_p->opt.save && !is_run) {
 		ret = mod_setup(h, veid, STATE_STOPPED, SKIP_NONE, &g_action,
