@@ -67,6 +67,7 @@ static void usage(int rc)
 "   [--diskspace <kbytes>] [--private <path>] [--root <path>]\n"
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
+"vzctl convert <ctid> [--layout ploop[:mode]] [--diskspace <kbytes>]\n"
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
 "vzctl console <ctid>\n"
 "vzctl enter <ctid> [--exec <command> [arg ...]]\n"
