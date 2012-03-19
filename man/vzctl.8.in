@@ -747,7 +747,7 @@ This command restores a container from the dump file created by the
 .I CTID
 .OP --ostemplate name
 .OP --config name
-.OP --layout \fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBplain\fR|\fBexpanded\fR|\fBraw\fR}]
+.OP --layout \fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
 .OP --private path
 .OP --root path
 .OP --ipadd addr
