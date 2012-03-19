@@ -323,6 +323,7 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	{"layout",	required_argument, NULL, PARAM_VE_LAYOUT},
 	{"ve_layout",	required_argument, NULL, PARAM_VE_LAYOUT},
 	{"velayout",	required_argument, NULL, PARAM_VE_LAYOUT},
+	{"diskspace",	required_argument, NULL, PARAM_DISKSPACE},
 	{ NULL, 0, NULL, 0 }
 };
 

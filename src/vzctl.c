@@ -64,7 +64,7 @@ static void usage(int rc)
 "\n"
 "vzctl create <ctid> [--ostemplate <name>] [--config <name>]\n"
 "   [--layout ploop|simfs] [--hostname <name>] [--name <name>] [--ipadd <addr>]\n"
-"   [--private <path>] [--root <path>]\n"
+"   [--diskspace <kbytes>] [--private <path>] [--root <path>]\n"
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"

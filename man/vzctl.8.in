@@ -762,6 +762,7 @@ This command restores a container from the dump file created by the
 .OP --ostemplate name
 .OP --config name
 .OP --layout \fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
+.OP --diskspace \fIkbytes\fR
 .OP --private path
 .OP --root path
 .OP --ipadd addr
@@ -793,6 +794,10 @@ option. In case \fBploop\fR is used, one can additionally specify ploop
 disk image format after a colon. Possible ploop formats are \fBexpanded\fR,
 \fBplain\fR and \fBraw\fR. Default is \fBexpanded\fR.
 Using \fBraw\fR is not recommended and is not supported.
+
+You can use \fB--diskspace\fR option to specify container file system size.
+Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
+(see \fBResource limits\fR section for more info on suffixes).
 
 You can use \fB--root\fR \fIpath\fR option to sets the path to the mount
 point for the container root directory (default is \fBVE_ROOT\fR specified in
