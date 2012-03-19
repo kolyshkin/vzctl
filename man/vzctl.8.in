@@ -783,9 +783,8 @@ configuration denoted by value of \fBCONFIGFILE\fR parameter of
 it will not be modified.
 
 The value of \fBCONFIGFILE\fR can be overwritten by using the
-.BI --config name
-option. This option can not be used if the container configuration file
-already exists.
+\fB--config\fR \fIname\fR option. This option can not be used
+if the container configuration file already exists.
 
 A new container can either be created using \fBsimfs\fR filesystem or
 on a \fBploop\fR device. The default is set by value of \fBVE_LAYOUT\fR
