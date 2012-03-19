@@ -618,6 +618,8 @@ delete network device from a specified container
 \fB--diskquota\fR \fByes\fR | \fBno\fR
 allows to enable or disable disk quota for a container. By default,
 a global value (\fBDISK_QUOTA\fR) from \fBvz.conf\fR(5) is used.
+
+Note that this parameter is ignored for \fBploop\fR layout.
 .TP
 \fB--diskspace\fR \fInum\fR[:\fInum\fR]
 For \fBsimfs\fR layout, sets soft and hard disk quota limits, in blocks.
@@ -633,11 +635,15 @@ Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
 \fB--diskinodes\fR \fInum\fR[:\fInum\fR]
 sets soft and hard disk quota limits, in i-nodes. First parameter is
 soft limit, second is hard limit.
+
+Note that this parameter is ignored for \fBploop\fR layout.
 .TP
 \fB--quotatime\fR \fIseconds\fR
 sets quota grace period. Container is permitted to exceed its soft limits
 for the grace period, but once it has expired, the soft limit is enforced
 as a hard limit.
+
+Note that this parameter is ignored for \fBploop\fR layout.
 .TP
 \fB--quotaugidlimit\fR \fInum\fR
 sets maximum number of user/group IDs in a container for which disk quota inside
