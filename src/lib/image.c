@@ -336,7 +336,7 @@ int ve_private_is_ploop(const char *private)
  * 4) update ve_layout
  */
 int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
-		fs_param *fs, dq_param *dq)
+		fs_param *fs, dq_param *dq, int mode)
 {
 	struct vzctl_create_image_param param = {};
 	struct vzctl_mount_param mount_param = {};
@@ -369,7 +369,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	if (make_dir_mode(new_private, 1, 0600) != 0)
 		return VZ_CANT_CREATE_DIR;
 
-	param.mode = PLOOP_EXPANDED_MODE;
+	param.mode = mode;
 	param.size = dq->diskspace[1]; // limit
 	ret = vzctl_create_image(new_private, &param);
 	if (ret)

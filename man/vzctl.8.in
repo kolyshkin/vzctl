@@ -35,7 +35,10 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
 \fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
-\fBconsole\fR | \fBconvert\fR \fICTID\fR
+\fBconsole\fR \fICTID\fR
+.SY vzctl
+[\fIflags\fR] \fBconvert\fR \fICTID\fR
+.OP --layout \fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
 .SY vzctl
 [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
@@ -855,7 +858,7 @@ to execution of \fBumount\fR and \fBpostumount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
 
 Note that \fBstop\fR does \fBumount\fR automatically.
-.IP "\fBconvert\fR \fICTID\fR" 4
+.IP "\fBconvert\fR \fICTID\fR [\fB--layout ploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]]" 4
 Convert CT private area to reside on a ploop device (available in kernel
 version 042stab052.8 and greater). Conversion should be performed when
 a container is stopped, plus disk space quota should be set.

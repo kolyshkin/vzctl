@@ -57,6 +57,6 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid);
 int vzctl_delete_snapshot(const char *ve_private, const char *guid);
 int ve_private_is_ploop(const char *private);
 int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
-		fs_param *fs, dq_param *dq);
+		fs_param *fs, dq_param *dq, int mode);
 
 #endif /* _IMAGE_H_ */

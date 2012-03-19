@@ -59,6 +59,7 @@ _vzctl()
 		enter exec exec2 runscript convert console"
 	local vzctl_create_opts="--ostemplate --config --private --root \
 		--layout --ipadd --hostname --name --description"
+	local vzctl_convert_opts="--layout"
 	local vzctl_set_opts="--save --onboot --root --private \
 		--userpasswd --disabled --ipadd --ipdel \
 		--hostname --nameserver --searchdomain \
@@ -248,6 +249,9 @@ _vzctl()
 						;;
 					set)
 						COMPREPLY=( $( compgen -W "$vzctl_set_opts" -- $cur ) )
+						;;
+					convert)
+						COMPREPLY=( $( compgen -W "$vzctl_convert_opts" -- $cur ) )
 						;;
 					chkpnt|restore)
 						COMPREPLY=( $( compgen -W "--dumpfile" -- $cur ) )

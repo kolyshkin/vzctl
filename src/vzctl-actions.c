@@ -356,11 +356,47 @@ static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	return ret;
 }
 
+static int parse_convert_opt(envid_t veid, int argc, char **argv,
+	vps_param *param)
+{
+	int ret;
+	struct option *opt;
+	struct option convert_options[] = {
+	{"layout",	required_argument, NULL, PARAM_VE_LAYOUT},
+	{"ve_layout",	required_argument, NULL, PARAM_VE_LAYOUT},
+	{"velayout",	required_argument, NULL, PARAM_VE_LAYOUT},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	opt = mod_make_opt(convert_options, &g_action, NULL);
+	if (opt == NULL)
+		return VZ_RESOURCE_ERROR;
+	ret = parse_opt(veid, argc, argv, opt, param);
+	free(opt);
+
+	return ret;
+}
+
 static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
 		vps_param *cmd_p)
 {
+	int layout = cmd_p->opt.layout;
+	int mode = cmd_p->opt.mode;
+
+	/* Set defaults if not specified */
+	if (layout == -1)
+		layout = VE_LAYOUT_PLOOP;
+	if (mode < 0)
+		mode = PLOOP_EXPANDED_MODE;
+
+	/* We only support ploop here */
+	if (layout != VE_LAYOUT_PLOOP) {
+		logger(-1, 0, "Only conversion to ploop is supported");
+		return VZ_INVALID_PARAMETER_VALUE;
+	}
+
 	return vzctl_env_convert_ploop(h, veid,
-			&g_p->res.fs, &g_p->res.dq);
+			&g_p->res.fs, &g_p->res.dq, mode);
 }
 
 static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
@@ -990,6 +1026,9 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 		break;
 	case ACTION_CREATE:
 		ret = parse_create_opt(veid, argc, argv, param);
+		break;
+	case ACTION_CONVERT:
+		ret = parse_convert_opt(veid, argc, argv, param);
 		break;
 	case ACTION_START:
 		ret = parse_startstop_opt(argc, argv, param, 1, 0);
