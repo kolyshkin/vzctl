@@ -249,7 +249,7 @@ modify_vzconf()
 	local cfg_new='CONFIGFILE="vswap-256m"'
 	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
 	if test $kv -ge 42; then
-		if grep -q $cfg_old $VZCONF; then
+		if grep -q "$cfg_old" $VZCONF; then
 			sed -i "s/${cfg_old}/${cfg_new}/" $VZCONF
 			ewarn "Setting $cfg_new in $VZCONF"
 		fi
