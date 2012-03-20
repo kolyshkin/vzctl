@@ -319,7 +319,7 @@ int vps_ip_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 
 
 int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
-	const char *root, vps_param *param, int state)
+	const fs_param *fs, vps_param *param, int state)
 {
 	int ret;
 	vps_res *res = &param->res;
@@ -334,17 +334,17 @@ int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 		logger(0, 0, "Dist action not loaded");
 		return -1;
 	}
-	if ((ret = vps_hostnm_configure(h, veid, actions, root,
+	if ((ret = vps_hostnm_configure(h, veid, actions, fs->root,
 		res->misc.hostname, get_local_ip(param), state)))
 	{
 		return ret;
 	}
-	if ((ret = vps_dns_configure(h, veid, actions, root, &res->misc,
+	if ((ret = vps_dns_configure(h, veid, actions, fs->root, &res->misc,
 		state)))
 	{
 		return ret;
 	}
-	if ((ret = vps_quota_configure(h, veid, actions, &res->fs, &res->dq,
+	if ((ret = vps_quota_configure(h, veid, actions, fs, &res->dq,
 		state)))
 	{
 		return ret;
