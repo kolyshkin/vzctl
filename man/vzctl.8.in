@@ -1089,6 +1089,8 @@ Container private area not exist
 Parameter \fBDISKSPACE\fR not set
 .IP 64
 Parameter \fBDISKINODES\fR not set
+.IP 65
+Error setting second-level (ugid) quota
 .IP 66
 \fBvzquota off\fR failed
 .IP 67

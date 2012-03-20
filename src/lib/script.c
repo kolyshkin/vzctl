@@ -215,10 +215,35 @@ int run_pre_script(int veid, char *script)
 	return ret;
 }
 
+#define UDEV_DEVICES_DIR1	"/etc/udev/devices"
+static int mk_quota_dev(const char *name, dev_t dev)
+{
+	mode_t mode = S_IFBLK | S_IXGRP;
+	char fname[256];
+	const char *p;
+
+	unlink(name);
+	if (mknod(name, mode, dev))
+		logger(-1, errno, "Unable to create %s", name);
+
+	if (stat_file(UDEV_DEVICES_DIR1) != 1)
+		return 0;
+
+	if ((p = strrchr(name, '/')) == NULL)
+		p = name;
+
+	snprintf(fname, sizeof(fname), UDEV_DEVICES_DIR1 "/%s", p);
+	unlink(fname);
+	if (mknod(fname, mode, dev))
+		logger(-1, errno, "Unable to create %s", name);
+
+	return 0;
+}
+
 #define PROC_QUOTA	"/proc/vz/vzaquota/"
 #define QUOTA_U		"/aquota.user"
 #define QUOTA_G		"/aquota.group"
-int mk_quota_link()
+static int mk_vzquota_link()
 {
 	struct stat st;
 	const char *fs;
@@ -231,10 +256,8 @@ int mk_quota_link()
 	fs = vz_fs_get_name();
 	/* make dev */
 	snprintf(buf, sizeof(buf), "/dev/%s", fs);
-	unlink(buf);
-	logger(3, 0, "Setup quota dev %s", buf);
-	if (mknod(buf, S_IFBLK | S_IXGRP, st.st_dev))
-		logger(-1, errno, "Unable to create %s", buf);
+	mk_quota_dev(buf, st.st_dev);
+
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
 		(unsigned long)st.st_dev);
 	unlink(QUOTA_U);
@@ -246,6 +269,16 @@ int mk_quota_link()
 	if (symlink(buf, QUOTA_G))
 		logger(-1, errno, "Unable to create symlink %s", buf);
 	return 0;
+}
+
+int setup_env_quota(const struct setup_env_quota_param *param)
+{
+	if (param == NULL)
+		return -1;
+	if (param->dev_name[0] == '\0') /* simfs/vzquota */
+		return mk_vzquota_link();
+	/* ploop */
+	return mk_quota_dev(param->dev_name, param->dev);
 }
 
 #define INITTAB_FILE		"/etc/inittab"

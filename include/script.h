@@ -18,10 +18,19 @@
 #ifndef _SCRIPT_H_
 #define _SCRIPT_H_
 
+#include <sys/types.h>
+
+/* Second-level quota */
+struct setup_env_quota_param {
+	char dev_name[256];
+	dev_t dev;
+};
+int setup_env_quota(const struct setup_env_quota_param *p);
+
+/* Misc scripts */
 int read_script(const char *fname, char *include, char **buf);
 int run_script(const char *f, char *argv[], char *envp[], int quiet);
 int run_pre_script(int veid, char *script);
-int mk_quota_link();
 int add_reach_runlevel_mark();
 int wait_on_fifo(void *data);
 

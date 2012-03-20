@@ -153,4 +153,9 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res);
 int need_configure(vps_res *res);
 
+/* Second-level quota */
+struct setup_env_quota_param;
+int fill_2quota_param(struct setup_env_quota_param *p,
+		const char *ve_private, const char *ve_root);
+
 #endif

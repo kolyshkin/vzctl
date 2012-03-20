@@ -37,6 +37,7 @@
 #include "vps_configure.h"
 #include "io.h"
 #include "image.h"
+#include "script.h"
 
 /** Function called on CT start to setup resource management
  *
@@ -52,30 +53,50 @@ int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
 	return 0;
 }
 
+int fill_2quota_param(struct setup_env_quota_param *p,
+		const char *ve_private, const char *ve_root)
+{
+	struct stat st;
+
+	if (!ve_private_is_ploop(ve_private)) {
+		/* simfs case */
+		if (stat(ve_root, &st)) {
+			logger(-1, errno, "%s: Can't stat %s",
+				       __func__, ve_root);
+			return VZ_ERROR_SET_USER_QUOTA;
+		}
+		p->dev_name[0] = 0;
+		p->dev = st.st_dev;
+
+		return 0;
+	}
+
+	/* ploop case */
+	if (vzctl_get_ploop_dev(ve_root, p->dev_name, sizeof(p->dev_name))) {
+		logger(-1, 0, "Unable to find ploop device for %s", ve_root);
+		return VZ_ERROR_SET_USER_QUOTA;
+	}
+	if (stat(p->dev_name, &st)) {
+		logger(-1, errno, "%s: Can't stat %s", __func__, p->dev_name);
+		return VZ_ERROR_SET_USER_QUOTA;
+	}
+	p->dev = st.st_rdev;
+
+	return 0;
+}
+
 /** Give Container permissions to do quotactl operations on its root.
  *
  */
-static int vps_2quota_perm(vps_handler *h, int veid,
-				const char *root, dq_param *dq)
+static int vps_2quota_perm(vps_handler *h, int veid, dev_t device)
 {
-	dev_res dev;
-	struct stat st;
+	dev_res dev = { };
 
-	if (dq->enable == NO || dq->ugidlimit == NULL ||  *dq->ugidlimit == 0)
-		return 0;
-
-	if (stat(root, &st)) {
-		logger(-1, errno, "Unable to stat %s", root);
-		return VZ_ERROR_SET_USER_QUOTA;
-	}
-
-	memset(&dev, 0, sizeof(dev));
-	dev.dev = st.st_dev;
+	dev.dev = device;
 	dev.type = S_IFBLK | VE_USE_MINOR;
-	dev.mask = S_IXGRP;
+	dev.mask = S_IRWXG;
 	return set_devperm(h, veid, &dev);
 }
-
 
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
@@ -117,8 +138,13 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 	if ((ret = ve_ioprio_set(h, veid, &res->io)))
 		return ret;
-	if ((ret = vps_2quota_perm(h, veid, fs->root, &res->dq)))
-		return ret;
+	if (is_2nd_level_quota_on(&res->dq)) {
+		struct setup_env_quota_param qp;
+		if ((ret = fill_2quota_param(&qp, fs->private, fs->root)))
+			return ret;
+		if ((ret = vps_2quota_perm(h, veid, qp.dev)))
+			return ret;
+	}
 
 	if (!(skip & SKIP_CONFIGURE))
 		vps_configure(h, veid, actions, fs->root, param, vps_state);
