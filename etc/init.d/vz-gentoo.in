@@ -251,7 +251,7 @@ modify_vzconf()
 	if test $kv -ge 42; then
 		if grep -q $cfg_old $VZCONF; then
 			sed -i "s/${cfg_old}/${cfg_new}/" $VZCONF
-			ewarn "Set $cfg_new in $VZCONF"
+			ewarn "Setting $cfg_new in $VZCONF"
 		fi
 	fi
 }
