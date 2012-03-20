@@ -406,7 +406,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to perform restore: "
 			"container already running");
-		return VZ_VE_NOT_RUNNING;
+		return VZ_VE_RUNNING;
 	}
 	logger(0, 0, "Restoring container ...");
 	ret = VZ_RESTORE_ERROR;
