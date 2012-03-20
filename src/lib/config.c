@@ -2170,6 +2170,15 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_BOOTORDER:
 		ret = conf_parse_ulong(&vps_p->res.misc.bootorder, val);
 		break;
+	case PARAM_SNAPSHOT_GUID:
+		ret = conf_parse_str(&vps_p->snap.guid, val);
+		break;
+	case PARAM_SNAPSHOT_NAME:
+		ret = conf_parse_str(&vps_p->snap.name, val);
+		break;
+	case PARAM_SNAPSHOT_DESC:
+		ret = conf_parse_str(&vps_p->snap.desc, val);
+		break;
 	case PARAM_IGNORED:
 		/* Well known but ignored parameter */
 		break;

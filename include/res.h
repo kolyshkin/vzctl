@@ -126,11 +126,18 @@ struct log_s {
 	int *verbose;
 };
 
+struct vzctl_snapshot_param {
+	char *guid;
+	char *name;
+	char *desc;
+};
+
 struct vps_param {
 	struct log_s log;
 	vps_res res;
 	vps_res del_res;
 	vps_opt opt;
+	struct vzctl_snapshot_param snap;
 	struct mod_action *mod;
 	struct vps_param *g_param;
 };

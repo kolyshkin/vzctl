@@ -207,6 +207,15 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_QUOTAOFF;
 	} else if (!strcmp(argv[1], "quotainit")) {
 		action = ACTION_QUOTAINIT;
+	} else if (!strcmp(argv[1], "snapshot-create") ||
+			!strcmp(argv[1], "snapshot")) {
+		action = ACTION_SNAPSHOT_CREATE;
+	} else if (!strcmp(argv[1], "snapshot-switch")) {
+		action = ACTION_SNAPSHOT_SWITCH;
+	} else if (!strcmp(argv[1], "snapshot-delete")) {
+		action = ACTION_SNAPSHOT_DELETE;
+	} else if (!strcmp(argv[1], "snapshot-list")) {
+		action = ACTION_SNAPSHOT_LIST;
 	} else if (!strcmp(argv[1], "--help")) {
 		usage(0);
 	} else {

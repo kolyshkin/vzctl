@@ -546,6 +546,50 @@ err_syntax:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
+static int parse_snapshot_create_opt(envid_t veid, int argc, char **argv,
+		vps_param *param)
+{
+	int ret;
+	struct option *opt;
+	static struct option snapshot_create_options[] =
+	{
+	{"id",  required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"uuid", required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"name", required_argument, NULL, PARAM_SNAPSHOT_NAME},
+	{"description", required_argument, NULL, PARAM_SNAPSHOT_DESC},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	opt = mod_make_opt(snapshot_create_options, &g_action, NULL);
+	if (opt == NULL)
+		return VZ_RESOURCE_ERROR;
+	ret = parse_opt(veid, argc, argv, opt, param);
+	free(opt);
+
+	return ret;
+}
+
+static int parse_snapshot_delete_opt(envid_t veid, int argc, char **argv,
+		vps_param *param)
+{
+	int ret;
+	struct option *opt;
+	static struct option snapshot_delete_options[] =
+	{
+	{"id",  required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"uuid", required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	opt = mod_make_opt(snapshot_delete_options, &g_action, NULL);
+	if (opt == NULL)
+		return VZ_RESOURCE_ERROR;
+	ret = parse_opt(veid, argc, argv, opt, param);
+	free(opt);
+
+	return ret;
+}
+
 static int check_set_ugidlimit(unsigned long *cur, unsigned long *old,
 		int loud)
 {
@@ -1085,6 +1129,15 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 		break;
 	case ACTION_CONSOLE:
 		break;
+	case ACTION_SNAPSHOT_CREATE:
+		ret = parse_snapshot_create_opt(veid, argc, argv, param);
+		break;
+	case ACTION_SNAPSHOT_DELETE:
+	case ACTION_SNAPSHOT_SWITCH:
+		ret = parse_snapshot_delete_opt(veid, argc, argv, param);
+		break;
+	case ACTION_SNAPSHOT_LIST:
+		break;
 	default :
 		if ((argc - 1) > 0) {
 			fprintf (stderr, "Invalid options: ");
@@ -1240,7 +1293,14 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = quota_init(veid, g_p->res.fs.private, &g_p->res.dq);
 		break;
 #undef CHECK_DQ
-
+	case ACTION_SNAPSHOT_CREATE:
+		break;
+	case ACTION_SNAPSHOT_DELETE:
+		break;
+	case ACTION_SNAPSHOT_SWITCH:
+		break;
+	case ACTION_SNAPSHOT_LIST:
+		break;
 	case ACTION_CUSTOM:
 		ret = mod_setup(h, veid, 0, 0, &g_action, g_p);
 		break;
