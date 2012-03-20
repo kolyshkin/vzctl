@@ -42,6 +42,9 @@ typedef struct {
 void logger(int log_level, int err_num, const char *format, ...)
 	__attribute__ ((__format__ (__printf__, 3, 4)));
 
+#define vzctl_err(ret, err_num, format, ...)	\
+	({ logger(-1, err_num, format, ##__VA_ARGS__); ret; })
+
 /** Change/set log file.
  *
  * @param file		file name.
