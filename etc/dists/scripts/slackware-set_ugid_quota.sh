@@ -18,17 +18,18 @@
 #
 # Configures quota startup script in a container.
 
-SCRIPTANAME=/etc/rc.d/rc.quota
-RC_LOCAL=/etc/rc.d/rc.local
+setup_vzquota() {
+	SCRIPTANAME=/etc/rc.d/rc.quota
+	RC_LOCAL=/etc/rc.d/rc.local
 
-if [ -z "$MAJOR" ]; then
-	rm -f ${SCRIPTANAME} > /dev/null 2>&1
-	rm -f /etc/mtab > /dev/null 2>&1
-	ln -sf /proc/mounts /etc/mtab
-	exit 0
-fi
+	if [ -z "$MAJOR" ]; then
+		rm -f ${SCRIPTANAME} > /dev/null 2>&1
+		rm -f /etc/mtab > /dev/null 2>&1
+		ln -sf /proc/mounts /etc/mtab
+		exit 0
+	fi
 
-cat << EOF > ${SCRIPTANAME} || exit 1
+	cat << EOF > ${SCRIPTANAME} || exit 1
 start() {
 	dev=\$(awk '(\$2 == "/") && (\$4 ~ /usrquota/) && (\$4 ~ /grpquota/) {print \$1}' /etc/mtab)
 	if test -z "\$dev"; then
@@ -49,11 +50,13 @@ case "$1" in
 	exit
 esac
 EOF
-chmod 755 ${SCRIPTANAME}
+	chmod 755 ${SCRIPTANAME}
 
-if ! grep -q "${SCRIPTANAME}" ${RC_LOCAL} 2>/dev/null; then
-	echo "${SCRIPTANAME} start" >> /etc/rc.d/rc.local
-fi
+	if ! grep -q "${SCRIPTANAME}" ${RC_LOCAL} 2>/dev/null; then
+		echo "${SCRIPTANAME} start" >> /etc/rc.d/rc.local
+	fi
+}
 
+setup_vzquota
 exit 0
 

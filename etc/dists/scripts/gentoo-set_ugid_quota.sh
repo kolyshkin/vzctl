@@ -22,17 +22,19 @@
 # Required parameters:
 #   MINOR	- root device minor number
 #   MAJOR	- root device major number
-SCRIPTANAME='/etc/init.d/vzquota'
 
-if [ -z "$MAJOR" ]; then
-	rc-update del vzquota default > /dev/null 2>&1
-	rm -f ${SCRIPTANAME} > /dev/null 2>&1
-	rm -f /etc/mtab > /dev/null 2>&1
-	ln -sf /proc/mounts /etc/mtab
-	exit 0
-fi
+setup_vzquota() {
+	SCRIPTANAME='/etc/init.d/vzquota'
 
-cat << EOF > ${SCRIPTANAME} || exit 1
+	if [ -z "$MAJOR" ]; then
+		rc-update del vzquota default > /dev/null 2>&1
+		rm -f ${SCRIPTANAME} > /dev/null 2>&1
+		rm -f /etc/mtab > /dev/null 2>&1
+		ln -sf /proc/mounts /etc/mtab
+		exit 0
+	fi
+
+	cat << EOF > ${SCRIPTANAME} || exit 1
 #!/sbin/runscript
 
 start() {
@@ -53,8 +55,10 @@ stop() {
 	return
 }
 EOF
-chmod 755 ${SCRIPTANAME}
+	chmod 755 ${SCRIPTANAME}
 
-rc-update add vzquota default
+	rc-update add vzquota default
+}
 
+setup_vzquota
 exit 0

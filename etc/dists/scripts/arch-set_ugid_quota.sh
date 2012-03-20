@@ -18,18 +18,19 @@
 #
 # Configures quota in a container running Archlinux.
 
-SCRIPTANAME='/etc/rc.d/vzquota'
-CFGFILE=/etc/rc.conf
+setup_vzquota() {
+	SCRIPTANAME='/etc/rc.d/vzquota'
+	CFGFILE=/etc/rc.conf
 
-if [ -z "$MAJOR" ]; then
-	rm -f ${SCRIPTANAME} > /dev/null 2>&1
-	rm -f /etc/mtab > /dev/null 2>&1
-	ln -sf /proc/mounts /etc/mtab
-	del_param3 ${CFGFILE} DAEMONS vzquota
-	exit 0
-fi
+	if [ -z "$MAJOR" ]; then
+		rm -f ${SCRIPTANAME} > /dev/null 2>&1
+		rm -f /etc/mtab > /dev/null 2>&1
+		ln -sf /proc/mounts /etc/mtab
+		del_param3 ${CFGFILE} DAEMONS vzquota
+		exit 0
+	fi
 
-cat << EOF > ${SCRIPTANAME} || exit 1
+	cat << EOF > ${SCRIPTANAME} || exit 1
 #!/bin/sh
 
 dev=\$(awk '(\$2 == "/") && (\$4 ~ /usrquota/) && (\$4 ~ /grpquota/) {print \$1}' /etc/mtab)
@@ -43,10 +44,12 @@ fi
 [ -e "\$dev" ] || mknod \$dev b $MAJOR $MINOR
 quotaon -aug
 EOF
-chmod 755 ${SCRIPTANAME}
+	chmod 755 ${SCRIPTANAME}
 
-# add vzquota to rc.conf
-del_param3 ${CFGFILE} DAEMONS vzquota
-add_param3 ${CFGFILE} DAEMONS vzquota
+	# add vzquota to rc.conf
+	del_param3 ${CFGFILE} DAEMONS vzquota
+	add_param3 ${CFGFILE} DAEMONS vzquota
+}
 
+setup_vzquota
 exit 0

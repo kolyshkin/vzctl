@@ -18,18 +18,19 @@
 #
 # Configures quota startup script in a container.
 
-SCRIPTANAME='/etc/init.d/vzquota'
-RCDIRS="/etc/rc.d /etc"
+setup_vzquota() {
+	SCRIPTANAME='/etc/init.d/vzquota'
+	RCDIRS="/etc/rc.d /etc"
 
-if [ -z "$MAJOR" ]; then
-	/usr/sbin/update-rc.d vzquota remove > /dev/null 2>&1
-	/sbin/chkconfig --del vzquota >/dev/null 2>&1
-	rm -f ${SCRIPTANAME} > /dev/null 2>&1
-	rm -f /etc/mtab > /dev/null 2>&1
-	ln -sf /proc/mounts /etc/mtab
-	exit 0
-fi
-cat << EOF > ${SCRIPTANAME} || exit 1
+	if [ -z "$MAJOR" ]; then
+		/usr/sbin/update-rc.d vzquota remove > /dev/null 2>&1
+		/sbin/chkconfig --del vzquota >/dev/null 2>&1
+		rm -f ${SCRIPTANAME} > /dev/null 2>&1
+		rm -f /etc/mtab > /dev/null 2>&1
+		ln -sf /proc/mounts /etc/mtab
+		exit 0
+	fi
+	cat << EOF > ${SCRIPTANAME} || exit 1
 #!/bin/sh
 # chkconfig: 2345 10 90
 # description: prepare container to use OpenVZ 2nd-level disk quotas
@@ -69,33 +70,35 @@ case "\$1" in
 	exit
 esac
 EOF
-chmod 755 ${SCRIPTANAME}
+	chmod 755 ${SCRIPTANAME}
 
-# Debian/Ubuntu case
-if test -x /usr/sbin/update-rc.d; then
-	/usr/sbin/update-rc.d vzquota defaults > /dev/null
-	exit
-fi
+	# Debian/Ubuntu case
+	if test -x /usr/sbin/update-rc.d; then
+		/usr/sbin/update-rc.d vzquota defaults > /dev/null
+		exit
+	fi
 
-# RedHat/RHEL/CentOS case
-if test -x /sbin/chkconfig; then
-	/sbin/chkconfig --add vzquota >/dev/null
-	exit
-fi
+	# RedHat/RHEL/CentOS case
+	if test -x /sbin/chkconfig; then
+		/sbin/chkconfig --add vzquota >/dev/null
+		exit
+	fi
 
-# Other cases, try to put into runlevels manually
-for RC in ${RCDIRS} ""; do
-	[ -d ${RC}/rc3.d ] && break
-done
+	# Other cases, try to put into runlevels manually
+	for RC in ${RCDIRS} ""; do
+		[ -d ${RC}/rc3.d ] && break
+	done
 
-if [ -z "${RC}" ]; then
-	echo "Unable to find init.d runlevel directories (tried $RCDIRS)"
-	exit 1
-fi
+	if [ -z "${RC}" ]; then
+		echo "Unable to find init.d runlevel directories (tried $RCDIRS)"
+		exit 1
+	fi
 
-for dir in `ls -d ${RC}/rc[0-6].d`; do
-	ln -sf ${SCRIPTANAME} ${dir}/S10vzquota
-done
+	for dir in `ls -d ${RC}/rc[0-6].d`; do
+		ln -sf ${SCRIPTANAME} ${dir}/S10vzquota
+	done
+}
 
+setup_vzquota
 exit 0
 
