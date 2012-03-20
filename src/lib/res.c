@@ -138,11 +138,16 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 	if ((ret = ve_ioprio_set(h, veid, &res->io)))
 		return ret;
+	/* Setup 2nd-level quota */
 	if (is_2nd_level_quota_on(&res->dq)) {
 		struct setup_env_quota_param qp;
 		if ((ret = fill_2quota_param(&qp, fs->private, fs->root)))
 			return ret;
 		if ((ret = vps_2quota_perm(h, veid, qp.dev)))
+			return ret;
+		if ((ret = vps_execFn(h, veid, fs->root,
+					(execFn)setup_env_quota, &qp,
+					VE_SKIPLOCK)))
 			return ret;
 	}
 

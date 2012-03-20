@@ -453,27 +453,6 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 		NULL, restore_fn, param);
 	if (ret)
 		goto err;
-	/* Restore second-level quota links & quota device */
-	if ((cmd == CMD_RESTORE || cmd == CMD_UNDUMP) &&
-			is_2nd_level_quota_on(&vps_p->res.dq))
-	{
-		struct setup_env_quota_param qparam;
-
-		logger(0, 0, "Restoring second-level quota");
-		ret = fill_2quota_param(&qparam,
-				vps_p->res.fs.private,
-				vps_p->res.fs.root);
-		if (ret != 0)
-			goto qerr;
-		ret = vps_execFn(h, veid, vps_p->res.fs.root,
-				(execFn)setup_env_quota, &qparam, VE_SKIPLOCK);
-		if (ret == 0)
-			goto err;
-qerr:
-			logger(-1, 0, "Error: restoring second-level "
-					"quota links failed");
-			ret = VZ_ERROR_SET_USER_QUOTA;
-	}
 err:
 	close(rst_fd);
 	if (dump_fd != -1)

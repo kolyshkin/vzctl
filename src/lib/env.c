@@ -414,13 +414,6 @@ try:
 		mount("sunrpc", "/var/lib/nfs/rpc_pipefs", "rpc_pipefs", 0, 0);
 	}
 	configure_sysctl();
-	if (is_2nd_level_quota_on(&res->dq)) {
-		struct setup_env_quota_param qp;
-
-		if (fill_2quota_param(&qp, res->fs.private, res->fs.root))
-			goto env_err;
-		setup_env_quota(&qp);
-	}
 
 	/* Close status descriptor to report that
 	 * environment is created.
