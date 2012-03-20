@@ -385,7 +385,7 @@ static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
 	int mode = cmd_p->opt.mode;
 
 	/* Set defaults if not specified */
-	if (layout == -1)
+	if (layout == 0)
 		layout = VE_LAYOUT_PLOOP;
 	if (mode < 0)
 		mode = PLOOP_EXPANDED_MODE;
