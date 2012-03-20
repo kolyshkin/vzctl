@@ -404,3 +404,40 @@ ip_conv() {
 	echo $ipm | grep -q ':' && return
 	_NETMASK=$(cidr2mask $_MASK)
 }
+
+quota_tools_support_ext4() {
+	quotacheck -V | awk '/ version /{
+		i=split($4, a, ".");
+		if (i < 2) {
+			print("Unable to detect quota version: " $0);
+			exit 1;
+		}
+		if (a[1] >= 4) {
+			exit 0;
+		}
+		if (a[1] < 3 || (a[1] == 3 && a[2] < 17)) {
+			print("Old quota utils version detected: " $0);
+			print("Quota utils version should be > 3.16");
+			exit 1;
+		}
+	}'
+}
+
+setup_quota_ploop() {
+	if [ -z "$UGIDLIMIT" ]; then
+		quotaoff -a
+		rm -f /aquota.user
+		rm -f /aquota.group
+	elif [ ! -f "/aquota.user" -o ! -f "/aquota.group" ]; then
+		quota_tools_support_ext4 || exit 1
+		quotacheck -anugmM
+	fi
+}
+
+setup_quota() {
+	if grep -q /dev/ploop /proc/mounts; then
+		setup_quota_ploop
+	else
+		setup_vzquota
+	fi
+}

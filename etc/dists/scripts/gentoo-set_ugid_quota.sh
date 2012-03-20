@@ -60,5 +60,5 @@ EOF
 	rc-update add vzquota default
 }
 
-setup_vzquota
+setup_quota
 exit 0

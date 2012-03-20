@@ -51,5 +51,5 @@ EOF
 	add_param3 ${CFGFILE} DAEMONS vzquota
 }
 
-setup_vzquota
+setup_quota
 exit 0

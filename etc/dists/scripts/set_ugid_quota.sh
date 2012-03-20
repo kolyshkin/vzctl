@@ -99,6 +99,6 @@ EOF
 	done
 }
 
-setup_vzquota
+setup_quota
 exit 0
 

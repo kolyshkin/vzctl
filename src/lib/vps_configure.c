@@ -34,6 +34,7 @@
 #include "env.h"
 #include "vps_configure.h"
 #include "list.h"
+#include "image.h"
 
 
 static struct vps_state{
@@ -186,15 +187,14 @@ int vps_pw_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 }
 
 static int vps_quota_configure(vps_handler *h, envid_t veid,
-	dist_actions *actions, const char *root, dq_param *dq, int state)
+	const dist_actions *actions, const fs_param *fs, const dq_param *dq,
+	int state)
 {
 	char *envp[6];
 	const char *script;
 	int ret, i;
 	char buf[64];
 	const char *str_state;
-	struct stat st;
-	const char *fs_name;
 
 	if (dq->enable == NO)
 		return 0;
@@ -206,26 +206,39 @@ static int vps_quota_configure(vps_handler *h, envid_t veid,
 			" specified");
 		return 0;
 	}
-	if (stat(root, &st)) {
-		logger(-1, errno, "Unable to stat %s", root);
-		return -1;
-	}
 	i = 0;
 	str_state = state2str(state);
 	snprintf(buf, sizeof(buf), "VE_STATE=%s", str_state);
 	envp[i++] = strdup(buf);
 	if (*dq->ugidlimit)  {
-		fs_name = vz_fs_get_name();
-		snprintf(buf, sizeof(buf), "DEVFS=%s", fs_name);
-		envp[i++] = strdup(buf);
-		snprintf(buf, sizeof(buf), "MINOR=%d", minor(st.st_dev));
-		envp[i++] = strdup(buf);
-		snprintf(buf, sizeof(buf), "MAJOR=%d", major(st.st_dev));
-		envp[i++] = strdup(buf);
+		if (!ve_private_is_ploop(fs->private)) {
+			/* simfs/vzquota case */
+			struct stat st;
+			const char *fs_name;
+
+			if (stat(fs->root, &st)) {
+				logger(-1, errno, "Unable to stat %s",
+						fs->root);
+				return VZ_ERROR_SET_USER_QUOTA;
+			}
+			fs_name = vz_fs_get_name();
+			snprintf(buf, sizeof(buf), "DEVFS=%s", fs_name);
+			envp[i++] = strdup(buf);
+			snprintf(buf, sizeof(buf), "MINOR=%d", minor(st.st_dev));
+			envp[i++] = strdup(buf);
+			snprintf(buf, sizeof(buf), "MAJOR=%d", major(st.st_dev));
+			envp[i++] = strdup(buf);
+		}
+		else {
+			/* ploop/native quota case */
+			snprintf(buf, sizeof(buf), "UGIDLIMIT=%lu",
+					*dq->ugidlimit);
+			envp[i++] = strdup(buf);
+		}
 	}
 	envp[i++] = strdup(ENV_PATH);
 	envp[i] = NULL;
-	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
+	ret = vps_exec_script(h, veid, fs->root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
 	free_arg(envp);
 
@@ -331,7 +344,7 @@ int vps_configure(vps_handler *h, envid_t veid, dist_actions *actions,
 	{
 		return ret;
 	}
-	if ((ret = vps_quota_configure(h, veid, actions, root, &res->dq,
+	if ((ret = vps_quota_configure(h, veid, actions, &res->fs, &res->dq,
 		state)))
 	{
 		return ret;
