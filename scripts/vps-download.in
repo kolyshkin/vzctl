@@ -22,7 +22,7 @@
 # by editing @PKGCONFDIR@/download.conf
 #
 # Exit codes:
-#  0 -- template downloaded succesfully
+#  0 -- template downloaded successfully
 #  1 -- download error
 #  2 -- local template file already present, not updating
 #  3 -- error in usage (no argument provided)

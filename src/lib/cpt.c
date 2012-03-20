@@ -291,7 +291,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			vps_umount(h, veid, &vps_p->res.fs, 0);
 	}
 	ret = 0;
-	logger(0, 0, "Checkpointing completed succesfully");
+	logger(0, 0, "Checkpointing completed successfully");
 err:
 	if (ret) {
 		ret = VZ_CHKPNT_ERROR;
@@ -458,7 +458,7 @@ err:
 	if (dump_fd != -1)
 		close(dump_fd);
 	if (!ret)
-		logger(0, 0, "Restoring completed succesfully");
+		logger(0, 0, "Restoring completed successfully");
 	return ret;
 }
 
