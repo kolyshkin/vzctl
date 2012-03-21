@@ -122,10 +122,10 @@ int stat_file(const char *file)
 	return 1;
 }
 
-int make_dir_mode(char *path, int full, int mode)
+int make_dir_mode(const char *path, int full, int mode)
 {
 	char buf[4096];
-	char *ps, *p;
+	const char *ps, *p;
 	int len;
 
 	if (path == NULL)
@@ -155,7 +155,7 @@ int make_dir_mode(char *path, int full, int mode)
 	return 0;
 }
 
-int make_dir(char *path, int full)
+int make_dir(const char *path, int full)
 {
 	return make_dir_mode(path, full, 0755);
 }
