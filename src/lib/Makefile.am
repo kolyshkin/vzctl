@@ -21,7 +21,8 @@ INCLUDES = -I$(top_srcdir)/include
 
 AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
             -DPKGCONFDIR=\"$(pkgconfdir)\" \
-            -DPKGLIBDIR=\"$(pkglibdir)\"
+            -DPKGLIBDIR=\"$(pkglibdir)\" \
+            $(XML_CPPFLAGS)
 
 LIB_VER = 0.0.3
 
@@ -41,6 +42,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       fs.c \
                       fs_simfs.c \
                       image.c \
+                      io.c \
                       iptables.c \
                       list.c \
                       lock.c \
@@ -57,7 +59,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       veth.c \
                       vps_configure.c \
                       vzfeatures.c \
-                      io.c
+                      xml.c
 
 libvzctl_la_LDFLAGS = -release $(LIB_VER)
-libvzctl_la_LIBADD = $(PLOOP_LIBS)
+libvzctl_la_LIBADD = $(PLOOP_LIBS) $(XML_LIBS)
