@@ -670,7 +670,7 @@ static void add_elem(struct Cveinfo *ve)
 	return;
 }
 
-static inline struct Cveinfo *find_ve(int veid)
+static struct Cveinfo *find_ve(int veid)
 {
 	return (struct Cveinfo *) bsearch(&veid, veinfo, n_veinfo,
 			sizeof(struct Cveinfo), id_search_fn);
