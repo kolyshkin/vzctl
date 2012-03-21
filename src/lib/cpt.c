@@ -185,11 +185,25 @@ err_out:
 	return VZ_CHKPNT_ERROR;
 }
 
+#define GET_DUMP_FILE(req_cmd)							\
+do {										\
+	dumpfile = param->dumpfile;						\
+	if (dumpfile == NULL) {							\
+		if (cmd == req_cmd) {						\
+			logger(-1,  0, "Error: dumpfile is not specified");	\
+			goto err;						\
+		}								\
+		get_dump_file(veid, param->dumpdir, buf, sizeof(buf));		\
+		dumpfile = buf;							\
+	}									\
+} while (0)
+
 int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 		int cmd, cpt_param *param)
 {
 	int dump_fd = -1;
-	char dumpfile[PATH_LEN];
+	char buf[PATH_LEN];
+	const char *dumpfile = NULL;
 	int cpt_fd, pid, ret;
 	const char *root = fs->root;
 
@@ -213,20 +227,11 @@ int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 		return VZ_CHKPNT_ERROR;
 	}
 	if ((cmd == CMD_CHKPNT || cmd == CMD_DUMP)) {
-		if (param->dumpfile == NULL) {
-			if (cmd == CMD_DUMP) {
-				logger(-1,  0, "Error: dumpfile is not"
-					" specified.");
-				goto err;
-			}
-			get_dump_file(veid, param->dumpdir,
-					dumpfile, sizeof(dumpfile));
-		}
-		dump_fd = open(param->dumpfile ? : dumpfile,
-			O_CREAT|O_TRUNC|O_RDWR, 0600);
+		GET_DUMP_FILE(CMD_DUMP);
+		dump_fd = open(dumpfile, O_CREAT|O_TRUNC|O_RDWR, 0600);
 		if (dump_fd < 0) {
 			logger(-1, errno, "Can not create dump file %s",
-				param->dumpfile ? : dumpfile);
+					dumpfile);
 			goto err;
 		}
 	}
@@ -284,7 +289,8 @@ err:
 		ret = VZ_CHKPNT_ERROR;
 		logger(-1, 0, "Checkpointing failed");
 		if (cmd == CMD_CHKPNT || cmd == CMD_DUMP)
-			unlink(param->dumpfile ? : dumpfile);
+			if (dumpfile)
+				unlink(dumpfile);
 	}
 	if (dump_fd != -1)
 		close(dump_fd);
@@ -388,7 +394,8 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 {
 	int ret, rst_fd;
 	int dump_fd = -1;
-	char dumpfile[PATH_LEN];
+	char buf[PATH_LEN];
+	const char *dumpfile;
 
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to perform restore: "
@@ -411,20 +418,11 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 			goto err;
 		}
 	}
-	if (param->dumpfile == NULL) {
-		if (cmd == CMD_UNDUMP) {
-			logger(-1, 0, "Error: dumpfile is not specified");
-			goto err;
-		}
-
-		get_dump_file(veid, vps_p->res.cpt.dumpdir,
-				dumpfile, sizeof(dumpfile));
-	}
+	GET_DUMP_FILE(CMD_UNDUMP);
 	if (cmd == CMD_RESTORE || cmd == CMD_UNDUMP) {
-		dump_fd = open(param->dumpfile ? : dumpfile, O_RDONLY);
+		dump_fd = open(dumpfile, O_RDONLY);
 		if (dump_fd < 0) {
-			logger(-1, errno, "Unable to open %s",
-				param->dumpfile ? : dumpfile);
+			logger(-1, errno, "Unable to open %s", dumpfile);
 			goto err;
 		}
 	}
