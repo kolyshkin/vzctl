@@ -54,6 +54,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       readelf.c \
                       res.c \
                       script.c \
+                      snapshot.c \
                       ub.c \
                       util.c \
                       veth.c \

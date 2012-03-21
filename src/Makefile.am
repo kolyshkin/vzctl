@@ -50,6 +50,7 @@ vzcfgvalidate_LDADD   = $(VZCTL_LIBS)
 
 vzctl_SOURCES = enter.c \
                 modules.c \
+                snapshot.c \
                 vzctl-actions.c \
                 vzctl.c
 vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS)
