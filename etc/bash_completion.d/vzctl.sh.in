@@ -56,7 +56,8 @@ _vzctl()
 	local vzctl_common_opts="--quiet --verbose --help --version"
 	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status quotaon quotaoff quotainit \
-		enter exec exec2 runscript convert console"
+		enter exec exec2 runscript convert console \
+		snapshot-create snapshot-switch snapshot-delete snapshot-list"
 	local vzctl_create_opts="--ostemplate --config --private --root \
 		--layout --diskspace --ipadd --hostname --name --description"
 	local vzctl_convert_opts="--layout"
@@ -77,6 +78,7 @@ _vzctl()
 	local vzctl_start_opts="--wait --force"
 	local vzctl_stop_opts="--fast"
 	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
+	local vzctl_snapshot_create_opts="--id --name --description"
 
 	local iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
@@ -264,6 +266,12 @@ _vzctl()
 						;;
 					restart)
 						COMPREPLY=( $( compgen -W "$vzctl_restart_opts" -- $cur ) )
+						;;
+					snapshot-create)
+						COMPREPLY=( $( compgen -W "$vzctl_snapshot_create_opts" -- $cur ) )
+						;;
+					snapshot-switch|snapshot-delete)
+						COMPREPLY=( $( compgen -W "--id" -- $cur ) )
 						;;
 					*)
 						;;
