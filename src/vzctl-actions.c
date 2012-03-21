@@ -403,7 +403,7 @@ static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
 
 static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 {
-	int c, ret;
+	int c;
 	int option_index;
 	cpt_param *cpt = &vps_p->res.cpt;
 	static struct option chkpnt_options[] = {
@@ -420,7 +420,6 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 	{ NULL, 0, NULL, 0 }
 	};
 
-	ret = 0;
 	while (1) {
 		option_index = -1;
 		c = getopt_long (argc, argv, "", chkpnt_options, NULL);
