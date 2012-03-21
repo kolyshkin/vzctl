@@ -228,6 +228,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 	}
 	if ((cmd == CMD_CHKPNT || cmd == CMD_DUMP)) {
 		GET_DUMP_FILE(CMD_DUMP);
+		make_dir(dumpfile, 0);
 		dump_fd = open(dumpfile, O_CREAT|O_TRUNC|O_RDWR, 0600);
 		if (dump_fd < 0) {
 			logger(-1, errno, "Can not create dump file %s",
