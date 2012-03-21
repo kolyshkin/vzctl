@@ -47,8 +47,8 @@
 
 static int setup_hardlink_dir(const char *mntdir, int cpt_fd);
 
-int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
-	vps_param *vps_p)
+int cpt_cmd(vps_handler *h, envid_t veid, const char *root,
+		int action, int cmd, unsigned int ctx)
 {
 	int fd;
 	int err, ret = 0;
@@ -76,11 +76,11 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 			logger(-1, errno, "Unable to open %s", file);
 		return err;
 	}
-	if ((ret = ioctl(fd, CPT_JOIN_CONTEXT, param->ctx ? : veid)) < 0) {
-		logger(-1, errno, "Can not join cpt context %d", param->ctx);
+	if ((ret = ioctl(fd, CPT_JOIN_CONTEXT, ctx ? : veid)) < 0) {
+		logger(-1, errno, "Can not join cpt context %d", ctx ? : veid);
 		goto err;
 	}
-	switch (param->cmd) {
+	switch (cmd) {
 	case CMD_KILL:
 		logger(0, 0, "Killing...");
 		if ((ret = ioctl(fd, CPT_KILL, 0)) < 0) {
@@ -90,20 +90,14 @@ int cpt_cmd(vps_handler *h, envid_t veid, int action, cpt_param *param,
 		break;
 	case CMD_RESUME:
 		logger(0, 0, "Resuming...");
-		clean_hardlink_dir(vps_p->res.fs.root);
+		clean_hardlink_dir(root);
 		if ((ret = ioctl(fd, CPT_RESUME, 0)) < 0) {
 			logger(-1, errno, "Can not resume container");
 			goto err;
 		}
-		if (action == CMD_CHKPNT) {
-			/* restore arp/routing cleared on dump stage */
-			run_net_script(veid, ADD, &vps_p->res.net.ip,
-				STATE_RUNNING,
-				vps_p->res.net.skip_arpdetect);
-		}
 		break;
 	}
-	if (!param->ctx) {
+	if (!ctx) {
 		logger(2, 0, "\tput context");
 		if ((ret = ioctl(fd, CPT_PUT_CONTEXT, 0)) < 0) {
 			logger(-1, errno, "Can not put context");

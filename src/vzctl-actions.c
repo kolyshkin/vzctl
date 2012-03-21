@@ -1005,8 +1005,19 @@ static int chkpnt(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p
 
 	cmd = cmd_p->res.cpt.cmd;
 	merge_vps_param(g_p, cmd_p);
-	if (cmd == CMD_KILL || cmd == CMD_RESUME)
-		return cpt_cmd(h, veid, CMD_CHKPNT, &cmd_p->res.cpt, g_p);
+	if (cmd == CMD_KILL || cmd == CMD_RESUME) {
+		ret = cpt_cmd(h, veid, g_p->res.fs.root,
+				CMD_CHKPNT, cmd, cmd_p->res.cpt.ctx);
+		if (ret)
+			return ret;
+		if (cmd == CMD_RESUME) {
+			/* restore arp/routing cleared on dump stage */
+			run_net_script(veid, ADD, &g_p->res.net.ip,
+				STATE_RUNNING,
+				cmd_p->res.net.skip_arpdetect);
+		}
+		return 0;
+	}
 
 	ret = vps_chkpnt(h, veid, &g_p->res.fs, cmd, &cmd_p->res.cpt);
 	if (ret)
@@ -1029,7 +1040,8 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	cmd = cmd_p->res.cpt.cmd;
 	merge_vps_param(g_p, cmd_p);
 	if (cmd == CMD_KILL || cmd == CMD_RESUME)
-		return cpt_cmd(h, veid, CMD_RESTORE, &cmd_p->res.cpt, g_p);
+		return cpt_cmd(h, veid, g_p->res.fs.root,
+				CMD_RESTORE, cmd, cmd_p->res.cpt.ctx);
 	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt);
 }
 
