@@ -1835,6 +1835,8 @@ static int parse_netif_cmd(envid_t veid, veth_param *veth, char *val)
 		if (parse_netif_str_cmd(veid, token, &dev))
 			return ERR_INVAL;
 		ret = add_veth_param(veth, &dev);
+		if (ret)
+			return ret;
 	}
 
 	return 0;
