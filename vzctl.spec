@@ -211,6 +211,8 @@ fi
 %package lib
 Summary: Containers control API library
 Group: System Environment/Kernel
+Requires: libxml2
+BuildRequires: libxml2-devel >= 2.6.16
 
 %description lib
 Containers control API library
