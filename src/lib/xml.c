@@ -287,7 +287,7 @@ int vzctl_store_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tre
 	list_head_t pool;
 	char *guid;
 
-	logger(0, 0, "store %s", fname);
+	logger(0, 0, "Storing %s", fname);
 	list_head_init(&pool);
 	doc = xmlNewDoc(BAD_CAST XML_DEFAULT_VERSION);
 	if (doc == NULL)
