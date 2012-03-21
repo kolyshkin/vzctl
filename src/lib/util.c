@@ -200,7 +200,7 @@ int check_var(const void *val, const char *message)
 
 int cp_file(char *dst, char *src)
 {
-	int fd_src, fd_dst, len, ret = 0;
+	int fd_src, fd_dst, ret = 0;
 	struct stat st;
 	char buf[4096];
 
@@ -208,7 +208,6 @@ int cp_file(char *dst, char *src)
 		logger(-1, errno, "Unable to stat %s", src);
 		return -1;
 	}
-	len = st.st_size;
 	if ((fd_src = open(src, O_RDONLY)) < 0) {
 		logger(-1, errno, "Unable to open %s", src);
 		return -1;
