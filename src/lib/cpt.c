@@ -395,7 +395,7 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	int ret, rst_fd;
 	int dump_fd = -1;
 	char buf[PATH_LEN];
-	const char *dumpfile;
+	const char *dumpfile = NULL;
 
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Unable to perform restore: "
@@ -442,8 +442,12 @@ err:
 	close(rst_fd);
 	if (dump_fd != -1)
 		close(dump_fd);
-	if (!ret)
+	if (!ret) {
 		logger(0, 0, "Restoring completed successfully");
+		if (cmd == CMD_RESTORE)
+			if (dumpfile)
+				unlink(dumpfile);
+	}
 	return ret;
 }
 
