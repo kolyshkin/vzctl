@@ -41,6 +41,7 @@
 #include "modules.h"
 #include "io.h"
 #include "image.h"
+#include "cpt.h"
 
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
@@ -1000,13 +1001,24 @@ static int exec(vps_handler *h, act_t action, envid_t veid, const char *root,
 
 static int chkpnt(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
 {
-	int cmd;
+	int cmd, ret;
 
 	cmd = cmd_p->res.cpt.cmd;
 	merge_vps_param(g_p, cmd_p);
 	if (cmd == CMD_KILL || cmd == CMD_RESUME)
 		return cpt_cmd(h, veid, CMD_CHKPNT, &cmd_p->res.cpt, g_p);
-	return vps_chkpnt(h, veid, g_p, cmd, &cmd_p->res.cpt);
+
+	ret = vps_chkpnt(h, veid, &g_p->res.fs, cmd, &cmd_p->res.cpt);
+	if (ret)
+		return ret;
+	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
+		/* Clear CT network configuration */
+		run_net_script(veid, DEL, &g_p->res.net.ip, STATE_RUNNING,
+			cmd_p->res.net.skip_arpdetect);
+		if (cmd == CMD_CHKPNT)
+			vps_umount(h, veid, &g_p->res.fs, 0);
+	}
+	return 0;
 }
 
 static int restore(vps_handler *h, envid_t veid, vps_param *g_p,

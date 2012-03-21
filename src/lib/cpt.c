@@ -191,13 +191,13 @@ err_out:
 	return VZ_CHKPNT_ERROR;
 }
 
-int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
-	cpt_param *param)
+int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
+		int cmd, cpt_param *param)
 {
 	int dump_fd = -1;
 	char dumpfile[PATH_LEN];
 	int cpt_fd, pid, ret;
-	const char *root = vps_p->res.fs.root;
+	const char *root = fs->root;
 
 	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
@@ -225,7 +225,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 					" specified.");
 				goto err;
 			}
-			get_dump_file(veid, vps_p->res.cpt.dumpdir,
+			get_dump_file(veid, param->dumpdir,
 					dumpfile, sizeof(dumpfile));
 		}
 		dump_fd = open(param->dumpfile ? : dumpfile,
@@ -283,13 +283,6 @@ int vps_chkpnt(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	ret = env_wait(pid);
 	if (ret)
 		goto err;
-	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
-		/* Clear CT network configuration */
-		run_net_script(veid, DEL, &vps_p->res.net.ip, STATE_RUNNING,
-			vps_p->res.net.skip_arpdetect);
-		if (cmd == CMD_CHKPNT)
-			vps_umount(h, veid, &vps_p->res.fs, 0);
-	}
 	ret = 0;
 	logger(0, 0, "Checkpointing completed successfully");
 err:

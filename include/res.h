@@ -27,7 +27,6 @@
 #include "quota.h"
 #include "fs.h"
 #include "dist.h"
-#include "cpt.h"
 #include "meminfo.h"
 #include "veth.h"
 
@@ -69,6 +68,15 @@ typedef struct name_param {
 	int veid;
 	char *name;
 } name_param;
+
+typedef struct cpt_param {
+	char *dumpdir;
+	char *dumpfile;
+	unsigned int ctx;
+	unsigned int cpu_flags;
+	int cmd;
+	int rst_fd;
+} cpt_param;
 
 /** Data structure for CT resources.
  */
