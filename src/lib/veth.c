@@ -467,7 +467,7 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 	const char *root, veth_param *veth_add, veth_param *veth_del,
 	int state, int skip)
 {
-	int ret, dev_num;
+	int ret;
 	veth_param veth_old;
 
 	if (list_empty(&veth_add->dev) &&
@@ -486,7 +486,6 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 		if (!list_empty(&veth_old.dev))
 			free_veth_param(&veth_old);
 	} else if (!list_empty(&veth_del->dev)) {
-		dev_num = 0;
 		fill_veth_dev_name(&veth_old, veth_del);
 		veth_ctl(h, veid, DEL, veth_del, 0);
 	}
