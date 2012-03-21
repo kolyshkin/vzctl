@@ -42,6 +42,7 @@
 #include "io.h"
 #include "image.h"
 #include "cpt.h"
+#include "snapshot.h"
 
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
@@ -1318,12 +1319,19 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 #undef CHECK_DQ
 	case ACTION_SNAPSHOT_CREATE:
+		ret = vzctl_env_create_snapshot(h, veid,
+				&g_p->res.fs, &cmd_p->snap);
 		break;
 	case ACTION_SNAPSHOT_DELETE:
+		ret = vzctl_env_delete_snapshot(h, veid,
+				&g_p->res.fs, cmd_p->snap.guid);
 		break;
 	case ACTION_SNAPSHOT_SWITCH:
+		ret = vzctl_env_switch_snapshot(h, veid, g_p, &g_p->res.fs,
+				cmd_p->snap.guid);
 		break;
 	case ACTION_SNAPSHOT_LIST:
+		ret = vzctl_env_list_snapshot_tree(g_p->res.fs.private);
 		break;
 	case ACTION_CUSTOM:
 		ret = mod_setup(h, veid, 0, 0, &g_action, g_p);
