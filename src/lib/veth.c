@@ -270,7 +270,7 @@ int add_veth_param(veth_param *veth, veth_dev *dev)
 
 	tmp = malloc(sizeof(*tmp));
 	if (tmp == NULL)
-		return -1;
+		return ERR_NOMEM;
 	memcpy(tmp, dev, sizeof(*tmp));
 	if (list_is_init(&veth->dev))
 		list_head_init(&veth->dev);

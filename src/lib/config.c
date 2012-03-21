@@ -1584,21 +1584,24 @@ static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 
 static int parse_netif(envid_t veid, veth_param *veth, char *val)
 {
-	int ret;
+	int ret = 0;
 	char *token;
 	veth_dev dev;
 
 	for_each_strtok(token, val, ";") {
-		if (parse_netif_str(veid, token, &dev)) {
-			free_veth_dev(&dev);
-			continue;
-		}
-		if (!find_veth_by_ifname_ve(&veth->dev, dev.dev_name_ve))
+		ret = parse_netif_str(veid, token, &dev);
+		if (ret)
+			goto out;
+		if (!find_veth_by_ifname_ve(&veth->dev, dev.dev_name_ve)) {
 			ret = add_veth_param(veth, &dev);
+			if (ret)
+				goto out;
+		}
 		free_veth_dev(&dev);
 	}
-
-	return 0;
+out:
+	free_veth_dev(&dev);
+	return ret;
 }
 
 static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
