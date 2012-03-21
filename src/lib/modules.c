@@ -125,6 +125,8 @@ int mod_save_config(struct mod_action *action, list_head_t *conf)
 		if (mod_info == NULL || mod_info->store == NULL)
 			continue;
 		ret = mod_info->store(mod->data, conf);
+		if (ret)
+			return ret;
 	}
 	return 0;
 }
@@ -164,6 +166,8 @@ int mod_cleanup(vps_handler *h, envid_t veid, struct mod_action *action,
 		if (mod_info == NULL || mod_info->cleanup == NULL)
 			continue;
 		ret = mod_info->cleanup(h, veid, mod->data, param);
+		if (ret)
+			return ret;
 	}
 	return 0;
 }
