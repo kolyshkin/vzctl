@@ -57,7 +57,7 @@ _vzctl()
 	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status quotaon quotaoff quotainit \
 		enter exec exec2 runscript convert console \
-		snapshot-create snapshot-switch snapshot-delete snapshot-list"
+		snapshot snapshot-switch snapshot-delete snapshot-list"
 	local vzctl_create_opts="--ostemplate --config --private --root \
 		--layout --diskspace --ipadd --hostname --name --description"
 	local vzctl_convert_opts="--layout"
@@ -267,7 +267,7 @@ _vzctl()
 					restart)
 						COMPREPLY=( $( compgen -W "$vzctl_restart_opts" -- $cur ) )
 						;;
-					snapshot-create)
+					snapshot|snapshot-create)
 						COMPREPLY=( $( compgen -W "$vzctl_snapshot_create_opts" -- $cur ) )
 						;;
 					snapshot-switch|snapshot-delete)
