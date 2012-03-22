@@ -24,7 +24,7 @@ AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
             -DPKGLIBDIR=\"$(pkglibdir)\" \
             $(XML_CPPFLAGS)
 
-LIB_VER = 0.0.3
+LIB_VER = $(VERSION)
 
 lib_LTLIBRARIES = libvzctl.la
 
