@@ -28,6 +28,15 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBchkpnt\fR | \fBrestore\fR
 .OP --dumpfile name
 .SY vzctl
+[\fIflags\fR] \fBsnapshot\fR
+.OP --id uuid
+.OP --name name
+.OP --description desc
+.SY vzctl
+[\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fB--id\fR \fIuuid\fR
+.SY vzctl
+[\fIflags\fR] \fBsnapshot-list\fR
+.SY vzctl
 [\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value [\.\.\.]
 .OP --save
 .OP --force
@@ -754,6 +763,31 @@ dump file name \fB/vz/dump/Dump.\fICTID\fR is used.
 \fBrestore\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
 This command restores a container from the dump file created by the
 \fBchkpnt\fR command.
+
+.SS Snapshotting
+
+Snapshotting is a feature based on checkpointing and ploop shapshots.
+It allows to save a complete state of container file system. Plus, if
+the container is running, it's in-memory state (as in checkpointing).
+Note that snapshot functionality is only working
+for containers on ploop device.
+.TP 4
+\fBsnapshot\fR | \fBsnapshot-create\fR \fICTID\fR [\fB--id\fR \fIuuid\fR]
+Creates a container snapshot. If \fIuuid\fR is not specified, it is
+auto-generated. If a container is running, it's checkpointed and then
+restored. If a container is not running, only file system state is saved.
+.TP 4
+\fBsnapshot-switch\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+Switches the container to a snapshot identified by \fIuuid\fR.
+Note that the current container state and its file system state is lost!
+If given snapshot contains CT memory dump, it is restored, otherwise
+it is stopped.
+.TP 4
+\fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+Removes a specified snapshot.
+.TP 4
+\fBsnapshot-list\fR \fICTID\fR
+Lists all snapshots. Active snapshot is marked with \fB*\fR sign.
 
 .SS Performing container actions
 
