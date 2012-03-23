@@ -368,8 +368,8 @@ with a suffix, or a special value \fBunlimited\fR.
 Arguments are in items, pages or bytes. Note that page size
 is architecture-specific, it is 4096 bytes on x86 and x86_64 platforms.
 .PP
-You can also specify different suffixes for \fBset\fR parameters
-(except for the parameters which names start with \fBnum\fR).
+You can also specify different suffixes for User Beancounter parameters
+(except for those which names start with \fBnum\fR).
 For example, \fBvzctl set\fR \fICTID\fR \fB--privvmpages 5M:6M\fR
 should set \fBprivvmpages\fR' barrier to 5 megabytes and its limit
 to 6 megabytes.
