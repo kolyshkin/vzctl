@@ -319,22 +319,20 @@ inside the Container.
 The following options sets memory and swap limits for VSwap-enabled kernels
 (kernel version 042stab042 or greater).
 .PP
-Argument is in bytes, with an optional suffix. Available suffixes are:
-.TP
-\fBT\fR, \fBt\fR
-terabytes;
-.TP
-\fBG\fR, \fBg\fR
-gigabytes;
-.TP
-\fBM\fR, \fBm\fR
-megabytes;
-.TP
-\fBK\fR, \fBk\fR
-kilobytes;
-.TP
-\fBP\fR, \fBp\fR
-memory pages (arch-specific).
+Argument is in bytes, unless otherwise specified by an optional suffix.
+Available suffixes are:
+.PP
+\(bu \fBT\fR, \fBt\fR	- terabytes;
+.br
+\(bu \fBG\fR, \fBg\fR	- gigabytes;
+.br
+\(bu \fBM\fR, \fBm\fR	- megabytes;
+.br
+\(bu \fBK\fR, \fBk\fR	- kilobytes;
+.br
+\(bu \fBP\fR, \fBp\fR	- memory pages (arch-specific, usually 4KB);
+.br
+\(bu \fBB\fR, \fBb\fR	- bytes.
 .PP
 .TP
 \fB--ram\fR \fIbytes\fR
@@ -377,21 +375,18 @@ should set \fBprivvmpages\fR' barrier to 5 megabytes and its limit
 to 6 megabytes.
 .PP
 Available suffixes are:
-.TP
-\fBT\fR, \fBt\fR
-terabytes;
-.TP
-\fBG\fR, \fBg\fR
-gigabytes;
-.TP
-\fBM\fR, \fBm\fR
-megabytes;
-.TP
-\fBK\fR, \fBk\fR
-kilobytes;
-.TP
-\fBP\fR, \fBp\fR
-memory pages (arch-specific).
+.PP
+\(bu \fBT\fR, \fBt\fR	- terabytes;
+.br
+\(bu \fBG\fR, \fBg\fR	- gigabytes;
+.br
+\(bu \fBM\fR, \fBm\fR	- megabytes;
+.br
+\(bu \fBK\fR, \fBk\fR	- kilobytes;
+.br
+\(bu \fBP\fR, \fBp\fR	- memory pages (arch-specific, usually 4KB);
+.br
+\(bu \fBB\fR, \fBb\fR	- bytes.
 .PP
 You can also specify the literal word \fBunlimited\fR in place of a number.
 In that case the corresponding value will be set to \fBLONG_MAX\fR, i. e.
