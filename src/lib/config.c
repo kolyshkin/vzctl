@@ -676,7 +676,7 @@ static int parse_vswap(ub_param *ub, const char *val, int id)
 	if (conf_get_by_id(config, id) == NULL)
 		return ERR_OTHER;
 
-	tail = parse_ul_sfx(val, &tmp, _page_size);
+	tail = parse_ul_sfx(val, &tmp, 1);
 	if (tail == NULL)
 		return ERR_INVAL;
 	if (*tail != '\0')
