@@ -76,6 +76,7 @@ static void usage(int rc)
 "vzctl chkpnt <ctid> [--dumpfile <name>]\n"
 "vzctl restore <ctid> [--dumpfile <name>]\n"
 "vzctl set <ctid> [--save] [--force] [--setmode restart|ignore]\n"
+"   [--ram <bytes>[KMG]] [--swap <bytes>[KMG]]\n"
 "   [--ipadd <addr>] [--ipdel <addr>|all] [--hostname <name>]\n"
 "   [--nameserver <addr>] [--searchdomain <name>]\n"
 "   [--onboot yes|no] [--bootorder <N>]\n"
