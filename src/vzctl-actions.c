@@ -588,6 +588,10 @@ static int parse_snapshot_delete_opt(envid_t veid, int argc, char **argv,
 	ret = parse_opt(veid, argc, argv, opt, param);
 	free(opt);
 
+	if (ret == 0 && param->snap.guid == NULL)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+			"Invalid syntax: snapshot id is missing");
+
 	return ret;
 }
 
