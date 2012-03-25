@@ -27,6 +27,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <libgen.h>
 
 #include "list.h"
 #include "logger.h"
@@ -375,7 +376,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	if (tmpl->ostmpl != NULL) {
 		if (cmd_p->res.tmpl.ostmpl != NULL)
 			free(cmd_p->res.tmpl.ostmpl);
-		cmd_p->res.tmpl.ostmpl = strdup(tmpl->ostmpl);
+		cmd_p->res.tmpl.ostmpl = strdup(basename(tmpl->ostmpl));
 	}
 	if ((ret = vps_save_config(veid, dst, cmd_p, vps_p, action)))
 		goto err_names;
