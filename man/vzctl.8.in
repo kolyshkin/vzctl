@@ -295,6 +295,9 @@ interface name for virtual interface in the host system.
 .TP
 \fB--host_mac\fR \fIXX:XX:XX:XX:XX:XX\fR
 MAC address of interface in the host system.
+
+If you want an independent communication with the Container through the bridge,
+you should specify a multicast MAC address here (FE:FF:FF:FF:FF:FF).
 .TP
 \fB--bridge\fR \fIname\fR
 Bridge name. Custom network start scripts can use this value to automatically
