@@ -11,7 +11,7 @@
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
 .SY vzctl
-[\fIflags\fR] \fBcreate\fR \fICTID\fR \fI--parameter value [\.\.\.]
+[\fIflags\fR] \fBcreate\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
 .SY vzctl
 [\fIflags\fR] \fBstart\fR \fICTID\fR
 .OP --wait
@@ -37,7 +37,7 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBsnapshot-list\fR
 .SY vzctl
-[\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value [\.\.\.]
+[\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
 .OP --save
 .OP --force
 .OP --setmode \fBrestart\fR|\fBignore
