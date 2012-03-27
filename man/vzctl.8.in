@@ -653,12 +653,19 @@ as a hard limit.
 Note that this parameter is ignored for \fBploop\fR layout.
 .TP
 \fB--quotaugidlimit\fR \fInum\fR
-sets maximum number of user/group IDs in a container for which disk quota inside
-the container will be accounted. If this value is set to \fB0\fR, user and group
-quotas inside the container will not be accounted.
+Enables or disables second-level disk quota (i.e. per-user and per-group
+disk quotas inside a container). If the value is set to \fB0\fR or not set,
+disk quotas inside the container is disabled and not accounted.
 
-Note that if you have previously set value of this parameter to \fB0\fR,
-changing it while the container is running will not take effect.
+For \fBsimfs\fR layout containers, non-zero value sets maximum number
+of user/group IDs for which disk quota is accounted.
+
+For \fBploop\fR layout containers, any non-zero value enables disk quota
+inside the container; the number of user/group IDs used by disk quota
+is not limited by OpenVZ.
+
+Note that enabling or disabling second-level disk quota requires container
+restart, so consider using \fB--setmode\fR option.
 
 .SS3 Mount option
 .TP
