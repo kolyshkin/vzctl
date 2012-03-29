@@ -965,10 +965,13 @@ meaning that:
 .br
 \(bu detaching from the console leaves anything running in this console as is.
 
-Type \fBEsc\fR then \fB.\fR to detach from the console.
-Type \fBEsc\fR then \fB!\fR to kill anything running on the console
-(by sending a SAK sequence).
+The following escape sequences are recognized by \fBvzctl console\fR.
 Note that these sequences are only recognized after \fBEnter\fR.
+
+\(bu \fBEsc\fR then \fB.\fR to detach from the console.
+
+\(bu \fBEsc\fR then \fB!\fR to kill anything running on the console
+(SAK). This is helpful when one expects a login prompt but there isn't one.
 
 .SS Other options
 
