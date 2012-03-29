@@ -956,12 +956,18 @@ some reason you can not use \fBssh\fR(1).
 You need to log out manually from the shell to finish session
 (even if you specified \fB--exec\fR).
 .IP "\fBconsole\fR \fICTID\fR" 4
-Attach to the container's console. Note that the console is persistent,
-meaning it can be attached to even if the container is not running,
-and there is no automatic detachment when the container is stopped.
+Attach to the container's console. Note the console is persistent,
+meaning that:
+.br
+\(bu it can be attached to even if the container is not running;
+.br
+\(bu there is no automatic detachment upon the container stop;
+.br
+\(bu detaching from the console leaves anything running in this console as is.
 
 Type \fBEsc\fR then \fB.\fR to detach from the console.
-Type \fBEsc\fR then \fB,\fR to detach without killing anything.
+Type \fBEsc\fR then \fB!\fR to kill anything running on the console
+(by sending a SAK sequence).
 Note that these sequences are only recognized after \fBEnter\fR.
 
 .SS Other options

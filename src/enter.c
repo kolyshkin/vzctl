@@ -510,10 +510,10 @@ int console_attach(vps_handler *h, envid_t veid, int ttyno)
 			TREAD(buf);
 			switch (buf) {
 				case '.':
+					goto out;
+				case '!':
 					sak();
-					goto out;
-				case ',':
-					goto out;
+					continue;
 				default:
 					TWRITE(esc);
 					break;
