@@ -434,7 +434,11 @@ static void sak(void)
 	ioctl(tty, TIOSAK);
 }
 
-int console_attach(vps_handler *h, envid_t veid)
+/* @ttyno: 0 is tty1, 1 is tty2 etc.
+ *
+ * Note tty1 is used for console
+ */
+int console_attach(vps_handler *h, envid_t veid, int ttyno)
 {
 	struct vzctl_ve_configure c;
 	struct sigaction act;
@@ -445,10 +449,13 @@ int console_attach(vps_handler *h, envid_t veid)
 	int after_enter = 0;
 	int ret = VZ_SYSTEM_ERROR;
 
+	if (ttyno < 0) /* undef */
+		ttyno = 0; /* tty1 aka console by default */
+
 	child_term = 0;
 	c.veid = veid;
 	c.key = VE_CONFIGURE_OPEN_TTY;
-	c.val = 0;
+	c.val = ttyno;
 	c.size = 0;
 
 	tty = ioctl(h->vzfd, VZCTL_VE_CONFIGURE, &c);
