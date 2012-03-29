@@ -94,7 +94,7 @@ static int vps_2quota_perm(vps_handler *h, int veid, dev_t device)
 
 	dev.dev = device;
 	dev.type = S_IFBLK | VE_USE_MINOR;
-	dev.mask = S_IRWXG;
+	dev.mask = S_IXGRP;
 	return set_devperm(h, veid, &dev);
 }
 
