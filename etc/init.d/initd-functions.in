@@ -16,12 +16,12 @@ VARLOCK=/var/lock/subsys
 
 # Source function library.
 if [ -r /etc/init.d/functions ]; then
-	source /etc/init.d/functions
+	. /etc/init.d/functions
 	if [ -r /etc/redhat-release ] || [ -r /etc/centos-release ]; then
 		DISTR=redhat
 	fi
 elif [ -r /etc/rc.status ]; then
-	source /etc/rc.status
+	. /etc/rc.status
 	if [ -r /etc/SuSE-release ]; then
 		DISTR=suse
 	fi
