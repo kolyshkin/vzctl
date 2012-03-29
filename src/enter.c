@@ -438,7 +438,7 @@ static void sak(void)
  *
  * Note tty1 is used for console
  */
-int console_attach(vps_handler *h, envid_t veid, int ttyno)
+int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 {
 	struct vzctl_ve_configure c;
 	struct sigaction act;

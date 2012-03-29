@@ -47,7 +47,7 @@
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
 			int argc, char **argv);
-extern int console_attach(vps_handler *h, envid_t veid, int ttyno);
+extern int do_console_attach(vps_handler *h, envid_t veid, int ttyno);
 
 static struct option set_opt[] = {
 	{"save",	no_argument, NULL, PARAM_SAVE},
@@ -964,6 +964,28 @@ static int enter(vps_handler *h, envid_t veid, const char *root,
 	return do_enter(h, veid, root, argc, argv);
 }
 
+static int console_attach(vps_handler *h, envid_t veid, int argc, char **argv)
+{
+	int tty = -1;
+
+	if (argc > 1)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+				"Invalid syntax: too many parameters!");
+
+	if (argc == 1) {
+		if (parse_int(argv[0], &tty) != 0)
+			goto err;
+		if (tty < 0)
+			goto err;
+	}
+
+	return do_console_attach(h, veid, tty);
+
+err:
+	return vzctl_err(VZ_INVALID_PARAMETER_VALUE, 0,
+			"Invalid tty number: %s", argv[0]);
+}
+
 static int exec(vps_handler *h, act_t action, envid_t veid, const char *root,
 		int argc, char **argv)
 {
@@ -1277,7 +1299,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = enter(h, veid, g_p->res.fs.root, argc, argv);
 		break;
 	case ACTION_CONSOLE:
-		ret = console_attach(h, veid, -1);
+		ret = console_attach(h, veid, argc, argv);
 		break;
 	case ACTION_EXEC:
 	case ACTION_EXEC2:

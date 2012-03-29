@@ -43,8 +43,9 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --setmode \fBrestart\fR|\fBignore
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
-\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR |
-\fBconsole\fR \fICTID\fR
+\fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR \fICTID\fR
+.SY vzctl
+[\fIflags\fR] \fBconsole\fR \fICTID\fR [\fIttynum\fR]
 .SY vzctl
 [\fIflags\fR] \fBconvert\fR \fICTID\fR
 .OP --layout \fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
@@ -955,9 +956,12 @@ some reason you can not use \fBssh\fR(1).
 
 You need to log out manually from the shell to finish session
 (even if you specified \fB--exec\fR).
-.IP "\fBconsole\fR \fICTID\fR" 4
-Attach to the container's console. Note the console is persistent,
-meaning that:
+.IP "\fBconsole\fR \fICTID\fR [\fIttynum\fR]" 4
+Attach to a container console. Optional \fIttynum\fR argument is
+tty number (such as \fB4\fR for \fBtty4\fR), default is \fB1\fR
+which is used for container's \fB/dev/console\fR.
+
+Note the consoles are persistent, meaning that:
 .br
 \(bu it can be attached to even if the container is not running;
 .br

@@ -69,7 +69,7 @@ static void usage(int rc)
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 "vzctl convert <ctid> [--layout ploop[:mode]] [--diskspace <kbytes>]\n"
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
-"vzctl console <ctid>\n"
+"vzctl console <ctid> [ttyno]\n"
 "vzctl enter <ctid> [--exec <command> [arg ...]]\n"
 "vzctl exec | exec2 <ctid> <command> [arg ...]\n"
 "vzctl runscript <ctid> <script>\n"
