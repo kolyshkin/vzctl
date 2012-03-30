@@ -278,7 +278,9 @@ int setup_env_quota(const struct setup_env_quota_param *param)
 	if (param->dev_name[0] == '\0') /* simfs/vzquota */
 		return mk_vzquota_link();
 	/* ploop */
-	return mk_quota_dev(param->dev_name, param->dev);
+	if (mk_quota_dev(param->dev_name, param->dev))
+		return -1;
+	return system("quotaon -a");
 }
 
 #define INITTAB_FILE		"/etc/inittab"
