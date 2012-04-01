@@ -73,7 +73,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	di = ploop_alloc_diskdescriptor();
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop_read_diskdescriptor(fname, di);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
@@ -106,7 +106,7 @@ int vzctl_umount_image(const char *ve_private)
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
 
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop_read_diskdescriptor(fname, di);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
@@ -163,7 +163,7 @@ int vzctl_convert_image(const char *ve_private, int mode)
 	di = ploop_alloc_diskdescriptor();
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop_read_diskdescriptor(fname, di);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
@@ -196,7 +196,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 	di = ploop_alloc_diskdescriptor();
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop_read_diskdescriptor(fname, di);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
@@ -234,7 +234,7 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 	di = ploop_alloc_diskdescriptor();
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	if (ploop_read_diskdescriptor(fname, di)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		ploop_free_diskdescriptor(di);
@@ -267,7 +267,7 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 	di = ploop_alloc_diskdescriptor();
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	if (ploop_read_diskdescriptor(fname, di)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		ploop_free_diskdescriptor(di);
@@ -301,7 +301,7 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 	di = ploop_alloc_diskdescriptor();
 	if (di == NULL)
 		return VZ_RESOURCE_ERROR;
-	GET_DISK_DESCRIPTOR(fname, ve_private)
+	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = VZCTL_E_MERGE_SNAPSHOT;
 	if (ploop_read_diskdescriptor(fname, di)) {
 		logger(-1, 0, "Failed to read %s", fname);

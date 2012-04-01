@@ -26,7 +26,7 @@
 
 #define GET_DISK_DESCRIPTOR(buf, ve_private) \
 	snprintf(buf, sizeof(buf), \
-		"%s/root.hdd/" DISKDESCRIPTOR_XML, ve_private);
+		"%s/root.hdd/" DISKDESCRIPTOR_XML, ve_private)
 
 struct vzctl_create_image_param {
 	int mode;

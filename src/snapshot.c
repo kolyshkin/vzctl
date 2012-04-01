@@ -87,7 +87,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		}
 	}
 	logger(0, 0, "Creating snapshot %s", guid);
-	GET_DISK_DESCRIPTOR(fname, fs->private)
+	GET_DISK_DESCRIPTOR(fname, fs->private);
 	if (ploop_read_diskdescriptor(fname, di)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
@@ -193,7 +193,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Unable to find snapshot by uuid %s", guid);
 		goto err;
 	}
-	GET_DISK_DESCRIPTOR(fname, fs->private)
+	GET_DISK_DESCRIPTOR(fname, fs->private);
 	ret = ploop_read_diskdescriptor(fname, di);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
