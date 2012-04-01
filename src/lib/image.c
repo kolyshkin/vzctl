@@ -63,6 +63,27 @@ int is_ploop_supported(void)
 	return (ploop_getdevice(&minor) == 0);
 }
 
+int is_image_mounted(const char *ve_private)
+{
+	int ret;
+	char dev[64];
+	char fname[MAXPATHLEN];
+	struct ploop_disk_images_data *di;
+
+	di = ploop_alloc_diskdescriptor();
+	if (di == NULL)
+		return -1;
+	GET_DISK_DESCRIPTOR(fname, ve_private);
+	ret = ploop_read_diskdescriptor(fname, di);
+	if (ret) {
+		logger(-1, 0, "Failed to read %s", fname);
+		ploop_free_diskdescriptor(di);
+		return -1;
+	}
+	ret = ploop_get_dev(di,dev, sizeof(dev));
+
+	return (ret == 0);
+}
 int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 {
 	int ret;
