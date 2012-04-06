@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "18 Mar 2012" "OpenVZ" "Containers"
+.TH vzctl 8 "6 Apr 2012" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -40,6 +40,7 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
 .OP --save
 .OP --force
+.OP --reset_ub
 .OP --setmode \fBrestart\fR|\fBignore
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
@@ -172,6 +173,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .\" Options
 .OP --save
 .OP --force
+.OP --reset_ub
 .OP --setmode \fBrestart\fR|\fBignore
 .YS
 .IP "" 4
@@ -188,6 +190,13 @@ If this flag is given, parameters are saved in container configuration file
 .B --force
 If this flag is given together with \fB--save\fR, parameters are saved
 even if the current kernel doesn't support OpenVZ.
+.TP
+.B --reset_ub
+If this flag is given, \fBvzctl\fR applies all User Beancounter parameters
+from the configuration file to a running container. This is helpful
+in case configuration file is modified manually. Please note this flag
+is not compatible with \fB--save\fR, and it is usually a bad idea
+to combine it with any other options.
 .TP
 \fB--setmode\fR \fBrestart\fR | \fBignore\fR
 A few parameters can only be applied by restarting the container.
