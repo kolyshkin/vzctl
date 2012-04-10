@@ -6,9 +6,9 @@
 umask 0077
 
 # Ratio of held/limit to bypass quiet
-Q_HELD=0.8
+Q_HELD=0.5
 # Ratio of maxheld/limit to bypass quiet
-Q_MAXHELD=0.5
+Q_MAXHELD=0.8
 # Directory to store previous failcnt values for relative mode
 STOREDIR=/tmp/vzubc.store
 # Colors
@@ -245,8 +245,8 @@ bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
 }
 
 BEGIN {
-	if (qmaxheld > qheld)
-		qmaxheld=qheld
+	if (qheld > qmaxheld)
+		qheld=qmaxheld
 	prepare_header()
 	bcid=-1
 }
