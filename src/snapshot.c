@@ -103,8 +103,6 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		goto err;
 	}
 	run = vps_is_run(h, veid);
-	if (run == -1)
-		goto err1;
 	/* 1 freeze */
 	if (run) {
 		ret = vps_chkpnt(h, veid, fs, CMD_SUSPEND, &cpt);
