@@ -142,9 +142,10 @@ err2:
 	if (ret)
 		logger(-1, 0, "Rollback failed, ploop_merge_snapshot %s: %s [%d]",
 				guid, ploop_get_last_error(), ret);
+
+err1:
 	if (run)
 		cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_RESUME, 0);
-err1:
 	unlink(tmp);
 
 err:
