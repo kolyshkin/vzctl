@@ -213,7 +213,6 @@ void vz_close(vps_handler *h)
 int vps_is_run(vps_handler *h, envid_t veid)
 {
 	int ret;
-	int errno;
 
 	if (veid == 0)
 		return 1;
