@@ -1,6 +1,6 @@
 #!/bin/sh
 # vzubc - a tool for displaying OpenVZ user beancounters.
-# Copyright (C) 2011, Parallels, Inc. All rights reserved.
+# Copyright (C) 2011-2012, Parallels, Inc. All rights reserved.
 # Licensed under GNU GPL v2 or later version.
 
 umask 0077
@@ -245,6 +245,10 @@ bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
 }
 
 BEGIN {
+	if (qheld > 1)
+		qheld /= 100
+	if (qmaxheld > 1)
+		qmaxheld /= 100
 	if (qheld > qmaxheld)
 		qheld=qmaxheld
 	prepare_header()
