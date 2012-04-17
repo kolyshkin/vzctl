@@ -230,7 +230,7 @@ static const char *layout2str(int layout)
 
 static void print_layout(struct Cveinfo *p, int index)
 {
-	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%6s",
+	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-6s",
 			layout2str(p->layout));
 }
 
