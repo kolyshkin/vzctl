@@ -16,7 +16,7 @@ _get_ves()
 			[ -n "$veids" ] || veids=100
 			echo $((veids+1))
 			;;
-		start|mount|umount|destroy|delete|convert)
+		start|mount|umount|destroy|delete)
 			# stopped CTs
 			@SBINDIR@/vzlist -H -S -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -S -oname 2>/dev/null | $rm_empty
@@ -32,6 +32,13 @@ _get_ves()
 			 @SBINDIR@/vzlist -HS -o status,name) 2>/dev/null | \
 				grep '^suspended ' | \
 				sed 's/^suspended *//' | $rm_empty
+			;;
+		convert)
+			# stopped CTs on simfs
+			(@SBINDIR@/vzlist -HS -o layout,ctid;
+			 @SBINDIR@/vzlist -HS -o layout,name) 2>/dev/null | \
+				grep '^simfs ' | \
+				sed 's/^simfs *//' | $rm_empty
 			;;
 		*)
 			# All CTs
