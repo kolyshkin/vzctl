@@ -232,6 +232,48 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-pci
 
 %changelog
+* Thu Mar 22 2012 Kir Kolyshkin <kir@openvz.org> - 3.1-1
+- New features
+  - preliminary beta support for ploop (aka container-in-a-file) technology
+    - new global config parameter VE_LAYOUT={simfs|ploop}
+    - new vzctl create options --layout and --diskspace
+    - new vzctl convert command to convert from simfs to ploop (not back!)
+    - vzctl mount/umount implemented for ploop case
+    - vzctl set --diskspace does ploop image resize
+    - second-level (quotaugidlimit) quota on ploop/ext4 support
+    - basic snapshot functionality (vzctl snapshot* commands)
+  - support for CT console (vzctl console command)
+- Fixes
+  - gentoo-add_ip.sh: do not set up venet0 if no IPs (#2077)
+  - vzctl enter: fix garbage output after enter (#2139, #2146)
+  - vzlist: do not exit with 1 if there are no CTs (#2149)
+  - vps-download: fix downloaded template GPG check (#2162)
+  - vps-download: fix to work under dash
+  - vzctl destroy: remove dump file as well (#2163)
+  - init.d/vz: fix grep statement
+  - vzctl restore: fix "container already running" exit code
+- Improvements
+  - Make the "Failed to set up upstart" message more verbose (#2140)
+  - vzctl create: tell "Creating container" at the right time
+  - vzctl create: show tarball extraction progress using pv (if available)
+  - init.d/vz: Stricter auto-replacement of CONFIGFILE (#2169)
+  - init.d/vz: fix for "we are in container" check
+  - postcreate.sh: add ability to skip crontab time randomization (#2174)
+  - Improve config parsing and its error reporting
+  - vzctl create: improve 'sample config not found' error msg
+  - umount_submounts(): process mounts in reverse order
+- Documentation
+  - ploop and console documented in appropriate man pages
+  - man/vzctl.8: fix --diskspace description for ploop case
+  - man/vzctl.8: --diskquota, --diskinodes and --quotatime ignored for ploop
+  - some macros that are not available on older systems are now embedded
+  - vzctl man page: simplified SYNOPSYS section
+  - vz.conf(5), vzctl(8): fix/improve description of CONFIGFILE / --config
+  - vzctl --help: fix create options
+  - vz.conf(5), vzctl(8): describe DEF_OSTEMPLATE / --ostemplate
+  - vzctl(8), vzctl --help: add missing --name option to 'create'
+  - vzctl(8): add CTID to commands where it was absent
+
 * Wed Jun 13 2007 Andy Shevchenko <andriy@asplinux.com.ua> - 3.0.17-1
 - fixed according to Fedora Packaging Guidelines:
   - use dist tag
