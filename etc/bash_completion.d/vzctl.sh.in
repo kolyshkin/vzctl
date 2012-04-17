@@ -269,7 +269,7 @@ _vzctl()
 					restart)
 						COMPREPLY=( $( compgen -W "$vzctl_restart_opts" -- $cur ) )
 						;;
-					snapshot|snapshot-create)
+					snapshot)
 						COMPREPLY=( $( compgen -W "$vzctl_snapshot_create_opts" -- $cur ) )
 						;;
 					snapshot-switch|snapshot-delete)

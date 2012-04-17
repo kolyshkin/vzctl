@@ -791,7 +791,7 @@ the container is running, it's in-memory state (as in checkpointing).
 Note that snapshot functionality is only working
 for containers on ploop device.
 .TP 4
-\fBsnapshot\fR | \fBsnapshot-create\fR \fICTID\fR [\fB--id\fR \fIuuid\fR] [\fB--skip-suspend\fR]
+\fBsnapshot\fR \fICTID\fR [\fB--id\fR \fIuuid\fR] [\fB--skip-suspend\fR]
 Creates a container snapshot. If \fIuuid\fR is not specified, it is
 auto-generated.
 
