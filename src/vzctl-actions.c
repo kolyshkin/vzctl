@@ -1276,6 +1276,12 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		else
 			ret = set(h, veid, g_p, vps_p, cmd_p);
 		if (cmd_p->opt.save == YES) {
+			if (ret) {
+				logger(-1, 0, "Error: failed to apply "
+						"some parameters, not saving "
+						"configuration file!");
+				break;
+			}
 			get_vps_conf_path(veid, fname, sizeof(fname));
 			/* Warn if config does not exist */
 			if (!stat_file(fname))
