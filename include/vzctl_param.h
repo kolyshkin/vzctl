@@ -143,6 +143,7 @@
 #define PARAM_SNAPSHOT_GUID	370
 #define PARAM_SNAPSHOT_NAME	371
 #define PARAM_SNAPSHOT_DESC	372
+#define PARAM_SNAPSHOT_SKIP_SUSPEND	373
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

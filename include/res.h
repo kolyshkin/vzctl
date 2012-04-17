@@ -138,6 +138,8 @@ struct vzctl_snapshot_param {
 	char *guid;
 	char *name;
 	char *desc;
+#define SNAPSHOT_SKIP_SUSPEND	1 << 1
+	int flags;
 };
 
 struct vps_param {

@@ -32,6 +32,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --id uuid
 .OP --name name
 .OP --description desc
+.OP --skip-suspend
 .SY vzctl
 [\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fB--id\fR \fIuuid\fR
 .SY vzctl
@@ -790,10 +791,13 @@ the container is running, it's in-memory state (as in checkpointing).
 Note that snapshot functionality is only working
 for containers on ploop device.
 .TP 4
-\fBsnapshot\fR | \fBsnapshot-create\fR \fICTID\fR [\fB--id\fR \fIuuid\fR]
+\fBsnapshot\fR | \fBsnapshot-create\fR \fICTID\fR [\fB--id\fR \fIuuid\fR] [\fB--skip-suspend\fR]
 Creates a container snapshot. If \fIuuid\fR is not specified, it is
-auto-generated. If a container is running, it's checkpointed and then
-restored. If a container is not running, only file system state is saved.
+auto-generated.
+
+If a container is running, and \fB--skip-suspend\fR option is not specified,
+a container is checkpointed and then restored, and CT memory dump becomes the
+part of snapshot. Otherwise, only file system state is saved.
 .TP 4
 \fBsnapshot-switch\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 Switches the container to a snapshot identified by \fIuuid\fR.

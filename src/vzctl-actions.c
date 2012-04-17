@@ -558,6 +558,7 @@ static int parse_snapshot_create_opt(envid_t veid, int argc, char **argv,
 	{"uuid", required_argument, NULL, PARAM_SNAPSHOT_GUID},
 	{"name", required_argument, NULL, PARAM_SNAPSHOT_NAME},
 	{"description", required_argument, NULL, PARAM_SNAPSHOT_DESC},
+	{"skip-suspend", no_argument, NULL, PARAM_SNAPSHOT_SKIP_SUSPEND},
 	{ NULL, 0, NULL, 0 }
 	};
 

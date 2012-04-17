@@ -55,7 +55,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		const fs_param *fs,
 		const struct vzctl_snapshot_param *param)
 {
-	int ret, run;
+	int ret, run = 0;
 	cpt_param cpt = {};
 	char guid[39];
 	char fname[MAXPATHLEN];
@@ -102,7 +102,8 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Failed to store %s", tmp);
 		goto err;
 	}
-	run = vps_is_run(h, veid);
+	if (!(param->flags & SNAPSHOT_SKIP_SUSPEND))
+		run = vps_is_run(h, veid);
 	/* 1 freeze */
 	if (run) {
 		ret = vps_chkpnt(h, veid, fs, CMD_SUSPEND, &cpt);

@@ -2184,6 +2184,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_SNAPSHOT_DESC:
 		ret = conf_parse_str(&vps_p->snap.desc, val);
 		break;
+	case PARAM_SNAPSHOT_SKIP_SUSPEND:
+		vps_p->snap.flags |= SNAPSHOT_SKIP_SUSPEND;
+		break;
 	case PARAM_IGNORED:
 		/* Well known but ignored parameter */
 		break;
