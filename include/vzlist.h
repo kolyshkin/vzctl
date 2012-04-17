@@ -105,6 +105,7 @@ struct Cveinfo {
 	int onboot;
 	int cpunum;
 	unsigned long *bootorder;
+	int layout; // VE_LAYOUT_*
 };
 
 #define RES_NONE	0

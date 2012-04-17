@@ -42,6 +42,7 @@
 #include "logger.h"
 #include "util.h"
 #include "types.h"
+#include "image.h"
 
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
@@ -215,6 +216,24 @@ static void print_cpunum(struct Cveinfo *p, int index)
 				"%5d", p->cpunum);
 }
 
+static const char *layout2str(int layout)
+{
+	switch (layout)
+	{
+		case VE_LAYOUT_SIMFS:
+			return "simfs";
+		case VE_LAYOUT_PLOOP:
+			return "ploop";
+	}
+	return "???";
+}
+
+static void print_layout(struct Cveinfo *p, int index)
+{
+	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%6s",
+			layout2str(p->layout));
+}
+
 #define PRINT_UBC(name)							\
 static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 {									\
@@ -361,6 +380,12 @@ static int cpunum_sort_fn(const void *val1, const void *val2)
 		((const struct Cveinfo *)val2)->cpunum;
 }
 
+static int layout_sort_fn(const void *val1, const void *val2)
+{
+	return ((const struct Cveinfo *)val1)->layout >
+		((const struct Cveinfo *)val2)->layout;
+}
+
 #define SORT_STR_FN(name)						\
 static int name ## _sort_fn(const void *val1, const void *val2)		\
 {									\
@@ -494,6 +519,7 @@ UBC_FIELD(swappages, SWAPP),
 {"onboot", "ONBOOT", "%6s", 0, RES_NONE, print_onboot, none_sort_fn},
 {"bootorder", "BOOTORDER", "%10s", 0, RES_NONE,
 	print_bootorder, bootorder_sort_fn},
+{"layout", "LAYOUT", "%6s", 0, RES_NONE, print_layout, layout_sort_fn},
 };
 
 static void *x_malloc(int size)
@@ -1263,6 +1289,18 @@ static int get_mounted_status()
 	return 0;
 }
 
+static int get_ves_layout()
+{
+	int i, ploop;
+
+	for (i = 0; i < n_veinfo; i++) {
+		ploop = ve_private_is_ploop(veinfo[i].ve_private);
+		veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
+	}
+
+	return 0;
+}
+
 static int get_ve_cpunum(struct Cveinfo *ve) {
 	char path[] = "/proc/vz/fairsched/2147483647/cpu.nr_cpus";
 	int veid = ve->veid;
@@ -1450,6 +1488,7 @@ static int collect()
 			return ret;
 	read_ves_param();
 	get_mounted_status();
+	get_ves_layout();
 	if (host_pattern != NULL)
 		filter_by_hostname();
 	if (name_pattern != NULL)
