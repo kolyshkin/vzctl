@@ -150,8 +150,6 @@ get_veinfo()
 {
 	if [ -f /proc/vz/veinfo ]; then
 		VEINFO=/proc/vz/veinfo
-	elif [ -f /proc/veinfo ]; then
-		VEINFO=/proc/veinfo
 	elif [ ! -f $VESTAT ]; then
 		return 1
 	fi
