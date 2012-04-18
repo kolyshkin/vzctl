@@ -839,9 +839,9 @@ do {								\
 			ve->name = strdup(res->name.name);
 	}
 	if (res->fs.root != NULL)
-		ve->ve_root = strdup(res->fs.root);
+		ve->root = strdup(res->fs.root);
 	if (res->fs.private != NULL)
-		ve->ve_private = strdup(res->fs.private);
+		ve->private = strdup(res->fs.private);
 	ve->onboot = res->misc.onboot;
 	if (res->misc.bootorder != NULL) {
 		ve->bootorder = x_malloc(sizeof(*ve->bootorder));
@@ -877,10 +877,10 @@ static int read_ves_param()
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.conf", veid);
 		vps_parse_config(veid, buf, param, NULL);
 		merge_conf(&veinfo[i], &param->res);
-		if (veinfo[i].ve_root == NULL)
-			veinfo[i].ve_root = subst_VEID(veinfo[i].veid, ve_root);
-		if (veinfo[i].ve_private == NULL)
-			veinfo[i].ve_private = subst_VEID(veinfo[i].veid,
+		if (veinfo[i].root == NULL)
+			veinfo[i].root = subst_VEID(veinfo[i].veid, ve_root);
+		if (veinfo[i].private == NULL)
+			veinfo[i].private = subst_VEID(veinfo[i].veid,
 								ve_private);
 		free_vps_param(param);
 	}
@@ -1272,8 +1272,8 @@ static int get_mounted_status()
 	for (i = 0; i < n_veinfo; i++) {
 		if (veinfo[i].status == VE_RUNNING)
 			continue;
-		if (veinfo[i].ve_private == NULL ||
-			!stat_file(veinfo[i].ve_private))
+		if (veinfo[i].private == NULL ||
+			!stat_file(veinfo[i].private))
 		{
 			veinfo[i].hide = 1;
 			continue;
@@ -1281,9 +1281,9 @@ static int get_mounted_status()
 		get_dump_file(veinfo[i].veid, dumpdir, buf, sizeof(buf));
 		if (stat_file(buf))
 			veinfo[i].status = VE_SUSPENDED;
-		if (veinfo[i].ve_root == NULL)
+		if (veinfo[i].root == NULL)
 			continue;
-		if (vps_is_mounted(veinfo[i].ve_root))
+		if (vps_is_mounted(veinfo[i].root))
 			veinfo[i].status = VE_MOUNTED;
 	}
 	return 0;
@@ -1294,7 +1294,7 @@ static int get_ves_layout()
 	int i, ploop;
 
 	for (i = 0; i < n_veinfo; i++) {
-		ploop = ve_private_is_ploop(veinfo[i].ve_private);
+		ploop = ve_private_is_ploop(veinfo[i].private);
 		veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
 	}
 
@@ -1531,10 +1531,10 @@ static void free_veinfo()
 			free(veinfo[i].cpustat);
 		if (veinfo[i].cpu != NULL)
 			free(veinfo[i].cpu);
-		if (veinfo[i].ve_root != NULL)
-			free(veinfo[i].ve_root);
-		if (veinfo[i].ve_private != NULL)
-			free(veinfo[i].ve_private);
+		if (veinfo[i].root != NULL)
+			free(veinfo[i].root);
+		if (veinfo[i].private != NULL)
+			free(veinfo[i].private);
 		if (veinfo[i].bootorder != NULL)
 			free(veinfo[i].bootorder);
 	}

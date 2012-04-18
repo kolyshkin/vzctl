@@ -93,8 +93,8 @@ struct Cveinfo {
 	char *description;
 	char *ostemplate;
 	char *ip;
-	char *ve_private;
-	char *ve_root;
+	char *private;
+	char *root;
 	struct Cubc *ubc;
 	struct Cquota *quota;
 	struct Ccpustat *cpustat;
