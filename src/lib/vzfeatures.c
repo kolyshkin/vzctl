@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "util.h"
 #include "vzfeatures.h"
 
 static struct feature_s features[] = {
@@ -31,15 +32,16 @@ static struct feature_s features[] = {
 	{ "ipgre",	0,	VE_FEATURE_IPGRE },
 	{ "bridge",	0,	VE_FEATURE_BRIDGE },
 	{ "nfsd",	0,	VE_FEATURE_NFSD },
-	{ NULL,		0,	0 }
 };
 
 struct feature_s *find_feature(const char *name)
 {
 	struct feature_s *feat;
 	int len = 0; /* make gcc happy */
+	unsigned int i;
 
-	for (feat = features; feat->name != NULL; feat++) {
+	for (i = 0; i < ARRAY_SIZE(features); i++) {
+		feat = &features[i];
 		len = strlen(feat->name);
 		if (strncmp(name, feat->name, len) == 0 && name[len] == ':')
 			break;
@@ -65,8 +67,10 @@ void features_mask2str(unsigned long long mask, unsigned long long known,
 {
 	struct feature_s *feat;
 	int ret;
+	unsigned int i;
 
-	for (feat = features; feat->name != NULL; feat++) {
+	for (i = 0; i < ARRAY_SIZE(features); i++) {
+		feat = &features[i];
 		if (!(known & feat->mask))
 			continue;
 
