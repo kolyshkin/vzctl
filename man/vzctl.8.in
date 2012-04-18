@@ -165,7 +165,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --pci_add dev
 .OP --pci_del dev
 .\" Features
-.OP --features param\fR:\fBon\fR|\fBoff
+.OP --features name\fR:\fBon\fR|\fBoff
 .\" Apply config
 .OP --applyconfig name
 .OP --applyconfig_map group
