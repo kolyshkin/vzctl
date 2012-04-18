@@ -689,11 +689,13 @@ Sets noatime flag (do not update inode access times) on filesystem.
 .SS3 Capability option
 .TP
 \fB--capability\fR \fIcapname\fR:\fBon\fR|\fBoff\fR
-Sets a capability for a container. Note that setting capability when
+Sets a capability for a container. Note that setting a capability when
 the container is running does not take immediate effect; restart the container
-in order for the changes to take effect. Note a container has default set
-of capabilities, thus any operation on capabilities is "logical and"
-with the default capability mask.
+in order for the changes to take effect (consider using \fB--setmode\fR
+option).
+
+A container has the default set of capabilities, thus any operation on
+capabilities is "logical AND" with the default capability mask.
 
 You can use the following values for \fIcapname\fR:
 \fBchown\fR, \fBdac_override\fR, \fBdac_read_search\fR, \fBfowner\fR,
