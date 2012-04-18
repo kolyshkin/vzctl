@@ -43,6 +43,7 @@
 #include "util.h"
 #include "types.h"
 #include "image.h"
+#include "vzfeatures.h"
 
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
@@ -234,6 +235,19 @@ static void print_layout(struct Cveinfo *p, int index)
 {
 	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-6s",
 			layout2str(p->layout));
+}
+
+static void print_features(struct Cveinfo *p, int index)
+{
+	int r;
+	char str[64]="-";
+
+	features_mask2str(p->features_mask, p->features_known,
+		       ",", str, sizeof(str));
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
+	if (!is_last_field)
+		r = 15;
+	p_outbuffer += r;
 }
 
 #define PRINT_UBC(name)							\
@@ -526,6 +540,7 @@ UBC_FIELD(swappages, SWAPP),
 {"bootorder", "BOOTORDER", "%10s", 0, RES_NONE,
 	print_bootorder, bootorder_sort_fn},
 {"layout", "LAYOUT", "%6s", 0, RES_NONE, print_layout, layout_sort_fn},
+{"features", "FEATURES", "%-15s", 0, RES_NONE, print_features, none_sort_fn},
 };
 
 static void *x_malloc(int size)
@@ -856,6 +871,8 @@ do {								\
 	ve->io.ioprio = res->io.ioprio;
 	if (res->cpu.vcpus != NULL)
 		ve->cpunum = *res->cpu.vcpus;
+	ve->features_mask  = res->env.features_mask;
+	ve->features_known = res->env.features_known;
 }
 
 static int read_ves_param()
