@@ -104,6 +104,8 @@ static void print_ ## fieldname(struct Cveinfo *p, int index) \
 	p_outbuffer += r; \
 }
 
+PRINT_STR_FIELD(private, 32)
+PRINT_STR_FIELD(root, 32)
 PRINT_STR_FIELD(hostname, 32)
 PRINT_STR_FIELD(name, 32)
 PRINT_STR_FIELD(description, 32)
@@ -397,6 +399,8 @@ static int name ## _sort_fn(const void *val1, const void *val2)		\
 	return ret;					\
 }
 
+SORT_STR_FN(private)
+SORT_STR_FN(root)
 SORT_STR_FN(hostname)
 SORT_STR_FN(name)
 SORT_STR_FN(description)
@@ -470,6 +474,8 @@ static struct Cfield field_names[] =
 /* vpsid is for backward compatibility -- will be removed later */
 {"vpsid", "CTID", "%10s", 0, RES_NONE, print_veid, id_sort_fn},
 
+{"private", "PRIVATE", "%-32s", 0, RES_NONE, print_private, private_sort_fn},
+{"root", "ROOT", "%-32s", 0, RES_NONE, print_root, root_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
 {"description", "DESCRIPTION", "%-32s", 0, RES_NONE, print_description, description_sort_fn },
