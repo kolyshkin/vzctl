@@ -165,7 +165,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --pci_add dev
 .OP --pci_del dev
 .\" Features
-.OP --features name\fR:\fBon\fR|\fBoff
+.OP --features name\fR:\fBon\fR|\fBoff\fR[\fB,\fR...]
 .\" Apply config
 .OP --applyconfig name
 .OP --applyconfig_map group
@@ -742,10 +742,11 @@ then configuring PCI devices. The script is usually located at
 
 .SS3 Features management
 .TP
-\fB--features\fR \fIname\fR:\fBon\fR|\fBoff\fR
+\fB--features\fR \fIname\fR:\fBon\fR|\fBoff\fR[\fB,\fR...]
 Enable or disable a specific container feature.
 Known features are: \fBsysfs\fR, \fBnfs\fR, \fBsit\fR, \fBipip\fR, \fBppp\fR,
-\fBipgre\fR, \fBbridge\fR, \fBnfsd\fR.
+\fBipgre\fR, \fBbridge\fR, \fBnfsd\fR. A few features can be specified at
+once, comma-separated.
 
 .SS3 Apply config
 .TP

@@ -379,7 +379,7 @@ static int parse_features(env_param_t *env, char *val)
 	char *token;
 	struct feature_s *feat;
 
-	for_each_strtok(token, val, "\t ") {
+	for_each_strtok(token, val, "\t ,") {
 		feat = find_feature(token);
 		if (!feat) {
 			logger(0, 0, "Warning: Unknown feature: %s", token);
