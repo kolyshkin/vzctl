@@ -63,7 +63,7 @@ struct feature_s *find_feature(const char *name)
 }
 
 void features_mask2str(unsigned long long mask, unsigned long long known,
-		char *buf, int len)
+		const char *delim, char *buf, int len)
 {
 	struct feature_s *feat;
 	int ret;
@@ -74,7 +74,9 @@ void features_mask2str(unsigned long long mask, unsigned long long known,
 		if (!(known & feat->mask))
 			continue;
 
-		ret = snprintf(buf, len, "%s:%s ", feat->name,
+		ret = snprintf(buf, len, "%s%s:%s",
+				i == 0 ? "" : delim,
+				feat->name,
 				mask & feat->mask ? "on" : "off");
 
 		buf += ret;

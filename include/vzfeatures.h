@@ -25,6 +25,8 @@ struct feature_s {
 };
 
 struct feature_s *find_feature(const char *name);
-void features_mask2str(unsigned long long, unsigned long long, char *, int);
+
+void features_mask2str(unsigned long long mask, unsigned long long known,
+		const char *delim, char *buf, int len);
 
 #endif //_VZFEATURES_H_

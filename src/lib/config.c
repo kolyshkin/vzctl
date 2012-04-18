@@ -401,7 +401,7 @@ static void store_features(unsigned long long mask, unsigned long long known,
 	int r;
 
 	r = snprintf(buf, sizeof(buf) - 1, "%s=\"", conf->name);
-	features_mask2str(mask, known, buf + r, sizeof(buf) - r - 2);
+	features_mask2str(mask, known, " ", buf + r, sizeof(buf) - r - 2);
 	strcat(buf, "\"");
 	add_str_param(conf_h, buf);
 }
