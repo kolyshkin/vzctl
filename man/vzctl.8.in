@@ -144,7 +144,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .\" Meminfo
 .OP --meminfo \fBnone\fR|\fImode\fR:\fIvalue
 .\" iptables control
-.OP --iptables name
+.OP --iptables name\fR[\fB,\fR...]
 .\" Network device control
 .OP --netdev_add ifname
 .OP --netdev_del ifname
@@ -157,7 +157,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .\" Mount option
 .OP --noatime \fByes\fR|\fBno
 .\" Capability
-.OP --capability capname\fR:\fBon\fR|\fBoff
+.OP --capability capname\fR:\fBon\fR|\fBoff\fR[\fB,\fR...]
 .\" Device access management
 .OP --devnodes param
 .OP --devices param
@@ -608,13 +608,11 @@ Default is \fBprivvmpages:1\fR.
 
 .SS3 iptables control parameters
 .TP
-\fB--iptables\fR \fIname\fR
+\fB--iptables\fR \fIname\fR[\fB,\fR...]
 Allow to use the functionality of \fIname\fR iptables module inside
-the container. To specify multiple \fIname\fRs, repeat --iptables
-for each, or use space-separated list as an argument
-(enclosed in single or double quotes to protect spaces).
+the container. Multiple comma-separated \fIname\fRs can be specified.
 
-The default list of enabled iptables modules is specified
+The default list of enabled iptables modules is defined
 by the \fBIPTABLES\fR variable in \fBvz.conf\fR(5).
 
 You can use the following values for \fIname\fR:
@@ -688,8 +686,11 @@ Sets noatime flag (do not update inode access times) on filesystem.
 
 .SS3 Capability option
 .TP
-\fB--capability\fR \fIcapname\fR:\fBon\fR|\fBoff\fR
-Sets a capability for a container. Note that setting a capability when
+\fB--capability\fR \fIcapname\fR:\fBon\fR|\fBoff\fR[\fB,\fR...]
+Sets a capability for a container. Multiple comma-separated capabilities
+can be specified.
+
+Note that setting a capability when
 the container is running does not take immediate effect; restart the container
 in order for the changes to take effect (consider using \fB--setmode\fR
 option).

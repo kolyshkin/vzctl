@@ -441,7 +441,7 @@ static int parse_iptables(env_param_t *env, char *val)
 	struct iptables_s *ipt;
 	int ret = 0;
 
-	for_each_strtok(token, val, "\t ") {
+	for_each_strtok(token, val, "\t ,") {
 		ipt = find_ipt(token);
 		if (!ipt) {
 			logger(-1, 0, "Warning: Unknown iptable module: %s,"
@@ -747,7 +747,7 @@ static int parse_cap(char *str, cap_param *cap)
 	char cap_nm[128];
 	unsigned long *mask;
 
-	for_each_strtok(token, str, "\t ") {
+	for_each_strtok(token, str, "\t ,") {
 		if ((p = strrchr(token, ':')) == NULL)
 			goto err;
 		if (!strcmp(p + 1, "off"))
