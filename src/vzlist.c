@@ -93,17 +93,17 @@ static inline int get_run_ve(int update)
 /* Print functions */
 #define PRINT_STR_FIELD_FNAME(funcname, fieldname, length)	\
 static void print_ ## funcname(struct Cveinfo *p, int index)	\
-{ \
-	int r; \
-	char *str = "-"; \
- \
-	if (p->fieldname != NULL) \
-		str = p->fieldname; \
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, \
-		"%" #length "s", str); \
-	if (!is_last_field) \
-		r = length; \
-	p_outbuffer += r; \
+{								\
+	int r;							\
+	char *str = "-";					\
+								\
+	if (p->fieldname != NULL)				\
+		str = p->fieldname;				\
+	r = snprintf(p_outbuffer, e_buf - p_outbuffer,		\
+		"%" #length "s", str);				\
+	if (!is_last_field)					\
+		r = length;					\
+	p_outbuffer += r;					\
 }
 
 #define PRINT_STR_FIELD(name, length)				\
@@ -423,7 +423,7 @@ static int name ## _sort_fn(const void *val1, const void *val2)		\
 	int ret;							\
 	if ((ret = check_empty_param(h1, h2)) == 2)			\
 		ret = strcmp(h1, h2);					\
-	return ret;					\
+	return ret;							\
 }
 
 SORT_STR_FN(private)
@@ -442,7 +442,7 @@ static int fn(const void *val1, const void *val2)			\
 	int ret;							\
 	if ((ret = check_empty_param(r1, r2)) == 2)			\
 		ret = r1->name[index] > r2->name[index];		\
-	return ret;					\
+	return ret;							\
 }
 
 #define SORT_UBC(res)							\
