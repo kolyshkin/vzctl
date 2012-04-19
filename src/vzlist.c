@@ -300,8 +300,7 @@ PRINT_UBC(swappages)
 #define PRINT_DQ(name)							\
 static void print_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	if (p->quota == NULL ||						\
-		(p->status != VE_RUNNING && (index == 0)))		\
+	if (p->quota == NULL ||	(index == 0 && p->quota->name[0] == 0))	\
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
 	else								\
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
