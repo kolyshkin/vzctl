@@ -23,9 +23,12 @@ By default only running containers are listed.
 If one or more \fICTID\fRs are specified, only specified containers are
 displayed.
 .PP
-For the fields that can have many values (e.g. \fBip\fR),
-all the values are displayed only for the last (i.e. leftmost) column;
-otherwise, only the first value is shown.
+For some fields that can have long values (e.g. \fBip\fR, \fBhostname\fR,
+\fBdescription\fR or \fBfeatures\fR), the value string is trimmed to some
+predefined width (in order not to break the columned layout), unless this
+field is the last one. So, in order to get the full non-trimmed value for
+such a field (such as when using vzlist from scripts), put the field
+name last in the list of fields for \fB-o\fR option.
 .SH OPTIONS
 .IP "\fB-a\fR, \fB--all\fR"
 List all containers.
