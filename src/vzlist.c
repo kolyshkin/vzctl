@@ -100,7 +100,7 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 	if (p->fieldname != NULL) \
 		str = p->fieldname; \
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer, \
-		"%-" #length "s", str); \
+		"%" #length "s", str); \
 	if (!is_last_field) \
 		r = length; \
 	p_outbuffer += r; \
@@ -109,12 +109,12 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 #define PRINT_STR_FIELD(name, length)				\
 	PRINT_STR_FIELD_FNAME(name, name, length)
 
-PRINT_STR_FIELD(private, 32)
-PRINT_STR_FIELD(root, 32)
-PRINT_STR_FIELD(hostname, 32)
-PRINT_STR_FIELD(name, 32)
-PRINT_STR_FIELD(description, 32)
-PRINT_STR_FIELD(ostemplate, 32)
+PRINT_STR_FIELD(private, -32)
+PRINT_STR_FIELD(root, -32)
+PRINT_STR_FIELD(hostname, -32)
+PRINT_STR_FIELD(name, -32)
+PRINT_STR_FIELD(description, -32)
+PRINT_STR_FIELD(ostemplate, -32)
 PRINT_STR_FIELD_FNAME(name_short, name, 10)
 
 static void print_ip(struct Cveinfo *p, int index)
