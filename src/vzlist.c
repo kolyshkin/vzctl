@@ -1237,6 +1237,50 @@ static int get_run_quota_stat()
 	return 0;
 }
 
+static int get_ve_ploop_info(struct Cveinfo *ve)
+{
+	char descr[PATH_MAX];
+	struct ploop_disk_images_data *di;
+	struct ploop_info i = {};
+	int ret = -1;
+
+	GET_DISK_DESCRIPTOR(descr, ve->private);
+	di = ploop_alloc_diskdescriptor();
+	if (ploop_read_diskdescriptor(descr, di))
+		goto err;
+	if (ploop_get_info(di, &i))
+		goto err;
+
+	// space avail
+	ve->quota->diskspace[1] = ve->quota->diskspace[2] =
+		(i.fs_blocks * i.fs_bsize) >> 10;
+	// space used
+	ve->quota->diskspace[0] =
+		((i.fs_blocks - i.fs_bfree) * i.fs_bsize) >> 10;
+
+	// inodes avail
+	ve->quota->diskinodes[1] = ve->quota->diskinodes[2] =
+		i.fs_inodes;
+	// inodes used
+	ve->quota->diskinodes[0] = i.fs_inodes - i.fs_ifree;
+
+	ret = 0;
+err:
+	ploop_free_diskdescriptor(di);
+	return ret;
+}
+
+static int get_ves_ploop_info()
+{
+	int i;
+
+	for (i = 0; i < n_veinfo; i++) {
+		if (veinfo[i].layout == VE_LAYOUT_PLOOP && !veinfo[i].hide)
+			get_ve_ploop_info(&veinfo[i]);
+	}
+	return 0;
+}
+
 static long get_clk_tck()
 {
 	if (__clk_tck != -1)
@@ -1493,8 +1537,6 @@ static int collect()
 		fprintf(stderr, "Container(s) not found\n");
 		return 1;
 	}
-	if (check_param(RES_QUOTA))
-		get_run_quota_stat();
 	if (check_param(RES_CPUSTAT))
 		get_ves_cpustat();
 	if (check_param(RES_CPU))
@@ -1506,6 +1548,10 @@ static int collect()
 	read_ves_param();
 	get_mounted_status();
 	get_ves_layout();
+	if (check_param(RES_QUOTA)) {
+		get_run_quota_stat();
+		get_ves_ploop_info();
+	}
 	if (host_pattern != NULL)
 		filter_by_hostname();
 	if (name_pattern != NULL)
