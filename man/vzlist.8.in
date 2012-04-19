@@ -6,6 +6,7 @@ vzlist \- show various information about containers
 [\fB-a\fR | \fB-S\fR]
 .OP -n
 .OP -H
+.OP -t
 .OP -o "name\fR[,\fIname\fR...] | \fB-1\fR"
 .OP -s \fR[\fB-\fR]\fIname
 .OP -h pattern
@@ -27,8 +28,9 @@ For some fields that can have long values (e.g. \fBip\fR, \fBhostname\fR,
 \fBdescription\fR or \fBfeatures\fR), the value string is trimmed to some
 predefined width (in order not to break the columned layout), unless this
 field is the last one. So, in order to get the full non-trimmed value for
-such a field (such as when using vzlist from scripts), put the field
-name last in the list of fields for \fB-o\fR option.
+such a field, put the field name last in the list of fields for
+\fB-o\fR option. If using \fBvzlist\fR from a script, add \fB-t\fR
+to disable trimming.
 .SH OPTIONS
 .IP "\fB-a\fR, \fB--all\fR"
 List all containers.
@@ -38,7 +40,9 @@ List only not running containers (including the ones with status shown as
 .IP "\fB-n\fR, \fB--name\fR"
 Display container names instead of hostnames.
 .IP "\fB-H\fR, \fB--no-header\fR"
-Suppress displaying the header row.
+Suppress displaying the header row. Usable for scripts.
+.IP "\fB-t\fR, \fB--no-trim\fR"
+Suppress trimming long fields. Usable for scripts.
 .IP "\fB-o\fR, \fB--output\fR \fIfield\fR[,\fIfield\fR...]"
 Display only the specified \fIfield\fRs (see \fBStandard fields\fR
 subsection below).

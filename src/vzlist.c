@@ -57,7 +57,7 @@ static char *desc_pattern = NULL;
 static char *dumpdir = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
-static int is_last_field;
+static int is_last_field = 1;
 static char *default_field_order = "veid,numproc,status,ip,hostname";
 static char *default_nm_field_order = "veid,numproc,status,ip,name";
 static int g_sort_field = 0;
@@ -66,6 +66,7 @@ static int n_ve_list = 0;
 static int veid_only = 0;
 static int sort_rev = 0;
 static int show_hdr = 1;
+static int trim = 1;
 static int all_ve = 0;
 static int only_stopped_ve = 0;
 static int with_names = 0;
@@ -691,7 +692,8 @@ static void print_ve()
 			continue;
 		if (only_stopped_ve && veinfo[idx].status == VE_RUNNING)
 			continue;
-		is_last_field = 0;
+		if (trim)
+			is_last_field = 0;
 		for (p = g_field_order; p != NULL; p = p->next) {
 			f = p->order;
 			if (p->next == NULL)
@@ -1566,6 +1568,7 @@ static void free_veinfo()
 static struct option list_options[] =
 {
 	{"no-header",	no_argument, NULL, 'H'},
+	{"no-trim",	no_argument, NULL, 't'},
 	{"stopped",	no_argument, NULL, 'S'},
 	{"all",		no_argument, NULL, 'a'},
 	{"name",	no_argument, NULL, 'n'},
@@ -1588,7 +1591,7 @@ int main(int argc, char **argv)
 
 	while (1) {
 		int option_index = -1;
-		c = getopt_long(argc, argv, "HSanN:h:d:o:s:Le1", list_options,
+		c = getopt_long(argc, argv, "HtSanN:h:d:o:s:Le1", list_options,
 				&option_index);
 		if (c == -1)
 			break;
@@ -1596,6 +1599,9 @@ int main(int argc, char **argv)
 		switch(c) {
 		case 'S'	:
 			only_stopped_ve = 1;
+			break;
+		case 't'	:
+			trim = 0;
 			break;
 		case 'H'	:
 			show_hdr = 0;
