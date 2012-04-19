@@ -937,16 +937,16 @@ static int check_veid_restr(int veid)
 			sizeof(*g_ve_list), veid_search_fn) != NULL);
 }
 
-#define UPDATE_UBC(str,name,ubc,held,maxheld,barrier,limit,failcnt)	\
+#define UPDATE_UBC(param)			\
 do {						\
-	if (!strcmp(str, #name)) {		\
-		ubc->name[0] = held;		\
-		ubc->name[1] = maxheld;		\
-		ubc->name[2] = barrier;		\
-		ubc->name[3] = limit;		\
-		ubc->name[4] = failcnt;		\
+	if (!strcmp(name, #param)) {		\
+		ve.ubc->param[0] = held;	\
+		ve.ubc->param[1] = maxheld;	\
+		ve.ubc->param[2] = barrier;	\
+		ve.ubc->param[3] = limit;	\
+		ve.ubc->param[4] = failcnt;	\
 	}					\
-} while(0);					\
+} while(0)
 
 static int get_ub()
 {
@@ -989,48 +989,27 @@ static int get_ub()
 		{
 			continue;
 		}
-		UPDATE_UBC(name, kmemsize, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, lockedpages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, privvmpages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, shmpages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numproc, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, physpages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, vmguarpages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, oomguarpages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numtcpsock, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numflock, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numpty, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numsiginfo, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, tcpsndbuf, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, tcprcvbuf, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, othersockbuf, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, dgramrcvbuf, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numothersock, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, dcachesize, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numfile, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, numiptent, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
-		UPDATE_UBC(name, swappages, ve.ubc, held, maxheld, barrier, \
-			limit, failcnt)
+		UPDATE_UBC(kmemsize);
+		UPDATE_UBC(lockedpages);
+		UPDATE_UBC(privvmpages);
+		UPDATE_UBC(shmpages);
+		UPDATE_UBC(numproc);
+		UPDATE_UBC(physpages);
+		UPDATE_UBC(vmguarpages);
+		UPDATE_UBC(oomguarpages);
+		UPDATE_UBC(numtcpsock);
+		UPDATE_UBC(numflock);
+		UPDATE_UBC(numpty);
+		UPDATE_UBC(numsiginfo);
+		UPDATE_UBC(tcpsndbuf);
+		UPDATE_UBC(tcprcvbuf);
+		UPDATE_UBC(othersockbuf);
+		UPDATE_UBC(dgramrcvbuf);
+		UPDATE_UBC(numothersock);
+		UPDATE_UBC(dcachesize);
+		UPDATE_UBC(numfile);
+		UPDATE_UBC(numiptent);
+		UPDATE_UBC(swappages);
 	}
 	if (veid && check_veid_restr(veid)) {
 		update_ubc(veid, ve.ubc);
