@@ -58,7 +58,7 @@ static char *dumpdir = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
 static int is_last_field = 1;
-static char *default_field_order = "veid,numproc,status,ip,hostname";
+static char *default_field_order = "smart_ctid,numproc,status,ip,hostname";
 static char *default_nm_field_order = "veid,numproc,status,ip,name";
 static int g_sort_field = 0;
 static int *g_ve_list = NULL;
@@ -91,8 +91,8 @@ static inline int get_run_ve(int update)
 
 
 /* Print functions */
-#define PRINT_STR_FIELD(fieldname, length) \
-static void print_ ## fieldname(struct Cveinfo *p, int index) \
+#define PRINT_STR_FIELD_FNAME(funcname, fieldname, length)	\
+static void print_ ## funcname(struct Cveinfo *p, int index)	\
 { \
 	int r; \
 	char *str = "-"; \
@@ -106,12 +106,16 @@ static void print_ ## fieldname(struct Cveinfo *p, int index) \
 	p_outbuffer += r; \
 }
 
+#define PRINT_STR_FIELD(name, length)				\
+	PRINT_STR_FIELD_FNAME(name, name, length)
+
 PRINT_STR_FIELD(private, 32)
 PRINT_STR_FIELD(root, 32)
 PRINT_STR_FIELD(hostname, 32)
 PRINT_STR_FIELD(name, 32)
 PRINT_STR_FIELD(description, 32)
 PRINT_STR_FIELD(ostemplate, 32)
+PRINT_STR_FIELD_FNAME(name_short, name, 10)
 
 static void print_ip(struct Cveinfo *p, int index)
 {
@@ -136,6 +140,14 @@ static void print_ip(struct Cveinfo *p, int index)
 static void print_veid(struct Cveinfo *p, int index)
 {
 	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10d", p->veid);
+}
+
+static void print_smart_ctid(struct Cveinfo *p, int index)
+{
+	if (p->name != NULL)
+		print_name_short(p, index);
+	else
+		print_veid(p, index);
 }
 
 static void print_status(struct Cveinfo *p, int index)
@@ -493,6 +505,7 @@ static struct Cfield field_names[] =
 {"root", "ROOT", "%-32s", 0, RES_NONE, print_root, root_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
+{"smart_ctid", "CTID", "%10s", 0, RES_NONE, print_smart_ctid, name_sort_fn},
 {"description", "DESCRIPTION", "%-32s", 0, RES_NONE, print_description, description_sort_fn },
 {"ostemplate", "OSTEMPLATE", "%-32s", 0, RES_NONE, print_ostemplate, ostemplate_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
