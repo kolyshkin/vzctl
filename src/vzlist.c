@@ -590,6 +590,7 @@ static void usage()
 "	-S, --stopped		list stopped containers\n"
 "	-n, --name		display containers' names\n"
 "	-H, --no-header		suppress columns header\n"
+"	-t, --no-trim		do not trim long values\n"
 "	-o, --output		output only specified fields\n"
 "	-1			synonym for -H -octid\n"
 "	-s, --sort		sort by the specified field\n"
