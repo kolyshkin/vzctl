@@ -22,7 +22,7 @@
 #include <mntent.h>
 #include <string.h>
 #include <sys/mount.h>
-#include <sys/param.h>
+#include <limits.h>
 
 #include "fs.h"
 #include "util.h"
@@ -71,7 +71,7 @@ static int umount_submounts(const char *root)
 	FILE *fp;
 	struct mntent *mnt;
 	int len;
-	char path[MAXPATHLEN + 1];
+	char path[PATH_MAX + 1];
 	list_head_t head;
 	str_param *it;
 

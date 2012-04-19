@@ -2,7 +2,6 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlwriter.h>
@@ -282,7 +281,7 @@ int vzctl_store_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tre
 	int i, rc = -1;
 	xmlTextWriterPtr writer = NULL;
 	xmlDocPtr doc = NULL;
-	char tmpfname[MAXPATHLEN];
+	char tmpfname[PATH_MAX];
 	struct xml_node_param *it;
 	list_head_t pool;
 	char *guid;

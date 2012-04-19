@@ -22,7 +22,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <sys/param.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -67,7 +67,7 @@ int is_image_mounted(const char *ve_private)
 {
 	int ret;
 	char dev[64];
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 
 	di = ploop_alloc_diskdescriptor();
@@ -88,7 +88,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 {
 	int ret;
 	struct ploop_mount_param mount_param = {};
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 
 	di = ploop_alloc_diskdescriptor();
@@ -120,7 +120,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 int vzctl_umount_image(const char *ve_private)
 {
 	int ret;
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 
 	di = ploop_alloc_diskdescriptor();
@@ -150,8 +150,8 @@ int vzctl_create_image(const char *ve_private,
 {
 	int ret = 0;
 	struct ploop_create_param create_param = {};
-	char dir[MAXPATHLEN];
-	char image[MAXPATHLEN];
+	char dir[PATH_MAX];
+	char image[PATH_MAX];
 
 	snprintf(dir, sizeof(dir), "%s/" VZCTL_VE_ROOTHDD_DIR, ve_private);
 	ret = make_dir_mode(dir, 1, 0700);
@@ -178,7 +178,7 @@ int vzctl_create_image(const char *ve_private,
 int vzctl_convert_image(const char *ve_private, int mode)
 {
 	int ret;
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 
 	di = ploop_alloc_diskdescriptor();
@@ -206,7 +206,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 	int ret;
 	struct ploop_disk_images_data *di;
 	struct ploop_resize_param param;
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 
 	if (ve_private == NULL) {
 		logger(-1, 0, "Failed to resize image: "
@@ -242,7 +242,7 @@ int vzctl_get_ploop_dev(const char *mnt, char *out, int len)
 
 int vzctl_create_snapshot(const char *ve_private, const char *guid)
 {
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 	int ret;
 	struct ploop_snapshot_param param = {};
@@ -276,7 +276,7 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 
 int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 {
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 	int ret;
 
@@ -307,7 +307,7 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 
 int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 {
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 	int ret;
 	struct ploop_merge_param param = {};
@@ -343,7 +343,7 @@ err:
 
 int ve_private_is_ploop(const char *private)
 {
-	char image[MAXPATHLEN];
+	char image[PATH_MAX];
 
 	snprintf(image, sizeof(image), "%s/%s/root.hdd",
 			private, VZCTL_VE_ROOTHDD_DIR);

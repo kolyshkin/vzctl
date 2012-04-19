@@ -10,7 +10,6 @@
 #include <string.h>
 #include <limits.h>
 #include <sys/ioctl.h>
-#include <sys/param.h>
 #include <linux/vzcalluser.h>
 #include <linux/cpt_ioctl.h>
 #include <ploop/libploop.h>
@@ -58,8 +57,8 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	int ret, run = 0;
 	cpt_param cpt = {};
 	char guid[39];
-	char fname[MAXPATHLEN];
-	char tmp[MAXPATHLEN];
+	char fname[PATH_MAX];
+	char tmp[PATH_MAX];
 	struct ploop_snapshot_param image_param = {};
 	struct ploop_merge_param merge_param = {};
 	struct ploop_disk_images_data *di = NULL;
@@ -163,10 +162,10 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 {
 	int ret, run;
 	cpt_param cpt = {};
-	char fname[MAXPATHLEN];
-	char tmp[MAXPATHLEN];
+	char fname[PATH_MAX];
+	char tmp[PATH_MAX];
 	char prev_top_guid[39];
-	char dumpfile[MAXPATHLEN];
+	char dumpfile[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
 	struct ploop_disk_images_data *di = NULL;
 
@@ -278,8 +277,8 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 		const fs_param *fs, const char *guid)
 {
 	int ret;
-	char fname[MAXPATHLEN];
-	char tmp[MAXPATHLEN];
+	char fname[PATH_MAX];
+	char tmp[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
 
 	if (!is_snapshot_supported(fs->private))
@@ -352,7 +351,7 @@ static void print_snapshot_data(struct vzctl_snapshot_data *data)
 
 int vzctl_env_list_snapshot_tree(const char *ve_private)
 {
-	char fname[MAXPATHLEN];
+	char fname[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
 	int i, ret = 0;
 
