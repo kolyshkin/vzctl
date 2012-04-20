@@ -20,7 +20,6 @@
 
 #include <stdlib.h>
 #include "types.h"
-#include "res.h"
 #include "logger.h"
 
 #define BACKUP		0
@@ -61,8 +60,6 @@ int move_config(int veid, int action);
 void remove_names(envid_t veid);
 
 size_t vz_strlcat(char *dst, const char *src, size_t count);
-
-void get_osrelease(vps_res *res);
 
 int get_running_ve_list(envid_t **ves);
 int ve_in_list(envid_t *list, int size, envid_t ve);
