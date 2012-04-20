@@ -813,10 +813,10 @@ static void merge_conf(struct Cveinfo *ve, vps_res *res)
 		memset(ve->ubc, 0, sizeof(struct Cubc));
 #define MERGE_UBC(name)						\
 do {								\
-	if (res == NULL || res->ub.name == NULL)		\
-		break;						\
-	ve->ubc->name[2] = res->ub.name[0];			\
-	ve->ubc->name[3] = res->ub.name[1];			\
+	if (res != NULL && res->ub.name != NULL) {		\
+		ve->ubc->name[2] = res->ub.name[0];		\
+		ve->ubc->name[3] = res->ub.name[1];		\
+	}							\
 } while(0)
 		MERGE_UBC(kmemsize);
 		MERGE_UBC(lockedpages);
