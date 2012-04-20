@@ -37,7 +37,11 @@
 /* User-defined scripts are in VPS_CONF_DIR */
 #define USER_CREATE_SCRIPT	VPS_CONF_DIR "vps.create"
 
-#define envid_t		unsigned int
+#ifndef __ENVID_T_DEFINED__
+typedef unsigned envid_t;
+#define __ENVID_T_DEFINED__
+#endif
+
 #define STR_SIZE	512
 #define PATH_LEN	256
 
