@@ -761,12 +761,15 @@ static void update_ve(int veid, char *ip, int status)
 	return;
 }
 
-static void update_ubc(int veid, struct Cubc *ubc)
+static void update_ubc(int veid, const struct Cubc *ubc)
 {
 	struct Cveinfo *tmp;
 
-	if ((tmp = find_ve(veid)) != NULL)
-		tmp->ubc = ubc;
+	if ((tmp = find_ve(veid)) != NULL) {
+		if (tmp->ubc == NULL)
+			tmp->ubc = x_malloc(sizeof(*ubc));
+		memcpy(tmp->ubc, ubc, sizeof(*ubc));
+	}
 	return ;
 }
 
@@ -940,11 +943,11 @@ static int check_veid_restr(int veid)
 #define UPDATE_UBC(param)			\
 do {						\
 	if (!strcmp(name, #param)) {		\
-		ve.ubc->param[0] = held;	\
-		ve.ubc->param[1] = maxheld;	\
-		ve.ubc->param[2] = barrier;	\
-		ve.ubc->param[3] = limit;	\
-		ve.ubc->param[4] = failcnt;	\
+		ubc.param[0] = held;		\
+		ubc.param[1] = maxheld;		\
+		ubc.param[2] = barrier;		\
+		ubc.param[3] = limit;		\
+		ubc.param[4] = failcnt;		\
 	}					\
 } while(0)
 
@@ -956,7 +959,7 @@ static int get_ub()
 	char name[32];
 	FILE *fp;
 	char *s;
-	struct Cveinfo ve;
+	struct Cubc ubc = {};
 
 	if ((fp = fopen(PROC_BC_RES, "r")) == NULL) {
 		if ((fp = fopen(PROCUBC, "r")) == NULL) {
@@ -967,7 +970,6 @@ static int get_ub()
 	}
 
 	veid = 0;
-	memset(&ve, 0, sizeof(struct Cveinfo));
 	while (!feof(fp)) {
 		if (fgets(buf, sizeof(buf), fp) == NULL)
 			break;
@@ -976,10 +978,9 @@ static int get_ub()
 			if (sscanf(buf, "%d:", &veid) != 1)
 				continue;
 			if (prev_veid && check_veid_restr(prev_veid)) {
-				update_ubc(prev_veid, ve.ubc);
+				update_ubc(prev_veid, &ubc);
 			}
-			ve.ubc = x_malloc(sizeof(struct Cubc));
-			memset(ve.ubc, 0, sizeof(struct Cubc));
+			memset(&ubc, 0, sizeof(struct Cubc));
 			s++;
 		} else {
 			s = buf;
@@ -1012,7 +1013,7 @@ static int get_ub()
 		UPDATE_UBC(swappages);
 	}
 	if (veid && check_veid_restr(veid)) {
-		update_ubc(veid, ve.ubc);
+		update_ubc(veid, &ubc);
 	}
 	fclose(fp);
 	return 0;
