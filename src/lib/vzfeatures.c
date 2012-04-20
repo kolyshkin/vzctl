@@ -16,12 +16,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <linux/vzcalluser.h>
 #include <string.h>
 #include <stdio.h>
 
 #include "util.h"
 #include "vzfeatures.h"
+#include <linux/vzcalluser.h>
 
 static struct feature_s features[] = {
 	{ "sysfs",	0,	VE_FEATURE_SYSFS },
