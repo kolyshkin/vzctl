@@ -811,35 +811,34 @@ static void merge_conf(struct Cveinfo *ve, vps_res *res)
 	if (ve->ubc == NULL) {
 		ve->ubc = x_malloc(sizeof(struct Cubc));
 		memset(ve->ubc, 0, sizeof(struct Cubc));
-#define MERGE_UBC(name, ubc, res)				\
+#define MERGE_UBC(name)						\
 do {								\
 	if (res == NULL || res->ub.name == NULL)		\
 		break;						\
-	ubc->name[2] = res->ub.name[0];				\
-	ubc->name[3] = res->ub.name[1];				\
-} while(0);
-
-		MERGE_UBC(kmemsize, ve->ubc, res);
-		MERGE_UBC(lockedpages, ve->ubc, res);
-		MERGE_UBC(privvmpages, ve->ubc, res);
-		MERGE_UBC(shmpages, ve->ubc, res);
-		MERGE_UBC(numproc, ve->ubc, res);
-		MERGE_UBC(physpages, ve->ubc, res);
-		MERGE_UBC(vmguarpages, ve->ubc, res);
-		MERGE_UBC(oomguarpages, ve->ubc, res);
-		MERGE_UBC(numtcpsock, ve->ubc, res);
-		MERGE_UBC(numflock, ve->ubc, res);
-		MERGE_UBC(numpty, ve->ubc, res);
-		MERGE_UBC(numsiginfo, ve->ubc, res);
-		MERGE_UBC(tcpsndbuf, ve->ubc, res);
-		MERGE_UBC(tcprcvbuf, ve->ubc, res);
-		MERGE_UBC(othersockbuf, ve->ubc, res);
-		MERGE_UBC(dgramrcvbuf, ve->ubc, res);
-		MERGE_UBC(numothersock, ve->ubc, res);
-		MERGE_UBC(dcachesize, ve->ubc, res);
-		MERGE_UBC(numfile, ve->ubc, res);
-		MERGE_UBC(numiptent, ve->ubc, res);
-		MERGE_UBC(swappages, ve->ubc, res);
+	ve->ubc->name[2] = res->ub.name[0];			\
+	ve->ubc->name[3] = res->ub.name[1];			\
+} while(0)
+		MERGE_UBC(kmemsize);
+		MERGE_UBC(lockedpages);
+		MERGE_UBC(privvmpages);
+		MERGE_UBC(shmpages);
+		MERGE_UBC(numproc);
+		MERGE_UBC(physpages);
+		MERGE_UBC(vmguarpages);
+		MERGE_UBC(oomguarpages);
+		MERGE_UBC(numtcpsock);
+		MERGE_UBC(numflock);
+		MERGE_UBC(numpty);
+		MERGE_UBC(numsiginfo);
+		MERGE_UBC(tcpsndbuf);
+		MERGE_UBC(tcprcvbuf);
+		MERGE_UBC(othersockbuf);
+		MERGE_UBC(dgramrcvbuf);
+		MERGE_UBC(numothersock);
+		MERGE_UBC(dcachesize);
+		MERGE_UBC(numfile);
+		MERGE_UBC(numiptent);
+		MERGE_UBC(swappages);
 #undef MERGE_UBC
 	}
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
