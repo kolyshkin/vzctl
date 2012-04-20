@@ -31,6 +31,18 @@
 #include "types.h"
 #include "logger.h"
 
+/** Data structure for logging.
+ */
+typedef struct {
+	FILE *fp;		/**< log file pointer. */
+	int level;		/**< maximum logging level. */
+	int enable;		/**< enable/disable logging. */
+	int quiet;		/**< skip logging to stdout/stderr. */
+	int verbose;		/**< Console verbosity. */
+	char prog[32];		/**< program name. */
+	envid_t veid;		/**< Container ID (CTID). */
+} log_param;
+
 log_param g_log = {NULL, 0, 1, 0, 0, "", 0};
 
 static inline void get_date(char *buf, int len)

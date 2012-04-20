@@ -18,20 +18,7 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
-#include <stdio.h>
 #include "types.h"
-
-/** Data structure for logging.
- */
-typedef struct {
-	FILE *fp;		/**< log file pointer. */
-	int level;		/**< maximum logging level. */
-	int enable;		/**< enable/disable logging. */
-	int quiet;		/**< skip logging to stdout/stderr. */
-	int verbose;		/**< Console verbosity. */
-	char prog[32];		/**< program name. */
-	envid_t veid;		/**< Container ID (CTID). */
-} log_param;
 
 /** Print message to log file & stdout.
  *
