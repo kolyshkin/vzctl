@@ -24,7 +24,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
 #include <string.h>
 #include <grp.h>
 #include <sys/ioctl.h>
@@ -687,91 +686,6 @@ static void fix_cpu(cpu_param *cpu)
 	}
 }
 
-#define SBIN_INIT "/sbin/init"
-#define UPSTART_INIT "/lib/upstart/init"
-#define UPSTART "upstart"
-#define SYSTEMD "systemd"
-#define FEDORA_RELEASE "/etc/fedora-release"
-#define DEV_CONSOLE "/dev/console"
-#define DEV_NULL "/dev/null"
-
-static int fix_ve_systemd(const char *root)
-{
-	struct stat st;
-	char file[STR_SIZE];
-	char dest[STR_SIZE];
-
-	/* Check if init is systemd */
-	snprintf(file, STR_SIZE - 1, "%s/" SBIN_INIT, root);
-	if (lstat(file, &st) != 0)
-		return 0; /* Some error -- giving up */
-	if (!S_ISLNK(st.st_mode))
-		return 0; /* Not a symlink, so not systemd */
-	if (readlink(file, dest, STR_SIZE - 1) < 0)
-		return 0; /* Some error -- giving up */
-	if (strstr(dest, SYSTEMD) == NULL)
-		return 0; /* Not systemd */
-
-	logger(2, 0, "systemd init found, changing to upstart");
-	snprintf(dest, STR_SIZE - 1, "%s/" UPSTART_INIT, root);
-	if (stat(dest, &st) != 0)
-		goto err;
-	if (unlink(file) != 0)
-		goto err;
-	if (symlink(UPSTART_INIT, file) != 0)
-		goto err;
-
-	return 0;
-err:
-	logger(-1, errno, "Failed to set upstart as init. "
-			"Please install upstart into this CT.");
-	return -1;
-}
-
-static int fix_ve_devconsole(const char *root)
-{
-	char file[STR_SIZE];
-	char dest[STR_SIZE];
-	struct stat st;
-
-	snprintf(file, STR_SIZE - 1, "%s/" DEV_CONSOLE , root);
-	if (lstat(file, &st) == 0 && S_ISLNK(st.st_mode))
-		return 0; /* already fixed */
-
-	/* Check that it's Fedora */
-	snprintf(file, STR_SIZE - 1, "%s/" FEDORA_RELEASE , root);
-	if (stat(file, &st) != 0)
-		return 0; /* not Fedora */
-
-	/* Check if init is upstart */
-	snprintf(file, STR_SIZE - 1, "%s/" SBIN_INIT , root);
-	if (lstat(file, &st) != 0)
-		return 0; /* Some error -- giving up */
-	if (!S_ISLNK(st.st_mode))
-		return 0; /* Not a symlink, so not upstart */
-	if (readlink(file, dest, STR_SIZE - 1) < 0)
-		return 0; /* Some error -- giving up */
-	if (strstr(dest, UPSTART) == NULL)
-		return 0; /* Not upstart */
-
-	/* For upstart 1.2 to work in CT,
-	 * /dev/console should point to /dev/null
-	 */
-	snprintf(file, STR_SIZE - 1, "%s/" DEV_CONSOLE, root);
-	if (unlink(file) != 0)
-		if (errno != ENOENT) {
-			logger(-1, errno, "Failed to remove %s", file);
-			return -1;
-		}
-
-	if (symlink(DEV_NULL, file) != 0) {
-		logger(-1, errno, "Failed to symlink %s -> " DEV_NULL, file);
-		return -1;
-	}
-
-	return 0;
-}
-
 int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *mod,
 	env_create_FN fn, void *data)
@@ -820,11 +734,6 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		if (!ploop)
 			quota_inc(&res->dq, -100);
 	}
-	/* Fedora 14/15 hacks */
-	if (fix_ve_devconsole(res->fs.root) != 0)
-		return VZ_FS_BAD_TMPL;
-	if (fix_ve_systemd(res->fs.root) != 0)
-		return VZ_FS_BAD_TMPL;
 
 	if (pipe(wait_p) < 0) {
 		logger(-1, errno, "Can not create pipe");
