@@ -89,6 +89,28 @@ static inline int get_run_ve(int update)
 #define get_run_ve get_run_ve_proc
 #endif
 
+#define FOR_ALL_UBC(func)	\
+	func(kmemsize)		\
+	func(lockedpages)	\
+	func(privvmpages)	\
+	func(shmpages)		\
+	func(numproc)		\
+	func(physpages)		\
+	func(vmguarpages)	\
+	func(oomguarpages)	\
+	func(numtcpsock)	\
+	func(numflock)		\
+	func(numpty)		\
+	func(numsiginfo)	\
+	func(tcpsndbuf)		\
+	func(tcprcvbuf)		\
+	func(othersockbuf)	\
+	func(dgramrcvbuf)	\
+	func(numothersock)	\
+	func(dcachesize)	\
+	func(numfile)		\
+	func(numiptent)		\
+	func(swappages)
 
 /* Print functions */
 #define PRINT_STR_FIELD_FNAME(funcname, fieldname, length)	\
@@ -275,27 +297,7 @@ static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 					p->ubc->name[index]);		\
 }									\
 
-PRINT_UBC(kmemsize)
-PRINT_UBC(lockedpages)
-PRINT_UBC(privvmpages)
-PRINT_UBC(shmpages)
-PRINT_UBC(numproc)
-PRINT_UBC(physpages)
-PRINT_UBC(vmguarpages)
-PRINT_UBC(oomguarpages)
-PRINT_UBC(numtcpsock)
-PRINT_UBC(numflock)
-PRINT_UBC(numpty)
-PRINT_UBC(numsiginfo)
-PRINT_UBC(tcpsndbuf)
-PRINT_UBC(tcprcvbuf)
-PRINT_UBC(othersockbuf)
-PRINT_UBC(dgramrcvbuf)
-PRINT_UBC(numothersock)
-PRINT_UBC(dcachesize)
-PRINT_UBC(numfile)
-PRINT_UBC(numiptent)
-PRINT_UBC(swappages)
+FOR_ALL_UBC(PRINT_UBC)
 
 #define PRINT_DQ(name)							\
 static void print_ ## name(struct Cveinfo *p, int index)		\
@@ -451,27 +453,7 @@ SORT_UL_RES(res ## _l_sort_fn, ubc, res, 2)				\
 SORT_UL_RES(res ## _b_sort_fn, ubc, res, 3)				\
 SORT_UL_RES(res ## _f_sort_fn, ubc, res, 4)
 
-SORT_UBC(kmemsize)
-SORT_UBC(lockedpages)
-SORT_UBC(privvmpages)
-SORT_UBC(shmpages)
-SORT_UBC(numproc)
-SORT_UBC(physpages)
-SORT_UBC(vmguarpages)
-SORT_UBC(oomguarpages)
-SORT_UBC(numtcpsock)
-SORT_UBC(numflock)
-SORT_UBC(numpty)
-SORT_UBC(numsiginfo)
-SORT_UBC(tcpsndbuf)
-SORT_UBC(tcprcvbuf)
-SORT_UBC(othersockbuf)
-SORT_UBC(dgramrcvbuf)
-SORT_UBC(numothersock)
-SORT_UBC(dcachesize)
-SORT_UBC(numfile)
-SORT_UBC(numiptent)
-SORT_UBC(swappages)
+FOR_ALL_UBC(SORT_UBC)
 
 #define SORT_DQ(res)							\
 SORT_UL_RES(res ## _u_sort_fn, quota, res, 0)				\
@@ -812,33 +794,13 @@ static void merge_conf(struct Cveinfo *ve, vps_res *res)
 		ve->ubc = x_malloc(sizeof(struct Cubc));
 		memset(ve->ubc, 0, sizeof(struct Cubc));
 #define MERGE_UBC(name)						\
-do {								\
 	if (res != NULL && res->ub.name != NULL) {		\
 		ve->ubc->name[2] = res->ub.name[0];		\
 		ve->ubc->name[3] = res->ub.name[1];		\
-	}							\
-} while(0)
-		MERGE_UBC(kmemsize);
-		MERGE_UBC(lockedpages);
-		MERGE_UBC(privvmpages);
-		MERGE_UBC(shmpages);
-		MERGE_UBC(numproc);
-		MERGE_UBC(physpages);
-		MERGE_UBC(vmguarpages);
-		MERGE_UBC(oomguarpages);
-		MERGE_UBC(numtcpsock);
-		MERGE_UBC(numflock);
-		MERGE_UBC(numpty);
-		MERGE_UBC(numsiginfo);
-		MERGE_UBC(tcpsndbuf);
-		MERGE_UBC(tcprcvbuf);
-		MERGE_UBC(othersockbuf);
-		MERGE_UBC(dgramrcvbuf);
-		MERGE_UBC(numothersock);
-		MERGE_UBC(dcachesize);
-		MERGE_UBC(numfile);
-		MERGE_UBC(numiptent);
-		MERGE_UBC(swappages);
+	}
+
+FOR_ALL_UBC(MERGE_UBC)
+
 #undef MERGE_UBC
 	}
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
@@ -940,15 +902,13 @@ static int check_veid_restr(int veid)
 }
 
 #define UPDATE_UBC(param)			\
-do {						\
 	if (!strcmp(name, #param)) {		\
 		ubc.param[0] = held;		\
 		ubc.param[1] = maxheld;		\
 		ubc.param[2] = barrier;		\
 		ubc.param[3] = limit;		\
 		ubc.param[4] = failcnt;		\
-	}					\
-} while(0)
+	}
 
 static int get_ub()
 {
@@ -989,27 +949,8 @@ static int get_ub()
 		{
 			continue;
 		}
-		UPDATE_UBC(kmemsize);
-		UPDATE_UBC(lockedpages);
-		UPDATE_UBC(privvmpages);
-		UPDATE_UBC(shmpages);
-		UPDATE_UBC(numproc);
-		UPDATE_UBC(physpages);
-		UPDATE_UBC(vmguarpages);
-		UPDATE_UBC(oomguarpages);
-		UPDATE_UBC(numtcpsock);
-		UPDATE_UBC(numflock);
-		UPDATE_UBC(numpty);
-		UPDATE_UBC(numsiginfo);
-		UPDATE_UBC(tcpsndbuf);
-		UPDATE_UBC(tcprcvbuf);
-		UPDATE_UBC(othersockbuf);
-		UPDATE_UBC(dgramrcvbuf);
-		UPDATE_UBC(numothersock);
-		UPDATE_UBC(dcachesize);
-		UPDATE_UBC(numfile);
-		UPDATE_UBC(numiptent);
-		UPDATE_UBC(swappages);
+
+		FOR_ALL_UBC(UPDATE_UBC)
 	}
 	if (veid && check_veid_restr(veid)) {
 		update_ubc(veid, &ubc);
