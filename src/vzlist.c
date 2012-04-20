@@ -748,6 +748,8 @@ static void update_ubc(int veid, const struct Cubc *ubc)
 	struct Cveinfo *tmp;
 
 	if ((tmp = find_ve(veid)) != NULL) {
+		if (tmp->status != VE_RUNNING)
+			return;
 		if (tmp->ubc == NULL)
 			tmp->ubc = x_malloc(sizeof(*ubc));
 		memcpy(tmp->ubc, ubc, sizeof(*ubc));
