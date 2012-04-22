@@ -93,8 +93,7 @@ void free_str_param(list_head_t *head)
 		return;
 	while(!list_empty(head)) {
 		list_for_each (cur, head, list) {
-			if (cur->val != NULL)
-				free(cur->val);
+			free(cur->val);
 			list_del(&cur->list);
 			free(cur);
 			break;

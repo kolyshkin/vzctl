@@ -65,8 +65,7 @@ void free_modules(struct mod_action *action)
 	if (action->mod_list == NULL)
 		return;
 	for (i = 0, mod = action->mod_list; i < action->mod_count; i++, mod++) {
-		if (mod->fname != NULL)
-			free(mod->fname);
+		free(mod->fname);
 		if (mod->mod_info != NULL && mod->mod_info->free_data != NULL)
 			mod->mod_info->free_data(mod->data);
 	}

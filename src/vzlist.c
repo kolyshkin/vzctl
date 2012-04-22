@@ -736,7 +736,7 @@ static void update_ve(int veid, char *ip, int status)
 	} else {
 		if (tmp->ip == NULL)
 			tmp->ip = ip;
-		else if (ip != NULL)
+		else
 			free(ip);
 		tmp->status = status;
 	}
@@ -1519,30 +1519,18 @@ static void free_veinfo()
 	int i;
 
 	for (i = 0; i < n_veinfo; i++) {
-		if (veinfo[i].ip != NULL)
-			free(veinfo[i].ip);
-		if (veinfo[i].hostname != NULL)
-			free(veinfo[i].hostname);
-		if (veinfo[i].name != NULL)
-			free(veinfo[i].name);
-		if (veinfo[i].description != NULL)
-			free(veinfo[i].description);
-		if (veinfo[i].ostemplate != NULL)
-			free(veinfo[i].ostemplate);
-		if (veinfo[i].ubc != NULL)
-			free(veinfo[i].ubc);
-		if (veinfo[i].quota != NULL)
-			free(veinfo[i].quota);
-		if (veinfo[i].cpustat != NULL)
-			free(veinfo[i].cpustat);
-		if (veinfo[i].cpu != NULL)
-			free(veinfo[i].cpu);
-		if (veinfo[i].root != NULL)
-			free(veinfo[i].root);
-		if (veinfo[i].private != NULL)
-			free(veinfo[i].private);
-		if (veinfo[i].bootorder != NULL)
-			free(veinfo[i].bootorder);
+		free(veinfo[i].ip);
+		free(veinfo[i].hostname);
+		free(veinfo[i].name);
+		free(veinfo[i].description);
+		free(veinfo[i].ostemplate);
+		free(veinfo[i].ubc);
+		free(veinfo[i].quota);
+		free(veinfo[i].cpustat);
+		free(veinfo[i].cpu);
+		free(veinfo[i].root);
+		free(veinfo[i].private);
+		free(veinfo[i].bootorder);
 	}
 }
 

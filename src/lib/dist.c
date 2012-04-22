@@ -108,20 +108,13 @@ void free_dist_actions(dist_actions *d_actions)
 {
 	if (d_actions == NULL)
 		return;
-	if (d_actions->add_ip != NULL)
-		free(d_actions->add_ip);
-	if (d_actions->del_ip != NULL)
-		free(d_actions->del_ip);
-	if (d_actions->set_hostname != NULL)
-		free(d_actions->set_hostname);
-	if (d_actions->set_dns != NULL)
-		free(d_actions->set_dns);
-	if (d_actions->set_userpass != NULL)
-		free(d_actions->set_userpass);
-	if (d_actions->set_ugid_quota != NULL)
-		free(d_actions->set_ugid_quota);
-	if (d_actions->post_create != NULL)
-		free(d_actions->post_create);
+	free(d_actions->add_ip);
+	free(d_actions->del_ip);
+	free(d_actions->set_hostname);
+	free(d_actions->set_dns);
+	free(d_actions->set_userpass);
+	free(d_actions->set_ugid_quota);
+	free(d_actions->post_create);
 }
 
 static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)

@@ -101,8 +101,7 @@ int read_script(const char *fname, char *include, char **buf)
 err:
 	if (fd > 0)
 		close(fd);
-	if (*buf != NULL)
-		free(*buf);
+	free(*buf);
 	return -1;
 }
 

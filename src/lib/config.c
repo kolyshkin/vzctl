@@ -1085,8 +1085,7 @@ static int parse_dev(vps_param *vps_p, char *val)
 		if (parse_devices_str(token, &dev))
 			return ERR_INVAL;
 		if (add_dev_param(&vps_p->res.dev, &dev)) {
-			if (dev.name)
-				free(dev.name);
+			free(dev.name);
 			return ERR_NOMEM;
 		}
 	}
@@ -1204,8 +1203,7 @@ static int parse_devnodes(vps_param *vps_p, char *val)
 		if (parse_devnodes_str(token, &dev))
 			return ERR_INVAL;
 		if (add_dev_param(&vps_p->res.dev, &dev)) {
-			if (dev.name)
-				free(dev.name);
+			free(dev.name);
 			return ERR_NOMEM;
 		}
 	}
@@ -2720,8 +2718,7 @@ void free_vps_param(vps_param *param)
 
 #define MERGE_STR(x)						\
 	if ((src->x) != NULL) {					\
-		if ((dst->x) != NULL)				\
-			free(dst->x);				\
+		free(dst->x);					\
 		dst->x = strdup(src->x);			\
 	}
 
