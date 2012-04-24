@@ -126,7 +126,6 @@ static inline void list_moveall(list_head_t *src, list_head_t *dst)
 
 char *list2str_c(char *name, char c, list_head_t *head);
 char *list2str(char *name, list_head_t *head);
-char **list2arg(list_head_t *head);
 int add_str_param(list_head_t *head, const char *str);
 int add_str_param2(list_head_t *head, char *str);
 int add_str2list(list_head_t *head, const char *val);
@@ -138,5 +137,4 @@ int __merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	char* (*find_fn)(list_head_t*, const char*));
 int merge_str_list(int delall, list_head_t *old, list_head_t *add,
 	list_head_t *del, list_head_t *merged);
-int list_size(list_head_t *head);
 #endif /* _LIST_H_ */

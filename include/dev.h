@@ -61,6 +61,5 @@ void free_dev_param(dev_param *dev);
 
 int vps_set_pci(vps_handler *h, envid_t veid, int op, const char *root,
 		pci_param *pci);
-void free_pci_param(pci_param *dev);
 
 #endif
