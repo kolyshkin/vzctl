@@ -141,9 +141,9 @@ int get_cap_mask(char *name, unsigned long *mask)
 /** merge capabilities and return in string format.
  *
  * @param new		new capability mask.
- * @param old		old capamility mask.
+ * @param old		old capability mask.
  * @param buf		merged capabilities in string format.
- * @return		filled buffer.
+ * @param len		max size of buf string.
  */
 void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
 {
