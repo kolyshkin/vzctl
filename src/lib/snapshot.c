@@ -16,7 +16,7 @@ static void remove_data_from_array(void **array, int nelem, int id)
 		array[i] = array[i + 1];
 }
 
-void free_snapshot_data(struct vzctl_snapshot_data *data)
+static void free_snapshot_data(struct vzctl_snapshot_data *data)
 {
 	free(data->guid);
 	free(data->parent_guid);
