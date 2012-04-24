@@ -155,7 +155,7 @@ int get_ub_resid(char *name)
 	return -1;
 }
 
-const char *get_ub_name(unsigned int res_id)
+static const char *get_ub_name(unsigned int res_id)
 {
 	int i;
 
