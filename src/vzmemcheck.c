@@ -52,6 +52,44 @@ static void header(int verbose, int param)
 	return;
 }
 
+static void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage)
+{
+	if (rusagetotal == NULL || rusage == NULL)
+		return;
+	rusagetotal->low_mem += rusage->low_mem;
+	rusagetotal->total_ram += rusage->total_ram;
+	rusagetotal->mem_swap += rusage->mem_swap;
+	rusagetotal->alloc_mem += rusage->alloc_mem;
+	rusagetotal->alloc_mem_lim += rusage->alloc_mem_lim;
+	if (rusage->alloc_mem_max_lim > rusagetotal->alloc_mem_max_lim)
+		rusagetotal->alloc_mem_max_lim = rusage->alloc_mem_max_lim;
+}
+
+static void shift_ubs_param(struct ub_struct *param)
+{
+#define SHIFTPARAM(name)						\
+if (param->name != NULL) {						\
+	param->name[0] = param->name[1];				\
+	param->name[1] = param->name[2];				\
+}
+	SHIFTPARAM(numproc);
+	SHIFTPARAM(numtcpsock);
+	SHIFTPARAM(numothersock);
+	SHIFTPARAM(oomguarpages)
+	SHIFTPARAM(vmguarpages);
+	SHIFTPARAM(kmemsize);
+	SHIFTPARAM(tcpsndbuf);
+	SHIFTPARAM(tcprcvbuf);
+	SHIFTPARAM(othersockbuf);
+	SHIFTPARAM(dgramrcvbuf);
+	SHIFTPARAM(privvmpages);
+	SHIFTPARAM(numfile);
+	SHIFTPARAM(dcachesize);
+	SHIFTPARAM(physpages)
+	SHIFTPARAM(numpty)
+#undef SHIFTPARAM
+}
+
 static int calculate(int numerator, int verbose)
 {
 	struct CRusage rutotal_comm, rutotal_utl;

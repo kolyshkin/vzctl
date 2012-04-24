@@ -62,6 +62,4 @@ int calc_ve_utilization(struct ub_struct *param, struct CRusage *rusage,
 	struct mem_struct *mem, int numerator);
 int calc_ve_commitment(struct ub_struct *param, struct CRusage *rusage,
 	struct mem_struct *mem, int numerator);
-void shift_ubs_param(struct ub_struct *param);
-void inc_rusage(struct CRusage *rusagetotal, struct CRusage *rusage);
 #endif
