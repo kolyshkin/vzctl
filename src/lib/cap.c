@@ -161,6 +161,8 @@ void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
 			op = 1;
 		else if (CAP_TO_MASK(i) & new->off)
 			op = 2;
+		else if (old == NULL)
+			continue;
 		else if (CAP_TO_MASK(i) & old->on)
 			op = 1;
 		else if (CAP_TO_MASK(i) & old->off)
