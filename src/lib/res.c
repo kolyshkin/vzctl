@@ -53,7 +53,7 @@ int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
 	return 0;
 }
 
-int fill_2quota_param(struct setup_env_quota_param *p,
+static int fill_2quota_param(struct setup_env_quota_param *p,
 		const char *ve_private, const char *ve_root)
 {
 	struct stat st;
