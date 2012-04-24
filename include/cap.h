@@ -60,6 +60,7 @@ int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap);
  * @param buf		merged capabilities in string format.
  * @return
  */
-void build_cap_str(cap_param *new, cap_param *old, char *buf, int len);
+void build_cap_str(cap_param *new, cap_param *old, const char *delim,
+		char *buf, int len);
 
 #endif

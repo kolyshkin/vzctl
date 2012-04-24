@@ -145,7 +145,8 @@ int get_cap_mask(char *name, unsigned long *mask)
  * @param buf		merged capabilities in string format.
  * @param len		max size of buf string.
  */
-void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
+void build_cap_str(cap_param *new, cap_param *old, const char *delim,
+		char *buf, int len)
 {
 	unsigned int i;
 	int r;
@@ -169,13 +170,15 @@ void build_cap_str(cap_param *new, cap_param *old, char *buf, int len)
 			op = 2;
 		else
 			continue;
-		r = snprintf(sp, ep - sp,  "%s:%s ", cap_names[i],
-			op == 1 ? "on" : "off");
+		r = snprintf(sp, ep - sp, "%s%s:%s",
+				i == 0 ? "" : delim,
+				cap_names[i],
+				op == 1 ? "on" : "off");
 		if (r < 0 || sp + r >= ep)
 			break;
 		sp += r;
 	}
-	sprintf(sp--, "\"");
+	sprintf(sp, "\"");
 }
 
 static int set_cap(envid_t veid, cap_t mask, int pid)

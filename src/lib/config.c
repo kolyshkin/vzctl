@@ -788,7 +788,7 @@ static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	p = buf;
 	p += sprintf(buf, "%s=", conf->name);
 	len = buf + sizeof(buf) - p - 1;
-	build_cap_str(cap, &old_p->res.cap, p, len);
+	build_cap_str(cap, &old_p->res.cap, " ", p, len);
 	add_str_param(conf_h, buf);
 
 	return 0;
