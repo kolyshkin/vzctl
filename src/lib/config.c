@@ -786,9 +786,10 @@ static int store_cap(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	if (!cap->on && !cap->off)
 		return 0;
 	p = buf;
-	p += sprintf(buf, "%s=", conf->name);
+	p += sprintf(buf, "%s=\"", conf->name);
 	len = buf + sizeof(buf) - p - 1;
 	build_cap_str(cap, &old_p->res.cap, " ", p, len);
+	strcat(p, "\"");
 	add_str_param(conf_h, buf);
 
 	return 0;

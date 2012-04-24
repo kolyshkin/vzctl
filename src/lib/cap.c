@@ -154,7 +154,6 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 
 	sp = buf;
 	ep = buf + len;
-	sp += sprintf(sp, "\"");
 	for (i = 0; i < ARRAY_SIZE(cap_names); i++) {
 		int op = 0;
 
@@ -178,7 +177,6 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 			break;
 		sp += r;
 	}
-	sprintf(sp, "\"");
 }
 
 static int set_cap(envid_t veid, cap_t mask, int pid)
