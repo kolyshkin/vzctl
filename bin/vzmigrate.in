@@ -374,7 +374,7 @@ VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
 # Disable vzquota operations for ploop CT
-if vzlist -H -olayout $VEID | grep ploop; then
+if vzlist -H -olayout $VEID | grep -wq ploop; then
 	DISK_QUOTA=no
 fi
 
