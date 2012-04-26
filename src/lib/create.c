@@ -110,6 +110,8 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 		logger(-1, 0, "Error: diskspace not set (required for ploop)");
 		return VZ_DISKSPACE_NOT_SET;
 	}
+	if (ploop && check_ploop_size(dq->diskspace[1]) < 0)
+		return VZ_DISKSPACE_NOT_SET;
 find:
 	for (i = 0; ext[i] != NULL; i++) {
 		snprintf(tarball, sizeof(tarball), "%s/cache/%s.tar%s",
