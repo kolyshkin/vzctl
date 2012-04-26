@@ -31,6 +31,7 @@
 #include "vzerror.h"
 #include "logger.h"
 #include "vzsyscalls.h"
+#include "util.h"
 
 static inline int setublimit(uid_t uid, unsigned long resource,
 	const unsigned long *rlim)
@@ -86,6 +87,11 @@ if (ub->name == NULL) {							\
 	{
 		CHECK_UB(physpages);
 		CHECK_UB(swappages);
+		if (!is_vswap_mode()) {
+			logger(-1, 0, "Error: detected vswap CT config but "
+					"kernel does not support vswap");
+			ret = VZ_BAD_KERNEL;
+		}
 		return ret;
 	}
 	/* else

@@ -661,6 +661,13 @@ static int parse_vswap(ub_param *ub, const char *val, int id)
 	const char *tail;
 	unsigned long long tmp;
 
+	/* If current kernel is not vswap-capable, cry out loud */
+	if (!is_vswap_mode()) {
+		logger(-1, 0, "Error: kernel does not support vswap, "
+				"unable to use --ram/--swap parameters");
+		return ERR_OTHER;
+	}
+
 	/* Translate from VSwap ('easy') to UBC parameter */
 	switch(id) {
 		case PARAM_RAM:
