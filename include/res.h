@@ -167,7 +167,6 @@ typedef struct vps_param vps_param;
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
 	struct mod_action *action);
-int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res);
 int need_configure(vps_res *res);
 
 #endif

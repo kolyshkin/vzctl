@@ -39,20 +39,6 @@
 #include "image.h"
 #include "script.h"
 
-/** Function called on CT start to setup resource management
- *
- */
-int setup_resource_management(vps_handler *h, envid_t veid, vps_res *res)
-{
-	int ret;
-
-	if ((ret = check_ub(&res->ub)))
-		return ret;
-	if ((ret = set_ublimit(h, veid, &res->ub)))
-		return ret;
-	return 0;
-}
-
 static int fill_2quota_param(struct setup_env_quota_param *p,
 		const char *ve_private, const char *ve_root)
 {

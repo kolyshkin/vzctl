@@ -448,7 +448,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		return ret;
 	if ((ret = vz_setluid(veid)))
 		return ret;
-	if ((ret = setup_resource_management(h, veid, res)))
+	if ((ret = set_ublimit(h, veid, &res->ub)))
 		return ret;
 	/* Create another process for proper resource accounting */
 	if ((pid = fork()) < 0) {
