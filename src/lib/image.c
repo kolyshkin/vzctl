@@ -80,10 +80,12 @@ int is_image_mounted(const char *ve_private)
 		ploop_free_diskdescriptor(di);
 		return -1;
 	}
-	ret = ploop_get_dev(di,dev, sizeof(dev));
+	ret = ploop_get_dev(di, dev, sizeof(dev));
+	ploop_free_diskdescriptor(di);
 
 	return (ret == 0);
 }
+
 int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 {
 	int ret;
