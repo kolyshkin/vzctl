@@ -373,6 +373,11 @@ log 2 "Loading $vzconf and $vpsconf files"
 VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
+# Disable vzquota operations for ploop CT
+if vzlist -H -olayout $VEID | grep ploop; then
+	DISK_QUOTA=no
+fi
+
 log 2 "Check IPs on destination node: $IP_ADDRESS"
 for IP in $IP_ADDRESS; do
 	if [ $($SSH "root@$host" "grep -c \" $IP \" /proc/vz/veip") -gt 0 ];
