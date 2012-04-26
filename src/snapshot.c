@@ -43,7 +43,7 @@ static void vzctl_get_snapshot_dumpfile(const char *private, const char *guid,
 static int is_snapshot_supported(const char *ve_private)
 {
 	if (! ve_private_is_ploop(ve_private)) {
-		logger(-1, 0,"Snapshot feature is only available "
+		logger(-1, 0, "Snapshot feature is only available "
 				"for ploop-based CTs");
 		return 0;
 	}

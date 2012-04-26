@@ -498,7 +498,7 @@ static void read_osrelease_conf(const char *dist, char *osrelease)
 	return;
 }
 
-#define KVER(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+#define KVER(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 static int compare_osrelease(const char *cur, const char *min)
 {
 	int cur_a, cur_b, cur_c;

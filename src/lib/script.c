@@ -164,7 +164,7 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		execve(f, argv, envp);
 		logger(-1, errno, "Error exec %s", f);
 		exit(1);
-	} else if(child == -1) {
+	} else if (child == -1) {
 		logger(-1, errno, "Unable to fork");
 		ret = VZ_RESOURCE_ERROR;
 		goto err;

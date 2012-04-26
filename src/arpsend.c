@@ -455,7 +455,7 @@ static void sender(void)
 	for (i = 0; i < trg_ipaddr_count; i ++) {
 		set_trg_ipaddr(&pkt, trg_ipaddr[i]);
 		logger(LOG_DEBUG, "send packet: %s", print_arp_packet(&pkt));
-		if(sendto(sock, &pkt,sizeof(pkt), 0,
+		if (sendto(sock, &pkt, sizeof(pkt), 0,
 			  (struct sockaddr*) &iaddr, sizeof(iaddr)) < 0) {
 			logger(LOG_ERROR, "sendto : %m");
 			exit(EXC_SYS);
@@ -480,7 +480,7 @@ static void set_signal(int signo, void (*handler)(void))
 	sigaction(signo, &sa, NULL);
 }
 
-int main(int argc,char** argv)
+int main(int argc, char** argv)
 {
 	sigset_t block_alarm;
 	program_name = argv[0];
@@ -593,10 +593,10 @@ static int read_hw_addr(u_char* buf, const char* str)
 		char c, val;
 
 		c = tolower(*str++);
-		if(!c)
+		if (!c)
 			goto out;
 
-		if(isdigit(c))
+		if (isdigit(c))
 			val = c - '0';
 		else if (c >= 'a' && c <= 'f')
 			val = c - 'a' + 10;
@@ -606,7 +606,7 @@ static int read_hw_addr(u_char* buf, const char* str)
 		if (i % 2)
 		{
 			*buf++ |= val;
-			if(*str == ':')
+			if (*str == ':')
 				str++;
 		}
 		else
@@ -621,7 +621,7 @@ out:
 static int read_ip_addr(struct in_addr* in_addr, const char* str)
 {
 	in_addr->s_addr=inet_addr(str);
-	if(in_addr->s_addr == INADDR_NONE)
+	if (in_addr->s_addr == INADDR_NONE)
 		return -1;
 	return 0;
 }

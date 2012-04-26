@@ -607,7 +607,7 @@ static int parse_meminfo(meminfo_param *param, const char *val)
 	if ((mode != VE_MEMINFO_NONE && ret !=2) ||
 	    (mode == VE_MEMINFO_NONE && ret == 2))
 		return ERR_INVAL;
-	if((mode != VE_MEMINFO_NONE) && meminfo_val == 0)
+	if ((mode != VE_MEMINFO_NONE) && meminfo_val == 0)
 		return ERR_INVAL;
 	param->mode = mode;
 	param->val = meminfo_val;
@@ -1121,11 +1121,11 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		major = major(res->dev);
 		minor = minor(res->dev);
 		if (res->use_major) {
-			r = snprintf(sp, ep - sp,"%c:%d:all:%s ",
+			r = snprintf(sp, ep - sp, "%c:%d:all:%s ",
 				S_ISBLK(res->type) ? 'b' : 'c', major,
 				devperm2str(res->mask));
 		} else {
-			r = snprintf(sp, ep - sp,"%c:%d:%d:%s ",
+			r = snprintf(sp, ep - sp, "%c:%d:%d:%s ",
 				S_ISBLK(res->type) ? 'b' : 'c', major, minor,
 				devperm2str(res->mask));
 		}
@@ -1235,7 +1235,7 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
-		r = snprintf(sp, ep - sp,"%s:%s ", res->name,
+		r = snprintf(sp, ep - sp, "%s:%s ", res->name,
 			devperm2str(res->mask));
 		sp += r;
 		if ((r < 0) || (sp >= ep))
@@ -1453,7 +1453,7 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 	switch (opt) {
 	case PARAM_NETIF_IFNAME:
 		if (dev->dev_name_ve[0] != 0) {
-			logger(-1, 0,"Multiple use of"
+			logger(-1, 0, "Multiple use of"
 				" --ifname option not allowed");
 			return ERR_INVAL;
 		}
@@ -1482,7 +1482,7 @@ static int add_netif_param(veth_param *veth, int opt, char *str)
 		break;
 	case PARAM_NETIF_BRIDGE:
 		if (dev->dev_bridge[0] != 0) {
-			logger(-1, 0,"Multiple use of"
+			logger(-1, 0, "Multiple use of"
 				" --bridge option not allowed");
 			return ERR_INVAL;
 		}

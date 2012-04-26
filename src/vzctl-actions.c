@@ -851,7 +851,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
 			cmd_p->res.fs.private_orig = NULL;
-			logger(-1, 0,"Unable to change VE_PRIVATE "
+			logger(-1, 0, "Unable to change VE_PRIVATE "
 					"on a running container");
 			return VZ_VE_RUNNING;
 		}

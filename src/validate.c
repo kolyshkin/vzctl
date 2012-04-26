@@ -80,7 +80,7 @@ static int check_param(struct ub_struct *param, int log)
 }
 
 #define SET_MES(val)	logger(0, 0, "set to %lu", val);
-#define SET2_MES(val1, val2) logger(0, 0,"set to %lu:%lu", val1, val2);
+#define SET2_MES(val1, val2) logger(0, 0, "set to %lu:%lu", val1, val2);
 
 /** Validate vswap config
  * Current ideas are:
@@ -546,7 +546,7 @@ if (ub->name != NULL) {							\
 		if (!recover) ret = 1;
 //		if (!ask) fprintf(stderr, "\n");
 	} else if (ub->othersockbuf[0] < val1) {
-		logger(-1, 0,"Recommendation: othersockbuf.bar should be >"
+		logger(-1, 0, "Recommendation: othersockbuf.bar should be >"
 				" %lu (currently, %lu)", val1,
 				ub->othersockbuf[0]);
 		if (ask || recover) {
