@@ -124,7 +124,7 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 	r = snprintf(p_outbuffer, e_buf - p_outbuffer,		\
 		"%" #length "s", str);				\
 	if (!is_last_field)					\
-		r = length;					\
+		r = abs(length);				\
 	p_outbuffer += r;					\
 }
 
