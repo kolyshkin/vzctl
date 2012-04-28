@@ -1,4 +1,4 @@
-.TH vzmigrate 8 "28 Jun 2011" "OpenVZ" "Containers"
+.TH vzmigrate 8 "29 Apr 2012" "OpenVZ" "Containers"
 
 .SH NAME
 vzmigrate \- migrate a container between two OpenVZ servers
@@ -107,9 +107,12 @@ on the destination node.
 .TP
 .B 13 EXIT_QUOTA
 Operation with CT quota failed.
+.TP
+.B 14 EXIT_OVZ_NOT_RUNNING
+OpenVZ is not running, or some required kernel modules are not loaded.
 
 .SH SEE ALSO
 .BR rsync (1).
 
 .SH COPYRIGHT
-Copyright (C) 2001-2010, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2001-2012, Parallels, Inc. Licensed under GNU GPL.
