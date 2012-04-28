@@ -35,6 +35,7 @@ confdir="@PKGCONFDIR@/conf"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
 act_scripts=
+PLOOP=no
 
 # Errors:
 MIG_ERR_USAGE=1
@@ -52,6 +53,7 @@ MIG_ERR_MOUNT_VPS=$MIG_ERR_START_VPS
 MIG_ERR_RESTORE_VPS=$MIG_ERR_START_VPS
 MIG_ERR_OVZ_NOT_RUNNING=14
 MIG_ERR_APPLY_CONFIG=15
+MIG_ERR_UNSUP_PLOOP=16
 
 # For local vzctl to work, make sure @SBINDIR@ is in $PATH
 if ! echo ":${PATH}:" | fgrep -q ':@SBINDIR@:'; then
@@ -373,9 +375,18 @@ log 2 "Loading $vzconf and $vpsconf files"
 VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
-# Disable vzquota operations for ploop CT
 if vzlist -H -olayout $VEID | grep -wq ploop; then
+	PLOOP=yes
+	# Disable vzquota operations for ploop CT
 	DISK_QUOTA=no
+fi
+
+if [ "$PLOOP" = "yes" ]; then
+	log 2 "Check if ploop is supported on destination node"
+	if ! logexec 2 $SSH "root@$HOST" ploop getdev ; then
+		log 0 "Destination node don't support ploop, can't migrate"
+		exit $MIG_ERR_UNSUP_PLOOP
+	fi
 fi
 
 log 2 "Check IPs on destination node: $IP_ADDRESS"
