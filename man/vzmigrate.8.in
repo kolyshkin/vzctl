@@ -110,6 +110,9 @@ Operation with CT quota failed.
 .TP
 .B 14 EXIT_OVZ_NOT_RUNNING
 OpenVZ is not running, or some required kernel modules are not loaded.
+.TP
+.B 15 EXIT_APPLY_CONFIG
+Unable to set CT name on destination node.
 
 .SH SEE ALSO
 .BR rsync (1).
