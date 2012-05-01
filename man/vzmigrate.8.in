@@ -58,7 +58,6 @@ nothing has happened.
 .B -v
 Verbose mode. Causes \fBvzmigrate\fP to print debugging messages about
 its progress.  Multiple \fB-v\fR options increase the verbosity.
-The maximum is 3.
 
 .SH EXAMPLES
 Migration of CT 101 to \fB192.168.1.130\fR with downtime:
