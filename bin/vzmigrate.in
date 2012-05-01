@@ -383,7 +383,7 @@ fi
 
 if [ "$PLOOP" = "yes" ]; then
 	log 2 "Check if ploop is supported on destination node"
-	if ! logexec 2 $SSH "root@$HOST" ploop getdev ; then
+	if ! logexec 2 $SSH "root@$host" ploop getdev ; then
 		log 0 "Destination node don't support ploop, can't migrate"
 		exit $MIG_ERR_UNSUP_PLOOP
 	fi
