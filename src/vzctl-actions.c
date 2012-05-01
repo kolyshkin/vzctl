@@ -1067,6 +1067,7 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 
 	cmd = cmd_p->res.cpt.cmd;
 	merge_vps_param(g_p, cmd_p);
+	cmd_p->res.cpt.dumpdir = g_p->res.cpt.dumpdir;
 	if (cmd == CMD_KILL || cmd == CMD_RESUME)
 		return cpt_cmd(h, veid, g_p->res.fs.root,
 				CMD_RESTORE, cmd, cmd_p->res.cpt.ctx);
