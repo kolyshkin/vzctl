@@ -381,7 +381,8 @@ log 2 "Loading $vzconf and $vpsconf files"
 VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
-if vzlist -H -olayout $VEID | grep -wq ploop; then
+DDXML=$VE_PRIVATE/root.hdd/DiskDescriptor.xml
+if [ -f $DDXML ]; then
 	PLOOP=yes
 	# Disable vzquota operations for ploop CT
 	DISK_QUOTA=no
