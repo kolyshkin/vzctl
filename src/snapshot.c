@@ -323,7 +323,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 					fname);
 	}
 
-	// move sbapshot.xml on place
+	// move snapshot.xml to its place
 	GET_SNAPSHOT_XML(fname, fs->private);
 	if (rename(tmp, fname))
 		logger(-1, 0, "Failed to rename %s %s", tmp, fname);
