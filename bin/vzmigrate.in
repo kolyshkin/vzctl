@@ -465,8 +465,6 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 		undo_quota_init
 		exit $MIG_ERR_QUOTA
 	fi
-else
-	log 2 "VZ disk quota disabled -- skipping quota migration"
 fi
 
 log 1 "Syncing private"
@@ -556,8 +554,6 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 		undo_copy_quota
 		exit $MIG_ERR_QUOTA
 	fi
-else
-	log 2 "VZ disk quota disabled -- skipping quota migration"
 fi
 
 if [ $online -eq 1 ]; then
