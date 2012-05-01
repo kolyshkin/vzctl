@@ -303,8 +303,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 	}
 	logger(0, 0, "Deleting snapshot %s", guid);
 	vzctl_del_snapshot_tree_entry(tree, guid);
-	GET_SNAPSHOT_XML(tmp, fs->private);
-	strcat(tmp, ".tmp");
+	GET_SNAPSHOT_XML_TMP(tmp, fs->private);
 	ret = vzctl_store_snapshot_tree(tmp, tree);
 	if (ret) {
 		logger(-1, 0, "Failed to store %s", tmp);
