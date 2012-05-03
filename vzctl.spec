@@ -21,7 +21,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 3.1
+Version: 3.2
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPL
@@ -232,6 +232,66 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-pci
 
 %changelog
+* Thu May 3 2012 Kir Kolyshkin <kir@openvz.org> - 3.2-1
+- New features
+  - vzctl console now accepts tty number argument
+  - vzctl console: add ESC ! to issue SAK
+  - vzlist: show diskspace/diskinodes usage/limit for ploop CTs
+  - vzlist: add more new fields
+    - layout (simfs/ploop)
+    - private/root (to show VE_PRIVATE and VE_ROOT)
+    - features
+    - smart_ctid (CT name if available, otherwise numeric CTID)
+- Fixes
+  - vzctl start: ability to start containers with systemd
+  - vzctl set --ram, --swap: default value is now in bytes
+  - vzctl set --save: do not save parameters if failed to apply (#2032)
+  - vzctl restore: fix non-working in-CT quota after restore for ploop case
+  - vzctl restore: do not ignore DUMPDIR value
+  - Fix giving excessive permissions for ugid quota disk device
+  - vzctl console: do not issue SAK on detach (it can kill scripts)
+  - vzctl start: umount ploop image on CT start
+  - vzctl set/start/convert</code: check for max possible ploop size (#2250)
+  - vzlist: do not show UBC from proc for stopped CTs (#2151)
+  - init.d/initd-functions: fixes for dash
+  - vzubc: fix mixed up qheld/qmaxheld (#2238)
+  - vzctl snapshot: resume CT if creating snapshot failed
+  - vzmigrate: skip vzquota ops for ploop-based CTs (related to #2252)
+  - vzmigrate: do not migrate ploop CT if ploop is not available on dst
+  - vzmigrate: do not use --sparse for ploop CTs (related to #2252)
+  - Fix error handling in vps_is_run() (#2243)
+- Improvements
+  - vps-download: accept relative template cache paths (#2222)
+  - vzlist: use smart_ctid instead of ctid in default output format
+  - vzctl set ram/swap, vzctl start: check if kernel is vswap capable (#2251)
+  - bash_completion: only complete simfs CTs for vzctl convert
+  - bash_completion: only complete ploop CTs for vzctl snapshot*
+  - vzubc: allow -qh/-qm argument to be per cent (if > 1)
+  - vzctl snapshot: removed snapshot-create command alias
+  - vzctl snapshot: add --skip-suspend option
+  - vzctl set --features/--iptables/--capability: ability to specify
+    several comma-separated values at once
+  - vzmigrate: make -vvv add -vv to rsync
+- Code cleanups
+  - include/*.h: remove non-existent function prototypes
+  - remove NULL checks before free()
+  - some functions marked as static, moved to there they belong
+  - get rid of setup_resource_management()
+  - whitespace nitpicks
+- Documentation
+  - Add --ram, --swap to vzctl --help output (#2219)
+  - vzctl(8): explain host_mac value for bridge (#2210)
+  - vzctl(8): better description of --quotaugidlimit wrt ploop
+  - vzctl(8): do not use "second-level quota" term
+  - vzctl(8): document ttynum vzctl console argument
+  - vzctl(8): add/improve escape sequences description for vzctl console
+  - vzctl(8): document --reset_ub
+  - vzctl(8): describe --name and --description for vzctl snapshot
+  - vzctl(8): various formatting fixes and improvements
+  - vzmigrate(8): add missing exit codes description
+  - man/toc.man.in: fix Copyright years
+  - vzctl.spec: add changelog
+
 * Thu Mar 22 2012 Kir Kolyshkin <kir@openvz.org> - 3.1-1
 - New features
   - preliminary beta support for ploop (aka container-in-a-file) technology
