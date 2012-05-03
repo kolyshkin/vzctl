@@ -250,6 +250,9 @@ while [ ! -z "$1" ]; do
 	-vvv)
 		verbose=$((verbose+3))
 		;;
+	-vvvv)
+		verbose=$((verbose+4))
+		;;
 	--remove-area|-r)
 		shift
 		if [ "$1" = "yes" ]; then
