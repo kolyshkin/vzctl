@@ -90,6 +90,9 @@ if (ub->name == NULL) {							\
 		if (!is_vswap_mode()) {
 			logger(-1, 0, "Error: detected vswap CT config but "
 					"kernel does not support vswap");
+			logger(-1, 0, "This means either old kernel "
+					"or bad config (physpages NOT set "
+					"to 0:unlimited)");
 			ret = VZ_BAD_KERNEL;
 		}
 		return ret;
