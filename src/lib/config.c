@@ -688,6 +688,7 @@ static int parse_vswap(ub_param *ub, const char *val, int id)
 		return ERR_INVAL;
 	if (*tail != '\0')
 		return ERR_INVAL;
+	tmp = (tmp + _page_size - 1) / _page_size;
 	if (tmp > LONG_MAX) {
 		tmp = LONG_MAX;
 		ret = ERR_LONG_TRUNC;
