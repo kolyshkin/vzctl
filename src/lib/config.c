@@ -654,7 +654,7 @@ static int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 	return ret;
 }
 
-static int parse_vswap(ub_param *ub, const char *val, int id)
+static int parse_vswap(ub_param *ub, const char *val, int id, int force)
 {
 	int ret=0;
 	ub_res res;
@@ -662,7 +662,7 @@ static int parse_vswap(ub_param *ub, const char *val, int id)
 	unsigned long long tmp;
 
 	/* If current kernel is not vswap-capable, cry out loud */
-	if (!is_vswap_mode()) {
+	if (!force && !is_vswap_mode()) {
 		logger(-1, 0, "Error: kernel does not support vswap, "
 				"unable to use --ram/--swap parameters");
 		return ERR_OTHER;
@@ -2014,7 +2014,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_RAM:
 	case PARAM_SWAP:
-		ret = parse_vswap(&vps_p->res.ub, val, id);
+		ret = parse_vswap(&vps_p->res.ub, val, id,
+				vps_p->opt.save_force);
 		break;
 	case PARAM_CAP:
 		ret = parse_cap(val, &vps_p->res.cap);

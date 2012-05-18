@@ -362,6 +362,10 @@ Set swap space available to a container.
 Actually, the option is a shortcut for setting \fB--swappages\fR limit
 (the barrier is set to 0).
 .PP
+Note that \fBvzctl\fR checks if running kernel is VSwap capable, and
+refuses to use these parameters otherwise. This behavior can be overriden
+by using \fB--force\fR flag before parameters.
+.PP
 Here is an example of setting container 777 to have
 512 megabytes of RAM and 1 gigabyte of swap:
 .EX
