@@ -349,7 +349,7 @@ Available suffixes are:
 .br
 \(bu \fBP\fR, \fBp\fR	- memory pages (arch-specific, usually 4KB);
 .br
-\(bu \fBB\fR, \fBb\fR	- bytes.
+\(bu \fBB\fR, \fBb\fR	- bytes (this is the default).
 .PP
 .TP
 \fB--ram\fR \fIbytes\fR
