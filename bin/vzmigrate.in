@@ -580,8 +580,8 @@ if [ "$state" = "running" ]; then
 		true
 	else
 		log 2 "Copying top delta"
-		if ! $SCP "$VE_PRIVATE/root.hdd/$TOP_DELTA" \
-				"root@$host:$VE_PRIVATE/root.hdd/$TOP_DELTA"; then
+		if ! $SCP "$VE_PRIVATE/$TOP_DELTA" \
+				"root@$host:$VE_PRIVATE/$TOP_DELTA"; then
 			log 0 "Failed to scp top ploop delta"
 			undo_source_stage
 			exit $MIG_ERR_COPY
