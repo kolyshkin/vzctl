@@ -431,5 +431,4 @@ int is_vswap_config(const ub_param *param)
 		(param->physpages != NULL) &&
 		(param->physpages[1] != LONG_MAX) &&
 		(param->physpages[1] != INT_MAX);
-
 }
