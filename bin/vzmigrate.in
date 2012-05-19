@@ -574,14 +574,16 @@ else
 			log 1 "Copying top ploop delta with CT stop"
 			if ! ploop_copy "$VZCTL stop $VEID --skip-umount"; then
 				log 0 "Failed to copy top ploop delta"
+				$VZCTL start $VEID 2>/dev/null
 				undo_sync
 				exit $MIG_ERR_COPY
 			fi
 			log 1 "Unmounting container"
 			if ! logexec 2 $VZCTL umount $VEID ; then
 				log 0 "Failed to umount container"
+				$VZCTL start $VEID 2>/dev/null
 				undo_sync
-	                        exit $MIG_ERR_STOP_SOURCE
+				exit $MIG_ERR_STOP_SOURCE
 			fi
 		fi
 	elif [ "$mounted" = "mounted" ]; then
