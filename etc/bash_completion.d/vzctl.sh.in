@@ -91,7 +91,7 @@ _vzctl()
 		--name --ioprio --setmode --meminfo --bootorder --features \
 		--reset_ub"
 	local vzctl_start_opts="--wait --force"
-	local vzctl_stop_opts="--fast"
+	local vzctl_stop_opts="--fast --skip-umount"
 	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 	local vzctl_snapshot_create_opts="--id --name --description \
 		--skip-suspend"

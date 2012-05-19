@@ -970,7 +970,7 @@ err:
  * @param veid		CT ID.
  * @param param		CT parameters.
  * @param stop_mode	stop mode, one of (M_REBOOT M_HALT M_KILL).
- * @param skip		flag to skip run action script (SKIP_ACTION_SCRIPT)
+ * @param skip		steps to skip (SKIP_ACTION_SCRIPT, SKIP_UMOUNT)
  * @param action	modules list, used to call cleanup() callback.
  * @return		0 on success.
  */
@@ -1006,7 +1006,8 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	/* Cleanup CT IPs */
 	run_net_script(veid, DEL, &param->del_res.net.ip,
 			STATE_STOPPING, param->res.net.skip_arpdetect);
-	ret = vps_umount(h, veid, &res->fs, skip);
+	if (!(skip & SKIP_UMOUNT))
+		ret = vps_umount(h, veid, &res->fs, skip);
 
 end:
 	free_str_param(&param->del_res.net.ip);

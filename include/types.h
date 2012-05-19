@@ -91,7 +91,8 @@ typedef enum {
 	SKIP_NONE =		0,
 	SKIP_SETUP =		(1<<0),
 	SKIP_CONFIGURE =	(1<<1),
-	SKIP_ACTION_SCRIPT =	(1<<2)
+	SKIP_ACTION_SCRIPT =	(1<<2),
+	SKIP_UMOUNT =		(1<<3),
 } skipFlags;
 
 typedef int (* execFn)(void *data);

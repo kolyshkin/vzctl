@@ -217,6 +217,7 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 		{"skip_ve_setup", no_argument, NULL, PARAM_SKIP_VE_SETUP},
 		{"wait", no_argument, NULL, PARAM_WAIT},
 		{"fast", no_argument, NULL, PARAM_FAST},
+		{"skip-umount", no_argument, NULL, PARAM_SKIP_UMOUNT},
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -246,6 +247,12 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 		case PARAM_FAST:
 			if (stop)
 				param->opt.fast_kill = YES;
+			else
+				ret = VZ_INVALID_PARAMETER_SYNTAX;
+			break;
+		case PARAM_SKIP_UMOUNT:
+			if (stop)
+				param->opt.skip_umount = YES;
 			else
 				ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
@@ -282,12 +289,17 @@ static int stop(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
 {
 	int ret;
 	int stop_mode;
+	skipFlags skip = SKIP_NONE;
 
 	if (cmd_p->opt.fast_kill == YES)
 		stop_mode = M_KILL;
 	else
 		stop_mode = M_HALT;
-	ret = vps_stop(h, veid, g_p, stop_mode, 0, &g_action);
+
+	if (cmd_p->opt.skip_umount == YES)
+		skip += SKIP_UMOUNT;
+
+	ret = vps_stop(h, veid, g_p, stop_mode, skip, &g_action);
 
 	return ret;
 }

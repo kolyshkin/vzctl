@@ -125,6 +125,7 @@ typedef struct {
 	char *apply_cfg;
 	int apply_cfg_map;
 	int reset_ub;
+	int skip_umount;
 } vps_opt;
 
 struct log_s {

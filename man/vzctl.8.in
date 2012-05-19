@@ -19,6 +19,7 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBstop\fR \fICTID\fR
 .OP --fast
+.OP --skip-umount
 .SY vzctl
 [\fIflags\fR] \fBrestart\fR \fICTID\fR
 .OP --wait
@@ -895,8 +896,9 @@ Specify \fB--force\fR if you want to start a container which is disabled
 
 Note that this command can lead to execution of \fBpremount\fR, \fBmount\fR
 and \fBstart\fR action scripts (see \fBACTION SCRIPTS\fR below).
-.IP "\fBstop\fR \fICTID\fR [\fB--fast\fR]" 4
-Stops and unmounts a container. Normally, \fBhalt\fR(8) is executed
+.IP "\fBstop\fR \fICTID\fR [\fB--fast\fR] [\fB--skip-umount\fR]" 4
+Stops a container and unmounts it (unless \fB--skip-umount\fR is given).
+Normally, \fBhalt\fR(8) is executed
 inside a container; option \fB--fast\fR makes \fBvzctl\fR use
 \fBreboot\fR(2) syscall instead which is faster but can lead to
 unclean container shutdown.
