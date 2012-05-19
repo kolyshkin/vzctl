@@ -475,7 +475,7 @@ else
 		undo_private
 		exit $MIG_ERR_COPY
 	fi
-	RSYNC1_OPTIONS="--exclude $TOP_DELTA"
+	RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
 fi
 
 if [ "${DISK_QUOTA}" != "no" ]; then
