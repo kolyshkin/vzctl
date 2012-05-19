@@ -517,7 +517,7 @@ if [ $online -eq 1 ]; then
 			exit $MIG_ERR_CHECKPOINT
 		fi
 	else
-		log 2 "Migrating top ploop delta with ploop copy"
+		log 2 "Copying top ploop delta with CT suspend"
 		# Use nice progress bar with pv if we can
 		CAT=cat
 		if pv -V >/dev/null 2>&1; then
@@ -527,7 +527,7 @@ if [ $online -eq 1 ]; then
 		if ! ploop copy -s /dev/$PLOOP_DEV -F "$VZCTL chkpnt $VEID --suspend 1>&2" | \
 				$CAT | \
 				$SSH "root@$host" ploop copy -d $VE_PRIVATE/$TOP_DELTA; then
-			log 0 "Failed to migrate top ploop delta"
+			log 0 "Failed to copy top ploop delta"
 			$VZCTL chkpnt $VEID --resume 2>/dev/null
 			undo_sync
 			exit $MIG_ERR_COPY
