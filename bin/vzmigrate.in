@@ -36,6 +36,9 @@ vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
 act_scripts=
 PLOOP=no
+RSYNC1_OPTIONS=
+PLOOP_DEV=
+TOP_DELTA=
 
 # Errors:
 MIG_ERR_USAGE=1
@@ -233,13 +236,14 @@ get_time () {
 }
 
 get_ploop_info() {
-	local top img
+	local dev top img
 
-	PLOOP_DEV=$(awk '$2=="'$VE_ROOT'" {print $1}' /proc/mounts | \
-		sed -e 's|^/dev/||' -e 's|p1$||')
-	top=$(cat /sys/block/${dev}/pstate/top)
-	img=$(cat /sys/block/${dev}/pdelta/${top}/image)
-	TOP_DELTA=$(basename $img)
+	dev=$(awk '$2=="'$VE_ROOT'" {print $1}' /proc/mounts | \
+		sed -e 's|^/dev/||' -e 's|p1$||') || return 1
+	top=$(cat /sys/block/${dev}/pstate/top) || return 1
+	img=$(cat /sys/block/${dev}/pdelta/${top}/image) || return 1
+	TOP_DELTA=$(echo $img | sed "s|^${VE_PRIVATE}/||") || return 1
+	PLOOP_DEV="${dev}"
 }
 
 if [ $# -lt 2 ]; then
@@ -466,7 +470,11 @@ fi
 if [ "$PLOOP" != "yes" ]; then
 	RSYNC1_OPTIONS="--sparse"
 else
-	get_ploop_info
+	if ! get_ploop_info; then
+		log 0 "Can't get ploop information"
+		undo_private
+		exit $MIG_ERR_COPY
+	fi
 	RSYNC1_OPTIONS="--exclude $TOP_DELTA"
 fi
 
@@ -510,8 +518,8 @@ if [ $online -eq 1 ]; then
 		fi
 	else
 		log 2 "Migrating top ploop delta with ploop copy"
-		if ! ploop copy -s $PLOOP_DEV -F "$VZCTL chkpnt $VEID --suspend" | \
-				$SSH "root@$host" ploop copy -d $VE_PRIVATE/root.hdd/$TOP_DELTA; then
+		if ! ploop copy -s /dev/$PLOOP_DEV -F "$VZCTL chkpnt $VEID --suspend 1>&2" | \
+				$SSH "root@$host" ploop copy -d $VE_PRIVATE/$TOP_DELTA; then
 			log 0 "Failed to migrate top ploop delta"
 			undo_suspend
 			exit $MIG_ERR_COPY
