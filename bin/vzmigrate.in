@@ -563,11 +563,26 @@ if [ $online -eq 1 ]; then
 	fi
 else
 	if [ "$state" = "running" ]; then
-		log 1 "Stopping container"
-		if ! logexec 2 $VZCTL stop $VEID ; then
-			log 0 "Failed to stop container"
-			undo_sync
-			exit $MIG_ERR_STOP_SOURCE
+		if [ "$PLOOP" != "yes" ]; then
+			log 1 "Stopping container"
+			if ! logexec 2 $VZCTL stop $VEID ; then
+				log 0 "Failed to stop container"
+				undo_sync
+				exit $MIG_ERR_STOP_SOURCE
+			fi
+		else
+			log 1 "Copying top ploop delta with CT stop"
+			if ! ploop_copy "$VZCTL stop $VEID --skip-umount"; then
+				log 0 "Failed to copy top ploop delta"
+				undo_sync
+				exit $MIG_ERR_COPY
+			fi
+			log 1 "Unmounting container"
+			if ! logexec 2 $VZCTL umount $VEID ; then
+				log 0 "Failed to umount container"
+				undo_sync
+	                        exit $MIG_ERR_STOP_SOURCE
+			fi
 		fi
 	elif [ "$mounted" = "mounted" ]; then
 		log 1 "Unmounting container"
@@ -579,26 +594,13 @@ else
 	fi
 fi
 
-if [ "$state" = "running" ]; then
+if [ "$state" = "running" -a "$PLOOP" != "yes" ]; then
 	time_rsync2=$(date +%s.%N)
-	if [ "$PLOOP" != "yes" ]; then
-		log 2 "Syncing private (2nd pass)"
-		if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
-			log 0 "Failed to sync container private areas"
-			undo_source_stage
-			exit $MIG_ERR_COPY
-		fi
-	elif [ $online -eq 1 ]; then
-		# Do nothing! We have already used ploop copy
-		true
-	else
-		log 2 "Copying top delta"
-		if ! $SCP "$VE_PRIVATE/$TOP_DELTA" \
-				"root@$host:$VE_PRIVATE/$TOP_DELTA"; then
-			log 0 "Failed to scp top ploop delta"
-			undo_source_stage
-			exit $MIG_ERR_COPY
-		fi
+	log 2 "Syncing private (2nd pass)"
+	if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
+		log 0 "Failed to sync container private areas"
+		undo_source_stage
+		exit $MIG_ERR_COPY
 	fi
 fi
 
