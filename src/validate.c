@@ -619,7 +619,7 @@ int calc_ve_utilization(struct ub_struct *param, struct CRusage *rusage,
 	rusage->mem_swap = ((double)param->oomguarpages[0] * page_size +
 		kmem_net);
 	if (!numerator)
-			rusage->mem_swap /= (mem->ram + mem->swap);
+		rusage->mem_swap /= (mem->ram + mem->swap);
 	/*	Allocated memory	*/
 	rusage->alloc_mem = ((double)param->privvmpages[0] * page_size +
 		kmem_net);
