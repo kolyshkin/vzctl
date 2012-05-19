@@ -518,7 +518,14 @@ if [ $online -eq 1 ]; then
 		fi
 	else
 		log 2 "Migrating top ploop delta with ploop copy"
+		# Use nice progress bar with pv if we can
+		CAT=cat
+		if pv -V >/dev/null 2>&1; then
+			SIZE=$(du -b $VE_PRIVATE/$TOP_DELTA | awk '{print $1}')
+			test -n "$SIZE" && CAT="pv -s $SIZE"
+		fi
 		if ! ploop copy -s /dev/$PLOOP_DEV -F "$VZCTL chkpnt $VEID --suspend 1>&2" | \
+				$CAT | \
 				$SSH "root@$host" ploop copy -d $VE_PRIVATE/$TOP_DELTA; then
 			log 0 "Failed to migrate top ploop delta"
 			$VZCTL chkpnt $VEID --resume 2>/dev/null
