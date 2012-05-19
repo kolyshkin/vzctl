@@ -232,6 +232,16 @@ get_time () {
 	awk -v t2=$2 -v t1=$1 'BEGIN{print t2-t1}'
 }
 
+get_ploop_info() {
+	local top img
+
+	PLOOP_DEV=$(awk '$2=="'$VE_ROOT'" {print $1}' /proc/mounts | \
+		sed -e 's|^/dev/||' -e 's|p1$||')
+	top=$(cat /sys/block/${dev}/pstate/top)
+	img=$(cat /sys/block/${dev}/pdelta/${top}/image)
+	TOP_DELTA=$(basename $img)
+}
+
 if [ $# -lt 2 ]; then
 	usage
 fi
@@ -455,6 +465,9 @@ fi
 
 if [ "$PLOOP" != "yes" ]; then
 	RSYNC1_OPTIONS="--sparse"
+else
+	get_ploop_info
+	RSYNC1_OPTIONS="--exclude $TOP_DELTA"
 fi
 
 if [ "${DISK_QUOTA}" != "no" ]; then
@@ -487,12 +500,22 @@ fi
 if [ $online -eq 1 ]; then
 	log 1 "Live migrating container..."
 
-	log 2 "Suspending container"
 	time_suspend=$(date +%s.%N)
-	if ! logexec 2 $VZCTL chkpnt $VEID --suspend ; then
-		log 0 "Failed to suspend container"
-		undo_sync
-		exit $MIG_ERR_CHECKPOINT
+	if [ "$PLOOP" != "yes" ]; then
+		log 2 "Suspending container"
+		if ! logexec 2 $VZCTL chkpnt $VEID --suspend ; then
+			log 0 "Failed to suspend container"
+			undo_sync
+			exit $MIG_ERR_CHECKPOINT
+		fi
+	else
+		log 2 "Migrating top ploop delta with ploop copy"
+		if ! ploop copy -s $PLOOP_DEV -F "$VZCTL chkpnt $VEID --suspend" | \
+				$SSH "root@$host" ploop copy -d $VE_PRIVATE/root.hdd/$TOP_DELTA; then
+			log 0 "Failed to migrate top ploop delta"
+			undo_suspend
+			exit $MIG_ERR_COPY
+		fi
 	fi
 
 	log 2 "Dumping container"
@@ -528,12 +551,25 @@ else
 fi
 
 if [ "$state" = "running" ]; then
-	log 2 "Syncing private (2nd pass)"
 	time_rsync2=$(date +%s.%N)
-	if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
-		log 0 "Failed to sync container private areas"
-		undo_source_stage
-		exit $MIG_ERR_COPY
+	if [ "$PLOOP" != "yes" ]; then
+		log 2 "Syncing private (2nd pass)"
+		if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
+			log 0 "Failed to sync container private areas"
+			undo_source_stage
+			exit $MIG_ERR_COPY
+		fi
+	elif [ $online -eq 1 ]; then
+		# Do nothing! We have already used ploop copy
+		true
+	else
+		log 2 "Copying top delta"
+		if ! $SCP "$VE_PRIVATE/root.hdd/$TOP_DELTA" \
+				"root@$host:$VE_PRIVATE/root.hdd/$TOP_DELTA"; then
+			log 0 "Failed to scp top ploop delta"
+			undo_source_stage
+			exit $MIG_ERR_COPY
+		fi
 	fi
 fi
 
