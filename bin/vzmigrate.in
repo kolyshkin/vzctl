@@ -521,7 +521,8 @@ if [ $online -eq 1 ]; then
 		if ! ploop copy -s /dev/$PLOOP_DEV -F "$VZCTL chkpnt $VEID --suspend 1>&2" | \
 				$SSH "root@$host" ploop copy -d $VE_PRIVATE/$TOP_DELTA; then
 			log 0 "Failed to migrate top ploop delta"
-			undo_suspend
+			$VZCTL chkpnt $VEID --resume 2>/dev/null
+			undo_sync
 			exit $MIG_ERR_COPY
 		fi
 	fi
