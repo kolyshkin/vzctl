@@ -529,8 +529,8 @@ fi
 if [ $online -eq 1 ]; then
 	log 1 "Live migrating container..."
 
-	time_suspend=$(date +%s.%N)
 	if [ "$PLOOP" != "yes" ]; then
+		time_suspend=$(date +%s.%N)
 		log 2 "Suspending container"
 		if ! logexec 2 $VZCTL chkpnt $VEID --suspend ; then
 			log 0 "Failed to suspend container"
@@ -547,6 +547,7 @@ if [ $online -eq 1 ]; then
 			undo_sync
 			exit $MIG_ERR_COPY
 		fi
+		time_pcopy=$(date +%s.%N)
 		time_suspend=$(cat $TMPF)
 		rm $TMPF
 	fi
@@ -655,7 +656,15 @@ if [ $online -eq 1 ]; then
 	fi
 	time_finish=$(date +%s.%N)
 	log 2 "Times:"
-	log 2 "  Suspend + Dump: " $(get_time $time_suspend $time_copy_dump)
+	dt_susp_dump=$(get_time $time_suspend $time_copy_dump)
+	if [ "$PLOOP" = "yes" ]; then
+		dt_pcopy=$(get_time $time_suspend $time_pcopy)
+		dt_susp_dump=$(get_time $dt_pcopy $dt_susp_dump)
+	fi
+	log 2 "  Suspend + Dump: " $dt_susp_dump
+	if [ "$PLOOP" = "yes" ]; then
+		log 2 "  Pcopy2:         " $dt_pcopy
+	fi
 	log 2 "  Copy dump file: " $(get_time $time_copy_dump $time_rsync2)
 	if [ "$PLOOP" != "yes" ]; then
 		log 2 "  Second rsync:   " $(get_time $time_rsync2 $time_quota)
