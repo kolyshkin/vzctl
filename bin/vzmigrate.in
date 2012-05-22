@@ -653,8 +653,10 @@ if [ $online -eq 1 ]; then
 	log 2 "Times:"
 	log 2 "  Suspend + Dump: " $(get_time $time_suspend $time_copy_dump)
 	log 2 "  Copy dump file: " $(get_time $time_copy_dump $time_rsync2)
-	log 2 "  Second rsync:   " $(get_time $time_rsync2 $time_quota)
-	log 2 "  2nd level quota:" $(get_time $time_quota $time_undump)
+	if [ "$PLOOP" != "yes" ]; then
+		log 2 "  Second rsync:   " $(get_time $time_rsync2 $time_quota)
+		log 2 "  2nd level quota:" $(get_time $time_quota $time_undump)
+	fi
 	log 2 "  Undump + Resume:" $(get_time $time_undump $time_finish)
 	log 2 "Total time: " $(get_time $time_suspend $time_finish)
 
