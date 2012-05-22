@@ -539,12 +539,16 @@ if [ $online -eq 1 ]; then
 		fi
 	else
 		log 2 "Copying top ploop delta with CT suspend"
-		if ! ploop_copy "$VZCTL chkpnt $VEID --suspend"; then
+		TMPF=$(mktemp)
+		if ! ploop_copy "date '+%s.%N' > $TMPF; $VZCTL chkpnt $VEID --suspend"; then
 			log 0 "Failed to copy top ploop delta"
 			$VZCTL chkpnt $VEID --resume 2>/dev/null
+			rm -f $TMPF
 			undo_sync
 			exit $MIG_ERR_COPY
 		fi
+		time_suspend=$(cat $TMPF)
+		rm $TMPF
 	fi
 
 	log 2 "Dumping container"
