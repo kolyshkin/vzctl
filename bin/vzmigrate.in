@@ -596,8 +596,8 @@ else
 	fi
 fi
 
+time_rsync2=$(date +%s.%N)
 if [ "$state" = "running" -a "$PLOOP" != "yes" ]; then
-	time_rsync2=$(date +%s.%N)
 	log 2 "Syncing private (2nd pass)"
 	if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
 		log 0 "Failed to sync container private areas"
