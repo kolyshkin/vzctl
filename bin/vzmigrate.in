@@ -606,11 +606,11 @@ if [ "$state" = "running" -a "$PLOOP" != "yes" ]; then
 	fi
 fi
 
+time_quota=$(date +%s.%N)
 if [ "${DISK_QUOTA}" != "no" ]; then
 	log 1 "Syncing 2nd level quota"
 
 	log 2 "Dumping 2nd level quota"
-	time_quota=$(date +%s.%N)
 	if ! vzdqdump $VEID -U -G -T > "$VE_QUOTADUMP"; then
 		log 0 "Failed to dump 2nd level quota"
 		undo_quota_dump
