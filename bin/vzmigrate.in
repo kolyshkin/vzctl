@@ -90,7 +90,7 @@ Options:
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics). Multiple -v options
-	increase the verbosity. The maximum is 3.
+	increase the verbosity. The maximum is 4.
 Examples:
 	Online migration of CT #101 to foo.com:
 		vzmigrate --online foo.com 101
