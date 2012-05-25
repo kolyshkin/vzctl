@@ -10,6 +10,7 @@ vzmigrate \- migrate a container between two OpenVZ servers
 .OP --rsync=\fIrsync_options
 .OP --keep-dst
 .OP --online
+.OP -t\fR|\fB--times
 .OP -v
 .I destination_address CTID
 .YS
@@ -55,9 +56,16 @@ hangs for a while and after the migration it continues working as though
 nothing has happened.
 
 .TP
+\fB-t\fR, \fB--times\fR
+At the end of online migration, output various timings for migration stages
+that affect total suspended CT time. Note that it only makes sense
+with \fB--online\fR.
+
+.TP
 .B -v
 Verbose mode. Causes \fBvzmigrate\fP to print debugging messages about
-its progress.  Multiple \fB-v\fR options increase the verbosity.
+its progress. Note that \fB-v\fR automatically implies \fB-t\fR.
+Multiple \fB-v\fR options increase the verbosity.
 
 .SH EXAMPLES
 Migration of CT 101 to \fB192.168.1.130\fR with downtime:

@@ -31,6 +31,7 @@ verbose=0
 remove_area=1
 keep_dst=0
 debug=0
+times=0
 confdir="@PKGCONFDIR@/conf"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
@@ -91,6 +92,10 @@ Options:
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics). Multiple -v options
 	increase the verbosity. The maximum is 4.
+-t, --times
+	At the end of online migration, output various timings for migration stages
+	that affect total suspended CT time.
+
 Examples:
 	Online migration of CT #101 to foo.com:
 		vzmigrate --online foo.com 101
@@ -267,6 +272,33 @@ ploop_copy() {
 		$SSH "root@$host" ploop copy -d $delta
 }
 
+print_times() {
+	local fmt='  %20s: %6.2f\n'
+	local dt_susp_dump dt_pcopy
+
+	[ $times -eq 0 ] && return
+
+	echo
+	dt_susp_dump=$(get_time $time_suspend $time_copy_dump)
+	if [ "$PLOOP" = "yes" ]; then
+		dt_pcopy=$(get_time $time_suspend $time_pcopy)
+		dt_susp_dump=$(get_time $dt_pcopy $dt_susp_dump)
+	fi
+	printf "$fmt" "Suspend + Dump" $dt_susp_dump
+	if [ "$PLOOP" = "yes" ]; then
+		printf "$fmt" "Pcopy after suspend" $dt_pcopy
+	fi
+	printf "$fmt" "Copy dump file" $(get_time $time_copy_dump $time_rsync2)
+	if [ "$PLOOP" != "yes" ]; then
+		printf "$fmt" "Second rsync" $(get_time $time_rsync2 $time_quota)
+		printf "$fmt" "2nd level quota" $(get_time $time_quota $time_undump)
+	fi
+	printf "$fmt" "Undump + Resume" $(get_time $time_undump $time_finish)
+	printf "  %20s  ------\n" " "
+	printf "$fmt" "Total suspended time" $(get_time $time_suspend $time_finish)
+	echo
+}
+
 if [ $# -lt 2 ]; then
 	usage
 fi
@@ -308,6 +340,9 @@ while [ ! -z "$1" ]; do
 	--rsync=*)
 		RSYNC_OPTIONS="$RSYNC_OPTIONS $(echo $1 | cut -c9-)"
 		;;
+	--times|-t)
+		times=1
+		;;
 	*)
 		break
 		;;
@@ -315,7 +350,11 @@ while [ ! -z "$1" ]; do
 	shift
 done
 
+if [ $verbose -gt 0 ]; then
+	times=1
+fi
 if [ $verbose -gt 1 ]; then
+
 	RSYNC_OPTIONS="$RSYNC_OPTIONS -v"
 	VZCTL="$VZCTL --verbose"
 fi
@@ -655,24 +694,7 @@ if [ $online -eq 1 ]; then
 		exit $MIG_ERR_RESTORE_VPS
 	fi
 	time_finish=$(date +%s.%N)
-	log 2 "Times:"
-	dt_susp_dump=$(get_time $time_suspend $time_copy_dump)
-	if [ "$PLOOP" = "yes" ]; then
-		dt_pcopy=$(get_time $time_suspend $time_pcopy)
-		dt_susp_dump=$(get_time $dt_pcopy $dt_susp_dump)
-	fi
-	log 2 "  Suspend + Dump: " $dt_susp_dump
-	if [ "$PLOOP" = "yes" ]; then
-		log 2 "  Pcopy2:         " $dt_pcopy
-	fi
-	log 2 "  Copy dump file: " $(get_time $time_copy_dump $time_rsync2)
-	if [ "$PLOOP" != "yes" ]; then
-		log 2 "  Second rsync:   " $(get_time $time_rsync2 $time_quota)
-		log 2 "  2nd level quota:" $(get_time $time_quota $time_undump)
-	fi
-	log 2 "  Undump + Resume:" $(get_time $time_undump $time_finish)
-	log 2 "Total time: " $(get_time $time_suspend $time_finish)
-
+	print_times
 	log 1 "Cleanup"
 
 	log 2 "Killing container"
