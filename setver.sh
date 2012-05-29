@@ -1,5 +1,24 @@
 #!/bin/sh
 
+while test -n "$1"; do
+	case $1 in
+	   -b|--build)
+		build=yes
+		;;
+	   -i|--install)
+		build=yes
+		install=yes
+		;;
+	   -v|--verbose)
+		verbose=yes
+		;;
+	   *)
+		echo "Invalid argument: $1" 1>&2
+		exit 1
+	esac
+	shift
+done
+
 CONFIGURE_AC=configure.ac
 RPM_SPEC=vzctl.spec
 
@@ -23,7 +42,7 @@ read_spec
 
 # Set version/release in spec from git
 if test "$GIT_VR" != "$SPEC_VR"; then
-#	echo "Changing $RPM_SPEC:"
+	test -z "$verbose" || echo "Changing $RPM_SPEC:"
 	# Version: 3.0.28
 	# Release: 1%{?dist}
 	sed -i -e "s/^\(Version:[[:space:]]*\).*\$/\1$GIT_V/" \
@@ -36,18 +55,23 @@ if test "$GIT_VR" != "$SPEC_VR"; then
 			$RPM_SPEC
 	fi
 fi
-#grep -E -H '^Version:|^%define rel|^Source:|^%setup' $RPM_SPEC
+test -z "$verbose" || \
+	grep -E -H '^Version:|^%define rel|^Source:|^%setup' $RPM_SPEC
 
 # Set version in configure.ac from spec
 read_spec
 SPEC_VR=$(echo $SPEC_VR | sed 's/-1$//')
 if test "$CONF_V" != "$SPEC_VR"; then
-#	echo "Changing $CONFIGURE_AC:"
+	test -z "$verbose" || echo "Changing $CONFIGURE_AC:"
 	# AC_INIT(vzctl, 3.0.28, devel@openvz.org)
 	sed -i "s/^\(AC_INIT(vzctl,[ ]\)[^,]*\(,.*\$\)/\1$SPEC_VR\2/" \
 		$CONFIGURE_AC
 	autoconf
 fi
-#grep -H '^AC_INIT' $CONFIGURE_AC
+test -z "$verbose" || \
+	grep -H '^AC_INIT' $CONFIGURE_AC
 
-exit 0
+test "$build" = "yes" && make rpms
+test "$install" = "yes" &&
+	sudo rpm -Uhv $(rpm --eval %{_rpmdir}/%{_arch})/vzctl-*${GIT_VR}*.rpm
+
