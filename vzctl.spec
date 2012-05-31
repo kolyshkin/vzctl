@@ -21,7 +21,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 3.2
+Version: 3.3
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPL
@@ -232,6 +232,21 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-pci
 
 %changelog
+* Thu May 31 2012 Kir Kolyshkin <kir@openvz.org> - 3.3-1
+- New features
+  - vzmigrate: ploop live migration using ploop-copy (#2252)
+  - vzctl stop: add --skip-umount flag
+  - vzctl set --ram/--swap: add --force
+- Bug fixes
+  - fix vzctl and vzlist linking with ld 2.22
+- Improvements
+  - vzmigrate: improve timings display, add -t option
+  - bash_completion: for vzctl restart offer running CT IDs
+
+* Fri May 18 2012 Kir Kolyshkin <kir@openvz.org> - 3.2.1-1
+- vzctl set: fix processing --ram/--swap options (#2269)
+- vzctl start: improve err msg for vswap config vs non-vswap kernel (#2263)
+
 * Thu May 3 2012 Kir Kolyshkin <kir@openvz.org> - 3.2-1
 - New features
   - vzctl console now accepts tty number argument
