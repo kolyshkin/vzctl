@@ -129,6 +129,7 @@ set_file_caps()
 }
 
 [ -z "${VE_ROOT}" ] && exit 1
+umask 0022
 randcrontab
 disableroot
 set_network
