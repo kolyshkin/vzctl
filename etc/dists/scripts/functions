@@ -330,6 +330,11 @@ change_hostname()
 			ate_localhost = 1;
 			next;
 		}
+		$1 == "::1" {
+			my_ipv6 = $0;
+			ate_ipv6 = 1;
+			next;
+		}
 		{print}
 		END {
 			if (ip == "") { ip ="127.0.0.1" }
@@ -354,6 +359,11 @@ change_hostname()
 			}
 			for (extraname in EXTRANAMES) { extranames = extranames " " extraname }
 			print ip " " host extranames;
+			if (ate_ipv6) {
+				print my_ipv6;
+			} else {
+				print "::1 localhost";
+			}
 		}
 	' < ${cfg} > ${cfg}.$$
 	if [ $? -ne 0 ]; then
