@@ -1,5 +1,6 @@
 #!/bin/bash
 #  Copyright (C) 2006-2007  SYSTS.ORG All rights reserved.
+#  Copyright (C) 2012 Brinstar Networks  All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,12 +17,15 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-# Deletes IP address(es) from a container running Archlinux.
+# Deletes IP address(es) from a container running Arch Linux.
 
 VENET_DEV=venet0
-CFGFILE=/etc/rc.conf
+OLDCFGFILE=/etc/rc.conf
 
-function remove_all_ve_aliases()
+CFGPATH=/etc/network.d
+NETCFG=/etc/conf.d/netcfg
+
+function old_remove_all_ve_aliases()
 {
 	local ve_if_name
 	local ve_if
@@ -35,13 +39,13 @@ function remove_all_ve_aliases()
 	done
 }
 
-function del_ip()
+function old_del_ip()
 {
 	local ifname
 	local ipm
 
 	if [ "x${IPDELALL}" = "xyes" ]; then
-		remove_all_ve_aliases
+		old_remove_all_ve_aliases
 		return 0
 	fi
 
@@ -62,6 +66,51 @@ function del_ip()
 	done
 }
 
-del_ip
+function remove_all_ve_aliases()
+{
+        local ve_if
+        for ve_if in $(ls -1 ${CFGPATH}/${VENET_DEV}_* 2> /dev/null | sed "s/.*${VENET_DEV}_//"); do
+                ip link set "${VENET_DEV}:${ve_if}" down
+                rm -f "${CFGPATH}/${VENET_DEV}_${ve_if}"
+
+                del_param3 "${NETCFG}" "NETWORKS" "${VENET_DEV}_${ve_if}"
+        done
+}
+
+function del_ip()
+{
+	local ve_if
+	local ipm
+
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		remove_all_ve_aliases
+		return 0
+	fi
+
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+
+		if [ -z "$_IPV6ADDR" ] ; then
+			ve_if=`grep -H "ADDR='${ip}'" "${CFGPATH}/${VENET_DEV}_*" 2> /dev/null | awk -F: '{print$1}' | sed "s/.*${VENET_DEV}_//"`
+		else
+			ve_if=`grep -H "ADDR6='${ip}/128'" "${CFGPATH}/${VENET_DEV}_*" 2> /dev/null | awk -F: '{print$1}' | sed "s/.*${VENET_DEV}_//"`
+		fi
+
+		if [ -z "$ve_if" ] ; then
+			break
+		fi
+
+		ip link set "${VENET_DEV}:${ve_if}" down
+		rm -f "${CFGPATH}/${VENET_DEV}_${ve_if}"
+
+		del_param3 "${NETCFG}" "NETWORKS" "${VENET_DEV}_${ve_if}"
+	done
+}
+
+if [ -d "${CFGPATH}" ] ; then
+	del_ip
+else
+	old_del_ip
+fi
 
 exit 0
