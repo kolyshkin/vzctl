@@ -68,7 +68,7 @@ usage() {
 	cat >&2 <<EOF
 This program is used for container migration to another node.
 Usage:
-vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--online] [-v]
+vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--live] [-v]
 	destination_address <CTID>
 Options:
 -r, --remove-area yes|no
@@ -84,21 +84,22 @@ Options:
 	error. It makes sense to use this option on big container migration to
 	avoid re-syncing container private area in case some error
 	(on container stop for example) occurs during first migration attempt.
---online
-	Perform online (zero-downtime) migration: during the migration the
-	container freezes for some time and after the migration it
-	keeps working as though nothing has happened.
+--live
+	Perform live migration: instead of restarting a container, checkpoint
+	and restore are used, so there is no container downtime or service
+	interruption. Additional steps are performed to minimize the time
+	when a container is in suspended state.
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics). Multiple -v options
 	increase the verbosity. The maximum is 4.
 -t, --times
-	At the end of online migration, output various timings for migration stages
-	that affect total suspended CT time.
+	At the end of live migration, output various timings for migration
+	stages that affect total suspended CT time.
 
 Examples:
 	Online migration of CT #101 to foo.com:
-		vzmigrate --online foo.com 101
+		vzmigrate --live foo.com 101
 	Migration of CT #102 to foo.com with downtime:
 		vzmigrate foo.com 102
 Notes:
@@ -305,7 +306,7 @@ fi
 
 while [ ! -z "$1" ]; do
 	case "$1" in
-	--online)
+	--live|--online)
 		online=1
 		;;
 	-v)
@@ -406,7 +407,7 @@ if [ "$exist" = "deleted" ]; then
 fi
 
 if [ $online -eq 1 ]; then
-	log 1 "Starting online migration of CT $VEID to $host"
+	log 1 "Starting live migration of CT $VEID to $host"
 else
 	log 1 "Starting migration of CT $VEID to $host"
 fi
@@ -425,17 +426,17 @@ if ! logexec 2 $SSH -o BatchMode=yes root@$host /etc/init.d/vz status ; then
 	exit $MIG_ERR_OVZ_NOT_RUNNING
 fi
 
-# Check if CPT modules are loaded for online migration
+# Check if CPT modules are loaded for live migration
 if [ $online -eq 1 ]; then
 	if [ ! -f /proc/cpt ]; then
 		log 0 "vzcpt module is not loaded on the source node"
-		log 0 "Can't continue online migration"
+		log 0 "Can't continue live migration"
 		exit $MIG_ERR_OVZ_NOT_RUNNING
 	fi
 	if ! logexec 2 $SSH -o BatchMode=yes root@$host "test -f /proc/rst";
 	then
 		log 0 "vzrst module is not loaded on the destination node"
-		log 0 "Can't continue online migration"
+		log 0 "Can't continue live migration"
 		exit $MIG_ERR_OVZ_NOT_RUNNING
 	fi
 fi
@@ -447,7 +448,7 @@ if [ "$dst_exist" = "exist" ]; then
 fi
 
 if [ $online -eq 1 -a "$state" != "running" ]; then
-	log 0 "Can't perform online migration of a stopped container"
+	log 0 "Can't perform live migration of a stopped container"
 	exit $MIG_ERR_VPS_IS_STOPPED
 fi
 
