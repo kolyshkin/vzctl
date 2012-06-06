@@ -265,7 +265,7 @@ ploop_copy() {
 
 	cat=cat
 	# Use nice progress bar with pv if we can
-	if pv -V >/dev/null 2>&1; then
+	if test $verbose -gt 0 && pv -V >/dev/null 2>&1; then
 		size=$(du -b $delta | awk '{print $1}')
 		test -n "$size" && cat="pv -s $size"
 	fi
