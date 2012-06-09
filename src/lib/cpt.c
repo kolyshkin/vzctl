@@ -293,8 +293,11 @@ err:
 			if (dumpfile)
 				unlink(dumpfile);
 	}
-	if (dump_fd != -1)
+	if (dump_fd != -1) {
+		if (ret == 0)
+			fsync(dump_fd);
 		close(dump_fd);
+	}
 	if (cpt_fd != -1)
 		close(cpt_fd);
 
