@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+# Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ ACT_SCRIPTS_SFX="start stop mount umount premount postumount"
 # blowfish is a fast block cipher, much faster then 3des
 SSH_OPTIONS="-c blowfish"
 SCP_OPTIONS=$SSH_OPTIONS
-RSYNC_OPTIONS="-aH --delete --numeric-ids"
+RSYNC_OPTIONS="-aHAX --delete --numeric-ids"
 VZCTL=vzctl
 
 online=0
