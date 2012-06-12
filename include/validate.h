@@ -18,14 +18,6 @@
 #ifndef _VALIDATE_H_
 #define _VALIDATE_H_
 
-#define ACT_NONE	0
-#define ACT_WARN	1
-#define ACT_ERROR	2
-#define ACT_FIX		3
-
-#define UTILIZATION	0
-#define COMMITMENT	1
-
 #define PROCUBC		"/proc/user_beancounters"
 
 struct CRusage {
@@ -36,16 +28,6 @@ struct CRusage {
 	double alloc_mem_lim;
 	double alloc_mem_max_lim;
 	double cpu;
-};
-
-struct ovrc {
-	int action;
-	float *level_low_mem;
-	float *level_total_ram;
-	float *level_mem_swap;
-	float *level_alloc_mem;
-	float *level_alloc_mem_lim;
-	float *level_alloc_mem_max_lim;
 };
 
 struct mem_struct {
