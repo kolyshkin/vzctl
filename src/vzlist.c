@@ -33,6 +33,7 @@
 #include <fnmatch.h>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <limits.h>
 #include <linux/vzcalluser.h>
 
 #include "vzlist.h"
@@ -463,6 +464,17 @@ static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 
 FOR_ALL_UBC(PRINT_UBC)
 
+static void print_vswap(struct Cveinfo *p, int index)
+{
+	/* Same conditions as used in is_vswap_config() */
+	int vswap = (p->ubc != NULL) &&
+		(p->ubc->physpages != NULL) &&
+		(p->ubc->physpages[1] != LONG_MAX) &&
+		(p->ubc->physpages[1] != INT_MAX);
+
+	print_bool("%5s", vswap);
+}
+
 static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 {
 	int running = p->status == VE_RUNNING;
@@ -727,6 +739,7 @@ UBC_FIELD(swappages, SWAPP),
 	print_bootorder, bootorder_sort_fn},
 {"layout", "LAYOUT", "%6s", 0, RES_NONE, print_layout, layout_sort_fn},
 {"features", "FEATURES", "%-15s", 0, RES_NONE, print_features, none_sort_fn},
+{"vswap", "VSWAP", "%5s", 0, RES_NONE, print_vswap, none_sort_fn},
 };
 
 static void *x_malloc(int size)

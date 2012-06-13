@@ -422,6 +422,7 @@ int vps_read_ubc(envid_t veid, ub_param *ub)
 	return !found;
 }
 
+/* If you want to modify this function, don't forget print_vswap() */
 int is_vswap_config(const ub_param *param)
 {
 	/* Dirty hack: treat INT_MAX (i.e. 32 bit LONG_MAX) as unlimited.
