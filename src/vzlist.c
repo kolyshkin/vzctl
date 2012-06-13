@@ -209,6 +209,16 @@ static void print_ip(struct Cveinfo *p, int index)
 	print_strlist(p->ip);
 }
 
+static void print_nameserver(struct Cveinfo *p, int index)
+{
+	print_strlist(p->nameserver);
+}
+
+static void print_searchdomain(struct Cveinfo *p, int index)
+{
+	print_strlist(p->searchdomain);
+}
+
 static void print_veid(struct Cveinfo *p, int index)
 {
 	if (fmt_json)
@@ -606,6 +616,8 @@ SORT_STR_FN(name)
 SORT_STR_FN(description)
 SORT_STR_FN(ostemplate)
 SORT_STR_FN(ip)
+SORT_STR_FN(nameserver)
+SORT_STR_FN(searchdomain)
 
 #define SORT_UL_RES(fn, res, name, index)				\
 static int fn(const void *val1, const void *val2)			\
@@ -662,6 +674,8 @@ static struct Cfield field_names[] =
 {"description", "DESCRIPTION", "%-32s", 0, RES_NONE, print_description, description_sort_fn },
 {"ostemplate", "OSTEMPLATE", "%-32s", 0, RES_NONE, print_ostemplate, ostemplate_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
+{"nameserver", "NAMESERVER", "%-15s", 0, RES_NONE, print_nameserver, nameserver_sort_fn},
+{"searchdomain", "SEARCHDOMAIN", "%-15s", 0, RES_NONE, print_searchdomain, searchdomain_sort_fn},
 {"status", "STATUS", "%-9s", 0, RES_NONE, print_status, status_sort_fn},
 /*	UBC	*/
 UBC_FIELD(kmemsize, KMEMSIZE),
@@ -1056,6 +1070,11 @@ FOR_ALL_UBC(MERGE_UBC)
 		if (veid_nm == ve->veid)
 			ve->name = strdup(res->name.name);
 	}
+	if (!list_empty(&res->misc.nameserver))
+		ve->nameserver = strdup(list2str(NULL, &res->misc.nameserver));
+	if (!list_empty(&res->misc.searchdomain))
+		ve->searchdomain = strdup(list2str(NULL, &res->misc.searchdomain));
+
 	if (res->fs.root != NULL)
 		ve->root = strdup(res->fs.root);
 	if (res->fs.private != NULL)
@@ -1747,6 +1766,8 @@ static void free_veinfo()
 
 	for (i = 0; i < n_veinfo; i++) {
 		free(veinfo[i].ip);
+		free(veinfo[i].nameserver);
+		free(veinfo[i].searchdomain);
 		free(veinfo[i].hostname);
 		free(veinfo[i].name);
 		free(veinfo[i].description);

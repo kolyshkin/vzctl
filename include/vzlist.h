@@ -94,6 +94,8 @@ struct Cveinfo {
 	char *description;
 	char *ostemplate;
 	char *ip;
+	char *nameserver;
+	char *searchdomain;
 	char *private;
 	char *root;
 	struct Cubc *ubc;
