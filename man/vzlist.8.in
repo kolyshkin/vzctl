@@ -7,6 +7,7 @@ vzlist \- show various information about containers
 .OP -n
 .OP -H
 .OP -t
+.OP -j
 .OP -o "name\fR[,\fIname\fR...] | \fB-1\fR"
 .OP -s \fR[\fB-\fR]\fIname
 .OP -h pattern
@@ -43,6 +44,8 @@ Display container names instead of hostnames.
 Suppress displaying the header row. Usable for scripts.
 .IP "\fB-t\fR, \fB--no-trim\fR"
 Suppress trimming long fields. Usable for scripts.
+.IP "\fB-j\fR, \fB--json\fR"
+Output in JSON format. By default, all possible fields are printed.
 .IP "\fB-o\fR, \fB--output\fR \fIfield\fR[,\fIfield\fR...]"
 Display only the specified \fIfield\fRs (see \fBStandard fields\fR
 subsection below).
@@ -100,6 +103,7 @@ soft limit
 .B .h
 hard limit
 .RE
+Note that for JSON output suffixes are not allowed.
 .SH EXAMPLES
 .TP
 .B vzlist -o ctid,kmemsize,kmemsize.l -s kmemsize
