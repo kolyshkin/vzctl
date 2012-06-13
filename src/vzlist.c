@@ -284,23 +284,27 @@ static void print_uptime(struct Cveinfo *p, int index)
 	}
 }
 
-static void print_cpulimit(struct Cveinfo *p, int index)
-{
-	if (p->cpu == NULL) {
-		if (fmt_json)
-			printf("null");
-		else
-			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
-					"%7s", "-");
-	}
-	else {
-		if (fmt_json)
-			printf("%lu", p->cpu->limit[index]);
-		else
-			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
-					"%7lu", p->cpu->limit[index]);
-	}
+#define PRINT_CPU(name)						\
+static void print_cpu ## name(struct Cveinfo *p, int index)	\
+{								\
+	if (p->cpu == NULL) {					\
+		if (fmt_json)					\
+			printf("null");				\
+		else						\
+			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,	\
+					"%7s", "-");		\
+	}							\
+	else {							\
+		if (fmt_json)					\
+			printf("%lu", p->cpu->name[index]);	\
+		else						\
+			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,	\
+					"%7lu", p->cpu->name[index]);			\
+	}							\
 }
+
+PRINT_CPU(limit)
+PRINT_CPU(units)
 
 static void print_ioprio(struct Cveinfo *p, int index)
 {
@@ -624,7 +628,7 @@ SORT_DQ(diskspace)
 SORT_DQ(diskinodes)
 
 SORT_UL_RES(cpulimit_sort_fn, cpu, limit, 0)
-SORT_UL_RES(cpuunits_sort_fn, cpu, limit, 1)
+SORT_UL_RES(cpuunits_sort_fn, cpu, units, 0)
 
 #define UBC_FIELD(name, header) \
 {#name,      #header,      "%10s", 0, RES_UBC, print_ubc_ ## name, name ## _h_sort_fn},	\
@@ -686,7 +690,7 @@ UBC_FIELD(swappages, SWAPP),
 {"uptime", "UPTIME", "%15s", 0, RES_CPUSTAT, print_uptime, uptime_sort_fn},
 
 {"cpulimit", "CPULIM", "%7s", 0, RES_CPU, print_cpulimit, cpulimit_sort_fn},
-{"cpuunits", "CPUUNI", "%7s", 1, RES_CPU, print_cpulimit, cpuunits_sort_fn},
+{"cpuunits", "CPUUNI", "%7s", 0, RES_CPU, print_cpuunits, cpuunits_sort_fn},
 {"cpus", "CPUS", "%5s", 0, RES_CPUNUM, print_cpunum, cpunum_sort_fn},
 
 {"ioprio", "IOP", "%3s", 0, RES_NONE, print_ioprio, ioprio_sort_fn},
@@ -981,7 +985,7 @@ static void update_cpu(int veid, unsigned long limit, unsigned long units)
 		return;
 	cpu = x_malloc(sizeof(*cpu));
 	cpu->limit[0] = limit;
-	cpu->limit[1] = units;
+	cpu->units[0] = units;
 	tmp->cpu = cpu;
 	return;
 }
@@ -1031,7 +1035,7 @@ FOR_ALL_UBC(MERGE_UBC)
 		if (res->cpu.limit != NULL)
 			ve->cpu->limit[0] = *res->cpu.limit;
 		if (res->cpu.units != NULL)
-			ve->cpu->limit[1] = *res->cpu.units;
+			ve->cpu->units[0] = *res->cpu.units;
 	}
 	if (res->misc.hostname != NULL)
 		ve->hostname = strdup(res->misc.hostname);

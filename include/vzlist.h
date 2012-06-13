@@ -79,7 +79,8 @@ struct Ccpustat {
 };
 
 struct Ccpu {
-	unsigned long limit[2];		// 0-limit, 1-units
+	unsigned long limit[1];
+	unsigned long units[1];
 };
 
 struct Cio {
