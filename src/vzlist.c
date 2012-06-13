@@ -48,9 +48,9 @@
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
 
-static char g_outbuffer[4096] = "";
-static char *p_outbuffer = g_outbuffer;
-static char *e_buf = g_outbuffer + sizeof(g_outbuffer) - 1;
+static char g_buf[4096] = "";
+static char *p_buf = g_buf;
+static char *e_buf = g_buf + sizeof(g_buf) - 1;
 static char *host_pattern = NULL;
 static char *name_pattern = NULL;
 static char *desc_pattern = NULL;
@@ -133,11 +133,11 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 								\
 	if (p->fieldname != NULL)				\
 		str = p->fieldname;				\
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer,		\
+	r = snprintf(p_buf, e_buf - p_buf,			\
 		"%" #length "s", str);				\
 	if (!is_last_field)					\
 		r = abs(length);				\
-	p_outbuffer += r;					\
+	p_buf += r;						\
 }
 
 #define PRINT_STR_FIELD(name, length)				\
@@ -198,10 +198,10 @@ static void print_ip(struct Cveinfo *p, int index)
 		if ((ch = strchr(str, ' ')) != NULL)
 			*ch = 0;
 	}
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
+	r = snprintf(p_buf, e_buf - p_buf, "%-15s", str);
 	if (!is_last_field)
 		r = 15;
-	p_outbuffer += r;
+	p_buf += r;
 }
 
 static void print_veid(struct Cveinfo *p, int index)
@@ -209,7 +209,7 @@ static void print_veid(struct Cveinfo *p, int index)
 	if (fmt_json)
 		printf("%d", p->veid);
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%10d", p->veid);
 }
 
@@ -226,7 +226,7 @@ static void print_status(struct Cveinfo *p, int index)
 	if (fmt_json)
 		print_json_str(ve_status[p->status]);
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%-9s", ve_status[p->status]);
 }
 
@@ -236,7 +236,7 @@ static void print_laverage(struct Cveinfo *p, int index)
 		if (fmt_json)
 			printf("null");
 		else
-			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+			p_buf += snprintf(p_buf, e_buf - p_buf,
 					"%14s", "-");
 	}
 	else {
@@ -246,7 +246,7 @@ static void print_laverage(struct Cveinfo *p, int index)
 					p->cpustat->la[1],
 					p->cpustat->la[2]);
 		else
-			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+			p_buf += snprintf(p_buf, e_buf - p_buf,
 					"%1.2f/%1.2f/%1.2f",
 					p->cpustat->la[0],
 					p->cpustat->la[1],
@@ -263,7 +263,7 @@ static void print_uptime(struct Cveinfo *p, int index)
 	}
 
 	if (p->cpustat == NULL)
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%15s", "-");
 	else
 	{
@@ -278,7 +278,7 @@ static void print_uptime(struct Cveinfo *p, int index)
 				(60ull * min + 60ull * 60 * hours +
 				 60ull * 60 * 24 * days));
 
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%.3dd%.2dh:%.2dm:%.2ds",
 				days, hours, min, secs);
 	}
@@ -291,15 +291,15 @@ static void print_cpu ## name(struct Cveinfo *p, int index)	\
 		if (fmt_json)					\
 			printf("null");				\
 		else						\
-			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,	\
+			p_buf += snprintf(p_buf, e_buf - p_buf,	\
 					"%7s", "-");		\
 	}							\
 	else {							\
 		if (fmt_json)					\
 			printf("%lu", p->cpu->name[index]);	\
 		else						\
-			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,	\
-					"%7lu", p->cpu->name[index]);			\
+			p_buf += snprintf(p_buf, e_buf - p_buf,	\
+				"%7lu", p->cpu->name[index]);	\
 	}							\
 }
 
@@ -314,9 +314,9 @@ static void print_ioprio(struct Cveinfo *p, int index)
 	}
 
 	if (p->io.ioprio < 0)
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%3s", "-");
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%3s", "-");
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%3d",
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%3d",
 			p->io.ioprio);
 }
 
@@ -325,7 +325,7 @@ static void print_onboot(struct Cveinfo *p, int index)
 	if (fmt_json)
 		printf(p->onboot == YES ? "true" : "false");
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf-p_buf,
 				"%6s", p->onboot == YES ? "yes" : "no");
 }
 
@@ -335,14 +335,14 @@ static void print_bootorder(struct Cveinfo *p, int index)
 		if (fmt_json)
 			printf("null");
 		else
-			p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+			p_buf += snprintf(p_buf, e_buf-p_buf,
 				"%10s", "-");
 	}
 	else {
 		if (fmt_json)
 			printf("%lu", p->bootorder[index]);
 		else
-			p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+			p_buf += snprintf(p_buf, e_buf-p_buf,
 					"%10lu", p->bootorder[index]);
 	}
 }
@@ -355,10 +355,10 @@ static void print_cpunum(struct Cveinfo *p, int index)
 	}
 
 	if (p->cpunum <= 0)
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%5s", "-");
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%5d", p->cpunum);
 }
 
@@ -379,7 +379,7 @@ static void print_layout(struct Cveinfo *p, int index)
 	if (fmt_json)
 		print_json_str(layout2str(p->layout));
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%-6s",	layout2str(p->layout));
 }
 
@@ -391,10 +391,10 @@ static void print_features(struct Cveinfo *p, int index)
 
 	features_mask2str(p->features_mask, p->features_known,
 		       ",", str, sizeof(str));
-	r = snprintf(p_outbuffer, e_buf - p_outbuffer, "%-15s", str);
+	r = snprintf(p_buf, e_buf - p_buf, "%-15s", str);
 	if (!is_last_field)
 		r = 15;
-	p_outbuffer += r;
+	p_buf += r;
 }
 
 static void print_ubc(struct Cveinfo *p, size_t res_off, int index)
@@ -422,9 +422,9 @@ static void print_ubc(struct Cveinfo *p, size_t res_off, int index)
 	}
 
 	if (!res || (!running && (index == 0 || index == 1 || index == 4)))
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%10s", "-");
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%10lu",
 				res[index]);
 }
 
@@ -461,9 +461,9 @@ static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 	}
 
 	if (!res || (!running && (index == 0)))
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%10s", "-");
 	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%10lu",
 				res[index]);
 }
 
@@ -776,16 +776,16 @@ static void print_hdr()
 
 	for (p = g_field_order; p != NULL; p = p->next) {
 		f = p->order;
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+		p_buf += snprintf(p_buf, e_buf - p_buf,
 				field_names[f].hdr_fmt, field_names[f].hdr);
-		if (p_outbuffer >= e_buf)
+		if (p_buf >= e_buf)
 			break;
 		if (p->next != NULL)
-			*p_outbuffer++ = ' ';
+			*p_buf++ = ' ';
 	}
-	printf("%s\n", trim_eol_space(g_outbuffer, p_outbuffer));
-	g_outbuffer[0] = 0;
-	p_outbuffer = g_outbuffer;
+	printf("%s\n", trim_eol_space(g_buf, p_buf));
+	g_buf[0] = 0;
+	p_buf = g_buf;
 }
 
 /*
@@ -844,15 +844,15 @@ static void print_one_ve(struct Cveinfo *ve)
 		if (p->next == NULL)
 			is_last_field = 1;
 		field_names[f].print_fn(ve, field_names[f].index);
-		if (p_outbuffer >= e_buf)
+		if (p_buf >= e_buf)
 			break;
 		if (p->next != NULL)
-			*p_outbuffer++ = ' ';
+			*p_buf++ = ' ';
 	}
 
-	printf("%s\n", trim_eol_space(g_outbuffer, p_outbuffer));
-	g_outbuffer[0] = 0;
-	p_outbuffer = g_outbuffer;
+	printf("%s\n", trim_eol_space(g_buf, p_buf));
+	g_buf[0] = 0;
+	p_buf = g_buf;
 }
 
 static void print_field_json(struct Cveinfo *ve, int fi)
