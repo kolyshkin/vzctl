@@ -151,47 +151,47 @@ PRINT_STR_FIELD(description, -32)
 PRINT_STR_FIELD(ostemplate, -32)
 PRINT_STR_FIELD_FNAME(name_short, name, 10)
 
-static void print_json_ip(const char *ip_list)
+static void print_json_list(const char *list)
 {
 	static const char spc[] = " \t";
-	int first_ip = 1;
-	const char *ip;
+	int first_item = 1;
+	const char *item;
 	const char *endp;
 
-	if (!ip_list) {
+	if (!list) {
 		printf("[]");
 		return;
 	}
 
 	printf("[");
-	ip = ip_list;
-	endp = ip_list + strlen(ip_list);
-	while (ip < endp) {
+	item = list;
+	endp = list + strlen(list);
+	while (item < endp) {
 		int toklen;
 
-		ip += strspn(ip, spc);
-		if (ip >= endp)
+		item += strspn(item, spc);
+		if (item >= endp)
 			break;
 
-		toklen = strcspn(ip, spc);
-		printf("%s\"%.*s\"", first_ip ? "" : ", ", toklen, ip);
-		first_ip = 0;
-		ip += toklen;
+		toklen = strcspn(item, spc);
+		printf("%s\"%.*s\"", first_item ? "" : ", ", toklen, item);
+		first_item = 0;
+		item += toklen;
 	}
 	printf("]");
 }
 
-static void print_ip(struct Cveinfo *p, int index)
+static void print_strlist(char *list)
 {
 	int r;
 	char *str = "-";
 	char *ch;
 
 	if (fmt_json)
-		return print_json_ip(p->ip);
+		return print_json_list(list);
 
-	if (p->ip != NULL)
-		str = p->ip;
+	if (list != NULL)
+		str = list;
 	if (!is_last_field)
 	{
 		/* Fixme: dont destroy original string */
@@ -202,6 +202,11 @@ static void print_ip(struct Cveinfo *p, int index)
 	if (!is_last_field)
 		r = 15;
 	p_buf += r;
+}
+
+static void print_ip(struct Cveinfo *p, int index)
+{
+	print_strlist(p->ip);
 }
 
 static void print_veid(struct Cveinfo *p, int index)
