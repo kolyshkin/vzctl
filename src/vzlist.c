@@ -71,6 +71,7 @@ static int all_ve = 0;
 static int only_stopped_ve = 0;
 static int with_names = 0;
 static long __clk_tck = -1;
+static int fmt_json = 0;
 
 char logbuf[32];
 char *plogbuf = logbuf;
@@ -113,11 +114,22 @@ static inline int get_run_ve(int update)
 	func(swappages)
 
 /* Print functions */
+static void print_json_str(const char *s)
+{
+	if (s)
+		printf("\"%s\"", s);
+	else
+		printf("null");
+}
+
 #define PRINT_STR_FIELD_FNAME(funcname, fieldname, length)	\
 static void print_ ## funcname(struct Cveinfo *p, int index)	\
 {								\
 	int r;							\
 	char *str = "-";					\
+								\
+	if (fmt_json)						\
+		print_json_str(p->fieldname);			\
 								\
 	if (p->fieldname != NULL)				\
 		str = p->fieldname;				\
@@ -139,11 +151,44 @@ PRINT_STR_FIELD(description, -32)
 PRINT_STR_FIELD(ostemplate, -32)
 PRINT_STR_FIELD_FNAME(name_short, name, 10)
 
+static void print_json_ip(const char *ip_list)
+{
+	static const char spc[] = " \t";
+	int first_ip = 1;
+	const char *ip;
+	const char *endp;
+
+	if (!ip_list) {
+		printf("[]");
+		return;
+	}
+
+	printf("[");
+	ip = ip_list;
+	endp = ip_list + strlen(ip_list);
+	while (ip < endp) {
+		int toklen;
+
+		ip += strspn(ip, spc);
+		if (ip >= endp)
+			break;
+
+		toklen = strcspn(ip, spc);
+		printf("%s\"%.*s\"", first_ip ? "" : ", ", toklen, ip);
+		first_ip = 0;
+		ip += toklen;
+	}
+	printf("]");
+}
+
 static void print_ip(struct Cveinfo *p, int index)
 {
 	int r;
 	char *str = "-";
 	char *ch;
+
+	if (fmt_json)
+		return print_json_ip(p->ip);
 
 	if (p->ip != NULL)
 		str = p->ip;
@@ -161,7 +206,11 @@ static void print_ip(struct Cveinfo *p, int index)
 
 static void print_veid(struct Cveinfo *p, int index)
 {
-	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10d", p->veid);
+	if (fmt_json)
+		printf("%d", p->veid);
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%10d", p->veid);
 }
 
 static void print_smart_ctid(struct Cveinfo *p, int index)
@@ -174,20 +223,45 @@ static void print_smart_ctid(struct Cveinfo *p, int index)
 
 static void print_status(struct Cveinfo *p, int index)
 {
-	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-9s", ve_status[p->status]);
+	if (fmt_json)
+		print_json_str(ve_status[p->status]);
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%-9s", ve_status[p->status]);
 }
 
 static void print_laverage(struct Cveinfo *p, int index)
 {
-	if (p->cpustat == NULL)
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%14s", "-");
-	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%1.2f/%1.2f/%1.2f",
-			p->cpustat->la[0], p->cpustat->la[1], p->cpustat->la[2]);
+	if (p->cpustat == NULL) {
+		if (fmt_json)
+			printf("null");
+		else
+			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+					"%14s", "-");
+	}
+	else {
+		if (fmt_json)
+			printf("[%1.2f, %1.2f, %1.2f]",
+					p->cpustat->la[0],
+					p->cpustat->la[1],
+					p->cpustat->la[2]);
+		else
+			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+					"%1.2f/%1.2f/%1.2f",
+					p->cpustat->la[0],
+					p->cpustat->la[1],
+					p->cpustat->la[2]);
+	}
 }
 
 static void print_uptime(struct Cveinfo *p, int index)
 {
+
+	if (fmt_json) {
+		printf("%.3f", p->cpustat ? p->cpustat->uptime : 0.);
+		return;
+	}
+
 	if (p->cpustat == NULL)
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
 				"%15s", "-");
@@ -212,15 +286,29 @@ static void print_uptime(struct Cveinfo *p, int index)
 
 static void print_cpulimit(struct Cveinfo *p, int index)
 {
-	if (p->cpu == NULL)
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%7s", "-");
-	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%7lu",
-			p->cpu->limit[index]);
+	if (p->cpu == NULL) {
+		if (fmt_json)
+			printf("null");
+		else
+			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+					"%7s", "-");
+	}
+	else {
+		if (fmt_json)
+			printf("%lu", p->cpu->limit[index]);
+		else
+			p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+					"%7lu", p->cpu->limit[index]);
+	}
 }
 
 static void print_ioprio(struct Cveinfo *p, int index)
 {
+	if (fmt_json) {
+		printf("%d", (p->io.ioprio < 0) ? 0 : p->io.ioprio);
+		return;
+	}
+
 	if (p->io.ioprio < 0)
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%3s", "-");
 	else
@@ -230,22 +318,38 @@ static void print_ioprio(struct Cveinfo *p, int index)
 
 static void print_onboot(struct Cveinfo *p, int index)
 {
-	p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
-			"%6s", p->onboot == YES ? "yes" : "no");
+	if (fmt_json)
+		printf(p->onboot == YES ? "true" : "false");
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+				"%6s", p->onboot == YES ? "yes" : "no");
 }
 
 static void print_bootorder(struct Cveinfo *p, int index)
 {
-	if (p->bootorder == NULL)
-		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+	if (p->bootorder == NULL) {
+		if (fmt_json)
+			printf("null");
+		else
+			p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
 				"%10s", "-");
-	else
-		p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
-				"%10lu", p->bootorder[index]);
+	}
+	else {
+		if (fmt_json)
+			printf("%lu", p->bootorder[index]);
+		else
+			p_outbuffer += snprintf(p_outbuffer, e_buf-p_outbuffer,
+					"%10lu", p->bootorder[index]);
+	}
 }
 
 static void print_cpunum(struct Cveinfo *p, int index)
 {
+	if (fmt_json) {
+		printf("%d", p->cpunum < 0 ? 0 : p->cpunum);
+		return;
+	}
+
 	if (p->cpunum <= 0)
 		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
 				"%5s", "-");
@@ -268,12 +372,16 @@ static const char *layout2str(int layout)
 
 static void print_layout(struct Cveinfo *p, int index)
 {
-	p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%-6s",
-			layout2str(p->layout));
+	if (fmt_json)
+		print_json_str(layout2str(p->layout));
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer,
+				"%-6s",	layout2str(p->layout));
 }
 
 static void print_features(struct Cveinfo *p, int index)
 {
+	/* FIXME: json output */
 	int r;
 	char str[64]="-";
 
@@ -285,29 +393,81 @@ static void print_features(struct Cveinfo *p, int index)
 	p_outbuffer += r;
 }
 
+static void print_ubc(struct Cveinfo *p, size_t res_off, int index)
+{
+	int running = p->status == VE_RUNNING;
+	unsigned long *res = p->ubc ?
+		(unsigned long *)((char *)(p->ubc) + res_off) : NULL;
+
+	if (fmt_json) {
+		if (res) {
+			printf("{\n"
+				"      \"held\": %lu,\n"
+				"      \"maxheld\": %lu,\n"
+				"      \"barrier\": %lu,\n"
+				"      \"limit\": %lu,\n"
+				"      \"failcnt\": %lu\n"
+				"    }",
+				running ? res[0] : 0,
+				running ? res[1] : 0,
+				res[2], res[3],
+				running ? res[4] : 0);
+		} else
+			printf("null");
+		return;
+	}
+
+	if (!res || (!running && (index == 0 || index == 1 || index == 4)))
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",
+				res[index]);
+}
+
+#ifndef offsetof
+# define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
+#endif
+
 #define PRINT_UBC(name)							\
 static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	if (p->ubc == NULL ||						\
-		(p->status != VE_RUNNING &&				\
-			(index == 0 || index == 1 || index == 4)))	\
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
-	else								\
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
-					p->ubc->name[index]);		\
-}									\
+	print_ubc(p, offsetof(struct Cubc, name), index);		\
+}
 
 FOR_ALL_UBC(PRINT_UBC)
+
+static void print_dq(struct Cveinfo *p, size_t res_off, int index)
+{
+	int running = p->status == VE_RUNNING;
+	unsigned long *res = p->quota ?
+		(unsigned long *)((char *)(p->quota) + res_off) : NULL;
+
+	if (fmt_json) {
+		if (res) {
+			printf("{\n"
+				"      \"usage\": %lu,\n"
+				"      \"softlimit\": %lu,\n"
+				"      \"hardlimit\": %lu\n"
+				"    }",
+				running ? res[0] : 0,
+				res[1], res[2]);
+		} else
+			printf("null");
+		return;
+	}
+
+	if (!res || (!running && (index == 0)))
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");
+	else
+		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",
+				res[index]);
+}
 
 #define PRINT_DQ(name)							\
 static void print_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	if (p->quota == NULL ||	(index == 0 && p->quota->name[0] == 0))	\
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10s", "-");	\
-	else								\
-		p_outbuffer += snprintf(p_outbuffer, e_buf - p_outbuffer, "%10lu",		\
-					p->quota->name[index]);		\
-}									\
+	print_dq(p, offsetof(struct Cquota, name), index);		\
+}
 
 PRINT_DQ(diskspace)
 PRINT_DQ(diskinodes)
@@ -572,6 +732,7 @@ static void usage()
 "	-n, --name		display containers' names\n"
 "	-H, --no-header		suppress columns header\n"
 "	-t, --no-trim		do not trim long values\n"
+"	-j, --json		output in JSON format\n"
 "	-o, --output		output only specified fields\n"
 "	-1			synonym for -H -octid\n"
 "	-s, --sort		sort by the specified field\n"
@@ -666,18 +827,71 @@ static void filter_by_description()
 	}
 }
 
-static void print_ve()
+static void print_one_ve(struct Cveinfo *ve)
 {
 	struct Cfield_order *p;
-	int i, f, idx;
+	int f;
+
+	if (trim)
+		is_last_field = 0;
+
+	for (p = g_field_order; p != NULL; p = p->next) {
+		f = p->order;
+		if (p->next == NULL)
+			is_last_field = 1;
+		field_names[f].print_fn(ve, field_names[f].index);
+		if (p_outbuffer >= e_buf)
+			break;
+		if (p->next != NULL)
+			*p_outbuffer++ = ' ';
+	}
+
+	printf("%s\n", trim_eol_space(g_outbuffer, p_outbuffer));
+	g_outbuffer[0] = 0;
+	p_outbuffer = g_outbuffer;
+}
+
+static void print_field_json(struct Cveinfo *ve, int fi)
+{
+	static struct Cveinfo *prev_ve = NULL;
+
+	printf("%s\n    \"%s\": ", prev_ve == ve ? "," : "",
+			field_names[fi].name);
+	field_names[fi].print_fn(ve, field_names[fi].index);
+	prev_ve = ve;
+}
+
+static void print_one_ve_json(struct Cveinfo *ve)
+{
+	static int first_entry = 1;
+
+	printf("%s\n  {", first_entry ? "" : ",");
+	first_entry = 0;
+	if (g_field_order) {
+		struct Cfield_order *p;
+		for (p = g_field_order; p != NULL; p = p->next)
+			print_field_json(ve, p->order);
+	} else {
+		unsigned long i;
+		for (i = 0; i < ARRAY_SIZE(field_names); i++)
+			if (!field_names[i].index)
+				print_field_json(ve, i);
+	}
+	printf("\n  }");
+}
+static void print_ve()
+{
+	int i, idx;
 
 	/* If sort order != veid (already sorted by) */
 	if (g_sort_field) {
 		qsort(veinfo, n_veinfo, sizeof(struct Cveinfo),
 			field_names[g_sort_field].sort_fn);
 	}
-	if (!(veid_only || !show_hdr))
+	if (!(veid_only || !show_hdr || fmt_json))
 		print_hdr();
+	if (fmt_json)
+		printf("[");
 	for (i = 0; i < n_veinfo; i++) {
 		if (sort_rev)
 			idx = n_veinfo - i - 1;
@@ -687,23 +901,13 @@ static void print_ve()
 			continue;
 		if (only_stopped_ve && veinfo[idx].status == VE_RUNNING)
 			continue;
-		if (trim)
-			is_last_field = 0;
-		for (p = g_field_order; p != NULL; p = p->next) {
-			f = p->order;
-			if (p->next == NULL)
-				is_last_field = 1;
-			field_names[f].print_fn(&veinfo[idx],
-						field_names[f].index);
-			if (p_outbuffer >= e_buf)
-				break;
-			if (p->next != NULL)
-				*p_outbuffer++ = ' ';
-		}
-		printf("%s\n", trim_eol_space(g_outbuffer, p_outbuffer));
-		g_outbuffer[0] = 0;
-		p_outbuffer = g_outbuffer;
+		if (fmt_json)
+			print_one_ve_json(&veinfo[idx]);
+		else
+			print_one_ve(&veinfo[idx]);
 	}
+	if (fmt_json)
+		printf("\n]\n");
 }
 
 static void add_elem(struct Cveinfo *ve)
@@ -1423,8 +1627,11 @@ static int build_field_order(char *fields)
 	size_t nm_len;
 
 	sp = fields;
-	if (fields == NULL)
+	if (fields == NULL) {
+		if (fmt_json)
+			return 0;
 		sp = default_field_order;
+	}
 	ep = sp + strlen(sp);
 	do {
 		if ((p = strchr(sp, ',')) == NULL)
@@ -1440,6 +1647,11 @@ static int build_field_order(char *fields)
 			fprintf(stderr, "Unknown field: %s\n", name);
 			return 1;
 		}
+		if (fmt_json && field_names[order].index) {
+			fprintf(stderr, "Field `%s' is not available "
+					"in JSON output\n", name);
+			return 1;
+		}
 		tmp = x_malloc(sizeof(struct Cfield_order));
 		tmp->order = order;
 		tmp->next = NULL;
@@ -1452,9 +1664,12 @@ static int build_field_order(char *fields)
 	return 0;
 }
 
-static inline int check_param(int res_type)
+static int check_param(int res_type)
 {
 	struct Cfield_order *p;
+
+	if (fmt_json && !g_field_order)
+		return 1;
 
 	for (p = g_field_order; p != NULL; p = p->next) {
 		if (field_names[p->order].res_type == res_type)
@@ -1541,6 +1756,7 @@ static struct option list_options[] =
 	{"stopped",	no_argument, NULL, 'S'},
 	{"all",		no_argument, NULL, 'a'},
 	{"name",	no_argument, NULL, 'n'},
+	{"json",	no_argument, NULL, 'j'},
 	{"name_filter", required_argument, NULL, 'N'},
 	{"hostname",	required_argument, NULL, 'h'},
 	{"description", required_argument, NULL, 'd'},
@@ -1560,8 +1776,8 @@ int main(int argc, char **argv)
 
 	while (1) {
 		int option_index = -1;
-		c = getopt_long(argc, argv, "HtSanN:h:d:o:s:Le1", list_options,
-				&option_index);
+		c = getopt_long(argc, argv, "HtSanjN:h:d:o:s:Le1",
+				list_options, &option_index);
 		if (c == -1)
 			break;
 
@@ -1612,6 +1828,9 @@ int main(int argc, char **argv)
 			break;
 		case 'N'	:
 			name_pattern = strdup(optarg);
+			break;
+		case 'j'	:
+			fmt_json = 1;
 			break;
 		default		:
 			/* "Unknown option" error msg is printed by getopt */
