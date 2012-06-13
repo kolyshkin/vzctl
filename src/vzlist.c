@@ -335,13 +335,18 @@ static void print_ioprio(struct Cveinfo *p, int index)
 			p->io.ioprio);
 }
 
-static void print_onboot(struct Cveinfo *p, int index)
+static void print_bool(const char *fmt, int val)
 {
 	if (fmt_json)
-		printf(p->onboot == YES ? "true" : "false");
+		printf(val ? "true" : "false");
 	else
 		p_buf += snprintf(p_buf, e_buf-p_buf,
-				"%6s", p->onboot == YES ? "yes" : "no");
+				fmt, val ? "yes" : "no");
+}
+
+static void print_onboot(struct Cveinfo *p, int index)
+{
+	print_bool("%6s", p->onboot == YES);
 }
 
 static void print_bootorder(struct Cveinfo *p, int index)
