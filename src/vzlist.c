@@ -385,9 +385,12 @@ static void print_layout(struct Cveinfo *p, int index)
 
 static void print_features(struct Cveinfo *p, int index)
 {
-	/* FIXME: json output */
 	int r;
 	char str[64]="-";
+
+	if (fmt_json)
+		return print_json_features(p->features_mask,
+				p->features_known);
 
 	features_mask2str(p->features_mask, p->features_known,
 		       ",", str, sizeof(str));

@@ -85,3 +85,25 @@ void features_mask2str(unsigned long long mask, unsigned long long known,
 			break;
 	}
 }
+
+void print_json_features(unsigned long long mask, unsigned long long known)
+{
+	struct feature_s *feat;
+	unsigned int i, j = 0;
+
+	for (i = 0; i < ARRAY_SIZE(features); i++) {
+		feat = &features[i];
+		if (!(known & feat->mask))
+			continue;
+
+		printf("%s      \"%s\": %s",
+				j++ == 0 ? "{\n" : ",\n",
+				feat->name,
+				mask & feat->mask ? "true" : "false");
+
+	}
+	if (j)
+		printf("\n    }");
+	else
+		printf("null");
+}
