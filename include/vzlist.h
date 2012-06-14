@@ -98,6 +98,7 @@ struct Cveinfo {
 	char *searchdomain;
 	char *private;
 	char *root;
+	char *origin_sample;
 	struct Cubc *ubc;
 	struct Cquota *quota;
 	struct Ccpustat *cpustat;
@@ -107,6 +108,7 @@ struct Cveinfo {
 	int hide;
 	int onboot;
 	int cpunum;
+	int disabled;
 	unsigned long *bootorder;
 	int layout; // VE_LAYOUT_*
 	unsigned long long features_mask;

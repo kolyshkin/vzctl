@@ -143,6 +143,7 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 
 PRINT_STR_FIELD(private, -32)
 PRINT_STR_FIELD(root, -32)
+PRINT_STR_FIELD(origin_sample, -32)
 PRINT_STR_FIELD(hostname, -32)
 PRINT_STR_FIELD(name, -32)
 PRINT_STR_FIELD(description, -32)
@@ -472,6 +473,11 @@ static void print_vswap(struct Cveinfo *p, int index)
 	print_bool("%5s", vswap);
 }
 
+static void print_disabled(struct Cveinfo *p, int index)
+{
+	print_bool("%6s", p->disabled);
+}
+
 static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 {
 	int running = p->status == VE_RUNNING;
@@ -625,6 +631,7 @@ static int name ## _sort_fn(const void *val1, const void *val2)		\
 
 SORT_STR_FN(private)
 SORT_STR_FN(root)
+SORT_STR_FN(origin_sample)
 SORT_STR_FN(hostname)
 SORT_STR_FN(name)
 SORT_STR_FN(description)
@@ -682,6 +689,7 @@ static struct Cfield field_names[] =
 
 {"private", "PRIVATE", "%-32s", 0, RES_NONE, print_private, private_sort_fn},
 {"root", "ROOT", "%-32s", 0, RES_NONE, print_root, root_sort_fn},
+{"origin_sample", "ORIGIN_SAMPLE", "%32s", 0, RES_NONE, print_origin_sample, origin_sample_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
 {"smart_name", "SMARTNAME", "%10s", 0, RES_NONE, print_smart_name, name_sort_fn},
@@ -737,6 +745,7 @@ UBC_FIELD(swappages, SWAPP),
 {"layout", "LAYOUT", "%6s", 0, RES_NONE, print_layout, layout_sort_fn},
 {"features", "FEATURES", "%-15s", 0, RES_NONE, print_features, none_sort_fn},
 {"vswap", "VSWAP", "%5s", 0, RES_NONE, print_vswap, none_sort_fn},
+{"disabled", "DISABL", "%6s", 0, RES_NONE, print_disabled, none_sort_fn},
 };
 
 static void *x_malloc(int size)
@@ -1035,7 +1044,7 @@ do {								\
 	}							\
 } while(0);
 
-static void merge_conf(struct Cveinfo *ve, vps_res *res)
+static void merge_conf(struct Cveinfo *ve, vps_res *res, vps_opt *opt)
 {
 	if (ve->ubc == NULL) {
 		ve->ubc = x_malloc(sizeof(struct Cubc));
@@ -1104,6 +1113,9 @@ FOR_ALL_UBC(MERGE_UBC)
 		ve->cpunum = *res->cpu.vcpus;
 	ve->features_mask  = res->env.features_mask;
 	ve->features_known = res->env.features_known;
+	ve->disabled = opt->start_disabled;
+	if (opt->origin_sample != NULL)
+		ve->origin_sample = strdup(opt->origin_sample);
 }
 
 static int read_ves_param()
@@ -1130,7 +1142,7 @@ static int read_ves_param()
 		param = init_vps_param();
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.conf", veid);
 		vps_parse_config(veid, buf, param, NULL);
-		merge_conf(&veinfo[i], &param->res);
+		merge_conf(&veinfo[i], &param->res, &param->opt);
 		if (veinfo[i].root == NULL)
 			veinfo[i].root = subst_VEID(veinfo[i].veid, ve_root);
 		if (veinfo[i].private == NULL)
@@ -1785,6 +1797,7 @@ static void free_veinfo()
 		free(veinfo[i].cpu);
 		free(veinfo[i].root);
 		free(veinfo[i].private);
+		free(veinfo[i].origin_sample);
 		free(veinfo[i].bootorder);
 	}
 }
