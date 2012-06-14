@@ -50,13 +50,13 @@ EXTRA_DIST = $(SRCS) toc.man.in toc.sh html2wiki.sh macros.tmac
 	cat macros.tmac $< > $@
 
 check-man-dates:
-	for FILE in $(man_MANS); do \
+	for FILE in $(SRCS); do \
 		DATE="$$(LANG=C git log -1 --format='format:%cD' \
 			$${FILE} | awk '{print $$2, $$3, $$4}')" && \
 		echo $$FILE: $$DATE && \
 		sed -e "1s%\(\.TH \w\w* [0-9] \"\)[0-9]* \w\w* [0-9][0-9][0-9][0-9]%\1$${DATE}%" -i $${FILE}; \
 	done
-	git diff $(man_MANS)
+	git diff $(SRCS)
 .PHONY: check-man-dates
 
 %.5.ps:	%.5
