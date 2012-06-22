@@ -907,7 +907,7 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 	return 0;
 }
 
-static int wait_child(int pid)
+static int wait_child(int pid, int ignore_kill)
 {
 	int status, ret;
 
@@ -923,7 +923,7 @@ static int wait_child(int pid)
 	ret = 0;
 	if (WIFEXITED(status) && (ret = WEXITSTATUS(status)))
 		logger(-1, 0, "Child %d exited with status %d", pid, ret);
-	else if (WIFSIGNALED(status)) {
+	else if (!ignore_kill && WIFSIGNALED(status)) {
 		logger(-1, 0, "Child %d terminated with signal %d",
 				pid, WTERMSIG(status));
 		ret = VZ_SYSTEM_ERROR;
@@ -949,7 +949,7 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		ret = real_env_stop(h, veid, root, stop_mode);
 		exit(ret);
 	}
-	if (wait_child(pid)) /* reboot/halt failed, retry with kill */
+	if (wait_child(pid, 0)) /* reboot/halt failed, retry with kill */
 		goto kill_vps;
 
 	for (i = 0; i < MAX_SHTD_TM; i++) {
@@ -971,7 +971,7 @@ kill_vps:
 		ret = real_env_stop(h, veid, root, M_KILL);
 		exit(ret);
 	}
-	ret = wait_child(pid);
+	ret = wait_child(pid, 1);
 	if (ret)
 		goto out;
 
