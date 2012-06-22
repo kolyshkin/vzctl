@@ -905,21 +905,40 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 	return 0;
 }
 
+static int wait_child(int pid)
+{
+	int status, ret;
+
+	while ((ret = waitpid(pid, &status, 0)) == -1)
+		if (errno != EINTR)
+			break;
+
+	if (ret < 0) {
+		logger(-1, errno, "Error in waitpid(%d)", pid);
+		return VZ_SYSTEM_ERROR;
+	}
+
+	ret = 0;
+	if (WIFEXITED(status) && (ret = WEXITSTATUS(status)))
+		logger(-1, 0, "Child %d exited with status %d", pid, ret);
+	else if (WIFSIGNALED(status)) {
+		logger(-1, 0, "Child %d terminated with signal %d",
+				pid, WTERMSIG(status));
+		ret = VZ_SYSTEM_ERROR;
+	}
+
+	return ret;
+}
+
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		int stop_mode)
 {
-	struct sigaction act, actold;
-	int i, pid, ret = 0;
+	int i, pid, ret, tout = 0;
 
-	sigaction(SIGCHLD, NULL, &actold);
-	sigemptyset(&act.sa_mask);
-	act.sa_handler = SIG_IGN;
-	act.sa_flags = SA_NOCLDSTOP;
-	sigaction(SIGCHLD, &act, NULL);
-
-	logger(0, 0, "Stopping container ...");
 	if (stop_mode == M_KILL)
 		goto kill_vps;
+
+	logger(0, 0, "Stopping container ...");
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Can not fork");
 		ret = VZ_RESOURCE_ERROR;
@@ -928,6 +947,9 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		ret = real_env_stop(h, veid, root, stop_mode);
 		exit(ret);
 	}
+	if (wait_child(pid)) /* reboot/halt failed, retry with kill */
+		goto kill_vps;
+
 	for (i = 0; i < MAX_SHTD_TM; i++) {
 		sleep(1);
 		if (!vps_is_run(h, veid)) {
@@ -937,15 +959,20 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 	}
 
 kill_vps:
+	logger(0, 0, "Killing container ...");
 	if ((pid = fork()) < 0) {
 		ret = VZ_RESOURCE_ERROR;
 		logger(-1, errno, "Can not fork");
-		goto err;
+		goto out;
 
 	} else if (pid == 0) {
 		ret = real_env_stop(h, veid, root, M_KILL);
 		exit(ret);
 	}
+	ret = wait_child(pid);
+	if (ret)
+		goto out;
+
 	ret = VZ_STOP_ERROR;
 	for (i = 0; i < MAX_SHTD_TM; i++) {
 		usleep(500000);
@@ -954,13 +981,14 @@ kill_vps:
 			break;
 		}
 	}
+	tout = 1;
 out:
 	if (ret)
-		logger(-1, 0, "Unable to stop container: operation timed out");
+		logger(-1, 0, "Unable to stop container%s",
+				tout ? ": operation timed out" : "");
 	else
 		logger(0, 0, "Container was stopped");
-err:
-	sigaction(SIGCHLD, &actold, NULL);
+
 	return ret;
 }
 
