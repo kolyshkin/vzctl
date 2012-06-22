@@ -886,12 +886,14 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 		{
 			char *argv[] = {"reboot", NULL};
 			execvep(argv[0], argv, NULL);
+			return VZ_STOP_ERROR;
 			break;
 		}
 		case M_HALT:
 		{
 			char *argv[] = {"halt", NULL};
 			execvep(argv[0], argv, NULL);
+			return VZ_STOP_ERROR;
 			break;
 		}
 		case M_KILL:
