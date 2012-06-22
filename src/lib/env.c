@@ -878,7 +878,7 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 		if (errno == ESRCH)
 			return 0;
 		logger(-1, errno, "Container enter failed");
-		return ret;
+		return VZ_ENVCREATE_ERROR;
 	}
 	close(h->vzfd);
 	switch (stop_mode) {
