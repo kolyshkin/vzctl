@@ -138,7 +138,7 @@ int env_wait(int pid)
 		}
 	} else {
 		ret = VZ_SYSTEM_ERROR;
-		logger(-1, errno, "Error in waitpid(%d)", ret);
+		logger(-1, errno, "Error in waitpid()");
 	}
 	return ret;
 }
