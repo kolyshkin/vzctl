@@ -19,10 +19,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mount.h>
-#include <sys/vfs.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
-#include <string.h>
+#include <limits.h>
 
 #include "types.h"
 #include "fs.h"
@@ -34,34 +34,23 @@
  *	    0 - no
  *	  < 0 - error
  */
-int vz_fs_is_mounted(const char *root)
+int vz_fs_is_mounted(const char *target)
 {
-	FILE *fp;
-	char buf[512];
-	char mnt[512];
-	char *path;
-	int ret = 0;
+	struct stat st1, st2;
+	char parent[PATH_MAX];
 
-	if ((fp = fopen("/proc/mounts", "r")) == NULL) {
-		logger(-1, errno,  "unable to open /proc/mounts");
+	if (stat(target, &st1)) {
+		logger(-1, errno, "stat(%s)", target);
 		return -1;
 	}
-	path = realpath(root, NULL);
-	if (path == NULL)
-		path = strdup(root);
-	while (!feof(fp)) {
-		if (fgets(buf, sizeof(buf), fp) == NULL)
-			break;
-		if (sscanf(buf, "%*[^ ] %s ", mnt) != 1)
-			continue;
-		if (!strcmp(mnt, path)) {
-			ret = 1;
-			break;
-		}
+
+	snprintf(parent, sizeof(parent), "%s/..", target);
+	if (stat(parent, &st2)) {
+		logger(-1, errno, "stat(%s)", parent);
+		return -1;
 	}
-	free(path);
-	fclose(fp);
-	return ret;
+
+	return (st1.st_dev != st2.st_dev);
 }
 
 static char *fs_name = "simfs";
