@@ -64,7 +64,6 @@ static char *default_nm_field_order = "veid,numproc,status,ip,name";
 static int g_sort_field = 0;
 static int *g_ve_list = NULL;
 static int n_ve_list = 0;
-static int veid_only = 0;
 static int sort_rev = 0;
 static int show_hdr = 1;
 static int trim = 1;
@@ -931,7 +930,7 @@ static void print_ve()
 		qsort(veinfo, n_veinfo, sizeof(struct Cveinfo),
 			field_names[g_sort_field].sort_fn);
 	}
-	if (!(veid_only || !show_hdr || fmt_json))
+	if (!(!show_hdr || fmt_json))
 		print_hdr();
 	if (fmt_json)
 		printf("[");
@@ -1870,7 +1869,7 @@ int main(int argc, char **argv)
 			break;
 		case '1'	:
 			f_order = strdup("veid");
-			veid_only = 1;
+			show_hdr = 0;
 			break;
 		case 'n'	:
 			f_order = strdup(default_nm_field_order);
