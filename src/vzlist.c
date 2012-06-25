@@ -59,8 +59,8 @@ static char *dumpdir = NULL;
 static int vzctlfd;
 static struct Cfield_order *g_field_order = NULL;
 static int is_last_field = 1;
-static char *default_field_order = "smart_ctid,numproc,status,ip,hostname";
-static char *default_nm_field_order = "veid,numproc,status,ip,name";
+static char *default_field_order = "ctid,numproc,status,ip,hostname";
+static char *default_nm_field_order = "smart_name,numproc,status,ip,hostname";
 static int g_sort_field = 0;
 static int *g_ve_list = NULL;
 static int n_ve_list = 0;
@@ -227,7 +227,7 @@ static void print_veid(struct Cveinfo *p, int index)
 				"%10d", p->veid);
 }
 
-static void print_smart_ctid(struct Cveinfo *p, int index)
+static void print_smart_name(struct Cveinfo *p, int index)
 {
 	if (p->name != NULL)
 		print_name_short(p, index);
@@ -685,7 +685,7 @@ static struct Cfield field_names[] =
 {"root", "ROOT", "%-32s", 0, RES_NONE, print_root, root_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
-{"smart_ctid", "CTID", "%10s", 0, RES_NONE, print_smart_ctid, name_sort_fn},
+{"smart_name", "SMARTNAME", "%10s", 0, RES_NONE, print_smart_name, name_sort_fn},
 {"description", "DESCRIPTION", "%-32s", 0, RES_NONE, print_description, description_sort_fn },
 {"ostemplate", "OSTEMPLATE", "%-32s", 0, RES_NONE, print_ostemplate, ostemplate_sort_fn },
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
