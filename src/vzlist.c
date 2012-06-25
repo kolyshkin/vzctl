@@ -70,7 +70,6 @@ static int show_hdr = 1;
 static int trim = 1;
 static int all_ve = 0;
 static int only_stopped_ve = 0;
-static int with_names = 0;
 static long __clk_tck = -1;
 static int fmt_json = 0;
 
@@ -1875,7 +1874,6 @@ int main(int argc, char **argv)
 			break;
 		case 'n'	:
 			f_order = strdup(default_nm_field_order);
-			with_names = 1;
 			break;
 		case 'N'	:
 			name_pattern = strdup(optarg);
