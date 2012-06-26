@@ -493,7 +493,7 @@ static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 		return;
 	}
 
-	if (!res || (!running && (index == 0)))
+	if (!res || (index == 0 && res[index] == 0))
 		p_buf += snprintf(p_buf, e_buf - p_buf, "%10s", "-");
 	else
 		p_buf += snprintf(p_buf, e_buf - p_buf, "%10lu",
