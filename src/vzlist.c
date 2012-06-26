@@ -1434,16 +1434,11 @@ static int get_run_quota_stat()
 static int get_ve_ploop_info(struct Cveinfo *ve)
 {
 	char descr[PATH_MAX];
-	struct ploop_disk_images_data *di;
 	struct ploop_info i = {};
-	int ret = -1;
 
 	GET_DISK_DESCRIPTOR(descr, ve->private);
-	di = ploop_alloc_diskdescriptor();
-	if (ploop_read_diskdescriptor(descr, di))
-		goto err;
-	if (ploop_get_info(di, &i))
-		goto err;
+	if (ploop_get_info_by_descr(descr, &i))
+		return -1;
 
 	// space avail
 	ve->quota->diskspace[1] = ve->quota->diskspace[2] =
@@ -1458,10 +1453,7 @@ static int get_ve_ploop_info(struct Cveinfo *ve)
 	// inodes used
 	ve->quota->diskinodes[0] = i.fs_inodes - i.fs_ifree;
 
-	ret = 0;
-err:
-	ploop_free_diskdescriptor(di);
-	return ret;
+	return 0;
 }
 
 static int get_ves_ploop_info()
