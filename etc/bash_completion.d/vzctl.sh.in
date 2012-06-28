@@ -70,7 +70,7 @@ _vzctl()
 	local vzctl_common_opts="--quiet --verbose --help --version"
 	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status quotaon quotaoff quotainit \
-		enter exec exec2 runscript convert console \
+		enter exec exec2 runscript convert compact console \
 		snapshot snapshot-switch snapshot-delete snapshot-list"
 	local vzctl_create_opts="--ostemplate --config --private --root \
 		--layout --diskspace --ipadd --hostname --name --description"
