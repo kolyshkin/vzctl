@@ -414,6 +414,52 @@ static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
 			&g_p->res.fs, &g_p->res.dq, mode);
 }
 
+static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
+		vps_param *cmd_p)
+{
+	char *cmd;
+	int mounted;
+	int ret;
+	const char *private	= g_p->res.fs.private;
+	const char *root	= g_p->res.fs.root;
+
+	if (check_var(root, "VE_ROOT is not set"))
+		return VZ_VE_ROOT_NOTSET;
+
+	if (check_var(private, "VE_PRIVATE is not set"))
+		return VZ_VE_PRIVATE_NOTSET;
+
+	if (!stat_file(private)) {
+		logger(-1, 0, "Container private area %s does not exist",
+				private);
+		return VZ_FS_NOPRVT;
+	}
+
+	if (!ve_private_is_ploop(private)) {
+		logger(0, 0, "Compact only makes sense for ploop containers");
+		return 0;
+	}
+
+	mounted = vps_is_mounted(root);
+	if (!mounted)
+	{
+		ret = vps_mount(h, veid, &g_p->res.fs, &g_p->res.dq,
+				SKIP_ACTION_SCRIPT);
+		if (ret != 0)
+			return ret;
+	}
+
+	asprintf(&cmd, "ploop balloon discard %s", root);
+	logger(1, 0, "Executing %s", cmd);
+	ret = system(cmd);
+	free(cmd);
+
+	if (!mounted)
+		vps_umount(h, veid, &g_p->res.fs, SKIP_ACTION_SCRIPT);
+
+	return (ret == 0) ? 0 : VZCTL_E_COMPACT;
+}
+
 static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 {
 	int c;
@@ -1282,6 +1328,9 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 	case ACTION_CONVERT:
 		ret = convert(h, veid, g_p, cmd_p);
+		break;
+	case ACTION_COMPACT:
+		ret = compact(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_SET:
 		if (veid == 0)

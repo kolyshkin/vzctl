@@ -53,6 +53,8 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBconvert\fR \fICTID\fR
 .OP --layout \fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
 .SY vzctl
+[\fIflags\fR] \fBcompact\fR \fICTID\fR
+.SY vzctl
 [\fIflags\fR] \fBexec\fR | \fBexec2\fR \fICTID\fR
 \fIcommand\fR [\fIarg\fR ...]
 .SY vzctl
@@ -947,6 +949,8 @@ Note that \fBstop\fR does \fBumount\fR automatically.
 Convert CT private area to reside on a ploop device (available in kernel
 version 042stab052.8 and greater). Conversion should be performed when
 a container is stopped, plus disk space quota should be set.
+.IP "\fBcompact\fR \fICTID\fR" 4
+Compact container image. This only makes sense for ploop layout.
 .IP "\fBquotaon\fR \fICTID\fR" 4
 Turn disk quota on. Not that \fBmount\fR and \fBstart\fR does that
 automatically.
@@ -1237,6 +1241,8 @@ Error merging ploop snapshot
 Error deleting ploop snapshot
 .IP 159
 Error switching  ploop snapshot
+.IP 160
+Error compacting ploop image
 .SH EXAMPLES
 To create and start "basic" container with ID of 1000 using
 \fBcentos-5\fR OS template and IP address of 192.168.10.200:

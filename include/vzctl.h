@@ -45,6 +45,7 @@ typedef enum {
 	ACTION_SNAPSHOT_SWITCH,
 	ACTION_SNAPSHOT_DELETE,
 	ACTION_SNAPSHOT_LIST,
+	ACTION_COMPACT,
 } act_t;
 
 /* default cpu units values */
