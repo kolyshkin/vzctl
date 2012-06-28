@@ -208,8 +208,6 @@ int quota_on(envid_t veid, char *private, dq_param *param)
 	arg[i++] = strdup("on");
 	snprintf(buf, sizeof(buf), "%d", veid);
 	arg[i++] = strdup(buf);
-	arg[i++] = strdup("-r");
-	arg[i++] = strdup("0");
 	/* Disk space */
 	arg[i++] = strdup("-b");
 	snprintf(buf, sizeof(buf), "%lu", param->diskspace[0]);
