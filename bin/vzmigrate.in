@@ -32,6 +32,8 @@ remove_area=1
 keep_dst=0
 debug=0
 times=0
+compact=0
+snapshot=0
 confdir="@PKGCONFDIR@/conf"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
@@ -84,6 +86,10 @@ Options:
 	error. It makes sense to use this option on big container migration to
 	avoid re-syncing container private area in case some error
 	(on container stop for example) occurs during first migration attempt.
+-c, --compact
+	Compact a container image before migration. Works for ploop only.
+-s, --snapshot
+	Create a container snapshot before migration. Works for ploop only.
 --live
 	Perform live migration: instead of restarting a container, checkpoint
 	and restore are used, so there is no container downtime or service
@@ -334,6 +340,12 @@ while [ ! -z "$1" ]; do
 	--keep-dst)
 		keep_dst=1
 		;;
+	-c|--compact)
+		compact=1
+		;;
+	-s|--snapshot)
+		snapshot=1
+		;;
 	--ssh=*)
 		SSH_OPTIONS="$SSH_OPTIONS $(echo $1 | cut -c7-)"
 		SCP_OPTIONS="`echo $SSH_OPTIONS | sed 's/-p/-P/1'`"
@@ -530,6 +542,8 @@ fi
 
 if [ "$PLOOP" != "yes" ]; then
 	RSYNC1_OPTIONS="--sparse"
+	compact=0
+	snapshot=0
 else
 	if ! get_ploop_info; then
 		log 0 "Can't get ploop information"
@@ -554,6 +568,22 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 		log 0 "Failed to turn quota on"
 		undo_quota_init
 		exit $MIG_ERR_QUOTA
+	fi
+fi
+
+if [ "$compact" -eq 1 ]; then
+	log 1 "Compacting container image"
+	if ! logexec 2 vzctl compact $VEID ; then
+		log 0 "Failed to compact container image"
+		undo_root
+	fi
+fi
+
+if [ "$snapshot" -eq 1 ]; then
+	log 1 "Creating a container snapshot"
+	if ! logexec 2 $VZCTL snapshot $VEID ; then
+		log 0 "Failed to snapshot a container"
+		undo_root
 	fi
 fi
 

@@ -1,4 +1,4 @@
-.TH vzmigrate 8 "29 Apr 2012" "OpenVZ" "Containers"
+.TH vzmigrate 8 "28 Jun 2012" "OpenVZ" "Containers"
 
 .SH NAME
 vzmigrate \- migrate a container between two OpenVZ servers
@@ -10,6 +10,8 @@ vzmigrate \- migrate a container between two OpenVZ servers
 .OP --rsync=\fIrsync_options
 .OP --keep-dst
 .OP --live
+.OP -c\fR|\fB--compact
+.OP -s\fR|\fB--snapshot
 .OP -t\fR|\fB--times
 .OP -v
 .I destination_address CTID
@@ -57,6 +59,16 @@ and restore are used, so there is no container downtime or service
 interruption. Additional steps are performed to minimize the time
 when a container is in suspended state.
 Option \fB--online\fR can be used as a backward-compatible alias.
+
+.TP
+\fB-c\fR, \fB--compact\fR
+Compact a container image (i.e. run \fBvzctl compact\fR)
+before migration. Works for ploop only, ignored otherwise.
+
+.TP
+\fB-s\fR, \fB--snapshot\fR
+Create a container snapshot (i.e. run \fBvzctl snapshot\fR)
+before migration. Works for ploop only, ignored otherwise.
 
 .TP
 \fB-t\fR, \fB--times\fR
