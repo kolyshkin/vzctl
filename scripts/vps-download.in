@@ -134,6 +134,8 @@ overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
 # in a directory, so we rely on having a .listing file next to templates.
 list()
 {
+	local url
+
 	for url in $TEMPLATE_REPOS; do
 		wget -q -O - $url/.listing
 	done
