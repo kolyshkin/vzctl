@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2011, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2011-2012, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -67,11 +67,12 @@ usage()
 	cat << -EOF- 1>&2
 Usage:
   $SELF [option ...] template [template ...]
-  $SELF --config | --help
+  $SELF --config | --help | --list
 Options:
   --no-gpg-check	Do not check GPG signatures
   --no-update		Do not try to update existing templates
   --config		Output current configuration
+  --list		Output list of templates available for download
   --help		Print this help
 Arguments:
   template		An OS template name (like centos-6-x86_64)
@@ -129,6 +130,15 @@ overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
 	done
 }
 
+# There's no generic way to ask a web server about list of files
+# in a directory, so we rely on having a .listing file next to templates.
+list()
+{
+	for url in $TEMPLATE_REPOS; do
+		wget -q -O - $url/.listing
+	done
+}
+
 # Parse arguments
 while echo $1 | grep -q '^-'; do
 	case $1 in
@@ -142,6 +152,10 @@ while echo $1 | grep -q '^-'; do
 		;;
 	   --config)
 		show_config
+		exit 0
+		;;
+	   --list)
+		list
 		exit 0
 		;;
 	   --help)
