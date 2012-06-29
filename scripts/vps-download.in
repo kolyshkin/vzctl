@@ -135,10 +135,17 @@ overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
 list()
 {
 	local url
+	local cache=/tmp/$SELF-list
 
-	for url in $TEMPLATE_REPOS; do
-		wget -q -O - $url/.listing
-	done
+	umask 0770
+	# Cache the result for 1 minute
+	if test -z "$(find $cache -mmin -1 2>/dev/null)"; then
+		for url in $TEMPLATE_REPOS; do
+			wget -q -O - $url/.listing
+		done > $cache
+	fi
+
+	cat $cache
 }
 
 # Parse arguments
