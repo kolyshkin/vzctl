@@ -349,8 +349,8 @@ int ve_private_is_ploop(const char *private)
 {
 	char image[PATH_MAX];
 
-	snprintf(image, sizeof(image), "%s/%s/root.hdd",
-			private, VZCTL_VE_ROOTHDD_DIR);
+	GET_DISK_DESCRIPTOR(image, private);
+
 	return stat_file(image);
 }
 
