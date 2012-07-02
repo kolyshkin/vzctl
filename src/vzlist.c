@@ -73,7 +73,6 @@ static long __clk_tck = -1;
 static int fmt_json = 0;
 
 char logbuf[32];
-char *plogbuf = logbuf;
 static int get_run_ve_proc(int);
 #if HAVE_VZLIST_IOCTL
 static int get_run_ve_ioctl(int);
