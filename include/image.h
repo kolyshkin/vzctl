@@ -24,9 +24,11 @@
 #include "quota.h"
 #include "fs.h"
 
+#define VZCTL_VE_ROOTHDD_DIR	"root.hdd"
+
 #define GET_DISK_DESCRIPTOR(buf, ve_private) \
 	snprintf(buf, sizeof(buf), \
-		"%s/root.hdd/" DISKDESCRIPTOR_XML, ve_private)
+		"%s/" VZCTL_VE_ROOTHDD_DIR "/" DISKDESCRIPTOR_XML, ve_private)
 
 struct vzctl_create_image_param {
 	int mode;

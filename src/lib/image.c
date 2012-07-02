@@ -37,7 +37,6 @@
 #include "destroy.h"
 
 #define DEFAULT_FSTYPE		"ext4"
-#define VZCTL_VE_ROOTHDD_DIR	"root.hdd"
 
 int get_ploop_type(const char *type)
 {
