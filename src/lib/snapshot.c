@@ -107,6 +107,10 @@ int vzctl_add_snapshot_tree_entry(struct vzctl_snapshot_tree *tree, int current,
 	struct vzctl_snapshot_data **tmp;
 	struct vzctl_snapshot_data *data;
 
+	if (vzctl_find_snapshot_by_guid(tree, guid) != -1)
+		return vzctl_err(VZ_INVALID_PARAMETER_VALUE, 0,
+				"Invalid guid %s specified: already exists", guid);
+
 	data = calloc(1, sizeof(struct vzctl_snapshot_data));
 	if (data == NULL)
 		return vzctl_err(VZ_RESOURCE_ERROR, ENOMEM, "calloc failed");
