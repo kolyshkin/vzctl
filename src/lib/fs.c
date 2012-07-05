@@ -223,8 +223,9 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 
 int vps_set_fs(fs_param *g_fs, fs_param *fs)
 {
-	if (fs->noatime != YES)
-		return 0;
+	/* This function is currently unused */
+	return 0;
+
 	if (check_var(g_fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 	if (check_var(g_fs->private, "VE_PRIVATE is not set"))
@@ -233,6 +234,5 @@ int vps_set_fs(fs_param *g_fs, fs_param *fs)
 		logger(-1, 0, "Container is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
-	g_fs->noatime = fs->noatime;
 	return vz_mount(g_fs, 1);
 }

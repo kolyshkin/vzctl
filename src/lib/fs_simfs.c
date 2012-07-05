@@ -63,8 +63,6 @@ int vz_mount(fs_param *fs, int remount)
 {
 	int mntopt = 0;
 
-	if (fs->noatime == YES)
-		mntopt |= MS_NOATIME;
 	if (remount)
 		mntopt |= MS_REMOUNT;
 	logger(2, 0,  "Mounting root: %s %s", fs->root, fs->private);

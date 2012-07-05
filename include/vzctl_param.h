@@ -70,7 +70,6 @@
 #define PARAM_QUOTAUGIDLIMIT	39
 #define PARAM_DISK_QUOTA	40
 
-#define PARAM_NOATIME		43
 #define PARAM_SAFE		44
 #define PARAM_CAP		45
 #define PARAM_CONFIG		47

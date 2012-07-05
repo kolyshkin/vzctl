@@ -44,7 +44,6 @@ typedef struct {
 	char *root;		/**< CT root path. */
 	char *root_orig;	/**< original not expanded root path. */
 	char *tmpl;		/**< TEMPLATE path. */
-	int noatime;
 } fs_param;
 
 /** Get CT mount status.

@@ -157,8 +157,6 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --diskinodes num
 .OP --quotatime seconds
 .OP --quotaugidlimit num
-.\" Mount option
-.OP --noatime \fByes\fR|\fBno
 .\" Capability
 .OP --capability capname\fR:\fBon\fR|\fBoff\fR[\fB,\fR...]
 .\" Device access management
@@ -685,11 +683,6 @@ is not limited by OpenVZ.
 
 Note that enabling or disabling in-container disk quotas requires container
 restart, so consider using \fB--setmode\fR option.
-
-.SS3 Mount option
-.TP
-\fB--noatime\fR \fByes\fR | \fBno\fR
-Sets noatime flag (do not update inode access times) on filesystem.
 
 .SS3 Capability option
 .TP

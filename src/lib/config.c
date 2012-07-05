@@ -112,7 +112,6 @@ static vps_config config[] = {
 {"VE_ROOT",	NULL, PARAM_ROOT},
 {"VE_PRIVATE",	NULL, PARAM_PRIVATE},
 {"TEMPLATE",	NULL, PARAM_TEMPLATE},
-{"NOATIME",	NULL, PARAM_NOATIME},
 {"VE_LAYOUT",	NULL, PARAM_VE_LAYOUT},
 /*	template     */
 {"OSTEMPLATE",	NULL, PARAM_OSTEMPLATE},
@@ -158,6 +157,7 @@ static vps_config config[] = {
 {"IPTABLES_MODULES",	NULL, PARAM_IGNORED},
 {"IP6TABLES",		NULL, PARAM_IGNORED},
 {"CONFIG_CUSTOMIZED",	NULL, PARAM_IGNORED},
+{"NOATIME",		NULL, PARAM_IGNORED},
 
 {NULL,		NULL, -1}
 };
@@ -927,9 +927,6 @@ static int store_fs(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		break;
 	case PARAM_PRIVATE:
 		ret = conf_store_str(conf_h, conf->name, fs->private_orig);
-		break;
-	case PARAM_NOATIME:
-		ret = conf_store_yesno(conf_h, conf->name, fs->noatime);
 		break;
 	}
 	return ret;
@@ -2048,9 +2045,6 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_TEMPLATE:
 		ret = conf_parse_str(&vps_p->res.fs.tmpl, val);
 		break;
-	case PARAM_NOATIME:
-		ret = conf_parse_yesno(&vps_p->res.fs.noatime, val);
-		break;
 	case PARAM_VE_LAYOUT:
 		ret = parse_ve_layout(&vps_p->opt.layout,
 				&vps_p->opt.mode, val);
@@ -2777,7 +2771,6 @@ static void merge_fs(fs_param *dst, fs_param *src)
 	MERGE_STR(private)
 	MERGE_STR(private_orig)
 	MERGE_STR(tmpl)
-	MERGE_INT(noatime)
 }
 
 static void merge_tmpl(tmpl_param *dst, tmpl_param *src)
