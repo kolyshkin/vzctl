@@ -95,6 +95,11 @@ typedef struct {
 	int stdfd;
 } vps_handler;
 
+static inline int is_vz_kernel(vps_handler *h)
+{
+	return h->vzfd != -1;
+}
+
 typedef enum {
 	SKIP_NONE =		0,
 	SKIP_SETUP =		(1<<0),
