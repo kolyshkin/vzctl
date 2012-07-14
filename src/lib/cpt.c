@@ -315,7 +315,7 @@ static int restore_fn(vps_handler *h, envid_t veid, int wait_p,
 	if (param == NULL)
 		goto err;
 	/* Close all fds */
-	close_fds(0, wait_p, old_wait_p, err_p, h->vzfd, param->rst_fd, -1);
+	close_fds(0, wait_p, old_wait_p, err_p, param->rst_fd, h->vzfd, -1);
 	if (ioctl(param->rst_fd, CPT_SET_VEID, veid) < 0) {
 		logger(-1, errno, "Can't set CT ID %d", param->rst_fd);
 		goto err;

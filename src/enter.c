@@ -288,7 +288,7 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 		tcgetattr(0, &tios);
 		close(in[1]); close(out[0]); close(st[0]); close(info[1]);
 		/* list of skipped fds -1 the end mark */
-		close_fds(1, in[0], out[1], st[1], h->vzfd, info[0], -1);
+		close_fds(1, in[0], out[1], st[1], info[0], h->vzfd, -1);
 		dup2(out[1], 1);
 		dup2(out[1], 2);
 		if ((ret = vz_chroot(root)))
