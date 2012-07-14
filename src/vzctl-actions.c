@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/mount.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
