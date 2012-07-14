@@ -44,6 +44,7 @@ typedef struct {
 	char *root;		/**< CT root path. */
 	char *root_orig;	/**< original not expanded root path. */
 	char *tmpl;		/**< TEMPLATE path. */
+	int flags;
 } fs_param;
 
 /** Get CT mount status.
@@ -99,6 +100,6 @@ int vps_set_fs(fs_param *g_fs, fs_param *fs);
 
 extern const char *vz_fs_get_name();
 extern int vz_fs_is_mounted(const char *root);
-extern int vz_mount(fs_param *fs, int remount);
+extern int vz_mount(fs_param *fs, int flags);
 
 #endif

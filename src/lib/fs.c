@@ -234,5 +234,6 @@ int vps_set_fs(fs_param *g_fs, fs_param *fs)
 		logger(-1, 0, "Container is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
-	return vz_mount(g_fs, 1);
+
+	return vz_mount(g_fs, MS_REMOUNT | fs->flags);
 }

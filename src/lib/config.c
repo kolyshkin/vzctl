@@ -2771,6 +2771,7 @@ static void merge_fs(fs_param *dst, fs_param *src)
 	MERGE_STR(private)
 	MERGE_STR(private_orig)
 	MERGE_STR(tmpl)
+	MERGE_INT(flags)
 }
 
 static void merge_tmpl(tmpl_param *dst, tmpl_param *src)

@@ -59,12 +59,11 @@ const char *vz_fs_get_name()
 	return fs_name;
 }
 
-int vz_mount(fs_param *fs, int remount)
+int vz_mount(fs_param *fs, int flags)
 {
-	int mntopt = 0;
+	int mntopt = fs->flags | flags;
+	const int remount = flags & MS_REMOUNT;
 
-	if (remount)
-		mntopt |= MS_REMOUNT;
 	logger(2, 0,  "Mounting root: %s %s", fs->root, fs->private);
 	if (mount(fs->private, fs->root, "simfs", mntopt,
 			remount ? "" : fs->private) < 0)
