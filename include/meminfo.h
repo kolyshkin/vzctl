@@ -18,7 +18,7 @@
 #ifndef _MEMINFO_H_
 #define _MEMINFO_H_
 
-typedef struct {
+typedef struct meminfo_param {
 	int mode;
 #define VE_MEMINFO_NONE 0
 #define VE_MEMINFO_PAGES 1

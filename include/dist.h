@@ -38,7 +38,7 @@ typedef struct {
 
 /* Data structure for distribution specific action scripts.
  */
-typedef struct {
+typedef struct dist_actions {
 	char *add_ip;		/**< setup ip address. */
 	char *del_ip;		/**< delete ip address. */
 	char *set_hostname;	/**< setup hostname. */

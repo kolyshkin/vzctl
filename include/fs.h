@@ -38,7 +38,7 @@
 
 /**  Data structure for file system parameter.
  */
-typedef struct {
+typedef struct fs_param {
 	char *private;		/**< CT private path. */
 	char *private_orig;	/**< original not expanded private path. */
 	char *root;		/**< CT root path. */

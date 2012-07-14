@@ -80,6 +80,14 @@ enum {
 #define ERR_INVAL_SKIP	-6
 #define ERR_LONG_TRUNC  -7
 
+struct fs_param;
+struct arg_start;
+struct ub_struct;
+struct dev_res;
+struct cpu_param;
+struct veth_dev;
+struct meminfo_param;
+
 /** CT handler.
  */
 typedef struct {

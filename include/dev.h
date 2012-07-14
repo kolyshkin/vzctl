@@ -26,7 +26,7 @@
 
 /** Data structure for devices.
  */
-typedef struct {
+typedef struct dev_res {
 	list_elem_t list;		/**< prev/next elements. */
 	char *name;			/**< device name. */
 	dev_t dev;			/**< device number. */

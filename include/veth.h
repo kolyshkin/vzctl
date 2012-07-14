@@ -34,7 +34,7 @@
 
 /** Data structure for devices.
  */
-typedef struct {
+typedef struct veth_dev {
 	list_elem_t list;		/**< prev/next element. */
 	char dev_addr[ETH_ALEN];	/**< device MAC address. */
 	int addrlen;			/**< device MAC address length. */

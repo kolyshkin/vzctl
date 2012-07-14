@@ -29,7 +29,7 @@ typedef struct {
 
 /** Data structure for cpu parameters.
  */
-typedef struct {
+typedef struct cpu_param {
 	unsigned long *limit;	/**< CPU usage for the CT, in per cent. */
 	unsigned long *weight;
 	unsigned long *units;	/**< CPU weight for the CT, in units. */
