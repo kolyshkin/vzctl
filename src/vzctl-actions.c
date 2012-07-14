@@ -1268,6 +1268,14 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 			return VZ_BAD_KERNEL;
 		}
 	}
+
+	if (!is_vz_kernel(h)) {
+		/* No simfs support, emulate it with a bind mount */
+		g_p->res.fs.flags |= MS_BIND;
+		/* No quotas, regardless of what the config says */
+		g_p->res.dq.enable = NO;
+	}
+
 	if (action != ACTION_EXEC &&
 		action != ACTION_EXEC2 &&
 		action != ACTION_EXEC3 &&
