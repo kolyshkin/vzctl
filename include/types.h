@@ -90,9 +90,10 @@ struct meminfo_param;
 
 /** CT handler.
  */
-typedef struct {
+typedef struct vps_handler {
 	int vzfd;	/**< /dev/vzctl file descriptor. */
 	int stdfd;
+	int (*open)(struct vps_handler *h);
 } vps_handler;
 
 static inline int is_vz_kernel(vps_handler *h)

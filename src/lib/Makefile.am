@@ -38,6 +38,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       dev.c \
                       dist.c \
                       env.c \
+                      hooks_vz.c \
                       exec.c \
                       fs.c \
                       fs_simfs.c \

@@ -106,4 +106,7 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 				env_create_FN fn, void *data);
 int vz_setluid(envid_t veid);
 int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
+
+int vz_do_open(vps_handler *h);
+int ct_do_open(vps_handler *h);
 #endif

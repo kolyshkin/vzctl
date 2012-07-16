@@ -155,37 +155,32 @@ static int reset_std()
  */
 vps_handler *vz_open(envid_t veid)
 {
-	int vzfd, stdfd;
 	vps_handler *h = NULL;
+	int ret = -1;
 
-	stdfd = reset_std();
-	if ((vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
-		logger(-1, errno, "Unable to open %s", VZCTLDEV);
-		logger(-1, 0, "Please check that vzdev kernel module is loaded"
-			" and you have sufficient permissions"
-			" to access the file.");
-		goto err;
-	}
 	h = calloc(1, sizeof(*h));
 	if (h == NULL)
-		goto err;
-	h->vzfd = vzfd;
-	h->stdfd = stdfd;
-	if (vz_env_create_ioctl(h, 0, 0) < 0 &&
-		(errno == ENOSYS || errno == EPERM))
-	{
-		logger(-1, 0, "Your kernel lacks support for virtual"
-			" environments or modules not loaded");
-		goto err;
-	}
-	return h;
+		return NULL;
 
-err:
+	h->stdfd = reset_std();
+
+	if (!stat_file(VZCTLDEV)) /* FIXME: try harder to detect VZ */
+		h->vzfd = -1;
+
+	if (is_vz_kernel(h))
+		ret = vz_do_open(h);
+	else
+#ifdef HAVE_UPSTREAM
+		ret = ct_do_open(h);
+#else
+		logger(-1, 0, "Support for non-OpenVZ kernel not compiled in");
+#endif
+	if (!ret)
+		return h;
+
+	if (h->stdfd != -1)
+		close(h->stdfd);
 	free(h);
-	if (vzfd != -1)
-		close(vzfd);
-	if (stdfd != -1)
-		close(stdfd);
 	return NULL;
 }
 
