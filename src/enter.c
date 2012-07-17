@@ -291,17 +291,8 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 		close_fds(1, in[0], out[1], st[1], info[0], h->vzfd, -1);
 		dup2(out[1], 1);
 		dup2(out[1], 2);
-		if ((ret = vz_chroot(root)))
+		if ((ret = h->enter(h, veid, root, 0)))
 			goto err;
-		ret = vz_env_create_ioctl(h, veid, VE_ENTER);
-		if (ret < 0) {
-			if (errno == ESRCH)
-				ret = VZ_VE_NOT_RUNNING;
-			else
-				ret = VZ_ENVCREATE_ERROR;
-			goto err;
-		}
-		close(h->vzfd);
 		if ((ret = pty_alloc(&master, &slave, &tios, &ws)))
 			goto err;
 		set_proc_title(ttyname(slave));

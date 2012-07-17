@@ -26,6 +26,7 @@
 #include "env.h"
 #include "types.h"
 #include "logger.h"
+#include "vzerror.h"
 
 static int vz_is_run(vps_handler *h, envid_t veid)
 {
@@ -36,6 +37,27 @@ static int vz_is_run(vps_handler *h, envid_t veid)
 	else if (ret < 0)
 		logger(-1, errno, "Error on vz_env_create_ioctl(VE_TEST)");
 	return 1;
+}
+
+static int vz_enter(vps_handler *h, envid_t veid, const char *root, int flags)
+{
+	int ret;
+
+	if ((ret = vz_chroot(root)))
+		return ret;
+
+	ret = vz_env_create_ioctl(h, veid, VE_ENTER | flags);
+	if (ret < 0) {
+		if (errno == ESRCH)
+			ret = VZ_VE_NOT_RUNNING;
+		else
+			ret = VZ_ENVCREATE_ERROR;
+	}
+	else
+		ret = 0;
+
+	close(h->vzfd);
+	return ret;
 }
 
 int vz_do_open(vps_handler *h)
@@ -57,6 +79,7 @@ int vz_do_open(vps_handler *h)
 	}
 
 	h->is_run = vz_is_run;
+	h->enter = vz_enter;
 	return 0;
 err:
 	close(h->vzfd);

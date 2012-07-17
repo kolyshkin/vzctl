@@ -856,18 +856,18 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 {
 	int ret;
 
-	if ((ret = vz_chroot(vps_root)))
-		return ret;
 	if ((ret = vz_setluid(veid)))
 		return ret;
 	close_fds(1, h->vzfd, -1);
-	if ((ret = vz_env_create_ioctl(h, veid, VE_ENTER)) < 0) {
-		if (errno == ESRCH)
-			return 0;
+	ret = h->enter(h, veid, vps_root, 0);
+	if (ret == VZ_VE_NOT_RUNNING)
+		/* Ignore "VE not running" error here */
+		return 0;
+	else if (ret) {
 		logger(-1, errno, "Container enter failed");
-		return VZ_ENVCREATE_ERROR;
+		return ret;
 	}
-	close(h->vzfd);
+
 	switch (stop_mode) {
 		case M_REBOOT:
 		{
