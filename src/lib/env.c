@@ -207,17 +207,9 @@ void vz_close(vps_handler *h)
  */
 int vps_is_run(vps_handler *h, envid_t veid)
 {
-	int ret;
-
 	if (veid == 0)
 		return 1;
-	ret = vz_env_create_ioctl(h, veid, VE_TEST);
-
-	if (ret < 0 && (errno == ESRCH || errno == ENOTTY))
-		return 0;
-	else if (ret < 0)
-		logger(-1, errno, "error on vz_env_create_ioctl(VE_TEST)");
-	return 1;
+	return h->is_run(h, veid);
 }
 
 /** Change root to specified directory

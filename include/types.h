@@ -94,6 +94,7 @@ typedef struct vps_handler {
 	int vzfd;	/**< /dev/vzctl file descriptor. */
 	int stdfd;
 	int (*open)(struct vps_handler *h);
+	int (*is_run)(struct vps_handler *h, envid_t veid);
 } vps_handler;
 
 static inline int is_vz_kernel(vps_handler *h)

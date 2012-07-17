@@ -21,10 +21,22 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <linux/vzcalluser.h>
 
 #include "env.h"
 #include "types.h"
 #include "logger.h"
+
+static int vz_is_run(vps_handler *h, envid_t veid)
+{
+	int ret = vz_env_create_ioctl(h, veid, VE_TEST);
+
+	if (ret < 0 && (errno == ESRCH || errno == ENOTTY))
+		return 0;
+	else if (ret < 0)
+		logger(-1, errno, "Error on vz_env_create_ioctl(VE_TEST)");
+	return 1;
+}
 
 int vz_do_open(vps_handler *h)
 {
@@ -44,6 +56,7 @@ int vz_do_open(vps_handler *h)
 		goto err;
 	}
 
+	h->is_run = vz_is_run;
 	return 0;
 err:
 	close(h->vzfd);
