@@ -60,6 +60,12 @@ static int vz_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	return ret;
 }
 
+static int vz_destroy(vps_handler *h, envid_t veid)
+{
+	/* Destroys automatically after reboot */
+	return 0;
+}
+
 int vz_do_open(vps_handler *h)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
@@ -80,6 +86,7 @@ int vz_do_open(vps_handler *h)
 
 	h->is_run = vz_is_run;
 	h->enter = vz_enter;
+	h->destroy = vz_destroy;
 	return 0;
 err:
 	close(h->vzfd);
