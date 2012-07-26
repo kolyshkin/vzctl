@@ -79,7 +79,7 @@ static int set_personality32()
 }
 #endif
 
-static int vz_env_create_data_ioctl(vps_handler *h,
+int vz_env_create_data_ioctl(vps_handler *h,
 	struct vzctl_env_create_data *data)
 {
 	int errcode;
@@ -260,7 +260,7 @@ int vz_setluid(envid_t veid)
 	return 0;
 }
 
-static int vz_env_configure(int fd, envid_t veid, const char *osrelease)
+int vz_env_configure(int fd, envid_t veid, const char *osrelease)
 {
 	int ret = 0;
 	struct vzctl_ve_configure *cparam;
@@ -297,44 +297,28 @@ static int configure_sysctl()
 	return 0;
 }
 
-static int _env_create(vps_handler *h, envid_t veid, int wait_p, int err_p,
-	void *data)
+int _env_create(vps_handler *h, void *data)
 {
 	struct vzctl_env_create_data env_create_data;
 	struct env_create_param3 create_param;
-	int fd, ret;
-	vps_res *res;
-	char *argv[] = {"init", "-z", "      ", NULL};
-	char *envp[] = {"HOME=/", "TERM=linux", NULL};
+	int ret;
+	struct arg_start *arg = data;
+	envid_t veid = arg->veid;
+	int wait_p = arg->wait_p;
+	int err_p = arg->err_p;
 
-	res = (vps_res *) data;
-	memset(&create_param, 0, sizeof(create_param));
-	create_param.iptables_mask = get_ipt_mask(res->env.ipt_mask);
-	logger(3, 0, "Set iptables mask %#10.8llx",
-			(unsigned long long) create_param.iptables_mask);
-	clean_hardlink_dir("/");
-	if (res->cpu.vcpus != NULL)
-		create_param.total_vcpus = *res->cpu.vcpus;
+	fill_container_param(arg, &create_param);
+
 	env_create_data.veid = veid;
 	env_create_data.class_id = 0;
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
 	env_create_data.data = &create_param;
 	env_create_data.datalen = sizeof(create_param);
 
-	create_param.feature_mask = res->env.features_mask;
-	create_param.known_features = res->env.features_known;
-	/* sysfs enabled by default, unless explicitly disabled */
-	if (! (res->env.features_known & VE_FEATURE_SYSFS)) {
-		create_param.feature_mask |= VE_FEATURE_SYSFS;
-		create_param.known_features |= VE_FEATURE_SYSFS;
-	}
-	logger(3, 0, "Set features mask %016llx/%016llx",
-			create_param.feature_mask,
-			create_param.known_features);
-
 	/* Close all fds except stdin. stdin is status pipe */
 	close(STDERR_FILENO); close(STDOUT_FILENO);
 	close_fds(0, wait_p, err_p, h->vzfd, -1);
+
 try:
 	ret = vz_env_create_data_ioctl(h, &env_create_data);
 	if (ret < 0) {
@@ -369,24 +353,59 @@ try:
 				ret = VZ_ENVCREATE_ERROR;
 				break;
 		}
-		goto env_err;
+		return ret;
 	}
-	if (res->env.osrelease != NULL) {
+
+	if (arg->res->env.osrelease != NULL) {
 		ret = vz_env_configure(h->vzfd, veid,
-				res->env.osrelease);
+				arg->res->env.osrelease);
 		if (ret != 0)
-			goto env_err;
+			return ret;
 	}
 
 	close(h->vzfd);
+	return exec_container_init(arg, &create_param);
+}
+
+void fill_container_param(struct arg_start *arg,
+			 struct env_create_param3 *create_param)
+{
+	memset(create_param, 0, sizeof(*create_param));
+	create_param->iptables_mask = get_ipt_mask(arg->res->env.ipt_mask);
+	logger(3, 0, "Setting iptables mask %#10.8llx",
+			(unsigned long long) create_param->iptables_mask);
+	clean_hardlink_dir("/");
+	if (arg->res->cpu.vcpus != NULL)
+		create_param->total_vcpus = *arg->res->cpu.vcpus;
+
+	create_param->feature_mask = arg->res->env.features_mask;
+	create_param->known_features = arg->res->env.features_known;
+
+	/* sysfs enabled by default, unless explicitly disabled */
+	if (! (arg->res->env.features_known & VE_FEATURE_SYSFS)) {
+		create_param->feature_mask |= VE_FEATURE_SYSFS;
+		create_param->known_features |= VE_FEATURE_SYSFS;
+	}
+	logger(3, 0, "Setting features mask %016llx/%016llx",
+			create_param->feature_mask,
+			create_param->known_features);
+}
+
+int exec_container_init(struct arg_start *arg,
+			struct env_create_param3 *create_param)
+{
+	int fd, ret;
+	char *argv[] = {"init", "-z", "      ", NULL};
+	char *envp[] = {"HOME=/", "TERM=linux", NULL};
+
 	/* Create /fastboot to skip run fsck */
 	fd = open("/fastboot", O_CREAT | O_RDONLY, 0644);
 	close(fd);
 
-	if (res->misc.wait == YES) {
+	if (arg->res->misc.wait == YES) {
 		if (add_reach_runlevel_mark()) {
 			ret = VZ_WAIT_FAILED;
-			goto env_err;
+			return -1;
 		}
 	}
 
@@ -394,7 +413,7 @@ try:
 	if (stat_file("/sys"))
 		mount("sysfs", "/sys", "sysfs", 0, 0);
 
-	if (create_param.feature_mask & VE_FEATURE_NFSD) {
+	if (create_param->feature_mask & VE_FEATURE_NFSD) {
 		mount("nfsd", "/proc/fs/nfsd", "nfsd", 0, 0);
 		make_dir("/var/lib/nfs/rpc_pipefs", 1);
 		mount("sunrpc", "/var/lib/nfs/rpc_pipefs", "rpc_pipefs", 0, 0);
@@ -408,28 +427,36 @@ try:
 	/* Now we wait until CT setup will be done
 	   If no error, then start init, otherwise exit.
 	*/
-	if (read(wait_p, &ret, sizeof(ret)) == 0)
-		return 0;
+
+	if (read(arg->wait_p, &ret, sizeof(ret)) == 0)
+		return -1;
+
 	if ((fd = open("/dev/null", O_RDWR)) != -1) {
 		dup2(fd, 0);
 		dup2(fd, 1);
 		dup2(fd, 2);
 	}
+
 	logger(10, 0, "Starting init");
 	execve("/sbin/init", argv, envp);
 	execve("/etc/init", argv, envp);
 	execve("/bin/init", argv, envp);
-
 	ret = VZ_FS_BAD_TMPL;
-	write(err_p, &ret, sizeof(ret));
-env_err:
+	write(arg->err_p, &ret, sizeof(ret));
 	return ret;
 }
 
-static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
-	int wait_p, int old_wait_p, int err_p, env_create_FN fn, void *data)
+int vz_do_env_create(struct arg_start *arg)
 {
 	int ret, pid;
+	int wait_p = arg->wait_p;
+	int old_wait_p = arg->old_wait_p;
+	int err_p = arg->err_p;
+	env_create_FN fn = arg->fn;
+	void *data = arg->data;
+	struct vps_res *res = arg->res;
+	vps_handler *h = arg->h;
+	envid_t veid = arg->veid;
 
 	if ((ret = vz_chroot(res->fs.root)))
 		return ret;
@@ -445,7 +472,7 @@ static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
 		if ((ret = vps_set_cap(veid, &res->env, &res->cap)))
 			goto env_err;
 		if (fn == NULL) {
-			ret = _env_create(h, veid, wait_p, err_p, (void *)res);
+			ret = _env_create(h, (void *)arg);
 		} else {
 			ret = fn(h, veid, wait_p, old_wait_p, err_p, data);
 		}
@@ -455,6 +482,24 @@ env_err:
 		exit(ret);
 	}
 	return 0;
+}
+
+static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
+	int wait_p, int old_wait_p, int err_p, env_create_FN fn, void *data)
+
+{
+	struct arg_start arg;
+
+	arg.res = res;
+	arg.wait_p = wait_p;
+	arg.old_wait_p = old_wait_p;
+	arg.err_p = err_p;
+	arg.veid = veid;
+	arg.h = h;
+	arg.data = data;
+	arg.fn = fn;
+
+	return h->env_create(&arg);
 }
 
 #define MAX_OSREL_LEN 128

@@ -87,6 +87,7 @@ int vz_do_open(vps_handler *h)
 	h->is_run = vz_is_run;
 	h->enter = vz_enter;
 	h->destroy = vz_destroy;
+	h->env_create = vz_do_env_create;
 	return 0;
 err:
 	close(h->vzfd);

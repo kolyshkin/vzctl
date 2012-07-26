@@ -80,6 +80,7 @@ enum {
 #define ERR_INVAL_SKIP	-6
 #define ERR_LONG_TRUNC  -7
 
+struct arg_start;
 struct fs_param;
 struct arg_start;
 struct ub_struct;
@@ -97,6 +98,7 @@ typedef struct vps_handler {
 	int (*is_run)(struct vps_handler *h, envid_t veid);
 	int (*enter)(struct vps_handler *h, envid_t veid, const char *root, int flags);
 	int (*destroy)(struct vps_handler *h, envid_t veid);
+	int (*env_create)(struct arg_start *arg);
 } vps_handler;
 
 static inline int is_vz_kernel(vps_handler *h)

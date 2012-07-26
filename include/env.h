@@ -21,6 +21,7 @@
 #include "types.h"
 #include "res.h"
 #include "modules.h"
+#include <linux/vzcalluser.h>
 
 /** Shutdown timeout.
  */
@@ -105,7 +106,30 @@ int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	int wait_p[2], int old_wait_p[2], int err_p[2],
 				env_create_FN fn, void *data);
 int vz_setluid(envid_t veid);
+
+struct vps_res;
+struct arg_start {
+	struct vps_res *res;
+	int wait_p;
+	int old_wait_p;
+	int err_p;
+	envid_t veid;
+	vps_handler *h;
+	void *data;
+	env_create_FN fn;
+};
+
+struct env_create_param3;
+void fill_container_param(struct arg_start *arg,
+			  struct env_create_param3 *create_param);
+int exec_container_init(struct arg_start *arg,
+			struct env_create_param3 *create_param);
+int vz_env_configure(int fd, envid_t veid, const char *osrelease);
+int vz_env_create_data_ioctl(vps_handler *h,
+		struct vzctl_env_create_data *data);
 int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
+int _env_create(vps_handler *h, void *data);
+int vz_do_env_create(struct arg_start *arg);
 
 int vz_do_open(vps_handler *h);
 int ct_do_open(vps_handler *h);
