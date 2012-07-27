@@ -45,11 +45,6 @@
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		int stop_mode);
 
-static inline int setluid(uid_t uid)
-{
-	return syscall(__NR_setluid, uid);
-}
-
 /*
  * Reset standard file descriptors to /dev/null in case they are closed.
  */
@@ -168,18 +163,6 @@ int vz_chroot(const char *root)
 	act.sa_flags = 0;
 	for (i = 1; i <= NSIG; ++i)
 		sigaction(i, &act, NULL);
-	return 0;
-}
-
-int vz_setluid(envid_t veid)
-{
-	if (setluid(veid) == -1) {
-		if (errno == ENOSYS)
-			logger(-1, 0, "Error: kernel does not support"
-				" user resources. Please, rebuild with"
-				" CONFIG_USER_RESOURCE=y");
-		return VZ_SETLUID_ERROR;
-	}
 	return 0;
 }
 
@@ -691,7 +674,7 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 {
 	int ret;
 
-	if ((ret = vz_setluid(veid)))
+	if ((ret = h->setcontext(veid)))
 		return ret;
 	close_fds(1, h->vzfd, -1);
 	ret = h->enter(h, veid, vps_root, 0);

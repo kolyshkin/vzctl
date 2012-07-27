@@ -105,7 +105,6 @@ int vz_chroot(const char *root);
 int vz_env_create(vps_handler *h, envid_t veid, vps_res *res,
 	int wait_p[2], int old_wait_p[2], int err_p[2],
 				env_create_FN fn, void *data);
-int vz_setluid(envid_t veid);
 
 struct vps_res;
 struct arg_start {

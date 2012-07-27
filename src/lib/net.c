@@ -323,7 +323,7 @@ int vps_set_netdev(vps_handler *h, envid_t veid, ub_param *ub,
 		return VZ_RESOURCE_ERROR;
 	} else if (pid1 == 0) {
 
-		if ((ret = vz_setluid(veid)))
+		if ((ret = h->setcontext(veid)))
 			exit(ret);
 		exit(set_netdev(h, veid, VE_NETDEV_ADD, net_add));
 	}

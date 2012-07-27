@@ -258,7 +258,7 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 		logger(-1, errno, "Unable to create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
-	if ((ret = vz_setluid(veid)))
+	if ((ret = h->setcontext(veid)))
 		return ret;
 	preload_lib();
 	child_term = 0;

@@ -34,6 +34,7 @@
 #include "logger.h"
 #include "vzerror.h"
 #include "readelf.h"
+#include "vzsyscalls.h"
 
 #define ENVRETRY	3
 
@@ -240,6 +241,23 @@ try:
 	return exec_container_init(arg, &create_param);
 }
 
+static inline int setluid(uid_t uid)
+{
+	return syscall(__NR_setluid, uid);
+}
+
+static int vz_setluid(envid_t veid)
+{
+	if (setluid(veid) == -1) {
+		if (errno == ENOSYS)
+			logger(-1, 0, "Error: kernel does not support"
+				" user resources. Please, rebuild with"
+				" CONFIG_USER_RESOURCE=y");
+		return VZ_SETLUID_ERROR;
+	}
+	return 0;
+}
+
 static int vz_do_env_create(struct arg_start *arg)
 {
 	int ret, pid;
@@ -321,6 +339,7 @@ int vz_do_open(vps_handler *h)
 	h->env_create = vz_do_env_create;
 	h->setlimits = set_ublimit;
 	h->setcpus = vz_setcpu;
+	h->setcontext = vz_setluid;
 	return 0;
 err:
 	close(h->vzfd);

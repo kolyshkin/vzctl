@@ -265,7 +265,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	} else if (pid == 0) {
-		if ((ret = vz_setluid(veid)))
+		if ((ret = h->setcontext(veid)))
 			exit(ret);
 		if ((pid = fork()) < 0) {
 			logger(-1, errno, "Can't fork");

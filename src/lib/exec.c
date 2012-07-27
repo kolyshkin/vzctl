@@ -184,7 +184,7 @@ static int vps_real_exec(vps_handler *h, envid_t veid, const char *root,
 	act.sa_flags = 0;
 	sigaction(SIGPIPE, &act, NULL);
 
-	if ((ret = vz_setluid(veid)))
+	if ((ret = h->setcontext(veid)))
 		return ret;
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Unable to fork");
@@ -347,7 +347,7 @@ static int _real_execFn(vps_handler *h, envid_t veid, const char *root,
 {
 	int ret, pid;
 
-	if ((ret = vz_setluid(veid)))
+	if ((ret = h->setcontext(veid)))
 		return ret;
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Unable to fork");
