@@ -124,12 +124,6 @@ void fill_container_param(struct arg_start *arg,
 			  struct env_create_param3 *create_param);
 int exec_container_init(struct arg_start *arg,
 			struct env_create_param3 *create_param);
-int vz_env_configure(int fd, envid_t veid, const char *osrelease);
-int vz_env_create_data_ioctl(vps_handler *h,
-		struct vzctl_env_create_data *data);
-int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags);
-int _env_create(vps_handler *h, void *data);
-int vz_do_env_create(struct arg_start *arg);
 
 int vz_do_open(vps_handler *h);
 int ct_do_open(vps_handler *h);

@@ -22,13 +22,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
-#include <grp.h>
-#include <sys/ioctl.h>
 #include <linux/vzcalluser.h>
-#include <sys/personality.h>
 #include <linux/reboot.h>
 #include <sys/mount.h>
 #include <sys/utsname.h>
@@ -42,12 +38,9 @@
 #include "util.h"
 #include "script.h"
 #include "iptables.h"
-#include "readelf.h"
 #include "vzsyscalls.h"
 #include "cpt.h"
 #include "image.h"
-
-#define ENVRETRY	3
 
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		int stop_mode);
@@ -55,76 +48,6 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 static inline int setluid(uid_t uid)
 {
 	return syscall(__NR_setluid, uid);
-}
-
-#ifdef  __x86_64__
-static int set_personality(unsigned long mask)
-{
-	unsigned long per;
-
-	per = personality(0xffffffff) | mask;
-	logger(3, 0, "Set personality %#10.8lx", per);
-	if (personality(per) == -1) {
-		logger(-1, errno, "Unable to set personality PER_LINUX32");
-		return  -1;
-	}
-	return 0;
-}
-
-static int set_personality32()
-{
-	if (get_arch_from_elf("/sbin/init") != elf_32)
-		return 0;
-	return set_personality(PER_LINUX32);
-}
-#endif
-
-int vz_env_create_data_ioctl(vps_handler *h,
-	struct vzctl_env_create_data *data)
-{
-	int errcode;
-	int retry = 0;
-
-	do {
-		if (retry)
-			sleep(1);
-		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE_DATA, data);
-	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
-
-	if (errcode >= 0) {
-		/* Clear supplementary group IDs */
-		setgroups(0, NULL);
-#ifdef  __x86_64__
-		/* Set personality PER_LINUX32 for i386 based CTs */
-		set_personality32();
-#endif
-	}
-	return errcode;
-}
-
-int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
-{
-	struct vzctl_env_create env_create;
-	int errcode;
-	int retry = 0;
-
-	memset(&env_create, 0, sizeof(env_create));
-	env_create.veid = veid;
-	env_create.flags = flags;
-	do {
-		if (retry)
-			sleep(1);
-		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE, &env_create);
-	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
-	if (errcode >= 0 && (flags & VE_ENTER)) {
-		/* Clear supplementary group IDs */
-		setgroups(0, NULL);
-#ifdef  __x86_64__
-		/* Set personality PER_LINUX32 for i386 based CTs */
-		set_personality32();
-#endif
-	}
-	return errcode;
 }
 
 /*
@@ -260,31 +183,6 @@ int vz_setluid(envid_t veid)
 	return 0;
 }
 
-int vz_env_configure(int fd, envid_t veid, const char *osrelease)
-{
-	int ret = 0;
-	struct vzctl_ve_configure *cparam;
-	int len;
-
-	len = strlen(osrelease) + 1;
-	cparam = calloc(1, sizeof(struct vzctl_ve_configure) + len);
-	if (cparam == NULL)
-		return VZ_RESOURCE_ERROR;
-
-	cparam->veid = veid;
-	cparam->key = VE_CONFIGURE_OS_RELEASE;
-	cparam->size = len;
-	strcpy(cparam->data, osrelease);
-
-	if (ioctl(fd, VZCTL_VE_CONFIGURE, cparam) != 0)
-		if (errno != ENOTTY)
-			ret = VZ_SET_OSRELEASE;
-
-	free(cparam);
-
-	return ret;
-}
-
 static int configure_sysctl()
 {
 	int fd;
@@ -295,76 +193,6 @@ static int configure_sysctl()
 	write(fd, "0", 1);
 	close(fd);
 	return 0;
-}
-
-int _env_create(vps_handler *h, void *data)
-{
-	struct vzctl_env_create_data env_create_data;
-	struct env_create_param3 create_param;
-	int ret;
-	struct arg_start *arg = data;
-	envid_t veid = arg->veid;
-	int wait_p = arg->wait_p;
-	int err_p = arg->err_p;
-
-	fill_container_param(arg, &create_param);
-
-	env_create_data.veid = veid;
-	env_create_data.class_id = 0;
-	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
-	env_create_data.data = &create_param;
-	env_create_data.datalen = sizeof(create_param);
-
-	/* Close all fds except stdin. stdin is status pipe */
-	close(STDERR_FILENO); close(STDOUT_FILENO);
-	close_fds(0, wait_p, err_p, h->vzfd, -1);
-
-try:
-	ret = vz_env_create_data_ioctl(h, &env_create_data);
-	if (ret < 0) {
-		switch(errno) {
-			case EINVAL:
-				ret = VZ_ENVCREATE_ERROR;
-				/* Run-time kernel did not understand the
-				 * latest create_param -- so retry with
-				 * the old env_create_param structs.
-				 */
-				switch (env_create_data.datalen) {
-				case sizeof(struct env_create_param3):
-					env_create_data.datalen =
-						sizeof(struct env_create_param2);
-					goto try;
-				case sizeof(struct env_create_param2):
-					env_create_data.datalen =
-						sizeof(struct env_create_param);
-					goto try;
-				}
-				break;
-			case EACCES:
-			/* License is not loaded */
-				ret = VZ_NO_ACCES;
-				break;
-			case ENOTTY:
-			/* Some vz modules are not present */
-				ret = VZ_BAD_KERNEL;
-				break;
-			default:
-				logger(-1, errno, "env_create error");
-				ret = VZ_ENVCREATE_ERROR;
-				break;
-		}
-		return ret;
-	}
-
-	if (arg->res->env.osrelease != NULL) {
-		ret = vz_env_configure(h->vzfd, veid,
-				arg->res->env.osrelease);
-		if (ret != 0)
-			return ret;
-	}
-
-	close(h->vzfd);
-	return exec_container_init(arg, &create_param);
 }
 
 void fill_container_param(struct arg_start *arg,
@@ -444,44 +272,6 @@ int exec_container_init(struct arg_start *arg,
 	ret = VZ_FS_BAD_TMPL;
 	write(arg->err_p, &ret, sizeof(ret));
 	return ret;
-}
-
-int vz_do_env_create(struct arg_start *arg)
-{
-	int ret, pid;
-	int wait_p = arg->wait_p;
-	int old_wait_p = arg->old_wait_p;
-	int err_p = arg->err_p;
-	env_create_FN fn = arg->fn;
-	void *data = arg->data;
-	struct vps_res *res = arg->res;
-	vps_handler *h = arg->h;
-	envid_t veid = arg->veid;
-
-	if ((ret = vz_chroot(res->fs.root)))
-		return ret;
-	if ((ret = vz_setluid(veid)))
-		return ret;
-	if ((ret = set_ublimit(h, veid, &res->ub)))
-		return ret;
-	/* Create another process for proper resource accounting */
-	if ((pid = fork()) < 0) {
-		logger(-1, errno, "Unable to fork");
-		return VZ_RESOURCE_ERROR;
-	} else if (pid == 0) {
-		if ((ret = vps_set_cap(veid, &res->env, &res->cap)))
-			goto env_err;
-		if (fn == NULL) {
-			ret = _env_create(h, (void *)arg);
-		} else {
-			ret = fn(h, veid, wait_p, old_wait_p, err_p, data);
-		}
-env_err:
-		if (ret)
-			write(STDIN_FILENO, &ret, sizeof(ret));
-		exit(ret);
-	}
-	return 0;
 }
 
 static int vz_real_env_create(vps_handler *h, envid_t veid, vps_res *res,
