@@ -270,18 +270,6 @@ static int vps_del_ip(vps_handler *h, envid_t veid,
 	return ret;
 }
 
-static int netdev_ctl(vps_handler *h, int veid, int op, char *name)
-{
-	struct vzctl_ve_netdev ve_netdev;
-
-	ve_netdev.veid = veid;
-	ve_netdev.op = op;
-	ve_netdev.dev_name = name;
-	if (ioctl(h->vzfd, VZCTL_VE_NETDEV, &ve_netdev) < 0)
-		return VZ_NETDEV_ERROR;
-	return 0;
-}
-
 static int set_netdev(vps_handler *h, envid_t veid, int cmd, net_param *net)
 {
 	int ret = 0;
@@ -291,7 +279,7 @@ static int set_netdev(vps_handler *h, envid_t veid, int cmd, net_param *net)
 	if (list_empty(dev_h))
 		return 0;
 	list_for_each(dev, dev_h, list) {
-		if ((ret = netdev_ctl(h, veid, cmd, dev->val))) {
+		if ((ret = h->netdev_ctl(h, veid, cmd, dev->val))) {
 			logger(-1, errno, "Unable to %s netdev %s",
 				(cmd == VE_NETDEV_ADD ) ? "add": "del",
 				dev->val);

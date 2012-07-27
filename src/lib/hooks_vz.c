@@ -332,6 +332,18 @@ static int vz_set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
 	return 0;
 }
 
+static int vz_netdev_ctl(vps_handler *h, envid_t veid, int op, char *name)
+{
+	struct vzctl_ve_netdev ve_netdev;
+
+	ve_netdev.veid = veid;
+	ve_netdev.op = op;
+	ve_netdev.dev_name = name;
+	if (ioctl(h->vzfd, VZCTL_VE_NETDEV, &ve_netdev) < 0)
+		return VZ_NETDEV_ERROR;
+	return 0;
+}
+
 int vz_do_open(vps_handler *h)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
@@ -358,6 +370,7 @@ int vz_do_open(vps_handler *h)
 	h->setcpus = vz_setcpu;
 	h->setcontext = vz_setluid;
 	h->setdevperm = vz_set_devperm;
+	h->netdev_ctl = vz_netdev_ctl;
 	return 0;
 err:
 	close(h->vzfd);
