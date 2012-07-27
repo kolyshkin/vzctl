@@ -46,6 +46,13 @@ typedef struct cpu_param {
  */
 int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu);
 
+
+int env_set_vcpus(envid_t veid, unsigned int vcpus);
+int set_cpumask(envid_t veid, cpumask_t *mask);
+int set_cpuunits(envid_t veid, unsigned int cpuunits);
+int set_cpuweight(envid_t veid, unsigned int cpuweight);
+int set_cpulimit(envid_t veid, unsigned int cpulimit);
+
 /**  Apply cpu parameters on Host system.
  *
  * @param cpu		cpu parameters.

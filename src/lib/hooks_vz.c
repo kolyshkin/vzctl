@@ -278,6 +278,25 @@ env_err:
 	return 0;
 }
 
+static int vz_setcpu(vps_handler *h, envid_t veid, cpu_param *cpu)
+{
+	int ret = 0;
+
+	if (cpu->limit != NULL)
+		ret = set_cpulimit(veid, *cpu->limit);
+
+	if (cpu->units != NULL)
+		ret = set_cpuunits(veid, *cpu->units);
+	else if (cpu->weight != NULL)
+		ret = set_cpuweight(veid, *cpu->weight);
+
+	if (cpu->vcpus != NULL)
+		ret = env_set_vcpus(veid, *cpu->vcpus);
+	if (cpu->mask != NULL)
+		ret = set_cpumask(veid, cpu->mask);
+	return ret;
+}
+
 int vz_do_open(vps_handler *h)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
@@ -301,6 +320,7 @@ int vz_do_open(vps_handler *h)
 	h->destroy = vz_destroy;
 	h->env_create = vz_do_env_create;
 	h->setlimits = set_ublimit;
+	h->setcpus = vz_setcpu;
 	return 0;
 err:
 	close(h->vzfd);
