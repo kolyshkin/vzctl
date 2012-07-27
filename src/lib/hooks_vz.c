@@ -315,6 +315,23 @@ static int vz_setcpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 	return ret;
 }
 
+static int vz_set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
+{
+	struct vzctl_setdevperms devperms;
+
+	devperms.veid = veid;
+	devperms.dev = dev->dev;
+	devperms.mask = dev->mask;
+	devperms.type = dev->type;
+
+	if (ioctl(h->vzfd, VZCTL_SETDEVPERMS, &devperms)) {
+		logger(-1, errno, "Error setting device permissions");
+		return VZ_SET_DEVICES;
+	}
+
+	return 0;
+}
+
 int vz_do_open(vps_handler *h)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
@@ -340,6 +357,7 @@ int vz_do_open(vps_handler *h)
 	h->setlimits = set_ublimit;
 	h->setcpus = vz_setcpu;
 	h->setcontext = vz_setluid;
+	h->setdevperm = vz_set_devperm;
 	return 0;
 err:
 	close(h->vzfd);

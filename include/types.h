@@ -102,6 +102,7 @@ typedef struct vps_handler {
 	int (*setlimits)(struct vps_handler *h, envid_t, struct ub_struct *ub);
 	int (*setcpus)(struct vps_handler *h, envid_t, struct cpu_param *cpu);
 	int (*setcontext)(envid_t veid);
+	int (*setdevperm)(struct vps_handler *h, envid_t veid, struct dev_res *res);
 } vps_handler;
 
 static inline int is_vz_kernel(vps_handler *h)

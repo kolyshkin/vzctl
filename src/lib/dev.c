@@ -91,23 +91,6 @@ static int dev_create(const char *root, dev_res *dev)
 	return 0;
 }
 
-int set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
-{
-	struct vzctl_setdevperms devperms;
-
-	devperms.veid = veid;
-	devperms.dev = dev->dev;
-	devperms.mask = dev->mask;
-	devperms.type = dev->type;
-
-	if (ioctl(h->vzfd, VZCTL_SETDEVPERMS, &devperms)) {
-		logger(-1, errno, "Error setting device permissions");
-		return VZ_SET_DEVICES;
-	}
-
-	return 0;
-}
-
 /** Allow/disallow access to devices on host system from CT.
  *
  * @param h		CT handler.
@@ -135,7 +118,7 @@ int vps_set_devperm(vps_handler *h, envid_t veid, const char *root,
 		if (res->name)
 			if ((ret = dev_create(root, res)))
 				goto out;
-		if ((ret = set_devperm(h, veid, res)))
+		if ((ret = h->setdevperm(h, veid, res)))
 			goto out;
 	}
 out:
