@@ -36,79 +36,6 @@
 #include "logger.h"
 #include "script.h"
 
-static int veth_dev_mac_filter(vps_handler *h, envid_t veid, veth_dev *dev)
-{
-	struct vzctl_ve_hwaddr veth;
-	int ret;
-
-	veth.op = dev->mac_filter == YES ? VE_ETH_DENY_MAC_CHANGE :
-							VE_ETH_ALLOW_MAC_CHANGE;
-	veth.veid = veid;
-	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
-	memcpy(veth.dev_name_ve, dev->dev_name_ve, IFNAMSIZE);
-	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
-	if (ret) {
-		if (errno != ENODEV) {
-			logger(-1, errno, "Unable to set mac filter");
-			ret = VZ_VETH_ERROR;
-		} else
-			ret = 0;
-	}
-	return ret;
-}
-
-static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
-{
-	struct vzctl_ve_hwaddr veth;
-
-	if (!dev->dev_name[0] || dev->addrlen != ETH_ALEN)
-		return VZ_VETH_ERROR;
-	if (dev->addrlen_ve != 0 && dev->addrlen_ve != ETH_ALEN)
-		return VZ_VETH_ERROR;
-	veth.op = VE_ETH_ADD;
-	veth.veid = veid;
-	veth.addrlen = dev->addrlen;
-	veth.addrlen_ve = dev->addrlen_ve;
-	memcpy(veth.dev_addr, dev->dev_addr, ETH_ALEN);
-	memcpy(veth.dev_addr_ve, dev->dev_addr_ve, ETH_ALEN);
-	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
-	memcpy(veth.dev_name_ve, dev->dev_name_ve, IFNAMSIZE);
-	if (ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth) != 0) {
-		if (errno == ENOTTY) {
-			logger(-1, 0, "Error: veth feature is"
-				" not supported by kernel");
-			logger(-1, 0, "Please check that vzethdev"
-				" kernel module is loaded");
-		} else {
-			logger(-1, errno, "Unable to create veth");
-		}
-		return VZ_VETH_ERROR;
-	}
-
-	return 0;
-}
-
-static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
-{
-	struct vzctl_ve_hwaddr veth;
-	int ret;
-
-	if (!dev->dev_name[0])
-		return EINVAL;
-	veth.op = VE_ETH_DEL;
-	veth.veid = veid;
-	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
-	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
-	if (ret) {
-		if (errno != ENODEV) {
-			logger(-1, errno, "Unable to remove veth");
-			ret = VZ_VETH_ERROR;
-		} else
-			ret = 0;
-	}
-	return ret;
-}
-
 void free_veth_dev(veth_dev *dev)
 {
 }
@@ -187,21 +114,11 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 		op == ADD ? "Configure" : "Deleting", buf);
 	list_for_each(tmp, dev_h, list) {
 		if (op == ADD) {
-			if (!tmp->active) {
-				if ((ret = veth_dev_create(h, veid, tmp)))
-					break;
-			}
-			tmp->flags = 1;
-			if (tmp->mac_filter) {
-				if ((ret = veth_dev_mac_filter(h, veid, tmp)))
-					break;
-			}
+			if ((ret = h->veth_ctl(h, veid, ADD, tmp)))
+				break;
 			if ((ret = run_vznetcfg(veid, tmp)))
 				break;
-		} else {
-			if (!tmp->active)
-				continue;
-			if ((ret = veth_dev_remove(h, veid, tmp)))
+		} else if ((ret = h->veth_ctl(h, veid, DEL, tmp))) {
 				break;
 		}
 	}
@@ -211,7 +128,7 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 	if (ret && rollback) {
 		list_for_each(tmp, dev_h, list) {
 			if (op == ADD && tmp->flags == 1)
-				veth_dev_remove(h, veid, tmp);
+				h->veth_ctl(h, veid, DEL, tmp);
 		}
 		free_veth(dev_h);
 	}

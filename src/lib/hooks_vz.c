@@ -28,6 +28,7 @@
 #include <netinet/in.h>
 #include <sys/personality.h>
 #include <linux/vzcalluser.h>
+#include <linux/vzctl_veth.h>
 #include <linux/vzctl_venet.h>
 
 #include "env.h"
@@ -405,6 +406,100 @@ static int vz_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
 
 }
 
+static int veth_dev_mac_filter(vps_handler *h, envid_t veid, veth_dev *dev)
+{
+	struct vzctl_ve_hwaddr veth;
+	int ret;
+
+	veth.op = dev->mac_filter == YES ? VE_ETH_DENY_MAC_CHANGE :
+							VE_ETH_ALLOW_MAC_CHANGE;
+	veth.veid = veid;
+	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
+	memcpy(veth.dev_name_ve, dev->dev_name_ve, IFNAMSIZE);
+	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
+	if (ret) {
+		if (errno != ENODEV) {
+			logger(-1, errno, "Unable to set mac filter");
+			ret = VZ_VETH_ERROR;
+		} else
+			ret = 0;
+	}
+	return ret;
+}
+
+static int veth_dev_create(vps_handler *h, envid_t veid, veth_dev *dev)
+{
+	struct vzctl_ve_hwaddr veth;
+
+	if (!dev->dev_name[0] || dev->addrlen != ETH_ALEN)
+		return VZ_VETH_ERROR;
+	if (dev->addrlen_ve != 0 && dev->addrlen_ve != ETH_ALEN)
+		return VZ_VETH_ERROR;
+	veth.op = VE_ETH_ADD;
+	veth.veid = veid;
+	veth.addrlen = dev->addrlen;
+	veth.addrlen_ve = dev->addrlen_ve;
+	memcpy(veth.dev_addr, dev->dev_addr, ETH_ALEN);
+	memcpy(veth.dev_addr_ve, dev->dev_addr_ve, ETH_ALEN);
+	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
+	memcpy(veth.dev_name_ve, dev->dev_name_ve, IFNAMSIZE);
+	if (ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth) != 0) {
+		if (errno == ENOTTY) {
+			logger(-1, 0, "Error: veth feature is"
+				" not supported by kernel");
+			logger(-1, 0, "Please check that vzethdev"
+				" kernel module is loaded");
+		} else {
+			logger(-1, errno, "Unable to create veth");
+		}
+		return VZ_VETH_ERROR;
+	}
+
+	return 0;
+}
+
+static int veth_dev_remove(vps_handler *h, envid_t veid, veth_dev *dev)
+{
+	struct vzctl_ve_hwaddr veth;
+	int ret;
+
+	if (!dev->dev_name[0])
+		return EINVAL;
+	veth.op = VE_ETH_DEL;
+	veth.veid = veid;
+	memcpy(veth.dev_name, dev->dev_name, IFNAMSIZE);
+	ret = ioctl(h->vzfd, VETHCTL_VE_HWADDR, &veth);
+	if (ret) {
+		if (errno != ENODEV) {
+			logger(-1, errno, "Unable to remove veth");
+			ret = VZ_VETH_ERROR;
+		} else
+			ret = 0;
+	}
+	return ret;
+}
+
+static int vz_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
+{
+	int ret = 0;
+	if (op == ADD) {
+		if (!dev->active) {
+			if ((ret = veth_dev_create(h, veid, dev)))
+				return ret;
+		}
+		dev->flags = 1;
+		if (dev->mac_filter) {
+			if ((ret = veth_dev_mac_filter(h, veid, dev)))
+				return ret;
+		}
+	} else {
+		if (!dev->active)
+			return ret;
+		ret = veth_dev_remove(h, veid, dev);
+	}
+	return ret;
+}
+
 int vz_do_open(vps_handler *h)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
@@ -433,6 +528,8 @@ int vz_do_open(vps_handler *h)
 	h->setdevperm = vz_set_devperm;
 	h->netdev_ctl = vz_netdev_ctl;
 	h->ip_ctl = vz_ip_ctl;
+	h->veth_ctl = vz_veth_ctl;
+
 	return 0;
 err:
 	close(h->vzfd);
