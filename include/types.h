@@ -103,6 +103,7 @@ typedef struct vps_handler {
 	int (*setcontext)(envid_t veid);
 	int (*setdevperm)(struct vps_handler *h, envid_t veid, struct dev_res *res);
 	int (*netdev_ctl)(struct vps_handler *h, envid_t veid, int op, char *name);
+	int (*ip_ctl)(struct vps_handler *h, envid_t veid, int op, const char *ipstr);
 } vps_handler;
 
 static inline int is_vz_kernel(vps_handler *h)

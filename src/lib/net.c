@@ -83,41 +83,8 @@ int merge_ip_list(int delall, list_head_t *old, list_head_t *add,
 	return __merge_str_list(delall, old, add, del, merged, find_ip);
 }
 
-static inline int _ip_ctl(vps_handler *h, envid_t veid, int op,
-			  unsigned int *ip, int family)
-{
-	struct vzctl_ve_ip_map ip_map;
-	union {
-		struct sockaddr_in  a4;
-		struct sockaddr_in6 a6;
-	} addr;
-
-	if (family == AF_INET) {
-		addr.a4.sin_family = AF_INET;
-		addr.a4.sin_addr.s_addr = ip[0];
-		addr.a4.sin_port = 0;
-		ip_map.addrlen = sizeof(addr.a4);
-	} else if (family == AF_INET6) {
-		addr.a6.sin6_family = AF_INET6;
-		memcpy(&addr.a6.sin6_addr, ip, 16);
-		addr.a6.sin6_port = 0;
-		ip_map.addrlen = sizeof(addr.a6);
-	} else {
-		return -EAFNOSUPPORT;
-	}
-
-	ip_map.veid = veid;
-	ip_map.op = op;
-	ip_map.addr = (struct sockaddr*) &addr;
-
-	return ioctl(h->vzfd, VENETCTL_VE_IP_MAP, &ip_map);
-}
-
 static int ip_ctl(vps_handler *h, envid_t veid, int op, char *str)
 {
-	int ret;
-	int family;
-	unsigned int ipaddr[4];
 	const char *ip, *mask;
 
 	mask = strchr(str, '/');
@@ -128,30 +95,8 @@ static int ip_ctl(vps_handler *h, envid_t veid, int op, char *str)
 	else {
 		ip = str;
 	}
-	if ((family = get_netaddr(ip, ipaddr)) < 0)
-		return 0;
-	ret = _ip_ctl(h, veid, op, ipaddr, family);
-	if (ret) {
-		switch (errno) {
-			case EADDRINUSE:
-				ret = VZ_IP_INUSE;
-				break;
-			case ESRCH:
-				ret = VZ_VE_NOT_RUNNING;
-				break;
-			case EADDRNOTAVAIL:
-				if (op == VE_IP_DEL)
-					return 0;
-				ret = VZ_IP_NA;
-				break;
-			default:
-				ret = VZ_CANT_ADDIP;
-				break;
-		}
-		logger(-1, errno, "Unable to %s IP %s",
-			op == VE_IP_ADD ? "add" : "del", ip);
-	}
-	return ret;
+
+	return h->ip_ctl(h, veid, op, ip);
 }
 
 int run_net_script(envid_t veid, int op, list_head_t *ip_h, int state,

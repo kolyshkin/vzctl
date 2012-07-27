@@ -25,8 +25,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <netinet/in.h>
 #include <sys/personality.h>
 #include <linux/vzcalluser.h>
+#include <linux/vzctl_venet.h>
 
 #include "env.h"
 #include "util.h"
@@ -344,6 +346,65 @@ static int vz_netdev_ctl(vps_handler *h, envid_t veid, int op, char *name)
 	return 0;
 }
 
+static int vz_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
+{
+	struct vzctl_ve_ip_map ip_map;
+	int family;
+	unsigned int ip[4];
+	int ret;
+
+	union {
+		struct sockaddr_in  a4;
+		struct sockaddr_in6 a6;
+	} addr;
+
+	if ((family = get_netaddr(ipstr, ip)) < 0)
+		return 0;
+
+
+	if (family == AF_INET) {
+		addr.a4.sin_family = AF_INET;
+		addr.a4.sin_addr.s_addr = ip[0];
+		addr.a4.sin_port = 0;
+		ip_map.addrlen = sizeof(addr.a4);
+	} else if (family == AF_INET6) {
+		addr.a6.sin6_family = AF_INET6;
+		memcpy(&addr.a6.sin6_addr, ip, 16);
+		addr.a6.sin6_port = 0;
+		ip_map.addrlen = sizeof(addr.a6);
+	} else {
+		return -EAFNOSUPPORT;
+	}
+
+	ip_map.veid = veid;
+	ip_map.op = op;
+	ip_map.addr = (struct sockaddr*) &addr;
+
+	ret = ioctl(h->vzfd, VENETCTL_VE_IP_MAP, ip_map);
+	if (ret) {
+		switch (errno) {
+			case EADDRINUSE:
+				ret = VZ_IP_INUSE;
+				break;
+			case ESRCH:
+				ret = VZ_VE_NOT_RUNNING;
+				break;
+			case EADDRNOTAVAIL:
+				if (op == VE_IP_DEL)
+					return 0;
+				ret = VZ_IP_NA;
+				break;
+			default:
+				ret = VZ_CANT_ADDIP;
+				break;
+		}
+		logger(-1, errno, "Unable to %s IP %s",
+			op == VE_IP_ADD ? "add" : "del", ipstr);
+	}
+	return ret;
+
+}
+
 int vz_do_open(vps_handler *h)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
@@ -371,6 +432,7 @@ int vz_do_open(vps_handler *h)
 	h->setcontext = vz_setluid;
 	h->setdevperm = vz_set_devperm;
 	h->netdev_ctl = vz_netdev_ctl;
+	h->ip_ctl = vz_ip_ctl;
 	return 0;
 err:
 	close(h->vzfd);
