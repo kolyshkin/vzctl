@@ -99,6 +99,7 @@ typedef struct vps_handler {
 	int (*enter)(struct vps_handler *h, envid_t veid, const char *root, int flags);
 	int (*destroy)(struct vps_handler *h, envid_t veid);
 	int (*env_create)(struct arg_start *arg);
+	int (*setlimits)(struct vps_handler *h, envid_t, struct ub_struct *ub);
 } vps_handler;
 
 static inline int is_vz_kernel(vps_handler *h)

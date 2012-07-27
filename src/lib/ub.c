@@ -245,7 +245,7 @@ int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
-	if ((ret = set_ublimit(h, veid, ub)))
+	if ((ret = h->setlimits(h, veid, ub)))
 		return ret;
 	logger(0, 0, "UB limits were set successfully");
 	return 0;

@@ -300,6 +300,7 @@ int vz_do_open(vps_handler *h)
 	h->enter = vz_enter;
 	h->destroy = vz_destroy;
 	h->env_create = vz_do_env_create;
+	h->setlimits = set_ublimit;
 	return 0;
 err:
 	close(h->vzfd);
