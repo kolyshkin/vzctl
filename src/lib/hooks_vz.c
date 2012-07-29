@@ -381,7 +381,7 @@ static int vz_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
 	ip_map.op = op;
 	ip_map.addr = (struct sockaddr*) &addr;
 
-	ret = ioctl(h->vzfd, VENETCTL_VE_IP_MAP, ip_map);
+	ret = ioctl(h->vzfd, VENETCTL_VE_IP_MAP, &ip_map);
 	if (ret) {
 		switch (errno) {
 			case EADDRINUSE:
