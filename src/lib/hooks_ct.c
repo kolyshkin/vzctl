@@ -17,8 +17,7 @@ static int ct_is_run(vps_handler *h, envid_t veid)
 
 static int ct_destroy(vps_handler *h, envid_t veid)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return VZ_RESOURCE_ERROR;
+	return destroy_container(veid);
 }
 
 static int ct_env_create(struct arg_start *arg)

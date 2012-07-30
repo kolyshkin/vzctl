@@ -11,6 +11,7 @@
 				CT_BASE_STRING, veid)
 
 int container_is_running(envid_t veid);
+int destroy_container(envid_t veid);
 
 static inline const char *container_error(int ret)
 {

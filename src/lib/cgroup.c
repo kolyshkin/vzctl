@@ -88,6 +88,19 @@ static int controller_has_tasks(const char *cgrp, const char *name)
 	return ret;
 }
 
+int destroy_container(envid_t veid)
+{
+	struct cgroup *ct;
+	char cgrp[CT_MAX_STR_SIZE];
+	int ret;
+
+	veid_to_name(cgrp, veid);
+	ct = cgroup_new_cgroup(cgrp);
+	ret = cgroup_delete_cgroup_ext(ct, 0);
+	cgroup_free(&ct);
+	return ret;
+}
+
 int container_is_running(envid_t veid)
 {
 	int ret = 0;
