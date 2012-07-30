@@ -22,8 +22,9 @@
 #define MINCPUUNITS		8
 
 #define CPUMASK_NBITS		1024
+#define CPUMASK_NBYTES		(CPUMASK_NBITS / (8 * sizeof(unsigned long)))
 typedef struct {
-	unsigned long bits[CPUMASK_NBITS / (8 * sizeof(unsigned long))];
+	unsigned long bits[CPUMASK_NBYTES];
 } cpumask_t;
 #define cpumask_bits(maskp)	((maskp)->bits)
 
