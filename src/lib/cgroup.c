@@ -11,6 +11,14 @@
 #include "types.h"
 #include "vzerror.h"
 #include "cgroup.h"
+#include "cpu.h"
+#include "bitmap.h"
+#include "logger.h"
+
+#define MEMLIMIT	"memory.limit_in_bytes"
+#define SWAPLIMIT	"memory.memsw.limit_in_bytes"
+#define KMEMLIMIT	"memory.kmem.limit_in_bytes"
+#define TCPLIMIT	"memory.kmem.tcp.limit_in_bytes"
 
 static int copy_string_from_parent(struct cgroup_controller *controller,
 				   struct cgroup_controller *pcont, const char *file)
@@ -44,6 +52,72 @@ static int controller_apply_config(struct cgroup *ct, struct cgroup *parent,
 			return ret;
 	}
 	return 0;
+}
+
+static char *conf_names[] = {
+	"Memory",
+	"Kernel Memory",
+	"Swap",
+	"TCPbuffer",
+};
+
+int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val)
+{
+	struct cgroup *ct;
+	char cgrp[CT_MAX_STR_SIZE];
+	struct cgroup_controller *mem;
+	int ret = -EINVAL;
+
+	veid_to_name(cgrp, veid);
+
+	ct = cgroup_new_cgroup(cgrp);
+	/*
+	 * We should really be doing some thing like:
+	 *
+	 *	ret = cgroup_get_cgroup(ct);
+	 *
+	 * and then doing cgroup_get_controller. However, libcgroup has
+	 * a very nasty bug that make it sometimes fail. adding a controller
+	 * to a newly "created" cgroup structure and then setting the value
+	 * is a workaround that seems to work on various versions of the
+	 * library
+	 */
+	switch (c) {
+	case MEMORY:
+		if ((mem = cgroup_add_controller(ct, "memory")))
+			ret = cgroup_set_value_uint64(mem, MEMLIMIT, *val);
+		break;
+	case SWAP:
+		/* Unlike kmem, this must always be greater than mem */
+		if ((mem = cgroup_add_controller(ct, "memory"))) {
+			unsigned long mval;
+			if (!cgroup_get_value_uint64(mem, MEMLIMIT, &mval))
+				ret = cgroup_set_value_uint64(mem, SWAPLIMIT,
+							      mval + *val);
+		}
+		break;
+	case KMEMORY:
+		if ((mem = cgroup_add_controller(ct, "memory")))
+			ret = cgroup_set_value_uint64(mem, KMEMLIMIT, *val);
+		break;
+	case TCP:
+		if ((mem = cgroup_add_controller(ct, "memory")))
+			ret = cgroup_set_value_uint64(mem, TCPLIMIT, *val);
+		break;
+	default:
+		ret = -EINVAL;
+		break;
+	}
+
+	if (ret)
+		goto out;
+
+	if ((ret = cgroup_modify_cgroup(ct)))
+		logger(-1, 0, "Failed to set limits for %s (%s)", conf_names[c],
+		       cgroup_strerror(ret));
+out:
+	cgroup_free(&ct);
+	return ret;
 }
 
 static int do_create_container(struct cgroup *ct, struct cgroup *parent)

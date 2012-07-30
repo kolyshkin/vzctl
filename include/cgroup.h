@@ -22,4 +22,13 @@ static inline const char *container_error(int ret)
 }
 
 int container_init(void);
+
+enum conf_files {
+	MEMORY,
+	KMEMORY,
+	SWAP,
+	TCP,
+};
+int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val);
+
 #endif /* _CGROUP_H_ */
