@@ -94,6 +94,7 @@ struct meminfo_param;
 typedef struct vps_handler {
 	int vzfd;	/**< /dev/vzctl file descriptor. */
 	int stdfd;
+	int can_join_pidns; /* can't enter otherwise */
 	int (*is_run)(struct vps_handler *h, envid_t veid);
 	int (*enter)(struct vps_handler *h, envid_t veid, const char *root, int flags);
 	int (*destroy)(struct vps_handler *h, envid_t veid);

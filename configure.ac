@@ -144,6 +144,22 @@ AC_ARG_ENABLE([udev],
               [enable_udev="+udev"])
 AM_CONDITIONAL(ENABLE_UDEV, test "x$enable_udev" = "x+udev")
 
+AC_ARG_WITH([cgroup],
+            [AS_HELP_STRING([--with-cgroup],
+                            [Enable support for cgroup and upstream kernel])],
+            [case "${withval}" in
+              yes) with_cgroup="+cgroup";;
+              no)  with_cgroup="-cgroup";;
+              *)   AC_MSG_ERROR(bad value ${withval} for --with-cgroup);;
+            esac],
+            [with_cgroup="-cgroup"])
+
+AS_IF([test "x$with_cgroup" = "x+cgroup"],
+        [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35]) ]
+)
+AM_CONDITIONAL(HAVE_CGROUP, [test "x$with_cgroup" = "x+cgroup"])
+AC_SUBST(CGROUP_LIBS)
+AC_SUBST(CGROUP_CFLAGS)
 
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
@@ -155,7 +171,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
      target: $target
      prefix: $prefix
  sysconfdir: $sysconfdir
-   features: $enable_bashcomp $enable_logrotate $enable_udev
+   features: $enable_bashcomp $enable_logrotate $enable_udev $with_cgroup
 "])
 
 # Output
