@@ -16,6 +16,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <grp.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -238,6 +239,8 @@ int exec_container_init(struct arg_start *arg,
 	char *argv[] = {"init", "-z", "      ", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
 
+	/* Clear supplementary group IDs */
+	setgroups(0, NULL);
 	/* for 32-bit userspace running over 64-bit kernels */
 	set_personality32();
 

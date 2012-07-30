@@ -137,10 +137,6 @@ static int vz_env_create_data_ioctl(vps_handler *h,
 		errcode = ioctl(h->vzfd, VZCTL_ENV_CREATE_DATA, data);
 	} while (errcode < 0 && errno == EBUSY && retry++ < ENVRETRY);
 
-	if (errcode >= 0) {
-		/* Clear supplementary group IDs */
-		setgroups(0, NULL);
-	}
 	return errcode;
 }
 
