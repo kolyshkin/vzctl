@@ -25,6 +25,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <linux/vzcalluser.h>
+#include <sys/personality.h>
 #include <linux/reboot.h>
 #include <sys/mount.h>
 #include <sys/utsname.h>
@@ -41,6 +42,7 @@
 #include "vzsyscalls.h"
 #include "cpt.h"
 #include "image.h"
+#include "readelf.h"
 
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		int stop_mode);
@@ -178,6 +180,33 @@ static int configure_sysctl()
 	return 0;
 }
 
+#ifdef  __x86_64__
+static int set_personality(unsigned long mask)
+{
+	unsigned long per;
+
+	per = personality(0xffffffff) | mask;
+	logger(3, 0, "Set personality %#10.8lx", per);
+	if (personality(per) == -1) {
+		logger(-1, errno, "Unable to set personality PER_LINUX32");
+		return  -1;
+	}
+	return 0;
+}
+
+int set_personality32()
+{
+	if (get_arch_from_elf("/sbin/init") != elf_32)
+		return 0;
+	return set_personality(PER_LINUX32);
+}
+#else
+int set_personality32()
+{
+	return 0;
+}
+#endif /* __x86_64__ */
+
 void fill_container_param(struct arg_start *arg,
 			 struct env_create_param3 *create_param)
 {
@@ -208,6 +237,9 @@ int exec_container_init(struct arg_start *arg,
 	int fd, ret;
 	char *argv[] = {"init", "-z", "      ", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
+
+	/* for 32-bit userspace running over 64-bit kernels */
+	set_personality32();
 
 	/* Create /fastboot to skip run fsck */
 	fd = open("/fastboot", O_CREAT | O_RDONLY, 0644);

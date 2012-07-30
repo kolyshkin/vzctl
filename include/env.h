@@ -124,6 +124,7 @@ void fill_container_param(struct arg_start *arg,
 int exec_container_init(struct arg_start *arg,
 			struct env_create_param3 *create_param);
 
+int set_personality32();
 int vz_do_open(vps_handler *h);
 int ct_do_open(vps_handler *h);
 #endif

@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
-#include <sys/personality.h>
 #include <linux/vzcalluser.h>
 #include <linux/vzctl_veth.h>
 #include <linux/vzctl_venet.h>
@@ -36,32 +35,9 @@
 #include "types.h"
 #include "logger.h"
 #include "vzerror.h"
-#include "readelf.h"
 #include "vzsyscalls.h"
 
 #define ENVRETRY	3
-
-#ifdef  __x86_64__
-static int set_personality(unsigned long mask)
-{
-	unsigned long per;
-
-	per = personality(0xffffffff) | mask;
-	logger(3, 0, "Set personality %#10.8lx", per);
-	if (personality(per) == -1) {
-		logger(-1, errno, "Unable to set personality PER_LINUX32");
-		return  -1;
-	}
-	return 0;
-}
-
-static int set_personality32()
-{
-	if (get_arch_from_elf("/sbin/init") != elf_32)
-		return 0;
-	return set_personality(PER_LINUX32);
-}
-#endif
 
 static int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 {
@@ -80,10 +56,8 @@ static int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 	if (errcode >= 0 && (flags & VE_ENTER)) {
 		/* Clear supplementary group IDs */
 		setgroups(0, NULL);
-#ifdef  __x86_64__
 		/* Set personality PER_LINUX32 for i386 based CTs */
 		set_personality32();
-#endif
 	}
 	return errcode;
 }
@@ -166,10 +140,6 @@ static int vz_env_create_data_ioctl(vps_handler *h,
 	if (errcode >= 0) {
 		/* Clear supplementary group IDs */
 		setgroups(0, NULL);
-#ifdef  __x86_64__
-		/* Set personality PER_LINUX32 for i386 based CTs */
-		set_personality32();
-#endif
 	}
 	return errcode;
 }
