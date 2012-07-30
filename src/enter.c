@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <linux/vzcalluser.h>
+#include <linux/limits.h>
 #include <wait.h>
 #include <termios.h>
 #include <pty.h>
@@ -51,20 +52,29 @@ static struct termios s_tios;
 extern char *_proc_title;
 extern int _proc_title_len;
 
+static void set_proc_title(char *tty)
+{
+	char *p;
+
+	p = tty;
+	if (p != NULL && !strncmp(p, "/dev/", 5))
+		p += 5;
+	memset(_proc_title, 0, _proc_title_len);
+	snprintf(_proc_title, _proc_title_len - 1, "vzctl: %s",
+		p != NULL ? p : "");
+}
+
 static int pty_alloc(int *master, int *slave, struct termios *tios,
 	struct winsize *ws)
 {
-	char *name;
+	char name[PATH_MAX];
 
-	if (openpty(master, slave, NULL, tios, ws) < 0) {
+	if (openpty(master, slave, name, tios, ws) < 0) {
 		logger(-1, errno, "Unable to open pty");
 		return -1;
 	}
-	if ((name = ttyname(*slave)) == NULL) {
-		logger(-1, errno, "Unable to get tty name");
-	} else {
-		logger(2, 0, "Open %s", name);
-	}
+	set_proc_title(name);
+	logger(2, 0, "Open %s", name);
 	return 0;
 }
 
@@ -125,18 +135,6 @@ static void child_handler(int sig)
 static void winchange_handler(int sig)
 {
 	win_changed = 1;
-}
-
-static void set_proc_title(char *tty)
-{
-	char *p;
-
-	p = tty;
-	if (p != NULL && !strncmp(p, "/dev/", 5))
-		p += 5;
-	memset(_proc_title, 0, _proc_title_len);
-	snprintf(_proc_title, _proc_title_len - 1, "vzctl: %s",
-		p != NULL ? p : "");
 }
 
 static int stdredir(int rdfd, int wrfd)
@@ -295,7 +293,6 @@ int do_enter(vps_handler *h, envid_t veid, const char *root,
 			goto err;
 		if ((ret = pty_alloc(&master, &slave, &tios, &ws)))
 			goto err;
-		set_proc_title(ttyname(slave));
 		child_term = 0;
 		sigemptyset(&act.sa_mask);
 		act.sa_flags = SA_NOCLDSTOP;
