@@ -167,6 +167,42 @@ out_free:
 	return ret;
 }
 
+/*
+ * This function assumes that all pids inside a cgroup
+ * belong to the same namespace, that is the container namespace.
+ * Therefore, from the host box, any of them will do.
+ */
+pid_t get_pid_from_container(envid_t veid)
+{
+	char cgrp[CT_MAX_STR_SIZE];
+	struct cgroup *ct;
+	void *task_handle;
+	void *cont_handle;
+	struct cgroup_mount_point mnt;
+	pid_t pid = -1;
+	int ret;
+
+	veid_to_name(cgrp, veid);
+	ct = cgroup_new_cgroup(cgrp);
+	ret = cgroup_get_cgroup(ct);
+	if (ret == ECGROUPNOTEXIST)
+		goto out_free;
+
+	ret = cgroup_get_controller_begin(&cont_handle, &mnt);
+	if (ret != 0) /* no controllers, something is wrong */
+		goto out_free;
+
+	ret = cgroup_get_task_begin(cgrp, mnt.name, &task_handle, &pid);
+	if (ret != 0) /* no tasks, something is also wrong */
+		goto out_end_cont;
+	cgroup_get_task_end(&task_handle);
+
+out_end_cont:
+	cgroup_get_controller_end(&cont_handle);
+out_free:
+	cgroup_free(&ct);
+	return pid;
+}
 int container_init(void)
 {
 	int ret;

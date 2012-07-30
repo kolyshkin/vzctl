@@ -9,6 +9,7 @@
 #include <sys/mount.h>
 #include <fcntl.h>
 #include <sched.h>
+#include <dirent.h>
 
 #include "vzerror.h"
 #include "env.h"
@@ -114,6 +115,72 @@ static int ct_env_create(struct arg_start *arg)
 	return 0;
 }
 
+static int __ct_enter(vps_handler *h, envid_t veid, int flags)
+{
+	DIR *dp;
+	struct dirent *ep;
+	char path[STR_SIZE]; /* long enough for any pid */
+	pid_t task_pid;
+	int ret = VZ_RESOURCE_ERROR;
+
+	if (!h->can_join_pidns) {
+		logger(-1, 0, "Kernel lacks setns for pid namespace");
+		return VZ_RESOURCE_ERROR;
+	}
+
+	task_pid = get_pid_from_container(veid);
+	if (task_pid < 0) {
+		logger(-1, 0, "Container doesn't seem to be started (no pids in container cgroup)");
+		return VZ_RESOURCE_ERROR;
+	}
+
+	if (snprintf(path, STR_SIZE, "/proc/%d/ns/", task_pid) < 0)
+		return VZ_RESOURCE_ERROR;
+
+	dp = opendir(path);
+	if (dp == NULL)
+		return VZ_RESOURCE_ERROR;
+
+	ret = VZ_RESOURCE_ERROR;
+	while ((ep = readdir (dp))) {
+		int fd;
+		if (!strcmp(ep->d_name, "."))
+			continue;
+		if (!strcmp(ep->d_name, ".."))
+			continue;
+
+		if (snprintf(path, sizeof(path), "/proc/%d/ns/%s", task_pid, ep->d_name) < 0)
+			goto out;
+		if ((fd = open(path, O_RDONLY)) < 0)
+			goto out;
+		if (setns(fd, 0))
+			logger(-1, 0, "Failed to set context for %s", ep->d_name);
+	}
+	ret = 0;
+
+	if ((ret = container_add_task(veid))) {
+		logger(-1, 0, "Can't add task creator to container: %s", container_error(ret));
+		return VZ_RESOURCE_ERROR;
+	}
+out:
+	closedir(dp);
+	return ret;
+}
+
+/*
+ * We need to do chroot only after the context is set. Otherwise, we can't find the proc files
+ * we need to operate on the ns files
+ */
+static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
+{
+	int ret;
+	if ((ret = __ct_enter(h, veid, flags)))
+		return ret;
+	if ((ret = vz_chroot(root)))
+		return ret;
+	return 0;
+}
+
 static int ct_setlimits(vps_handler *h, envid_t veid, struct ub_struct *ub)
 {
 	logger(-1, 0, "%s not yet supported upstream", __func__);
@@ -152,16 +219,6 @@ static int ct_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 
 static int ct_setcontext(envid_t veid)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return VZ_RESOURCE_ERROR;
-}
-
-static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
-{
-	if (!h->can_join_pidns) {
-		logger(-1, 0, "Kernel lacks setns for pid namespace");
-		return VZ_RESOURCE_ERROR;
-	}
 	return 0;
 }
 
