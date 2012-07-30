@@ -254,8 +254,31 @@ static int ct_setlimits(vps_handler *h, envid_t veid, struct ub_struct *ub)
 
 static int ct_setcpus(vps_handler *h, envid_t veid, struct cpu_param *cpu)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return 0;
+	int ret = 0;
+	/*
+	 * Need to convert both cpulimit and vcpus to something comparable.
+	 * So get both in percentages
+	 */
+	unsigned long max_lim = ~0UL;
+
+	if (cpu->mask)
+		ret = container_apply_config(veid, CPUMASK,
+					     cpumask_bits(cpu->mask));
+
+	if (cpu->limit != NULL && *cpu->limit)
+		max_lim = min_ul(*cpu->limit, max_lim);
+	if (cpu->vcpus != NULL)
+		max_lim = min_ul(max_lim, *cpu->vcpus * 100);
+	if (max_lim != ~0ULL)
+		ret |= container_apply_config(veid, CPULIMIT, &max_lim);
+
+	if (cpu->units != NULL) {
+		ret |= container_apply_config(veid, CPUSHARES, cpu->units);
+	} else if (cpu->weight != NULL) {
+		ret |= container_apply_config(veid, CPUSHARES, cpu->weight);
+	}
+
+	return ret;
 }
 
 static int ct_setdevperm(vps_handler *h, envid_t veid, dev_res *dev)

@@ -59,13 +59,16 @@ static char *conf_names[] = {
 	"Kernel Memory",
 	"Swap",
 	"TCPbuffer",
+	"CPU limits",
+	"CPU mask",
+	"CPU shares",
 };
 
 int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val)
 {
 	struct cgroup *ct;
 	char cgrp[CT_MAX_STR_SIZE];
-	struct cgroup_controller *mem;
+	struct cgroup_controller *mem, *cpu, *cpuset;
 	int ret = -EINVAL;
 
 	veid_to_name(cgrp, veid);
@@ -104,6 +107,62 @@ int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val)
 		if ((mem = cgroup_add_controller(ct, "memory")))
 			ret = cgroup_set_value_uint64(mem, TCPLIMIT, *val);
 		break;
+	case CPULIMIT: {
+		u_int64_t period;
+		u_int64_t quota;
+		if ((cpu = cgroup_add_controller(ct, "cpu")) == NULL)
+			break;
+
+		/* Should be 100000, but be safe. It may fail on some versions
+		 * of libcgroup, so if it fails, just assume the default */
+		ret = cgroup_get_value_uint64(cpu, "cpu.cfs_period_us", &period);
+		if (ret)
+			period = 100000;
+		/* val will contain an integer percentage, like 223% */
+		quota = (period * (*val)) / 100;
+		ret = cgroup_set_value_uint64(cpu, "cpu.cfs_quota_us", quota);
+		break;
+	}
+	case CPUSHARES:
+		if ((cpu = cgroup_add_controller(ct, "cpu")) == NULL)
+			break;
+		ret = cgroup_set_value_uint64(cpu, "cpu.shares", *val);
+		break;
+	case CPUMASK: {
+		struct cgroup_controller *pcont;
+		struct cgroup *parent;
+		char *ptr = NULL;
+		char cpusetstr[2 * CPUMASK_NBITS];
+		unsigned int i;
+
+		if ((cpuset = cgroup_add_controller(ct, "cpuset")) == NULL)
+			break;
+		/*
+		 * Having all bits set is a bit different, bitmap_snprintf will
+		 * return a bad string. (From the PoV of the cpuset cgroup). We
+		 * actually need to copy the parent's mask in that case.
+		 */
+		for (i = 0; i < CPUMASK_NBYTES; i++) {
+			if (val[i] != (~0UL)) {
+				bitmap_snprintf(cpusetstr, CPUMASK_NBITS * 2,
+						val, CPUMASK_NBITS);
+				goto string_ok;
+			}
+		}
+
+		parent = cgroup_new_cgroup(CT_BASE_STRING);
+		cgroup_get_cgroup(parent);
+		pcont = cgroup_get_controller(parent, "cpuset");
+		ret = cgroup_get_value_string(pcont, "cpuset.cpus", &ptr);
+		if (ptr) {
+			strncpy(cpusetstr, ptr, CPUMASK_NBITS *2);
+			free(ptr);
+		}
+		cgroup_free(&parent);
+string_ok:
+		ret = cgroup_set_value_string(cpuset, "cpuset.cpus", cpusetstr);
+		break;
+	}
 	default:
 		ret = -EINVAL;
 		break;

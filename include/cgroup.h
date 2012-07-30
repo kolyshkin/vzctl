@@ -28,6 +28,9 @@ enum conf_files {
 	KMEMORY,
 	SWAP,
 	TCP,
+	CPULIMIT,
+	CPUMASK,
+	CPUSHARES,
 };
 int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val);
 
