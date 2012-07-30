@@ -12,8 +12,7 @@
 
 static int ct_is_run(vps_handler *h, envid_t veid)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return 0;
+	return container_is_running(veid);
 }
 
 static int ct_destroy(vps_handler *h, envid_t veid)

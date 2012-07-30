@@ -73,6 +73,55 @@ static int do_create_container(struct cgroup *ct, struct cgroup *parent)
 
 }
 
+/* libcgroup is lame. This should be done with the cgroup structure, not the
+ * cgroup name
+ */
+static int controller_has_tasks(const char *cgrp, const char *name)
+{
+	int ret;
+	pid_t pid;
+	void *handle;
+
+	ret = cgroup_get_task_begin(cgrp, name, &handle, &pid);
+	ret = (ret != ECGEOF);
+	cgroup_get_task_end(&handle);
+	return ret;
+}
+
+int container_is_running(envid_t veid)
+{
+	int ret = 0;
+	void *handle;
+	struct cgroup_mount_point mnt;
+	struct cgroup *ct;
+	char cgrp[CT_MAX_STR_SIZE];
+
+	veid_to_name(cgrp, veid);
+
+	ct = cgroup_new_cgroup(cgrp);
+	ret = cgroup_get_cgroup(ct);
+	if (ret == ECGROUPNOTEXIST) {
+		ret = 0;
+		goto out_free;
+	}
+
+	ret = cgroup_get_controller_begin(&handle, &mnt);
+	do {
+		if ((ret = controller_has_tasks(cgrp, mnt.name)) != 0)
+			goto out;
+	} while ((ret = cgroup_get_controller_next(&handle, &mnt)) == 0);
+
+	if (ret != ECGEOF)
+		ret = -ret;
+	else
+		ret = 0;
+out:
+	cgroup_get_controller_end(&handle);
+out_free:
+	cgroup_free(&ct);
+	return ret;
+}
+
 int container_init(void)
 {
 	int ret;
