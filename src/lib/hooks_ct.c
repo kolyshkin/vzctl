@@ -4,11 +4,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/mount.h>
+#include <fcntl.h>
+#include <sched.h>
 
 #include "vzerror.h"
 #include "env.h"
+#include "util.h"
 #include "logger.h"
 #include "cgroup.h"
+
+#define NETNS_RUN_DIR "/var/run/netns"
 
 static int ct_is_run(vps_handler *h, envid_t veid)
 {
@@ -17,13 +25,93 @@ static int ct_is_run(vps_handler *h, envid_t veid)
 
 static int ct_destroy(vps_handler *h, envid_t veid)
 {
+	char ctpath[STR_SIZE];
+
+	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, veid);
+	umount2(ctpath, MNT_DETACH);
 	return destroy_container(veid);
+}
+
+static int _env_create(void *data)
+{
+	struct arg_start *arg = data;
+	struct env_create_param3 create_param;
+	int ret;
+
+	if ((ret = vz_chroot(arg->res->fs.root)))
+		return ret;
+
+	if ((ret = vps_set_cap(arg->veid, &arg->res->env, &arg->res->cap)))
+		return ret;
+
+	fill_container_param(arg, &create_param);
+
+	/* Close all fds except stdin. stdin is status pipe */
+	close(STDERR_FILENO); close(STDOUT_FILENO);
+	close_fds(0, arg->wait_p, arg->err_p, -1);
+
+	return exec_container_init(arg, &create_param);
 }
 
 static int ct_env_create(struct arg_start *arg)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return VZ_RESOURCE_ERROR;
+
+	long stack_size = sysconf(_SC_PAGESIZE);
+	void *child_stack = (char *)alloca(stack_size) + stack_size;
+	int clone_flags;
+	int ret;
+	char procpath[STR_SIZE];
+	char ctpath[STR_SIZE];
+
+	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, arg->veid);
+	if ((ret = open(ctpath, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR)) < 0) {
+		logger(-1, errno, "Can't create container netns file");
+		return VZ_RESOURCE_ERROR;
+	}
+	close(ret);
+
+	if (child_stack == NULL) {
+		logger(-1, errno, "Unable to alloc");
+		return VZ_RESOURCE_ERROR;
+	}
+
+	if ((ret = create_container(arg->veid))) {
+		logger(-1, 0, "Container creation failed: %s", container_error(ret));
+		return VZ_RESOURCE_ERROR;
+	}
+
+	if ((ret = container_add_task(arg->veid))) {
+		logger(-1, 0, "Can't add task creator to container: %s", container_error(ret));
+		return VZ_RESOURCE_ERROR;
+	}
+
+	/*
+	 * Belong in the setup phase
+	 */
+	clone_flags = SIGCHLD;
+	/* FIXME: USERNS is still work in progress */
+	clone_flags |= CLONE_NEWUTS|CLONE_NEWPID|CLONE_NEWIPC;
+	clone_flags |= CLONE_NEWNET|CLONE_NEWNS;
+
+	ret = clone(_env_create, child_stack, clone_flags, arg);
+	if (ret  < 0) {
+		logger(-1, errno, "Unable to clone");
+		/* FIXME: remove ourselves from container first */
+		destroy_container(arg->veid);
+		return VZ_RESOURCE_ERROR;
+	}
+
+	snprintf(procpath, STR_SIZE, "/proc/%d/ns/net", ret);
+
+	umount2(ctpath, MNT_DETACH);
+	ret = mount(procpath, ctpath, "none", MS_MGC_VAL|MS_BIND, NULL);
+	if (ret) {
+		logger(-1, errno, "Can't mount into netns file %s", ctpath);
+		destroy_container(arg->veid);
+		return VZ_RESOURCE_ERROR;
+	}
+
+	return 0;
 }
 
 static int ct_setlimits(vps_handler *h, envid_t veid, struct ub_struct *ub)
@@ -91,6 +179,13 @@ int ct_do_open(vps_handler *h)
 
 	if (snprintf(path, sizeof(path), "/proc/%d/ns/pid", getpid()) < 0)
 		return VZ_RESOURCE_ERROR;
+
+	ret = mkdir(NETNS_RUN_DIR, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+
+	if (ret && (errno != EEXIST)) {
+		logger(-1, errno, "Can't create directory ", NETNS_RUN_DIR);
+		return VZ_RESOURCE_ERROR;
+	}
 
 	h->can_join_pidns = !stat(path, &st);
 	h->is_run = ct_is_run;

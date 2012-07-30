@@ -73,6 +73,23 @@ static int do_create_container(struct cgroup *ct, struct cgroup *parent)
 
 }
 
+int create_container(envid_t veid)
+{
+	char cgrp[CT_MAX_STR_SIZE];
+	struct cgroup *ct, *parent;
+	int ret;
+
+	veid_to_name(cgrp, veid);
+	ct = cgroup_new_cgroup(cgrp);
+	parent = cgroup_new_cgroup(CT_BASE_STRING);
+
+	ret = do_create_container(ct, parent);
+	cgroup_free(&ct);
+	cgroup_free(&parent);
+
+	return ret;
+}
+
 /* libcgroup is lame. This should be done with the cgroup structure, not the
  * cgroup name
  */
@@ -86,6 +103,21 @@ static int controller_has_tasks(const char *cgrp, const char *name)
 	ret = (ret != ECGEOF);
 	cgroup_get_task_end(&handle);
 	return ret;
+}
+
+int container_add_task(envid_t veid)
+{
+	char cgrp[CT_MAX_STR_SIZE];
+	struct cgroup *ct;
+
+	veid_to_name(cgrp, veid);
+	ct = cgroup_new_cgroup(cgrp);
+	if (cgroup_get_cgroup(ct))
+		return -1;
+
+	cgroup_attach_task_pid(ct, getpid());
+	cgroup_free(&ct);
+	return 0;
 }
 
 int destroy_container(envid_t veid)
