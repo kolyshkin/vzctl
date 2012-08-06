@@ -1883,6 +1883,7 @@ int main(int argc, char **argv)
 			break;
 		case 'j'	:
 			fmt_json = 1;
+			p_buf = e_buf = NULL;
 			break;
 		default		:
 			/* "Unknown option" error msg is printed by getopt */
