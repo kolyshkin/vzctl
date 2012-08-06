@@ -54,12 +54,7 @@ int get_ploop_type(const char *type)
 
 int is_ploop_supported(void)
 {
-	int minor;
-	/* Use ploop_getdevice because it's a call that
-	 * - doesn't change anything
-	 * - fails if ploop is not available
-	 */
-	return (ploop_getdevice(&minor) == 0);
+	return (stat_file("/proc/vz/ploop_minor") == 1);
 }
 
 int is_image_mounted(const char *ve_private)
