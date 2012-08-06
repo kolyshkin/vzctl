@@ -127,7 +127,7 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 	char *str = "-";					\
 								\
 	if (fmt_json)						\
-		print_json_str(p->fieldname);			\
+		return print_json_str(p->fieldname);		\
 								\
 	if (p->fieldname != NULL)				\
 		str = p->fieldname;				\
