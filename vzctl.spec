@@ -42,8 +42,8 @@ Requires: vzquota >= 2.7.0-4
 Requires: fileutils
 Requires: vzctl-lib = %{version}-%{release}
 Requires: tar
-Requires: ploop > 1.5-1
-BuildRequires: ploop-devel > 1.5-1
+Requires: ploop > 1.4-1
+BuildRequires: ploop-devel > 1.4-1
 
 # requires for vzmigrate purposes
 Requires: rsync
