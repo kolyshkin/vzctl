@@ -423,7 +423,7 @@ static void print_ubc(struct Cveinfo *p, size_t res_off, int index)
 {
 	int running = p->status == VE_RUNNING;
 	unsigned long *res = p->ubc ?
-		(unsigned long *)((char *)(p->ubc) + res_off) : NULL;
+		(unsigned long *)(p->ubc) + res_off : NULL;
 
 	if (fmt_json) {
 		if (res) {
@@ -457,7 +457,8 @@ static void print_ubc(struct Cveinfo *p, size_t res_off, int index)
 #define PRINT_UBC(name)							\
 static void print_ubc_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	print_ubc(p, offsetof(struct Cubc, name), index);		\
+	print_ubc(p, offsetof(struct Cubc, name) /			\
+			sizeof(unsigned long), index);			\
 }
 
 FOR_ALL_UBC(PRINT_UBC)
@@ -482,7 +483,7 @@ static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 {
 	int running = p->status == VE_RUNNING;
 	unsigned long *res = p->quota ?
-		(unsigned long *)((char *)(p->quota) + res_off) : NULL;
+		(unsigned long *)(p->quota) + res_off : NULL;
 
 	if (fmt_json) {
 		if (res) {
@@ -508,7 +509,8 @@ static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 #define PRINT_DQ(name)							\
 static void print_ ## name(struct Cveinfo *p, int index)		\
 {									\
-	print_dq(p, offsetof(struct Cquota, name), index);		\
+	print_dq(p, offsetof(struct Cquota, name) /			\
+			sizeof(unsigned long), index);			\
 }
 
 PRINT_DQ(diskspace)
