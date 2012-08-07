@@ -129,6 +129,18 @@ vzcreatepair()
 	${IP_CMD} link set $HNAME up
 }
 
+# Move an already existing interface to the network namespace given by VEID
+vzmoveif()
+{
+	${IP_CMD} link show | grep -w -F $HNAME >/dev/null 2>&1
+	if [ $? -ne 0 ]; then
+		vzerror "Can't move non-existent interface"
+		return;
+	fi
+
+	${IP_CMD} link set $HNAME netns $VEID
+}
+
 # Removes the interface referred to by VNAME from the container.
 vzdestroylink()
 {
@@ -162,6 +174,15 @@ vzconfbridge()
 	if [ "x$BRIDGE" != "x" ]; then
 		brctl addif $BRIDGE $HNAME >/dev/null 2>&1
 	fi
+}
+
+# Move back an interface to the host namespace.
+#
+# When we move a physical host-side network device to the container, this is
+# what we should call to undo the operation.
+vzregainif()
+{
+	${IP_CMD} netns exec $VEID ${IP_CMD} link set $VNAME netns $$
 }
 
 # This function fills $NETDEVICES with all network interfaces

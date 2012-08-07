@@ -15,6 +15,7 @@
 #include "env.h"
 #include "util.h"
 #include "logger.h"
+#include "script.h"
 #include "cgroup.h"
 
 #define NETNS_RUN_DIR "/var/run/netns"
@@ -287,10 +288,43 @@ static int ct_setdevperm(vps_handler *h, envid_t veid, dev_res *dev)
 	return 0;
 }
 
+/*
+ * This will move an existing device from host to the container.  We will
+ * signal that to the network scripts by setting HNAME == VNAME.
+ *
+ * This is an impossible situation for a normal device pair, so it is a safe
+ * thing to do, while removing the need to create yet another script just for
+ * the special case of device movement. Both device creation and device
+ * deletion will abide by this convention.
+ */
 static int ct_netdev_ctl(vps_handler *h, envid_t veid, int op, char *name)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return 0;
+	char *envp[10];
+	char buf[STR_SIZE];
+	int i = 0;
+	int ret = 0;
+
+	snprintf(buf, sizeof(buf), "VEID=%d", veid);
+	envp[i++] = strdup(buf);
+
+	snprintf(buf, sizeof(buf), "VNAME=%s", name);
+	envp[i++] = strdup(buf);
+
+	snprintf(buf, sizeof(buf), "HNAME=%s", name);
+	envp[i++] = strdup(buf);
+
+	envp[i] = NULL;
+
+	if (op == VE_NETDEV_ADD) {
+		char *argv[] = { VPS_NETNS_DEV_ADD, NULL };
+		ret = run_script(VPS_NETNS_DEV_ADD, argv, envp, 0);
+	} else {
+		char *argv[] = { VPS_NETNS_DEV_DEL, NULL };
+		ret = run_script(VPS_NETNS_DEV_DEL, argv, envp, 0);
+	}
+	free_arg(envp);
+
+	return ret;
 }
 
 static int ct_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)

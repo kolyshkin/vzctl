@@ -33,6 +33,10 @@
 vzcheckvar VEID
 vzcheckvar VNAME
 
-vzdestroylink
+if [ "x$VNAME" = "x$HNAME" ]; then
+	vzregainif
+else
+	vzdestroylink
+fi
 
 exit 0
