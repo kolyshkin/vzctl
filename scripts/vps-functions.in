@@ -102,6 +102,68 @@ vzcheckvar()
 	done
 }
 
+# Creates a pair of veth devices, being one of them in the host, and the other
+# inside the container The function should be called with the following env
+# variables set:
+#
+#  HNAME: The intended name of the device in the host side
+#  VNAME: The indented name of the device inside the container
+#  VEID:  The numerical container id.
+#
+# HNAME and VNAME must be different, since they will at some point cohexist at
+# the host side, and our name convention forced by vzctl tool guarantees that
+# this shouldn't be a problem for sane setups.
+#
+# This function leaves the host device in the "link up" state, but with no
+# further configuration. The container device setup is left entirely to the
+# container.
+#
+# If the device given by HNAME in the host already exists, this function exits
+# with no visible action.
+vzcreatepair()
+{
+	${IP_CMD} link show | grep -w -F $HNAME >/dev/null 2>&1 && return
+
+	${IP_CMD} netns exec $VEID ${IP_CMD} link add name $HNAME type veth peer name $VNAME
+	${IP_CMD} netns exec $VEID ${IP_CMD} link set $HNAME netns $$
+	${IP_CMD} link set $HNAME up
+}
+
+# Removes the interface referred to by VNAME from the container.
+vzdestroylink()
+{
+	${IP_CMD} netns exec $VEID ${IP_CMD} link delete $VNAME type veth
+}
+
+# Adjusts host-side and container's interface configuration so they have the
+# desired mac addresses.  The host mac address is given by HMAC, and the
+# container's by VMAC.  They are both optional parameters. If no mac is
+# specified, this function does nothing.
+vzadjustmacs()
+{
+	if [ "x$HMAC" != "x" ]; then
+		${IP_CMD} link set dev $HNAME address $HMAC
+	fi
+
+	if [ "x$VMAC" != "x" ]; then
+		${IP_CMD} netns exec $VEID ${IP_CMD} link set dev $VNAME address $VMAC
+	fi
+}
+
+# Bridge configuration function.
+#
+# It allows us to automatically insert a given host-side interface (HNAME) into
+# a bridge. Calling the bridge "venet0" has a special meaning, since this is a
+# bridge expected to always exist in our setup. In this case, we'll make sure
+# the bridge exists by creating it in case we are the first caller.  For all
+# other setups, the bridge is expected to already exist and be valid.
+vzconfbridge()
+{
+	if [ "x$BRIDGE" != "x" ]; then
+		brctl addif $BRIDGE $HNAME >/dev/null 2>&1
+	fi
+}
+
 # This function fills $NETDEVICES with all network interfaces
 # You should always call it before calling vzarp
 vzgetnetdev()

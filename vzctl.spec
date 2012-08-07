@@ -225,6 +225,8 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-functions
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_add
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-net_del
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-netns_dev_add
+%attr(755,root,root) %{_pkglibdir}/scripts/vps-netns_dev_del
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-create
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-download
 %attr(755,root,root) %{_pkglibdir}/scripts/vzevent-stop

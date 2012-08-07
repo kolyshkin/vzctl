@@ -299,10 +299,59 @@ static int ct_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
 	return 0;
 }
 
+/*
+ * This function is the simplest one among the network handling functions.
+ * It will create a veth pair, and move one of its ends to the container.
+ *
+ * MAC addresses and Bridge parameters are optional
+ */
 static int ct_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return 0;
+	int ret = -1;
+	char *envp[10];
+	char buf[STR_SIZE];
+	int i = 0;
+
+	snprintf(buf, sizeof(buf), "VEID=%d", veid);
+	envp[i++] = strdup(buf);
+
+	snprintf(buf, sizeof(buf), "VNAME=%s", dev->dev_name_ve);
+	envp[i++] = strdup(buf);
+
+	if (dev->dev_addr_ve) {
+		snprintf(buf, sizeof(buf), "VMAC=%s", dev->dev_addr_ve);
+		envp[i++] = strdup(buf);
+	}
+
+	if (dev->dev_addr) {
+		snprintf(buf, sizeof(buf), "HMAC=%s", dev->dev_addr);
+		envp[i++] = strdup(buf);
+	}
+
+	if (dev->dev_name) {
+		snprintf(buf, sizeof(buf), "HNAME=%s", dev->dev_name);
+		envp[i++] = strdup(buf);
+	}
+
+	if (dev->dev_bridge) {
+		snprintf(buf, sizeof(buf), "BRIDGE=%s", dev->dev_bridge);
+		envp[i++] = strdup(buf);
+	}
+
+	envp[i] = NULL;
+
+	if (op == ADD) {
+		char *argv[] = { VPS_NETNS_DEV_ADD, NULL };
+
+		ret = run_script(VPS_NETNS_DEV_ADD, argv, envp, 0);
+	} else  {
+		char *argv[] = { VPS_NETNS_DEV_DEL, NULL };
+
+		ret = run_script(VPS_NETNS_DEV_DEL, argv, envp, 0);
+	}
+	free_arg(envp);
+
+	return ret;
 }
 
 static int ct_setcontext(envid_t veid)
