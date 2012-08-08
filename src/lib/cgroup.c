@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string.h>
 #include <strings.h>
+#include <signal.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -296,6 +297,47 @@ int container_is_running(envid_t veid)
 out:
 	cgroup_get_controller_end(&handle);
 out_free:
+	cgroup_free(&ct);
+	return ret;
+}
+
+/*
+ * We send a kill signal to all processes. This is racy in theory, since they
+ * could spawn new processes faster than we kill. But since one of them is the
+ * init process, (we don't really know which), then eventually the init process
+ * will die taking away all the others, so this is fine.
+ *
+ * This is a big hack, and only exists because we have no way to enter a PID
+ * namespace from the outside (yet). From there, we could just issue a normal
+ * reboot.
+ */
+int hackish_empty_container(envid_t veid)
+{
+	char cgrp[CT_MAX_STR_SIZE];
+	struct cgroup *ct;
+	int ret = 0;
+	void *task_handle;
+	pid_t pid;
+
+	veid_to_name(cgrp, veid);
+	ct = cgroup_new_cgroup(cgrp);
+
+	ret = cgroup_get_cgroup(ct);
+	if (ret == ECGROUPNOTEXIST)
+		goto out;
+
+	/* Any controller will do */
+	ret = cgroup_get_task_begin(cgrp, "cpu", &task_handle, &pid);
+	while (!ret) {
+		kill(pid, SIGKILL);
+		ret = cgroup_get_task_next(&task_handle, &pid);
+	}
+	if (ret == ECGEOF)
+		ret = 0;
+
+	cgroup_get_task_end(&task_handle);
+
+out:
 	cgroup_free(&ct);
 	return ret;
 }

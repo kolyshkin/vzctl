@@ -28,6 +28,11 @@ static int ct_is_run(vps_handler *h, envid_t veid)
 static int ct_destroy(vps_handler *h, envid_t veid)
 {
 	char ctpath[STR_SIZE];
+	int ret;
+
+	ret = hackish_empty_container(veid);
+	if (ret)
+		return ret;
 
 	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, veid);
 	umount2(ctpath, MNT_DETACH);

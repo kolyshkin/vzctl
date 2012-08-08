@@ -780,6 +780,15 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 	if (stop_mode == M_KILL)
 		goto kill_vps;
 
+	if (!is_vz_kernel(h)) {
+		logger(-1, 0, "Due to lack of proper support in this kernel, "
+		"container can't be cleanly\n"
+		"stopped from the host system. Please stop it from inside, "
+		"or use --fast option\n"
+		"to forcibly kill it (note it is unsafe operation).");
+		ret = VZ_BAD_KERNEL;
+		goto out;
+	}
 	logger(0, 0, "Stopping container ...");
 	if ((pid = fork()) < 0) {
 		logger(-1, errno, "Can not fork");
@@ -802,6 +811,10 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 
 kill_vps:
 	logger(0, 0, "Killing container ...");
+	ret = h->destroy(h, veid);
+	if (!is_vz_kernel(h))
+		goto out;
+
 	if ((pid = fork()) < 0) {
 		ret = VZ_RESOURCE_ERROR;
 		logger(-1, errno, "Can not fork");

@@ -34,4 +34,6 @@ enum conf_files {
 };
 int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val);
 
+int hackish_empty_container(envid_t veid);
+
 #endif /* _CGROUP_H_ */
