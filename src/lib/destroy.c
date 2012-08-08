@@ -75,42 +75,6 @@ int vps_destroy_dir(envid_t veid, char *dir)
 	return 0;
 }
 
-static char *get_destroy_root(const char *dir)
-{
-	struct stat st;
-	dev_t id;
-	int len;
-	const char *p, *prev;
-	char tmp[STR_SIZE];
-
-	if (stat(dir, &st) < 0)
-		return NULL;
-	id = st.st_dev;
-	p = dir + strlen(dir);
-	prev = p;
-	while (p > dir) {
-		while (p > dir && (*p == '/' || *p == '.')) p--;
-		while (p > dir && *p != '/') p--;
-		if (p <= dir)
-			break;
-		len = p - dir + 1;
-		strncpy(tmp, dir, len);
-		tmp[len] = 0;
-		if (stat(tmp, &st) < 0)
-			return NULL;
-		if (id != st.st_dev)
-			break;
-		prev = p;
-	}
-	len = prev - dir;
-	if (len) {
-		strncpy(tmp, dir, len);
-		tmp[len] = 0;
-		return strdup(tmp);
-	}
-	return NULL;
-}
-
 /* Removes all the directories under 'root'
  * those names start with 'destroy_dir_magic'
  */
@@ -198,7 +162,7 @@ static int destroydir(char *dir)
 		return _unlink(dir);
 	}
 
-	root = get_destroy_root(dir);
+	root = get_fs_root(dir);
 	if (root == NULL) {
 		logger(-1, 0, "Unable to get root for %s", dir);
 		return -1;

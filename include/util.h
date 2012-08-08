@@ -33,6 +33,7 @@ char *parse_line(char *str, char *ltoken, int lsz, char **errstr);
 int stat_file(const char *file);
 int make_dir(const char *path, int full);
 int make_dir_mode(const char *path, int full, int mode);
+char *get_fs_root(const char *dir);
 int parse_int(const char *str, int *val);
 int parse_ul(const char *str, unsigned long *val);
 int check_var(const void *val, const char *message);

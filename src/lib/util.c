@@ -159,6 +159,42 @@ int make_dir(const char *path, int full)
 	return make_dir_mode(path, full, 0755);
 }
 
+char *get_fs_root(const char *dir)
+{
+	struct stat st;
+	dev_t id;
+	int len;
+	const char *p, *prev;
+	char tmp[STR_SIZE];
+
+	if (stat(dir, &st) < 0)
+		return NULL;
+	id = st.st_dev;
+	p = dir + strlen(dir);
+	prev = p;
+	while (p > dir) {
+		while (p > dir && (*p == '/' || *p == '.')) p--;
+		while (p > dir && *p != '/') p--;
+		if (p <= dir)
+			break;
+		len = p - dir + 1;
+		strncpy(tmp, dir, len);
+		tmp[len] = 0;
+		if (stat(tmp, &st) < 0)
+			return NULL;
+		if (id != st.st_dev)
+			break;
+		prev = p;
+	}
+	len = prev - dir;
+	if (len) {
+		strncpy(tmp, dir, len);
+		tmp[len] = 0;
+		return strdup(tmp);
+	}
+	return NULL;
+}
+
 int parse_int(const char *str, int *val)
 {
 	char *tail;
