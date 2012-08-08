@@ -163,14 +163,19 @@ char *get_fs_root(const char *dir)
 {
 	struct stat st;
 	dev_t id;
-	int len;
+	size_t len;
 	const char *p, *prev;
-	char tmp[STR_SIZE];
+	char tmp[PATH_MAX];
 
 	if (stat(dir, &st) < 0)
 		return NULL;
 	id = st.st_dev;
-	p = dir + strlen(dir);
+	len = strlen(dir);
+	if (len > sizeof(tmp) - 1) {
+		errno = ERANGE;
+		return NULL;
+	}
+	p = dir + len;
 	prev = p;
 	while (p > dir) {
 		while (p > dir && *p == '/') p--;
