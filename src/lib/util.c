@@ -173,7 +173,7 @@ char *get_fs_root(const char *dir)
 	p = dir + strlen(dir);
 	prev = p;
 	while (p > dir) {
-		while (p > dir && (*p == '/' || *p == '.')) p--;
+		while (p > dir && *p == '/') p--;
 		while (p > dir && *p != '/') p--;
 		if (p <= dir)
 			break;
