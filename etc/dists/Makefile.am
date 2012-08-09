@@ -40,6 +40,9 @@ SUSE_7x_VER   = 7.3
 SUSE_8x_VER   = 8.0 8.1 8.2
 UBUNTU_6x_VER = 6.06
 
+alpine:
+	$(INSTALL_DATA) $(srcdir)/alpine.conf $(DESTDIR)$(distconfdir)/alpine.conf
+
 altlinux:
 	$(INSTALL_DATA) $(srcdir)/altlinux.conf \
 		$(DESTDIR)$(distconfdir)/altlinux.conf
@@ -132,7 +135,8 @@ ubuntu:
 	$(INSTALL_DATA) $(srcdir)/debian.conf \
 		$(DESTDIR)$(distconfdir)/ubuntu.conf
 
-install-data-hook: altlinux \
+install-data-hook: alpine \
+                   altlinux \
                    arch \
                    centos \
                    debian \
