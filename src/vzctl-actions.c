@@ -450,7 +450,10 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 			return ret;
 	}
 
-	asprintf(&cmd, "ploop balloon discard %s", root);
+	if (asprintf(&cmd, "ploop balloon discard %s", root) < 0) {
+		logger(-1, ENOMEM, "Can't allocate string for cmd");
+		return VZ_RESOURCE_ERROR;
+	}
 	logger(1, 0, "Executing %s", cmd);
 	ret = system(cmd);
 	free(cmd);
