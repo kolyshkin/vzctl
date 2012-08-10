@@ -50,6 +50,9 @@ Requires: rsync
 Requires: gawk
 Requires: openssh
 
+# requires for bash_completion and vps-download
+Requires: wget
+
 # Virtual provides for newer RHEL6 kernel
 Provides: virtual-vzkernel-install = 2.0.0
 
