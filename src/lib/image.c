@@ -71,7 +71,8 @@ static int load_ploop_lib(void)
 	dlerror(); /* Clear any existing error */
 	resolve = dlsym(h, "ploop_resolve_functions");
 	if ((err = dlerror()) != NULL) {
-		logger(-1, 0, "Can't resolve ploop library symbols: %s", err);
+		logger(-1, 0, "Can't init ploop library: %s", err);
+		logger(-1, 0, "Please upgrade your ploop packages!");
 		return -1;
 	}
 
