@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include "image.h"
 #include "logger.h"
@@ -37,6 +38,8 @@
 #include "destroy.h"
 
 #define DEFAULT_FSTYPE		"ext4"
+
+struct ploop_functions ploop = { NULL };
 
 int get_ploop_type(const char *type)
 {
@@ -52,9 +55,55 @@ int get_ploop_type(const char *type)
 	return -1;
 }
 
-int is_ploop_supported(void)
+/* This should only be called once */
+static int load_ploop_lib(void)
 {
-	return (stat_file("/proc/vz/ploop_minor") == 1);
+	void *h;
+	void (*resolve)(struct ploop_functions *);
+	char *err;
+
+	h = dlopen("libploop.so", RTLD_LAZY);
+	if (!h) {
+		logger(-1, 0, "Can't load ploop library: %s", dlerror());
+		return -1;
+	}
+
+	dlerror(); /* Clear any existing error */
+	resolve = dlsym(h, "ploop_resolve_functions");
+	if ((err = dlerror()) != NULL) {
+		logger(-1, 0, "Can't resolve ploop library symbols: %s", err);
+		return -1;
+	}
+
+	(*resolve)(&ploop);
+	logger(1, 0, "The ploop library has been loaded successfully");
+
+	return 0;
+}
+
+int is_ploop_supported()
+{
+	static int ret = -1;
+
+	if (ret >= 0)
+		return ret;
+
+	if (stat_file("/proc/vz/ploop_minor") != 1) {
+		logger(-1, 0, "No ploop support in the kernel, or kernel is way too old.\n"
+				"Make sure you have OpenVZ kernel 042stab058.7 or later running,\n"
+				"and kernel ploop modules loaded.");
+		ret = 0;
+		return ret;
+	}
+
+	if (load_ploop_lib() != 0) {
+		/* Error is printed by load_ploop_lib() */
+		ret = 0;
+		return ret;
+	}
+
+	ret = 1;
+	return ret;
 }
 
 int is_image_mounted(const char *ve_private)

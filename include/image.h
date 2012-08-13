@@ -20,6 +20,7 @@
 #define _IMAGE_H_
 
 #include <ploop/libploop.h>
+#include <ploop/libploop-sym.h>
 #include "types.h"
 #include "quota.h"
 #include "fs.h"
@@ -45,6 +46,8 @@ struct vzctl_mount_param {
 	char *mount_data;
 	char dummy[32];
 };
+
+extern struct ploop_functions ploop;
 
 int get_ploop_type(const char *type);
 int is_ploop_supported(void);
