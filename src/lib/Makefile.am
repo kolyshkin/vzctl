@@ -64,7 +64,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       xml.c
 
 libvzctl_la_LDFLAGS = -release $(LIB_VER)
-libvzctl_la_LIBADD = $(PLOOP_LIBS) $(XML_LIBS) $(CGROUP_LIBS)
+libvzctl_la_LIBADD = $(XML_LIBS) $(CGROUP_LIBS)
 
 if HAVE_CGROUP
 libvzctl_la_SOURCES += cgroup.c hooks_ct.c

@@ -552,6 +552,8 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		return ret;
 
 	ploop = ve_private_is_ploop(res->fs.private);
+	if (ploop && !is_ploop_supported())
+		return VZ_BAD_KERNEL;
 
 	dist_name = get_dist_name(&res->tmpl);
 	ret = read_dist_actions(dist_name, DIST_DIR, &actions);
