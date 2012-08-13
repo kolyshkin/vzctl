@@ -26,6 +26,7 @@
 #include <linux/vzcalluser.h>
 #include <errno.h>
 #include <signal.h>
+#include <limits.h>
 
 #include "vzctl.h"
 #include "vzctl_param.h"
@@ -423,6 +424,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 	int ret;
 	const char *private	= g_p->res.fs.private;
 	const char *root	= g_p->res.fs.root;
+	char fname[PATH_MAX];
 
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
@@ -450,7 +452,8 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 			return ret;
 	}
 
-	if (asprintf(&cmd, "ploop balloon discard %s", root) < 0) {
+	GET_DISK_DESCRIPTOR(fname, private);
+	if (asprintf(&cmd, "ploop balloon discard %s", fname) < 0) {
 		logger(-1, ENOMEM, "Can't allocate string for cmd");
 		return VZ_RESOURCE_ERROR;
 	}
