@@ -160,7 +160,7 @@ static int __ct_enter(vps_handler *h, envid_t veid, int flags)
 		if ((fd = open(path, O_RDONLY)) < 0)
 			goto out;
 		if (setns(fd, 0))
-			logger(-1, 0, "Failed to set context for %s", ep->d_name);
+			logger(-1, errno, "Failed to set context for %s", ep->d_name);
 	}
 	ret = 0;
 
