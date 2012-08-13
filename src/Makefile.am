@@ -53,7 +53,7 @@ vzctl_SOURCES = enter.c \
                 snapshot.c \
                 vzctl-actions.c \
                 vzctl.c
-vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS) $(PLOOP_LIBS)
+vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS)
 
 vzlist_SOURCES = vzlist.c
 vzlist_LDADD   = $(VZCTL_LIBS)

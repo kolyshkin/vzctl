@@ -47,7 +47,8 @@ static int is_snapshot_supported(const char *ve_private)
 				"for ploop-based CTs");
 		return 0;
 	}
-	return 1;
+
+	return is_ploop_supported();
 }
 
 int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
@@ -69,11 +70,11 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	tree = vzctl_alloc_snapshot_tree();
 	if (tree == NULL)
 		return VZ_RESOURCE_ERROR;
-	di = ploop_alloc_diskdescriptor();
+	di = ploop.alloc_diskdescriptor();
 	if (di == NULL)
 		goto err;
 	if (param->guid == NULL) {
-		if (ploop_uuid_generate(guid, sizeof(guid)))
+		if (ploop.uuid_generate(guid, sizeof(guid)))
 			goto err;
 	} else
 		snprintf(guid, sizeof(guid), "%s", param->guid);
@@ -87,7 +88,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	}
 	logger(0, 0, "Creating snapshot %s", guid);
 	GET_DISK_DESCRIPTOR(fname, fs->private);
-	if (ploop_read_diskdescriptor(fname, di)) {
+	if (ploop.read_diskdescriptor(fname, di)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
 	}
@@ -112,10 +113,10 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	/* 2 create snapshot with specified guid */
 	image_param.guid = guid;
 	image_param.snap_guid = 1;
-	ret = ploop_create_snapshot(di, &image_param);
+	ret = ploop.create_snapshot(di, &image_param);
 	if (ret) {
 		logger(-1, 0, "Failed to create snapshot: %s [%d]",
-				ploop_get_last_error(), ret);
+				ploop.get_last_error(), ret);
 		goto err1;
 	}
 	/* 3 store dump & continue */
@@ -134,14 +135,14 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Failed to rename %s -> %s", tmp, fname);
 	logger(0, 0, "Snapshot %s has been successfully created",
 			guid);
-	ploop_free_diskdescriptor(di);
+	ploop.free_diskdescriptor(di);
 	return 0;
 err2:
 	// merge top_delta
-	ret = ploop_merge_snapshot(di, &merge_param);
+	ret = ploop.merge_snapshot(di, &merge_param);
 	if (ret)
 		logger(-1, 0, "Rollback failed, ploop_merge_snapshot %s: %s [%d]",
-				guid, ploop_get_last_error(), ret);
+				guid, ploop.get_last_error(), ret);
 
 err1:
 	if (run)
@@ -151,7 +152,7 @@ err1:
 err:
 	logger(-1, 0, "Failed to create snapshot");
 	if (di != NULL)
-		ploop_free_diskdescriptor(di);
+		ploop.free_diskdescriptor(di);
 	if (tree != NULL)
 		vzctl_free_snapshot_tree(tree);
 	return VZCTL_E_CREATE_SNAPSHOT;
@@ -179,7 +180,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	tree = vzctl_alloc_snapshot_tree();
 	if (tree == NULL)
 		goto err;
-	di = ploop_alloc_diskdescriptor();
+	di = ploop.alloc_diskdescriptor();
 	if (di == NULL)
 		goto err;
 
@@ -193,7 +194,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		goto err;
 	}
 	GET_DISK_DESCRIPTOR(fname, fs->private);
-	ret = ploop_read_diskdescriptor(fname, di);
+	ret = ploop.read_diskdescriptor(fname, di);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
@@ -221,7 +222,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			goto err1;
 	}
 	/* switch snapshot */
-	ret = ploop_switch_snapshot(di, guid, (run ? PLOOP_LEAVE_TOP_DELTA : 0));
+	ret = ploop.switch_snapshot(di, guid, (run ? PLOOP_LEAVE_TOP_DELTA : 0));
 	if (ret)
 		goto err2;
 	/* stop CT */
@@ -231,7 +232,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			goto err3;
 		if (vps_umount(h, veid, fs, 0))
 			goto err3;
-		if (ploop_delete_snapshot(di, prev_top_guid))
+		if (ploop.delete_snapshot(di, prev_top_guid))
 			logger(-1, 0, "Failed to remove old top guid %s",
 				prev_top_guid);
 	}
@@ -248,7 +249,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 
 	logger(0, 0, "Container has been successfully switched "
 			"to another snapshot");
-	ploop_free_diskdescriptor(di);
+	ploop.free_diskdescriptor(di);
 	return 0;
 
 err3:
@@ -269,7 +270,7 @@ err:
 	if (tree != NULL)
 		vzctl_free_snapshot_tree(tree);
 	if (di != NULL)
-		ploop_free_diskdescriptor(di);
+		ploop.free_diskdescriptor(di);
 	return VZCTL_E_SWITCH_SNAPSHOT;
 }
 
