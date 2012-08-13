@@ -319,7 +319,6 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		goto err_cfg;
 	}
 	if (vps_p->opt.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
-		logger(-1, 0, "No ploop support in the kernel");
 		ret = VZ_BAD_KERNEL;
 		goto err_cfg;
 	}
