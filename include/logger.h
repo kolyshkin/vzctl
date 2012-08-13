@@ -59,5 +59,6 @@ void set_log_level(int level);
 void set_log_verbose(int level);
 void set_log_ctid(envid_t id);
 void set_log_quiet(int quiet);
+void vzctl_init_ploop_log(void);
 
 #endif

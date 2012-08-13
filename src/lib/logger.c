@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <sys/file.h>
 #include <ploop/libploop.h>
+#include "image.h"
 
 #include "types.h"
 #include "logger.h"
@@ -41,9 +42,12 @@ typedef struct {
 	int verbose;		/**< Console verbosity. */
 	char prog[32];		/**< program name. */
 	envid_t veid;		/**< Container ID (CTID). */
+	char *file;		/**< log file name */
 } log_param;
 
-log_param g_log = {NULL, 0, 1, 0, 0, "", 0};
+log_param g_log = {NULL, 0, 1, 0, 0, "", 0, NULL};
+
+static int ploop_log = 0;
 
 static inline void get_date(char *buf, int len)
 {
@@ -101,12 +105,19 @@ int set_log_file(char *file)
 		fclose(g_log.fp);
 		g_log.fp = NULL;
 	}
+	if (g_log.file) {
+		free(g_log.file);
+		g_log.file = NULL;
+	}
 	if (file != NULL) {
 		if ((fp = fopen(file, "a")) == NULL)
 			return -1;
 		g_log.fp = fp;
+		g_log.file = strdup(file);
 	}
-	ploop_set_log_file(file);
+	if (ploop_log)
+		ploop.set_log_file(file);
+
 	return 0;
 }
 
@@ -114,19 +125,22 @@ void free_log()
 {
 	if (g_log.fp  != NULL)
 		fclose(g_log.fp);
+	free(g_log.file);
 	memset(&g_log, 0, sizeof(g_log));
 }
 
 void set_log_level(int level)
 {
 	g_log.level = level;
-	ploop_set_log_level(level);
+	if (ploop_log)
+		ploop.set_log_level(level);
 }
 
 void set_log_verbose(int level)
 {
 	g_log.verbose = level;
-	ploop_set_verbose_level(level);
+	if (ploop_log)
+		ploop.set_verbose_level(level);
 }
 
 void set_log_ctid(envid_t id) {
@@ -135,7 +149,8 @@ void set_log_ctid(envid_t id) {
 
 void set_log_quiet(int quiet) {
 	g_log.quiet = quiet;
-	ploop_set_verbose_level(PLOOP_LOG_NOCONSOLE);
+	if (ploop_log)
+		ploop.set_verbose_level(PLOOP_LOG_NOCONSOLE);
 }
 
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
@@ -156,10 +171,24 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 	else
 		g_log.prog[0] = 0;
 
-	ploop_set_log_file(file);
-	ploop_set_log_level(level);
-	if (!quiet)
-		ploop_set_verbose_level(level);
+	if (ploop_log) {
+		ploop.set_log_file(file);
+		ploop.set_log_level(level);
+		if (!quiet)
+			ploop.set_verbose_level(level);
+	}
 
 	return 0;
+}
+
+void vzctl_init_ploop_log(void)
+{
+	ploop.set_log_file(g_log.file);
+	ploop.set_log_level(g_log.level);
+	if (!g_log.quiet)
+		ploop.set_verbose_level(g_log.level);
+	else
+		ploop.set_verbose_level(PLOOP_LOG_NOCONSOLE);
+
+	ploop_log = 1;
 }

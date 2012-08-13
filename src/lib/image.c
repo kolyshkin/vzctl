@@ -76,6 +76,7 @@ static int load_ploop_lib(void)
 	}
 
 	(*resolve)(&ploop);
+	vzctl_init_ploop_log();
 	logger(1, 0, "The ploop library has been loaded successfully");
 
 	return 0;
