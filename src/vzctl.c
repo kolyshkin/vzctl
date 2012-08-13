@@ -194,6 +194,8 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_CONSOLE;
 	} else if (!strcmp(argv[1], "convert")) {
 		action = ACTION_CONVERT;
+	} else if (!strcmp(argv[1], "compact")) {
+		action = ACTION_COMPACT;
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
 		quiet = 1;
