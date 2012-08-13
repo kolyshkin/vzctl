@@ -156,7 +156,7 @@ AC_ARG_WITH([cgroup],
 
 AS_IF([test "x$with_cgroup" = "x+cgroup"],
         [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35]);
-          AC_CHECK_FUNC(setns, , AC_MSG_ERROR([function setns not found])) ]
+          AC_CHECK_FUNCS([setns]) ]
 )
 AM_CONDITIONAL(HAVE_CGROUP, [test "x$with_cgroup" = "x+cgroup"])
 AC_SUBST(CGROUP_LIBS)

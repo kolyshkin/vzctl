@@ -20,6 +20,26 @@
 
 #define NETNS_RUN_DIR "/var/run/netns"
 
+#ifndef HAVE_SETNS
+
+#ifndef __NR_setns
+#if defined __i386__
+#define __NR_setns     346
+#elif defined __x86_64__
+#define __NR_setns     308
+#else
+#error "No setns syscall known for this arch"
+#endif
+#endif /* ! __NR_setns */
+
+static int sys_setns(int fd, int nstype)
+{
+	return syscall(__NR_setns, fd, nstype);
+}
+#define setns sys_setns
+
+#endif /* ! HAVE_SETNS */
+
 static int ct_is_run(vps_handler *h, envid_t veid)
 {
 	return container_is_running(veid);
