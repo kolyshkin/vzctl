@@ -65,6 +65,7 @@ static int load_ploop_lib(void)
 	h = dlopen("libploop.so", RTLD_LAZY);
 	if (!h) {
 		logger(-1, 0, "Can't load ploop library: %s", dlerror());
+		logger(-1, 0, "Please install ploop packages!");
 		return -1;
 	}
 
