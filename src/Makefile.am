@@ -56,7 +56,7 @@ vzctl_SOURCES = enter.c \
 vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS) $(PLOOP_LIBS)
 
 vzlist_SOURCES = vzlist.c
-vzlist_LDADD   = $(VZCTL_LIBS) $(PLOOP_LIBS)
+vzlist_LDADD   = $(VZCTL_LIBS)
 
 vzmemcheck_SOURCES = validate.c \
                      vzmemcheck.c

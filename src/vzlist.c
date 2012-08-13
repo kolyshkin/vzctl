@@ -1450,7 +1450,7 @@ static int get_ve_ploop_info(struct Cveinfo *ve)
 	struct ploop_info i = {};
 
 	GET_DISK_DESCRIPTOR(descr, ve->private);
-	if (ploop_get_info_by_descr(descr, &i))
+	if (ploop.get_info_by_descr(descr, &i))
 		return -1;
 
 	// space avail
@@ -1474,7 +1474,8 @@ static int get_ves_ploop_info()
 	int i;
 
 	for (i = 0; i < n_veinfo; i++) {
-		if (veinfo[i].layout == VE_LAYOUT_PLOOP && !veinfo[i].hide)
+		if (veinfo[i].layout == VE_LAYOUT_PLOOP && !veinfo[i].hide
+				&& is_ploop_supported())
 			get_ve_ploop_info(&veinfo[i]);
 	}
 	return 0;
