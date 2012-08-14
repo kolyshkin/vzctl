@@ -143,7 +143,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	struct ploop_disk_images_data *di;
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	di = ploop.alloc_diskdescriptor();
 	if (di == NULL)
@@ -178,7 +178,7 @@ int vzctl_umount_image(const char *ve_private)
 	struct ploop_disk_images_data *di;
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	di = ploop.alloc_diskdescriptor();
 	if (di == NULL)
@@ -211,7 +211,7 @@ int vzctl_create_image(const char *ve_private,
 	char image[PATH_MAX];
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	snprintf(dir, sizeof(dir), "%s/" VZCTL_VE_ROOTHDD_DIR, ve_private);
 	ret = make_dir_mode(dir, 1, 0700);
@@ -242,7 +242,7 @@ int vzctl_convert_image(const char *ve_private, int mode)
 	struct ploop_disk_images_data *di;
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	di = ploop.alloc_diskdescriptor();
 	if (di == NULL)
@@ -272,7 +272,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 	char fname[PATH_MAX];
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	if (ve_private == NULL) {
 		logger(-1, 0, "Failed to resize image: "
@@ -320,7 +320,7 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 	struct ploop_snapshot_param param = {};
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	if (ve_private == NULL) {
 		logger(-1, 0, "Failed to create snapshot: "
@@ -356,7 +356,7 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 	int ret;
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	if (ve_private == NULL) {
 		logger(-1, 0, "Failed to delete snapshot: "
@@ -391,7 +391,7 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 	struct ploop_merge_param param = {};
 
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 
 	if (guid == NULL)
 		return VZCTL_E_MERGE_SNAPSHOT;
@@ -465,7 +465,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		return 0;
 	}
 	if (!is_ploop_supported()) {
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 	}
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "CT is running (stop it first)");

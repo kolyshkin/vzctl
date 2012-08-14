@@ -319,7 +319,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		goto err_cfg;
 	}
 	if (vps_p->opt.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
-		ret = VZ_BAD_KERNEL;
+		ret = VZ_PLOOP_UNSUP;
 		goto err_cfg;
 	}
 

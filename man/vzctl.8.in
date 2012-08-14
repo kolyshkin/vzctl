@@ -1190,6 +1190,8 @@ Error setting devices (\fB--devices\fR or \fB--devnodes\fR)
 IP address not available
 .IP 91
 OS template not found
+.IP 99
+Ploop is not supported by either the running kernel or vzctl.
 .IP 100
 Unable to find container IP address
 .IP 104

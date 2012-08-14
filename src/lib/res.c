@@ -59,7 +59,7 @@ static int fill_2quota_param(struct setup_env_quota_param *p,
 
 	/* ploop case */
 	if (!is_ploop_supported())
-		return VZ_BAD_KERNEL;
+		return VZ_PLOOP_UNSUP;
 	if (vzctl_get_ploop_dev(ve_root, p->dev_name, sizeof(p->dev_name))) {
 		logger(-1, 0, "Unable to find ploop device for %s", ve_root);
 		return VZ_ERROR_SET_USER_QUOTA;

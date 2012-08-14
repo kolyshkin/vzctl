@@ -132,6 +132,9 @@
 /* Template Error */
 #define VZ_OSTEMPLATE_NOT_FOUND		91
 
+/* ploop might not be supported by kernel or vzctl */
+#define VZ_PLOOP_UNSUP			99
+
 #define VZ_GET_IP_ERROR			100
 #define VZ_NETDEV_ERROR			104
 #define VZ_VE_START_DISABLED		105
