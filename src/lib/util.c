@@ -252,7 +252,7 @@ int cp_file(char *dst, char *src)
 		logger(-1, errno, "Unable to open %s", src);
 		return -1;
 	}
-	if ((fd_dst = open(dst, O_CREAT|O_RDWR, st.st_mode)) < 0) {
+	if ((fd_dst = open(dst, O_CREAT|O_TRUNC|O_RDWR, st.st_mode)) < 0) {
 		logger(-1, errno, "Unable to open %s", dst);
 		close(fd_src);
 		return -1;
