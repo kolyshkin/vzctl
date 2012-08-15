@@ -146,6 +146,10 @@ find:
 	}
 	dst = tmp_dir;
 	if (ploop) {
+#ifndef HAVE_PLOOP
+		ret = VZ_PLOOP_UNSUP;
+		goto err;
+#else
 		/* Create and mount ploop image */
 		struct vzctl_create_image_param param = {};
 		struct vzctl_mount_param mount_param = {};
@@ -169,6 +173,7 @@ find:
 			goto err;
 
 		dst = fs->root;
+#endif
 	}
 	if (!ploop &&
 		dq != NULL &&
@@ -194,8 +199,10 @@ find:
 	logger(0, 0, "Creating container private area (%s)", tmpl->ostmpl);
 	ret = run_script(VPS_CREATE, arg, env, 0);
 	free_arg(env);
+#ifdef HAVE_PLOOP
 	if (ploop)
 		vzctl_umount_image(tmp_dir);
+#endif
 	if (ret)
 		goto err;
 	if (quota) {

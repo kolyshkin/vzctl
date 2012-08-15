@@ -1446,6 +1446,7 @@ static int get_run_quota_stat()
 
 static int get_ve_ploop_info(struct Cveinfo *ve)
 {
+#ifdef HAVE_PLOOP
 	char descr[PATH_MAX];
 	struct ploop_info i = {};
 
@@ -1465,6 +1466,14 @@ static int get_ve_ploop_info(struct Cveinfo *ve)
 		i.fs_inodes;
 	// inodes used
 	ve->quota->diskinodes[0] = i.fs_inodes - i.fs_ifree;
+#else
+	static int shown = 0;
+
+	if (!shown) {
+		fprintf(stderr, "Warning: ploop support is not compiled in\n");
+		shown = 1;
+	}
+#endif /* HAVE_PLOOP */
 
 	return 0;
 }

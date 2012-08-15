@@ -50,12 +50,22 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 		return VZ_FS_MPOINTCREATE;
 	}
 	if (ve_private_is_ploop(fs->private)) {
-		struct vzctl_mount_param param = {};
+		if (! is_ploop_supported())
+			return VZ_PLOOP_UNSUP;
+#ifdef HAVE_PLOOP
+		{
+			struct vzctl_mount_param param = {};
 
-		param.target = fs->root;
-		param.quota = is_2nd_level_quota_on(dq);
-
-		ret = vzctl_mount_image(fs->private, &param);
+			param.target = fs->root;
+			param.quota = is_2nd_level_quota_on(dq);
+			ret = vzctl_mount_image(fs->private, &param);
+		}
+#else
+		/* Check for is_ploop_supported() above will log and return
+		 * an error. This part is for compiler to be happy.
+		 */
+		ret = VZ_PLOOP_UNSUP;
+#endif
 	}
 	else {
 		if ((ret = vps_quotaon(veid, fs->private, dq)))
@@ -106,8 +116,18 @@ int fsumount(envid_t veid, const fs_param *fs)
 {
 	umount_submounts(fs->root);
 
-	if (ve_private_is_ploop(fs->private))
+	if (ve_private_is_ploop(fs->private)) {
+		if (! is_ploop_supported())
+			return VZ_PLOOP_UNSUP;
+#ifdef HAVE_PLOOP
 		return vzctl_umount_image(fs->private);
+#else
+		/* Check for is_ploop_supported() above will log and return
+		 * an error. This part is for compiler to be happy.
+		 */
+		return VZ_PLOOP_UNSUP;
+#endif
+	}
 	/* simfs case */
 	if (umount(fs->root) != 0) {
 		logger(-1, errno, "Can't umount %s", fs->root);

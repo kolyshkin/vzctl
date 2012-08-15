@@ -19,13 +19,23 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
+#ifdef HAVE_PLOOP
 #include <ploop/libploop.h>
 #include <ploop/libploop-sym.h>
+#endif
+
 #include "types.h"
 #include "quota.h"
 #include "fs.h"
 
 #define VZCTL_VE_ROOTHDD_DIR	"root.hdd"
+
+/* We want ve_private_is_ploop() to work even when vzctl is compiled
+ * without ploop lib headers, thus a define copied from libploop.h:
+ */
+#ifndef DISKDESCRIPTOR_XML
+#define DISKDESCRIPTOR_XML	"DiskDescriptor.xml"
+#endif
 
 #define GET_DISK_DESCRIPTOR(buf, ve_private) \
 	snprintf(buf, sizeof(buf), \
@@ -52,6 +62,7 @@ int get_ploop_type(const char *type);
 int ve_private_is_ploop(const char *private);
 int check_ploop_size(unsigned long size);
 
+#ifdef HAVE_PLOOP
 extern struct ploop_functions ploop;
 
 int is_image_mounted(const char *ve_private);
@@ -66,5 +77,6 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid);
 int vzctl_delete_snapshot(const char *ve_private, const char *guid);
 int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		fs_param *fs, dq_param *dq, int mode);
+#endif /* HAVE_PLOOP */
 
 #endif /* _IMAGE_H_ */

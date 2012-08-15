@@ -192,10 +192,12 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_ENTER;
 	} else if (!strcmp(argv[1], "console")) {
 		action = ACTION_CONSOLE;
+#ifdef HAVE_PLOOP
 	} else if (!strcmp(argv[1], "convert")) {
 		action = ACTION_CONVERT;
 	} else if (!strcmp(argv[1], "compact")) {
 		action = ACTION_COMPACT;
+#endif
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
 		quiet = 1;
@@ -209,6 +211,7 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_QUOTAOFF;
 	} else if (!strcmp(argv[1], "quotainit")) {
 		action = ACTION_QUOTAINIT;
+#ifdef HAVE_PLOOP
 	} else if (!strcmp(argv[1], "snapshot")) {
 		action = ACTION_SNAPSHOT_CREATE;
 	} else if (!strcmp(argv[1], "snapshot-switch")) {
@@ -217,6 +220,7 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_SNAPSHOT_DELETE;
 	} else if (!strcmp(argv[1], "snapshot-list")) {
 		action = ACTION_SNAPSHOT_LIST;
+#endif
 	} else if (!strcmp(argv[1], "--help")) {
 		usage(0);
 	} else {

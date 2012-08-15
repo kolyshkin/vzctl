@@ -55,13 +55,15 @@ libvzctl_la_SOURCES = bitmap.c \
                       readelf.c \
                       res.c \
                       script.c \
-                      snapshot.c \
                       ub.c \
                       util.c \
                       veth.c \
                       vps_configure.c \
-                      vzfeatures.c \
-                      xml.c
+                      vzfeatures.c
+
+if HAVE_PLOOP
+libvzctl_la_SOURCES += snapshot.c xml.c
+endif
 
 libvzctl_la_LDFLAGS = -release $(LIB_VER)
 libvzctl_la_LIBADD = $(XML_LIBS) $(CGROUP_LIBS)

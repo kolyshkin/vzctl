@@ -39,7 +39,20 @@
 
 #define DEFAULT_FSTYPE		"ext4"
 
+#ifdef HAVE_PLOOP
 struct ploop_functions ploop = { NULL };
+#endif
+
+/* We want get_ploop_type() to work even if vzctl is compiled
+ * w/o ploop includes, thus a copy-paste from libploop.h:
+ */
+#ifndef HAVE_PLOOP
+enum ploop_image_mode {
+	PLOOP_EXPANDED_MODE = 0,
+	PLOOP_EXPANDED_PREALLOCATED_MODE = 1,
+	PLOOP_RAW_MODE = 2,
+};
+#endif
 
 int get_ploop_type(const char *type)
 {
@@ -77,6 +90,7 @@ int check_ploop_size(unsigned long size)
 	return -1;
 }
 
+#ifdef HAVE_PLOOP
 /* This should only be called once */
 static int load_ploop_lib(void)
 {
@@ -105,6 +119,7 @@ static int load_ploop_lib(void)
 
 	return 0;
 }
+#endif
 
 int is_ploop_supported()
 {
@@ -113,6 +128,10 @@ int is_ploop_supported()
 	if (ret >= 0)
 		return ret;
 
+#ifndef HAVE_PLOOP
+	ret = 0;
+	logger(-1, 0, "Warning: ploop support is not compiled in");
+#else
 	if (stat_file("/proc/vz/ploop_minor") != 1) {
 		logger(-1, 0, "No ploop support in the kernel, or kernel is way too old.\n"
 				"Make sure you have OpenVZ kernel 042stab058.7 or later running,\n"
@@ -128,8 +147,11 @@ int is_ploop_supported()
 	}
 
 	ret = 1;
+#endif
 	return ret;
 }
+
+#ifdef HAVE_PLOOP
 
 /* Note: caller should call is_ploop_supported() before.
  * Currently the only caller is vps_start_custom() which does.
@@ -522,3 +544,5 @@ err:
 		del_dir(new_private);
 	return ret;
 }
+
+#endif /* HAVE_PLOOP */

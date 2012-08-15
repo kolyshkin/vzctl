@@ -26,8 +26,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/file.h>
+#ifdef HAVE_PLOOP
 #include <ploop/libploop.h>
 #include "image.h"
+#endif
 
 #include "types.h"
 #include "logger.h"
@@ -47,7 +49,9 @@ typedef struct {
 
 log_param g_log = {NULL, 0, 1, 0, 0, "", 0, NULL};
 
+#ifdef HAVE_PLOOP
 static int ploop_log = 0;
+#endif
 
 static inline void get_date(char *buf, int len)
 {
@@ -115,9 +119,10 @@ int set_log_file(char *file)
 		g_log.fp = fp;
 		g_log.file = strdup(file);
 	}
+#ifdef HAVE_PLOOP
 	if (ploop_log)
 		ploop.set_log_file(file);
-
+#endif
 	return 0;
 }
 
@@ -132,15 +137,19 @@ void free_log()
 void set_log_level(int level)
 {
 	g_log.level = level;
+#ifdef HAVE_PLOOP
 	if (ploop_log)
 		ploop.set_log_level(level);
+#endif
 }
 
 void set_log_verbose(int level)
 {
 	g_log.verbose = level;
+#ifdef HAVE_PLOOP
 	if (ploop_log)
 		ploop.set_verbose_level(level);
+#endif
 }
 
 void set_log_ctid(envid_t id) {
@@ -149,8 +158,10 @@ void set_log_ctid(envid_t id) {
 
 void set_log_quiet(int quiet) {
 	g_log.quiet = quiet;
+#ifdef HAVE_PLOOP
 	if (ploop_log)
 		ploop.set_verbose_level(PLOOP_LOG_NOCONSOLE);
+#endif
 }
 
 int init_log(char *file, envid_t veid, int enable, int level, int quiet,
@@ -171,16 +182,19 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 	else
 		g_log.prog[0] = 0;
 
+#ifdef HAVE_PLOOP
 	if (ploop_log) {
 		ploop.set_log_file(file);
 		ploop.set_log_level(level);
 		if (!quiet)
 			ploop.set_verbose_level(level);
 	}
+#endif
 
 	return 0;
 }
 
+#ifdef HAVE_PLOOP
 void vzctl_init_ploop_log(void)
 {
 	ploop.set_log_file(g_log.file);
@@ -192,3 +206,4 @@ void vzctl_init_ploop_log(void)
 
 	ploop_log = 1;
 }
+#endif

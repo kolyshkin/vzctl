@@ -1,3 +1,4 @@
+#ifdef HAVE_PLOOP
 #ifndef __SNAPSHOT_H__
 #define __SNAPSHOT_H__
 
@@ -48,3 +49,4 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 
 int vzctl_env_list_snapshot_tree(const char *ve_private);
 #endif /* __SNAPSHOT_H__ */
+#endif /* HAVE_PLOOP */

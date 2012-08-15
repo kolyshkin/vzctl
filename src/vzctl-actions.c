@@ -373,6 +373,7 @@ static int destroy(vps_handler *h, envid_t veid, vps_param *g_p,
 	return ret;
 }
 
+#ifdef HAVE_PLOOP
 static int parse_convert_opt(envid_t veid, int argc, char **argv,
 	vps_param *param)
 {
@@ -466,6 +467,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 
 	return (ret == 0) ? 0 : VZCTL_E_COMPACT;
 }
+#endif /* HAVE_PLOOP */
 
 static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 {
@@ -612,6 +614,7 @@ err_syntax:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
+#ifdef HAVE_PLOOP
 static int parse_snapshot_create_opt(envid_t veid, int argc, char **argv,
 		vps_param *param)
 {
@@ -660,6 +663,7 @@ static int parse_snapshot_delete_opt(envid_t veid, int argc, char **argv,
 
 	return ret;
 }
+#endif /* HAVE_PLOOP */
 
 static int check_set_ugidlimit(unsigned long *cur, unsigned long *old,
 		int loud)
@@ -967,9 +971,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	if (ve_private_is_ploop(g_p->res.fs.private) &&
 			cmd_p->res.dq.diskspace)
 	{
+		if (! is_ploop_supported())
+			return VZ_PLOOP_UNSUP;
+#ifdef HAVE_PLOOP
 		if ((ret = vzctl_resize_image(g_p->res.fs.private,
 						cmd_p->res.dq.diskspace[1])))
 			return ret;
+#endif
 	}
 	/* Skip applying parameters on stopped CT */
 	if (cmd_p->opt.save && !is_run) {
@@ -1178,9 +1186,11 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_CREATE:
 		ret = parse_create_opt(veid, argc, argv, param);
 		break;
+#ifdef HAVE_PLOOP
 	case ACTION_CONVERT:
 		ret = parse_convert_opt(veid, argc, argv, param);
 		break;
+#endif
 	case ACTION_START:
 		ret = parse_startstop_opt(argc, argv, param, 1, 0);
 		break;
@@ -1235,6 +1245,7 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 		break;
 	case ACTION_CONSOLE:
 		break;
+#ifdef HAVE_PLOOP
 	case ACTION_SNAPSHOT_CREATE:
 		ret = parse_snapshot_create_opt(veid, argc, argv, param);
 		break;
@@ -1244,6 +1255,7 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 		break;
 	case ACTION_SNAPSHOT_LIST:
 		break;
+#endif
 	default :
 		if ((argc - 1) > 0) {
 			fprintf (stderr, "Invalid options: ");
@@ -1329,12 +1341,14 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	case ACTION_RESTART:
 		ret = restart(h, veid, g_p, cmd_p);
 		break;
+#ifdef HAVE_PLOOP
 	case ACTION_CONVERT:
 		ret = convert(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_COMPACT:
 		ret = compact(h, veid, g_p, cmd_p);
 		break;
+#endif
 	case ACTION_SET:
 		if (veid == 0)
 			ret = set_ve0(h, g_p, vps_p, cmd_p);
@@ -1416,6 +1430,8 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = quota_init(veid, g_p->res.fs.private, &g_p->res.dq);
 		break;
 #undef CHECK_DQ
+
+#ifdef HAVE_PLOOP
 	case ACTION_SNAPSHOT_CREATE:
 		ret = vzctl_env_create_snapshot(h, veid,
 				&g_p->res.fs, &cmd_p->snap);
@@ -1431,6 +1447,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	case ACTION_SNAPSHOT_LIST:
 		ret = vzctl_env_list_snapshot_tree(g_p->res.fs.private);
 		break;
+#endif
 	case ACTION_CUSTOM:
 		ret = mod_setup(h, veid, 0, 0, &g_action, g_p);
 		break;

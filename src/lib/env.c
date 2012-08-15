@@ -565,8 +565,10 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (vps_is_mounted(res->fs.root)) {
 		vps_umount(h, veid, &res->fs, skip);
 	}
+#ifdef HAVE_PLOOP
 	else if (ploop && (is_image_mounted(res->fs.private)))
 		vzctl_umount_image(res->fs.private);
+#endif
 	if (!vps_is_mounted(res->fs.root)) {
 		/* increase quota to perform setup */
 		if (!ploop)
