@@ -76,12 +76,6 @@ AC_CHECK_LIB(util, openpty,
 
 AC_SUBST(UTIL_LIBS)
 
-AC_CHECK_LIB(ploop, ploop_mount_image,
-	PLOOP_LIBS="-lploop", AC_MSG_ERROR([ploop lib not found]),)
-AC_SUBST(PLOOP_LIBS)
-
-AM_PATH_XML2(2.6.16)
-
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h \
 	sys/file.h sys/ioctl.h sys/mount.h sys/param.h sys/socket.h \
@@ -144,6 +138,30 @@ AC_ARG_ENABLE([udev],
               [enable_udev="+udev"])
 AM_CONDITIONAL(ENABLE_UDEV, test "x$enable_udev" = "x+udev")
 
+AC_ARG_WITH([ploop],
+            [AS_HELP_STRING([--with-ploop],
+                            [Enable support for ploop])],
+            [case "${withval}" in
+              yes) with_ploop="+ploop";;
+              no)  with_ploop="-ploop";;
+              *)   AC_MSG_ERROR(bad value ${withval} for --with-ploop);;
+            esac],
+            [with_ploop="+ploop"])
+
+AS_IF([test "x$with_ploop" = "x+ploop"],
+	[ AC_CHECK_HEADER(ploop/dynload.h,
+		[ AM_PATH_XML2(2.6.16)
+		  AC_DEFINE(HAVE_PLOOP) ],
+		[ AC_MSG_ERROR( [
+The ploop library headers not found or way too old. You need to either
+install recent ploop library headers (most probably ploop-devel package),
+or use ./configure --without-ploop] ),
+		] )
+	]
+)
+
+AM_CONDITIONAL(HAVE_PLOOP, [test "x$with_ploop" = "x+ploop"])
+
 AC_ARG_WITH([cgroup],
             [AS_HELP_STRING([--with-cgroup],
                             [Enable support for cgroup and upstream kernel])],
@@ -172,7 +190,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
      target: $target
      prefix: $prefix
  sysconfdir: $sysconfdir
-   features: $enable_bashcomp $enable_logrotate $enable_udev $with_cgroup
+   features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup
 "])
 
 # Output
