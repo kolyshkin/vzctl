@@ -51,6 +51,28 @@ int get_ploop_type(const char *type)
 		return PLOOP_EXPANDED_PREALLOCATED_MODE;
 	else if (!strcmp(type, "raw"))
 		return PLOOP_RAW_MODE;
+	return -1;
+}
+
+int ve_private_is_ploop(const char *private)
+{
+	char image[PATH_MAX];
+
+	GET_DISK_DESCRIPTOR(image, private);
+
+	return stat_file(image);
+}
+
+int check_ploop_size(unsigned long size)
+{
+	const unsigned long max_size = /* 2T - 2G - 1M, in Kb */
+		(2ull << 30) - (2ull << 20) - (1 << 10);
+
+	if (size < max_size)
+		return 0;
+
+	logger(-1, 0, "Error: diskspace is set too big for ploop: %lu KB "
+			"(max size is %lu KB)", size, max_size - 1);
 
 	return -1;
 }
@@ -420,29 +442,6 @@ err:
 	ploop.free_diskdescriptor(di);
 
 	return (ret = 0) ? 0: VZCTL_E_MERGE_SNAPSHOT;
-}
-
-int ve_private_is_ploop(const char *private)
-{
-	char image[PATH_MAX];
-
-	GET_DISK_DESCRIPTOR(image, private);
-
-	return stat_file(image);
-}
-
-int check_ploop_size(unsigned long size)
-{
-	const unsigned long max_size = /* 2T - 2G - 1M, in Kb */
-		(2ull << 30) - (2ull << 20) - (1 << 10);
-
-	if (size < max_size)
-		return 0;
-
-	logger(-1, 0, "Error: diskspace is set too big for ploop: %lu KB "
-			"(max size is %lu KB)", size, max_size - 1);
-	return -1;
-
 }
 
 /* Convert a CT to ploop layout
