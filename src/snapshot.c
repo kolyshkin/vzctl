@@ -164,7 +164,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	int ret, run;
 	cpt_param cpt = {};
 	char fname[PATH_MAX];
-	char tmp[PATH_MAX];
+	char snap_xml_tmp[PATH_MAX];
 	char prev_top_guid[39];
 	char dumpfile[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
@@ -201,10 +201,10 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	logger(0, 0, "Switching to snapshot %s", guid);
 	vzctl_snapshot_tree_set_current(tree, guid);
-	GET_SNAPSHOT_XML_TMP(tmp, fs->private);
-	ret = vzctl_store_snapshot_tree(tmp, tree);
+	GET_SNAPSHOT_XML_TMP(snap_xml_tmp, fs->private);
+	ret = vzctl_store_snapshot_tree(snap_xml_tmp, tree);
 	if (ret) {
-		logger(-1, 0, "Failed to store %s", tmp);
+		logger(-1, 0, "Failed to store %s", snap_xml_tmp);
 		goto err;
 	}
 
@@ -244,8 +244,8 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			logger(-1, 0, "Failed to resume Container");
 	}
 	GET_SNAPSHOT_XML(fname, fs->private);
-	if (rename(tmp, fname))
-		logger(-1, 0, "Failed to rename %s %s", tmp, fname);
+	if (rename(snap_xml_tmp, fname))
+		logger(-1, 0, "Failed to rename %s %s", snap_xml_tmp, fname);
 
 	logger(0, 0, "Container has been successfully switched "
 			"to another snapshot");
@@ -264,7 +264,7 @@ err2:
 	if (cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_RESUME, 0))
 		logger(-1, 0, "Failed to resume Container on error");
 err1:
-	unlink(tmp);
+	unlink(snap_xml_tmp);
 err:
 	logger(-1, 0, "Failed to switch to snapshot %s", guid);
 	if (tree != NULL)
