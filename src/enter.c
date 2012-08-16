@@ -430,8 +430,7 @@ static void sak(void)
 int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 {
 	struct vzctl_ve_configure c;
-	struct sigaction act;
-	int pid;
+	int pid, status;
 	char buf;
 	const char esc = 27;
 	const char enter = 13;
@@ -454,8 +453,6 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 		return VZ_SYSTEM_ERROR;
 	}
 
-	sigaction(SIGPIPE, &act, NULL);
-
 	signal(SIGCHLD, child_handler);
 	signal(SIGWINCH, console_winch);
 	console_winch(SIGWINCH);
@@ -471,11 +468,16 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 		ssize_t nread;
 		while (1) {
 			if ((nread = read(tty, &bigbuf, sizeof bigbuf)) <= 0) {
-				err(1, "tty read error");
-				continue;
+				if (errno == EINTR || errno == EAGAIN)
+					continue;
+				if (nread < 0)
+					err(1, "tty read error: %m");
+				exit(nread < 0 ? 2 : 0 );
 			}
-			if (write(1, &bigbuf, nread) <= 0)
-				err(1, "stdout write error");
+			if (write(1, &bigbuf, nread) < 0) {
+				err(1, "stdout write error: %m");
+				exit(3);
+			}
 		}
 		exit(0);
 	}
@@ -519,6 +521,9 @@ out:
 	ret = 0;
 err:
 	kill(pid, SIGKILL);
+	while (waitpid(pid, &status, 0) == -1)
+		if (errno != EINTR)
+			break;
 	raw_off();
 	fprintf(stderr, "\nDetached from CT %d\n", veid);
 
