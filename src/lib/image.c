@@ -321,7 +321,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 	if (ve_private == NULL) {
 		logger(-1, 0, "Failed to resize image: "
 				"CT private is not specified");
-		return VZCTL_E_RESIZE_IMAGE;
+		return VZ_VE_PRIVATE_NOTSET;
 	}
 
 	if (check_ploop_size(newsize) < 0)
