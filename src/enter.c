@@ -467,10 +467,14 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 	}
 
 	if (pid == 0) {
+		char bigbuf[4096];
+		ssize_t nread;
 		while (1) {
-			if (read(tty, &buf, sizeof buf) <= 0)
+			if ((nread = read(tty, &bigbuf, sizeof bigbuf)) <= 0) {
 				err(1, "tty read error");
-			if (write(1, &buf, sizeof buf) <= 0)
+				continue;
+			}
+			if (write(1, &bigbuf, nread) <= 0)
 				err(1, "stdout write error");
 		}
 		exit(0);
