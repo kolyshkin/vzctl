@@ -414,7 +414,7 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 	if (ploop.read_diskdescriptor(fname, di)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		ploop.free_diskdescriptor(di);
-		return VZCTL_E_CREATE_SNAPSHOT;
+		return VZCTL_E_DELETE_SNAPSHOT;
 	}
 	ret = ploop.delete_snapshot(di, guid);
 	if (ret) {
