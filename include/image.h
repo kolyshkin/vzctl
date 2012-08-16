@@ -21,7 +21,7 @@
 
 #ifdef HAVE_PLOOP
 #include <ploop/libploop.h>
-#include <ploop/libploop-sym.h>
+#include <ploop/dynload.h>
 #endif
 
 #include "types.h"
