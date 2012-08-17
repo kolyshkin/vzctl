@@ -24,7 +24,8 @@
 #include "snapshot.h"
 #include "vzerror.h"
 
-#define VZCTL_VE_DUMP_DIR     "/dump"
+#define VZCTL_VE_DUMP_DIR	"/dump"
+#define VZCTL_VE_CONF		"ve.conf"
 
 #define SNAPSHOT_XML	"Snapshots.xml"
 #define GET_SNAPSHOT_XML(buf, ve_private) \
@@ -38,6 +39,13 @@ static void vzctl_get_snapshot_dumpfile(const char *private, const char *guid,
 		char *buf, int len)
 {
 	snprintf(buf, len, "%s" VZCTL_VE_DUMP_DIR "/%s", private, guid);
+}
+
+static void vzctl_get_snapshot_ve_conf(const char *private, const char *guid,
+		char *buf, int len)
+{
+	snprintf(buf, len, "%s" VZCTL_VE_DUMP_DIR "/%s." VZCTL_VE_CONF,
+			private, guid);
 }
 
 static int is_snapshot_supported(const char *ve_private)
@@ -60,6 +68,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	char guid[39];
 	char fname[PATH_MAX];
 	char tmp[PATH_MAX];
+	char snap_ve_conf[PATH_MAX];
 	struct ploop_snapshot_param image_param = {};
 	struct ploop_merge_param merge_param = {};
 	struct ploop_disk_images_data *di = NULL;
@@ -102,6 +111,14 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Failed to store %s", tmp);
 		goto err;
 	}
+	// Store ve.conf
+	get_vps_conf_path(veid, fname, sizeof(fname));
+	vzctl_get_snapshot_ve_conf(fs->private, guid,
+			snap_ve_conf, sizeof(snap_ve_conf));
+	make_dir(snap_ve_conf, 0);
+	if (cp_file(snap_ve_conf, tmp))
+		goto err1;
+
 	if (!(param->flags & SNAPSHOT_SKIP_SUSPEND))
 		run = vps_is_run(h, veid);
 	/* 1 freeze */
@@ -147,6 +164,7 @@ err1:
 	if (run)
 		cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_RESUME, 0);
 	unlink(tmp);
+	unlink(snap_ve_conf);
 
 err:
 	logger(-1, 0, "Failed to create snapshot");
@@ -165,6 +183,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	cpt_param cpt = {};
 	char fname[PATH_MAX];
 	char snap_xml_tmp[PATH_MAX];
+	char ve_conf_tmp[PATH_MAX] = "";
 	char topdelta_fname[PATH_MAX] = "";
 	char dd_tmp[PATH_MAX] = "";
 	char dumpfile[PATH_MAX];
@@ -236,6 +255,15 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		unlink(dd_tmp);
 		goto err2;
 	}
+	/* restore ve.conf */
+	vzctl_get_snapshot_ve_conf(fs->private, guid, fname, sizeof(fname));
+	if (stat_file(fname)) {
+		get_vps_conf_path(veid, fname, sizeof(fname) - 4);
+		strcat(fname, ".tmp");
+		if (cp_file(ve_conf_tmp, fname))
+			goto err2;
+	}
+
 	/* stop CT */
 	if (run) {
 		ret = cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_KILL, 0);
@@ -245,6 +273,12 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			goto err3;
 	}
 	/* resume CT in case dump file exists (no rollback, ignore error) */
+	if (ve_conf_tmp[0] != '\0') {
+		get_vps_conf_path(veid, fname, sizeof(fname));
+		if (rename(ve_conf_tmp, fname))
+			logger(-1, errno, "Failed to rename %s -> %s",
+					ve_conf_tmp, fname);
+	}
 	vzctl_get_snapshot_dumpfile(fs->private, guid, dumpfile, sizeof(dumpfile));
 	if (stat_file(dumpfile)) {
 		cpt.dumpfile = dumpfile;
@@ -343,6 +377,11 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 			logger(-1, 0, "Failed to delete dump %s",
 					fname);
 	}
+
+	// delete ve.conf
+	vzctl_get_snapshot_ve_conf(fs->private, guid, fname, sizeof(fname));
+	if (stat_file(fname) && unlink(fname))
+		logger(-1, errno, "Failed to delete %s", fname);
 
 	// move snapshot.xml to its place
 	GET_SNAPSHOT_XML(fname, fs->private);
