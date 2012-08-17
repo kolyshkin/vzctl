@@ -380,7 +380,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 	if (stat_file(fname)) {
 		logger(1, 0, "Deleting CT dump %s", fname);
 		if (unlink(fname))
-			logger(-1, 0, "Failed to delete dump %s",
+			logger(-1, errno, "Failed to delete dump %s",
 					fname);
 	}
 
