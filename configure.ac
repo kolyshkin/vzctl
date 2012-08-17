@@ -155,7 +155,7 @@ AS_IF([test "x$with_ploop" = "x+ploop"],
 		[ AC_MSG_ERROR( [
 The ploop library headers not found or way too old. You need to either
 install recent ploop library headers (most probably ploop-devel package),
-or use ./configure --without-ploop] ),
+or use ./configure --without-ploop] )
 		] )
 	]
 )
@@ -173,7 +173,7 @@ AC_ARG_WITH([cgroup],
             [with_cgroup="-cgroup"])
 
 AS_IF([test "x$with_cgroup" = "x+cgroup"],
-        [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35]);
+        [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35])
           AC_CHECK_FUNCS([setns]) ]
 )
 AM_CONDITIONAL(HAVE_CGROUP, [test "x$with_cgroup" = "x+cgroup"])
