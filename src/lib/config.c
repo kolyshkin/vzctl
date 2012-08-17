@@ -2323,6 +2323,36 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 	return err;
 }
 
+vps_param *reread_vps_config(envid_t veid)
+{
+	vps_param *gparam = NULL;
+	vps_param *vps_p = NULL;
+	char fname[PATH_MAX];
+
+	get_vps_conf_path(veid, fname, sizeof(fname));
+	if (stat_file(fname))
+		goto err;
+
+	gparam = init_vps_param();
+	if (vps_parse_config(veid, GLOBAL_CFG, gparam, NULL))
+		goto err;
+
+	vps_p = init_vps_param();
+	if (vps_parse_config(veid, fname, vps_p, NULL))
+		goto err;
+
+	merge_vps_param(gparam, vps_p);
+	free_vps_param(vps_p);
+
+	return gparam;
+
+err:
+	free_vps_param(gparam);
+	free_vps_param(vps_p);
+
+	return NULL;
+}
+
 /********************************************************/
 /*	CT save config stuff				*/
 /********************************************************/

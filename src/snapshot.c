@@ -23,6 +23,7 @@
 #include "image.h"
 #include "snapshot.h"
 #include "vzerror.h"
+#include "config.h"
 
 #define VZCTL_VE_DUMP_DIR	"/dump"
 #define VZCTL_VE_CONF		"ve.conf"
@@ -272,18 +273,23 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		if (vps_umount(h, veid, fs, 0))
 			goto err3;
 	}
-	/* resume CT in case dump file exists (no rollback, ignore error) */
 	if (ve_conf_tmp[0] != '\0') {
 		get_vps_conf_path(veid, fname, sizeof(fname));
 		if (rename(ve_conf_tmp, fname))
 			logger(-1, errno, "Failed to rename %s -> %s",
 					ve_conf_tmp, fname);
 	}
+	/* resume CT in case dump file exists (no rollback, ignore error) */
 	vzctl_get_snapshot_dumpfile(fs->private, guid, dumpfile, sizeof(dumpfile));
 	if (stat_file(dumpfile)) {
+		vps_param *param;
+
+		param = reread_vps_config(veid);
 		cpt.dumpfile = dumpfile;
-		if (vps_restore(h, veid, g_p, CMD_RESTORE, &cpt))
+		if (vps_restore(h, veid, (param) ? param : g_p,
+					CMD_RESTORE, &cpt))
 			logger(-1, 0, "Failed to resume Container");
+		free_vps_param(param);
 	}
 	GET_SNAPSHOT_XML(fname, fs->private);
 	if (rename(snap_xml_tmp, fname))

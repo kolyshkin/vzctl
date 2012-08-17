@@ -37,6 +37,7 @@ int vps_parse_opt(envid_t veid, struct option *opts, vps_param *param,
 	int opt, char *rval, struct mod_action *action);
 int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 	vps_param *old_p, struct mod_action *action);
+vps_param *reread_vps_config(envid_t veid);
 
 vps_param *init_vps_param();
 ub_res *get_ub_res(ub_param *ub, int res_id);
