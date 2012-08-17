@@ -158,7 +158,8 @@ or use ./configure --without-ploop] ) ]
 )
 
 AS_IF([test "x$with_ploop" = "x+ploop"],
-	[ AM_PATH_XML2(2.6.16)
+	[ AM_PATH_XML2(2.6.16, ,
+		AC_MSG_ERROR([Please install libxml2 devel package]))
 	  AC_DEFINE(HAVE_PLOOP) ])
 AM_CONDITIONAL(HAVE_PLOOP, [test "x$with_ploop" = "x+ploop"])
 
