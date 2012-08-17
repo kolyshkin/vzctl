@@ -149,17 +149,17 @@ AC_ARG_WITH([ploop],
             [with_ploop="+ploop"])
 
 AS_IF([test "x$with_ploop" = "x+ploop"],
-	[ AC_CHECK_HEADER(ploop/dynload.h,
-		[ AM_PATH_XML2(2.6.16)
-		  AC_DEFINE(HAVE_PLOOP) ],
+	[ AC_CHECK_HEADER(ploop/dynload.h, ,
 		[ AC_MSG_ERROR( [
 The ploop library headers not found or way too old. You need to either
 install recent ploop library headers (most probably ploop-devel package),
-or use ./configure --without-ploop] )
-		] )
-	]
+or use ./configure --without-ploop] ) ]
+	) ]
 )
 
+AS_IF([test "x$with_ploop" = "x+ploop"],
+	[ AM_PATH_XML2(2.6.16)
+	  AC_DEFINE(HAVE_PLOOP) ])
 AM_CONDITIONAL(HAVE_PLOOP, [test "x$with_ploop" = "x+ploop"])
 
 AC_ARG_WITH([cgroup],
