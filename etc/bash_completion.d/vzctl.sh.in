@@ -70,8 +70,7 @@ _vzctl()
 	local vzctl_common_opts="--quiet --verbose --help --version"
 	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
 		set start stop restart status quotaon quotaoff quotainit \
-		enter exec exec2 runscript convert compact console \
-		snapshot snapshot-switch snapshot-delete snapshot-list"
+		enter exec exec2 runscript console"
 	local vzctl_create_opts="--ostemplate --config --private --root \
 		--layout --diskspace --ipadd --hostname --name --description"
 	local vzctl_convert_opts="--layout"
@@ -111,6 +110,10 @@ _vzctl()
 
 	local feature_names="sysfs nfs sit ipip ppp ipgre bridge nfsd"
 
+	if test -f /proc/vz/ploop_minor; then
+		vzctl_cmds+=" convert compact snapshot \
+			snapshot-switch snapshot-delete snapshot-list"
+	fi
 
 	case $COMP_CWORD in
 	1)
