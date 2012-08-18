@@ -34,17 +34,17 @@
  *	    0 - no
  *	  < 0 - error
  */
-int vz_fs_is_mounted(const char *target)
+int vz_fs_is_mounted(const char *root)
 {
 	struct stat st1, st2;
 	char parent[PATH_MAX];
 
-	if (stat(target, &st1)) {
-		logger(-1, errno, "stat(%s)", target);
+	if (stat(root, &st1)) {
+		logger(-1, errno, "stat(%s)", root);
 		return -1;
 	}
 
-	snprintf(parent, sizeof(parent), "%s/..", target);
+	snprintf(parent, sizeof(parent), "%s/..", root);
 	if (stat(parent, &st2)) {
 		logger(-1, errno, "stat(%s)", parent);
 		return -1;
