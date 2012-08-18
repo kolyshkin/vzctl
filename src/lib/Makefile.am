@@ -22,7 +22,8 @@ INCLUDES = -I$(top_srcdir)/include
 AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
             -DPKGCONFDIR=\"$(pkgconfdir)\" \
             -DPKGLIBDIR=\"$(pkglibdir)\" \
-            $(XML_CPPFLAGS)
+            $(XML_CPPFLAGS) \
+            $(CGROUP_CFLAGS)
 
 LIB_VER = $(VERSION)
 
@@ -70,5 +71,4 @@ libvzctl_la_LIBADD = $(XML_LIBS) $(CGROUP_LIBS)
 
 if HAVE_CGROUP
 libvzctl_la_SOURCES += cgroup.c hooks_ct.c
-CFLAGS += $(CGROUP_CFLAGS) -DHAVE_UPSTREAM
 endif
