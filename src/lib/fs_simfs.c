@@ -29,12 +29,7 @@
 #include "logger.h"
 #include "vzerror.h"
 
-/*  Check is fs mounted
- *  return: 1 - yes
- *	    0 - no
- *	  < 0 - error
- */
-int vps_is_mounted(const char *root)
+int vps_is_mounted(const char *root, const char *private)
 {
 	struct stat st1, st2;
 	char parent[PATH_MAX];
@@ -50,7 +45,17 @@ int vps_is_mounted(const char *root)
 		return -1;
 	}
 
-	return (st1.st_dev != st2.st_dev);
+	/* Check for real mount (simfs or ploop) */
+	if (st1.st_dev != st2.st_dev)
+		return 1;
+
+	/* Check for bind mount (upstream case) */
+	if (stat(private, &st2)) {
+		logger(-1, errno, "stat(%s)", private);
+		return -1;
+	}
+
+	return (st1.st_dev == st2.st_dev) && (st1.st_ino == st2.st_ino);
 }
 
 static char *fs_name = "simfs";

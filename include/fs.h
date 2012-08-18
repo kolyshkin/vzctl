@@ -50,11 +50,12 @@ typedef struct fs_param {
 /** Get CT mount status.
  *
  * @param root		CT root.
+ * @param private	CT private.
  * @return		 1 - CT mounted
  *			 0 - CT unmounted.
  *			-1 - error
  */
-int vps_is_mounted(const char *root);
+int vps_is_mounted(const char *root, const char *private);
 
 /** Mount CT.
  *

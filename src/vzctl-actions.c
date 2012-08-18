@@ -444,7 +444,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 		return 0;
 	}
 
-	mounted = vps_is_mounted(root);
+	mounted = vps_is_mounted(root, private);
 	if (!mounted)
 	{
 		ret = vps_mount(h, veid, &g_p->res.fs, &g_p->res.dq,
@@ -1144,7 +1144,7 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 	get_vps_conf_path(veid, buf, sizeof(buf));
 	if (fs->private != NULL && stat_file(fs->private) && stat_file(buf))
 		exist = 1;
-	mounted = vps_is_mounted(fs->root);
+	mounted = vps_is_mounted(fs->root, fs->private);
 	run = vps_is_run(h, veid);
 	if (exist == 1) {
 		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));

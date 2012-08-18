@@ -424,6 +424,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	int ret, retry;
 	char *argv[2];
 	const char *root = vps_p->res.fs.root;
+	const char *private = vps_p->res.fs.private;
 
 	if (!stat_file(script))	{
 		logger(-1, 0, "Script not found: %s", script);
@@ -445,7 +446,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (!(is_run = vps_is_run(h, veid))) {
 		if ((ret = check_ub(&vps_p->res.ub)))
 			return ret;
-		if (!(is_mounted = vps_is_mounted(root))) {
+		if (!(is_mounted = vps_is_mounted(root, private))) {
 			if ((ret = fsmount(veid, &vps_p->res.fs,
 				&vps_p->res.dq )))
 			{

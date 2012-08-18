@@ -1553,7 +1553,7 @@ static int get_mounted_status()
 			veinfo[i].status = VE_SUSPENDED;
 		if (veinfo[i].root == NULL)
 			continue;
-		if (vps_is_mounted(veinfo[i].root))
+		if (vps_is_mounted(veinfo[i].root, veinfo[i].private))
 			veinfo[i].status = VE_MOUNTED;
 	}
 	return 0;

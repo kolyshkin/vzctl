@@ -264,7 +264,7 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 			" Stop it first.");
 		return VZ_VE_RUNNING;
 	}
-	if (vps_is_mounted(fs->root)) {
+	if (vps_is_mounted(fs->root, fs->private)) {
 		logger(0, 0, "Container is currently mounted (umount first)");
 		return VZ_FS_MOUNTED;
 	}
