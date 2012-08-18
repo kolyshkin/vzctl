@@ -34,7 +34,7 @@
  *	    0 - no
  *	  < 0 - error
  */
-int vz_fs_is_mounted(const char *root)
+int vps_is_mounted(const char *root)
 {
 	struct stat st1, st2;
 	char parent[PATH_MAX];

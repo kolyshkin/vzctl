@@ -35,11 +35,6 @@
 
 int vps_is_run(vps_handler *h, envid_t veid);
 
-int vps_is_mounted(const char *root)
-{
-	return vz_fs_is_mounted(root);
-}
-
 int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 {
 	int ret;
