@@ -214,29 +214,33 @@ int run_pre_script(int veid, char *script)
 	return ret;
 }
 
-#define UDEV_DEVICES_DIR1	"/etc/udev/devices"
 static int mk_quota_dev(const char *name, dev_t dev)
 {
 	mode_t mode = S_IFBLK | S_IXGRP;
+	static char *dirs[] = {"/dev",
+		"/etc/udev/devices",
+		"/lib/udev/devices"};
 	char fname[256];
 	const char *p;
-
-	unlink(name);
-	if (mknod(name, mode, dev))
-		logger(-1, errno, "Unable to create %s", name);
-
-	if (stat_file(UDEV_DEVICES_DIR1) != 1)
-		return 0;
+	unsigned int i;
+	int ret = 0;
 
 	if ((p = strrchr(name, '/')) == NULL)
 		p = name;
 
-	snprintf(fname, sizeof(fname), UDEV_DEVICES_DIR1 "/%s", p);
-	unlink(fname);
-	if (mknod(fname, mode, dev))
-		logger(-1, errno, "Unable to create %s", name);
+	for(i = 0; i < ARRAY_SIZE(dirs); i++) {
+		if (stat_file(dirs[i]) != 1)
+			continue;
 
-	return 0;
+		snprintf(fname, sizeof(fname), "%s/%s", dirs[i], p);
+		unlink(fname);
+		if (mknod(fname, mode, dev)) {
+			logger(-1, errno, "Unable to create %s", fname);
+			ret = 1;
+		}
+	}
+
+	return ret;
 }
 
 #define PROC_QUOTA	"/proc/vz/vzaquota/"
