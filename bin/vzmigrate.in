@@ -544,7 +544,8 @@ if [ "$PLOOP" != "yes" ]; then
 	RSYNC1_OPTIONS="--sparse"
 	compact=0
 	snapshot=0
-else
+elif [ "$state" == "running" ]; then
+	# Online ploop migration: exclude top delta
 	if ! get_ploop_info; then
 		log 0 "Can't get ploop information"
 		undo_private
