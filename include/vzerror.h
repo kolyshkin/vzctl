@@ -154,7 +154,6 @@
 #define VZ_SET_IO			148
 
 /* ploop */
-#define VZ_NO_IMAGE_FILE		150
 #define VZCTL_E_CREATE_IMAGE		151
 #define VZCTL_E_MOUNT_IMAGE		152
 #define VZCTL_E_UMOUNT_IMAGE		153
