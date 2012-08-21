@@ -1236,7 +1236,7 @@ Error merging ploop snapshot
 Error deleting ploop snapshot
 .IP 159
 Error switching  ploop snapshot
-.IP 160
+.IP 161
 Error compacting ploop image
 .SH EXAMPLES
 To create and start "basic" container with ID of 1000 using

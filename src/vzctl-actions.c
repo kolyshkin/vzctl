@@ -465,7 +465,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (!mounted)
 		vps_umount(h, veid, &g_p->res.fs, SKIP_ACTION_SCRIPT);
 
-	return (ret == 0) ? 0 : VZCTL_E_COMPACT;
+	return (ret == 0) ? 0 : VZCTL_E_COMPACT_IMAGE;
 }
 #endif /* HAVE_PLOOP */
 
