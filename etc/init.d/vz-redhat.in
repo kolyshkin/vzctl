@@ -382,6 +382,7 @@ lockfile()
 		return 0;
 	}
 	kill -0 `cat $LOCKFILE` >/dev/null 2>&1 && {
+		trap -- - EXIT
 		return 1;
 	}
 	ln ${TEMPFILE} ${LOCKFILE} >/dev/null 2>&1 && {
