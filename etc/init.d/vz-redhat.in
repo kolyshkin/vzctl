@@ -316,7 +316,7 @@ stop_ves()
 		for i in 0 1 2; do
 			iter=0;
 			pids=
-			velist=`awk '$1 != "VEID" && $1 != "Version:" {print $1}' ${VESTAT}`
+			velist=$(vzlist -o ctid -sbootorder)
 			for veid in $velist; do
 				echo "Shutting down CT $veid"
 				# Set fairsched parameters to maximum so
