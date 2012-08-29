@@ -444,7 +444,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		return VZ_FS_NOPRVT;
 	}
 	if (!(is_run = vps_is_run(h, veid))) {
-		if ((ret = check_ub(&vps_p->res.ub)))
+		if ((ret = check_ub(h, &vps_p->res.ub)))
 			return ret;
 		if (!(is_mounted = vps_is_mounted(root, private))) {
 			if ((ret = fsmount(veid, &vps_p->res.fs,

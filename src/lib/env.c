@@ -551,7 +551,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
 	}
-	if ((ret = check_ub(&res->ub)))
+	if ((ret = check_ub(h, &res->ub)))
 		return ret;
 
 	ploop = ve_private_is_ploop(res->fs.private);

@@ -153,7 +153,7 @@ int set_ublimit(vps_handler *h, envid_t veid, ub_param *ubc);
  * @param ub		UBC parameters.
  * @return		0 on success.
  */
-int check_ub(ub_param *ub);
+int check_ub(vps_handler *h, ub_param *ub);
 
 /** Add UBC resource in ub_res format to UBC struct
  *

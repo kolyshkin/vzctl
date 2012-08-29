@@ -73,7 +73,7 @@ static struct ubname2id {
  * @param ub		UBC parameters.
  * @return		0 on success.
  */
-int check_ub(ub_param *ub)
+int check_ub(vps_handler *h, ub_param *ub)
 {
 	int ret = 0;
 
@@ -87,7 +87,7 @@ if (ub->name == NULL) {							\
 	{
 		CHECK_UB(physpages);
 		CHECK_UB(swappages);
-		if (!is_vswap_mode()) {
+		if (is_vz_kernel(h) && !is_vswap_mode()) {
 			logger(-1, 0, "Error: detected vswap CT config but "
 					"kernel does not support vswap");
 			logger(-1, 0, "This means either old kernel "
