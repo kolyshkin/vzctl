@@ -41,7 +41,6 @@ vps_param *reread_vps_config(envid_t veid);
 
 vps_param *init_vps_param();
 ub_res *get_ub_res(ub_param *ub, int res_id);
-int check_ub(ub_param *ub);
 int merge_vps_param(vps_param *dst, vps_param *src);
 int merge_global_param(vps_param *dst, vps_param *src);
 void free_vps_param(vps_param *param);
