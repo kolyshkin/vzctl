@@ -57,10 +57,14 @@ IPADDR=127.0.0.1" > ${IFCFG} ||
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
 	fi
-	cat << EOF > ${ROUTES}
+	if [ -n "${IP_ADDR}" ]; then
+		cat << EOF > ${ROUTES}
 default - - ${VENET_DEV}
 default :: - ${VENET_DEV}
 EOF
+	else
+		> ${ROUTES}
+	fi
 	fix_ifup_route
 }
 
@@ -81,7 +85,11 @@ function add_ip()
 	local found
 
 	if [ "x${VE_STATE}" = "xstarting" ]; then
-		init_config
+		if [ -n "${IP_ADDR}" ]; then
+			init_config
+		elif grep -q "^IPADDR_" ${IFCFG}; then
+			init_config
+		fi
 	elif [ "x${IPDELALL}" = "xyes" ]; then
 		init_config
 	elif [ ! -f "${IFCFG}" ]; then
