@@ -72,7 +72,7 @@ test -z "$verbose" || \
 	grep -H '^AC_INIT' $CONFIGURE_AC
 
 test "$build" = "yes" || exit 0
-make rpms
+make rpms || exit 1
 
 test "$install" = "yes" || exit 0
 sudo rpm -Uhv $(rpm --eval %{_rpmdir}/%{_arch})/vzctl-*${GIT_VR}*.rpm
