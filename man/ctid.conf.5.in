@@ -39,6 +39,8 @@ Corresponds to the \fB--ostemplate\fR option.
 Corresponds to the \fB--root\fR option.
 .IP \fBVE_PRIVATE\fR="\fIdirectory\fR"
 Corresponds to the \fB--private\fR option.
+.IP \fBMOUNT_OPTS\fR="\fIoption\fR[,\fIoption\fR...]"
+Corresponds to \fB--mount_opts\fR option.
 .IP \fBDISABLED\fR="\fByes\fR|\fBno\fR"
 Corresponds to the \fB--disabled\fR option.
 .IP \fBORIGIN_SAMPLE\fR="\fIname\fR"

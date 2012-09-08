@@ -145,6 +145,7 @@
 #define PARAM_SNAPSHOT_SKIP_SUSPEND	373
 
 #define PARAM_SKIP_UMOUNT	374
+#define PARAM_MOUNT_OPTS	396
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

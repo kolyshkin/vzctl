@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "6 Apr 2012" "OpenVZ" "Containers"
+.TH vzctl 8 "8 Sep 2012" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -96,6 +96,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --bootorder number
 .OP --root path
 .OP --private path
+.OP --mount_opts options
 .OP --userpasswd user\fR:\fIpass
 .OP --disabled \fByes\fR|\fBno
 .OP --name name
@@ -230,6 +231,10 @@ Sets the path to private directory (\fBVE_PRIVATE\fR) for this container.
 This is a directory in which all the container's files are stored.
 Argument can contain literal string \fB$VEID\fR, which will be
 substituted with the numeric CT ID.
+.TP
+\fB--mount_opts\fR \fIoption\fR[\fB,\fIoption\fR...]
+Sets additional mount options for container file system. Only applicable
+for \fBploop\fR layout, ignored otherwise.
 .TP
 \fB--userpasswd\fR \fIuser\fR:\fIpassword\fR
 Sets password for the given user in a container, creating the user if

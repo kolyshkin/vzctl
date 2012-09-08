@@ -112,6 +112,7 @@ static vps_config config[] = {
 {"VE_ROOT",	NULL, PARAM_ROOT},
 {"VE_PRIVATE",	NULL, PARAM_PRIVATE},
 {"TEMPLATE",	NULL, PARAM_TEMPLATE},
+{"MOUNT_OPTS",	NULL, PARAM_MOUNT_OPTS},
 {"VE_LAYOUT",	NULL, PARAM_VE_LAYOUT},
 /*	template     */
 {"OSTEMPLATE",	NULL, PARAM_OSTEMPLATE},
@@ -927,6 +928,9 @@ static int store_fs(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		break;
 	case PARAM_PRIVATE:
 		ret = conf_store_str(conf_h, conf->name, fs->private_orig);
+		break;
+	case PARAM_MOUNT_OPTS:
+		ret = conf_store_str(conf_h, conf->name, fs->mount_opts);
 		break;
 	}
 	return ret;
@@ -2189,6 +2193,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_SNAPSHOT_SKIP_SUSPEND:
 		vps_p->snap.flags |= SNAPSHOT_SKIP_SUSPEND;
 		break;
+	case PARAM_MOUNT_OPTS:
+		ret = conf_parse_str(&vps_p->res.fs.mount_opts, val);
+		break;
 	case PARAM_IGNORED:
 		/* Well known but ignored parameter */
 		break;
@@ -2653,6 +2660,7 @@ static void free_fs(fs_param *fs)
 	FREE_P(fs->private)
 	FREE_P(fs->private_orig)
 	FREE_P(fs->tmpl)
+	FREE_P(fs->mount_opts)
 }
 
 static void free_tmpl(tmpl_param *tmpl)
@@ -2801,6 +2809,7 @@ static void merge_fs(fs_param *dst, fs_param *src)
 	MERGE_STR(private)
 	MERGE_STR(private_orig)
 	MERGE_STR(tmpl)
+	MERGE_STR(mount_opts)
 	MERGE_INT(flags)
 }
 

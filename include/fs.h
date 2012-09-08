@@ -44,6 +44,7 @@ typedef struct fs_param {
 	char *root;		/**< CT root path. */
 	char *root_orig;	/**< original not expanded root path. */
 	char *tmpl;		/**< TEMPLATE path. */
+	char *mount_opts;	/**< additional mount options (for ploop) */
 	int flags;
 } fs_param;
 

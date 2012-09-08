@@ -84,7 +84,7 @@ _vzctl()
 		--dcachesize --numiptent --physpages --swappages \
 		--cpuunits --cpulimit --cpus --cpumask \
 		--iptables --netdev_add --netdev_del --netif_add --netif_del \
-		--diskquota \
+		--diskquota --mount_opts \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--capability --devnodes --devices --applyconfig \
 		--name --ioprio --setmode --meminfo --bootorder --features \

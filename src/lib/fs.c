@@ -53,6 +53,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 
 			param.target = fs->root;
 			param.quota = is_2nd_level_quota_on(dq);
+			param.mount_data = fs->mount_opts;
 			ret = vzctl_mount_image(fs->private, &param);
 		}
 #else
