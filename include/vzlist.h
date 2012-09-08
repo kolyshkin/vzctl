@@ -98,6 +98,7 @@ struct Cveinfo {
 	char *searchdomain;
 	char *private;
 	char *root;
+	char *mount_opts;
 	char *origin_sample;
 	struct Cubc *ubc;
 	struct Cquota *quota;

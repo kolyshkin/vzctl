@@ -143,6 +143,7 @@ static void print_ ## funcname(struct Cveinfo *p, int index)	\
 
 PRINT_STR_FIELD(private, -32)
 PRINT_STR_FIELD(root, -32)
+PRINT_STR_FIELD(mount_opts, -16)
 PRINT_STR_FIELD(origin_sample, -32)
 PRINT_STR_FIELD(hostname, -32)
 PRINT_STR_FIELD(name, -32)
@@ -633,6 +634,7 @@ static int name ## _sort_fn(const void *val1, const void *val2)		\
 
 SORT_STR_FN(private)
 SORT_STR_FN(root)
+SORT_STR_FN(mount_opts)
 SORT_STR_FN(origin_sample)
 SORT_STR_FN(hostname)
 SORT_STR_FN(name)
@@ -691,6 +693,7 @@ static struct Cfield field_names[] =
 
 {"private", "PRIVATE", "%-32s", 0, RES_NONE, print_private, private_sort_fn},
 {"root", "ROOT", "%-32s", 0, RES_NONE, print_root, root_sort_fn},
+{"mount_opts", "MOUNT_OPTS", "%-16s", 0, RES_NONE, print_mount_opts, mount_opts_sort_fn},
 {"origin_sample", "ORIGIN_SAMPLE", "%32s", 0, RES_NONE, print_origin_sample, origin_sample_sort_fn},
 {"hostname", "HOSTNAME", "%-32s", 0, RES_HOSTNAME, print_hostname, hostname_sort_fn},
 {"name", "NAME", "%-32s", 0, RES_NONE, print_name, name_sort_fn},
@@ -1105,6 +1108,8 @@ FOR_ALL_UBC(MERGE_UBC)
 		ve->root = strdup(res->fs.root);
 	if (res->fs.private != NULL)
 		ve->private = strdup(res->fs.private);
+	if (res->fs.mount_opts != NULL)
+		ve->mount_opts = strdup(res->fs.mount_opts);
 	ve->onboot = res->misc.onboot;
 	if (res->misc.bootorder != NULL) {
 		ve->bootorder = x_malloc(sizeof(*ve->bootorder));
@@ -1809,6 +1814,7 @@ static void free_veinfo()
 		free(veinfo[i].cpu);
 		free(veinfo[i].root);
 		free(veinfo[i].private);
+		free(veinfo[i].mount_opts);
 		free(veinfo[i].origin_sample);
 		free(veinfo[i].bootorder);
 	}
