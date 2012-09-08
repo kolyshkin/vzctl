@@ -744,6 +744,14 @@ static int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 					"on a running container");
 		found++;
 	}
+	/* Changing mount_opts */
+	if ( new_res->fs.mount_opts && strcmp(new_res->fs.mount_opts,
+				old_res->fs.mount_opts)) {
+		if (loud)
+			logger(-1, 0, "Unable to change mount options "
+					"on a running container");
+		found++;
+	}
 
 	if (!found)
 		return 0;
