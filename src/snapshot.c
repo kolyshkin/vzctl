@@ -80,9 +80,6 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	tree = vzctl_alloc_snapshot_tree();
 	if (tree == NULL)
 		return VZ_RESOURCE_ERROR;
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		goto err;
 	if (param->guid == NULL) {
 		if (ploop.uuid_generate(guid, sizeof(guid)))
 			goto err;
@@ -98,7 +95,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	}
 	logger(0, 0, "Creating snapshot %s", guid);
 	GET_DISK_DESCRIPTOR(fname, fs->private);
-	if (ploop.read_diskdescriptor(fname, di)) {
+	if (ploop.read_disk_descr(&di, fname)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
 	}
@@ -201,9 +198,6 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	tree = vzctl_alloc_snapshot_tree();
 	if (tree == NULL)
 		goto err;
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		goto err;
 
 	ret = vzctl_read_snapshot_tree(fname, tree);
 	if (ret) {
@@ -215,7 +209,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		goto err;
 	}
 	GET_DISK_DESCRIPTOR(fname, fs->private);
-	ret = ploop.read_diskdescriptor(fname, di);
+	ret = ploop.read_disk_descr(&di, fname);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;

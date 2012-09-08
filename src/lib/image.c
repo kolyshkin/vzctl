@@ -163,14 +163,10 @@ int is_image_mounted(const char *ve_private)
 	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return -1;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	ret = ploop.read_diskdescriptor(fname, di);
+	ret = ploop.read_disk_descr(&di, fname);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return -1;
 	}
 	ret = ploop.get_dev(di, dev, sizeof(dev));
@@ -189,14 +185,10 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
 
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	ret = ploop.read_diskdescriptor(fname, di);
+	ret = ploop.read_disk_descr(&di, fname);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return VZCTL_E_MOUNT_IMAGE;
 	}
 
@@ -224,15 +216,10 @@ int vzctl_umount_image(const char *ve_private)
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
 
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
-
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	ret = ploop.read_diskdescriptor(fname, di);
+	ret = ploop.read_disk_descr(&di, fname);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return VZCTL_E_UMOUNT_IMAGE;
 	}
 
@@ -288,14 +275,10 @@ int vzctl_convert_image(const char *ve_private, int mode)
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
 
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	ret = ploop.read_diskdescriptor(fname, di);
+	ret = ploop.read_disk_descr(&di, fname);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return VZCTL_E_CONVERT_IMAGE;
 	}
 	ret = ploop.convert_image(di, mode, 0);
@@ -327,14 +310,10 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 	if (check_ploop_size(newsize) < 0)
 		return VZ_DISKSPACE_NOT_SET;
 
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	ret = ploop.read_diskdescriptor(fname, di);
+	ret = ploop.read_disk_descr(&di, fname);
 	if (ret) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return VZCTL_E_RESIZE_IMAGE;
 	}
 	param.size = newsize * 2; /* Kb to 512b sectors */
@@ -371,13 +350,9 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 				"CT private is not specified");
 		return VZ_VE_PRIVATE_NOTSET;
 	}
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	if (ploop.read_diskdescriptor(fname, di)) {
+	if (ploop.read_disk_descr(&di, fname)) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return VZCTL_E_CREATE_SNAPSHOT;
 	}
 	param.guid = strdup(guid);
@@ -407,13 +382,9 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 				"CT private is not specified");
 		return VZ_VE_PRIVATE_NOTSET;
 	}
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	if (ploop.read_diskdescriptor(fname, di)) {
+	if (ploop.read_disk_descr(&di, fname)) {
 		logger(-1, 0, "Failed to read %s", fname);
-		ploop.free_diskdescriptor(di);
 		return VZCTL_E_DELETE_SNAPSHOT;
 	}
 	ret = ploop.delete_snapshot(di, guid);
@@ -444,12 +415,9 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 				"CT private is not specified");
 		return VZ_VE_PRIVATE_NOTSET;
 	}
-	di = ploop.alloc_diskdescriptor();
-	if (di == NULL)
-		return VZ_RESOURCE_ERROR;
 	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = VZCTL_E_MERGE_SNAPSHOT;
-	if (ploop.read_diskdescriptor(fname, di)) {
+	if (ploop.read_disk_descr(&di, fname)) {
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
 	}
