@@ -32,31 +32,22 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: vzkernel
 Requires: vzeventmod
 URL: http://openvz.org/
-# these reqs are for vz helper scripts
-Requires: bash
-Requires: gawk
-Requires: sed
-Requires: grep
 Requires: /sbin/chkconfig
 Requires: vzquota >= 2.7.0-4
 Requires: fileutils
-Requires: vzctl-lib = %{version}-%{release}
+Requires: vzctl-core = %{version}-%{release}
 Requires: tar
 BuildRequires: ploop-devel > 1.4-1
-
+BuildRequires: libxml2-devel >= 2.6.16
 # requires for vzmigrate purposes
 Requires: rsync
 Requires: gawk
 Requires: openssh
-
-# requires for bash_completion and vps-download
-Requires: wget
-
 # Virtual provides for newer RHEL6 kernel
 Provides: virtual-vzkernel-install = 2.0.0
 
 %description
-This utility allows system administator to control OpenVZ containers,
+This utility allows system administator to control Linux containers,
 i.e. create, start, shutdown, set various options and limits etc.
 
 %prep
@@ -66,7 +57,8 @@ i.e. create, start, shutdown, set various options and limits etc.
 CFLAGS="$RPM_OPT_FLAGS" %configure \
 	--enable-bashcomp \
 	--enable-logrotate \
-	--disable-static
+	--disable-static \
+	--with-cgroup
 make %{?_smp_mflags}
 
 %install
@@ -89,22 +81,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_pkglibdir}/scripts/initd-functions
 %attr(755,root,root) %{_initddir}/vz
 %attr(755,root,root) %{_initddir}/vzeventd
-%dir %attr(755,root,root) %{_lockdir}
-%dir %attr(755,root,root) %{_dumpdir}
-%dir %attr(700,root,root) %{_privdir}
-%dir %attr(700,root,root) %{_rootdir}
-%dir %attr(755,root,root) %{_cachedir}
-%dir %attr(755,root,root) %{_veipdir}
-%dir %attr(755,root,root) %{_configdir}
-%dir %attr(755,root,root) %{_namesdir}
-%dir %attr(755,root,root) %{_vpsconfdir}
-%dir %attr(755,root,root) %{_distconfdir}
-%dir %attr(755,root,root) %{_distscriptdir}
-%dir %attr(755,root,root) %{_vzdir}
-%attr(755,root,root) %{_sbindir}/vzctl
 %attr(755,root,root) %{_sbindir}/vzeventd
-%attr(755,root,root) %{_sbindir}/arpsend
-%attr(755,root,root) %{_sbindir}/ndsend
 %attr(755,root,root) %{_sbindir}/vzsplit
 %attr(755,root,root) %{_sbindir}/vzlist
 %attr(755,root,root) %{_sbindir}/vzmemcheck
@@ -117,19 +94,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/vzmigrate
 %attr(755,root,root) %{_sbindir}/vzifup-post
 %attr(755,root,root) %{_sbindir}/vzubc
-%attr(644,root,root) %{_logrdir}/vzctl
-%attr(644,root,root) %{_distconfdir}/distribution.conf-template
-%attr(644,root,root) %{_distconfdir}/default
-%attr(755,root,root) %{_distscriptdir}/*.sh
-%attr(644,root,root) %{_distscriptdir}/functions
 %attr(755,root,root) %{_netdir}/ifup-venet
 %attr(755,root,root) %{_netdir}/ifdown-venet
 %attr(644,root,root) %{_netdir}/ifcfg-venet0
-%attr(644, root, root) %{_mandir}/man8/vzctl.8.*
 %attr(644, root, root) %{_mandir}/man8/vzeventd.8.*
 %attr(644, root, root) %{_mandir}/man8/vzmigrate.8.*
-%attr(644, root, root) %{_mandir}/man8/arpsend.8.*
-%attr(644, root, root) %{_mandir}/man8/ndsend.8.*
 %attr(644, root, root) %{_mandir}/man8/vzsplit.8.*
 %attr(644, root, root) %{_mandir}/man8/vzcfgvalidate.8.*
 %attr(644, root, root) %{_mandir}/man8/vzmemcheck.8.*
@@ -139,27 +108,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzubc.8.*
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man8/vzifup-post.8.*
-%attr(644, root, root) %{_mandir}/man5/ctid.conf.5.*
-%attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 %attr(644, root, root) %{_udevrulesdir}/*
-%attr(644, root, root) %{_bashcdir}/*
-
-%config(noreplace) %{_configdir}/vz.conf
-%config(noreplace) %{_configdir}/osrelease.conf
-%config(noreplace) %{_configdir}/download.conf
-%config(noreplace) %{_distconfdir}/*.conf
-%config %{_vpsconfdir}/ve-basic.conf-sample
-%config %{_vpsconfdir}/ve-light.conf-sample
-%config %{_vpsconfdir}/ve-unlimited.conf-sample
-%config %{_vpsconfdir}/ve-vswap-256m.conf-sample
-%config %{_vpsconfdir}/ve-vswap-512m.conf-sample
-%config %{_vpsconfdir}/ve-vswap-1024m.conf-sample
-%config %{_vpsconfdir}/ve-vswap-1g.conf-sample
-%config %{_vpsconfdir}/ve-vswap-2g.conf-sample
-%config %{_vpsconfdir}/ve-vswap-4g.conf-sample
-%config %{_vpsconfdir}/0.conf
-
-%attr(777, root, root) /etc/vz/conf
 %config /etc/sysconfig/vz
 %ghost %config(missingok) /etc/sysconfig/vzeventd
 
@@ -210,18 +159,50 @@ if [ $1 = 0 ]; then
 	/sbin/chkconfig --del vzeventd >/dev/null 2>&1
 fi
 
-%package lib
-Summary: Containers control API library
+%package core
+Summary: OpenVZ containers control utility core
 Group: System Environment/Kernel
 Requires: libxml2
-BuildRequires: libxml2-devel >= 2.6.16
+Obsoletes: vzctl-lib
+# these reqs are for vz helper scripts
+Requires: bash
+Requires: gawk
+Requires: sed
+Requires: grep
+# requires for bash_completion and vps-download
+Requires: wget
 
-%description lib
-Containers control API library
+%description core
+OpenVZ containers control utility core package
 
-%files lib
+%files core
 %defattr(-,root,root)
 %attr(755,root,root) %{_libdir}/libvzctl-*.so
+%dir %attr(755,root,root) %{_lockdir}
+%dir %attr(755,root,root) %{_dumpdir}
+%dir %attr(700,root,root) %{_privdir}
+%dir %attr(700,root,root) %{_rootdir}
+%dir %attr(755,root,root) %{_cachedir}
+%dir %attr(755,root,root) %{_veipdir}
+%dir %attr(755,root,root) %{_configdir}
+%dir %attr(755,root,root) %{_namesdir}
+%dir %attr(755,root,root) %{_vpsconfdir}
+%dir %attr(755,root,root) %{_distconfdir}
+%dir %attr(755,root,root) %{_distscriptdir}
+%dir %attr(755,root,root) %{_vzdir}
+%attr(755,root,root) %{_sbindir}/vzctl
+%attr(755,root,root) %{_sbindir}/arpsend
+%attr(755,root,root) %{_sbindir}/ndsend
+%attr(644,root,root) %{_logrdir}/vzctl
+%attr(644,root,root) %{_distconfdir}/distribution.conf-template
+%attr(644,root,root) %{_distconfdir}/default
+%attr(755,root,root) %{_distscriptdir}/*.sh
+%attr(644,root,root) %{_distscriptdir}/functions
+%attr(644, root, root) %{_mandir}/man8/vzctl.8.*
+%attr(644, root, root) %{_mandir}/man8/arpsend.8.*
+%attr(644, root, root) %{_mandir}/man8/ndsend.8.*
+%attr(644, root, root) %{_mandir}/man5/ctid.conf.5.*
+%attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 %dir %{_pkglibdir}
 %dir %{_pkglibdir}/scripts
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-functions
@@ -234,6 +215,22 @@ Containers control API library
 %attr(755,root,root) %{_pkglibdir}/scripts/vzevent-stop
 %attr(755,root,root) %{_pkglibdir}/scripts/vzevent-reboot
 %attr(755,root,root) %{_pkglibdir}/scripts/vps-pci
+%attr(644, root, root) %{_bashcdir}/*
+%attr(777, root, root) /etc/vz/conf
+%config(noreplace) %{_configdir}/vz.conf
+%config(noreplace) %{_configdir}/osrelease.conf
+%config(noreplace) %{_configdir}/download.conf
+%config(noreplace) %{_distconfdir}/*.conf
+%config %{_vpsconfdir}/ve-basic.conf-sample
+%config %{_vpsconfdir}/ve-light.conf-sample
+%config %{_vpsconfdir}/ve-unlimited.conf-sample
+%config %{_vpsconfdir}/ve-vswap-256m.conf-sample
+%config %{_vpsconfdir}/ve-vswap-512m.conf-sample
+%config %{_vpsconfdir}/ve-vswap-1024m.conf-sample
+%config %{_vpsconfdir}/ve-vswap-1g.conf-sample
+%config %{_vpsconfdir}/ve-vswap-2g.conf-sample
+%config %{_vpsconfdir}/ve-vswap-4g.conf-sample
+%config %{_vpsconfdir}/0.conf
 
 %changelog
 * Thu May 31 2012 Kir Kolyshkin <kir@openvz.org> - 3.3-1
