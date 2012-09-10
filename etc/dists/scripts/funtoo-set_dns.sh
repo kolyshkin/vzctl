@@ -19,9 +19,9 @@
 #
 # Associated DNS information with localhost interface so resolvconf works
 # as expected.
- 
+
 ezdns() {
-        # This function generates a resolv.conf file, which ezresolv() passes to resolvconf
+	# This function generates a resolv.conf file, which ezresolv() passes to resolvconf
 	[ -n "${SEARCHDOMAIN}" ] && echo "search ${SEARCHDOMAIN}"
 	for ns in ${NAMESERVER}; do
 			echo "nameserver $ns"
