@@ -820,7 +820,7 @@ kill_vps:
 	logger(0, 0, "Killing container ...");
 	ret = h->destroy(h, veid);
 	if (!is_vz_kernel(h))
-		goto out;
+		goto wait;
 
 	if ((pid = fork()) < 0) {
 		ret = VZ_RESOURCE_ERROR;
@@ -835,6 +835,7 @@ kill_vps:
 	if (ret)
 		goto out;
 
+wait:
 	ret = VZ_STOP_ERROR;
 	for (i = 0; i < MAX_SHTD_TM; i++) {
 		usleep(500000);
