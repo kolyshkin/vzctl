@@ -83,7 +83,7 @@ static void usage(int rc)
 "   [--userpasswd <user>:<passwd>]\n"
 "   [--cpuunits <N>] [--cpulimit <N>] [--cpus <N>] [--cpumask <cpus>]\n"
 "   [--diskspace <soft>[:<hard>]] [--diskinodes <soft>[:<hard>]]\n"
-"   [--quotatime <N>] [--quotaugidlimit <N>] [--mount_opts <opt>[,<opt>...]]"
+"   [--quotatime <N>] [--quotaugidlimit <N>] [--mount_opts <opt>[,<opt>...]]\n"
 "   [--capability <name>:on|off ...]\n"
 "   [--devices b|c:major:minor|all:r|w|rw]\n"
 "   [--devnodes device:r|w|rw|none]\n"
