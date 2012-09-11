@@ -58,8 +58,7 @@ i.e. create, start, shutdown, set various options and limits etc.
 CFLAGS="$RPM_OPT_FLAGS" %configure \
 	--enable-bashcomp \
 	--enable-logrotate \
-	--disable-static \
-	--with-cgroup
+	--disable-static
 make %{?_smp_mflags}
 
 %install

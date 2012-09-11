@@ -171,7 +171,7 @@ AC_ARG_WITH([cgroup],
               no)  with_cgroup="-cgroup";;
               *)   AC_MSG_ERROR(bad value ${withval} for --with-cgroup);;
             esac],
-            [with_cgroup="-cgroup"])
+            [with_cgroup="+cgroup"])
 
 AS_IF([test "x$with_cgroup" = "x+cgroup"],
         [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35])
