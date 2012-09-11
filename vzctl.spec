@@ -33,7 +33,7 @@ Requires: vzkernel
 Requires: vzeventmod
 URL: http://openvz.org/
 Requires: /sbin/chkconfig
-Requires: vzquota >= 2.7.0-4
+Requires: vzquota >= 3.1
 Requires: fileutils
 Requires: vzctl-core = %{version}-%{release}
 Requires: tar

@@ -687,7 +687,7 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 	log 1 "Syncing 2nd level quota"
 
 	log 2 "Dumping 2nd level quota"
-	if ! vzdqdump $VEID -U -G -T > "$VE_QUOTADUMP"; then
+	if ! vzdqdump $VEID -U -G -T -F > "$VE_QUOTADUMP"; then
 		log 0 "Failed to dump 2nd level quota"
 		undo_quota_dump
 		exit $MIG_ERR_QUOTA
@@ -701,7 +701,7 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 	fi
 
 	log 2 "Load 2nd level quota"
-	if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T < $VE_QUOTADUMP &&
+	if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T -F < $VE_QUOTADUMP &&
 			vzquota reload2 $VEID)"; then
 		log 0 "Failed to load 2nd level quota"
 		undo_copy_quota
