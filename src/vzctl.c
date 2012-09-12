@@ -67,7 +67,14 @@ static void usage(int rc)
 "   [--diskspace <kbytes>] [--private <path>] [--root <path>]\n"
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
+#ifdef HAVE_PLOOP
 "vzctl convert <ctid> [--layout ploop[:mode]] [--diskspace <kbytes>]\n"
+"vzctl compact <ctid>\n"
+"vzctl snapshot <ctid> [--id <uuid>] [--name <name>] [--description <desc>]\n"
+"   [--skip-suspend]\n"
+"vzctl snapshot-switch | snapshot-delete <ctid> --id <uuid>\n"
+"vzctl snapshot-list\n"
+#endif
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
 "vzctl console <ctid> [ttyno]\n"
 "vzctl enter <ctid> [--exec <command> [arg ...]]\n"
