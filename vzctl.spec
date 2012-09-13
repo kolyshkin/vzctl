@@ -8,7 +8,6 @@
 %define _veipdir /var/lib/vzctl/veip
 %define _pkglibdir %_libdir/vzctl
 %define _configdir %_sysconfdir/vz
-%define _scriptdir /usr/share/vzctl/scripts
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
 %define _netdir	%_sysconfdir/sysconfig/network-scripts
 %define _logrdir %_sysconfdir/logrotate.d
