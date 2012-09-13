@@ -67,7 +67,7 @@ libvzctl_la_SOURCES += snapshot.c xml.c
 endif
 
 libvzctl_la_LDFLAGS = -release $(LIB_VER)
-libvzctl_la_LIBADD = $(XML_LIBS) $(CGROUP_LIBS)
+libvzctl_la_LIBADD = $(XML_LIBS) $(CGROUP_LIBS) $(DL_LIBS)
 
 if HAVE_CGROUP
 libvzctl_la_SOURCES += cgroup.c hooks_ct.c
