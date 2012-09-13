@@ -35,7 +35,7 @@ sbin_PROGRAMS = arpsend \
                 vzsplit \
                 vzeventd
 
-VZCTL_LIBS = $(top_builddir)/src/lib/libvzctl.la
+VZCTL_LIBS = lib/libvzctl.la
 
 arpsend_SOURCES = arpsend.c
 
