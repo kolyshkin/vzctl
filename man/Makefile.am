@@ -47,7 +47,7 @@ GROFF_HTML_OPTS=-Thtml -t -man -msafer
 EXTRA_DIST = $(SRCS) toc.man.in toc.sh html2wiki.sh macros.tmac
 
 %: %.in macros.tmac
-	cat macros.tmac $< > $@
+	cat $(srcdir)/macros.tmac $< > $@
 
 check-man-dates:
 	for FILE in $(SRCS); do \
