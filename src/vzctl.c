@@ -28,7 +28,7 @@
 #include "env.h"
 #include "logger.h"
 #include "exec.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "vzerror.h"
 #include "types.h"
 #include "util.h"

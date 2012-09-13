@@ -37,7 +37,7 @@
 #include <linux/vzcalluser.h>
 
 #include "vzlist.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "fs.h"
 #include "res.h"
 #include "logger.h"

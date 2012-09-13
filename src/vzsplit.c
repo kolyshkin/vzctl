@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include "types.h"
-#include "config.h"
+#include "vzconfig.h"
 
 #include "logger.h"
 #include "util.h"

@@ -34,7 +34,7 @@
 
 #include "types.h"
 #include "logger.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "vzerror.h"
 #include "script.h"
 

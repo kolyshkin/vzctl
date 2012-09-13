@@ -37,7 +37,7 @@
 #include "logger.h"
 #include "list.h"
 #include "bitmap.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "vzctl_param.h"
 #include "vzerror.h"
 #include "util.h"

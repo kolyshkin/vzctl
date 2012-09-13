@@ -23,7 +23,7 @@
 #include "image.h"
 #include "snapshot.h"
 #include "vzerror.h"
-#include "config.h"
+#include "vzconfig.h"
 
 #define VZCTL_VE_DUMP_DIR	"/dump"
 #define VZCTL_VE_CONF		"ve.conf"

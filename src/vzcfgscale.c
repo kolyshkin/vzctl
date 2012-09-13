@@ -9,7 +9,7 @@
 #include "vzcfgscale.h"
 #include "vzctl.h"
 #include "list.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "validate.h"
 #include "vzfs.h"
 #include "vz.h"

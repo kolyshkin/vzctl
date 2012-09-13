@@ -30,7 +30,7 @@
 
 #include "list.h"
 #include "logger.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "vzerror.h"
 #include "util.h"
 #include "script.h"

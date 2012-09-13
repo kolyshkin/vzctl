@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <getopt.h>
 
-#include "config.h"
+#include "vzconfig.h"
 #include "validate.h"
 #include "logger.h"
 #include "util.h"

@@ -23,7 +23,7 @@
 #include <ctype.h>
 
 #include "ub.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "util.h"
 
 static void usage(int rc)

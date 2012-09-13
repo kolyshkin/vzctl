@@ -39,7 +39,7 @@
 #include "env.h"
 #include "exec.h"
 #include "script.h"
-#include "config.h"
+#include "vzconfig.h"
 #include "vzerror.h"
 #include "logger.h"
 #include "util.h"
