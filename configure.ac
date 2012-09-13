@@ -160,7 +160,7 @@ or use ./configure --without-ploop] ) ]
 AS_IF([test "x$with_ploop" = "x+ploop"],
 	[ AM_PATH_XML2(2.6.16, ,
 		AC_MSG_ERROR([Please install libxml2 devel package]))
-	  AC_DEFINE(HAVE_PLOOP) ])
+	  AC_DEFINE(HAVE_PLOOP, [1], [Define to enable ploop support]) ])
 AM_CONDITIONAL(HAVE_PLOOP, [test "x$with_ploop" = "x+ploop"])
 
 AC_ARG_WITH([cgroup],
@@ -175,7 +175,7 @@ AC_ARG_WITH([cgroup],
 
 AS_IF([test "x$with_cgroup" = "x+cgroup"],
         [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35])
-          AC_DEFINE(HAVE_UPSTREAM)
+          AC_DEFINE(HAVE_UPSTREAM, [1], [Define to enable upstream kernel support])
           AC_CHECK_FUNCS([setns]) ]
 )
 AM_CONDITIONAL(HAVE_CGROUP, [test "x$with_cgroup" = "x+cgroup"])
