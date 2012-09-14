@@ -22,7 +22,6 @@
 #define GLOBAL_CFG		VZ_DIR "vz.conf"
 #define OSRELEASE_CFG		VZ_DIR "osrelease.conf"
 #define VPS_CONF_DIR		VZ_DIR "conf/"
-#define LIB_SCRIPTS_DIR		PKGLIBDIR "/scripts/"
 #define DIST_DIR		VZ_DIR "dists"
 #define VENAME_DIR		VZ_DIR "names"
 
@@ -30,11 +29,11 @@
 
 #define VZFIFO_FILE		"/.vzfifo"
 
-#define VPS_NET_ADD		LIB_SCRIPTS_DIR "vps-net_add"
-#define VPS_NET_DEL		LIB_SCRIPTS_DIR "vps-net_del"
-#define VPS_NETNS_DEV_ADD	LIB_SCRIPTS_DIR "vps-netns_dev_add"
-#define VPS_NETNS_DEV_DEL	LIB_SCRIPTS_DIR "vps-netns_dev_del"
-#define VPS_PCI			LIB_SCRIPTS_DIR "vps-pci"
+#define VPS_NET_ADD		SCRIPTDIR "/vps-net_add"
+#define VPS_NET_DEL		SCRIPTDIR "/vps-net_del"
+#define VPS_NETNS_DEV_ADD	SCRIPTDIR "/vps-netns_dev_add"
+#define VPS_NETNS_DEV_DEL	SCRIPTDIR "/vps-netns_dev_del"
+#define VPS_PCI			SCRIPTDIR "/vps-pci"
 
 /* User-defined scripts are in VPS_CONF_DIR */
 #define USER_CREATE_SCRIPT	VPS_CONF_DIR "vps.create"

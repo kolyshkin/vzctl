@@ -21,8 +21,8 @@
 
 VEINFO=/proc/vz/veinfo
 test -n "$VEID" || exit 1
-test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
-. @PKGLIBDIR@/scripts/vps-functions
+test -f @SCRIPTDIR@/vps-functions || exit 1
+. @SCRIPTDIR@/vps-functions
 
 clear_ve_net()
 {

@@ -17,7 +17,7 @@
 
 include $(top_srcdir)/pathsubst.am
 
-vzlib_SCRIPTS = \
+script_SCRIPTS = \
 	vps-create \
 	vps-download \
 	vps-functions \
@@ -30,7 +30,7 @@ vzlib_SCRIPTS = \
 	vps-pci
 
 EXTRA_DIST = \
-	$(vzlib_SCRIPTS:%=%.in)
+	$(script_SCRIPTS:%=%.in)
 
 CLEANFILES = \
-	$(vzlib_SCRIPTS)
+	$(script_SCRIPTS)

@@ -28,7 +28,7 @@
 #                 container interface, but move it back to the host.
 
 . @PKGCONFDIR@/vz.conf
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 
 vzcheckvar VEID
 vzcheckvar VNAME

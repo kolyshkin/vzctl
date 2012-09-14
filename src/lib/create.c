@@ -41,8 +41,8 @@
 #include "destroy.h"
 #include "image.h"
 
-#define VPS_CREATE	LIB_SCRIPTS_DIR "vps-create"
-#define VPS_DOWNLOAD	LIB_SCRIPTS_DIR "vps-download"
+#define VPS_CREATE	SCRIPTDIR "/vps-create"
+#define VPS_DOWNLOAD	SCRIPTDIR "/vps-download"
 #define VZOSTEMPLATE	"/usr/bin/vzosname"
 
 static int vps_postcreate(envid_t veid, vps_res *res);

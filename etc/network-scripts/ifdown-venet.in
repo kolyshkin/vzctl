@@ -17,7 +17,7 @@
 #
 
 test -f @PKGCONFDIR@/vz.conf || exit 1
-test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
+test -f @SCRIPTDIR@/vps-functions || exit 1
 test -f /etc/init.d/functions && . /etc/init.d/functions
 
 ## SuSE distro

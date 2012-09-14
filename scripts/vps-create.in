@@ -23,7 +23,7 @@
 #   VE_PRVT		- path to root of CT private areas
 #   PRIVATE_TEMPLATE	- path to private template used as a source for copying
 
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 
 vzcheckvar VE_PRVT PRIVATE_TEMPLATE
 

@@ -18,7 +18,7 @@
 
 VZCONF=@PKGCONFDIR@/vz.conf
 test -f ${VZCONF} || exit 1
-test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
+test -f @SCRIPTDIR@/vps-functions || exit 1
 test -f /etc/init.d/functions && . /etc/init.d/functions
 
 # configure VZNET
@@ -35,7 +35,7 @@ else
 	fi
 	vznet=$DEVICE
 fi
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 . ${VZCONF}
 
 veinfo="/proc/vz/veinfo"

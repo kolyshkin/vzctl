@@ -23,7 +23,7 @@ INCLUDES = -I$(top_srcdir)/include
 
 AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
             -DPKGCONFDIR=\"$(pkgconfdir)\" \
-            -DPKGLIBDIR=\"$(pkglibdir)\" \
+            -DSCRIPTDIR=\"$(scriptdir)\" \
             -DMODULESDIR=\"$(modulesdir)\"
 
 sbin_PROGRAMS = arpsend \

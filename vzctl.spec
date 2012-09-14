@@ -7,6 +7,7 @@
 %define _cachedir %{_vzdir}/template/cache
 %define _veipdir /var/lib/vzctl/veip
 %define _pkglibdir %_libdir/vzctl
+%define _scriptdir %_pkglibdir/scripts
 %define _configdir %_sysconfdir/vz
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
 %define _netdir	%_sysconfdir/sysconfig/network-scripts
@@ -76,8 +77,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%dir %{_pkglibdir}/scripts
-%attr(755,root,root) %{_pkglibdir}/scripts/initd-functions
+%dir %{_scriptdir}
+%attr(755,root,root) %{_scriptdir}/initd-functions
 %attr(755,root,root) %{_initddir}/vz
 %attr(755,root,root) %{_initddir}/vzeventd
 %attr(755,root,root) %{_sbindir}/vzeventd
@@ -203,17 +204,17 @@ OpenVZ containers control utility core package
 %attr(644, root, root) %{_mandir}/man5/ctid.conf.5.*
 %attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
 %dir %{_pkglibdir}
-%dir %{_pkglibdir}/scripts
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-functions
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-net_add
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-net_del
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-netns_dev_add
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-netns_dev_del
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-create
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-download
-%attr(755,root,root) %{_pkglibdir}/scripts/vzevent-stop
-%attr(755,root,root) %{_pkglibdir}/scripts/vzevent-reboot
-%attr(755,root,root) %{_pkglibdir}/scripts/vps-pci
+%dir %{_scriptdir}
+%attr(755,root,root) %{_scriptdir}/vps-functions
+%attr(755,root,root) %{_scriptdir}/vps-net_add
+%attr(755,root,root) %{_scriptdir}/vps-net_del
+%attr(755,root,root) %{_scriptdir}/vps-netns_dev_add
+%attr(755,root,root) %{_scriptdir}/vps-netns_dev_del
+%attr(755,root,root) %{_scriptdir}/vps-create
+%attr(755,root,root) %{_scriptdir}/vps-download
+%attr(755,root,root) %{_scriptdir}/vzevent-stop
+%attr(755,root,root) %{_scriptdir}/vzevent-reboot
+%attr(755,root,root) %{_scriptdir}/vps-pci
 %attr(644, root, root) %{_bashcdir}/*
 %attr(777, root, root) /etc/vz/conf
 %config(noreplace) %{_configdir}/vz.conf

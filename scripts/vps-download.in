@@ -40,7 +40,7 @@
 # Wget is required for this script to function
 wget -V >/dev/null || exit 4
 
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 . @PKGCONFDIR@/vz.conf
 test -r @PKGCONFDIR@/download.conf && . @PKGCONFDIR@/download.conf
 

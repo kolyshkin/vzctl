@@ -38,7 +38,7 @@
 
 # This line is needed to cheat /etc/init.d/rc who expects action word
 
-. @VZLIBDIR@/initd-functions
+. @SCRIPTDIR@/initd-functions
 
 VZQUOTA=@SBINDIR@/vzquota
 CONFIG_DIR=@PKGCONFDIR@/conf

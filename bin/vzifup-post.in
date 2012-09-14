@@ -15,9 +15,9 @@ usage()
 DEV=$1
 [ -z "${DEV}" ] && usage
 
-test -f @PKGLIBDIR@/scripts/vps-functions || exit 1
+test -f @SCRIPTDIR@/vps-functions || exit 1
 test -f @PKGCONFDIR@/vz.conf || exit 1
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 . @PKGCONFDIR@/vz.conf
 
 update_arp()

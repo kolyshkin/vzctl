@@ -62,11 +62,11 @@ static void child_handler(int signo)
 
 static int run_event_script(envid_t ctid, const char *event)
 {
-	char script[sizeof(LIB_SCRIPTS_DIR)*2];
+	char script[sizeof(SCRIPTDIR)*2];
 	int pid;
 
-	snprintf(script, sizeof(script), "%svzevent-%s",
-			LIB_SCRIPTS_DIR, event);
+	snprintf(script, sizeof(script), "%s/vzevent-%s",
+			SCRIPTDIR, event);
 	logger(1, 0, "Running %s event script", event);
 
 	pid = fork();

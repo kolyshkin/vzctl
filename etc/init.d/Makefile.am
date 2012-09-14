@@ -16,11 +16,11 @@
 #
 
 INITSCRIPTS = vz-redhat vz-gentoo vzeventd-redhat vzeventd-gentoo
-vzlib_DATA = initd-functions
+script_DATA = initd-functions
 
-EXTRA_DIST = $(INITSCRIPTS:%=%.in) $(vzlib_DATA:%=%.in)
+EXTRA_DIST = $(INITSCRIPTS:%=%.in) $(script_DATA:%=%.in)
 
-CLEANFILES = $(INITSCRIPTS) $(vzlib_DATA)
+CLEANFILES = $(INITSCRIPTS) $(script_DATA)
 
 include $(top_srcdir)/pathsubst.am
 

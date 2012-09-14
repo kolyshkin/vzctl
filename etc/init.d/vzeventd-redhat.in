@@ -22,7 +22,7 @@
 #              and performs required actions associated with those events.
 ### END INIT INFO
 
-. @VZLIBDIR@/initd-functions
+. @SCRIPTDIR@/initd-functions
 
 prog=vzeventd
 lockfile=$VARLOCK/$prog

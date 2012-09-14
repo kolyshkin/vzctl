@@ -27,7 +27,7 @@
 #		  starting | stopping | running
 
 . @PKGCONFDIR@/vz.conf
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 
 vzcheckvar IP_ADDR VEID
 

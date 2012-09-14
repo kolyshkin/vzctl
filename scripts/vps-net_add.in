@@ -28,7 +28,7 @@
 #		  starting | running
 
 . @PKGCONFDIR@/vz.conf
-. @PKGLIBDIR@/scripts/vps-functions
+. @SCRIPTDIR@/vps-functions
 
 vzcheckvar VEID
 

@@ -22,8 +22,7 @@ pathsubst_RULES = \
 	s!@'PKGCONFDIR'@!$(pkgconfdir)!g; \
 	s!@'VPSCONFDIR'@!$(vpsconfdir)!g; \
 	s!@'PKGDATADIR'@!$(pkgdatadir)!g; \
-	s!@'PKGLIBDIR'@!$(pkglibdir)!g; \
-	s!@'VZLIBDIR'@!$(vzlibdir)!g;
+	s!@'SCRIPTDIR'@!$(scriptdir)!g;
 
 pathsubst = sed -e '$(pathsubst_RULES)'
 
