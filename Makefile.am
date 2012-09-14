@@ -15,6 +15,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+include $(top_srcdir)/paths.am
+
 SUBDIRS = bin \
           etc \
           man \
@@ -33,7 +35,6 @@ vzdumpdir   = $(vzdir)/dump
 vzprivdir   = $(vzdir)/private
 vzrootdir   = $(vzdir)/root
 veipdumpdir = $(localstatedir)/lib/vzctl/veip
-modulesdir  = $(pkglibdir)/modules
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(vzdir)

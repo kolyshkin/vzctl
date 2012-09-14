@@ -37,3 +37,4 @@ distconfdir = $(pkgconfdir)/dists
 namesdir    = $(pkgconfdir)/names
 
 vzlibdir    = $(pkglibdir)/scripts
+modulesdir  = $(pkglibdir)/modules

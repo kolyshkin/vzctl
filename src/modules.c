@@ -124,12 +124,12 @@ void init_modules(struct mod_action *action, const char *name)
 	struct stat st;
 	char fname[256];
 
-	dir = opendir(MOD_DIR);
+	dir = opendir(MODULESDIR);
 	if (!dir) {
 		return;
 	}
 	while ((ent = readdir(dir)) != NULL)  {
-		snprintf(fname, sizeof(fname), "%s/%s", MOD_DIR, ent->d_name);
+		snprintf(fname, sizeof(fname), "%s/%s", MODULESDIR, ent->d_name);
 		if (stat(fname, &st))
 			continue;
 		/* FIxme: handle symlink
