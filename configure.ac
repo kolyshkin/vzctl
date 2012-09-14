@@ -36,6 +36,11 @@ AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
+# If we are on an x86_64, libraries should go to lib64.
+if test "$target_cpu" = "x86_64" -a "$libdir" = '${exec_prefix}/lib'; then
+	libdir='${exec_prefix}/lib64'
+fi
+
 # Automake
 AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2])
 
@@ -193,6 +198,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
      target: $target
      prefix: $prefix
  sysconfdir: $sysconfdir
+     libdir: $libdir
    features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup
 "])
 
