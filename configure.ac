@@ -61,7 +61,8 @@ CFLAGS="${CFLAGS} -Wcast-align -Wno-unused-parameter"
 CFLAGS="${CFLAGS} -Wno-missing-field-initializers"
 CFLAGS="${CFLAGS} -D_FILE_OFFSET_BITS=64"
 
-if test x$build_cpu = xppc64 -o x$build_cpu = xpowerpc64; then
+# We need -m64 for ppc64 in order to get proper ioctls
+if test x$target_cpu = xppc64 -o x$target_cpu = xpowerpc64; then
 	CFLAGS="${CFLAGS} -m64"
 fi
 
