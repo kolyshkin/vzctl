@@ -214,7 +214,7 @@ static int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 		int start, int stop)
 {
-	int c, ret = 0;
+	int c, ret = 0, idx;
 	struct option start_options[] = {
 		{"force", no_argument, NULL, PARAM_FORCE},
 		{"skip_ve_setup", no_argument, NULL, PARAM_SKIP_VE_SETUP},
@@ -225,7 +225,7 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 	};
 
 	while (1) {
-		c = getopt_long (argc, argv, "", start_options, NULL);
+		c = getopt_long (argc, argv, "", start_options, &idx);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -233,38 +233,46 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 			if (start)
 				param->opt.start_force = YES;
 			else
-				ret = VZ_INVALID_PARAMETER_SYNTAX;
+				goto err;
 			break;
 		case PARAM_SKIP_VE_SETUP:
 			if (start)
 				param->opt.skip_setup = YES;
 			else
-				ret = VZ_INVALID_PARAMETER_SYNTAX;
+				goto err;
 			break;
 		case PARAM_WAIT:
 			if (start)
 				param->res.misc.wait = YES;
 			else
-				ret = VZ_INVALID_PARAMETER_SYNTAX;
+				goto err;
 			break;
 		case PARAM_FAST:
 			if (stop)
 				param->opt.fast_kill = YES;
 			else
-				ret = VZ_INVALID_PARAMETER_SYNTAX;
+				goto err;
 			break;
 		case PARAM_SKIP_UMOUNT:
 			if (stop)
 				param->opt.skip_umount = YES;
 			else
-				ret = VZ_INVALID_PARAMETER_SYNTAX;
+				goto err;
 			break;
 		default:
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
 		}
 	}
+
 	return ret;
+
+err:
+	fprintf(stderr, "Option --%s is not applicable to %s command\n",
+			start_options[idx].name,
+			start ? "start" : "stop");
+
+	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
 static int start(vps_handler *h, envid_t veid, vps_param *g_p,
