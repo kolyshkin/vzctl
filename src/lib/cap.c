@@ -32,6 +32,16 @@
 #include "logger.h"
 #include "util.h"
 
+#ifndef _LINUX_CAPABILITY_VERSION_1
+# define _LINUX_CAPABILITY_VERSION_1  0x19980330
+#endif
+#ifndef _LINUX_CAPABILITY_VERSION_2
+# define _LINUX_CAPABILITY_VERSION_2  0x20071026
+#endif
+#ifndef _LINUX_CAPABILITY_VERSION_3
+# define _LINUX_CAPABILITY_VERSION_3  0x20080522
+#endif
+
 #ifndef	CAP_AUDIT_WRITE
 #define	CAP_AUDIT_WRITE	29
 #endif
@@ -182,19 +192,28 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 static int set_cap(envid_t veid, cap_t mask, int pid)
 {
 	struct __user_cap_header_struct header;
-	struct __user_cap_data_struct data;
+	struct __user_cap_data_struct data[2]; /* as of .._VERSION_3 */
 
 	memset(&header, 0, sizeof(header));
-	header.version = _LINUX_CAPABILITY_VERSION;
 	capget(&header, NULL); /* Get linux capability version from kernel */
+	switch (header.version) {
+		case _LINUX_CAPABILITY_VERSION_1:
+		case _LINUX_CAPABILITY_VERSION_2:
+		case _LINUX_CAPABILITY_VERSION_3:
+			break;
+		default:
+			errno = ENOSYS;
+			/* Error is printed by vps_set_cap() */
+			return -1;
+	}
 	header.pid = pid;
 
 	memset(&data, 0, sizeof(data));
-	data.effective = mask;
-	data.permitted = mask;
-	data.inheritable = mask;
+	data[0].effective = mask;
+	data[0].permitted = mask;
+	data[0].inheritable = mask;
 
-	return capset(&header, &data);
+	return capset(&header, data);
 }
 
 static inline cap_t make_cap_mask(cap_t def, cap_t on, cap_t off)
