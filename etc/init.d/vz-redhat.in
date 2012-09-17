@@ -180,6 +180,23 @@ modify_vzconf()
 	fi
 }
 
+# Add /vz to PRUNEPATHS in /etc/updatedb.conf so updatedb won't:
+# 1 clog its database with lots of file entries
+# 2 interfere with vzctl umount
+fix_updatedb() {
+	local file="/etc/updatedb.conf"
+	local var="PRUNEPATHS"
+	local add="/vz"
+
+	test -r $file || return
+	grep -qw "^${var}" $file || return
+	grep -qE "^${var}.* ${add}[\" ]" $file && return
+	__echo "Adding ${add} to ${var} in ${file}:"
+	sed -i.rpmsave \
+		"s@\(^${var}[^\"]*\"[^\"]*\)\(\".*\)\$@\1 ${add}\2@" $file
+	print_result
+}
+
 status()
 {
 	check_vzkernel
@@ -446,6 +463,7 @@ start()
 	start_net
 	setup_ve0
 	modify_vzconf
+	fix_updatedb
 	start_ves
 
 	rm -f $LOCKFILE
