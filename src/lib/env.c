@@ -184,7 +184,6 @@ static int configure_sysctl()
 	return 0;
 }
 
-#ifdef  __x86_64__
 static int set_personality(unsigned long mask)
 {
 	unsigned long per;
@@ -204,12 +203,6 @@ int set_personality32()
 		return 0;
 	return set_personality(PER_LINUX32);
 }
-#else
-int set_personality32()
-{
-	return 0;
-}
-#endif /* __x86_64__ */
 
 void fill_container_param(struct arg_start *arg,
 			 struct env_create_param3 *create_param)
