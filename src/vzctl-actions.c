@@ -985,8 +985,8 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		}
 	}
 	/* Resize ploop image if --diskspace is supplied */
-	if (ve_private_is_ploop(g_p->res.fs.private) &&
-			cmd_p->res.dq.diskspace)
+	if (cmd_p->res.dq.diskspace &&
+			ve_private_is_ploop(g_p->res.fs.private))
 	{
 		if (! is_ploop_supported())
 			return VZ_PLOOP_UNSUP;
