@@ -996,6 +996,13 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			return ret;
 #endif
 	}
+	/* Warn that --diskinodes is ignored for ploop CT */
+	if (cmd_p->res.dq.diskinodes &&
+			ve_private_is_ploop(g_p->res.fs.private))
+	{
+		logger(0, 0, "Warning: --diskinodes is ignored for "
+				"ploop-based container");
+	}
 	/* Skip applying parameters on stopped CT */
 	if (cmd_p->opt.save && !is_run) {
 		ret = mod_setup(h, veid, STATE_STOPPED, SKIP_NONE, &g_action,
