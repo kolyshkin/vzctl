@@ -58,13 +58,17 @@ int get_arch_from_elf(const char *file)
 	struct stat st;
 	struct elf_hdr_s elf_hdr;
 
-	if (stat(file, &st))
-		return -1;
-	if (!S_ISREG(st.st_mode))
-		return -1;
-	fd = open(file, O_RDONLY);
+	fd = open(file, O_RDONLY|O_NOCTTY);
 	if (fd < 0)
 		return -1;
+	if (fstat(fd, &st)) {
+		close(fd);
+		return -1;
+	}
+	if (!S_ISREG(st.st_mode)) {
+		close(fd);
+		return -1;
+	}
 	nbytes = read(fd, (void *) &elf_hdr, sizeof(elf_hdr));
 	close(fd);
 	if (nbytes < (int)sizeof(elf_hdr))
