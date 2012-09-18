@@ -72,7 +72,7 @@ static int ct_destroy(vps_handler *h, envid_t veid)
 		return ret;
 
 	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, veid);
-	umount2(ctpath, MNT_DETACH);
+	unlink(ctpath);
 	return destroy_container(veid);
 }
 
@@ -107,17 +107,13 @@ static int ct_env_create(struct arg_start *arg)
 	char procpath[STR_SIZE];
 	char ctpath[STR_SIZE];
 
-	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, arg->veid);
-	if ((ret = open(ctpath, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR)) < 0) {
-		logger(-1, errno, "Can't create container netns file");
-		return VZ_RESOURCE_ERROR;
-	}
-	close(ret);
 
 	if (child_stack == NULL) {
 		logger(-1, errno, "Unable to alloc");
 		return VZ_RESOURCE_ERROR;
 	}
+	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, arg->veid);
+	unlink(ctpath);
 
 	if ((ret = create_container(arg->veid))) {
 		logger(-1, 0, "Container creation failed: %s", container_error(ret));
@@ -146,11 +142,9 @@ static int ct_env_create(struct arg_start *arg)
 	}
 
 	snprintf(procpath, STR_SIZE, "/proc/%d/ns/net", ret);
-
-	umount2(ctpath, MNT_DETACH);
-	ret = mount(procpath, ctpath, "none", MS_MGC_VAL|MS_BIND, NULL);
+	ret = symlink(procpath, ctpath);
 	if (ret) {
-		logger(-1, errno, "Can't mount into netns file %s", ctpath);
+		logger(-1, errno, "Can't symlink into netns file %s", ctpath);
 		destroy_container(arg->veid);
 		return VZ_RESOURCE_ERROR;
 	}
