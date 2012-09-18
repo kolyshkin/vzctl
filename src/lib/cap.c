@@ -25,6 +25,7 @@
 #include <linux/capability.h>
 #include <string.h>
 #include <linux/vzcalluser.h>
+#include <sys/prctl.h>
 
 #include "cap.h"
 #include "res.h"
@@ -189,6 +190,39 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 	}
 }
 
+static int set_cap_bound(cap_t mask)
+{
+	int i;
+
+	for (i = 0; ; i++) {
+		/* Currently (kernel 3.5) in-kernel cap size is u64,
+		 * but it might change in the future */
+		if (i == sizeof(__u64) * 8) {
+			errno = EOVERFLOW;
+			return -1;
+		}
+
+		if ((1ULL << i) & mask)
+			continue;
+
+		if (prctl(PR_CAPBSET_DROP, i) == -1) {
+			if (i == 0)
+				return 1; /* PR_CAPBSET_DROP not supported */
+
+			/* vzctl could have been built with the headers
+			 * different from those of the running kernel, so
+			 * it can't rely on CAP_LAST_CAP value. Therefore,
+			 * try dropping all caps until EINVAL.
+			 */
+			if (errno == EINVAL) /* All capabilities were set */
+				break;
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
 static int set_cap(envid_t veid, cap_t mask, int pid)
 {
 	struct __user_cap_header_struct header;
@@ -224,11 +258,17 @@ static inline cap_t make_cap_mask(cap_t def, cap_t on, cap_t off)
 int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap)
 {
 	cap_t mask;
+	int ret;
 
 	if ((env->features_known & env->features_mask) & VE_FEATURE_BRIDGE)
 		cap_raise(cap->on, CAP_NET_ADMIN);
 
 	mask = make_cap_mask(CAPDEFAULTMASK, cap->on, cap->off);
+
+	ret = set_cap_bound(mask);
+	if (ret < 0)
+		goto out;
+
 	if (set_cap(veid, mask, 0) == 0)
 		return 0;
 
@@ -236,7 +276,7 @@ int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap)
 	mask = make_cap_mask(CAPDEFAULTMASK_OLD, cap->on, cap->off);
 	if (set_cap(veid, mask, 0) == 0)
 		return 0;
-
+out:
 	logger(-1, errno, "Unable to set capability");
 	return VZ_SET_CAP;
 }
