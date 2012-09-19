@@ -4,10 +4,10 @@
 #include <libcgroup.h>
 #include "types.h"
 
-#define CT_BASE_STRING "/vz/"
+#define CT_BASE_STRING "/vz"
 #define CT_MAX_STR_SIZE STR_SIZE
 
-#define veid_to_name(buf, veid) snprintf(buf, CT_MAX_STR_SIZE, "%s%d", \
+#define veid_to_name(buf, veid) snprintf(buf, CT_MAX_STR_SIZE, "%s-%d", \
 				CT_BASE_STRING, veid)
 
 int container_is_running(envid_t veid);

@@ -51,6 +51,9 @@ static int controller_apply_config(struct cgroup *ct, struct cgroup *parent,
 
 		if ((ret = copy_string_from_parent(controller, pcont, "cpuset.mems")))
 			return ret;
+	} else if (!strcmp("memory", name)) {
+		if ((ret = cgroup_set_value_string(controller, "memory.use_hierarchy", "1")))
+			return ret;
 	}
 	return 0;
 }
@@ -215,7 +218,7 @@ int create_container(envid_t veid)
 
 	veid_to_name(cgrp, veid);
 	ct = cgroup_new_cgroup(cgrp);
-	parent = cgroup_new_cgroup(CT_BASE_STRING);
+	parent = cgroup_new_cgroup("/");
 
 	ret = do_create_container(ct, parent);
 	cgroup_free(&ct);
@@ -380,22 +383,6 @@ out_free:
 }
 int container_init(void)
 {
-	int ret;
-	struct cgroup *ct, *parent;
-	struct cgroup_controller *mem;
-
 	cgroup_init();
-	ct  = cgroup_new_cgroup(CT_BASE_STRING);
-	parent  = cgroup_new_cgroup("/");
-	ret = do_create_container(ct, parent);
-
-	/*
-	 * We do it here, because writes to memory.use_hierarchy from a kid
-	 * whose parent have hierarchy set, will fail
-	 */
-	mem = cgroup_add_controller(ct, "memory");
-	cgroup_set_value_string(mem, "memory.use_hierarchy", "1");
-	cgroup_free(&ct);
-	cgroup_free(&parent);
-	return ret;
+	return 0;
 }
