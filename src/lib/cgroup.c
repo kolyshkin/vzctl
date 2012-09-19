@@ -68,12 +68,13 @@ static char *conf_names[] = {
 	"CPU shares",
 };
 
-int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val)
+int container_apply_config(envid_t veid, enum conf_files c, void *_val)
 {
 	struct cgroup *ct;
 	char cgrp[CT_MAX_STR_SIZE];
 	struct cgroup_controller *mem, *cpu, *cpuset;
 	int ret = -EINVAL;
+	unsigned long *val = _val;
 
 	veid_to_name(cgrp, veid);
 

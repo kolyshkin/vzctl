@@ -32,7 +32,7 @@ enum conf_files {
 	CPUMASK,
 	CPUSHARES,
 };
-int container_apply_config(envid_t veid, enum conf_files c, unsigned long *val);
+int container_apply_config(envid_t veid, enum conf_files c, void *val);
 
 int hackish_empty_container(envid_t veid);
 
