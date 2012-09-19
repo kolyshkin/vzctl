@@ -15,6 +15,7 @@
 #include "cpu.h"
 #include "bitmap.h"
 #include "logger.h"
+#include "util.h"
 
 #define MEMLIMIT	"memory.limit_in_bytes"
 #define SWAPLIMIT	"memory.memsw.limit_in_bytes"
@@ -54,6 +55,9 @@ static int controller_apply_config(struct cgroup *ct, struct cgroup *parent,
 	} else if (!strcmp("memory", name)) {
 		if ((ret = cgroup_set_value_string(controller, "memory.use_hierarchy", "1")))
 			return ret;
+	} else if (!strcmp("devices", name)) {
+		if ((ret = cgroup_set_value_string(controller, "devices.deny", "a")))
+			return ret;
 	}
 	return 0;
 }
@@ -66,6 +70,8 @@ static char *conf_names[] = {
 	"CPU limits",
 	"CPU mask",
 	"CPU shares",
+	"Allowed Devices",
+	"Denied Devices",
 };
 
 int container_apply_config(envid_t veid, enum conf_files c, void *_val)
@@ -168,6 +174,24 @@ string_ok:
 		ret = cgroup_set_value_string(cpuset, "cpuset.cpus", cpusetstr);
 		break;
 	}
+	case DEVICES_DENY: {
+		struct cgroup_controller *dev;
+
+		if ((dev = cgroup_add_controller(ct, "devices")) == NULL)
+			break;
+
+		ret = cgroup_set_value_string(dev, "devices.deny", (char *)_val);
+		break;
+	}
+	case DEVICES_ALLOW: {
+		struct cgroup_controller *dev;
+
+		if ((dev = cgroup_add_controller(ct, "devices")) == NULL)
+			break;
+
+		ret = cgroup_set_value_string(dev, "devices.allow", (char *)_val);
+		break;
+	}
 	default:
 		ret = -EINVAL;
 		break;
@@ -216,6 +240,17 @@ int create_container(envid_t veid)
 	char cgrp[CT_MAX_STR_SIZE];
 	struct cgroup *ct, *parent;
 	int ret;
+	unsigned int i;
+	const char *devices[] = { "c *:* m", /* everyone can mknod */
+				  "b *:* m", /* block devices too */
+				  "c 1:3 rmw", /* null */
+				  "c 1:5 rmw", /* zero */
+				  "c 1:7 rmw", /* full */
+				  "c 1:8 rmw", /* random */
+				  "c 1:9 rmw", /* urandom */
+				  "c 5:2 rmw", /* ptmx */
+				  "c 136:* rmw", /* various pts */
+				};
 
 	veid_to_name(cgrp, veid);
 	ct = cgroup_new_cgroup(cgrp);
@@ -224,6 +259,40 @@ int create_container(envid_t veid)
 	ret = do_create_container(ct, parent);
 	cgroup_free(&ct);
 	cgroup_free(&parent);
+
+
+	/*
+	 * FIXME: This is yet another hack required by libcgroup. At some point
+	 * in time, this MUST go away.
+	 *
+	 * Problem is that libcgroup works with buffered writes. If we write to
+	 * a cgroup file and want it to be seen in the filesystem, we need to
+	 * call cgroup_modify_cgroup().
+	 *
+	 * However, all versions up to 0.38 will fail that operation for already
+	 * existent cgroups, due to a bug in the way they handle modifications
+	 * in the presence of read-only files (whether or not that specific file
+	 * was being modified). Because of that, we need to come up with a new
+	 * cgroup all the time, and free it afterwards.
+	 */
+	for (i = 0; i < ARRAY_SIZE(devices); i++) {
+		struct cgroup_controller *dev;
+
+		veid_to_name(cgrp, veid);
+		ct = cgroup_new_cgroup(cgrp);
+
+		if ((dev = cgroup_add_controller(ct, "devices"))) {
+			cgroup_set_value_string(dev, "devices.allow", devices[i]);
+			if ((ret = cgroup_modify_cgroup(ct))) {
+				logger(-1, 0, "Failed to set device permissions for %s (%s)",
+					devices[i], cgroup_strerror(ret));
+			}
+		} else {
+			logger(-1, 0, "Failed to attach device controller (%s)",
+			       cgroup_strerror(ret));
+		}
+		cgroup_free(&ct);
+	}
 
 	return ret;
 }

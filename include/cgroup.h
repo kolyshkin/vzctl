@@ -31,6 +31,8 @@ enum conf_files {
 	CPULIMIT,
 	CPUMASK,
 	CPUSHARES,
+	DEVICES_ALLOW,
+	DEVICES_DENY,
 };
 int container_apply_config(envid_t veid, enum conf_files c, void *val);
 

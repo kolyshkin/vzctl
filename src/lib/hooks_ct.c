@@ -318,10 +318,75 @@ static int ct_setcpus(vps_handler *h, envid_t veid, struct cpu_param *cpu)
 	return ret;
 }
 
+static int deny_devices(vps_handler *h, envid_t veid, dev_res *dev)
+{
+	char dev_str[STR_SIZE];
+	char perms[4];
+	int i = 0;
+
+	/*
+	 * Attention: what we want to do is figure out which permissions we want
+	 * to mask out, so this has to be a negative test. If all of them are
+	 * masked out, we don't call allow, and revoke the device entirely
+	 */
+	if (!(dev->mask & S_IROTH))
+		perms[i++] = 'r';
+	if (!(dev->mask & S_IWOTH))
+		perms[i++] = 'w';
+
+	if (i == 0)
+		return 0;
+
+	/* revoke entirely */
+	if (i == 2)
+		perms[i++] = 'm';
+
+	perms[i++] = '\0';
+	snprintf(dev_str, STR_SIZE, "%c %d:%d %s",
+		S_ISBLK(dev->type) ? 'b' : 'c',
+		major(dev->dev), minor(dev->dev), perms);
+
+	return  container_apply_config(veid, DEVICES_DENY, &dev_str);
+}
+
 static int ct_setdevperm(vps_handler *h, envid_t veid, dev_res *dev)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return 0;
+	char dev_str[STR_SIZE];
+	char perms[4];
+	int i = 0;
+	int ret;
+
+	if ((dev->mask & S_IXGRP))
+		logger(1, 0, "Quota setup not implemented with upstream kernels, ignoring");
+
+	if ((ret = deny_devices(h, veid, dev)))
+		return ret;
+
+	if (dev->mask & S_IROTH)
+		perms[i++] = 'r';
+	if (dev->mask & S_IWOTH)
+		perms[i++] = 'w';
+	/*
+	 * If the user has not specified any permissions, what we need to
+	 * do is just remove the device from the list. In that case, we're done
+	 * here
+	 */
+	if (i == 0)
+		return 0;
+
+	/*
+	 * Since this is not specifiable from the cmdline, always give mknod
+	 * permission
+	 */
+	perms[i++] = 'm';
+	perms[i++] = '\0';
+
+	snprintf(dev_str, STR_SIZE, "%c %d:%d %s",
+		S_ISBLK(dev->type) ? 'b' : 'c',
+		major(dev->dev), minor(dev->dev),
+		perms);
+
+	return container_apply_config(veid, DEVICES_ALLOW, &dev_str);
 }
 
 /*
