@@ -882,14 +882,21 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 			}
 		}
 	}
+
 	/* get CT IP addresses for cleanup */
-	get_vps_ip(h, veid, &param->del_res.net.ip);
+	if (is_vz_kernel(h))
+		get_vps_ip(h, veid, &param->del_res.net.ip);
+
 	if ((ret = env_stop(h, veid, res->fs.root, stop_mode)))
 		goto end;
+
 	mod_cleanup(h, veid, action, param);
+
 	/* Cleanup CT IPs */
-	run_net_script(veid, DEL, &param->del_res.net.ip,
+	if (is_vz_kernel(h))
+		run_net_script(veid, DEL, &param->del_res.net.ip,
 			STATE_STOPPING, param->res.net.skip_arpdetect);
+
 	if (!(skip & SKIP_UMOUNT))
 		ret = vps_umount(h, veid, &res->fs, skip);
 
