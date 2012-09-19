@@ -49,9 +49,11 @@ int get_cap_mask(char *name, unsigned long *mask);
  * @param veid		CT ID.
  * @param env		CT environment parameters.
  * @param cap		capability mask.
+ * @param is_upstream	set to 1 for non-OpenVZ kernel.
  * @return		0 on success.
  */
-int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap);
+int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap,
+		int is_upstream);
 
 /** Merge capabilities and return in string format.
  *

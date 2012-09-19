@@ -85,7 +85,7 @@ static int _env_create(void *data)
 	if ((ret = vz_chroot(arg->res->fs.root)))
 		return ret;
 
-	if ((ret = vps_set_cap(arg->veid, &arg->res->env, &arg->res->cap)))
+	if ((ret = vps_set_cap(arg->veid, &arg->res->env, &arg->res->cap, 1)))
 		return ret;
 
 	fill_container_param(arg, &create_param);

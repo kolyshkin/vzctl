@@ -250,7 +250,7 @@ static int vz_do_env_create(struct arg_start *arg)
 		logger(-1, errno, "Unable to fork");
 		return VZ_RESOURCE_ERROR;
 	} else if (pid == 0) {
-		if ((ret = vps_set_cap(veid, &res->env, &res->cap)))
+		if ((ret = vps_set_cap(veid, &res->env, &res->cap, 0)))
 			goto env_err;
 		if (fn == NULL) {
 			ret = _env_create(h, (void *)arg);

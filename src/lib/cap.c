@@ -84,6 +84,11 @@
 	CAP_TO_MASK(CAP_SETPCAP)			| \
 	CAP_TO_MASK(CAP_SETFCAP)
 
+#define CAPDEFAULTMASK_UPSTREAM				  \
+	CAPDEFAULTMASK					| \
+	CAP_TO_MASK(CAP_SYS_ADMIN)			| \
+	CAP_TO_MASK(CAP_NET_ADMIN)
+
 static char *cap_names[] = {
 "CHOWN",		/*	0	*/
 "DAC_OVERRIDE",		/*	1	*/
@@ -255,15 +260,18 @@ static inline cap_t make_cap_mask(cap_t def, cap_t on, cap_t off)
 	return (def | on) & ~off;
 }
 
-int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap)
+int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap,
+		int is_upstream)
 {
-	cap_t mask;
+	cap_t mask = CAPDEFAULTMASK;
 	int ret;
 
 	if ((env->features_known & env->features_mask) & VE_FEATURE_BRIDGE)
 		cap_raise(cap->on, CAP_NET_ADMIN);
 
-	mask = make_cap_mask(CAPDEFAULTMASK, cap->on, cap->off);
+	if (is_upstream)
+		mask = CAPDEFAULTMASK_UPSTREAM;
+	mask = make_cap_mask(mask, cap->on, cap->off);
 
 	ret = set_cap_bound(mask);
 	if (ret < 0)
