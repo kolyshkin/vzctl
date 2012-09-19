@@ -109,6 +109,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644, root, root) %{_mandir}/man8/vzlist.8.*
 %attr(644, root, root) %{_mandir}/man8/vzifup-post.8.*
 %attr(644, root, root) %{_udevrulesdir}/*
+%attr(644, root, root) %{_bashcdir}/*
 %config /etc/sysconfig/vz
 %ghost %config(missingok) /etc/sysconfig/vzeventd
 
@@ -215,7 +216,6 @@ OpenVZ containers control utility core package
 %attr(755,root,root) %{_scriptdir}/vzevent-stop
 %attr(755,root,root) %{_scriptdir}/vzevent-reboot
 %attr(755,root,root) %{_scriptdir}/vps-pci
-%attr(644, root, root) %{_bashcdir}/*
 %attr(777, root, root) /etc/vz/conf
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_configdir}/osrelease.conf
