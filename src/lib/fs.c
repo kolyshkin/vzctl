@@ -130,7 +130,7 @@ int fsumount(envid_t veid, const fs_param *fs)
 		return VZ_FS_CANTUMOUNT;
 	}
 
-	if (!quota_ctl(veid, QUOTA_STAT))
+	if (is_vzquota_available() && !quota_ctl(veid, QUOTA_STAT))
 		return quota_off(veid, 0);
 
 	return 0;

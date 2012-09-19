@@ -45,6 +45,7 @@ typedef struct {
 	unsigned long *ugidlimit;	/**< user/group quota limit. */
 } dq_param;
 
+int is_vzquota_available(void);
 int is_2nd_level_quota_on(const dq_param *param);
 int vps_set_quota(envid_t veid, dq_param *dq);
 int vps_quotaon(envid_t veid, char *private, dq_param *dq);
