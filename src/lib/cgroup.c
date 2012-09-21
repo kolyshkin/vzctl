@@ -414,8 +414,10 @@ int hackish_empty_container(envid_t veid)
 	ct = cgroup_new_cgroup(cgrp);
 
 	ret = cgroup_get_cgroup(ct);
-	if (ret == ECGROUPNOTEXIST)
+	if (ret == ECGROUPNOTEXIST) {
+		ret = 0;
 		goto out;
+	}
 
 	/* Any controller will do */
 	ret = cgroup_get_task_begin(cgrp, "cpu", &task_handle, &pid);
