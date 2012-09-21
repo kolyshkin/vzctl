@@ -929,8 +929,8 @@ it can be either \fBmounted\fR or \fBunmounted\fR.
 Fifth word shows if the container is running,
 it can be either \fBrunning\fR or \fBdown\fR.
 
-Sixth word, if exists, is \fBsuspended\fR. It appears if both a container
-and its dump file exist (see \fBchkpnt\fR).
+Sixth word, if exists, is \fBsuspended\fR. It appears if
+a dump file exists for a stopped container (see \fBchkpnt\fR).
 
 This command can also be usable from scripts.
 .IP "\fBmount\fR \fICTID\fR" 4

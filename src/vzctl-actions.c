@@ -1170,7 +1170,7 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 		exist = 1;
 	mounted = (vps_is_mounted(fs->root, fs->private) == 1);
 	run = vps_is_run(h, veid);
-	if (exist == 1) {
+	if (exist && !run) {
 		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));
 		if (stat_file(buf))
 			suspended = 1;
