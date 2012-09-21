@@ -316,15 +316,18 @@ int container_add_task(envid_t veid)
 {
 	char cgrp[CT_MAX_STR_SIZE];
 	struct cgroup *ct;
+	int ret = -1;
 
 	veid_to_name(cgrp, veid);
 	ct = cgroup_new_cgroup(cgrp);
 	if (cgroup_get_cgroup(ct))
-		return -1;
+		goto out;
 
 	cgroup_attach_task_pid(ct, getpid());
+	ret = 0;
+out:
 	cgroup_free(&ct);
-	return 0;
+	return ret;
 }
 
 int destroy_container(envid_t veid)
