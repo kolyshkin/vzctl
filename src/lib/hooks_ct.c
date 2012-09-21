@@ -108,6 +108,11 @@ static int ct_env_create(struct arg_start *arg)
 	char ctpath[STR_SIZE];
 
 
+	/* non-fatal */
+	if ((ret = ct_destroy(arg->h, arg->veid)))
+		logger(0, 0, "Could not properly cleanup container %s",
+			container_error(ret));
+
 	if (child_stack == NULL) {
 		logger(-1, errno, "Unable to alloc");
 		return VZ_RESOURCE_ERROR;
