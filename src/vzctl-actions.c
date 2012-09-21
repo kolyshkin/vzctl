@@ -1168,7 +1168,7 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 	get_vps_conf_path(veid, buf, sizeof(buf));
 	if (fs->private != NULL && stat_file(fs->private) && stat_file(buf))
 		exist = 1;
-	mounted = vps_is_mounted(fs->root, fs->private);
+	mounted = (vps_is_mounted(fs->root, fs->private) == 1);
 	run = vps_is_run(h, veid);
 	if (exist == 1) {
 		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));
