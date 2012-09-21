@@ -110,7 +110,7 @@ static int ct_env_create(struct arg_start *arg)
 
 	/* non-fatal */
 	if ((ret = ct_destroy(arg->h, arg->veid)))
-		logger(0, 0, "Could not properly cleanup container %s",
+		logger(0, 0, "Could not properly cleanup container: %s",
 			container_error(ret));
 
 	if (child_stack == NULL) {
