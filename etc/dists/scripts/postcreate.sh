@@ -112,9 +112,12 @@ _sc()
 {
 	local val=$1
 	shift
-	local file
-	for file in $*; do
-		setfattr -n security.capability -v $val ${VE_ROOT}${file}
+	local f file
+	for f in $*; do
+		file=${VE_ROOT}${f}
+		if [ -e $file ]; then
+			setfattr -n security.capability -v $val $file
+		fi
 	done
 }
 
