@@ -7,7 +7,15 @@ while test -n "$1"; do
 		;;
 	   -i|--install)
 		build=yes
-		install=yes
+		install=i
+		;;
+	   -U|--update)
+		build=yes
+		install=U
+		;;
+	   -F|--freshen)
+		build=yes
+		install=F
 		;;
 	   -v|--verbose)
 		verbose=yes
@@ -74,6 +82,6 @@ test -z "$verbose" || \
 test "$build" = "yes" || exit 0
 make rpms || exit 1
 
-test "$install" = "yes" || exit 0
-sudo rpm -Uhv $(rpm --eval %{_rpmdir}/%{_arch})/vzctl-*${GIT_VR}*.rpm
+test -z "$install" && exit 0
+sudo rpm -${install}hv $(rpm --eval %{_rpmdir}/%{_arch})/vzctl-*${GIT_VR}*.rpm
 
