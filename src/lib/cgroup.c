@@ -359,6 +359,12 @@ int container_is_running(envid_t veid)
 
 	ret = cgroup_get_controller_begin(&handle, &mnt);
 	do {
+		struct cgroup_controller *controller;
+		controller = cgroup_get_controller(ct, mnt.name);
+		if (!controller) {
+			logger(0, 0, "Controller %s seems to be missing!", mnt.name);
+			continue;
+		}
 		if ((ret = controller_has_tasks(cgrp, mnt.name)) != 0)
 			goto out;
 	} while ((ret = cgroup_get_controller_next(&handle, &mnt)) == 0);
