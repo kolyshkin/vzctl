@@ -338,7 +338,16 @@ int destroy_container(envid_t veid)
 
 	veid_to_name(cgrp, veid);
 	ct = cgroup_new_cgroup(cgrp);
+	ret = cgroup_get_cgroup(ct);
+
+	/* Since this can also be called from initialization, this is valid */
+	if ((ret == ECGROUPNOTEXIST)) {
+		ret = 0;
+		goto out;
+	}
+
 	ret = cgroup_delete_cgroup_ext(ct, 0);
+out:
 	cgroup_free(&ct);
 	return ret;
 }
