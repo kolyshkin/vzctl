@@ -57,6 +57,19 @@ static int sys_setns(int fd, int nstype)
 # define CLONE_NEWNET   0x40000000      /* New network namespace.  */
 #endif
 
+/* From sys/mount.h */
+#ifndef MS_REC
+# define MS_REC 16384
+#endif
+
+#ifndef MS_PRIVATE
+# define MS_PRIVATE (1 << 18)
+#endif
+
+/* This function is there in GLIBC, but not in headers */
+extern int pivot_root(const char * new_root, const char * put_old);
+
+
 static int ct_is_run(vps_handler *h, envid_t veid)
 {
 	return container_is_running(veid);
@@ -76,13 +89,222 @@ static int ct_destroy(vps_handler *h, envid_t veid)
 	return destroy_container(veid);
 }
 
+static int mnt_sort_fn(const void *p1, const void *p2)
+{
+	char * const *m1 = p1;
+	char * const *m2 = p2;
+
+	/* Sort by length, longer/deeper directories first */
+	return strlen(*m2) - strlen(*m1);
+}
+
+static char ** collect_mounts(const char *root, int *s)
+{
+	char path[PATH_MAX];
+	char prefix[PATH_MAX];
+	int prefixlen;
+	FILE *f;
+	char **mounts = NULL;
+	int size = 0, max_size = 256;
+	int i;
+
+	snprintf(path, sizeof(path), "%s/proc/mounts", root);
+	f = fopen(path, "r");
+	if (f == NULL) {
+		logger(-1, errno, "Can't open %s", path);
+		return NULL;
+	}
+
+	mounts = malloc(max_size * sizeof(char *));
+	if (!mounts) {
+		logger(-1, ENOMEM, "malloc failed");
+		goto err;
+	}
+
+	prefixlen = snprintf(prefix, sizeof(prefix), "/%s", root);
+
+	/* Collect all mounts */
+	while (!feof(f)) {
+		char *mnt;
+
+		if (fscanf(f, "%*s %as %*[^\n]", &mnt) != 1)
+			continue;
+		if (!mnt) {
+			logger(-1, 0, "Error reading %s", path);
+			goto err;
+		}
+		/* Skip mounts not under oldroot */
+		if (strncmp(mnt, prefix, prefixlen))
+			continue;
+
+		mounts[size++] = mnt;
+
+		if (size == max_size) {
+			char **new_mounts;
+
+			new_mounts = realloc(mounts,
+					2 * max_size * sizeof(char *));
+			if (!new_mounts) {
+				logger(-1, ENOMEM, "realloc failed");
+				goto err;
+			}
+
+			mounts = new_mounts;
+			max_size *= 2;
+		}
+
+	}
+
+	qsort(mounts, size, sizeof(char *), mnt_sort_fn);
+
+	/* check for and remove duplicates, aka uniq */
+	for (i = 0; i < (size - 1); i++) {
+		if (!strcmp(mounts[i], mounts[i + 1])) {
+			free(mounts[i]);
+			mounts[i] = NULL;
+		}
+	}
+
+	goto out;
+
+err:
+	/* Error; clean up */
+	if (size)
+		for (i = 0; i < size; i++)
+			free(mounts[i]);
+	free(mounts);
+	mounts = NULL;
+
+out:
+	fclose(f);
+	*s = size;
+
+	return mounts;
+}
+
+static int umount_old(const char *root)
+{
+	char **mounts;
+	int size;
+	int old_fail, fail = 0;
+	int i;
+
+	mounts = collect_mounts(root, &size);
+	if (!mounts)
+		return -1;
+
+	/* Umount */
+	do {
+		old_fail = fail;
+		fail = 0;
+
+		for (i = 0; i < size; i++) {
+			int r;
+
+			if (!mounts[i])
+				continue;
+
+			r = umount(mounts[i]);
+			if (!r) {
+				free(mounts[i]);
+				mounts[i] = NULL;
+				continue;
+			}
+			logger(3, errno, "Warning: can't umount %s",
+					mounts[i]);
+			fail++;
+		}
+	} while (fail > 0 && old_fail != fail);
+
+	if (fail > 0) {
+		fail = 0;
+		for (i = 0; i < size; i++) {
+			int r;
+
+			if (!mounts[i])
+				continue;
+
+			r = umount2(mounts[i], MNT_DETACH);
+			if (!r) {
+				free(mounts[i]);
+				mounts[i] = NULL;
+				continue;
+			}
+			logger(3, errno, "Can't umount2(%s, MNT_DETACH)",
+					mounts[i]);
+
+			r = umount2(mounts[i], MNT_FORCE);
+			if (!r) {
+				free(mounts[i]);
+				mounts[i] = NULL;
+				continue;
+			}
+
+			logger(0, errno, "Can't umount2(%s, MNT_FORCE)",
+					mounts[i]);
+			fail++;
+		}
+	}
+
+	if (fail)
+		for (i = 0; i < size; i++)
+			free(mounts[i]);
+	free(mounts);
+
+	return fail;
+}
+
+
+int ct_chroot(const char *root)
+{
+	char oldroot[] = "vzctl-old-root.XXXXXX";
+	int ret = VZ_RESOURCE_ERROR;
+
+	if (chdir(root)) {
+		logger(-1, errno, "Can't chdir %s", root);
+		return ret;
+	}
+
+	if (mount("", "/", NULL, MS_PRIVATE|MS_REC, NULL) < 0) {
+		logger(-1, errno, "Can't remount root with MS_PRIVATE");
+		return ret;
+	}
+
+	if (mkdtemp(oldroot) == NULL) {
+		logger(-1, errno, "Can't mkdtemp %s", oldroot);
+		return ret;
+	}
+
+	if (pivot_root(".", oldroot)) {
+		logger(-1, errno, "Can't pivot_root(\".\", %s)", oldroot);
+		goto rmdir;
+	}
+
+	if (chdir("/")) {
+		logger(-1, errno, "Can't chdir /");
+		goto rmdir;
+	}
+
+	if (umount_old(oldroot)) {
+		logger(-1, 0, "Can't umount old mounts");
+		goto rmdir;
+	}
+
+	ret = 0;
+rmdir:
+	if (rmdir(oldroot))
+		logger(-1, errno, "Can't rmdir %s", oldroot);
+
+	return ret;
+}
+
 static int _env_create(void *data)
 {
 	struct arg_start *arg = data;
 	struct env_create_param3 create_param;
 	int ret;
 
-	if ((ret = vz_chroot(arg->res->fs.root)))
+	if ((ret = ct_chroot(arg->res->fs.root)))
 		return ret;
 
 	if ((ret = vps_set_cap(arg->veid, &arg->res->env, &arg->res->cap, 1)))
@@ -218,7 +440,7 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	int ret;
 	if ((ret = __ct_enter(h, veid, flags)))
 		return ret;
-	if ((ret = vz_chroot(root)))
+	if ((ret = ct_chroot(root)))
 		return ret;
 	return 0;
 }
