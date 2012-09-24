@@ -186,9 +186,13 @@ modify_vzconf()
 fix_updatedb() {
 	local file="/etc/updatedb.conf"
 	local var="PRUNEPATHS"
-	local add="/vz"
+	local add
 
 	test -r $file || return
+	add=$(printf "$VE_ROOT\n$VE_PRIVATE" | \
+		sed -e 'N;s/^\(.*\).*\n\1.*$/\1/' -e 's@/[^/]*$@@')
+	test "$add" = "/" && return
+	test -d "$add" || return
 	grep -qw "^${var}" $file || return
 	grep -qE "^${var}.* ${add}[\" ]" $file && return
 	__echo "Adding ${add} to ${var} in ${file}:"
