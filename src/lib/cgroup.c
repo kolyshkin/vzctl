@@ -341,7 +341,7 @@ int destroy_container(envid_t veid)
 	ret = cgroup_get_cgroup(ct);
 
 	/* Since this can also be called from initialization, this is valid */
-	if ((ret == ECGROUPNOTEXIST)) {
+	if (ret == ECGROUPNOTEXIST) {
 		ret = 0;
 		goto out;
 	}
