@@ -1240,10 +1240,6 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 			}
 		}
 		break;
-	case ACTION_DESTROY:
-		break;
-	case ACTION_MOUNT:
-		break;
 	case ACTION_EXEC:
 	case ACTION_EXEC2:
 	case ACTION_EXEC3:
@@ -1276,8 +1272,6 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_SNAPSHOT_DELETE:
 	case ACTION_SNAPSHOT_SWITCH:
 		ret = parse_snapshot_delete_opt(veid, argc, argv, param);
-		break;
-	case ACTION_SNAPSHOT_LIST:
 		break;
 #endif
 	default :
