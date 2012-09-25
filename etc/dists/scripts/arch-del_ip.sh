@@ -30,12 +30,12 @@ function old_remove_all_ve_aliases()
 	local ve_if_name
 	local ve_if
 
-	ve_if_name=`grep "^${VENET_DEV}_" ${CFGFILE} | cut -d'=' -f1`
+	ve_if_name=`grep "^${VENET_DEV}_" ${OLDCFGFILE} | cut -d'=' -f1`
 
 	for ve_if in ${ve_if_name}; do
 	    /etc/rc.d/network ifdown ${ve_if} 2>/dev/null
-	    del_param "${CFGFILE}" "${ve_if}"
-	    del_param3 "${CFGFILE}" "INTERFACES" "${ve_if}"
+	    del_param "${OLDCFGFILE}" "${ve_if}"
+	    del_param3 "${OLDCFGFILE}" "INTERFACES" "${ve_if}"
 	done
 }
 
@@ -51,17 +51,17 @@ function old_del_ip()
 
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
-		ifname=$(grep -Fw "${_IP}" ${CFGFILE} |
+		ifname=$(grep -Fw "${_IP}" ${OLDCFGFILE} |
 			 grep "^${VENET_DEV}_" | cut -d'=' -f1)
 		if [ -n "${ifname}" ]; then
 		    # shutdown interface venet0:x
 		    /etc/rc.d/network ifdown ${ifname/_/:} 2> /dev/null
 
 		    # remove venet0_x from cfg
-		    del_param "${CFGFILE}" "${ifname}"
+		    del_param "${OLDCFGFILE}" "${ifname}"
 
 		    # del venet0_x from INTERFACES array
-		    del_param3 "${CFGFILE}" "INTERFACES" "${ifname}"
+		    del_param3 "${OLDCFGFILE}" "INTERFACES" "${ifname}"
 		fi
 	done
 }
