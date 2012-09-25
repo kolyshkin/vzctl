@@ -68,13 +68,13 @@ function old_del_ip()
 
 function remove_all_ve_aliases()
 {
-        local ve_if
-        for ve_if in $(ls -1 ${CFGPATH}/${VENET_DEV}_* 2> /dev/null | sed "s/.*${VENET_DEV}_//"); do
-                ip link set "${VENET_DEV}:${ve_if}" down
-                rm -f "${CFGPATH}/${VENET_DEV}_${ve_if}"
+	local ve_if
+	for ve_if in $(ls -1 ${CFGPATH}/${VENET_DEV}_* 2> /dev/null | sed "s/.*${VENET_DEV}_//"); do
+		ip link set "${VENET_DEV}:${ve_if}" down
+		rm -f "${CFGPATH}/${VENET_DEV}_${ve_if}"
 
-                del_param3 "${NETCFG}" "NETWORKS" "${VENET_DEV}_${ve_if}"
-        done
+		del_param3 "${NETCFG}" "NETWORKS" "${VENET_DEV}_${ve_if}"
+	done
 }
 
 function del_ip()
