@@ -37,6 +37,7 @@ Requires: vzquota >= 3.1
 Requires: fileutils
 Requires: vzctl-core = %{version}-%{release}
 Requires: tar
+Conflicts: ploop-lib < 1.5-1
 BuildRequires: ploop-devel > 1.4-1
 BuildRequires: libxml2-devel >= 2.6.16
 BuildRequires: libcgroup-devel >= 0.37
