@@ -21,7 +21,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 3.3
+Version: 4.0
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPL
@@ -234,6 +234,67 @@ OpenVZ containers control utility core package
 %config %{_vpsconfdir}/0.conf
 
 %changelog
+* Tue Sep 25 2012 Kir Kolyshkin <kir@openvz.org> - 4.0-1
+- New features
+- * Ability to work with non-openvz kernel (experimental,
+    see http://wiki.openvz.org/Vzctl_for_upstream_kernel)
+- * vzlist: add JSON output format (--json flag)
+- * vzctl compact: implement (to compact ploop image)
+- * vzctl snapshot: store/restore CT config on snapshot create/switch
+- * vzctl set: add --mount_opts to set mount options for ploop
+- * Implement dynamic loading of ploop library
+- * Implement ability to build w/o ploop headers (./configure --without-ploop)
+- * Split into vzctl-core and vzctl packages, removed vzctl-lib
+- * Scripts moved from /usr/lib[64]/vzctl/scripts to /usr/libexec/vzctl
+- * Added dists/scripts support for Alpine Linux
+- Fixes
+- * postcreate.sh: create /etc/resolv.conf with correct owner and perms (#2290)
+- * vzctl --help: add snapshot* and compact commands
+- * vzctl set --capability: improve cap setting code, eliminate kernel warning
+- * vzctl set --quotaugidlimit: fix working for ploop after restart
+- * vzctl start|enter|exec: eliminate race when checking CT's /sbin/init
+- * vzlist, vzctl set --save: avoid extra delimiter in features list
+- * vzlist: return default to always print CTID (use -n for names) (#2308)
+- * vzmigrate: fix for offline migration of ploop CT (#2316, #2356)
+- * vzctl.spec: add wget requirement (for vps-download)
+- * osrelease.conf: add ubuntu-12.04 (#2343)
+- * init.d/vz-redhat: fix errorneous lockfile removal (#2342)
+- * suse-add_ip.sh: do not set default route on venet0 when no IPs (#1941)
+- * arch-del_ip.sh: fixed for /etc/rc.conf case (#2367)
+- * arch-{add,del}_ip.sh: updated to deal with new Arch netcfg (#2280)
+- * configure.ac: on an x86_64, install libraries to lib64
+- * Build system: fix massively parallel build (e.g. make -j88)
+- Improvements
+- * init.d/vz*: stop CTs in the in the reverse order of start (#2330)
+- * init.d/vz-redhat: add /vz to PRUNEPATHS in /etc/updatedb.conf
+- * bash-completion: add remote completion for --ostemplate
+- * bash_completion: complete ploop commands only if supported by the kernel
+- * vzctl: call set_personality32() for 32-bit CTs on all architectures
+- * vzctl console: speed up by using bigger buffer
+- * vzctl chkpnt: fsync dump file
+- * vzctl mount,destroy,snapshot-list: error out for too many arguments
+- * vzctl set --diskinodes: warn it's ignored on ploop
+- * vzctl set --hostname: put ::1 below 127.0.0.1 in CT's /etc/hosts (#2290)
+- * vzctl set: remove --noatime (obsolete now when relatime is used)
+- * vzctl snapshot: added check for snapshot guid dup
+- * vzctl snapshot-delete: fix error code
+- * vzctl start/stop: print error for non-applicable options
+- * vzctl status: do not show 'mounted' if stat() on root/private fails
+- * vzctl status: do not show 'suspended' for running container
+- * vzctl stop: various minor improvements
+- * vzlist: add the following new fields:
+    nameserver, searchdomain, vswap, disabled, origin_sample, mount_opts
+- * vzlist, vzctl status: speed up querying mounted status
+- * vzlist: faster ploop diskspace info for unmounted case
+- * vzmigrate: rename --online to --live
+- * vzmigrate: do not use pv unless -v is specified
+- * vzmigrate: do not lose ACLs and XATTRS (#2056)
+- * vzmigrate: dump/restore first-level quota
+- * switch to new ploop_read_disk_descr()
+- * is_ploop_supported(): reimplement using /proc/vz/ploop_minor
+- * Code refactoring, moving vz- and upstream-specific stuff to hooks_{vz,ct}.c
+- * Various code cleanups
+
 * Thu May 31 2012 Kir Kolyshkin <kir@openvz.org> - 3.3-1
 - New features
   - vzmigrate: ploop live migration using ploop-copy (#2252)
