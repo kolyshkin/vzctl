@@ -429,8 +429,11 @@ int hackish_empty_container(envid_t veid)
 	}
 	cgroup_get_task_end(&task_handle);
 
-	if (ret != ECGEOF)
+	if (ret != ECGEOF) {
+		logger(-1, 0, "Could not finish all tasks: %s",
+				cgroup_strerror(ret));
 		goto out;
+	}
 
 	ret = 0;
 	for (i = 0; i < MAX_SHTD_TM; i++) {
@@ -438,8 +441,8 @@ int hackish_empty_container(envid_t veid)
 			goto out;
 		usleep(500000);
 	}
-	/* stick to libcg's error codes for consistency */
-	ret = ECGNONEMPTY;
+	logger(-1, 0, "Failed to wait for CT tasks to die");
+	ret = VZ_STOP_ERROR;
 out:
 	cgroup_free(&ct);
 	return ret;

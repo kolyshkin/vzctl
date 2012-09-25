@@ -81,10 +81,8 @@ static int ct_destroy(vps_handler *h, envid_t veid)
 	int ret;
 
 	ret = hackish_empty_container(veid);
-	if (ret) {
-		logger(-1, 0, "Could not finish all tasks: %s", cgroup_strerror(ret));
+	if (ret)
 		return ret;
-	}
 
 	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, veid);
 	unlink(ctpath);
