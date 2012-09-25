@@ -180,7 +180,7 @@ AC_ARG_WITH([cgroup],
             [with_cgroup="+cgroup"])
 
 AS_IF([test "x$with_cgroup" = "x+cgroup"],
-        [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.35])
+        [ PKG_CHECK_MODULES(CGROUP, [libcgroup >= 0.37])
           AC_DEFINE(HAVE_UPSTREAM, [1], [Define to enable upstream kernel support])
           AC_CHECK_FUNCS([setns]) ]
 )
