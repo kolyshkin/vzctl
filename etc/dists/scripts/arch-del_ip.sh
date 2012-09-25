@@ -51,11 +51,11 @@ function old_del_ip()
 
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
-		ifname=`grep -B 1 -e "\\<${_IP}\\>" ${CFGFILE} |
-			grep "${VENET_DEV}_" | cut -d'=' -f1`
+		ifname=$(grep -Fw "${_IP}" ${CFGFILE} |
+			 grep "^${VENET_DEV}_" | cut -d'=' -f1)
 		if [ -n "${ifname}" ]; then
-		    # shutdown interface venet0_x
-		    /etc/rc.d/network ifdown ${ifname} 2> /dev/null
+		    # shutdown interface venet0:x
+		    /etc/rc.d/network ifdown ${ifname/_/:} 2> /dev/null
 
 		    # remove venet0_x from cfg
 		    del_param "${CFGFILE}" "${ifname}"
