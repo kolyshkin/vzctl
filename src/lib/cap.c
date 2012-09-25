@@ -53,6 +53,11 @@
 #define	CAP_SETFCAP	31
 #endif
 
+/* From /usr/include/linux/prctl.h */
+#ifndef PR_CAPBSET_DROP
+# define PR_CAPBSET_DROP 24
+#endif
+
 #define CAPDEFAULTMASK_OLD				  \
 	CAP_TO_MASK(CAP_CHOWN)				| \
 	CAP_TO_MASK(CAP_DAC_OVERRIDE)			| \
