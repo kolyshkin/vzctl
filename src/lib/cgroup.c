@@ -16,6 +16,7 @@
 #include "bitmap.h"
 #include "logger.h"
 #include "util.h"
+#include "env.h"
 
 #define MEMLIMIT	"memory.limit_in_bytes"
 #define SWAPLIMIT	"memory.memsw.limit_in_bytes"
@@ -409,6 +410,7 @@ int hackish_empty_container(envid_t veid)
 	int ret = 0;
 	void *task_handle;
 	pid_t pid;
+	int i;
 
 	veid_to_name(cgrp, veid);
 	ct = cgroup_new_cgroup(cgrp);
@@ -425,11 +427,19 @@ int hackish_empty_container(envid_t veid)
 		kill(pid, SIGKILL);
 		ret = cgroup_get_task_next(&task_handle, &pid);
 	}
-	if (ret == ECGEOF)
-		ret = 0;
-
 	cgroup_get_task_end(&task_handle);
 
+	if (ret != ECGEOF)
+		goto out;
+
+	ret = 0;
+	for (i = 0; i < MAX_SHTD_TM; i++) {
+		if (!container_is_running(veid))
+			goto out;
+		usleep(500000);
+	}
+	/* stick to libcg's error codes for consistency */
+	ret = ECGNONEMPTY;
 out:
 	cgroup_free(&ct);
 	return ret;
