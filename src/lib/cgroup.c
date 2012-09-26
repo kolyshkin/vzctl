@@ -486,6 +486,5 @@ out_free:
 }
 int container_init(void)
 {
-	cgroup_init();
-	return 0;
+	return cgroup_init();
 }
