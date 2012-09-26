@@ -729,8 +729,13 @@ int ct_do_open(vps_handler *h)
 
 	ret = container_init();
 	if (ret) {
-		logger(-1, 0, "Container init failed: %s", container_error(ret));
-		return ret;
+		/*
+		 * We will use fprintf to stderr, and not the logger, because some commands,
+		 * like vzctl status, will disable the logger altogether. We are early, and
+		 * all those errors are considered fatal.
+		 */
+		fprintf(stderr, "Container init failed: %s\n", container_error(ret));
+		return VZ_RESOURCE_ERROR;
 	}
 
 	if (snprintf(path, sizeof(path), "/proc/%d/ns/pid", getpid()) < 0)
@@ -739,7 +744,7 @@ int ct_do_open(vps_handler *h)
 	ret = mkdir(NETNS_RUN_DIR, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	if (ret && (errno != EEXIST)) {
-		logger(-1, errno, "Can't create directory %s", NETNS_RUN_DIR);
+		fprintf(stderr, "Can't create directory %s (%s\n)", NETNS_RUN_DIR, strerror(errno));
 		return VZ_RESOURCE_ERROR;
 	}
 
