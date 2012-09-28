@@ -19,12 +19,11 @@ include $(top_srcdir)/paths.am
 
 SUBDIRS = lib
 
-INCLUDES = -I$(top_srcdir)/include
-
-AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
-            -DPKGCONFDIR=\"$(pkgconfdir)\" \
-            -DSCRIPTDIR=\"$(scriptdir)\" \
-            -DMODULESDIR=\"$(modulesdir)\"
+AM_CPPFLAGS = -I$(top_srcdir)/include \
+              -DSBINDIR=\"$(sbindir)\" \
+              -DPKGCONFDIR=\"$(pkgconfdir)\" \
+              -DSCRIPTDIR=\"$(scriptdir)\" \
+              -DMODULESDIR=\"$(modulesdir)\"
 
 sbin_PROGRAMS = arpsend \
                 ndsend \

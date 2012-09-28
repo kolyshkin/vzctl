@@ -17,13 +17,13 @@
 
 include $(top_srcdir)/paths.am
 
-INCLUDES = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include \
+              -DSBINDIR=\"$(sbindir)\" \
+              -DPKGCONFDIR=\"$(pkgconfdir)\" \
+              -DSCRIPTDIR=\"$(scriptdir)\" \
+              $(XML_CPPFLAGS)
 
-AM_CFLAGS = -DSBINDIR=\"$(sbindir)\" \
-            -DPKGCONFDIR=\"$(pkgconfdir)\" \
-            -DSCRIPTDIR=\"$(scriptdir)\" \
-            $(XML_CPPFLAGS) \
-            $(CGROUP_CFLAGS)
+AM_CFLAGS = $(CGROUP_CFLAGS)
 
 LIB_VER = $(VERSION)
 
