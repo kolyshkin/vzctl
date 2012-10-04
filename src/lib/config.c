@@ -2193,6 +2193,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_SNAPSHOT_SKIP_SUSPEND:
 		vps_p->snap.flags |= SNAPSHOT_SKIP_SUSPEND;
 		break;
+	case PARAM_SNAPSHOT_SKIP_CONFIG:
+		vps_p->snap.flags |= SNAPSHOT_SKIP_CONFIG;
+		break;
 	case PARAM_MOUNT_OPTS:
 		ret = conf_parse_str(&vps_p->res.fs.mount_opts, val);
 		break;

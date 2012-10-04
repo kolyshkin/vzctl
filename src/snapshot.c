@@ -109,13 +109,15 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Failed to store %s", tmp);
 		goto err;
 	}
-	// Store ve.conf
-	get_vps_conf_path(veid, fname, sizeof(fname));
-	vzctl_get_snapshot_ve_conf(fs->private, guid,
-			snap_ve_conf, sizeof(snap_ve_conf));
-	make_dir(snap_ve_conf, 0);
-	if (cp_file(snap_ve_conf, tmp))
-		goto err1;
+	if (!(param->flags & SNAPSHOT_SKIP_CONFIG)) {
+		// Store ve.conf
+		get_vps_conf_path(veid, fname, sizeof(fname));
+		vzctl_get_snapshot_ve_conf(fs->private, guid,
+				snap_ve_conf, sizeof(snap_ve_conf));
+		make_dir(snap_ve_conf, 0);
+		if (cp_file(snap_ve_conf, tmp))
+			goto err1;
+	}
 
 	if (!(param->flags & SNAPSHOT_SKIP_SUSPEND))
 		run = vps_is_run(h, veid);

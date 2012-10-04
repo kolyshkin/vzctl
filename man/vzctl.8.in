@@ -34,6 +34,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --name name
 .OP --description desc
 .OP --skip-suspend
+.OP --skip-config
 .SY vzctl
 [\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fB--id\fR \fIuuid\fR
 .SY vzctl
@@ -800,14 +801,19 @@ the container is running, it's in-memory state (as in checkpointing).
 Note that snapshot functionality is only working
 for containers on ploop device.
 .TP 4
-\fBsnapshot\fR \fICTID\fR [\fB--id \fIuuid\fR] [\fB--name \fIname\fR] [\fB--description \fIdesc\fR] [\fB--skip-suspend\fR]
-Creates a container snapshot. If \fIuuid\fR is not specified, it is
-auto-generated.
+\fBsnapshot\fR \fICTID\fR [\fB--id \fIuuid\fR] [\fB--name \fIname\fR] [\fB--description \fIdesc\fR] [\fB--skip-suspend\fR] [\fB--skip-config\fR]
+Creates a container snapshot, i.e. saves the current container state,
+including its file system state, running processes state,
+and configuration file.
 
 If a container is running, and \fB--skip-suspend\fR option is not specified,
 a container is checkpointed and then restored, and CT memory dump becomes the
-part of snapshot. Otherwise, only file system state is saved.
+part of snapshot.
 
+Unless \fB--skip-config\fR option is given, container configuration file
+is saved to the snapshot.
+
+If \fIuuid\fR is not specified, it is auto-generated.
 Options \fB--name\fR and \fB--description\fR can be used to specify the
 snapshot name and description, respectively. Name is displayed by
 \fBsnapshot-list\fR.

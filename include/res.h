@@ -140,6 +140,7 @@ struct vzctl_snapshot_param {
 	char *name;
 	char *desc;
 #define SNAPSHOT_SKIP_SUSPEND	1 << 1
+#define SNAPSHOT_SKIP_CONFIG	1 << 2
 	int flags;
 };
 
