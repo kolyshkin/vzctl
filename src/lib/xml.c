@@ -413,7 +413,6 @@ int vzctl_read_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tree
 	ret = parse_xml(fname, root_element, tree);
 
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 
 	return ret;
 }
