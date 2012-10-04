@@ -822,7 +822,7 @@ snapshot name and description, respectively. Name is displayed by
 Switches the container to a snapshot identified by \fIuuid\fR.
 Note that the current container state and its file system state is lost!
 If given snapshot contains CT memory dump, it is restored, otherwise
-it is stopped.
+container is stopped.
 .TP 4
 \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 Removes a specified snapshot.
