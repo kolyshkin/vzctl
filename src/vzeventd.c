@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 	int daemonize = 1;
 	int opt, verbose = 0;
 
-	while ((opt = getopt(argc, argv, "dv")) != -1) {
+	while ((opt = getopt(argc, argv, "dvh")) != -1) {
 		switch (opt) {
 		case 'd':
 			daemonize = 0;
