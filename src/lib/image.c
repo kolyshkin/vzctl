@@ -416,22 +416,21 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 		return VZ_VE_PRIVATE_NOTSET;
 	}
 	GET_DISK_DESCRIPTOR(fname, ve_private);
-	ret = VZCTL_E_MERGE_SNAPSHOT;
 	if (ploop.read_disk_descr(&di, fname)) {
 		logger(-1, 0, "Failed to read %s", fname);
-		goto err;
+		return VZCTL_E_MERGE_SNAPSHOT;
 	}
 	param.guid = guid;
 	ret = ploop.merge_snapshot(di, &param);
 	if (ret) {
 		logger(-1, 0, "Failed to merge snapshot %s: %s [%d]",
 				guid, ploop.get_last_error(), ret);
-		goto err;
+		ret = VZCTL_E_MERGE_SNAPSHOT;
 	}
-err:
+
 	ploop.free_diskdescriptor(di);
 
-	return (ret = 0) ? 0: VZCTL_E_MERGE_SNAPSHOT;
+	return ret;
 }
 
 /* Convert a CT to ploop layout
