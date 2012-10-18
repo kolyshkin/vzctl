@@ -57,6 +57,7 @@ i.e. create, start, shutdown, set various options and limits etc.
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" %configure \
+	vzdir=%{_vzdir} \
 	--enable-bashcomp \
 	--enable-logrotate \
 	--disable-static
