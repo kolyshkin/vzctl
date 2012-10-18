@@ -58,7 +58,7 @@ typedef unsigned envid_t;
 #define ENV_PATH	"PATH=" DEF_PATH
 
 /* Defaults for checkpointing */
-#define DEF_DUMPDIR	"/vz/dump"
+#define DEF_DUMPDIR	VZDIR "/dump"
 #define DEF_DUMPFILE	"Dump.%d"
 
 /* CT states */
