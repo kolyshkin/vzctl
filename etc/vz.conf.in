@@ -1,7 +1,7 @@
 ## Global parameters
 VIRTUOZZO=yes
-LOCKDIR=/vz/lock
-DUMPDIR=/vz/dump
+LOCKDIR=@VZDIR@/lock
+DUMPDIR=@VZDIR@/dump
 VE0CPUUNITS=1000
 
 ## Logging parameters
@@ -28,11 +28,11 @@ NEIGHBOUR_DEVS=detect
 ERROR_ON_ARPFAIL="no"
 
 ## Template parameters
-TEMPLATE=/vz/template
+TEMPLATE=@VZDIR@/template
 
 ## Defaults for containers
-VE_ROOT=/vz/root/$VEID
-VE_PRIVATE=/vz/private/$VEID
+VE_ROOT=@VZDIR@/root/$VEID
+VE_PRIVATE=@VZDIR@/private/$VEID
 CONFIGFILE="basic" # Use vswap-256m on RHEL6 kernel
 DEF_OSTEMPLATE="centos-5"
 ## Filesystem layout for new CTs: either simfs (default) or ploop

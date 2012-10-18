@@ -28,7 +28,6 @@ noinst_HEADERS = $(wildcard include/*.h) \
 
 EXTRA_DIST = vzctl.spec include/version.h.in
 
-vzdir       = /vz
 vzcachedir  = $(vzdir)/template/cache
 vzlockdir   = $(vzdir)/lock
 vzdumpdir   = $(vzdir)/dump

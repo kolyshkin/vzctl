@@ -1,4 +1,4 @@
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-include $(top_srcdir)/paths.am
+include $(top_srcdir)/pathsubst.am
 
 SUBDIRS = \
 	bash_completion.d \
@@ -27,9 +27,8 @@ SUBDIRS = \
 	network-scripts \
 	udev
 
-pkgconf_DATA = vz.conf osrelease.conf download.conf
-
-EXTRA_DIST = $(pkgconf_DATA)
+pkgconf_DATA =  vz.conf osrelease.conf download.conf
+EXTRA_DIST = vz.conf.in osrelease.conf download.conf
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
