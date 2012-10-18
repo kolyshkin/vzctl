@@ -27,8 +27,6 @@ if ENABLE_UDEV
 udevdir     = $(sysconfdir)/udev/rules.d
 endif
 
-vzdir       = /vz
-
 initddir    = $(sysconfdir)/init.d
 netsdir     = $(sysconfdir)/sysconfig/network-scripts
 ifupdir     = $(sysconfdir)/network/if-up.d

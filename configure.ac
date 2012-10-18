@@ -1,4 +1,4 @@
-#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -188,6 +188,11 @@ AM_CONDITIONAL(HAVE_CGROUP, [test "x$with_cgroup" = "x+cgroup"])
 AC_SUBST(CGROUP_LIBS)
 AC_SUBST(CGROUP_CFLAGS)
 
+# A way to redefine /vz is ./configure vzdir=/some/dir
+AS_IF([test "x$vzdir" = "x"], vzdir=/vz)
+AC_ARG_VAR(vzdir, [Common prefix for a few OpenVZ-related directories,
+		   including VE_ROOT and VE_PRIVATE (default: /vz)])
+
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
@@ -199,6 +204,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
      prefix: $prefix
  sysconfdir: $sysconfdir
      libdir: $libdir
+      vzdir: $vzdir
    features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup
 "])
 
