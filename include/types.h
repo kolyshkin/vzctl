@@ -18,12 +18,11 @@
 #ifndef	_TYPES_H_
 #define	_TYPES_H_
 
-#define VZ_DIR			PKGCONFDIR "/"
-#define GLOBAL_CFG		VZ_DIR "vz.conf"
-#define OSRELEASE_CFG		VZ_DIR "osrelease.conf"
-#define VPS_CONF_DIR		VZ_DIR "conf/"
-#define DIST_DIR		VZ_DIR "dists"
-#define VENAME_DIR		VZ_DIR "names"
+#define GLOBAL_CFG		PKGCONFDIR "/vz.conf"
+#define OSRELEASE_CFG		PKGCONFDIR "/osrelease.conf"
+#define VPS_CONF_DIR		PKGCONFDIR "/conf/"
+#define DIST_DIR		PKGCONFDIR "/dists"
+#define VENAME_DIR		PKGCONFDIR "/names"
 
 #define VZCTLDEV		"/dev/vzctl"
 
