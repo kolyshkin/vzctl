@@ -652,15 +652,16 @@ a global value (\fBDISK_QUOTA\fR) from \fBvz.conf\fR(5) is used.
 Note that this parameter is ignored for \fBploop\fR layout.
 .TP
 \fB--diskspace\fR \fInum\fR[:\fInum\fR]
-For \fBsimfs\fR layout, sets soft and hard disk quota limits, in blocks.
-First parameter is soft limit,
-second is hard limit. One block is currently equal to 1Kb.
+For \fBsimfs\fR layout, sets soft and hard disk quota limits.
+First parameter is soft limit, second is hard limit.
 
-For \fBploop\fR layout, sets the size of the ploop image file, in
-kilobytes.
+For \fBploop\fR layout, initiates the procedure of resizing
+the ploop image file to the new size. Since there is no soft/hard
+limit concept in ploop, second \fInum\fR, if specified, is ignored.
 
 Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
 (see \fBResource limits\fR section for more info on suffixes).
+If suffix is not specified, value is in kilobytes.
 .TP
 \fB--diskinodes\fR \fInum\fR[:\fInum\fR]
 sets soft and hard disk quota limits, in i-nodes. First parameter is
