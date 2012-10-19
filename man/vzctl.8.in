@@ -868,9 +868,14 @@ parameter of \fBvz.conf\fR(5) and can be overwritten by \fB--layout\fR
 option. In case \fBploop\fR is used, one can additionally specify ploop
 disk image format after a colon. Possible ploop formats are \fBexpanded\fR,
 \fBplain\fR and \fBraw\fR. Default is \fBexpanded\fR.
-Using \fBraw\fR is not recommended and is not supported.
+Using value other than \fBexpanded\fR is not recommended and is currently
+not supported.
 
 You can use \fB--diskspace\fR option to specify container file system size.
+If DISKSPACE is not specified either in the sample configuration file used
+or in global configuration file \fBvz.conf\fR(5), this parameter
+is required for \fBploop\fR layout.
+
 Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
 (see \fBResource limits\fR section for more info on suffixes).
 
