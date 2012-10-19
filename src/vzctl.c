@@ -80,8 +80,7 @@ static void usage(int rc)
 "vzctl enter <ctid> [--exec <command> [arg ...]]\n"
 "vzctl exec | exec2 <ctid> <command> [arg ...]\n"
 "vzctl runscript <ctid> <script>\n"
-"vzctl chkpnt <ctid> [--dumpfile <name>]\n"
-"vzctl restore <ctid> [--dumpfile <name>]\n"
+"vzctl suspend | resume <ctid> [--dumpfile <name>]\n"
 "vzctl set <ctid> [--save] [--force] [--setmode restart|ignore]\n"
 "   [--ram <bytes>[KMG]] [--swap <bytes>[KMG]]\n"
 "   [--ipadd <addr>] [--ipdel <addr>|all] [--hostname <name>]\n"
@@ -209,10 +208,10 @@ int main(int argc, char *argv[], char *envp[])
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
 		quiet = 1;
-	} else if (!strcmp(argv[1], "chkpnt")) {
-		action = ACTION_CHKPNT;
-	} else if (!strcmp(argv[1], "restore")) {
-		action = ACTION_RESTORE;
+	} else if (!strcmp(argv[1], "suspend") || !strcmp(argv[1], "chkpnt")) {
+		action = ACTION_SUSPEND;
+	} else if (!strcmp(argv[1], "resume") || !strcmp(argv[1], "restore")) {
+		action = ACTION_RESUME;
 	} else if (!strcmp(argv[1], "quotaon")) {
 		action = ACTION_QUOTAON;
 	} else if (!strcmp(argv[1], "quotaoff")) {

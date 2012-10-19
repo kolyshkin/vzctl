@@ -21,12 +21,12 @@ _get_ves()
 			@SBINDIR@/vzlist -H -S -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -S -oname 2>/dev/null | $rm_empty
 			;;
-		stop|restart|enter|exec*|chkpnt)
+		stop|restart|enter|exec*|suspend|chkpnt)
 			# running CTs
 			@SBINDIR@/vzlist -H -octid 2>/dev/null
 			@SBINDIR@/vzlist -H -oname 2>/dev/null | $rm_empty
 			;;
-		restore)
+		resume|restore)
 			# suspended CTs
 			(@SBINDIR@/vzlist -HS -o status,ctid;
 			 @SBINDIR@/vzlist -HS -o status,name) 2>/dev/null | \
@@ -69,6 +69,7 @@ _vzctl()
 
 	local vzctl_common_opts="--quiet --verbose --help --version"
 	local vzctl_cmds="create destroy delete mount umount chkpnt restore \
+		suspend resume \
 		set start stop restart status quotaon quotaoff quotainit \
 		enter exec exec2 runscript console"
 	local vzctl_create_opts="--ostemplate --config --private --root \
@@ -275,7 +276,7 @@ _vzctl()
 					convert)
 						COMPREPLY=( $( compgen -W "$vzctl_convert_opts" -- $cur ) )
 						;;
-					chkpnt|restore)
+					suspend|resume|chkpnt|restore)
 						COMPREPLY=( $( compgen -W "--dumpfile" -- $cur ) )
 						;;
 					start)

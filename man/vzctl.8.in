@@ -26,7 +26,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --force
 .OP --fast
 .SY vzctl
-[\fIflags\fR] \fBchkpnt\fR | \fBrestore\fR
+[\fIflags\fR] \fBsuspend\fR | \fBresume\fR
 .OP --dumpfile name
 .SY vzctl
 [\fIflags\fR] \fBsnapshot\fR
@@ -779,19 +779,19 @@ Assigns I/O priority to container. \fIPriority\fR range is \fB0-7\fR.
 The greater \fIpriority\fR is, the more time for I/O activity container has.
 By default each container has \fIpriority\fR of \fB4\fR.
 
-.SS Checkpointing and restore
+.SS Suspending and resuming
 
 Checkpointing is a feature of OpenVZ kernel which allows to save a complete
-state of a running container, and to restore it later.
+in-kernel state of a running container, and to restore it later.
 .TP 4
-\fBchkpnt\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
-This command saves a complete state of a running container to a dump file,
-and stops the container. If an option \fB--dumpfile\fR is not set, default
+\fBsuspend\fR|\fBchkpnt\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
+This command suspends a container to a dump file
+If an option \fB--dumpfile\fR is not set, default
 dump file name \fB/vz/dump/Dump.\fICTID\fR is used.
 .TP 4
-\fBrestore\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
+\fBresume\fR|\fBrestore\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
 This command restores a container from the dump file created by the
-\fBchkpnt\fR command.
+\fBsuspend\fR command.
 
 .SS Snapshotting
 
@@ -936,7 +936,7 @@ Fifth word shows if the container is running,
 it can be either \fBrunning\fR or \fBdown\fR.
 
 Sixth word, if exists, is \fBsuspended\fR. It appears if
-a dump file exists for a stopped container (see \fBchkpnt\fR).
+a dump file exists for a stopped container (see \fBsuspend\fR).
 
 This command can also be usable from scripts.
 .IP "\fBmount\fR \fICTID\fR" 4
@@ -1118,9 +1118,9 @@ Container configuration file \fBctid.conf\fR(5) not found
 .IP 15
 Timeout on \fBvzctl exec\fR
 .IP 16
-Error during \fBvzctl chkpnt\fR
+Error during \fBvzctl suspend\fR
 .IP 17
-Error during \fBvzctl restore\fR
+Error during \fBvzctl resume\fR
 .IP 18
 Error from \fBsetluid()\fR syscall
 .IP 20

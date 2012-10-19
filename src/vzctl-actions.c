@@ -1258,10 +1258,10 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_CUSTOM:
 		ret = parse_custom_opt(veid, argc, argv, param, name);
 		break;
-	case ACTION_CHKPNT:
+	case ACTION_SUSPEND:
 		ret = parse_chkpnt_opt(argc, argv, param);
 		break;
-	case ACTION_RESTORE:
+	case ACTION_RESUME:
 		ret = parse_restore_opt(argc, argv, param);
 		break;
 	case ACTION_CONSOLE:
@@ -1413,10 +1413,10 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		if (ret && action == ACTION_EXEC)
 			ret = VZ_COMMAND_EXECUTION_ERROR;
 		break;
-	case ACTION_CHKPNT:
+	case ACTION_SUSPEND:
 		ret = chkpnt(h, veid, g_p, cmd_p);
 		break;
-	case ACTION_RESTORE:
+	case ACTION_RESUME:
 		ret = restore(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_RUNSCRIPT:
