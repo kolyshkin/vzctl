@@ -275,6 +275,31 @@ err:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
+/* Try to restore container from suspend if its private area exists
+ * and its default dump file exists. Otherwise return -1.
+ */
+static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
+		vps_param *cmd_p)
+{
+	char buf[STR_SIZE];
+	const char *private = g_p->res.fs.private;
+	char *dumpdir = g_p->res.cpt.dumpdir;
+
+	/* if private area exists */
+	if (!private || stat_file(private) != 1)
+		return -1;
+
+	/* if dump file exists */
+	get_dump_file(veid, dumpdir, buf, sizeof(buf));
+	if (stat_file(buf) != 1)
+		return -1;
+
+	/* Do restore */
+	cmd_p->res.cpt.dumpdir = dumpdir;
+
+	return vps_restore(h, veid, g_p, CMD_RESTORE, &cmd_p->res.cpt);
+}
+
 static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
@@ -290,9 +315,15 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
 	}
+	/* Try restore first */
+	ret = try_restore(h, veid, g_p, cmd_p);
+	if (ret != -1)
+		return ret;
+
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
 	ret = vps_start(h, veid, g_p,
 		cmd_p->opt.skip_setup == YES ? SKIP_SETUP : 0, &g_action);
+
 	return ret;
 }
 
