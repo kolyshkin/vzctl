@@ -72,6 +72,8 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 	return ret;
 }
 
+#define DELETED_STR	" (deleted)"
+
 static int umount_submounts(const char *root)
 {
 	FILE *fp;
@@ -93,8 +95,13 @@ static int umount_submounts(const char *root)
 	strcat(path, "/"); /* skip base mountpoint */
 	len = strlen(path);
 	while ((mnt = getmntent(fp)) != NULL) {
-		if (strncmp(path, mnt->mnt_dir, len) == 0)
-			add_str_param(&head, mnt->mnt_dir);
+		const char *p = mnt->mnt_dir;
+
+		if (strncmp(p, DELETED_STR, sizeof(DELETED_STR) - 1) == 0)
+			p += sizeof(DELETED_STR) - 1;
+
+		if (strncmp(path, p, len) == 0)
+			add_str_param(&head, p);
 	}
 	endmntent(fp);
 
