@@ -47,7 +47,7 @@ static int getlockpid(char *file)
 
 	if ((fd = open(file, O_RDONLY)) == -1)
 		return -1;
-	if ((len = read(fd, buf, sizeof(buf))) >= 0) {
+	if ((len = read(fd, buf, sizeof(buf) - 1)) >= 0) {
 		buf[len] = 0;
 		if (sscanf(buf, "%d", &pid) != 1) {
 			logger(1, 0, "Incorrect pid: %s in %s", buf, file);
