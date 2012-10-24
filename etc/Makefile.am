@@ -27,8 +27,9 @@ SUBDIRS = \
 	network-scripts \
 	udev
 
-pkgconf_DATA =  vz.conf osrelease.conf download.conf
 EXTRA_DIST = vz.conf.in osrelease.conf download.conf
+CLEANFILES = vz.conf
+pkgconf_DATA = $(EXTRA_DIST:%.in=%)
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(namesdir)
