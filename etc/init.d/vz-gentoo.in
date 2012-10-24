@@ -177,7 +177,7 @@ END { print num * 4; }' /proc/cpuinfo`
 }
 
 stop_ve() {
-	local veid velist msg m mounts fail i iter pid pids quota
+	local veid velist i iter pid pids
 
 	if [ -f ${VESTAT} ]; then
 		get_parallel
@@ -207,9 +207,12 @@ stop_ve() {
 			done
 		done
 	fi
+}
 
-	iter=0
-	fail=1
+umount_ve() {
+	local iter=0
+	local fail=1
+	local m mounts msg quota
 
 	while [ ${iter} -lt 5 -a ${fail} -ne 0 ]; do
 		fail=0
@@ -316,6 +319,7 @@ stop() {
 	local mod
 
 	stop_ve
+	umount_ve
 	umount_cgroups
 	stop_net
 

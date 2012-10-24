@@ -324,12 +324,7 @@ stop_ves()
 {
 	local veid
 	local velist
-	local msg
-	local m
-	local mounts
-	local fail
 	local iter
-	local quota
 	local pids
 
 	if get_veinfo; then
@@ -359,8 +354,15 @@ stop_ves()
 			done
 		done
 	fi
-	iter=0
-	fail=1
+}
+
+umount_ves()
+{
+	local iter=0
+	local fail=1
+	local m mounts msg quota
+
+	# umount all simfs mounts
 	while test $iter -lt 5 -a $fail -ne 0; do
 		fail=0
 		mounts=`awk '{if ($3=="simfs") print $2}' /proc/mounts`
@@ -496,6 +498,7 @@ stop()
 	fi
 
 	stop_ves
+	umount_ves
 	umount_cgroups
 	stop_net
 	__echo "Stopping OpenVZ: "
