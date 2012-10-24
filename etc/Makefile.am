@@ -27,7 +27,7 @@ SUBDIRS = \
 	network-scripts \
 	udev
 
-EXTRA_DIST = vz.conf.in osrelease.conf download.conf
+EXTRA_DIST = vz.conf.in osrelease.conf download.conf oom-groups.conf
 CLEANFILES = vz.conf
 pkgconf_DATA = $(EXTRA_DIST:%.in=%)
 

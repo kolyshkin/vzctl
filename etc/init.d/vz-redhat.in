@@ -476,6 +476,10 @@ start()
 		fi
 	fi
 
+	__echo "Applying OOM adjustments: "
+	cat /etc/vz/oom-groups.conf > /proc/vz/oom_score_adj
+	print_result
+
 	start_net
 	setup_ve0
 	modify_vzconf
