@@ -179,34 +179,36 @@ END { print num * 4; }' /proc/cpuinfo`
 stop_ve() {
 	local veid velist i iter pid pids
 
-	if [ -f ${VESTAT} ]; then
-		get_parallel
-		for ((i = 0; i <= 2; i++)); do
-			iter=0
-			pids=
-			velist=$(vzlist -o ctid -sbootorder)
-			for veid in ${velist}; do
-				ebegin "Shutting down CT $veid"
-				# Set fairsched parameters to maximum so
-				# CT will stop fast
-				${VZCTL} set ${veid} --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
-				${VZCTL} --skiplock stop ${veid} >/dev/null 2>&1 &
-				pids="${pids} $!"
-				let iter++
-				if [ ${iter} -gt ${PARALLEL} ]; then
-					for pid in ${pids}; do
-						wait ${pid}
-					done
-					pids=
-					iter=0
-				fi
-			done
-
-			for pid in ${pids}; do
-				wait ${pid}
-			done
-		done
+	if [ ! -f ${VESTAT} ]; then
+		return
 	fi
+
+	get_parallel
+	for ((i = 0; i <= 2; i++)); do
+		iter=0
+		pids=
+		velist=$(vzlist -o ctid -sbootorder)
+		for veid in ${velist}; do
+			ebegin "Shutting down CT $veid"
+			# Set fairsched parameters to maximum so
+			# CT will stop fast
+			${VZCTL} set ${veid} --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
+			${VZCTL} --skiplock stop ${veid} >/dev/null 2>&1 &
+			pids="${pids} $!"
+			let iter++
+			if [ ${iter} -gt ${PARALLEL} ]; then
+				for pid in ${pids}; do
+					wait ${pid}
+				done
+				pids=
+				iter=0
+			fi
+		done
+
+		for pid in ${pids}; do
+			wait ${pid}
+		done
+	done
 }
 
 umount_ve() {
