@@ -322,10 +322,7 @@ start_ves()
 
 stop_ves()
 {
-	local veid
-	local velist
-	local iter
-	local pids
+	local veid velist i iter pid pids
 
 	if ! get_veinfo; then
 		return
