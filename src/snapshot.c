@@ -115,7 +115,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		vzctl_get_snapshot_ve_conf(fs->private, guid,
 				snap_ve_conf, sizeof(snap_ve_conf));
 		make_dir(snap_ve_conf, 0);
-		if (cp_file(snap_ve_conf, tmp))
+		if (cp_file(snap_ve_conf, fname))
 			goto err1;
 	}
 
