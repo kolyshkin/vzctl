@@ -296,6 +296,45 @@ static int conf_parse_bitmap(unsigned long **dst, int nmaskbits,
 	return 0;
 }
 
+#define UUID_LEN 36
+/* Check for valid GUID, add curly brackets if necessary:
+ *	fbcdf284-5345-416b-a589-7b5fcaa87673 ->
+ *	{fbcdf284-5345-416b-a589-7b5fcaa87673}
+ */
+static int conf_parse_guid(char **dst, const char *val)
+{
+	int i;
+	char guid[UUID_LEN + 4];
+	const char *in;
+	char *out;
+
+	in = (val[0] == '{') ? val + 1 : val;
+	guid[0] = '{';
+	out = guid + 1;
+
+	for (i = 0; i < UUID_LEN; i++) {
+		if (in[i] == '\0')
+			break;
+		if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) {
+			if (in[i] != '-' )
+				break;
+		} else if (!isxdigit(in[i])) {
+			break;
+		}
+		out[i] = in[i];
+	}
+	if (i < UUID_LEN)
+		return ERR_INVAL;
+	if (in[UUID_LEN] != '\0' &&
+			(in[UUID_LEN] != '}' || in[UUID_LEN + 1] != '\0'))
+		return ERR_INVAL;
+
+	out[UUID_LEN] = '}';
+	out[UUID_LEN+1] = '\0';
+
+	return conf_parse_str(dst, guid);
+}
+
 static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val,
 		int allow_empty)
 {
@@ -2182,7 +2221,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = conf_parse_ulong(&vps_p->res.misc.bootorder, val);
 		break;
 	case PARAM_SNAPSHOT_GUID:
-		ret = conf_parse_str(&vps_p->snap.guid, val);
+		ret = conf_parse_guid(&vps_p->snap.guid, val);
 		break;
 	case PARAM_SNAPSHOT_NAME:
 		ret = conf_parse_str(&vps_p->snap.name, val);
