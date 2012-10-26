@@ -255,8 +255,8 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	/* restore ve.conf */
 	vzctl_get_snapshot_ve_conf(fs->private, guid, fname, sizeof(fname));
 	if (stat_file(fname)) {
-		get_vps_conf_path(veid, fname, sizeof(fname) - 4);
-		strcat(fname, ".tmp");
+		get_vps_conf_path(veid, ve_conf_tmp, sizeof(ve_conf_tmp) - 4);
+		strcat(ve_conf_tmp, ".tmp");
 		if (cp_file(ve_conf_tmp, fname))
 			goto err2;
 	}
