@@ -64,7 +64,7 @@ SELF=$(basename $0)
 
 usage()
 {
-	cat << -EOF- 1>&2
+	cat << =EOF= 1>&2
 Usage:
   $SELF [option ...] template [template ...]
   $SELF --config | --help | --list
@@ -76,7 +76,7 @@ Options:
   --help		Print this help
 Arguments:
   template		An OS template name (like centos-6-x86_64)
--EOF-
+=EOF=
 	exit $1
 }
 
@@ -95,13 +95,13 @@ gpg_working()
 	# ... and our key is there
 	if ! gpg -k "$GPG_KEY" >/dev/null 2>&1; then
 		CHECK_TEMPLATE_SIG=no
-		cat << -EOF- 1>&2
+		cat << =EOF= 1>&2
 
 $SELF WARNING: no public gpg key $GPG_KEY found,
 disabling signature check. To import the public key, see
 http://wiki.openvz.org/Package_signatures#Importing_the_public_key
 
--EOF-
+=EOF=
 		return 2
 	fi
 }
@@ -112,7 +112,7 @@ show_config()
 
 	gpg_working
 
-	cat << -EOF-
+	cat << =EOF=
 Current $SELF configuration is below. Defaults are built-in and can be
 overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
 
@@ -123,7 +123,7 @@ overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
 * Prefix to template cache repository URL (\$TMPL_REPO_PREFIX):
   $TMPL_REPO_PREFIX
 * List of template URLs to try (\$TEMPLATE_REPOS):
--EOF-
+=EOF=
 
 	for url in $TEMPLATE_REPOS; do
 		echo "  ${url}"
