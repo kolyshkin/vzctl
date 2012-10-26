@@ -20,6 +20,9 @@ while test -n "$1"; do
 	   -v|--verbose)
 		verbose=yes
 		;;
+	   -c|--clean)
+		clean=yes
+		;;
 	   *)
 		echo "Invalid argument: $1" 1>&2
 		exit 1
@@ -47,6 +50,13 @@ read_spec() {
 	SPEC_VR="${SPEC_V}-${SPEC_R}"
 }
 read_spec
+
+# Store original spec and configure.in
+if test "$clean" = "yes"; then
+	cp -a $RPM_SPEC .$RPM_SPEC.$$
+	cp -a $CONFIGURE_AC .$CONFIGURE_AC.$$
+	trap "cp -a .$RPM_SPEC.$$ $RPM_SPEC; cp -a .$CONFIGURE_AC.$$ $CONFIGURE_AC" EXIT
+fi
 
 # Set version/release in spec from git
 if test "$GIT_VR" != "$SPEC_VR"; then
