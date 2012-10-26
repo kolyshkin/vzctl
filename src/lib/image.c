@@ -295,7 +295,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 {
 	int ret;
 	struct ploop_disk_images_data *di;
-	struct ploop_resize_param param;
+	struct ploop_resize_param param = {};
 	char fname[PATH_MAX];
 
 	if (!is_ploop_supported())
