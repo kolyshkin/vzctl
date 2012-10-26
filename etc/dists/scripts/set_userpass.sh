@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ CFGFILE="/etc/passwd"
 set_serrpasswd()
 {
 	local userpw="$1"
-	local user=${userpw/:*/}
-	local passwd=${userpw:${#user}+1}
+	local user=$(echo $userpw | sed 's/:.*$//')
+	local passwd=$(echo $userpw | sed 's/^[^:]*://')
 
 	if [ -z "${user}" -o  -z "${passwd}" ]; then
 		exit $VZ_CHANGEPASS
