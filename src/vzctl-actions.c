@@ -295,6 +295,7 @@ static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
 		return -1;
 
 	/* Do restore */
+	logger(0, 0, "Dump file %s exists, trying to restore from it", buf);
 	cmd_p->res.cpt.dumpdir = dumpdir;
 
 	return vps_restore(h, veid, g_p, CMD_RESTORE, &cmd_p->res.cpt);
