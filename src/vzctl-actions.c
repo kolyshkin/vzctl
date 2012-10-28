@@ -317,7 +317,7 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	}
 	/* Try restore first */
 	ret = try_restore(h, veid, g_p, cmd_p);
-	if (ret != -1)
+	if (ret == 0)
 		return ret;
 
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
