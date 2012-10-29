@@ -301,6 +301,7 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 {
 	int ret;
 	const char *private = g_p->res.fs.private;
+	skipFlags skip = SKIP_NONE;
 
 	if (g_p->opt.start_disabled == YES &&
 		cmd_p->opt.start_force != YES)
@@ -327,9 +328,10 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (ret == 0)
 		return ret;
 
+	if (cmd_p->opt.skip_setup == YES)
+		skip |= SKIP_SETUP;
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
-	ret = vps_start(h, veid, g_p,
-		cmd_p->opt.skip_setup == YES ? SKIP_SETUP : 0, &g_action);
+	ret = vps_start(h, veid, g_p, skip, &g_action);
 
 	return ret;
 }
