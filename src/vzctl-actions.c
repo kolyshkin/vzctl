@@ -293,7 +293,8 @@ static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	logger(0, 0, "Dump file %s exists, trying to restore from it", buf);
 	cmd_p->res.cpt.dumpdir = dumpdir;
 
-	return vps_restore(h, veid, g_p, CMD_RESTORE, &cmd_p->res.cpt);
+	return vps_restore(h, veid, g_p, CMD_RESTORE, &cmd_p->res.cpt,
+			SKIP_UMOUNT);
 }
 
 static int start(vps_handler *h, envid_t veid, vps_param *g_p,
@@ -327,7 +328,8 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	ret = try_restore(h, veid, g_p, cmd_p);
 	if (ret == 0)
 		return ret;
-
+	if (ret != -1) /* We tried to restore */
+		skip |= SKIP_REMOUNT; /* Do not remount just mounted fs */
 	if (cmd_p->opt.skip_setup == YES)
 		skip |= SKIP_SETUP;
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
@@ -1198,7 +1200,7 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (cmd == CMD_KILL || cmd == CMD_RESUME)
 		return cpt_cmd(h, veid, g_p->res.fs.root,
 				CMD_RESTORE, cmd, cmd_p->res.cpt.ctx);
-	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt);
+	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt, SKIP_NONE);
 }
 
 static int show_status(vps_handler *h, envid_t veid, vps_param *param)
