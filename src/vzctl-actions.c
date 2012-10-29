@@ -275,19 +275,14 @@ err:
 	return VZ_INVALID_PARAMETER_SYNTAX;
 }
 
-/* Try to restore container from suspend if its private area exists
- * and its default dump file exists. Otherwise return -1.
+/* Try to restore container from suspend if its default dump file exists.
+ * Otherwise return -1.
  */
 static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
 		vps_param *cmd_p)
 {
 	char buf[STR_SIZE];
-	const char *private = g_p->res.fs.private;
 	char *dumpdir = g_p->res.cpt.dumpdir;
-
-	/* if private area exists */
-	if (!private || stat_file(private) != 1)
-		return -1;
 
 	/* if dump file exists */
 	get_dump_file(veid, dumpdir, buf, sizeof(buf));
@@ -305,6 +300,7 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
 	int ret;
+	const char *private = g_p->res.fs.private;
 
 	if (g_p->opt.start_disabled == YES &&
 		cmd_p->opt.start_force != YES)
@@ -312,6 +308,16 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 		logger(-1, 0, "Container start disabled");
 		return VZ_VE_START_DISABLED;
 	}
+
+	if (check_var(private, "VE_PRIVATE is not set"))
+		return VZ_VE_PRIVATE_NOTSET;
+
+	if (stat_file(private) != 1) {
+		logger(-1, 0, "Container private area %s does not exist",
+				private);
+		return VZ_FS_NOPRVT;
+	}
+
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
