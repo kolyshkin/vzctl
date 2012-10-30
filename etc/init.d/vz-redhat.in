@@ -291,8 +291,11 @@ start_ves()
 	local need_restart
 
 	need_restart=""
-	velist=$(vzlist -aH -octid,onboot -s-bootorder |
-		awk '$2 == "yes" {print $1}')
+	# List CTs from vzrebootdir plus the ones with ONBOOT=yes
+	velist=$(ls $VZREBOOTDIR;
+		vzlist -aH -octid,onboot | awk '$2 == "yes" {print $1}')
+	# Then sort by bootorder
+	velist=$(vzlist -aH -octid -s-bootorder $velist)
 	sysctl -q -w net.ipv4.route.src_check=0
 	for veid in $velist; do
 		[ "${veid}" = "0" ] && continue
@@ -307,6 +310,7 @@ start_ves()
 				fi
 			fi
 		fi
+		rm -f $VZREBOOTDIR/$veid
 		msg=`$VZCTL start ${veid} 2>&1`
 		print_result "$msg"
 	done
@@ -333,6 +337,8 @@ stop_ves()
 	for veid in $velist; do
 		# Equalize cpuunits for all CTs
 		$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
+		# Save to vzreboot list
+		touch $VZREBOOTDIR/$veid
 	done
 
 	get_parallel

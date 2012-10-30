@@ -40,3 +40,4 @@ scriptdir   = $(pkglibexecdir)/scripts
 modulesdir  = $(pkglibexecdir)/modules
 
 veipdumpdir = $(localstatedir)/lib/vzctl/veip
+vzrebootdir = $(localstatedir)/lib/vzctl/vzreboot

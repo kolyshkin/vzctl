@@ -24,6 +24,7 @@ pathsubst_RULES = \
 	s!@'PKGDATADIR'@!$(pkgdatadir)!g; \
 	s!@'SCRIPTDIR'@!$(scriptdir)!g; \
 	s!@'VEIPDUMPDIR'@!$(veipdumpdir)!g; \
+	s!@'VZREBOOTDIR'@!$(vzrebootdir)!g; \
 	s!@'VZDIR'@!$(vzdir)!g;
 
 pathsubst = sed -e '$(pathsubst_RULES)'

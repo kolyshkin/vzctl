@@ -42,6 +42,7 @@ install-data-local:
 	$(mkinstalldirs) -m 700 $(DESTDIR)$(vzprivdir)
 	$(mkinstalldirs) -m 700 $(DESTDIR)$(vzrootdir)
 	$(mkinstalldirs) $(DESTDIR)$(veipdumpdir)
+	$(mkinstalldirs) $(DESTDIR)$(vzrebootdir)
 	$(mkinstalldirs) $(DESTDIR)$(modulesdir)
 
 DISTRO_TARGETS = \

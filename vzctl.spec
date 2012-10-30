@@ -6,6 +6,7 @@
 %define _rootdir %{_vzdir}/root
 %define _cachedir %{_vzdir}/template/cache
 %define _veipdir /var/lib/vzctl/veip
+%define _vzrebootdir /var/lib/vzctl/vzreboot
 %define _pkglibdir %_libexecdir/vzctl
 %define _scriptdir %_pkglibdir/scripts
 %define _configdir %_sysconfdir/vz
@@ -187,6 +188,7 @@ OpenVZ containers control utility core package
 %dir %attr(700,root,root) %{_rootdir}
 %dir %attr(755,root,root) %{_cachedir}
 %dir %attr(755,root,root) %{_veipdir}
+%dir %attr(755,root,root) %{_vzrebootdir}
 %dir %attr(755,root,root) %{_configdir}
 %dir %attr(755,root,root) %{_namesdir}
 %dir %attr(755,root,root) %{_vpsconfdir}
