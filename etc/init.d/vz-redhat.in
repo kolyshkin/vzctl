@@ -328,6 +328,13 @@ stop_ves()
 		return
 	fi
 
+	# Pre-stop stage
+	velist=$(vzlist -1)
+	for veid in $velist; do
+		# Equalize cpuunits for all CTs
+		$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
+	done
+
 	get_parallel
 	stages="suspend stop"
 	for stage in $stages; do
@@ -345,9 +352,10 @@ stop_ves()
 			velist=$(vzlist -H -o ctid -sbootorder)
 			for veid in $velist; do
 				echo $msg $veid
-				# Set fairsched parameters to maximum so
-				# CT will stop fast
-				$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
+				if [ "$stage" = "stop" ]; then
+					# Unset cpulimit for CT to stop fast
+					$VZCTL set $veid --cpulimit 0 >/dev/null 2>&1
+				fi
 				$VZCTL --skiplock $stage $veid >/dev/null 2>&1 &
 				pids="$pids $!"
 				iter=$(($iter+1))
