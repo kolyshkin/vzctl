@@ -33,7 +33,6 @@ vzlockdir   = $(vzdir)/lock
 vzdumpdir   = $(vzdir)/dump
 vzprivdir   = $(vzdir)/private
 vzrootdir   = $(vzdir)/root
-veipdumpdir = $(localstatedir)/lib/vzctl/veip
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(vzdir)

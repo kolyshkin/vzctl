@@ -38,3 +38,5 @@ namesdir    = $(pkgconfdir)/names
 
 scriptdir   = $(pkglibexecdir)/scripts
 modulesdir  = $(pkglibexecdir)/modules
+
+veipdumpdir = $(localstatedir)/lib/vzctl/veip
