@@ -188,10 +188,10 @@ stop_ve() {
 	for stage in $stages; do
 		case $stage in
 			suspend)
-				msg='Suspending CT $veid'
+				msg='Suspending CT'
 				;;
 			stop)
-				msg='Shutting down CT $veid'
+				msg='Shutting down CT'
 				;;
 		esac
 		for ((i = 0; i <= 2; i++)); do
@@ -199,7 +199,7 @@ stop_ve() {
 			pids=
 			velist=$(vzlist -o ctid -sbootorder)
 			for veid in ${velist}; do
-				ebegin $msg
+				ebegin "$msg $veid"
 				# Set fairsched parameters to maximum so
 				# CT will stop fast
 				${VZCTL} set ${veid} --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
