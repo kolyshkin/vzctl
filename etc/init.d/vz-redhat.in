@@ -333,7 +333,7 @@ stop_ves()
 	fi
 
 	# Pre-stop stage
-	velist=$(vzlist -1)
+	velist=$(vzlist -1 2>/dev/null)
 	for veid in $velist; do
 		# Equalize cpuunits for all CTs
 		$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
@@ -355,7 +355,7 @@ stop_ves()
 		for i in 0 1 2; do
 			iter=0;
 			pids=
-			velist=$(vzlist -H -o ctid -sbootorder)
+			velist=$(vzlist -H -o ctid -sbootorder 2>/dev/null)
 			for veid in $velist; do
 				echo $msg $veid
 				if [ "$stage" = "stop" ]; then
