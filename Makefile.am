@@ -71,7 +71,7 @@ install-data-hook:
 	@echo "	Please invoke make with the target for your distribution!"
 	@echo "	*********************************************************"
 
-rpms: dist
+rpms: dist-bzip2
 	cp $(distdir).tar.bz2 `rpm --eval %_sourcedir`
 	rpmbuild -ba vzctl.spec
 
