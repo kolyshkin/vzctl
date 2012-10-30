@@ -322,7 +322,7 @@ start_ves()
 
 stop_ves()
 {
-	local veid velist i iter pid pids
+	local veid velist i iter pid pids msg stage stages
 
 	if ! get_veinfo; then
 		return
