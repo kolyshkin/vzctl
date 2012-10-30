@@ -640,8 +640,9 @@ err:
 	free_dist_actions(&actions);
 	if (ret) {
 		/* Kill environment */
-		logger(-1, 0, "Container start failed (try to check kernel "
-				"messages, e.g. \"dmesg | tail\")");
+		logger(-1, 0, "Container %s failed (try to check kernel "
+				"messages, e.g. \"dmesg | tail\")",
+				(fn) ? "restore" : "start");
 		/* Close wait fd without writing anything to it
 		 * to signal the child that we have failed to configure
 		 * the environment, so it should not start /sbin/init
@@ -672,7 +673,8 @@ err:
 			if (ret == VZ_FS_BAD_TMPL)
 				logger(-1, 0, "Unable to start init, probably"
 					" incorrect template");
-			logger(-1, 0, "Container start failed");
+			logger(-1, 0, "Container %s failed",
+					(fn) ? "restore" : "start");
 		}
 	}
 	if (ret) {
