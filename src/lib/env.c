@@ -556,7 +556,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	free(dist_name);
 	if (ret)
 		return ret;
-	logger(0, 0, "Starting container ...");
+
 	if (!(skip & SKIP_REMOUNT)) {
 		/* if CT is mounted -- umount first, to cleanup mount state */
 		if (vps_is_mounted(res->fs.root, res->fs.private)) {
@@ -705,6 +705,7 @@ err:
 int vps_start(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *mod)
 {
+	logger(0, 0, "Starting container...");
 	return vps_start_custom(h, veid, param, skip, mod, NULL, NULL);
 }
 
