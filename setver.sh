@@ -29,8 +29,9 @@ done
 
 test "$build" = "yes" && clean="yes"
 
+NAME=vzctl
 CONFIGURE_AC=configure.ac
-RPM_SPEC=vzctl.spec
+RPM_SPEC=${NAME}.spec
 
 # Try to figure out version from git
 GIT_DESC=$(git describe --tags | sed s'/^[^0-9]*-\([0-9].*\)$/\1/')
@@ -81,7 +82,7 @@ SPEC_VR=$(echo $SPEC_VR | sed 's/-1$//')
 if test "$CONF_V" != "$SPEC_VR"; then
 	test -z "$verbose" || echo "Changing $CONFIGURE_AC:"
 	# AC_INIT(vzctl, 3.0.28, devel@openvz.org)
-	sed -i "s/^\(AC_INIT(vzctl,[ ]\)[^,]*\(,.*\$\)/\1$SPEC_VR\2/" \
+	sed -i "s/^\(AC_INIT(${NAME},[ ]\)[^,]*\(,.*\$\)/\1$SPEC_VR\2/" \
 		$CONFIGURE_AC
 	autoconf
 fi
@@ -92,5 +93,5 @@ test "$build" = "yes" || exit 0
 make rpms || exit 1
 
 test -z "$install" && exit 0
-sudo rpm -${install}hv $(rpm --eval %{_rpmdir}/%{_arch})/vzctl-*${GIT_VR}*.rpm
+sudo rpm -${install}hv $(rpm --eval %{_rpmdir}/%{_arch})/${NAME}-*${GIT_VR}*.rpm
 
