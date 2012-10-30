@@ -51,8 +51,8 @@ create_prvt()
 		' 42 5a') # bzip2
 			OPT=-j
 			# No way to get uncompressed size, so guess
-			NEEDED="$(ls -lk "$PRIVATE_TEMPLATE" | \
-				awk 'END {print int($5*3)}')"
+			NEEDED="$(ls -l "$PRIVATE_TEMPLATE" | \
+				awk 'END {print int($5/1024*3)}')"
 			;;
 		' fd 37') # xz
 			OPT=-J
@@ -61,15 +61,15 @@ create_prvt()
 				awk 'END {print int($5/1024)}')"
 			# Not all xz versions implement -l, so guess
 			if [ "$NEEDED" = "0" ] ; then
-				NEEDED="$(ls -lk "$PRIVATE_TEMPLATE" | \
-					awk 'END {print int($5*4.7)}')"
+				NEEDED="$(ls -l "$PRIVATE_TEMPLATE" | \
+					awk 'END {print int($5/1024*4.7)}')"
 			fi
 
 			;;
 	esac
 	# For the uncompressed case
 	if [ -z "$NEEDED" ] ; then
-		NEEDED="$(ls -lk "$PRIVATE_TEMPLATE" | awk 'END {print $5}')"
+		NEEDED="$(ls -l "$PRIVATE_TEMPLATE" | awk 'END {print $5/1024}')"
 	fi
 
 	[ "$AVAIL" -ge "$NEEDED" ] ||
