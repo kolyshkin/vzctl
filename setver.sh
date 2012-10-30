@@ -55,7 +55,7 @@ read_spec
 if test "$clean" = "yes"; then
 	cp -a $RPM_SPEC .$RPM_SPEC.$$
 	cp -a $CONFIGURE_AC .$CONFIGURE_AC.$$
-	trap "cp -a .$RPM_SPEC.$$ $RPM_SPEC; cp -a .$CONFIGURE_AC.$$ $CONFIGURE_AC" EXIT
+	trap "mv -f .$RPM_SPEC.$$ $RPM_SPEC; mv -f .$CONFIGURE_AC.$$ $CONFIGURE_AC" EXIT
 fi
 
 # Set version/release in spec from git
