@@ -57,13 +57,14 @@ IPADDR=127.0.0.1" > ${IFCFG} ||
 	if [ ! -f ${HOSTFILE} ]; then
 		echo "127.0.0.1 localhost.localdomain localhost" > $HOSTFILE
 	fi
-	if [ -n "${IP_ADDR}" ]; then
+	# Set default route to venet0 only if there are IPs
+	# and there is no other default route
+	rm -f ${ROUTES}
+	if [ -n "${IP_ADDR}" ] && ! grep -qw ^default ${IFCFG_DIR}/ifroute-*; then
 		cat << EOF > ${ROUTES}
 default - - ${VENET_DEV}
 default :: - ${VENET_DEV}
 EOF
-	else
-		> ${ROUTES}
 	fi
 	fix_ifup_route
 }
