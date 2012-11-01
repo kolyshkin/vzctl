@@ -20,6 +20,9 @@ while test -n "$1"; do
 	   -v|--verbose)
 		verbose=yes
 		;;
+	   -o|--oldpackage)
+		oldpackage="--oldpackage"
+		;;
 	   *)
 		echo "Invalid argument: $1" 1>&2
 		exit 1
@@ -96,7 +99,8 @@ make rpms || exit 1
 test "$clean" = "yes" && rm -f ${NAME}-${GIT_VR}.tar.bz2
 
 test -z "$install" && exit 0
-sudo rpm -${install}hv $(rpm --eval %{_rpmdir}/%{_arch})/${NAME}-*${GIT_VR}*.rpm
+sudo rpm -${install}hv $oldpackage \
+	$(rpm --eval %{_rpmdir}/%{_arch})/${NAME}-*${GIT_VR}*.rpm
 
 # Remove rpms
 if test "$clean" = "yes"; then
