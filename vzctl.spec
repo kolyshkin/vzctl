@@ -22,7 +22,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.0
+Version: 4.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPL
@@ -238,6 +238,56 @@ OpenVZ containers control utility core package
 %config %{_vpsconfdir}/0.conf
 
 %changelog
+* Thu Nov  1 2012 Kir Kolyshkin <kir@openvz.org> - 4.1-1
+- New features
+- * etc/init.d/vz: restore running containers after reboot (#781)
+- * etc/init.d/vz: faster restart by doing CT suspend instead of stop (#2325)
+- * vzctl start: try to restore CT first if default dump file exists
+- * Add OOM adjustments configuration (see /etc/vz/oom-groups.conf)
+- * If a CT is locked, show pid and cmdline of a locker
+- * vzctl snapshot: add --skip-config option
+- * vzctl: add 'suspend' and 'resume' aliases (for 'chkpnt' and 'restore')
+- Fixes
+- * vzctl snapshot: fix storing CT config file
+- * vzctl snapshot-switch: fix restoring CT config file
+- * vps-create: fix checking needed disk space (#2413)
+- * vzctl set --mount_opts: fix a segfault (#2385)
+- * suse-add_ip.sh: only set default route if there is no other (#2376)
+- * set_userpass.sh: fix a bashism (#2403)
+- * etc/init.d/vz*: eliminate "Container(s) not found" msg
+- * etc/init.d/vz*: fix vzlist invocation in stop_ve(s)
+- * etc/init.d/vz-redhat: mark more local vars as such
+- * vzctl_resize_image(): initialize ploop_resize_param
+- * getlockpid(): fix potential buffer overflow
+- * Do not call xmlCleanupParser() from vzctl
+- * Fixed compilation with libcgroup-0.37-r2 (#2370)
+- * Properly return errors in cgroup_init() (#2372)
+- * Print failures in ct_do_open directly to stderr
+- * vzeventd: do process -h option
+- Improvements
+- * etc/init.d/vz* stop: set cpuunits for all CTs at once
+- * vzctl snapshot*: improve --id parameter parsing
+- * vzctl umount: handle the case when CT have deleted mount points
+- * vzevent-stop: add workaround for Fedora 17 reboot problem (#2336)
+- * vzctl restore: do not print "Starting container"
+- * vzctl restore: print 'restore failed' not 'start failed'
+- * scripts/vps-download: fix bogus warning from checkbashisms
+- * vzctl_merge_snapshot(): simplify return code handling
+- * Simplify ct_chroot() (no need to umount each mount point)
+- Documentation
+- * vzctl(8): improved vzctl create --layout/--diskspace description
+- * vzctl(8): improve --diskspace description
+- * vzctl(8): disambiguate 'it' in snapshot-switch description
+- Build system
+- * configure: add ability to alter /vz path (#421)
+- * src/Makefile.am: fix building with builddir != srcdir (#2375)
+- * Makefile.am: use AM_CPPFLAGS (not AM_CFLAGS)
+- * properly propagate /var/lib/vzctl/veip dir
+- * setver.sh: restore original configure.ac and vzctl.spec if building
+- * setver.sh: clean up dist tarball (if building) and rpms (if installing)
+- * setver.sh: add -o|--oldpackage option
+- * other minor improvements
+
 * Tue Sep 25 2012 Kir Kolyshkin <kir@openvz.org> - 4.0-1
 - New features
 - * Ability to work with non-openvz kernel (experimental,
