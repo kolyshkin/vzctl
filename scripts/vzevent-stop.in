@@ -49,6 +49,19 @@ while vzctl --quiet status $VEID | fgrep -w running; do
 	test $I -gt 10 && exit 1
 done
 
+# Workaround for Fedora 17, see http://bugzilla.openvz.org/2336
+# If $VE_ROOT/reboot file is present, rm it and restart CT
+(
+	. @PKGCONFDIR@/vz.conf
+	. $CONF_DIR/$VEID.conf
+	test -f $VE_ROOT/reboot || exit 0
+	$(awk '$2 == "'$VE_ROOT'" && $4 !~ "^rw" {
+		print "mount -oremount,rw",$1,$2}' /proc/mounts)
+	rm -f $VE_ROOT/reboot
+	exit 111
+)
+test $? -eq 111 && exec vzctl --quiet start $VEID
+
 if vzctl --quiet status $VEID | fgrep -w mounted; then
 	vzctl --quiet umount $VEID
 fi
