@@ -732,6 +732,9 @@ static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
 		return ret;
 	}
 
+	/* Disable fsync. The fsync will be done by umount() */
+	write_val("/proc/sys/fs/fsync-enable", "0");
+
 	switch (stop_mode) {
 		case M_REBOOT:
 		{
