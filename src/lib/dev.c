@@ -41,6 +41,7 @@ static int dev_create(const char *root, dev_res *dev)
 	char buf2[STR_SIZE];
 	struct stat st, st2;
 	const char* udev_paths[] = {
+		"/usr/lib/udev/devices",
 		"/lib/udev/devices",
 		"/etc/udev/devices",
 		NULL};
