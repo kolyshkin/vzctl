@@ -172,16 +172,20 @@ int vz_chroot(const char *root)
 	return 0;
 }
 
-static int configure_sysctl()
+static int write_val(const char *file, const char *val)
 {
-	int fd;
+	int fd, len, ret = -1;
 
-	fd = open("/proc/sys/net/ipv6/conf/all/forwarding", O_WRONLY);
+	len = strlen(val);
+
+	fd = open(file, O_WRONLY);
 	if (fd == -1)
-		return -1;
-	write(fd, "0", 1);
+		return ret;
+	if (write(fd, val, len) == len)
+		ret = 0;
 	close(fd);
-	return 0;
+
+	return ret;
 }
 
 static int set_personality(unsigned long mask)
@@ -260,7 +264,7 @@ int exec_container_init(struct arg_start *arg,
 		make_dir("/var/lib/nfs/rpc_pipefs", 1);
 		mount("sunrpc", "/var/lib/nfs/rpc_pipefs", "rpc_pipefs", 0, 0);
 	}
-	configure_sysctl();
+	write_val("/proc/sys/net/ipv6/conf/all/forwarding", "0");
 
 	/* Close status descriptor to report that
 	 * environment is created.
