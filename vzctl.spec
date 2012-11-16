@@ -72,7 +72,8 @@ ln -s ../vz/vz.conf $RPM_BUILD_ROOT/etc/sysconfig/vz
 # Needed for %ghost in %files section below
 touch $RPM_BUILD_ROOT/etc/sysconfig/vzeventd
 # This could go to vzctl-lib-devel, but since we don't have it...
-rm -f  $RPM_BUILD_ROOT/%_libdir/libvzctl.{la,so}
+rm -f $RPM_BUILD_ROOT/%_libdir/libvzctl.la
+rm -f $RPM_BUILD_ROOT/%_libdir/libvzctl.so
 
 %clean
 rm -rf $RPM_BUILD_ROOT
