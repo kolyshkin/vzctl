@@ -236,6 +236,12 @@ OpenVZ containers control utility core package
 %config %{_vpsconfdir}/ve-vswap-4g.conf-sample
 %config %{_vpsconfdir}/0.conf
 
+%post core
+/sbin/ldconfig
+
+%postun core
+/sbin/ldconfig
+
 %changelog
 * Thu Nov  1 2012 Kir Kolyshkin <kir@openvz.org> - 4.1-1
 - New features
