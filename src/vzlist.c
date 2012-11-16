@@ -969,6 +969,7 @@ static void add_elem(struct Cveinfo *ve)
 {
 	veinfo = (struct Cveinfo *)x_realloc(veinfo,
 				sizeof(struct Cveinfo) * ++n_veinfo);
+	ve->cpunum = -1;
 	memcpy(&veinfo[n_veinfo - 1], ve, sizeof(struct Cveinfo));
 	return;
 }
@@ -1116,7 +1117,7 @@ FOR_ALL_UBC(MERGE_UBC)
 		*ve->bootorder = *res->misc.bootorder;
 	}
 	ve->io.ioprio = res->io.ioprio;
-	if (res->cpu.vcpus != NULL)
+	if (ve->cpunum == -1 && res->cpu.vcpus != NULL)
 		ve->cpunum = *res->cpu.vcpus;
 	ve->features_mask  = res->env.features_mask;
 	ve->features_known = res->env.features_known;
