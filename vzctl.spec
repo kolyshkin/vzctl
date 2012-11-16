@@ -25,7 +25,7 @@ Name: vzctl
 Version: 4.1
 %define rel 1
 Release: %{rel}%{?dist}
-License: GPL
+License: GPLv2+
 Group: System Environment/Kernel
 Source: http://download.openvz.org/utils/%{name}/%{version}/src/%{name}-%{version}.tar.bz2
 ExclusiveOS: Linux
@@ -50,11 +50,11 @@ Requires: openssh
 Provides: virtual-vzkernel-install = 2.0.0
 
 %description
-This utility allows system administator to control Linux containers,
+This utility allows system administrators to control Linux containers,
 i.e. create, start, shutdown, set various options and limits etc.
 
 %prep
-%setup
+%setup -q
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" %configure \
@@ -65,7 +65,6 @@ CFLAGS="$RPM_OPT_FLAGS" %configure \
 make %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT vpsconfdir=%{_vpsconfdir} \
 	install install-redhat-from-spec
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
