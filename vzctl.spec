@@ -78,40 +78,39 @@ rm -f  $RPM_BUILD_ROOT/%_libdir/libvzctl.{la,so}
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,root)
 %dir %{_scriptdir}
-%attr(755,root,root) %{_scriptdir}/initd-functions
-%attr(755,root,root) %{_initddir}/vz
-%attr(755,root,root) %{_initddir}/vzeventd
-%attr(755,root,root) %{_sbindir}/vzeventd
-%attr(755,root,root) %{_sbindir}/vzsplit
-%attr(755,root,root) %{_sbindir}/vzlist
-%attr(755,root,root) %{_sbindir}/vzmemcheck
-%attr(755,root,root) %{_sbindir}/vzcpucheck
-%attr(755,root,root) %{_sbindir}/vznetcfg
-%attr(755,root,root) %{_sbindir}/vznetaddbr
-%attr(755,root,root) %{_sbindir}/vzcalc
-%attr(755,root,root) %{_sbindir}/vzpid
-%attr(755,root,root) %{_sbindir}/vzcfgvalidate
-%attr(755,root,root) %{_sbindir}/vzmigrate
-%attr(755,root,root) %{_sbindir}/vzifup-post
-%attr(755,root,root) %{_sbindir}/vzubc
-%attr(755,root,root) %{_netdir}/ifup-venet
-%attr(755,root,root) %{_netdir}/ifdown-venet
-%attr(644,root,root) %{_netdir}/ifcfg-venet0
-%attr(644, root, root) %{_mandir}/man8/vzeventd.8.*
-%attr(644, root, root) %{_mandir}/man8/vzmigrate.8.*
-%attr(644, root, root) %{_mandir}/man8/vzsplit.8.*
-%attr(644, root, root) %{_mandir}/man8/vzcfgvalidate.8.*
-%attr(644, root, root) %{_mandir}/man8/vzmemcheck.8.*
-%attr(644, root, root) %{_mandir}/man8/vzcalc.8.*
-%attr(644, root, root) %{_mandir}/man8/vzpid.8.*
-%attr(644, root, root) %{_mandir}/man8/vzcpucheck.8.*
-%attr(644, root, root) %{_mandir}/man8/vzubc.8.*
-%attr(644, root, root) %{_mandir}/man8/vzlist.8.*
-%attr(644, root, root) %{_mandir}/man8/vzifup-post.8.*
-%attr(644, root, root) %{_udevrulesdir}/*
-%attr(644, root, root) %{_bashcdir}/*
+%{_scriptdir}/initd-functions
+%{_initddir}/vz
+%{_initddir}/vzeventd
+%{_sbindir}/vzeventd
+%{_sbindir}/vzsplit
+%{_sbindir}/vzlist
+%{_sbindir}/vzmemcheck
+%{_sbindir}/vzcpucheck
+%{_sbindir}/vznetcfg
+%{_sbindir}/vznetaddbr
+%{_sbindir}/vzcalc
+%{_sbindir}/vzpid
+%{_sbindir}/vzcfgvalidate
+%{_sbindir}/vzmigrate
+%{_sbindir}/vzifup-post
+%{_sbindir}/vzubc
+%{_netdir}/ifup-venet
+%{_netdir}/ifdown-venet
+%{_netdir}/ifcfg-venet0
+%{_mandir}/man8/vzeventd.8.*
+%{_mandir}/man8/vzmigrate.8.*
+%{_mandir}/man8/vzsplit.8.*
+%{_mandir}/man8/vzcfgvalidate.8.*
+%{_mandir}/man8/vzmemcheck.8.*
+%{_mandir}/man8/vzcalc.8.*
+%{_mandir}/man8/vzpid.8.*
+%{_mandir}/man8/vzcpucheck.8.*
+%{_mandir}/man8/vzubc.8.*
+%{_mandir}/man8/vzlist.8.*
+%{_mandir}/man8/vzifup-post.8.*
+%{_udevrulesdir}/*
+%{_bashcdir}/*
 %config /etc/sysconfig/vz
 %ghost %config(missingok) /etc/sysconfig/vzeventd
 
@@ -179,47 +178,46 @@ Requires: wget
 OpenVZ containers control utility core package
 
 %files core
-%defattr(-,root,root)
-%attr(755,root,root) %{_libdir}/libvzctl-*.so
-%dir %attr(755,root,root) %{_lockdir}
-%dir %attr(755,root,root) %{_dumpdir}
-%dir %attr(700,root,root) %{_privdir}
-%dir %attr(700,root,root) %{_rootdir}
-%dir %attr(755,root,root) %{_cachedir}
-%dir %attr(755,root,root) %{_veipdir}
-%dir %attr(755,root,root) %{_vzrebootdir}
-%dir %attr(755,root,root) %{_configdir}
-%dir %attr(755,root,root) %{_namesdir}
-%dir %attr(755,root,root) %{_vpsconfdir}
-%dir %attr(755,root,root) %{_distconfdir}
-%dir %attr(755,root,root) %{_distscriptdir}
-%dir %attr(755,root,root) %{_vzdir}
-%attr(755,root,root) %{_sbindir}/vzctl
-%attr(755,root,root) %{_sbindir}/arpsend
-%attr(755,root,root) %{_sbindir}/ndsend
-%attr(644,root,root) %{_logrdir}/vzctl
-%attr(644,root,root) %{_distconfdir}/distribution.conf-template
-%attr(644,root,root) %{_distconfdir}/default
-%attr(755,root,root) %{_distscriptdir}/*.sh
-%attr(644,root,root) %{_distscriptdir}/functions
-%attr(644, root, root) %{_mandir}/man8/vzctl.8.*
-%attr(644, root, root) %{_mandir}/man8/arpsend.8.*
-%attr(644, root, root) %{_mandir}/man8/ndsend.8.*
-%attr(644, root, root) %{_mandir}/man5/ctid.conf.5.*
-%attr(644, root, root) %{_mandir}/man5/vz.conf.5.*
+%{_libdir}/libvzctl-*.so
+%dir %{_lockdir}
+%dir %{_dumpdir}
+%dir %{_privdir}
+%dir %{_rootdir}
+%dir %{_cachedir}
+%dir %{_veipdir}
+%dir %{_vzrebootdir}
+%dir %{_configdir}
+%dir %{_namesdir}
+%dir %{_vpsconfdir}
+%dir %{_distconfdir}
+%dir %{_distscriptdir}
+%dir %{_vzdir}
+%{_sbindir}/vzctl
+%{_sbindir}/arpsend
+%{_sbindir}/ndsend
+%{_logrdir}/vzctl
+%{_distconfdir}/distribution.conf-template
+%{_distconfdir}/default
+%{_distscriptdir}/*.sh
+%{_distscriptdir}/functions
+%{_mandir}/man8/vzctl.8.*
+%{_mandir}/man8/arpsend.8.*
+%{_mandir}/man8/ndsend.8.*
+%{_mandir}/man5/ctid.conf.5.*
+%{_mandir}/man5/vz.conf.5.*
 %dir %{_pkglibdir}
 %dir %{_scriptdir}
-%attr(755,root,root) %{_scriptdir}/vps-functions
-%attr(755,root,root) %{_scriptdir}/vps-net_add
-%attr(755,root,root) %{_scriptdir}/vps-net_del
-%attr(755,root,root) %{_scriptdir}/vps-netns_dev_add
-%attr(755,root,root) %{_scriptdir}/vps-netns_dev_del
-%attr(755,root,root) %{_scriptdir}/vps-create
-%attr(755,root,root) %{_scriptdir}/vps-download
-%attr(755,root,root) %{_scriptdir}/vzevent-stop
-%attr(755,root,root) %{_scriptdir}/vzevent-reboot
-%attr(755,root,root) %{_scriptdir}/vps-pci
-%attr(777, root, root) /etc/vz/conf
+%{_scriptdir}/vps-functions
+%{_scriptdir}/vps-net_add
+%{_scriptdir}/vps-net_del
+%{_scriptdir}/vps-netns_dev_add
+%{_scriptdir}/vps-netns_dev_del
+%{_scriptdir}/vps-create
+%{_scriptdir}/vps-download
+%{_scriptdir}/vzevent-stop
+%{_scriptdir}/vzevent-reboot
+%{_scriptdir}/vps-pci
+/etc/vz/conf
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_configdir}/osrelease.conf
 %config(noreplace) %{_configdir}/download.conf
