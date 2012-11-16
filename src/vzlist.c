@@ -1604,6 +1604,10 @@ static int get_ves_cpunum()
 {
 	int i;
 
+	if (access("/proc/vz/fairsched/", F_OK))
+		/* pre-RHEL6 kernel */
+		return -1;
+
 	for (i = 0; i < n_veinfo; i++) {
 		if ((veinfo[i].hide) || (veinfo[i].status != VE_RUNNING))
 			continue;
