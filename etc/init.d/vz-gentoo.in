@@ -136,7 +136,7 @@ start_ve() {
 	velist=$(ls $VZREBOOTDIR;
 		vzlist -aH -octid,onboot | awk '$2 == "yes" {print $1}')
 	# Then sort by bootorder
-	velist=$(vzlist -aH -octid -s-bootorder $velist)
+	test -n "$velist" && velist=$(vzlist -aH -octid -s-bootorder $velist)
 
 	/sbin/sysctl -q -w net.ipv4.route.src_check=0
 
