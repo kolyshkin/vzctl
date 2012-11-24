@@ -121,6 +121,41 @@ int stat_file(const char *file)
 	return 1;
 }
 
+/** Check if a directory is empty
+ * Returns:
+ *  1 - empty or nonexistent
+ *  0 - not empty
+ * -1 - error
+ */
+int dir_empty(const char *dir)
+{
+	DIR *dp;
+	struct dirent *ep;
+	int ret = 1;
+
+	dp = opendir(dir);
+	if (dp == NULL) {
+		if (errno == ENOENT)
+			return 1;
+
+		logger(-1, errno, "Can't opendir %s", dir);
+		return -1;
+	}
+
+	while ((ep = readdir(dp))) {
+		if (!strcmp(ep->d_name, "."))
+			continue;
+		if (!strcmp(ep->d_name, ".."))
+			continue;
+		/* Not empty */
+		ret = 0;
+		break;
+	}
+	closedir(dp);
+
+	return ret;
+}
+
 int make_dir_mode(const char *path, int full, int mode)
 {
 	char buf[4096];

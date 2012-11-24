@@ -320,7 +320,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		ret = VZ_VE_ROOT_NOTSET;
 		goto err_cfg;
 	}
-	if (stat_file(fs->private)) {
+	if (dir_empty(fs->private) != 1) {
 		logger(-1, 0, "Private area already exists in %s", fs->private);
 		ret = VZ_FS_PRVT_AREA_EXIST;
 		goto err_cfg;

@@ -31,6 +31,7 @@
 
 char *parse_line(char *str, char *ltoken, int lsz, char **errstr);
 int stat_file(const char *file);
+int dir_empty(const char *dir);
 int make_dir(const char *path, int full);
 int make_dir_mode(const char *path, int full, int mode);
 char *get_fs_root(const char *dir);
