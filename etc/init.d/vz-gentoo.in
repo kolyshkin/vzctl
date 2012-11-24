@@ -323,9 +323,11 @@ start() {
 		return 1
 	fi
 
-	ebegin "Applying OOM adjustments"
-	cat /etc/vz/oom-groups.conf > /proc/vz/oom_score_adj
-	eend $?
+	if [ -f /proc/vz/oom_score_adj ]; then
+		ebegin "Applying OOM adjustments"
+		cat /etc/vz/oom-groups.conf > /proc/vz/oom_score_adj
+		eend $?
+	fi
 
 	start_net
 	setup_ve0
