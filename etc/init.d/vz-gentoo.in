@@ -75,7 +75,7 @@ setup_ve0() {
 	test -f ${ve0conf} || return
 	egrep -q '^ONBOOT=yes\|^ONBOOT=\"yes\"' ${ve0conf} || return
 
-	ebegin "Configuring hardware node UB resources: "
+	ebegin "Configuring hardware node UB resources"
 	msg=$(${VZCTL} set 0 --reset_ub 2>&1)
 	eend $? ${msg}
 }
