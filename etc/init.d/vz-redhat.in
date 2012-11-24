@@ -490,9 +490,11 @@ start()
 		fi
 	fi
 
-	__echo "Applying OOM adjustments: "
-	cat /etc/vz/oom-groups.conf > /proc/vz/oom_score_adj
-	print_result
+	if [ -f /proc/vz/oom_score_adj ]; then
+		__echo "Applying OOM adjustments: "
+		cat /etc/vz/oom-groups.conf > /proc/vz/oom_score_adj
+		print_result
+	fi
 
 	start_net
 	setup_ve0
