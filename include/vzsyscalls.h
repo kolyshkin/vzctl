@@ -20,6 +20,8 @@
 
 #include <sys/syscall.h>
 
+#ifdef VZ_KERNEL_SUPPORTED
+
 #ifdef __ia64__
 #define __NR_fairsched_vcpus	1499
 #define __NR_fairsched_chwt	1502
@@ -63,7 +65,8 @@
 #endif
 #endif
 #else
-#error "no syscall for this arch"
+#error "VZ kernel not supported in this architecture"
 #endif
 
 #endif
+#endif /* VZ_KERNEL_SUPPORTED */
