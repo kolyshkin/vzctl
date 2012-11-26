@@ -30,6 +30,7 @@
 #include "logger.h"
 #include "vzsyscalls.h"
 
+#ifdef VZ_KERNEL_SUPPORTED
 static inline int fairsched_chwt(unsigned int id, unsigned wght)
 {
 	int ret;
@@ -60,28 +61,44 @@ static inline int fairsched_vcpus(unsigned int id, unsigned vcpus)
 	return ret;
 }
 
-#if defined(__i386__) || defined(__x86_64__)
 static inline int fairsched_cpumask(unsigned int id,
 		unsigned int masksize, unsigned long *mask)
 {
-	int ret;
-
-	ret = syscall(__NR_fairsched_cpumask, id, masksize, mask);
-	if (ret && errno == ENOSYS)
-		ret = 0;
-	return ret;
-}
-#else
+	int ret = ENOTSUP;
 /*
  * fairsched_cpumask is available only in vz kernels based on linux 2.6.32
  * or later which do not support platforms different from x86.
  */
+#if defined(__i386__) || defined(__x86_64__)
+
+	ret = syscall(__NR_fairsched_cpumask, id, masksize, mask);
+	if (ret && errno == ENOSYS)
+		ret = 0;
+#endif
+	return ret;
+}
+#else /* ! VZ_KERNEL_SUPPORTED */
+static inline int fairsched_chwt(unsigned int id, unsigned wght)
+{
+	return ENOTSUP;
+}
+
+static inline int fairsched_rate(unsigned int id, int op, unsigned rate)
+{
+	return ENOTSUP;
+}
+
+static inline int fairsched_vcpus(unsigned int id, unsigned vcpus)
+{
+	return ENOTSUP;
+}
+
 static inline int fairsched_cpumask(unsigned int id,
 		unsigned int masksize, unsigned long *mask)
 {
 	return ENOTSUP;
 }
-#endif
+#endif /* VZ_KERNEL_SUPPORTED */
 
 int set_cpulimit(envid_t veid, unsigned int cpulimit)
 {
