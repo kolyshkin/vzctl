@@ -40,7 +40,6 @@ libvzctl_la_SOURCES = bitmap.c \
                       dev.c \
                       dist.c \
                       env.c \
-                      hooks_vz.c \
                       exec.c \
                       fs.c \
                       fs_simfs.c \
@@ -74,5 +73,5 @@ libvzctl_la_SOURCES += cgroup.c hooks_ct.c
 endif
 
 if HAVE_VZ_KERNEL
-libvzctl_la_SOURCES += ub.c
+libvzctl_la_SOURCES += ub.c hooks_vz.c
 endif
