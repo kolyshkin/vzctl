@@ -85,17 +85,20 @@ vps_handler *vz_open(envid_t veid)
 
 	h->stdfd = reset_std();
 
+#ifdef VZ_KERNEL_SUPPORTED
 	/* Find out if we are under OpenVZ or upstream kernel */
 	if (stat_file("/proc/vz"))
 		ret = vz_do_open(h);
-	else {
+	else
+#endif
+	{
 		logger(0, 0, "Directory /proc/vz not found, assuming "
 				"non-OpenVZ kernel");
 		h->vzfd = -1;
 #ifdef HAVE_UPSTREAM
 		ret = ct_do_open(h);
 #else
-		logger(-1, 0, "Support for non-OpenVZ kernel not compiled in");
+		logger(-1, 0, "No suitable kernel support compiled in");
 #endif
 	}
 
