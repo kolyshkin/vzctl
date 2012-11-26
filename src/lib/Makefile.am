@@ -57,7 +57,6 @@ libvzctl_la_SOURCES = bitmap.c \
                       readelf.c \
                       res.c \
                       script.c \
-                      ub.c \
                       util.c \
                       veth.c \
                       vps_configure.c \
@@ -72,4 +71,8 @@ libvzctl_la_LIBADD = $(XML_LIBS) $(CGROUP_LIBS) $(DL_LIBS)
 
 if HAVE_CGROUP
 libvzctl_la_SOURCES += cgroup.c hooks_ct.c
+endif
+
+if HAVE_VZ_KERNEL
+libvzctl_la_SOURCES += ub.c
 endif
