@@ -54,6 +54,12 @@ shutdown quota state without performing quota reinitialization
 (which is usually a time-consuming process). After all the containers are
 started, the initscript when restarts those containers with unclean quota
 in a normal way (to recalculate/fix quotas).
+.IP \fBVE_STOP_MODE\fR=\fBsuspend\fR|\fBstop\fR
+If the value of this parameter is set to \fBsuspend\fR or not set at all,
+\fBvz\fR initscript called with \fBstop\fR argument will try to suspend
+the running containers, instead of stopping them. Suspended containers when
+will be restored on \fBvz start\fR. This feature usually helps to decrease
+the reboot time. If a container fails to suspend, it will be stopped anyway.
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
 Value of this parameter is a directory in which all container template data are
 stored.

@@ -3,6 +3,7 @@ VIRTUOZZO=yes
 LOCKDIR=@VZDIR@/lock
 DUMPDIR=@VZDIR@/dump
 VE0CPUUNITS=1000
+VE_STOP_MODE=suspend
 
 ## Logging parameters
 LOGGING=yes

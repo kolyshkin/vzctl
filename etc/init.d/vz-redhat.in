@@ -342,7 +342,10 @@ stop_ves()
 	done
 
 	get_parallel
-	stages="suspend stop"
+	stages="stop"
+	if [ -z "${VE_STOP_MODE}" -o "$VE_STOP_MODE" = "suspend" ]; then
+		stages="suspend stop"
+	fi
 	for stage in $stages; do
 		case $stage in
 			suspend)
