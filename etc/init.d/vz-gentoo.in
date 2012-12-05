@@ -19,6 +19,7 @@ check_config() {
 	: ${VPSCONFDIR:=@VPSCONFDIR@}
 	: ${VZDEV:=venet0}
 	: ${VZCONF:=@PKGCONFDIR@/vz.conf}
+	: ${VE_STOP_MODE:=suspend}
 
 	if [ "${MODULES_DISABLED}" != "yes" ]; then
 		: ${IPTABLES_MODULES:="${IPTABLES}"}
@@ -195,7 +196,8 @@ stop_ve() {
 		touch $VZREBOOTDIR/$veid
 	done
 	get_parallel
-	stages="suspend stop"
+	stages="stop"
+	[ "$VE_STOP_MODE" = "suspend" ] && stages="suspend stop"
 	for stage in $stages; do
 		case $stage in
 			suspend)
