@@ -188,6 +188,36 @@ AM_CONDITIONAL(HAVE_CGROUP, [test "x$with_cgroup" = "x+cgroup"])
 AC_SUBST(CGROUP_LIBS)
 AC_SUBST(CGROUP_CFLAGS)
 
+
+AC_ARG_WITH([vz],
+            [AS_HELP_STRING([--with-vz],
+                            [Enable support for OpenVZ kernel])],
+            [case "${withval}" in
+              yes) with_vz="+vz";;
+              no)  with_vz="-vz";;
+              *)   AC_MSG_ERROR(bad value ${withval} for --with-vz);;
+            esac],
+            [with_vz="+vz"])
+
+
+AS_IF([test "x$with_vz" = "x+vz"],
+# vzsyscalls.h will encode the knowledge of which syscalls are supported in
+# which archs, and determine whether or not the VZ_KERNEL is usable. For now
+# we will only disable it if we can't really use it.
+
+[AC_MSG_CHECKING([if current architecture supported by OpenVZ])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include "${srcdir}/include/vzsyscalls.h"]])],
+	[AC_DEFINE(VZ_KERNEL_SUPPORTED)
+	 AM_CONDITIONAL(HAVE_VZ_KERNEL, true)
+	 AC_MSG_RESULT([yes])
+	],
+	[AM_CONDITIONAL(HAVE_VZ_KERNEL, false)
+	 with_vz="-vz"
+	AC_MSG_RESULT([no])]
+)],
+[AM_CONDITIONAL(HAVE_VZ_KERNEL, false)]
+)
+
 # A way to redefine /vz is ./configure vzdir=/some/dir
 AS_IF([test "x$vzdir" = "x"], vzdir=/vz)
 AC_ARG_VAR(vzdir, [Common prefix for a few OpenVZ-related directories,
@@ -205,8 +235,12 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
  sysconfdir: $sysconfdir
      libdir: $libdir
       vzdir: $vzdir
-   features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup
+   features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup $with_vz
 "])
+
+AS_IF([test "x$with_vz" = "x-vz" -a "x$with_cgroup" = "x-cgroup"],
+[AC_ERROR("At least one of cgroup or vz must be enabled")]
+)
 
 # Output
 AC_CONFIG_FILES([bin/Makefile
