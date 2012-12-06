@@ -346,7 +346,14 @@ static void print_bool(const char *fmt, int val)
 
 static void print_onboot(struct Cveinfo *p, int index)
 {
-	print_bool("%6s", p->onboot == YES);
+	/* ONBOOT value is NONE (0), YES (1) or NO (2) */
+	if (p->onboot)
+		return print_bool("%6s", p->onboot == YES);
+
+	if (fmt_json)
+		printf("null");
+	else
+		p_buf += snprintf(p_buf, e_buf-p_buf, "%6s", "-");
 }
 
 static void print_bootorder(struct Cveinfo *p, int index)
