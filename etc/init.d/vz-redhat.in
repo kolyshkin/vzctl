@@ -291,9 +291,14 @@ start_ves()
 	local need_restart
 
 	need_restart=""
-	# List CTs from vzrebootdir plus the ones with ONBOOT=yes
-	velist=$(ls $VZREBOOTDIR;
-		vzlist -aH -octid,onboot | awk '$2 == "yes" {print $1}')
+	# CTs that were running before a reboot
+	velist=$(ls $VZREBOOTDIR)
+	# ... and not have ONBOOT=no
+	test -n "$velist" && velist=$(vzlist -aH -octid,onboot $velist |
+			awk '$2 != "no" {print $1}')
+	# ... plus ones with ONBOOT=yes
+	velist=$(echo "$velist"; vzlist -aH -octid,onboot |
+			awk '$2 == "yes" {print $1}')
 	# Then sort by bootorder
 	test -n "$velist" && velist=$(vzlist -aH -octid -s-bootorder $velist)
 	sysctl -q -w net.ipv4.route.src_check=0
