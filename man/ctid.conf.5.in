@@ -27,8 +27,6 @@ Corresponds to the \fB--name\fR option.
 Corresponds to the \fB--description\fR option.
 .IP \fBONBOOT\fR="\fByes\fR|\fBno\fR"
 Specifies whether this container will be started during system boot.
-Default is \fBno\fR, meaning the container will not be started
-if \fBONBOOT\fR parameter is omitted.
 Corresponds to the \fB--onboot\fR option.
 .IP \fBBOOTORDER\fR="\fInumber\fR"
 Specifies the CT boot order priority. Corresponds to the

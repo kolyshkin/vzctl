@@ -212,8 +212,11 @@ or \fB--setmode ignore\fR to suppress the above mentioned warning.
 .TP
 \fB--onboot\fR \fByes\fR | \fBno\fR
 Sets whether the container will be started during system boot.
-The container will not be auto-started unless this parameter
-is set to \fByes\fR.
+The container will be started on boot by \fBvz\fR initscript if
+either this parameter is set to \fByes\fR, or the container was running
+just before last reboot, and this parameter is not set to \fBno\fR.
+Default value is unset, meaning the container will be started if
+it was running before the last reboot.
 .TP
 \fB--bootorder\fR \fInumber\fR
 Sets the boot order priority for this CT. The higher the \fInumber\fR is,
