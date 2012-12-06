@@ -135,6 +135,7 @@ start_ve() {
 
 	# CTs that were running before a reboot
 	velist=$(ls $VZREBOOTDIR)
+	rm -f $VZREBOOTDIR/*
 	# ... and not have ONBOOT=no
 	test -n "$velist" && velist=$(vzlist -aH -octid,onboot $velist |
 			awk '$2 != "no" {print $1}')
@@ -193,6 +194,7 @@ stop_ve() {
 	fi
 
 	# Pre-stop stage
+	rm -f $VZREBOOTDIR/*
 	velist=$(vzlist -1 2>/dev/null)
 	for veid in $velist; do
 		# Equalize cpuunits for all CTs
