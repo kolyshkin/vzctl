@@ -22,7 +22,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.1
+Version: 4.1.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPL
@@ -238,6 +238,22 @@ OpenVZ containers control utility core package
 %config %{_vpsconfdir}/0.conf
 
 %changelog
+* Fri Dec  7 2012 Kir Kolyshkin <kir@openvz.org> - 4.1.1-1
+- Regressions:
+-- etc/init.d/vz*: fix accidental start of all CTs (#2424)
+-- etc/init.d/vz*: do not auto-start CTs marked with ONBOOT=no (#2456)
+-- init.d/vz*: only apply oom score if appropriate /proc file exist (#2423)
+- Fixes:
+-- vzctl set --devnodes: add /usr/lib/udev/devices
+-- vzlist --json: skip collecting numcpu info on old kernel
+- Improvements:
+-- vz.conf, init.d/vz*: support for VE_STOP_MODE global parameter (#2432)
+-- enable build for architectures not supported by OpenVZ kernel
+-- vzlist: show if onboot field is unset
+- Documentation:
+-- vz.conf(5): describe VE_STOP_MODE
+-- vzctl(8), ctid.conf(5): fix ONBOOT/--onboot description
+
 * Thu Nov  1 2012 Kir Kolyshkin <kir@openvz.org> - 4.1-1
 - New features
 - * etc/init.d/vz: restore running containers after reboot (#781)
