@@ -202,11 +202,15 @@ AC_ARG_WITH([vz],
 
 AS_IF([test "x$with_vz" = "x+vz"],
 # vzsyscalls.h will encode the knowledge of which syscalls are supported in
-# which archs, and determine whether or not the VZ_KERNEL is usable. For now
-# we will only disable it if we can't really use it.
-
+# which archs, and determine whether or not the VZ_KERNEL is usable. During
+# normal operation, this file in enclosed within VZ_KERNEL_SUPPORTED, so as
+# to get it out of the way during compilation. To check for it, we manually
+# define the constant in the test program
 [AC_MSG_CHECKING([if current architecture supported by OpenVZ])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include "${srcdir}/include/vzsyscalls.h"]])],
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+	[#define VZ_KERNEL_SUPPORTED
+	#include "${srcdir}/include/vzsyscalls.h"]])
+	],
 	[AC_DEFINE(VZ_KERNEL_SUPPORTED)
 	 AM_CONDITIONAL(HAVE_VZ_KERNEL, true)
 	 AC_MSG_RESULT([yes])
