@@ -27,7 +27,12 @@ every 2 seconds (by default) until interrupted by Ctrl-C.
 .TP
 .B -wd
 Make \fBwatch\fR(1) highlight the differences between current and previous
-output (corresponds to \fBwatch -d\fR option).
+output. Corresponds to \fBwatch -d\fR option.
+.TP
+.B -wt
+Instruct \fBwatch\fR(1) to now show its title (interval, command, and
+current time at the top of the display, as well as the following blank
+line). Corresponds to \fBwatch -t\fR option.
 .TP
 .BI -wn \ time
 Refresh interval for \fBwatch\fR(1), in seconds (corresponds to \fBwatch -n \fItime\fR).

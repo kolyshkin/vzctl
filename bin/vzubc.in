@@ -24,6 +24,7 @@ Usage: vzubc [option ...] [<ctid> ...]
  -w, --watch:
      Run itself under watch(1) (a la top mode, Ctrl-C to exit).
      -wd: show differences between runs
+     -wt: do not show watch title
      -wn <time>: refresh every <time> seconds
  -q, --quiet:
      Quiet mode (only show beancounters with fails and close to limits).
@@ -82,6 +83,10 @@ while test $# -gt 0; do
 	-wd)
 		watch=yes
 		WATCH_ARGS="$WATCH_ARGS -d"
+		;;
+	-wt)
+		watch=yes
+		WATCH_ARGS="$WATCH_ARGS -t"
 		;;
 	-wn)
 		chk_zeroarg $1 $2
