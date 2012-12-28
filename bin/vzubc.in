@@ -74,10 +74,6 @@ while test $# -gt 0; do
 		watch=
 		;;
 	-w|--watch)
-		if ! which watch >/dev/null; then
-			echo "Error: watch binary not found" 1>&2
-			exit 1
-		fi
 		watch=yes
 		;;
 	-wd)
