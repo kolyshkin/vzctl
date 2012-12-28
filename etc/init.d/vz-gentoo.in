@@ -17,6 +17,7 @@ check_config() {
 	: ${VZVEINFO:=/proc/vz/veinfo}
 	: ${VESTAT:=/proc/vz/vestat}
 	: ${VPSCONFDIR:=@VPSCONFDIR@}
+	: ${VZREBOOTDIR:=@VZREBOOTDIR@}
 	: ${VZDEV:=venet0}
 	: ${VZCONF:=@PKGCONFDIR@/vz.conf}
 	: ${VE_STOP_MODE:=suspend}
