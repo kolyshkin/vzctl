@@ -13,7 +13,6 @@ rc_done='..done'
 rc_failed='..failed'
 
 VARLOCK=/var/lock/subsys
-VZREBOOTDIR=@VZREBOOTDIR@
 
 # Source function library.
 if [ -r /etc/init.d/functions ]; then
