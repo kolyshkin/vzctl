@@ -152,7 +152,7 @@ static struct option set_opt[] = {
 };
 
 static int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
-	vps_param *param)
+	struct option *internal_opt, vps_param *param)
 {
 	int c, ret;
 
@@ -164,7 +164,7 @@ static int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 			break;
 		if (c == '?')
 			return VZ_INVALID_PARAMETER_VALUE;
-		ret = vps_parse_opt(veid, opt, param, c, optarg, &g_action);
+		ret = vps_parse_opt(veid, internal_opt, param, c, optarg, &g_action);
 		switch (ret) {
 			case 0:
 			case ERR_DUP:
@@ -397,7 +397,7 @@ static int parse_create_opt(envid_t veid, int argc, char **argv,
 	opt = mod_make_opt(create_options, &g_action, NULL);
 	if (opt == NULL)
 		return VZ_RESOURCE_ERROR;
-	ret = parse_opt(veid, argc, argv, opt, param);
+	ret = parse_opt(veid, argc, argv, opt, create_options, param);
 	free(opt);
 
 	return ret;
@@ -440,7 +440,7 @@ static int parse_convert_opt(envid_t veid, int argc, char **argv,
 	opt = mod_make_opt(convert_options, &g_action, NULL);
 	if (opt == NULL)
 		return VZ_RESOURCE_ERROR;
-	ret = parse_opt(veid, argc, argv, opt, param);
+	ret = parse_opt(veid, argc, argv, opt, convert_options, param);
 	free(opt);
 
 	return ret;
@@ -685,7 +685,7 @@ static int parse_snapshot_create_opt(envid_t veid, int argc, char **argv,
 	opt = mod_make_opt(snapshot_create_options, &g_action, NULL);
 	if (opt == NULL)
 		return VZ_RESOURCE_ERROR;
-	ret = parse_opt(veid, argc, argv, opt, param);
+	ret = parse_opt(veid, argc, argv, opt, snapshot_create_options, param);
 	free(opt);
 
 	return ret;
@@ -706,7 +706,7 @@ static int parse_snapshot_delete_opt(envid_t veid, int argc, char **argv,
 	opt = mod_make_opt(snapshot_delete_options, &g_action, NULL);
 	if (opt == NULL)
 		return VZ_RESOURCE_ERROR;
-	ret = parse_opt(veid, argc, argv, opt, param);
+	ret = parse_opt(veid, argc, argv, opt, snapshot_delete_options, param);
 	free(opt);
 
 	if (ret == 0 && param->snap.guid == NULL)
@@ -867,7 +867,7 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	opt = mod_make_opt(set_opt, &g_action, NULL);
 	if (opt == NULL)
 		return VZ_RESOURCE_ERROR;
-	ret = parse_opt(veid, argc, argv, opt, param);
+	ret = parse_opt(veid, argc, argv, opt, set_opt, param);
 	free(opt);
 
 	return ret;
@@ -1236,7 +1236,7 @@ static int parse_custom_opt(envid_t veid, int argc, char **argv,
 	opt = mod_make_opt(NULL, &g_action, name);
 	if (opt == NULL)
 		return VZ_RESOURCE_ERROR;
-	ret = parse_opt(veid, argc, argv, opt, param);
+	ret = parse_opt(veid, argc, argv, opt, NULL, param);
 	free(opt);
 
 	return ret;
