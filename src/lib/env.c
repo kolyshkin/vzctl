@@ -170,7 +170,7 @@ int vz_chroot(const char *root)
 	sigemptyset(&act.sa_mask);
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
-	for (i = 1; i <= NSIG; ++i)
+	for (i = 1; i < NSIG; ++i)
 		sigaction(i, &act, NULL);
 	return 0;
 }
