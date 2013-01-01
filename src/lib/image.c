@@ -97,6 +97,14 @@ static int load_ploop_lib(void)
 	void *h;
 	void (*resolve)(struct ploop_functions *);
 	char *err;
+	struct {
+		struct ploop_functions ploop;
+		/* Newer versions of ploop library might have struct ploop_functions
+		 * bigger than the one we are compiling against. Reserve some space
+		 * to prevent a buffer overflow.
+		 */
+		void *padding[32];
+	} src;
 
 	h = dlopen("libploop.so", RTLD_LAZY);
 	if (!h) {
@@ -113,7 +121,11 @@ static int load_ploop_lib(void)
 		return -1;
 	}
 
-	(*resolve)(&ploop);
+	(*resolve)(&src.ploop);
+	if (src.padding[0] != NULL)
+		logger(1, 0, "Notice: ploop library is newer when expected");
+	memcpy(&ploop, &src.ploop, sizeof(ploop));
+
 	vzctl_init_ploop_log();
 	logger(1, 0, "The ploop library has been loaded successfully");
 
