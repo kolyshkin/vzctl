@@ -40,7 +40,7 @@
 #define DEFAULT_FSTYPE		"ext4"
 
 #ifdef HAVE_PLOOP
-struct ploop_functions ploop = { NULL };
+struct ploop_functions ploop;
 #endif
 
 /* We want get_ploop_type() to work even if vzctl is compiled
