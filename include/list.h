@@ -100,6 +100,9 @@ static inline void list_moveall(list_head_t *src, list_head_t *dst)
 	list_head_init(src);
 }
 
+#define LIST_HEAD(name) \
+	list_head_t name = { (void *) &name, (void *) &name }
+
 #define list_entry(ptr, type, field)					\
 	((type *)(void *)((char *)(ptr)-(unsigned long)(&((type *)0)->field)))
 
