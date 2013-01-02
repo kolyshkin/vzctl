@@ -75,6 +75,8 @@ int vzctl_get_ploop_dev(const char *mnt, char *out, int len);
 int vzctl_create_snapshot(const char *ve_private, const char *guid);
 int vzctl_merge_snapshot(const char *ve_private, const char *guid);
 int vzctl_delete_snapshot(const char *ve_private, const char *guid);
+const char *generate_snapshot_component_name(unsigned int envid,
+		const char *data, char *buf, int len);
 int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		fs_param *fs, dq_param *dq, int mode);
 #endif /* HAVE_PLOOP */

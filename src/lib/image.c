@@ -38,6 +38,7 @@
 #include "destroy.h"
 
 #define DEFAULT_FSTYPE		"ext4"
+#define SNAPSHOT_MOUNT_ID	"snap"
 
 #ifdef HAVE_PLOOP
 struct ploop_functions ploop;
@@ -443,6 +444,14 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 	ploop.free_diskdescriptor(di);
 
 	return ret;
+}
+
+
+const char *generate_snapshot_component_name(unsigned int envid,
+		const char *data, char *buf, int len)
+{
+	snprintf(buf, len, "%d-%s-%s", envid, SNAPSHOT_MOUNT_ID, data);
+	return buf;
 }
 
 /* Convert a CT to ploop layout
