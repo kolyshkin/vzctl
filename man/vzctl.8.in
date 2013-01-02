@@ -38,7 +38,7 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 .SY vzctl
-[\fIflags\fR] \fBsnapshot-list\fR \fICTID\fR
+[\fIflags\fR] \fBsnapshot-list\fR \fICTID\fR [\fB-H\fR] [\fB-o\fR \fIfield\fR[,\fIfield\fR...] [\fB--id\fR \fIuuid\fR]
 .SY vzctl
 [\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
 .OP --save
@@ -831,8 +831,13 @@ container is stopped.
 \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 Removes a specified snapshot.
 .TP 4
-\fBsnapshot-list\fR \fICTID\fR
-Lists all snapshots. Active snapshot is marked with \fB*\fR sign.
+\fBsnapshot-list\fR \fICTID\fR [\fB-H\fR] [\fB-o\fR \fIfield\fR[,\fIfield\fR...] [\fB--id\fR \fIuuid\fR]
+List container's snapshots.
+
+You can suppress displaying header using \fB-H\fR option.
+
+You can use the \fB-o\fR option to display only the specified \fIfield\fR(s).
+List of available fields can be obtained using \fB-L\fR option.
 
 .SS Performing container actions
 

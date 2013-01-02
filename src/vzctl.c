@@ -73,7 +73,7 @@ static void usage(int rc)
 "vzctl snapshot <ctid> [--id <uuid>] [--name <name>] [--description <desc>]\n"
 "   [--skip-suspend]\n"
 "vzctl snapshot-switch | snapshot-delete <ctid> --id <uuid>\n"
-"vzctl snapshot-list\n"
+"vzctl snapshot-list <ctid> [-H] [-o field[,field...]] [--id <uuid>]\n"
 #endif
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
 "vzctl console <ctid> [ttyno]\n"

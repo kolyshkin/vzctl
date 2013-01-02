@@ -54,6 +54,8 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid, vps_param *g_p,
 int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 		const char *guid);
 
-int vzctl_env_list_snapshot_tree(const char *ve_private);
+/* src/snapshot-list.c */
+int vzctl_env_snapshot_list(int argc, char **argv, int envid,
+		const char *ve_private);
 #endif /* __SNAPSHOT_H__ */
 #endif /* HAVE_PLOOP */

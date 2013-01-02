@@ -1507,7 +1507,8 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 				cmd_p->snap.guid);
 		break;
 	case ACTION_SNAPSHOT_LIST:
-//		ret = vzctl_env_list_snapshot_tree(g_p->res.fs.private);
+		ret = vzctl_env_snapshot_list(argc, argv, veid,
+				g_p->res.fs.private);
 		break;
 #endif
 	case ACTION_CUSTOM:

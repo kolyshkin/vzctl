@@ -55,7 +55,7 @@ vzctl_SOURCES = enter.c \
                 vzctl-actions.c \
                 vzctl.c
 if HAVE_PLOOP
-vzctl_SOURCES += snapshot.c
+vzctl_SOURCES += snapshot.c snapshot-list.c
 endif
 
 vzctl_LDADD = $(VZCTL_LIBS) $(DL_LIBS) $(UTIL_LIBS)
