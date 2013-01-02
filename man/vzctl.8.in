@@ -26,19 +26,19 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --force
 .OP --fast
 .SY vzctl
-[\fIflags\fR] \fBsuspend\fR | \fBresume\fR
+[\fIflags\fR] \fBsuspend\fR | \fBresume\fR \fICTID\fR
 .OP --dumpfile name
 .SY vzctl
-[\fIflags\fR] \fBsnapshot\fR
+[\fIflags\fR] \fBsnapshot\fR \fICTID\fR
 .OP --id uuid
 .OP --name name
 .OP --description desc
 .OP --skip-suspend
 .OP --skip-config
 .SY vzctl
-[\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fB--id\fR \fIuuid\fR
+[\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 .SY vzctl
-[\fIflags\fR] \fBsnapshot-list\fR
+[\fIflags\fR] \fBsnapshot-list\fR \fICTID\fR
 .SY vzctl
 [\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
 .OP --save
