@@ -297,41 +297,12 @@ static int conf_parse_bitmap(unsigned long **dst, int nmaskbits,
 	return 0;
 }
 
-#define UUID_LEN 36
-/* Check for valid GUID, add curly brackets if necessary:
- *	fbcdf284-5345-416b-a589-7b5fcaa87673 ->
- *	{fbcdf284-5345-416b-a589-7b5fcaa87673}
- */
 static int conf_parse_guid(char **dst, const char *val)
 {
-	int i;
-	char guid[UUID_LEN + 4];
-	const char *in;
-	char *out;
+	char guid[64];
 
-	in = (val[0] == '{') ? val + 1 : val;
-	guid[0] = '{';
-	out = guid + 1;
-
-	for (i = 0; i < UUID_LEN; i++) {
-		if (in[i] == '\0')
-			break;
-		if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) {
-			if (in[i] != '-' )
-				break;
-		} else if (!isxdigit(in[i])) {
-			break;
-		}
-		out[i] = in[i];
-	}
-	if (i < UUID_LEN)
+	if (vzctl_get_normalized_guid(val, guid, sizeof(guid)))
 		return ERR_INVAL;
-	if (in[UUID_LEN] != '\0' &&
-			(in[UUID_LEN] != '}' || in[UUID_LEN + 1] != '\0'))
-		return ERR_INVAL;
-
-	out[UUID_LEN] = '}';
-	out[UUID_LEN+1] = '\0';
 
 	return conf_parse_str(dst, guid);
 }

@@ -69,6 +69,8 @@ int ve_in_list(envid_t *list, int size, envid_t ve);
 const char* ubcstr(unsigned long bar, unsigned long lim);
 int is_vswap_mode(void);
 
+int vzctl_get_normalized_guid(const char *str, char *buf, int len);
+
 #define logger_enomem(log_level, err, size, file, line)			\
 	logger(log_level, err, "%s:%i: Can't allocate %lu bytes",	\
 		file, line, (unsigned long)size)

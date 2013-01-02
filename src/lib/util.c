@@ -798,3 +798,44 @@ int is_vswap_mode(void)
 {
 	return (access("/proc/vz/vswap", F_OK) == 0);
 }
+
+#define UUID_LEN 36
+/* Check for valid GUID, add curly brackets if necessary:
+ *	fbcdf284-5345-416b-a589-7b5fcaa87673 ->
+ *	{fbcdf284-5345-416b-a589-7b5fcaa87673}
+ */
+int vzctl_get_normalized_guid(const char *str, char *buf, int len)
+{
+	int i;
+	const char *in;
+	char *out;
+
+	 if (len < UUID_LEN + 3)
+		 return -1;
+
+	in = (str[0] == '{') ? str + 1 : str;
+	buf[0] = '{';
+	out = buf + 1;
+
+	for (i = 0; i < UUID_LEN; i++) {
+		if (in[i] == '\0')
+			break;
+		if ((i == 8) || (i == 13) || (i == 18) || (i == 23)) {
+			if (in[i] != '-' )
+				break;
+		} else if (!isxdigit(in[i])) {
+			break;
+		}
+		out[i] = in[i];
+	}
+	if (i < UUID_LEN)
+		return 1;
+	if (in[UUID_LEN] != '\0' &&
+			(in[UUID_LEN] != '}' || in[UUID_LEN + 1] != '\0'))
+		return 1;
+
+	out[UUID_LEN] = '}';
+	out[UUID_LEN+1] = '\0';
+
+	return 0;
+}
