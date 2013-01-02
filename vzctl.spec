@@ -22,7 +22,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.1.1
+Version: 4.1.2
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPL
@@ -238,6 +238,14 @@ OpenVZ containers control utility core package
 %config %{_vpsconfdir}/0.conf
 
 %changelog
+* Tue Jan  1 2013 Kir Kolyshkin <kir@openvz.org> - 4.1.2-1
+- Regressions:
+-- etc/init.d/vz-gentoo: fix missing VZREBOOTDIR (#2467)
+-- fix extra arguments parsing by add-on modules (#2428)
+-- do not whine about unknown VE_STOP_MODE parameter
+- Bug fixes:
+-- load_ploop_lib(): prevent buffer overflow with newer ploop-lib
+
 * Fri Dec  7 2012 Kir Kolyshkin <kir@openvz.org> - 4.1.1-1
 - Regressions:
 -- etc/init.d/vz*: fix accidental start of all CTs (#2424)
