@@ -28,14 +28,6 @@
 #define VZCTL_VE_DUMP_DIR	"/dump"
 #define VZCTL_VE_CONF		"ve.conf"
 
-#define SNAPSHOT_XML	"Snapshots.xml"
-#define GET_SNAPSHOT_XML(buf, ve_private) \
-	snprintf(buf, sizeof(buf), "%s/" SNAPSHOT_XML, ve_private);
-
-#define GET_SNAPSHOT_XML_TMP(buf, ve_private) \
-	snprintf(buf, sizeof(buf), "%s/" SNAPSHOT_XML ".tmp", ve_private);
-
-
 static void vzctl_get_snapshot_dumpfile(const char *private, const char *guid,
 		char *buf, int len)
 {

@@ -21,6 +21,13 @@ struct vzctl_snapshot_tree {
 
 struct vzctl_snapshot_param;
 
+#define SNAPSHOT_XML	"Snapshots.xml"
+#define GET_SNAPSHOT_XML(buf, ve_private) \
+	snprintf(buf, sizeof(buf), "%s/" SNAPSHOT_XML, ve_private);
+
+#define GET_SNAPSHOT_XML_TMP(buf, ve_private) \
+	snprintf(buf, sizeof(buf), "%s/" SNAPSHOT_XML ".tmp", ve_private);
+
 /* src/lib/snapshot.c */
 void vzctl_free_snapshot_tree(struct vzctl_snapshot_tree *tree);
 struct vzctl_snapshot_tree *vzctl_alloc_snapshot_tree(void);
