@@ -19,7 +19,7 @@
 # OpenVZ startup script, used for redhat and debian related distributions.
 
 ###
-# chkconfig: 2345 96 88
+# chkconfig: 2345 96 20
 # description: OpenVZ startup script.
 ###
 
