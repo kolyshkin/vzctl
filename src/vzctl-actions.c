@@ -1317,6 +1317,8 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_SNAPSHOT_SWITCH:
 		ret = parse_snapshot_delete_opt(veid, argc, argv, param);
 		break;
+	case ACTION_SNAPSHOT_LIST:
+		break;
 #endif
 	default :
 		if ((argc - 1) > 0) {
