@@ -65,6 +65,7 @@ CFLAGS="$RPM_OPT_FLAGS" %configure \
 make %{?_smp_mflags}
 
 %install
+rm -rf %{buildroot}
 make DESTDIR=$RPM_BUILD_ROOT vpsconfdir=%{_vpsconfdir} \
 	install install-redhat-from-spec
 ln -s ../sysconfig/vz-scripts $RPM_BUILD_ROOT/%{_configdir}/conf
