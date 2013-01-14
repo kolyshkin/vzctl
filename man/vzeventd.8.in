@@ -1,4 +1,4 @@
-.TH vzeventd 8 "28 Jun 2011" "OpenVZ" "Containers"
+.TH vzeventd 8 "14 Jan 2013" "OpenVZ" "Containers"
 .SH NAME
 vzeventd \- the OpenVZ events daemon.
 .SH SYNOPSIS
@@ -22,7 +22,7 @@ Current list of known events and associated \fBvzeventd\fR actions are:
 Ignore.
 .TP
 .B stop
-Run /usr/lib/vzctl/scripts/vzevent-stop. This script takes care of removing
+Run /usr/libexec/vzctl/scripts/vzevent-stop. This script takes care of removing
 ARP and routing records for the given CT from CT0.
 .TP
 .B mount
@@ -32,8 +32,8 @@ Ignore.
 Ignore.
 .TP
 .B reboot
-Run /usr/lib/vzctl/scripts/vzevent-reboot. This script takes care of rebooting
-a given CT.
+Run /usr/libexec/vzctl/scripts/vzevent-reboot. This script takes care of
+rebooting a given CT.
 .SH OPTIONS
 .TP
 .B \-v
@@ -47,7 +47,7 @@ Display help and exit.
 .SH EXIT STATUS
 Returns 0 upon success.
 .SH LICENSE
-Copyright (C) 2010-2011, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2010-2013, Parallels, Inc. Licensed under GNU GPL.
 .SH AUTHOR
 .PP
 This manual page was initially written by Thorsten Schifferdecker

@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "8 Sep 2012" "OpenVZ" "Containers"
+.TH vzctl 8 "14 Jan 2013" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -751,7 +751,7 @@ Delete a PCI device from the container.
 
 Note that \fBvps-pci\fR configuration script is executed by \fBvzctl\fR
 then configuring PCI devices. The script is usually located at
-\fB/usr/lib[64]/vzctl/scripts/\fR.
+\fB/usr/libexec/vzctl/scripts/\fR.
 
 .SS3 Features management
 .TP
@@ -1358,4 +1358,4 @@ To permanently remove this container:
 .BR vzubc (8),
 .BR http://wiki.openvz.org/UBC .
 .SH LICENSE
-Copyright (C) 2000-2011, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2000-2013, Parallels, Inc. Licensed under GNU GPL.
