@@ -239,6 +239,11 @@ static int __ct_enter(vps_handler *h, envid_t veid, int flags)
 	if (dp == NULL)
 		return VZ_RESOURCE_ERROR;
 
+	if ((ret = container_add_task(veid))) {
+		logger(-1, 0, "Can't add task creator to container: %s", container_error(ret));
+		return VZ_RESOURCE_ERROR;
+	}
+
 	ret = VZ_RESOURCE_ERROR;
 	while ((ep = readdir (dp))) {
 		int fd;
@@ -256,10 +261,6 @@ static int __ct_enter(vps_handler *h, envid_t veid, int flags)
 	}
 	ret = 0;
 
-	if ((ret = container_add_task(veid))) {
-		logger(-1, 0, "Can't add task creator to container: %s", container_error(ret));
-		return VZ_RESOURCE_ERROR;
-	}
 out:
 	closedir(dp);
 	return ret;
