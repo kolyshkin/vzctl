@@ -45,6 +45,7 @@ int vzctl_read_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tree
 int vzctl_store_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tree);
 
 /* src/snapshot.c */
+int is_snapshot_supported(const char *ve_private);
 int vzctl_env_create_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 		const struct vzctl_snapshot_param *param);
 

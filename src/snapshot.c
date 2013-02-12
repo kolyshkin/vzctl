@@ -41,7 +41,7 @@ static void vzctl_get_snapshot_ve_conf(const char *private, const char *guid,
 			private, guid);
 }
 
-static int is_snapshot_supported(const char *ve_private)
+int is_snapshot_supported(const char *ve_private)
 {
 	if (! ve_private_is_ploop(ve_private)) {
 		logger(-1, 0, "Snapshot feature is only available "
