@@ -169,17 +169,17 @@ static int build_field_order_list(const char *fields)
 		len = p - sp + 1;
 		if (len > sizeof(name) - 1) {
 			fprintf(stderr, "Field name %s is unknown.\n", sp);
-			return 1;
+			return VZ_INVALID_PARAMETER_VALUE;
 		}
 		snprintf(name, len, "%s", sp);
 		sp = p + 1;
 		id = get_field_tbl_id(name);
 		if (id == -1) {
 			fprintf(stderr, "Unknown field: %s\n", name);
-			return 1;
+			return VZ_INVALID_PARAMETER_VALUE;
 		}
 		if (add_entry(&g_field_order_head, id))
-			return 1;
+			return VZ_RESOURCE_ERROR;
 	} while (sp < ep);
 
 	return 0;
@@ -194,7 +194,7 @@ static int build_uuid_list(struct vzctl_snapshot_tree *tree, const char *guid)
 	if (guid == NULL) {
 		for (n = 0; n < tree->nsnapshots; n++) {
 			if (add_entry(&g_uuid_list_head, n))
-				return 1;
+				return VZ_RESOURCE_ERROR;
 		}
 		return 0;
 	}
@@ -202,11 +202,11 @@ static int build_uuid_list(struct vzctl_snapshot_tree *tree, const char *guid)
 		id = vzctl_find_snapshot_by_guid(tree, guid);
 		if (id == -1) {
 			fprintf(stderr, "Can't find snapshot by uuid %s\n", guid);
-			return 1;
+			return VZ_INVALID_PARAMETER_VALUE;
 		}
 
 		if (add_entry(&g_uuid_list_head, id))
-			return 1;
+			return VZ_RESOURCE_ERROR;
 
 		guid = tree->snapshots[id]->parent_guid;
 		if (guid == NULL || *guid == '\0') {
@@ -216,7 +216,7 @@ static int build_uuid_list(struct vzctl_snapshot_tree *tree, const char *guid)
 	}
 	if (!done) {
 		fprintf(stderr, "Inconsistency detected, base image not found\n");
-		return 1;
+		return VZCTL_E_LIST_SNAPSHOT;
 	}
 	return 0;
 }
@@ -286,7 +286,7 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 			if (vzctl_get_normalized_guid(optarg, fname, sizeof(fname))) {
 				fprintf(stderr, "Invalid guid is specified: %s\n",
 						optarg);
-				return 1;
+				return VZ_INVALID_PARAMETER_VALUE;
 			}
 			guid = strdup(fname);
 			break;
@@ -298,7 +298,7 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 			return 0;
 		default:
 			usage_snapshot_list(1);
-			return 1;
+			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 	}
 
@@ -307,19 +307,20 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 		while (optind < argc)
 			fprintf(stderr, "%s ", argv[optind++]);
 		fprintf(stderr, "\n");
-		return 1;
+		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 
-	if (build_field_order_list(output))
-		return 1;
+	ret = build_field_order_list(output);
+	if (ret)
+		return ret;
 
 	if (ve_private == NULL) {
 		fprintf(stderr, "VE_PRIVATE is not specified");
-		return 1;
+		return VZ_VE_PRIVATE_NOTSET;
 	}
 
 	if (!is_snapshot_supported(ve_private))
-		return 1;
+		return VZCTL_E_LIST_SNAPSHOT;
 
 	GET_SNAPSHOT_XML(fname, ve_private)
 	if (stat_file(fname) != 1) {
@@ -329,23 +330,24 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 
 	tree = vzctl_alloc_snapshot_tree();
 	if (tree == NULL)
-		return 1;
+		return VZ_RESOURCE_ERROR;
 
 	ret = vzctl_read_snapshot_tree(fname, tree);
 	if (ret) {
 		fprintf(stderr, "Failed to read %s", fname);
-		return 1;
+		return ret;
 	}
 
-	if (build_uuid_list(tree, guid))
-		return 1;
+	ret = build_uuid_list(tree, guid);
+	if (ret)
+		return ret;
 
 	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop.read_disk_descr(&g_di, fname);
 	if (ret) {
 		fprintf(stderr, "Failed to read %s: %s",
 				fname, ploop.get_last_error());
-		return 1;
+		return VZCTL_E_LIST_SNAPSHOT;
 	}
 
 	print_hdr(no_hdr);

@@ -1263,6 +1263,8 @@ Error deleting ploop snapshot
 Error switching  ploop snapshot
 .IP 161
 Error compacting ploop image
+.IP 162
+Error listing ploop snapsots
 .SH EXAMPLES
 To create and start "basic" container with ID of 1000 using
 \fBcentos-5\fR OS template and IP address of 192.168.10.200:
