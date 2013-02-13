@@ -51,7 +51,8 @@ BOOTPROTO=static
 ONBOOT=yes
 IPADDR=127.0.0.1
 NETMASK=255.255.255.255
-BROADCAST=0.0.0.0" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
+BROADCAST=0.0.0.0
+ARPCHECK=\"no\"" > $IFCFG || error "Can't write to file $IFCFG" $VZ_FS_NO_DISK_SPACE
 
 	# Set /etc/sysconfig/network
 	put_param $NETFILE NETWORKING yes
@@ -103,7 +104,11 @@ function add_ip6()
 	if ! grep -qw "$1" ${IFCFG} 2>/dev/null; then
 		setup6_network
 		add_param ${IFCFG} IPV6ADDR_SECONDARIES "$1/$2"
-		ifconfig ${VENET_DEV} add "$1/$2"
+		if have_ifconfig; then
+			ifconfig ${VENET_DEV} add "$1/$2"
+		else
+			ip a a $1/$2 dev ${VENET_DEV}
+		fi
 	fi
 }
 
@@ -161,6 +166,21 @@ function move_configs()
 	rm -rf ${IFCFG_DIR}/bak
 }
 
+function check_running()
+{
+	if have_ifconfig; then
+		if ifconfig ${VENET_DEV} | grep -qFw RUNNING 2>/dev/null; then
+			return 1
+		fi
+	else
+		if ip l l ${VENET_DEV} | grep -qFw UP 2>/dev/null; then
+			return 1
+		fi
+	fi
+
+	return 0
+}
+
 function add_ip()
 {
 	local ipm
@@ -213,7 +233,8 @@ function add_ip()
 		# synchronyze config files & interfaces
 		if [ "${NETWORKRESTART}" = "yes" ]; then
 			/etc/init.d/network restart
-		elif ! ifconfig ${VENET_DEV}|grep -q RUNNING 2>/dev/null; then
+		elif check_running; then
+			# check_running return 0; so not running; restart
 			/etc/init.d/network restart
 		elif [ -n "${if_restart}" ]; then
 			ifup ${VENET_DEV}

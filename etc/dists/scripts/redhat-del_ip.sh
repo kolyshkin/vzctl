@@ -30,6 +30,7 @@ function del_ip()
 	local filetodel
 	local file
 	local aliasid
+	local addr
 
 	[ -d ${IFCFG_DIR} ] || return 0
 	cd ${IFCFG_DIR} || return 0
@@ -43,7 +44,11 @@ function del_ip()
 		# IPV6 processing
 		if [ -n "$_IPV6ADDR" ]; then
 			del_param ${IFCFG} IPV6ADDR_SECONDARIES "${_IP}\\/${_MASK}"
-			ifconfig ${VENET_DEV} del ${_IP}/${_MASK}
+			if have_ifconfig; then
+				ifconfig ${VENET_DEV} del ${_IP}/${_MASK}
+			else
+				ip a d ${_IP}/${_MASK} dev ${VENET_DEV}
+			fi
 			continue
 		fi
 		# find and delete a file with this alias
@@ -53,14 +58,25 @@ function del_ip()
 			rm -f "${file}"
 			aliasid=`echo ${file} | sed s/.*://g`
 			if [ -n "${aliasid}" ]; then
-				ifconfig ${VENET_DEV}:${aliasid} down >/dev/null 2>&1
+				if have_ifconfig; then
+					ifconfig ${VENET_DEV}:${aliasid} down >/dev/null 2>&1
+				else
+					ip a d ${_IP}/${_MASK} dev ${VENET_DEV} >/dev/null 2>&1
+				fi
 			fi
 		done
-		# Even if file not found, try to delete IP
-		for aliasid in $(ifconfig | grep -B1 "\\<inet addr:${_IP}\\>" |
-				awk "/^${VENET_DEV}:/ {print \$1}"); do
-			ifconfig ${aliasid} down >/dev/null 2>&1
-		done
+		# Even if file not found, try to delete by address
+		if have_ifconfig; then
+			for aliasid in $(ifconfig | grep -B1 "\\<inet addr:${_IP}\\>" |
+					awk "/^${VENET_DEV}:/ {print \$1}"); do
+				ifconfig ${aliasid} down >/dev/null 2>&1
+			done
+		else
+			for addr in $(ip a l dev ${VENET_DEV} |
+					grep -Fw ${_IP} | awk '{print $2}'); do
+				ip a d $addr dev ${VENET_DEV} >/dev/null 2>&1
+			done
+		fi
 	done
 }
 

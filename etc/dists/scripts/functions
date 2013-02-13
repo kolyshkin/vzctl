@@ -451,3 +451,8 @@ setup_quota() {
 		setup_vzquota
 	fi
 }
+
+have_ifconfig()
+{
+	which ifconfig >/dev/null 2>&1
+}
