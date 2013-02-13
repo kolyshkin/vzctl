@@ -36,7 +36,36 @@
 #include "logger.h"
 #include "script.h"
 
-int create_static_dev(const char *root, const char *name,
+/* Create an /etc/tmpfiles.d entry for systemd from Fedora 18+ */
+static int create_tmpfiles_d_entry(const char *prefix,
+		const char *name, const char *alias,
+		mode_t mode, dev_t dev)
+{
+	FILE *fp;
+	char buf[PATH_MAX];
+
+	snprintf(buf, sizeof(buf), "%setc/tmpfiles.d", prefix);
+	if (stat_file(buf) != 1)
+		return 0;
+
+	if (alias == NULL)
+		alias = name;
+
+	snprintf(buf, sizeof(buf), "%setc/tmpfiles.d/device-%s.conf",
+			prefix, alias);
+	logger(2, 0, "Creating %s", buf);
+	fp = fopen(buf, "w");
+	if (fp == NULL)
+		return vzctl_err(-1, errno, "Failed to create %s", buf);
+	fprintf(fp, "%c /dev/%s 0700 root root - %d:%d\n",
+			(mode & S_IFBLK) ? 'b' : 'c',
+			name, gnu_dev_major(dev), gnu_dev_minor(dev));
+	fclose(fp);
+
+	return 0;
+}
+
+int create_static_dev(const char *root, const char *name, const char *alias,
 		mode_t mode, dev_t dev)
 {
 	char buf[PATH_MAX];
@@ -76,6 +105,8 @@ int create_static_dev(const char *root, const char *name,
 		}
 	}
 
+	create_tmpfiles_d_entry(prefix, device, alias, mode, dev);
+
 	return ret;
 }
 
@@ -105,7 +136,8 @@ static int dev_create(const char *root, dev_res *dev)
 	}
 
 	/* ... and create it in CT */
-	if (create_static_dev(root, dev->name, st.st_mode, st.st_rdev) != 0)
+	if (create_static_dev(root, dev->name, NULL,
+				st.st_mode, st.st_rdev) != 0)
 		return VZ_SET_DEVICES;
 
 	return 0;
