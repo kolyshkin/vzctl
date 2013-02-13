@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <string.h>
+#include <limits.h>
 
 #include <linux/vzcalluser.h>
 
@@ -35,60 +36,78 @@
 #include "logger.h"
 #include "script.h"
 
-static int dev_create(const char *root, dev_res *dev)
+static int create_static_dev(const char *root, const char *name,
+		mode_t mode, dev_t dev)
 {
-	char buf1[STR_SIZE];
-	char buf2[STR_SIZE];
-	struct stat st, st2;
-	const char* udev_paths[] = {
+	char buf[PATH_MAX];
+	const char *device;
+	const char *prefix = "/";
+	static char *dirs[] = {
+		"/dev",
 		"/usr/lib/udev/devices",
 		"/lib/udev/devices",
 		"/etc/udev/devices",
-		NULL};
-	int i;
+		};
+	unsigned int i;
+	int ret = 0;
+
+	if (name == NULL)
+		return 0;
+
+	if (root)
+		prefix = root;
+
+	device = strrchr(name, '/');
+	if (device == NULL)
+		device = name;
+	else
+		device++;
+
+	for (i = 0; i < ARRAY_SIZE(dirs); i++) {
+		snprintf(buf, sizeof(buf), "%s%s", prefix, dirs[i]);
+		if (stat_file(buf) != 1)
+			continue;
+
+		snprintf(buf, sizeof(buf), "%s%s/%s", prefix, dirs[i], device);
+		unlink(buf);
+		if (mknod(buf, mode, dev)) {
+			logger(-1, errno, "Failed to mknod %s", buf);
+			ret = 1;
+		}
+	}
+
+	return ret;
+}
+
+static int dev_create(const char *root, dev_res *dev)
+{
+	char buf[PATH_MAX];
+	struct stat st;
 
 	if (!dev->name)
 		return 0;
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 
-	/* Get device information from CT0 and create it in CT */
-	snprintf(buf1, sizeof(buf1), "%s/dev/%s", root, dev->name);
-	snprintf(buf2, sizeof(buf2), "/dev/%s", dev->name);
-	if (stat(buf2, &st)) {
+	/* Get device information from CT0 ... */
+	snprintf(buf, sizeof(buf), "/dev/%s", dev->name);
+	if (stat(buf, &st)) {
 		if (errno == ENOENT)
 			logger(-1, 0, "Incorrect name or no such device %s",
-				buf2);
+				buf);
 		else
-			logger(-1, errno, "Unable to stat device %s", buf2);
+			logger(-1, errno, "Unable to stat device %s", buf);
 		return VZ_SET_DEVICES;
 	}
 	if (!S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode)) {
-		logger(-1, 0, "The %s is not block or character device", buf2);
+		logger(-1, 0, "The %s is not block or character device", buf);
 		return VZ_SET_DEVICES;
 	}
-	if (make_dir(buf1, 0))
+
+	/* ... and create it in CT */
+	if (create_static_dev(root, dev->name, st.st_mode, st.st_rdev) != 0)
 		return VZ_SET_DEVICES;
-	unlink(buf1);
-	if (mknod(buf1, st.st_mode, st.st_rdev)) {
-		logger(-1, errno, "Unable to create device %s", buf1);
-		return VZ_SET_DEVICES;
-	}
-	/* Try to create static device node for udev */
-	for (i = 0; udev_paths[i] != NULL; i++) {
-		if (stat(udev_paths[i], &st2) == 0) {
-			if (S_ISDIR(st2.st_mode)) {
-				snprintf(buf1, sizeof(buf1),
-						"%s/%s/%s",
-						root, udev_paths[i],
-						dev->name);
-				make_dir(buf1, 0);
-				unlink(buf1);
-				mknod(buf1, st.st_mode, st.st_rdev);
-				break;
-			}
-		}
-	}
+
 	return 0;
 }
 
