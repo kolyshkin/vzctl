@@ -60,7 +60,16 @@ del_ip()
 	for ipm; do
 		ip_conv $ipm
 		quoted="$(quote_sed_regexp "$_IP/$_MASK")"
-		sed -i -e "/^$quoted/d" "$VENET_DEV/ipv4address"
+		if [ -n "$_IPV6ADDR" ]; then
+			sed -i -e "/^$quoted/d" "$VENET_DEV/ipv6address"
+			if [ ! -s "$VENET_DEV/ipv6address" ]; then
+				rm -f -- "$VENET_DEV/ipv6address"
+				rm -f -- "$VENET_DEV/ipv6route"
+				sed -i -e "/^CONFIG_IPV6/d" "$VENET_DEV/options"
+			fi
+		else
+			sed -i -e "/^$quoted/d" "$VENET_DEV/ipv4address"
+		fi
 		ip addr del dev "$VENET_DEV" "$_IP/$_MASK"
 	done
 

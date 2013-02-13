@@ -58,6 +58,24 @@ destroy_venet_config()
 		error "Cannot destroy $dir" ${VZ_FS_NO_DISK_SPACE}
 }
 
+del_ipv6_conf()
+{
+	local dir="$1"; shift
+
+	if [ -f "$dir/ipv6address" ]; then
+		rm -f "$dir/ipv6address" ||
+			error "Cannot remove $dir/ipv6address" ${VZ_FS_NO_DISK_SPACE}
+	fi
+
+	if [ -f "$dir/ipv6route" ]; then
+		rm -f "$dir/ipv6route" ||
+			error "Cannot remove $dir/ipv6route" ${VZ_FS_NO_DISK_SPACE}
+	fi
+
+	del_param ".tmp/$VENET_DEV/options" "CONFIG_IPV6=yes"
+
+}
+
 setup_network()
 {
 	# Purge old venet0 interface settings
@@ -82,6 +100,23 @@ create_alias()
 
 	echo "$ip/$mask label $VENET_DEV:$ifnum" >>".tmp/$VENET_DEV/ipv4address" ||
 		error "Cannot create .tmp/$VENET_DEV/ipv4address" ${VZ_FS_NO_DISK_SPACE}
+}
+
+add_ip6() {
+	local ip="$1"; shift
+	local mask="$1"; shift
+
+	[ "${IPV6}" != "yes" ] && return
+
+	if ! grep -qw "$ip" ".tmp/$VENET_DEV/ipv6address" 2>/dev/null; then
+		echo "2000::/3 dev $VENET_DEV" > ".tmp/$VENET_DEV/ipv6route" ||
+			error "Cannot create .tmp/$VENET_DEV/ipv6route" ${VZ_FS_NO_DISK_SPACE}
+
+		echo "$ip/$mask" >> ".tmp/$VENET_DEV/ipv6address" ||
+			error "Cannot create .tmp/$VENET_DEV/ipv6address" ${VZ_FS_NO_DISK_SPACE}
+
+		put_param ".tmp/$VENET_DEV/options" "CONFIG_IPV6" "yes"
+	fi
 }
 
 backup_configs()
@@ -125,8 +160,15 @@ add_ip()
 		local i=0 ipm
 		for ipm; do
 			ip_conv $ipm
-			i="$(find_unused_alias "$(($i+1))")"
-			create_alias "$_IP" "$_MASK" "$i"
+			if [ -z "$_IPV6ADDR" ]; then
+				i="$(find_unused_alias "$(($i+1))")"
+				create_alias "$_IP" "$_MASK" "$i"
+			else
+				if [ "$IPDELALL" = "yes" ]; then
+				     del_ipv6_conf "$VENET_DEV"
+				fi
+				add_ip6 "${_IP}" "${_MASK}"
+			fi
 		done
 
 		move_configs
