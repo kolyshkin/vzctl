@@ -1075,15 +1075,17 @@ FOR_ALL_UBC(MERGE_UBC)
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
 		ve->ip = strdup(list2str(NULL, &res->net.ip));
 	}
-	if (ve->quota == NULL &&
-		res->dq.diskspace != NULL &&
-		res->dq.diskinodes != NULL)
+	if (ve->quota == NULL && (
+		res->dq.diskspace != NULL ||
+		res->dq.diskinodes != NULL))
 	{
 		ve->quota = x_malloc(sizeof(struct Cquota));
 		memset(ve->quota, 0, sizeof(struct Cquota));
 
-		MERGE_QUOTA(diskspace, ve->quota, res->dq);
-		MERGE_QUOTA(diskinodes, ve->quota, res->dq);
+		if (res->dq.diskspace)
+			MERGE_QUOTA(diskspace, ve->quota, res->dq);
+		if (res->dq.diskinodes)
+			MERGE_QUOTA(diskinodes, ve->quota, res->dq);
 
 	}
 	if (ve->cpu == NULL &&
@@ -1466,6 +1468,11 @@ static int get_ve_ploop_info(struct Cveinfo *ve)
 	GET_DISK_DESCRIPTOR(descr, ve->private);
 	if (ploop.get_info_by_descr(descr, &i))
 		return -1;
+
+	if (ve->quota == NULL) {
+		ve->quota = x_malloc(sizeof(struct Cquota));
+		memset(ve->quota, 0, sizeof(struct Cquota));
+	}
 
 	// space avail
 	ve->quota->diskspace[1] = ve->quota->diskspace[2] =
