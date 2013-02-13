@@ -489,7 +489,6 @@ static void print_disabled(struct Cveinfo *p, int index)
 
 static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 {
-	int running = p->status == VE_RUNNING;
 	unsigned long *res = p->quota ?
 		(unsigned long *)(p->quota) + res_off : NULL;
 
@@ -500,8 +499,7 @@ static void print_dq(struct Cveinfo *p, size_t res_off, int index)
 				"      \"softlimit\": %lu,\n"
 				"      \"hardlimit\": %lu\n"
 				"    }",
-				running ? res[0] : 0,
-				res[1], res[2]);
+				res[0], res[1], res[2]);
 		} else
 			printf("null");
 		return;
