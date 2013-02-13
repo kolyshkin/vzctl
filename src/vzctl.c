@@ -314,7 +314,7 @@ int main(int argc, char *argv[], char *envp[])
 	}
 	merge_vps_param(gparam, vps_p);
 	merge_global_param(cmd_p, gparam);
-	ret = run_action(veid, action, gparam, vps_p, cmd_p, argc-1, argv+1,
+	ret = run_action(veid, action, gparam, vps_p, cmd_p, argc, argv,
 		skiplock);
 
 error:

@@ -1446,15 +1446,15 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = show_status(h, veid, g_p);
 		break;
 	case ACTION_ENTER:
-		ret = enter(h, veid, g_p->res.fs.root, argc, argv);
+		ret = enter(h, veid, g_p->res.fs.root, argc-1, argv+1);
 		break;
 	case ACTION_CONSOLE:
-		ret = console_attach(h, veid, argc, argv);
+		ret = console_attach(h, veid, argc-1, argv+1);
 		break;
 	case ACTION_EXEC:
 	case ACTION_EXEC2:
 	case ACTION_EXEC3:
-		ret = exec(h, action, veid, g_p->res.fs.root, argc, argv);
+		ret = exec(h, action, veid, g_p->res.fs.root, argc-1, argv+1);
 		if (ret && action == ACTION_EXEC)
 			ret = VZ_COMMAND_EXECUTION_ERROR;
 		break;
@@ -1465,7 +1465,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = restore(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_RUNSCRIPT:
-		ret = vps_run_script(h, veid, argv[0], g_p);
+		ret = vps_run_script(h, veid, argv[1], g_p);
 		break;
 
 #define CHECK_DQ(r)								\
