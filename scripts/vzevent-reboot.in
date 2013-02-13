@@ -6,4 +6,8 @@ while vzctl --quiet status $VEID | fgrep -w running; do
 	test $I -gt 10 && exit 1
 done
 
+if vzctl --quiet status $VEID | fgrep -w mounted; then
+	vzctl --quiet umount $VEID
+fi
+
 vzctl --quiet start $VEID

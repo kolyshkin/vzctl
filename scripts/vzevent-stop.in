@@ -1,5 +1,5 @@
 #!/bin/sh
-#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -49,6 +49,10 @@ while vzctl --quiet status $VEID | fgrep -w running; do
 	test $I -gt 10 && exit 1
 done
 
+if vzctl --quiet status $VEID | fgrep -w mounted; then
+	vzctl --quiet umount $VEID
+fi
+
 # Workaround for Fedora 17, see http://bugzilla.openvz.org/2336
 # If $VE_ROOT/reboot file is present, rm it and restart CT
 (
@@ -61,10 +65,6 @@ done
 	exit 111
 )
 test $? -eq 111 && exec vzctl --quiet start $VEID
-
-if vzctl --quiet status $VEID | fgrep -w mounted; then
-	vzctl --quiet umount $VEID
-fi
 
 if test -f "$VE_STATE_DIR/$VEID"; then
 	clear_ve_net
