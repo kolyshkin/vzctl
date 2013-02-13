@@ -36,7 +36,7 @@
 #include "logger.h"
 #include "script.h"
 
-static int create_static_dev(const char *root, const char *name,
+int create_static_dev(const char *root, const char *name,
 		mode_t mode, dev_t dev)
 {
 	char buf[PATH_MAX];

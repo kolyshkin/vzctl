@@ -36,6 +36,7 @@
 #include "util.h"
 #include "script.h"
 #include "fs.h"
+#include "dev.h"
 
 volatile sig_atomic_t alarm_flag;
 static char *envp_bash[] = {"HOME=/", "TERM=linux", ENV_PATH, NULL};
@@ -214,35 +215,6 @@ int run_pre_script(int veid, char *script)
 	return ret;
 }
 
-static int mk_quota_dev(const char *name, dev_t dev)
-{
-	mode_t mode = S_IFBLK | S_IXGRP;
-	static char *dirs[] = {"/dev",
-		"/etc/udev/devices",
-		"/lib/udev/devices"};
-	char fname[256];
-	const char *p;
-	unsigned int i;
-	int ret = 0;
-
-	if ((p = strrchr(name, '/')) == NULL)
-		p = name;
-
-	for(i = 0; i < ARRAY_SIZE(dirs); i++) {
-		if (stat_file(dirs[i]) != 1)
-			continue;
-
-		snprintf(fname, sizeof(fname), "%s/%s", dirs[i], p);
-		unlink(fname);
-		if (mknod(fname, mode, dev)) {
-			logger(-1, errno, "Unable to create %s", fname);
-			ret = 1;
-		}
-	}
-
-	return ret;
-}
-
 #define PROC_QUOTA	"/proc/vz/vzaquota/"
 #define QUOTA_U		"/aquota.user"
 #define QUOTA_G		"/aquota.group"
@@ -258,8 +230,7 @@ static int mk_vzquota_link()
 	}
 	fs = vz_fs_get_name();
 	/* make dev */
-	snprintf(buf, sizeof(buf), "/dev/%s", fs);
-	mk_quota_dev(buf, st.st_dev);
+	create_static_dev(NULL, fs, S_IFBLK|S_IXGRP, st.st_dev);
 
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
 		(unsigned long)st.st_dev);
@@ -281,7 +252,8 @@ int setup_env_quota(const struct setup_env_quota_param *param)
 	if (param->dev_name[0] == '\0') /* simfs/vzquota */
 		return mk_vzquota_link();
 	/* ploop */
-	if (mk_quota_dev(param->dev_name, param->dev))
+	if (create_static_dev(NULL, param->dev_name,
+				S_IFBLK|S_IXGRP, param->dev))
 		return -1;
 	return system("quotaon -a");
 }
