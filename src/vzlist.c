@@ -1931,12 +1931,11 @@ int main(int argc, char **argv)
 			veid = strtol(argv[optind], &ep, 10);
 			if (*ep != 0 || !veid) {
 				veid = get_veid_by_name(argv[optind]);
-				if (veid < 0) {
-					fprintf(stderr,
-						"CT ID %s is invalid.\n",
+			}
+			if (veid < 0 || veid > VEID_MAX) {
+				fprintf(stderr, "CT ID %s is invalid.\n",
 						argv[optind]);
-					return 1;
-				}
+				return 1;
 			}
 			optind++;
 			g_ve_list = x_realloc(g_ve_list,
