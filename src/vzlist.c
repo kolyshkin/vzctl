@@ -1678,6 +1678,11 @@ static int get_ve_list()
 		res = sscanf(ep->d_name, "%d.%5s", &veid, str);
 		if (!(res == 2 && !strcmp(str, "conf")))
 			continue;
+		if (veid < 0 || veid > VEID_MAX) {
+			fprintf(stderr, "Warning: invalid CTID in config file "
+					"name: %s, skipping\n", ep->d_name);
+			continue;
+		}
 		if (!check_veid_restr(veid))
 			continue;
 		ve.veid = veid;
