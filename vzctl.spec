@@ -22,7 +22,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.1
+Version: 4.2
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -243,6 +243,60 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Fri Feb 15 2013 Kir Kolyshkin <kir@openvz.org> - 4.2-1
+- New functionality:
+-- Support for Fedora 18 in container (devices, disk quota, venet IPs, caps)
+-- vzctl snapshot-list: add options a la vzlist (see --help or man for details)
+- Improvements:
+-- vzctl create: allow existing empty VE_PRIVATE (#2450)
+-- vzctl stop/reboot: disable fsync in CT
+-- vzctl: fix check for VEID_MAX
+-- vzctl --ipadd: IPv6 support for etcnet (ALT Linux) (#2482)
+-- vzlist: more strict check for cmdline-supplied CTIDs
+-- vzlist: warn/skip invalid CTIDs in ve.conf files (#2514)
+-- vzevent: do umount CT in case of reboot (#2507)
+-- init.d/vz-redhat: stop vz earlier (#2478)
+-- init.d/vz-gentoo: don't call tools by absolute path (#2477)
+-- vzubc: add -wt option (add -t to invoked watch) (#2474)
+-- vzubc: remove check for watch presence
+-- vzctl.spec: cleanups, fixes, improvements
+-- vzctl set --devnodes: add /usr/lib/udev/devices
+-- minor code cleanups
+- Fixes:
+-- vzlist: fix segfault for ploop-based CT with no DISKINODES set (#2488)
+-- vzlist --json: fix showing disk usage for non-running CTs
+-- vzlist -o cpus: do not overwrite runtime value
+-- vzlist --json: skip collecting numcpu info on old kernel
+-- vzubc: fix -w/-c check
+- Documentation:
+-- man/*: correct path to scripts
+-- vzctl(8): add missing CTID to SYNOPSYS
+-- vzctl(8): document new snapshot-list options
+
+* Tue Jan  1 2013 Kir Kolyshkin <kir@openvz.org> - 4.1.2-1
+- Regressions:
+-- etc/init.d/vz-gentoo: fix missing VZREBOOTDIR (#2467)
+-- fix extra arguments parsing by add-on modules (#2428)
+-- do not whine about unknown VE_STOP_MODE parameter
+- Bug fixes:
+-- load_ploop_lib(): prevent buffer overflow with newer ploop-lib
+
+* Fri Dec  7 2012 Kir Kolyshkin <kir@openvz.org> - 4.1.1-1
+- Regressions:
+-- etc/init.d/vz*: fix accidental start of all CTs (#2424)
+-- etc/init.d/vz*: do not auto-start CTs marked with ONBOOT=no (#2456)
+-- init.d/vz*: only apply oom score if appropriate /proc file exist (#2423)
+- Fixes:
+-- vzctl set --devnodes: add /usr/lib/udev/devices
+-- vzlist --json: skip collecting numcpu info on old kernel
+- Improvements:
+-- vz.conf, init.d/vz*: support for VE_STOP_MODE global parameter (#2432)
+-- enable build for architectures not supported by OpenVZ kernel
+-- vzlist: show if onboot field is unset
+- Documentation:
+-- vz.conf(5): describe VE_STOP_MODE
+-- vzctl(8), ctid.conf(5): fix ONBOOT/--onboot description
+
 * Thu Nov  1 2012 Kir Kolyshkin <kir@openvz.org> - 4.1-1
 - New features
 - * etc/init.d/vz: restore running containers after reboot (#781)
