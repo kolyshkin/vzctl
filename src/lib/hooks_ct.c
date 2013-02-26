@@ -213,13 +213,14 @@ static int ct_env_create(struct arg_start *arg)
 	return 0;
 }
 
-static int __ct_enter(vps_handler *h, envid_t veid, int flags)
+static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 {
 	DIR *dp;
 	struct dirent *ep;
 	char path[STR_SIZE]; /* long enough for any pid */
 	pid_t task_pid;
 	int ret = VZ_RESOURCE_ERROR;
+	bool joined_mnt_ns = false;
 
 	if (!h->can_join_pidns) {
 		logger(-1, 0, "Kernel lacks setns for pid namespace");
@@ -258,26 +259,27 @@ static int __ct_enter(vps_handler *h, envid_t veid, int flags)
 			goto out;
 		if (setns(fd, 0))
 			logger(-1, errno, "Failed to set context for %s", ep->d_name);
+
+		if (!strcmp(ep->d_name, "mnt"))
+			joined_mnt_ns = true;
 	}
+
+	/*
+	 * If we can join the mount namespace, we don't need to call
+	 * pivot_root, or any other follow up step, since we will already
+	 * inherit any fs tree structure the process already has.
+	 *
+	 * As a matter of fact, we won't even be able to see the container
+	 * directories to jump to
+	 */
+	if (!joined_mnt_ns && (ret = ct_chroot(root)))
+		return ret;
+
 	ret = 0;
 
 out:
 	closedir(dp);
 	return ret;
-}
-
-/*
- * We need to do chroot only after the context is set. Otherwise, we can't find the proc files
- * we need to operate on the ns files
- */
-static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
-{
-	int ret;
-	if ((ret = __ct_enter(h, veid, flags)))
-		return ret;
-	if ((ret = ct_chroot(root)))
-		return ret;
-	return 0;
 }
 
 #define add_value(val, var, mult) do { if (val) { var = *val * mult; } } while (0)
