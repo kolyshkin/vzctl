@@ -797,7 +797,7 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 	if (stop_mode == M_KILL)
 		goto kill_vps;
 
-	if (!is_vz_kernel(h)) {
+	if (!is_vz_kernel(h) && !h->can_join_pidns) {
 		logger(-1, 0, "Due to lack of proper support in this kernel, "
 		"container can't be cleanly\n"
 		"stopped from the host system. Please stop it from inside, "
