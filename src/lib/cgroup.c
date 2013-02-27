@@ -105,7 +105,7 @@ int container_apply_config(envid_t veid, enum conf_files c, void *_val)
 	case SWAP:
 		/* Unlike kmem, this must always be greater than mem */
 		if ((mem = cgroup_add_controller(ct, "memory"))) {
-			unsigned long mval;
+			u_int64_t mval;
 			if (!cgroup_get_value_uint64(mem, MEMLIMIT, &mval))
 				ret = cgroup_set_value_uint64(mem, SWAPLIMIT,
 							      mval + *val);
