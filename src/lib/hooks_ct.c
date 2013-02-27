@@ -370,7 +370,7 @@ static int ct_setcpus(vps_handler *h, envid_t veid, struct cpu_param *cpu)
 		max_lim = min_ul(*cpu->limit, max_lim);
 	if (cpu->vcpus != NULL)
 		max_lim = min_ul(max_lim, *cpu->vcpus * 100);
-	if (max_lim != ~0ULL)
+	if (max_lim != ~0UL)
 		ret |= container_apply_config(veid, CPULIMIT, &max_lim);
 
 	if (cpu->units != NULL) {
