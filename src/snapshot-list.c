@@ -50,7 +50,7 @@ static void print_name(struct vzctl_snapshot_data *p)
 
 static void print_desc(struct vzctl_snapshot_data *p)
 {
-	printf(FMT("%-38s "), p->desc ? p->desc : "");
+	printf(FMT("%-32s "), p->desc ? p->desc : "");
 }
 
 static void print_parent_uuid(struct vzctl_snapshot_data *p)
