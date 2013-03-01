@@ -74,10 +74,10 @@ static void print_device(struct vzctl_snapshot_data *p)
 	if (ploop.get_dev(g_di, dev, sizeof(dev)))
 		goto err;
 
-	printf(FMT("%-32s "), dev);
+	printf(FMT("%-16s "), dev);
 	return;
 err:
-	printf(FMT("%-32s "), "");
+	printf(FMT("%-16s "), "");
 	fprintf(stderr, "%s", ploop.get_last_error());
 	error++;
 }
