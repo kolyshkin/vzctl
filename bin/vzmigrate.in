@@ -481,14 +481,14 @@ if [ -f $DDXML ]; then
 fi
 
 if [ "$PLOOP" = "yes" ]; then
-	log 2 "Check if ploop is supported on destination node"
+	log 2 "Checking if ploop is supported on destination node"
 	if ! logexec 2 $SSH "root@$host" ploop getdev ; then
-		log 0 "Destination node don't support ploop, can't migrate"
+		log 0 "Destination node does not support ploop, can't migrate"
 		exit $MIG_ERR_UNSUP_PLOOP
 	fi
 fi
 
-log 2 "Check IPs on destination node: $IP_ADDRESS"
+log 2 "Checking IPs on destination node: $IP_ADDRESS"
 for IP in $IP_ADDRESS; do
 	if [ $($SSH "root@$host" "grep -c \" $IP \" /proc/vz/veip") -gt 0 ];
 	then
@@ -702,7 +702,7 @@ if [ "${DISK_QUOTA}" != "no" ]; then
 		exit $MIG_ERR_COPY
 	fi
 
-	log 2 "Load 2nd level quota"
+	log 2 "Loading 2nd level quota"
 	if ! $SSH "root@$host" "(vzdqload $VEID -U -G -T -F < $VE_QUOTADUMP &&
 			vzquota reload2 $VEID)"; then
 		log 0 "Failed to load 2nd level quota"
@@ -729,7 +729,7 @@ if [ $online -eq 1 ]; then
 	fi
 	time_finish=$(date +%s.%N)
 	print_times
-	log 1 "Cleanup"
+	log 1 "Cleaning up"
 
 	log 2 "Killing container"
 	logexec 2 $VZCTL chkpnt $VEID --kill
@@ -762,7 +762,7 @@ else
 		fi
 	fi
 
-	log 1 "Cleanup"
+	log 1 "Cleaning up"
 fi
 
 if [ $remove_area -eq 1 ]; then
