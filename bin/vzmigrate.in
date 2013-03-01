@@ -486,6 +486,20 @@ if [ "$PLOOP" = "yes" ]; then
 		log 0 "Destination node does not support ploop, can't migrate"
 		exit $MIG_ERR_UNSUP_PLOOP
 	fi
+
+	if [ "$state" = "running" ]; then
+		# Online ploop migration: exclude top delta
+		if ! get_ploop_info; then
+			log 0 "Can't get ploop information"
+			exit $MIG_ERR_COPY
+		fi
+		RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
+	fi
+else
+	# non-ploop case: can use sparse rsync, can't do compact/snapshot
+	RSYNC1_OPTIONS="--sparse"
+	compact=0
+	snapshot=0
 fi
 
 # Check that IP_ADDRESSes are not in use on dest
@@ -543,20 +557,6 @@ if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE"; then
 	log 0 "Failed to make container private area directory"
 	undo_private
 	exit $MIG_ERR_COPY
-fi
-
-if [ "$PLOOP" != "yes" ]; then
-	RSYNC1_OPTIONS="--sparse"
-	compact=0
-	snapshot=0
-elif [ "$state" = "running" ]; then
-	# Online ploop migration: exclude top delta
-	if ! get_ploop_info; then
-		log 0 "Can't get ploop information"
-		undo_private
-		exit $MIG_ERR_COPY
-	fi
-	RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
 fi
 
 if [ "${DISK_QUOTA}" != "no" ]; then
