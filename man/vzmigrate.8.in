@@ -152,6 +152,9 @@ CPT version incompatibility with the destination node.
 .TP
 .B 18 EXIT_UNSUP_CPU
 Destination node CPU incompatibility.
+.TP
+.B 19 EXIT_CANT_READ_REMOTE_CONFIG
+Unable to read remote vz.conf.
 
 .SH SEE ALSO
 .BR rsync (1),

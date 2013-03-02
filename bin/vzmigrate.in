@@ -63,6 +63,7 @@ MIG_ERR_APPLY_CONFIG=15
 MIG_ERR_UNSUP_PLOOP=16
 MIG_ERR_UNSUP_CPT_VER=17
 MIG_ERR_UNSUP_CPU=18
+MIG_ERR_CANT_READ_REMOTE_CONFIG=19
 
 # For local vzctl to work, make sure @SBINDIR@ is in $PATH
 if ! echo ":${PATH}:" | fgrep -q ':@SBINDIR@:'; then
@@ -170,13 +171,13 @@ undo_act_scripts () {
 
 undo_private () {
 	if [ $keep_dst -eq 0 ]; then
-		$SSH "root@$host" "rm -rf $VE_PRIVATE"
+		$SSH "root@$host" "rm -rf $VE_PRIVATE_REMOTE"
 	fi
 	undo_act_scripts
 }
 
 undo_root () {
-	$SSH "root@$host" "rm -rf $VE_ROOT"
+	$SSH "root@$host" "rm -rf $VE_ROOT_REMOTE"
 	undo_private
 }
 
@@ -529,6 +530,22 @@ log 2 "Loading $vzconf and $vpsconf files"
 VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
+log 2 "Getting remote VE_ROOT and VE_PRIVATE"
+eval $($SSH root@$host "sh -c 'VEID='$VEID'; source /etc/vz/vz.conf && echo VE_ROOT_REMOTE=\$VE_ROOT && echo VE_PRIVATE_REMOTE=\$VE_PRIVATE'")
+if [ -z "$VE_ROOT_REMOTE" -o -z "$VE_PRIVATE_REMOTE" ]; then
+        log 0 "Failed to get remote VE_ROOT/VE_PRIVATE"
+        exit $MIG_ERR_CANT_READ_REMOTE_CONFIG
+fi
+
+if [ $VE_PRIVATE != $VE_PRIVATE_REMOTE ]; then
+        log 1 "Remote VE_PRIVATE path differs from local $VEID.conf"
+        log 1 "Using $VE_PRIVATE_REMOTE for syncing"
+fi
+if [ $VE_ROOT != $VE_ROOT_REMOTE ]; then
+        log 1 "Remote VE_ROOT path differs from local $VEID.conf"
+        log 1 "Using $VE_ROOT_REMOTE for syncing"
+fi
+
 DDXML=$VE_PRIVATE/root.hdd/DiskDescriptor.xml
 if [ -f $DDXML ]; then
 	PLOOP=yes
@@ -585,6 +602,8 @@ if ! logexec 2 $SCP $vpsconf root@$host:$vpsconf ; then
 	exit $MIG_ERR_COPY
 fi
 
+logexec 2 $SSH root@$host $VZCTL set $VEID --private $VE_PRIVATE_REMOTE --root $VE_ROOT_REMOTE --save
+
 logexec 2 $SSH root@$host $VZCTL set $VEID --applyconfig_map name --save
 RET=$?
 # vzctl return code 20 or 21 in case of unrecognized option
@@ -610,14 +629,14 @@ if [ -n "$act_scripts" ]; then
 fi
 
 log 2 "Creating remote container root dir"
-if ! $SSH "root@$host" "mkdir -p $VE_ROOT"; then
+if ! $SSH "root@$host" "mkdir -p $VE_ROOT_REMOTE"; then
 	log 0 "Failed to make container root directory"
 	undo_act_scripts
 	exit $MIG_ERR_COPY
 fi
 
 log 2 "Creating remote container private dir"
-if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE"; then
+if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE_REMOTE"; then
 	log 0 "Failed to make container private area directory"
 	undo_private
 	exit $MIG_ERR_COPY
@@ -658,7 +677,7 @@ if [ "$snapshot" -eq 1 ]; then
 fi
 
 log 1 "Syncing private"
-$RSYNC $RSYNC1_OPTIONS "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"
+$RSYNC $RSYNC1_OPTIONS "$VE_PRIVATE" "root@$host:${VE_PRIVATE_REMOTE%/*}"
 RET=$?
 # Ignore rsync error 24 "Partial transfer due to vanished source files"
 if [ $RET != 24 ] && [ $RET != 0 ]; then
@@ -745,7 +764,7 @@ fi
 time_rsync2=$(date +%s.%N)
 if [ "$state" = "running" -a "$PLOOP" != "yes" ]; then
 	log 2 "Syncing private (2nd pass)"
-	if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"; then
+	if ! $RSYNC "$VE_PRIVATE" "root@$host:${VE_PRIVATE_REMOTE%/*}"; then
 		log 0 "Failed to sync container private areas"
 		undo_source_stage
 		exit $MIG_ERR_COPY
