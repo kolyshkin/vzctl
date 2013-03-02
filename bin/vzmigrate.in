@@ -523,8 +523,9 @@ if ! logexec 2 $SCP $vpsconf root@$host:$vpsconf ; then
 fi
 
 logexec 2 $SSH root@$host $VZCTL set $VEID --applyconfig_map name --save
+RET=$?
 # vzctl return code 20 or 21 in case of unrecognized option
-if [ $? != 20 ] && [ $? != 21 ] && [ $? != 0 ]; then
+if [ $RET != 20 ] && [ $RET != 21 ] && [ $RET != 0 ]; then
 	log 0 "Failed to apply config on destination node"
 	undo_conf
 	exit $MIG_ERR_APPLY_CONFIG
@@ -595,8 +596,9 @@ fi
 
 log 1 "Syncing private"
 $RSYNC $RSYNC1_OPTIONS "$VE_PRIVATE" "root@$host:${VE_PRIVATE%/*}"
+RET=$?
 # Ignore rsync error 24 "Partial transfer due to vanished source files"
-if [ $? != 24 ] && [ $? != 0 ]; then
+if [ $RET != 24 ] && [ $RET != 0 ]; then
 	log 0 "Failed to sync container private areas"
 	undo_quota_on
 	exit $MIG_ERR_COPY
