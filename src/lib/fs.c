@@ -153,11 +153,6 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 		return VZ_VE_ROOT_NOTSET;
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
-	if (!stat_file(fs->private)) {
-		logger(-1, 0, "Container private area %s does not exist",
-				fs->private);
-		return VZ_FS_NOPRVT;
-	}
 	if (vps_is_mounted(fs->root, fs->private) == 1) {
 		logger(-1, 0, "Container is already mounted");
 		return 0;
@@ -175,6 +170,16 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 			snprintf(buf, sizeof(buf), "%s%d.%s", VPS_CONF_DIR,
 				veid, PRE_MOUNT_PREFIX);
 		}
+	}
+	if (!stat_file(fs->private)) {
+		logger(-1, 0, "Container private area %s does not exist",
+				fs->private);
+		return VZ_FS_NOPRVT;
+	}
+	if (!stat_file(fs->private)) {
+		logger(-1, 0, "Container private area %s does not exist",
+				fs->private);
+		return VZ_FS_NOPRVT;
 	}
 	if ((ret = fsmount(veid, fs, dq)))
 		return ret;
