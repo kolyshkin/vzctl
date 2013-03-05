@@ -92,6 +92,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/vznetcfg
 %{_sbindir}/vznetaddbr
 %{_sbindir}/vzcalc
+%{_sbindir}/vzcptcheck
 %{_sbindir}/vzpid
 %{_sbindir}/vzcfgvalidate
 %{_sbindir}/vzmigrate
@@ -102,6 +103,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_netdir}/ifcfg-venet0
 %{_mandir}/man8/vzeventd.8.*
 %{_mandir}/man8/vzmigrate.8.*
+%{_mandir}/man8/vzcptcheck.8.*
 %{_mandir}/man8/vzsplit.8.*
 %{_mandir}/man8/vzcfgvalidate.8.*
 %{_mandir}/man8/vzmemcheck.8.*

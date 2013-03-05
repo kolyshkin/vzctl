@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2010, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #define CPT_SET_ERRORFD _IOW(CPTCTLTYPE, 21, int)
 #define CPT_LINKDIR_ADD _IOW(CPTCTLTYPE, 24, int)
 #define CPT_HARDLNK_ON  _IOW(CPTCTLTYPE, 25, int)
+#define CPT_TEST_VERSION _IOW(CPTCTLTYPE, 26, int)
 #define CPT_SET_LOCKFD2 _IOW(CPTCTLTYPE, 27, int)
 
 #endif

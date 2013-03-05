@@ -25,6 +25,7 @@ man_MANS = \
  vzsplit.8 \
  vzubc.8 \
  vzmigrate.8 \
+ vzcptcheck.8 \
  arpsend.8 \
  ndsend.8 \
  vzpid.8 \

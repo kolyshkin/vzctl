@@ -31,6 +31,7 @@ sbin_PROGRAMS = arpsend \
                 ndsend \
                 vzcalc \
                 vzcfgvalidate \
+                vzcptcheck \
                 vzctl \
                 vzlist \
                 vzmemcheck \
