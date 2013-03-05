@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
+# Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
 
 ACT_SCRIPTS_SFX="start stop mount umount premount postumount"
 # blowfish is a fast block cipher, much faster then 3des
-SSH_OPTIONS="-c blowfish"
+SSH_OPTIONS="-c blowfish -o BatchMode=yes"
 SCP_OPTIONS=$SSH_OPTIONS
 RSYNC_OPTIONS="-aHAX --delete --numeric-ids"
 VZCTL=vzctl
@@ -427,14 +427,14 @@ else
 fi
 
 # Try to connect to destination
-if ! logexec 2 $SSH -o BatchMode=yes root@$host /bin/true; then
+if ! logexec 2 $SSH root@$host /bin/true; then
 	log 0 "Can't connect to destination address using public key"
 	log 0 "Please put your public key to destination node"
 	exit $MIG_ERR_CANT_CONNECT
 fi
 
 # Check if OpenVZ is running
-if ! logexec 2 $SSH -o BatchMode=yes root@$host /etc/init.d/vz status ; then
+if ! logexec 2 $SSH root@$host /etc/init.d/vz status ; then
 	log 0 "OpenVZ is not running on the target machine"
 	log 0 "Can't continue migration"
 	exit $MIG_ERR_OVZ_NOT_RUNNING
@@ -447,7 +447,7 @@ if [ $online -eq 1 ]; then
 		log 0 "Can't continue live migration"
 		exit $MIG_ERR_OVZ_NOT_RUNNING
 	fi
-	if ! logexec 2 $SSH -o BatchMode=yes root@$host "test -f /proc/rst";
+	if ! logexec 2 $SSH root@$host "test -f /proc/rst";
 	then
 		log 0 "vzrst module is not loaded on the destination node"
 		log 0 "Can't continue live migration"
