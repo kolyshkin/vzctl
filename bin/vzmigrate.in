@@ -456,11 +456,12 @@ if [ "$exist" = "deleted" ]; then
 	exit $MIG_ERR_NOEXIST
 fi
 
-if [ $online -eq 1 ]; then
-	log 1 "Starting live migration of CT $VEID to $host"
-else
-	log 1 "Starting migration of CT $VEID to $host"
-fi
+S="Starting"
+M="migration"
+[ $check_only -eq 1] && S="Checking"
+[ $online -eq 1 ] && M="live migration"
+log 1 "$S $M of CT $VEID to $host"
+unset S M
 
 # Try to connect to destination
 if ! logexec 2 $SSH root@$host /bin/true; then
