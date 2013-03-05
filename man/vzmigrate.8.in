@@ -1,4 +1,4 @@
-.TH vzmigrate 8 "28 Jun 2012" "OpenVZ" "Containers"
+.TH vzmigrate 8 "5 Mar 2013" "OpenVZ" "Containers"
 
 .SH NAME
 vzmigrate \- migrate a container between two OpenVZ servers
@@ -138,9 +138,16 @@ Unable to set CT name on destination node.
 .TP
 .B 16 EXIT_PLOOP_UNSUP
 Ploop is not supported by destination node.
+.TP
+.B 17 EXIT_UNSUP_CPT_VER
+CPT version incompatibility with the destination node.
+.TP
+.B 18 EXIT_UNSUP_CPU
+Destination node CPU incompatibility.
 
 .SH SEE ALSO
-.BR rsync (1).
+.BR rsync (1),
+.BR vzcptcheck (8).
 
 .SH COPYRIGHT
-Copyright (C) 2001-2012, Parallels, Inc. Licensed under GNU GPL.
+Copyright (C) 2001-2013, Parallels, Inc. Licensed under GNU GPL.

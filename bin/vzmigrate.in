@@ -60,6 +60,8 @@ MIG_ERR_RESTORE_VPS=$MIG_ERR_START_VPS
 MIG_ERR_OVZ_NOT_RUNNING=14
 MIG_ERR_APPLY_CONFIG=15
 MIG_ERR_UNSUP_PLOOP=16
+MIG_ERR_UNSUP_CPT_VER=17
+MIG_ERR_UNSUP_CPU=18
 
 # For local vzctl to work, make sure @SBINDIR@ is in $PATH
 if ! echo ":${PATH}:" | fgrep -q ':@SBINDIR@:'; then
@@ -308,6 +310,32 @@ print_times() {
 	echo
 }
 
+check_cpt_props() {
+	local version caps
+
+	log 2 "Checking for CPT version compatibility"
+	version=$(vzcptcheck version)
+	if [ $? -ne 0 -o "$version" = "" ]; then
+		log 1 "Warning: can't get local CPT version, skipping check"
+	elif ! logexec 1 $SSH root@$host vzcptcheck version $version; then
+		log 0 "Error: CPT version check failed on destination node!"
+		log 0 "Destination node kernel is too old, please upgrade"
+		log 0 "Can't continue live migration"
+		exit $MIG_ERR_UNSUP_CPT_VER
+	fi
+
+	log 2 "Checking for CPU flags compatibility"
+	caps=$($SSH root@$host vzcptcheck caps)
+	if [ $? -ne 0 -o "$caps" = "" ]; then
+		log 1 "Warning: can't get remote CPU caps, skipping check"
+	elif ! logexec 1 vzcptcheck caps $VEID $caps; then
+		log 0 "Error: CPU capabilities check failed!"
+		log 0 "Destination node CPU is not compatible"
+		log 0 "Can't continue live migration"
+		exit $MIG_ERR_UNSUP_CPU
+	fi
+}
+
 if [ $# -lt 2 ]; then
 	usage
 fi
@@ -464,6 +492,18 @@ fi
 if [ $online -eq 1 -a "$state" != "running" ]; then
 	log 0 "Can't perform live migration of a stopped container"
 	exit $MIG_ERR_VPS_IS_STOPPED
+fi
+
+if [ $online -eq 1 ]; then
+	if ! which vzcptcheck >/dev/null; then
+		log 1 "Warning: no vzcptcheck binary on local node,"
+		log 1 "skipping CPT version and CPU caps checks"
+	elif ! logexec 1 $SSH root@$host which vzcptcheck >/dev/null; then
+		log 1 "Warning: no vzcptcheck binary on destination node,"
+		log 1 "skipping CPT version and CPU caps checks"
+	else
+		check_cpt_props
+	fi
 fi
 
 log 2 "Loading $vzconf and $vpsconf files"
