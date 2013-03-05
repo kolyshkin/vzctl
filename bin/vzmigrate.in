@@ -34,6 +34,7 @@ debug=0
 times=0
 compact=0
 snapshot=0
+check_only=0
 confdir="@PKGCONFDIR@/conf"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
@@ -97,6 +98,10 @@ Options:
 	and restore are used, so there is no container downtime or service
 	interruption. Additional steps are performed to minimize the time
 	when a container is in suspended state.
+--check-only, --dry-run
+	Do not perform actual migration, stop after preliminary checks.
+	This is used to check if a CT can possibly be migrated. Combine
+	with --live to enable more checks for live migration case.
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics). Multiple -v options
@@ -376,6 +381,9 @@ while [ ! -z "$1" ]; do
 	-s|--snapshot)
 		snapshot=1
 		;;
+	--check-only|--dry-run)
+		check_only=1
+		;;
 	--ssh=*)
 		SSH_OPTIONS="$SSH_OPTIONS $(echo $1 | cut -c7-)"
 		SCP_OPTIONS="`echo $SSH_OPTIONS | sed 's/-p/-P/1'`"
@@ -552,6 +560,10 @@ IP_X=$(echo $IP_X | sed 's/ /|/g')
 if [ $($SSH "root@$host" "grep -cwE \"$IP_X\" /proc/vz/veip") -gt 0 ]; then
 	log 0 "IP address(es) already in use on destination node"
 	exit $MIG_ERR_IP_IN_USE
+fi
+
+if [ $check_only -eq 1 ]; then
+	exit 0
 fi
 
 log 1 "Preparing remote node"

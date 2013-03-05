@@ -12,6 +12,7 @@ vzmigrate \- migrate a container between two OpenVZ servers
 .OP --live
 .OP -c\fR|\fB--compact
 .OP -s\fR|\fB--snapshot
+.OP --check-only\fR|\fB--dry-run
 .OP -t\fR|\fB--times
 .OP -v
 .I destination_address CTID
@@ -69,6 +70,13 @@ before migration. Works for ploop only, ignored otherwise.
 \fB-s\fR, \fB--snapshot\fR
 Create a container snapshot (i.e. run \fBvzctl snapshot\fR)
 before migration. Works for ploop only, ignored otherwise.
+
+.TP
+
+\fB--check-only\fR, \fB--dry-run\fR
+Do not perform actual migration, stop after preliminary checks.
+This is used to check if a CT can possibly be migrated. Combine
+with \fB--live\fR to enable more checks for live migration case.
 
 .TP
 \fB-t\fR, \fB--times\fR
