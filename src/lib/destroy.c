@@ -38,6 +38,7 @@
 #include "modules.h"
 #include "create.h"
 #include "env.h"
+#include "image.h"
 
 #define BACKUP		0
 #define DESTR		1
@@ -66,12 +67,13 @@ int vps_destroy_dir(envid_t veid, char *dir)
 
 	logger(0, 0, "Destroying container private area: %s", dir);
 
-	if (!quota_ctl(veid, QUOTA_STAT)) {
-		if ((ret = quota_off(veid, 0)))
-			if ((ret = quota_off(veid, 1)))
-				return ret;
+	if (!ve_private_is_ploop(dir)) {
+		if (!quota_ctl(veid, QUOTA_STAT))
+			if ((ret = quota_off(veid, 0)))
+				if ((ret = quota_off(veid, 1)))
+					return ret;
+		quota_ctl(veid, QUOTA_DROP);
 	}
-	quota_ctl(veid, QUOTA_DROP);
 
 	if ((ret = destroydir(dir)))
 		return ret;
