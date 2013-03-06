@@ -64,14 +64,18 @@ int vps_destroy_dir(envid_t veid, char *dir)
 {
 	int ret;
 
+	logger(0, 0, "Destroying container private area: %s", dir);
+
 	if (!quota_ctl(veid, QUOTA_STAT)) {
 		if ((ret = quota_off(veid, 0)))
 			if ((ret = quota_off(veid, 1)))
 				return ret;
 	}
 	quota_ctl(veid, QUOTA_DROP);
+
 	if ((ret = destroydir(dir)))
 		return ret;
+
 	return 0;
 }
 
@@ -268,7 +272,6 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 		logger(0, 0, "Container is currently mounted (umount first)");
 		return VZ_FS_MOUNTED;
 	}
-	logger(0, 0, "Destroying container private area: %s", fs->private);
 	if ((ret = vps_destroy_dir(veid, fs->private)))
 		return ret;
 	move_config(veid, BACKUP);
