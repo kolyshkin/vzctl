@@ -91,6 +91,18 @@ static int download_template(char *tmpl)
 	return run_script(VPS_DOWNLOAD, arg, env, 0);
 }
 
+struct destroy_ve {
+	envid_t veid;
+	char *private;
+};
+
+static void cleanup_destroy_ve(void *data)
+{
+	struct destroy_ve *d = data;
+
+	vps_destroy_dir(d->veid, d->private);
+}
+
 static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	dq_param *dq, int layout, int ploop_mode)
 {
@@ -106,6 +118,8 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
 	int ploop = (layout == VE_LAYOUT_PLOOP);
+	struct destroy_ve ddata;
+	struct vzctl_cleanup_handler *ch;
 
 	if (ploop && (!dq->diskspace || dq->diskspace[1] <= 0)) {
 		logger(-1, 0, "Error: diskspace not set (required for ploop)");
@@ -146,6 +160,11 @@ find:
 		goto err;
 	}
 	dst = tmp_dir;
+
+	ddata.veid = veid;
+	ddata.private = dst;
+	ch = add_cleanup_handler(cleanup_destroy_ve, &ddata);
+
 	if (ploop) {
 #ifndef HAVE_PLOOP
 		ret = VZ_PLOOP_UNSUP;
@@ -215,6 +234,7 @@ find:
 	}
 	/* Unlock CT area */
 	rmdir(fs->private);
+	del_cleanup_handler(ch);
 	if (rename(tmp_dir, fs->private)) {
 		logger(-1, errno, "Can't rename %s to %s", tmp_dir, fs->private);
 		ret = VZ_FS_NEW_VE_PRVT;
@@ -231,18 +251,6 @@ err:
 	return ret;
 }
 
-struct destroy_ve {
-	envid_t veid;
-	char *private;
-};
-
-static void cleanup_destroy_ve(void *data)
-{
-	struct destroy_ve *d = data;
-
-	vps_destroy_dir(d->veid, d->private);
-}
-
 int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	struct mod_action *action)
 {
@@ -255,8 +263,6 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	vps_param *conf_p;
 	int cfg_exists;
 	char *full_ostmpl;
-	struct destroy_ve ddata;
-	struct vzctl_cleanup_handler *ch;
 
 	get_vps_conf_path(veid, dst, sizeof(dst));
 	sample_config = NULL;
@@ -375,13 +381,9 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		ddata.veid = veid;
-		ddata.private = fs->private;
-		ch = add_cleanup_handler(cleanup_destroy_ve, &ddata);
 		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
 						vps_p->opt.layout,
 						vps_p->opt.mode);
-		del_cleanup_handler(ch);
 		if (ret)
 			goto err_root;
 	}
