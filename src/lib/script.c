@@ -37,6 +37,7 @@
 #include "script.h"
 #include "fs.h"
 #include "dev.h"
+#include "exec.h"
 
 volatile sig_atomic_t alarm_flag;
 static char *envp_bash[] = {"HOME=/", "TERM=linux", ENV_PATH, NULL};
@@ -109,8 +110,7 @@ err:
 #define ENV_SIZE	256
 int run_script(const char *f, char *argv[], char *env[], int quiet)
 {
-	int child, pid, fd;
-	int status;
+	int child, fd;
 	int ret, i, j;
 	char *cmd;
 	struct sigaction act, actold;
@@ -170,19 +170,8 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	}
-	while ((pid = waitpid(child, &status, 0)) == -1)
-		if (errno != EINTR)
-			break;
-	ret = VZ_SYSTEM_ERROR;
-	if (pid == child) {
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			logger(-1, 0, "Received signal:"
-					"  %d in %s", WTERMSIG(status), f);
-	} else {
-		logger(-1, errno, "Error in waitpid");
-	}
+	ret = env_wait(child);
+
 err:
 	sigaction(SIGCHLD, &actold, NULL);
 
