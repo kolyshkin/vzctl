@@ -251,6 +251,11 @@ err:
 	return ret;
 }
 
+static void cleanup_destroy_file(void *data)
+{
+	unlink(data);
+}
+
 int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	struct mod_action *action)
 {
@@ -263,6 +268,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	vps_param *conf_p;
 	int cfg_exists;
 	char *full_ostmpl;
+	struct vzctl_cleanup_handler *ch = NULL;
 
 	get_vps_conf_path(veid, dst, sizeof(dst));
 	sample_config = NULL;
@@ -309,6 +315,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		}
 	}
 	if (sample_config != NULL) {
+		ch = add_cleanup_handler(cleanup_destroy_file, &dst);
 		if (cp_file(dst, src))
 		{
 			ret = VZ_CP_CONFIG;
@@ -418,6 +425,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		goto err_names;
 	}
 
+	del_cleanup_handler(ch);
 	logger(0, 0, "Container private area was created");
 	return 0;
 
