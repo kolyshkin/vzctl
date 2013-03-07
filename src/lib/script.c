@@ -38,6 +38,7 @@
 #include "fs.h"
 #include "dev.h"
 #include "exec.h"
+#include "cleanup.h"
 
 volatile sig_atomic_t alarm_flag;
 static char *envp_bash[] = {"HOME=/", "TERM=linux", ENV_PATH, NULL};
@@ -116,6 +117,7 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 	struct sigaction act, actold;
 	int out[2];
 	char *envp[ENV_SIZE];
+	struct vzctl_cleanup_handler *ch;
 
 	if (!stat_file(f)) {
 		logger(-1, 0, "File %s not found", f);
@@ -170,7 +172,9 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		ret = VZ_RESOURCE_ERROR;
 		goto err;
 	}
+	ch = add_cleanup_handler(cleanup_kill_process, &child);
 	ret = env_wait(child);
+	del_cleanup_handler(ch);
 
 err:
 	sigaction(SIGCHLD, &actold, NULL);
