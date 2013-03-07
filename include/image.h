@@ -65,6 +65,11 @@ int check_ploop_size(unsigned long size);
 #ifdef HAVE_PLOOP
 extern struct ploop_functions ploop;
 
+#define PLOOP_CLEANUP(code)					\
+	ch = add_cleanup_handler(cancel_ploop_op, NULL);	\
+	code;							\
+	del_cleanup_handler(ch);
+
 int is_image_mounted(const char *ve_private);
 int vzctl_create_image(const char *ve_private, struct vzctl_create_image_param *param);
 int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param);
