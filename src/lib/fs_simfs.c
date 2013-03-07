@@ -60,6 +60,9 @@ int vps_is_mounted(const char *root, const char *private)
 
 	/* Check for bind mount (upstream case) */
 	if (stat(private, &st2)) {
+		/* return false when private area does not exist */
+		if (errno == ENOENT)
+			return 0;
 		logger(-1, errno, "stat(%s)", private);
 		return -1;
 	}
