@@ -45,6 +45,7 @@
 #include "image.h"
 #include "cpt.h"
 #include "snapshot.h"
+#include "cleanup.h"
 
 extern struct mod_action g_action;
 extern int do_enter(vps_handler *h, envid_t veid, const char *root,
@@ -1332,6 +1333,13 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	return ret;
 }
 
+
+static void cleanup_callback(int sig)
+{
+	fprintf(stderr, "\nCancelling...\n");
+	run_cleanup();
+}
+
 int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	vps_param *cmd_p, int argc, char **argv, int skiplock)
 {
@@ -1378,9 +1386,11 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 				goto err;
 			}
 		}
+
 		sigemptyset(&act.sa_mask);
-		act.sa_handler = SIG_IGN;
+		act.sa_handler = cleanup_callback;
 		act.sa_flags = 0;
+		sigaction(SIGTERM, &act, NULL);
 		sigaction(SIGINT, &act, NULL);
 	}
 	switch (action) {

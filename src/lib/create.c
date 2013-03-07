@@ -40,6 +40,7 @@
 #include "create.h"
 #include "destroy.h"
 #include "image.h"
+#include "cleanup.h"
 
 #define VPS_CREATE	SCRIPTDIR "/vps-create"
 #define VPS_DOWNLOAD	SCRIPTDIR "/vps-download"
@@ -230,6 +231,18 @@ err:
 	return ret;
 }
 
+struct destroy_ve {
+	envid_t veid;
+	char *private;
+};
+
+static void cleanup_destroy_ve(void *data)
+{
+	struct destroy_ve *d = data;
+
+	vps_destroy_dir(d->veid, d->private);
+}
+
 int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	struct mod_action *action)
 {
@@ -242,6 +255,8 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	vps_param *conf_p;
 	int cfg_exists;
 	char *full_ostmpl;
+	struct destroy_ve ddata;
+	struct vzctl_cleanup_handler *ch;
 
 	get_vps_conf_path(veid, dst, sizeof(dst));
 	sample_config = NULL;
@@ -360,9 +375,14 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		if ((ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
+		ddata.veid = veid;
+		ddata.private = fs->private;
+		ch = add_cleanup_handler(cleanup_destroy_ve, &ddata);
+		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
 						vps_p->opt.layout,
-						vps_p->opt.mode)))
+						vps_p->opt.mode);
+		del_cleanup_handler(ch);
+		if (ret)
 			goto err_root;
 	}
 

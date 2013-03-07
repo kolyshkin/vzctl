@@ -32,6 +32,7 @@ lib_LTLIBRARIES = libvzctl.la
 
 libvzctl_la_SOURCES = bitmap.c \
                       cap.c \
+                      cleanup.c \
                       config.c \
                       cpt.c \
                       cpu.c \
