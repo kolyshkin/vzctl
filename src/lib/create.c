@@ -111,7 +111,7 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	char buf[PATH_LEN];
 	int ret;
 	char *arg[2];
-	char *env[4];
+	char *env[6];
 	int quota = 0;
 	int i;
 	char *dst;
@@ -211,11 +211,18 @@ find:
 	arg[0] = VPS_CREATE;
 	arg[1] = NULL;
 	snprintf(buf, sizeof(buf), "PRIVATE_TEMPLATE=%s", tarball);
-	env[0] = strdup(buf);
+	i = 0;
+	env[i++] = strdup(buf);
 	snprintf(buf, sizeof(buf), "VE_PRVT=%s", dst);
-	env[1] = strdup(buf);
-	env[2] = strdup(ENV_PATH);
-	env[3] = NULL;
+	env[i++] = strdup(buf);
+	if (!is_vz_kernel(h) && h->can_join_userns) {
+		snprintf(buf, sizeof(buf), "UID_OFFSET=%d", uid_offset);
+		env[i++] = strdup(buf);
+		snprintf(buf, sizeof(buf), "GID_OFFSET=%d", gid_offset);
+		env[i++] = strdup(buf);
+	}
+	env[i++] = strdup(ENV_PATH);
+	env[i] = NULL;
 	logger(0, 0, "Creating container private area (%s)", tmpl->ostmpl);
 	ret = run_script(VPS_CREATE, arg, env, 0);
 	free_arg(env);
