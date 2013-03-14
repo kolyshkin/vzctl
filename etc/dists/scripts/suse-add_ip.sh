@@ -88,7 +88,7 @@ function add_ip()
 	if [ "x${VE_STATE}" = "xstarting" ]; then
 		if [ -n "${IP_ADDR}" ]; then
 			init_config
-		elif grep -q "^IPADDR_" ${IFCFG}; then
+		elif [ -f ${IFCFG} ] && grep -q "^IPADDR_" ${IFCFG}; then
 			init_config
 		fi
 	elif [ "x${IPDELALL}" = "xyes" ]; then
