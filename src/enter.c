@@ -434,7 +434,7 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 	char buf;
 	const char esc = 27;
 	const char enter = 13;
-	int after_enter = 0;
+	int new_line = 1;
 	int ret = VZ_SYSTEM_ERROR;
 
 	if (ttyno < 0) /* undef */
@@ -501,7 +501,7 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 
 	while (!child_term) {
 		TREAD(buf);
-		if (buf == esc && after_enter) {
+		if (buf == esc && new_line) {
 			TREAD(buf);
 			switch (buf) {
 				case '.':
@@ -515,7 +515,7 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 			}
 		}
 		TWRITE(buf);
-		after_enter = (buf == enter);
+		new_line = (buf == enter);
 	}
 out:
 	ret = 0;

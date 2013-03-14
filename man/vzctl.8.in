@@ -1022,7 +1022,7 @@ Note the consoles are persistent, meaning that:
 \(bu detaching from the console leaves anything running in this console as is.
 
 The following escape sequences are recognized by \fBvzctl console\fR.
-Note that these sequences are only recognized after \fBEnter\fR.
+Note that these sequences are only recognized at the beginning of a line.
 
 \(bu \fBEsc\fR then \fB.\fR to detach from the console.
 
