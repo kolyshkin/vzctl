@@ -19,7 +19,7 @@
 # Deletes IP address(es) from a container running SuSE.
 
 VENET_DEV=venet0
-IFCFG_DIR=/etc/sysconfig/network/
+IFCFG_DIR=/etc/sysconfig/network
 IFCFG="${IFCFG_DIR}/ifcfg-${VENET_DEV}"
 
 function del_ip()

@@ -19,7 +19,7 @@
 # Adds IP address(es) in a container running SuSE.
 
 VENET_DEV=venet0
-IFCFG_DIR=/etc/sysconfig/network/
+IFCFG_DIR=/etc/sysconfig/network
 IFCFG=${IFCFG_DIR}/ifcfg-${VENET_DEV}
 ROUTES=${IFCFG_DIR}/ifroute-${VENET_DEV}
 HOSTFILE=/etc/hosts
