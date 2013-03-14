@@ -368,7 +368,7 @@ static int restore_fn(vps_handler *h, envid_t veid, int wait_p,
 	} else if (param->cmd == CMD_UNDUMP && !param->ctx) {
 		logger(0, 0, "\tget context...");
 		if (ioctl(param->rst_fd, CPT_GET_CONTEXT, veid) < 0) {
-			logger(-1, 0, "Can not get context");
+			logger(-1, errno, "Can not get context");
 			goto err_undump;
 		}
 	}
