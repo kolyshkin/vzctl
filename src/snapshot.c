@@ -72,7 +72,6 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	struct ploop_merge_param merge_param = {};
 	struct ploop_disk_images_data *di = NULL;
 	struct vzctl_snapshot_tree *tree = NULL;
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_snapshot_supported(fs->private))
 		return VZCTL_E_CREATE_SNAPSHOT;
@@ -128,7 +127,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	}
 	/* 2 create snapshot with specified guid */
 	image_param.guid = guid;
-	PLOOP_CLEANUP(ret = ploop.create_snapshot(di, &image_param))
+	PLOOP_CLEANUP(ret = ploop.create_snapshot(di, &image_param));
 	if (ret) {
 		logger(-1, 0, "Failed to create snapshot: %s [%d]",
 				ploop.get_last_error(), ret);
@@ -154,7 +153,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	return 0;
 err2:
 	// merge top_delta
-	PLOOP_CLEANUP(ret = ploop.merge_snapshot(di, &merge_param))
+	PLOOP_CLEANUP(ret = ploop.merge_snapshot(di, &merge_param));
 	if (ret)
 		logger(-1, 0, "Rollback failed, ploop_merge_snapshot %s: %s [%d]",
 				guid, ploop.get_last_error(), ret);
@@ -188,7 +187,6 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	char dumpfile[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
 	struct ploop_disk_images_data *di = NULL;
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_snapshot_supported(fs->private))
 		return VZCTL_E_SWITCH_SNAPSHOT;
@@ -247,7 +245,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	if (cp_file(dd_tmp, fname))
 		goto err1;
 
-	PLOOP_CLEANUP(ret = ploop.switch_snapshot(di, guid, flags))
+	PLOOP_CLEANUP(ret = ploop.switch_snapshot(di, guid, flags));
 	if (ret) {
 		unlink(dd_tmp);
 		goto err2;

@@ -200,7 +200,6 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	struct ploop_mount_param mount_param = {};
 	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -217,7 +216,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	mount_param.quota = param->quota;
 	mount_param.mount_data = param->mount_data;
 
-	PLOOP_CLEANUP(ret = ploop.mount_image(di, &mount_param))
+	PLOOP_CLEANUP(ret = ploop.mount_image(di, &mount_param));
 	if (ret) {
 		logger(-1, 0, "Failed to mount image: %s [%d]",
 				ploop.get_last_error(), ret);
@@ -232,7 +231,6 @@ int vzctl_umount_image(const char *ve_private)
 	int ret;
 	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -244,7 +242,7 @@ int vzctl_umount_image(const char *ve_private)
 		return VZCTL_E_UMOUNT_IMAGE;
 	}
 
-	PLOOP_CLEANUP(ret = ploop.umount_image(di))
+	PLOOP_CLEANUP(ret = ploop.umount_image(di));
 	if (ret) {
 		logger(-1, 0, "Failed to umount image: %s [%d]",
 				ploop.get_last_error(), ret);
@@ -261,7 +259,6 @@ int vzctl_create_image(const char *ve_private,
 	struct ploop_create_param create_param = {};
 	char dir[PATH_MAX];
 	char image[PATH_MAX];
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -278,7 +275,7 @@ int vzctl_create_image(const char *ve_private,
 	create_param.fstype = DEFAULT_FSTYPE;
 	create_param.size = param->size * 2; /* Kb to 512b sectors */
 	create_param.image = image;
-	PLOOP_CLEANUP(ret = ploop.create_image(&create_param))
+	PLOOP_CLEANUP(ret = ploop.create_image(&create_param));
 	if (ret) {
 		rmdir(dir);
 		logger(-1, 0, "Failed to create image: %s [%d]",
@@ -293,7 +290,6 @@ int vzctl_convert_image(const char *ve_private, int mode)
 	int ret;
 	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -304,7 +300,7 @@ int vzctl_convert_image(const char *ve_private, int mode)
 		logger(-1, 0, "Failed to read %s", fname);
 		return VZCTL_E_CONVERT_IMAGE;
 	}
-	PLOOP_CLEANUP(ret = ploop.convert_image(di, mode, 0))
+	PLOOP_CLEANUP(ret = ploop.convert_image(di, mode, 0));
 	if (ret) {
 		logger(-1, 0, "Failed to convert image: %s [%d]",
 				ploop.get_last_error(), ret);
@@ -320,7 +316,6 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 	struct ploop_disk_images_data *di;
 	struct ploop_resize_param param = {};
 	char fname[PATH_MAX];
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -341,7 +336,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 		return VZCTL_E_RESIZE_IMAGE;
 	}
 	param.size = newsize * 2; /* Kb to 512b sectors */
-	PLOOP_CLEANUP(ret = ploop.resize_image(di, &param))
+	PLOOP_CLEANUP(ret = ploop.resize_image(di, &param));
 	if (ret) {
 		logger(-1, 0, "Failed to resize image: %s [%d]",
 				ploop.get_last_error(), ret);
@@ -365,7 +360,6 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 	struct ploop_disk_images_data *di;
 	int ret;
 	struct ploop_snapshot_param param = {};
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -381,7 +375,7 @@ int vzctl_create_snapshot(const char *ve_private, const char *guid)
 		return VZCTL_E_CREATE_SNAPSHOT;
 	}
 	param.guid = strdup(guid);
-	PLOOP_CLEANUP(ret = ploop.create_snapshot(di, &param))
+	PLOOP_CLEANUP(ret = ploop.create_snapshot(di, &param));
 	free(param.guid);
 	if (ret) {
 		logger(-1, 0, "Failed to create snapshot: %s [%d]",
@@ -398,7 +392,6 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 	char fname[PATH_MAX];
 	struct ploop_disk_images_data *di;
 	int ret;
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -413,7 +406,7 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 		logger(-1, 0, "Failed to read %s", fname);
 		return VZCTL_E_DELETE_SNAPSHOT;
 	}
-	PLOOP_CLEANUP(ret = ploop.delete_snapshot(di, guid))
+	PLOOP_CLEANUP(ret = ploop.delete_snapshot(di, guid));
 	if (ret) {
 		logger(-1, 0, "Failed to delete snapshot: %s [%d]",
 				ploop.get_last_error(), ret);
@@ -430,7 +423,6 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 	struct ploop_disk_images_data *di;
 	int ret;
 	struct ploop_merge_param param = {};
-	struct vzctl_cleanup_handler *ch;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -448,7 +440,7 @@ int vzctl_merge_snapshot(const char *ve_private, const char *guid)
 		return VZCTL_E_MERGE_SNAPSHOT;
 	}
 	param.guid = guid;
-	PLOOP_CLEANUP(ret = ploop.merge_snapshot(di, &param))
+	PLOOP_CLEANUP(ret = ploop.merge_snapshot(di, &param));
 	if (ret) {
 		logger(-1, 0, "Failed to merge snapshot %s: %s [%d]",
 				guid, ploop.get_last_error(), ret);
