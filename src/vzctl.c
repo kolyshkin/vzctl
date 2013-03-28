@@ -73,6 +73,8 @@ static void usage(int rc)
 "vzctl snapshot <ctid> [--id <uuid>] [--name <name>] [--description <desc>]\n"
 "   [--skip-suspend]\n"
 "vzctl snapshot-switch | snapshot-delete <ctid> --id <uuid>\n"
+"vzctl snapshot-mount <ctid> --id <uuid> --target <dir>\n"
+"vzctl snapshot-umount <ctid> --id <uuid>\n"
 "vzctl snapshot-list <ctid> [-H] [-o field[,field...]] [--id <uuid>]\n"
 #endif
 "vzctl quotaon | quotaoff | quotainit <ctid>\n"
@@ -227,6 +229,10 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_SNAPSHOT_DELETE;
 	} else if (!strcmp(argv[1], "snapshot-list")) {
 		action = ACTION_SNAPSHOT_LIST;
+	} else if (!strcmp(argv[1], "snapshot-mount")) {
+		action = ACTION_SNAPSHOT_MOUNT;
+	} else if (!strcmp(argv[1], "snapshot-umount")) {
+		action = ACTION_SNAPSHOT_UMOUNT;
 #endif
 	} else if (!strcmp(argv[1], "--help")) {
 		usage(0);

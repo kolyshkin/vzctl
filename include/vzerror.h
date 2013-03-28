@@ -28,6 +28,7 @@
 /* not a VZ-capable kernel */
 #define VZ_BAD_KERNEL			5
 #define VZ_RESOURCE_ERROR		6
+/* #define VZCTL_E_NOMEM			VZ_RESOURCE_ERROR */
 #define VZ_ENVCREATE_ERROR		7
 
 #define VZ_COMMAND_EXECUTION_ERROR	8

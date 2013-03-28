@@ -460,6 +460,85 @@ const char *generate_snapshot_component_name(unsigned int envid,
 	return buf;
 }
 
+int vzctl_mount_snapshot(unsigned envid, const char *ve_private,
+		struct vzctl_mount_param *param)
+{
+	int ret = VZCTL_E_MOUNT_SNAPSHOT;
+	char fname[PATH_MAX];
+	struct ploop_disk_images_data *di;
+	struct ploop_mount_param mount_param = {};
+
+	if (!is_ploop_supported())
+		return VZ_PLOOP_UNSUP;
+
+	GET_DISK_DESCRIPTOR(fname, ve_private);
+	if (ploop.read_disk_descr(&di, fname)) {
+		logger(-1, 0, "Failed to read %s", fname);
+		return ret;
+	}
+
+	mount_param.ro = param->ro;
+	if (param->mount_by_parent_guid) {
+		mount_param.guid = ploop.find_parent_by_guid(di, param->guid);
+		if (mount_param.guid == NULL) {
+			logger(-1, 0, "Unable to find parent guid by %s",
+					param->guid);
+			goto err;
+		}
+	} else {
+		mount_param.guid = (char *)param->guid;
+	}
+	mount_param.target = param->target;
+	ploop.set_component_name(di,
+			generate_snapshot_component_name(envid, param->guid,
+				fname, sizeof(fname)));
+
+	PLOOP_CLEANUP(ret = ploop.mount_image(di, &mount_param));
+	if (ret) {
+		logger(-1, 0, "Failed to mount snapshot %s: %s [%d]",
+				param->guid, ploop.get_last_error(), ret);
+		ret = VZCTL_E_MOUNT_SNAPSHOT;
+		goto err;
+	}
+
+	/* provide device to caller */
+	strncpy(param->device, mount_param.device, sizeof(param->device)-1);
+
+err:
+	ploop.free_diskdescriptor(di);
+
+	return ret;
+}
+
+int vzctl_umount_snapshot(unsigned envid, const char *ve_private, char *guid)
+{
+	int ret;
+	char fname[PATH_MAX];
+	struct ploop_disk_images_data *di;
+
+	if (!is_ploop_supported())
+		return VZ_PLOOP_UNSUP;
+
+	GET_DISK_DESCRIPTOR(fname, ve_private);
+	if (ploop.read_disk_descr(&di, fname)) {
+		logger(-1, 0, "Failed to read %s", fname);
+		return VZCTL_E_UMOUNT_SNAPSHOT;
+	}
+
+	ploop.set_component_name(di,
+			generate_snapshot_component_name(envid, guid,
+				fname, sizeof(fname)));
+
+	PLOOP_CLEANUP(ret = ploop.umount_image(di));
+	ploop.free_diskdescriptor(di);
+	if (ret)
+		return vzctl_err(VZCTL_E_UMOUNT_SNAPSHOT, 0,
+				"Failed to umount snapshot %s: %s [%d]",
+				guid, ploop.get_last_error(), ret);
+
+	return 0;
+}
+
 /* Convert a CT to ploop layout
  * 1) mount CT
  * 2) create & mount image

@@ -716,6 +716,36 @@ static int parse_snapshot_delete_opt(envid_t veid, int argc, char **argv,
 
 	return ret;
 }
+
+static int parse_snapshot_mount_opt(envid_t veid, int argc, char **argv,
+		vps_param *param)
+{
+	int ret;
+	struct option *opt;
+	static struct option snapshot_create_options[] =
+	{
+	{"id",  required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"uuid", required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"target", required_argument, NULL, PARAM_SNAPSHOT_MOUNT_TARGET},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	opt = mod_make_opt(snapshot_create_options, &g_action, NULL);
+	if (opt == NULL)
+		return VZ_RESOURCE_ERROR;
+	ret = parse_opt(veid, argc, argv, opt, snapshot_create_options, param);
+	free(opt);
+
+	if (ret == 0 && param->snap.guid == NULL)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+			"Invalid syntax: snapshot id is missing");
+	if (ret == 0 && param->snap.target == NULL)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+			"Invalid syntax: mount target is missing");
+
+	return ret;
+}
+
 #endif /* HAVE_PLOOP */
 
 static int check_set_ugidlimit(unsigned long *cur, unsigned long *old,
@@ -1316,9 +1346,13 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 		break;
 	case ACTION_SNAPSHOT_DELETE:
 	case ACTION_SNAPSHOT_SWITCH:
+	case ACTION_SNAPSHOT_UMOUNT:
 		ret = parse_snapshot_delete_opt(veid, argc, argv, param);
 		break;
 	case ACTION_SNAPSHOT_LIST:
+		break;
+	case ACTION_SNAPSHOT_MOUNT:
+		ret = parse_snapshot_mount_opt(veid, argc, argv, param);
 		break;
 #endif
 	default :
@@ -1521,6 +1555,14 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	case ACTION_SNAPSHOT_LIST:
 		ret = vzctl_env_snapshot_list(argc, argv, veid,
 				g_p->res.fs.private);
+		break;
+	case ACTION_SNAPSHOT_MOUNT:
+		ret = vzctl_env_mount_snapshot(veid, g_p->res.fs.private,
+				cmd_p->snap.target, cmd_p->snap.guid);
+		break;
+	case ACTION_SNAPSHOT_UMOUNT:
+		ret = vzctl_env_umount_snapshot(veid, g_p->res.fs.private,
+				cmd_p->snap.guid);
 		break;
 #endif
 	case ACTION_CUSTOM:

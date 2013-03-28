@@ -38,6 +38,11 @@ vzctl \- perform various operations on an OpenVZ container
 .SY vzctl
 [\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 .SY vzctl
+[\fIflags\fR] \fBsnapshot-mount\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+\fB--target\fR \fIdir\fR
+.SY vzctl
+[\fIflags\fR] \fBsnapshot-umount\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+.SY vzctl
 [\fIflags\fR] \fBsnapshot-list\fR \fICTID\fR [\fB-H\fR] [\fB-o\fR \fIfield\fR[,\fIfield\fR...] [\fB--id\fR \fIuuid\fR]
 .SY vzctl
 [\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
@@ -830,6 +835,13 @@ container is stopped.
 .TP 4
 \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 Removes a specified snapshot.
+.TP 4
+\fBsnapshot-mount\fR \fICTID\fR \fB--id\fR \fIuuid\fR \fB--target\fR \fIdirectory\fR
+Mounts a snapshot specified by \fIuuid\fR to a \fIdirectory\fR. Note
+this mount is read-only.
+.TP 4
+\fBsnapshot-umount\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+Unmounts a specified snapshot.
 .TP 4
 \fBsnapshot-list\fR \fICTID\fR [\fB-H\fR] [\fB-o\fR \fIfield\fR[,\fIfield\fR...] [\fB--id\fR \fIuuid\fR]
 List container's snapshots.

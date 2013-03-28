@@ -398,3 +398,75 @@ err:
 	vzctl_free_snapshot_tree(tree);
 	return VZCTL_E_DELETE_SNAPSHOT;
 }
+
+int vzctl_env_mount_snapshot(unsigned veid, char *ve_private, char *mnt, char *guid)
+{
+	int ret;
+	char fname[PATH_MAX];
+	struct vzctl_snapshot_tree *tree = NULL;
+	struct vzctl_mount_param param = {};
+
+	if (guid == NULL)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+				"Failed to mount snapshot: "
+				"snapshot uuid not specified");
+	if (ve_private == NULL)
+		return vzctl_err(VZ_VE_PRIVATE_NOTSET, 0,
+				"Failed to mount snapshot: "
+				"CT private not set");
+
+	if (!is_snapshot_supported(ve_private))
+		return VZCTL_E_MOUNT_SNAPSHOT;
+
+	GET_SNAPSHOT_XML(fname, ve_private);
+	if (stat_file(fname) != 1)
+		return vzctl_err(VZCTL_E_MOUNT_SNAPSHOT, 0,
+				"Snapshot description file %s not found",
+				fname);
+
+	tree = vzctl_alloc_snapshot_tree();
+	if (tree == NULL)
+		return VZ_RESOURCE_ERROR;
+
+	ret = vzctl_read_snapshot_tree(fname, tree);
+	if (ret) {
+		logger(-1, 0, "Failed to read %s", fname);
+		goto free_tree;
+	}
+	if (vzctl_find_snapshot_by_guid(tree, guid) == -1) {
+		logger(-1, 0, "Unable to find snapshot by uuid %s", guid);
+		ret = VZCTL_E_MOUNT_SNAPSHOT;
+		goto free_tree;
+	}
+	vzctl_free_snapshot_tree(tree);
+	logger(0, 0, "Mounting snapshot %s to %s", guid, mnt);
+
+	/* Mount read-only */
+	param.ro = 1;
+	param.target = mnt;
+	param.guid = guid;
+	return vzctl_mount_snapshot(veid, ve_private, &param);
+
+free_tree:
+	vzctl_free_snapshot_tree(tree);
+	return ret;
+}
+
+int vzctl_env_umount_snapshot(unsigned veid, char *ve_private, char *guid)
+{
+	if (guid == NULL)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+				"Failed to umount snapshot: "
+				"snapshot uuid not specified");
+	if (ve_private == NULL)
+		return vzctl_err(VZ_VE_PRIVATE_NOTSET, 0,
+				"Failed to umount snapshot: "
+				"CT private not set");
+
+	if (!is_snapshot_supported(ve_private))
+		return VZCTL_E_UMOUNT_SNAPSHOT;
+
+	logger(0, 0, "Umounting snapshot %s", guid);
+
+	return vzctl_umount_snapshot(veid, ve_private, guid);
+}

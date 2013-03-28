@@ -142,6 +142,7 @@ struct vzctl_snapshot_param {
 #define SNAPSHOT_SKIP_SUSPEND	1 << 1
 #define SNAPSHOT_SKIP_CONFIG	1 << 2
 	int flags;
+	char *target;	/* snapshot mount point */
 };
 
 struct vps_param {

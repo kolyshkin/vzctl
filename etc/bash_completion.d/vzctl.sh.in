@@ -95,6 +95,7 @@ _vzctl()
 	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 	local vzctl_snapshot_create_opts="--id --name --description \
 		--skip-suspend --skip-config"
+	local vzctl_snapshot_mount_opts="--id --target"
 
 	local iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
@@ -113,6 +114,7 @@ _vzctl()
 
 	if test -f /proc/vz/ploop_minor; then
 		vzctl_cmds+=" convert compact snapshot \
+			snapshot-mount snapshot-umount \
 			snapshot-switch snapshot-delete snapshot-list"
 	fi
 
@@ -291,8 +293,11 @@ _vzctl()
 					snapshot)
 						COMPREPLY=( $( compgen -W "$vzctl_snapshot_create_opts" -- $cur ) )
 						;;
-					snapshot-switch|snapshot-delete)
+					snapshot-switch|snapshot-delete|snapshot-umount)
 						COMPREPLY=( $( compgen -W "--id" -- $cur ) )
+						;;
+					snapshot-mount)
+						COMPREPLY=( $( compgen -W "$vzctl_snapshot_mount_opts" -- $cur ) )
 						;;
 					*)
 						;;
