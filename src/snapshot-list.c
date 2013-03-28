@@ -335,19 +335,20 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 	ret = vzctl_read_snapshot_tree(fname, tree);
 	if (ret) {
 		fprintf(stderr, "Failed to read %s", fname);
-		return ret;
+		goto free_tree;
 	}
 
 	ret = build_uuid_list(tree, guid);
 	if (ret)
-		return ret;
+		goto free_tree;
 
 	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop.read_disk_descr(&g_di, fname);
 	if (ret) {
 		fprintf(stderr, "Failed to read %s: %s",
 				fname, ploop.get_last_error());
-		return VZCTL_E_LIST_SNAPSHOT;
+		ret = VZCTL_E_LIST_SNAPSHOT;
+		goto free_tree;
 	}
 
 	print_hdr(no_hdr);
@@ -358,7 +359,10 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 			field_tbl[field_entry->id].print_fn(tree->snapshots[uuid_entry->id]);
 		}
 	}
-	ploop.free_diskdescriptor(g_di);
 
-	return 0;
+	ploop.free_diskdescriptor(g_di);
+free_tree:
+	vzctl_free_snapshot_tree(tree);
+
+	return ret;
 }
