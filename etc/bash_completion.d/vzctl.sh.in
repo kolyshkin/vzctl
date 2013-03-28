@@ -96,6 +96,8 @@ _vzctl()
 	local vzctl_snapshot_create_opts="--id --name --description \
 		--skip-suspend --skip-config"
 	local vzctl_snapshot_mount_opts="--id --target"
+	local vzctl_snapshot_list_opts="-H --no-header -o --output --id \
+		-L --list --help"
 
 	local iptables_names="iptable_filter iptable_mangle ipt_limit
 		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
@@ -329,6 +331,9 @@ _vzctl()
 						;;
 					snapshot-mount)
 						COMPREPLY=( $( compgen -W "$vzctl_snapshot_mount_opts" -- $cur ) )
+						;;
+					snapshot-list)
+						COMPREPLY=( $( compgen -W "$vzctl_snapshot_list_opts" -- $cur ) )
 						;;
 					*)
 						;;
