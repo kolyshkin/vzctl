@@ -259,6 +259,37 @@ _vzctl()
 				# makes no sense for other parameters (UBCs
 				# etc). So no action for now.
 				;;
+			--id|--uuid)
+				# Only allow this completion
+				# when user has root privileges
+				[ "$EUID" -ne 0 ] && exit 1
+				# Get command and CTID
+				local cmd=${COMP_WORDS[1]}
+				local ve=${COMP_WORDS[2]}
+				if [ ${cmd::2} = "--" ] ; then
+					# --verbose or --quiet used
+					cmd=${COMP_WORDS[2]}
+					ve=${COMP_WORDS[3]}
+				fi
+				local ids
+				case ${cmd} in
+				    snapshot-umount)
+					# For umount, only give mounted IDs
+					ids="`@SBINDIR@/vzctl snapshot-list $ve -H -ouuid,device 2>/dev/null | awk 'NF==2 {print $1}' | tr -d '{}'`"
+					;;
+				    snapshot-*)
+					# For other commands, give all IDs
+					ids="`@SBINDIR@/vzctl snapshot-list $ve -H -ouuid 2>/dev/null | tr -d '{}'`"
+					;;
+				    *)
+					# Do not give anything for other cmds
+					# including 'snapshot' itself
+					# since it requires a new unused ID
+					exit 0
+					;;
+				esac
+				COMPREPLY=( $( compgen -W "$ids" -- $cur ) )
+				;;
 			*)
 				if [[ "${prev::2}" != "--" || "$prev" = "--save" ]]; then
 					# List options
