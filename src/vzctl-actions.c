@@ -542,7 +542,7 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 
 	while (1) {
 		option_index = -1;
-		c = getopt_long (argc, argv, "", chkpnt_options, NULL);
+		c = getopt_long (argc, argv, "", chkpnt_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
