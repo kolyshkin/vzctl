@@ -1182,6 +1182,7 @@ static int exec(vps_handler *h, act_t action, envid_t veid, const char *root,
 	}
 	logger(1, 0, "Executing command: %s", buf);
 	ret = vps_exec(h, veid, root, mode, arg, NULL, NULL, 0);
+	free(buf);
 
 	return ret;
 }
