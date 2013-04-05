@@ -536,7 +536,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	int wait_p[2];
 	int old_wait_p[2];
 	int err_p[2];
-	int ret, err;
+	int ret;
 	char buf[64];
 	char *dist_name;
 	struct sigaction act;
@@ -638,8 +638,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		}
 	}
 	/* Tell the child that it's time to start /sbin/init */
-	err = 0;
-	if (write(wait_p[1], &err, sizeof(err)) != sizeof(err))
+	if (write(wait_p[1], &ret, sizeof(ret)) != sizeof(ret))
 		logger(-1, errno, "Unable to write to waitfd to start init");
 	close(wait_p[1]);
 	close(old_wait_p[1]);
@@ -655,18 +654,18 @@ err:
 		 * the environment, so it should not start /sbin/init
 		 */
 		close(wait_p[1]);
-		write(old_wait_p[1], &err, sizeof(err));
+		write(old_wait_p[1], &ret, sizeof(ret));
 		close(old_wait_p[1]);
 	} else {
 		if (!read(err_p[0], &ret, sizeof(ret))) {
 			if (res->misc.wait == YES) {
 				logger(0, 0, "Container start in progress"
 					", waiting ...");
-				err = vps_execFn(h, veid, res->fs.root,
+				ret = vps_execFn(h, veid, res->fs.root,
 					wait_on_fifo, NULL, 0);
-				if (err) {
+				if (ret) {
 					logger(0, 0, "Container wait failed%s",
-						err == VZ_EXEC_TIMEOUT ? \
+						ret == VZ_EXEC_TIMEOUT ? \
 						" - timeout expired" : "");
 					ret = VZ_WAIT_FAILED;
 				} else {
