@@ -673,7 +673,6 @@ void remove_names(envid_t veid)
 	struct stat st;
 	struct dirent *ep;
 	DIR *dp;
-	char *p;
 	int r;
 	envid_t id;
 
@@ -689,9 +688,7 @@ void remove_names(envid_t veid)
 		if (r < 0)
 			continue;
 		content[r] = 0;
-		if ((p = strrchr(content, '/')) != NULL)
-			p++;
-		if (sscanf(p, "%d.conf", &id) == 1 && veid == id)
+		if (sscanf(basename(content), "%d.conf", &id) == 1 && veid == id)
 			unlink(buf);
 	}
 	closedir(dp);
