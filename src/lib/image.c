@@ -106,7 +106,7 @@ static int load_ploop_lib(void)
 		 * to prevent a buffer overflow.
 		 */
 		void *padding[32];
-	} src;
+	} src = { {0}, {0} };
 
 	h = dlopen("libploop.so", RTLD_LAZY);
 	if (!h) {
