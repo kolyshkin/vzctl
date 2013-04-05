@@ -33,6 +33,7 @@ void vzctl_free_snapshot_tree(struct vzctl_snapshot_tree *tree)
 	for (i = 0; i < tree->nsnapshots; i++)
 		free_snapshot_data(tree->snapshots[i]);
 	free(tree->snapshots);
+	free(tree);
 }
 
 struct vzctl_snapshot_tree *vzctl_alloc_snapshot_tree(void)
