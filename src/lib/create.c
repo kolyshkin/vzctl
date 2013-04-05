@@ -61,7 +61,7 @@ static char *get_ostemplate_name(char *ostmpl)
 		return NULL;
 	}
 	*buf = 0;
-	while((p = fgets(buf, sizeof(buf), fd)) != NULL);
+	while((fgets(buf, sizeof(buf), fd)) != NULL);
 	status = pclose(fd);
 	if (WEXITSTATUS(status) || *buf == 0) {
 		logger(-1, 0, "Unable to get full ostemplate name for %s",
