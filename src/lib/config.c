@@ -2270,7 +2270,7 @@ int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
 
 	if ((fp = fopen(path, "r")) == NULL) {
 		logger(-1, errno, "Unable to open %s", path);
-		return 1;
+		return VZ_SYSTEM_ERROR;
 	}
 	if (!stat(path, &st))
 		len = st.st_size;
