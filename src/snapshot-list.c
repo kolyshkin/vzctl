@@ -111,7 +111,9 @@ struct snapshot_field {
 } field_tbl[] =
 {
 {"uuid", "UUID", "%-38s", print_uuid},
+{"id", "UUID", "%-38s", print_uuid},
 {"parent_uuid", "PARENT_UUID", "%-38s", print_parent_uuid},
+{"parent_id", "PARENT_UUID", "%-38s", print_parent_uuid},
 {"current", "C", "%1s", print_current},
 {"date", "DATE", "%-19s", print_date},
 {"name", "NAME", "%-32s", print_name},
