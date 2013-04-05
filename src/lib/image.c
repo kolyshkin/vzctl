@@ -131,6 +131,7 @@ static int load_ploop_lib(void)
 
 	vzctl_init_ploop_log();
 	logger(1, 0, "The ploop library has been loaded successfully");
+	/* Don't dlclose(), we need lib for the rest of runtime */
 
 	return 0;
 }
