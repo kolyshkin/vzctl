@@ -157,22 +157,23 @@ static int ct_env_create(struct arg_start *arg)
 {
 
 	long stack_size = sysconf(_SC_PAGESIZE);
-	void *child_stack = (char *)alloca(stack_size) + stack_size;
+	char *child_stack = alloca(stack_size);
 	int clone_flags;
 	int ret;
 	char procpath[STR_SIZE];
 	char ctpath[STR_SIZE];
 
+	if (child_stack == NULL) {
+		logger(-1, 0, "Unable to alloc");
+		return VZ_RESOURCE_ERROR;
+	}
+	child_stack += stack_size;
 
 	/* non-fatal */
 	if ((ret = ct_destroy(arg->h, arg->veid)))
 		logger(0, 0, "Could not properly cleanup container: %s",
 			container_error(ret));
 
-	if (child_stack == NULL) {
-		logger(-1, errno, "Unable to alloc");
-		return VZ_RESOURCE_ERROR;
-	}
 	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, arg->veid);
 	unlink(ctpath);
 
