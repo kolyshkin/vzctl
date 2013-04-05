@@ -67,7 +67,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	char guid[39];
 	char fname[PATH_MAX];
 	char tmp[PATH_MAX];
-	char snap_ve_conf[PATH_MAX];
+	char snap_ve_conf[PATH_MAX] = "";
 	struct ploop_snapshot_param image_param = {};
 	struct ploop_merge_param merge_param = {};
 	struct ploop_disk_images_data *di = NULL;
