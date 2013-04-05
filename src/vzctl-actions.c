@@ -1032,8 +1032,10 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (!actions)
 			return VZ_RESOURCE_ERROR;
 		dist_name = get_dist_name(&g_p->res.tmpl);
-		if ((ret = read_dist_actions(dist_name, DIST_DIR, actions)))
+		if ((ret = read_dist_actions(dist_name, DIST_DIR, actions))) {
+			free(actions);
 			return ret;
+		}
 		free(dist_name);
 	}
 	/* Setup password */
@@ -1063,12 +1065,14 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	if (cmd_p->res.dq.diskspace &&
 			ve_private_is_ploop(g_p->res.fs.private))
 	{
-		if (! is_ploop_supported())
-			return VZ_PLOOP_UNSUP;
+		if (! is_ploop_supported()) {
+			ret=VZ_PLOOP_UNSUP;
+			goto err;
+		}
 #ifdef HAVE_PLOOP
 		if ((ret = vzctl_resize_image(g_p->res.fs.private,
 						cmd_p->res.dq.diskspace[1])))
-			return ret;
+			goto err;
 #endif
 	}
 	/* Warn that --diskinodes is ignored for ploop CT */
@@ -1082,7 +1086,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	if (cmd_p->opt.save && !is_run) {
 		ret = mod_setup(h, veid, STATE_STOPPED, SKIP_NONE, &g_action,
 			cmd_p);
-		return ret;
+		goto err;
 	}
 	if (is_run) {
 		ret = check_set_mode(h, veid, cmd_p->opt.setmode,
