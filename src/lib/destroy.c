@@ -150,7 +150,7 @@ static int destroydir(char *dir)
 		int i;
 		i = readlink(dir, tmp, sizeof(tmp) - 1);
 		if (i == -1) {
-			logger(-1, 0, "Unable to readlink %s", dir);
+			logger(-1, errno, "Unable to readlink %s", dir);
 			return -1;
 		}
 		tmp[i] = '\0';
