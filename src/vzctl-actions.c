@@ -1389,8 +1389,9 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 
 	ret = 0;
 	if ((h = vz_open(veid)) == NULL) {
-		/* Accept to run "set --save --force" on non-openvz
-		 * kernel */
+		/* Accept to run "set --save --force" on any kernel,
+		 * otherwise error out if initialization failed
+		 */
 		if (action != ACTION_SET ||
 		    cmd_p->opt.save_force != YES ||
 		    cmd_p->opt.save != YES)

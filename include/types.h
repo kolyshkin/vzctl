@@ -110,7 +110,7 @@ typedef struct vps_handler {
 
 static inline int is_vz_kernel(vps_handler *h)
 {
-	return h->vzfd != -1;
+	return h && h->vzfd != -1;
 }
 
 typedef enum {
