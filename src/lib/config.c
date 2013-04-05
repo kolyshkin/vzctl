@@ -2491,9 +2491,10 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 
 	list_head_init(&conf);
 	list_head_init(&new_conf);
-	if (old_p == NULL && stat_file(path)) {
+	if (old_p == NULL) {
 		tmp_old_p = init_vps_param();
-		vps_parse_config(veid, path, tmp_old_p, action);
+		if (stat_file(path))
+			vps_parse_config(veid, path, tmp_old_p, action);
 		old_p = tmp_old_p;
 	}
 	if (read_conf(path, &conf) != 0)
