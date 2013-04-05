@@ -63,7 +63,7 @@ int read_script(const char *fname, char *include, char **buf)
 			snprintf(inc, p - fname + 2, "%s", fname);
 			strcat(inc, include);
 		} else {
-			snprintf(inc, sizeof(inc), "%s", include);
+			sprintf(inc, "%s", include);
 		}
 		if (stat_file(inc))
 			len = read_script(inc, NULL, buf);
