@@ -302,9 +302,8 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 
 	logger(0, 0, "Container has been successfully switched "
 			"to another snapshot");
-	ploop.free_diskdescriptor(di);
-
-	return 0;
+	ret = 0;
+	goto out;
 
 err3:
 	/* Restore original DiskDescriptor.xml */
@@ -324,14 +323,18 @@ err2:
 		logger(-1, 0, "Failed to resume Container on error");
 err1:
 	unlink(snap_xml_tmp);
+
 err:
+	ret = VZCTL_E_SWITCH_SNAPSHOT;
 	logger(-1, 0, "Failed to switch to snapshot %s", guid);
+
+out:
 	if (tree != NULL)
 		vzctl_free_snapshot_tree(tree);
 	if (di != NULL)
 		ploop.free_diskdescriptor(di);
 
-	return VZCTL_E_SWITCH_SNAPSHOT;
+	return ret;
 }
 
 int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
