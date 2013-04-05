@@ -149,8 +149,9 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Failed to rename %s -> %s", tmp, fname);
 	logger(0, 0, "Snapshot %s has been successfully created",
 			guid);
-	ploop.free_diskdescriptor(di);
-	return 0;
+	ret = 0;
+	goto out;
+
 err2:
 	// merge top_delta
 	PLOOP_CLEANUP(ret = ploop.merge_snapshot(di, &merge_param));
@@ -165,12 +166,16 @@ err1:
 	unlink(snap_ve_conf);
 
 err:
+	ret = VZCTL_E_CREATE_SNAPSHOT;
 	logger(-1, 0, "Failed to create snapshot");
+
+out:
 	if (di != NULL)
 		ploop.free_diskdescriptor(di);
 	if (tree != NULL)
 		vzctl_free_snapshot_tree(tree);
-	return VZCTL_E_CREATE_SNAPSHOT;
+
+	return ret;
 }
 
 int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
