@@ -403,7 +403,8 @@ err:
 		ret = VZ_EXEC_TIMEOUT;
 	alarm(0);
 	sigaction(SIGALRM, &actold, NULL);
-	close(fd);
 	unlink(VZFIFO_FILE);
+	if (fd >= 0)
+		close(fd);
 	return ret;
 }
