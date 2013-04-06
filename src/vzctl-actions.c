@@ -1104,8 +1104,15 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			goto err;
 		}
 	}
-	ret = vps_setup_res(h, veid, actions, &g_p->res.fs, cmd_p,
-		STATE_RUNNING, SKIP_NONE, &g_action);
+
+	/* Only try to apply parameters on a supported kernel */
+	if (h) {
+		/* If CT is not running, call this anyway to get relevant
+		 * errors messages like "Can't set CPU: CT is not running"
+		 */
+		ret = vps_setup_res(h, veid, actions, &g_p->res.fs, cmd_p,
+				STATE_RUNNING, SKIP_NONE, &g_action);
+	}
 err:
 	free_dist_actions(actions);
 	free(actions);
