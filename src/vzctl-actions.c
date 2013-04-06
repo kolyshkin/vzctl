@@ -1089,17 +1089,19 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		goto err;
 	}
 	if (is_run) {
+		/* Check if restart is required */
 		ret = check_set_mode(h, veid, cmd_p->opt.setmode,
 			cmd_p->opt.save, &cmd_p->res, &g_p->res);
 		if (ret) {
 			if (ret < 0) {
+				/* ignore but return error */
 				ret = VZ_VE_RUNNING;
-				goto err;
 			} else {
+				/* do restart */
 				merge_vps_param(g_p, cmd_p);
 				ret = restart(h, veid, g_p, cmd_p);
-				goto err;
 			}
+			goto err;
 		}
 	}
 	ret = vps_setup_res(h, veid, actions, &g_p->res.fs, cmd_p,
