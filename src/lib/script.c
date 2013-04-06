@@ -102,7 +102,7 @@ int read_script(const char *fname, char *include, char **buf)
 
 	return len;
 err:
-	if (fd > 0)
+	if (fd >= 0)
 		close(fd);
 	free(*buf);
 	return -1;
