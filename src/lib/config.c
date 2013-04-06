@@ -777,8 +777,9 @@ static int parse_cap(char *str, cap_param *cap)
 		else
 			goto err;
 		len = p - token;
-		strncpy(cap_nm, token,
-			len < sizeof(cap_nm) ? len : sizeof(cap_nm));
+		if (len + 1 > sizeof(cap_nm))
+			return ERR_INVAL;
+		strncpy(cap_nm, token, len);
 		cap_nm[len] = 0;
 		if (get_cap_mask(cap_nm, mask)) {
 			logger(-1, 0, "Capability %s is unknown", cap_nm);
