@@ -582,7 +582,8 @@ int ct_do_open(vps_handler *h)
 	ret = mkdir(NETNS_RUN_DIR, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	if (ret && (errno != EEXIST)) {
-		fprintf(stderr, "Can't create directory %s (%s\n)", NETNS_RUN_DIR, strerror(errno));
+		fprintf(stderr, "Can't create directory %s: %s\n",
+				NETNS_RUN_DIR, strerror(errno));
 		return VZ_RESOURCE_ERROR;
 	}
 
