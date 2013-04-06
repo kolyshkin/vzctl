@@ -1736,7 +1736,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		len = ch - str;
 		ch++;
 	}
-	if (len > IFNAMSIZE)
+	if (len + 1 > IFNAMSIZE)
 		return ERR_INVAL;
 	snprintf(dev->dev_name_ve, len + 1, "%s", str);
 	tmp = ch;
@@ -1791,7 +1791,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 		ch++;
 	}
 	if (len) {
-		if (len > IFNAMSIZE)
+		if (len + 1 > IFNAMSIZE)
 			return ERR_INVAL;
 		snprintf(dev->dev_name, len + 1, "%s", tmp);
 		if (ch == ep) {
@@ -1837,7 +1837,7 @@ static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
 	/* Parsing bridge name */
 	len = strlen (ch);
 
-	if (len > IFNAMSIZE)
+	if (len + 1 > IFNAMSIZE)
 		return ERR_INVAL;
 
 	snprintf(dev->dev_bridge, len + 1, "%s", ch);
