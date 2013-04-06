@@ -34,6 +34,9 @@ int vps_is_mounted(const char *root, const char *private)
 	struct stat st1, st2;
 	char parent[PATH_MAX];
 
+	if (!root || !private)
+		return -1;
+
 	if (stat(root, &st1)) {
 		logger(-1, errno, "stat(%s)", root);
 		return -1;
