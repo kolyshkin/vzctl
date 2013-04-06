@@ -619,6 +619,7 @@ void close_fds(int close_std, ...)
 		fd = open("/dev/null", O_RDWR);
 		if (fd != -1) {
 			dup2(fd, 0); dup2(fd, 1); dup2(fd, 2);
+			close(fd);
 		} else {
 			close(0); close(1); close(2);
 		}
