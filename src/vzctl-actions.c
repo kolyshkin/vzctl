@@ -1120,6 +1120,44 @@ err:
 	return ret;
 }
 
+static int vps_set(vps_handler *h, envid_t veid,
+		vps_param *g_p, vps_param *vps_p, vps_param *cmd_p)
+{
+	int ret;
+	char fname[STR_SIZE];
+
+	if (veid == 0)
+		ret = set_ve0(h, g_p, vps_p, cmd_p);
+	else
+		ret = set(h, veid, g_p, vps_p, cmd_p);
+
+	if (cmd_p->opt.save == YES) {
+		if (ret) {
+			logger(-1, 0, "Error: failed to apply "
+					"some parameters, not saving "
+					"configuration file!");
+			return ret;
+		}
+		get_vps_conf_path(veid, fname, sizeof(fname));
+		/* Warn if config does not exist */
+		if (!stat_file(fname))
+			logger(-1, errno, "WARNING: %s not found",
+					fname);
+		ret = vps_save_config(veid, fname,
+				cmd_p, vps_p, &g_action);
+	} else if (cmd_p->opt.save != NO) {
+		if (list_empty(&cmd_p->res.misc.userpw)) {
+			int is_run = h != NULL && vps_is_run(h, veid);
+			logger(0, 0, "WARNING: Settings were not saved"
+					" to config %s(use --save flag)",
+					is_run ? "and will be lost after CT restart "
+					: "");
+		}
+	}
+
+	return ret;
+}
+
 static int enter(vps_handler *h, envid_t veid, const char *root,
 		int argc, char **argv)
 {
@@ -1394,7 +1432,6 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	vps_handler *h = NULL;
 	int ret, lock_id = -1;
 	struct sigaction act;
-	char fname[STR_SIZE];
 
 	ret = 0;
 	if ((h = vz_open(veid)) == NULL) {
@@ -1473,33 +1510,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 #endif
 	case ACTION_SET:
-		if (veid == 0)
-			ret = set_ve0(h, g_p, vps_p, cmd_p);
-		else
-			ret = set(h, veid, g_p, vps_p, cmd_p);
-		if (cmd_p->opt.save == YES) {
-			if (ret) {
-				logger(-1, 0, "Error: failed to apply "
-						"some parameters, not saving "
-						"configuration file!");
-				break;
-			}
-			get_vps_conf_path(veid, fname, sizeof(fname));
-			/* Warn if config does not exist */
-			if (!stat_file(fname))
-				logger(-1, errno, "WARNING: %s not found",
-					fname);
-			ret = vps_save_config(veid, fname,
-					cmd_p, vps_p, &g_action);
-		} else if (cmd_p->opt.save != NO) {
-			if (list_empty(&cmd_p->res.misc.userpw)) {
-				int is_run = h != NULL && vps_is_run(h, veid);
-				logger(0, 0, "WARNING: Settings were not saved"
-				" to config %s(use --save flag)",
-				is_run ? "and will be lost after CT restart "
-					: "");
-			}
-		}
+		ret = vps_set(h, veid, g_p, vps_p, cmd_p);
 		break;
 	case ACTION_STATUS:
 		ret = show_status(h, veid, g_p);
