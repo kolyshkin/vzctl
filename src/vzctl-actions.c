@@ -906,6 +906,11 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 				 " --name option without --save");
 			return VZ_SET_NAME_ERROR;
 		}
+		if (param->opt.save_force) {
+			logger(-1, 0, "Error: --force is useless "
+					"without --save");
+			return VZ_INVALID_PARAMETER_SYNTAX;
+		}
 	}
 
 	return 0;

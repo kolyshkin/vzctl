@@ -199,7 +199,8 @@ If this flag is given, parameters are saved in container configuration file
 .TP
 .B --force
 If this flag is given together with \fB--save\fR, parameters are saved
-even if the current kernel doesn't support OpenVZ.
+even if the current kernel doesn't support OpenVZ. Note this flag
+does not make sense without \fB--save\fR, so \fB--save\fR is required.
 .TP
 .B --reset_ub
 If this flag is given, \fBvzctl\fR applies all User Beancounter parameters
