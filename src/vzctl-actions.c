@@ -945,6 +945,10 @@ static int set_ve0(vps_handler *h, vps_param *g_p,
 		ub = &cmd_p->res.ub;
 		cpu = &cmd_p->res.cpu;
 	}
+
+	if (!h)
+		return 0;
+
 	ret = vps_set_ublimit(h, 0, ub);
 	if (ret)
 		return ret;
