@@ -889,6 +889,16 @@ static int apply_param_from_cfg(int veid, vps_param *param, char *cfg)
 	return 0;
 }
 
+static int check_set_opt(int argc, char *argv[], vps_param *param)
+{
+	if ((param->opt.reset_ub == YES) && (argc > 1)) {
+		logger(-1, 0, "Error: option --reset_ub is exclusive");
+		return VZ_INVALID_PARAMETER_SYNTAX;
+	}
+
+	return 0;
+}
+
 static int parse_set_opt(envid_t veid, int argc, char *argv[],
 	vps_param *param)
 {
@@ -900,6 +910,9 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 		return VZ_RESOURCE_ERROR;
 	ret = parse_opt(veid, argc, argv, opt, set_opt, param);
 	free(opt);
+
+	if (!ret)
+		ret = check_set_opt(argc, argv, param);
 
 	return ret;
 }

@@ -48,8 +48,9 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBset\fR \fICTID\fR \fI--parameter value\fR [\.\.\.]
 .OP --save
 .OP --force
-.OP --reset_ub
 .OP --setmode \fBrestart\fR|\fBignore
+.SY vzctl
+[\fIflags\fR] \fBset\fR \fICTID\fR \fB--reset_ub\fR
 .SY vzctl
 [\fIflags\fR] \fBdestroy\fR | \fBdelete\fR | \fBmount\fR | \fBumount\fR |
 \fBstatus\fR | \fBquotaon\fR | \fBquotaoff\fR | \fBquotainit\fR \fICTID\fR
@@ -204,8 +205,7 @@ even if the current kernel doesn't support OpenVZ.
 If this flag is given, \fBvzctl\fR applies all User Beancounter parameters
 from the configuration file to a running container. This is helpful
 in case configuration file is modified manually. Please note this flag
-is not compatible with \fB--save\fR, and it is usually a bad idea
-to combine it with any other options.
+is exclusive, i.e. it can not be combined with any other options or flags.
 .TP
 \fB--setmode\fR \fBrestart\fR | \fBignore\fR
 A few parameters can only be applied by restarting the container.
