@@ -263,7 +263,8 @@ use \fBvzctl start --force\fR.
 .TP
 \fB--name\fR \fIname\fR
 Add a name for a container. The \fIname\fR can later be used in
-subsequent calls to \fBvzctl\fR in place of \fICTID\fR.
+subsequent calls to \fBvzctl\fR in place of \fICTID\fR. Note this
+option can not be used without \fB--save\fR.
 .TP
 \fB--description\fR \fIstring\fR
 Add a textual description for a container.
