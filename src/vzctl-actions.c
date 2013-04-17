@@ -891,6 +891,9 @@ static int apply_param_from_cfg(int veid, vps_param *param, char *cfg)
 
 static int check_set_opt(int argc, char *argv[], vps_param *param)
 {
+	/* argv[0] is vzctl, we're not interested in it here */
+	argc--; argv++;
+
 	if ((param->opt.reset_ub == YES) && (argc > 1)) {
 		logger(-1, 0, "Error: option --reset_ub is exclusive");
 		return VZ_INVALID_PARAMETER_SYNTAX;
