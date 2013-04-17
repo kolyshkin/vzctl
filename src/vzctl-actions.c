@@ -899,6 +899,15 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 
+	/* A few options require --save flag */
+	if (!param->opt.save) {
+		if (param->res.name.name != NULL) {
+			logger(-1, 0, "Error: unable to use"
+				 " --name option without --save");
+			return VZ_SET_NAME_ERROR;
+		}
+	}
+
 	return 0;
 }
 
@@ -1010,14 +1019,8 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 	if (cmd_p->res.name.name != NULL) {
-		if (!cmd_p->opt.save) {
-			logger(-1, 0, "Error: unable to use"
-				 " --name option without --save");
-			ret =  VZ_SET_NAME_ERROR;
-		} else {
-			ret = set_name(veid, cmd_p->res.name.name,
+		ret = set_name(veid, cmd_p->res.name.name,
 				vps_p->res.name.name);
-		}
 		if (ret) {
 			cmd_p->opt.save = NO;
 			return ret;
