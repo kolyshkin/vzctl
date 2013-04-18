@@ -908,6 +908,13 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 					"without --save");
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
+		if (param->res.dq.diskspace &&
+				ve_private_is_ploop(param->g_param->res.fs.private))
+		{
+			logger(-1, 0, "Error: can't use --diskspace without --save "
+					"for a ploop-based container");
+			return VZ_INVALID_PARAMETER_SYNTAX;
+		}
 	}
 
 	return 0;

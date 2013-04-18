@@ -668,6 +668,9 @@ First parameter is soft limit, second is hard limit.
 For \fBploop\fR layout, initiates the procedure of resizing
 the ploop image file to the new size. Since there is no soft/hard
 limit concept in ploop, second \fInum\fR, if specified, is ignored.
+Note that such resize is NOT performed on container start, so
+for consistency \fB--diskspace\fR must be used together
+with \fB--save\fR flag.
 
 Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
 (see \fBResource limits\fR section for more info on suffixes).
