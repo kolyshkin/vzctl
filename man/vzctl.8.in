@@ -210,9 +210,10 @@ is exclusive, i.e. it can not be combined with any other options or flags.
 .TP
 \fB--setmode\fR \fBrestart\fR | \fBignore\fR
 A few parameters can only be applied by restarting the container.
-By default, \fBvzctl\fR warns if such parameters are present and a container
-is running. Use \fB--setmode restart\fR to restart a container in such a case,
-or \fB--setmode ignore\fR to suppress the above mentioned warning.
+By default, \fBvzctl\fR prints a warning if such parameters are supplied
+and a container is running. Use \fB--setmode restart\fR
+together with \fB--save\fR flag to restart a container in such a case,
+or \fB--setmode ignore\fR to suppress the warning.
 
 .SS3 Miscellaneous
 .TP
