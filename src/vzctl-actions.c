@@ -891,9 +891,6 @@ static int apply_param_from_cfg(int veid, vps_param *param, char *cfg)
 
 static int check_set_opt(int argc, char *argv[], vps_param *param)
 {
-	/* argv[0] is vzctl, we're not interested in it here */
-	argc--; argv++;
-
 	if ((param->opt.reset_ub == YES) && (argc > 1)) {
 		logger(-1, 0, "Error: option --reset_ub is exclusive");
 		return VZ_INVALID_PARAMETER_SYNTAX;
@@ -927,9 +924,6 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 		return VZ_RESOURCE_ERROR;
 	ret = parse_opt(veid, argc, argv, opt, set_opt, param);
 	free(opt);
-
-	if (!ret)
-		ret = check_set_opt(argc, argv, param);
 
 	return ret;
 }
@@ -992,7 +986,7 @@ static int fix_ip_param(vps_param *conf, vps_param *cmd)
 }
 
 static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
-	vps_param *cmd_p)
+	vps_param *cmd_p, int argc, char **argv)
 {
 	int ret = 0, is_run;
 	dist_actions *actions = NULL;
@@ -1011,6 +1005,10 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	}
 
 	cmd_p->g_param = g_p;
+	ret = check_set_opt(argc, argv, cmd_p);
+	if (ret)
+		return ret;
+
 	if (cmd_p->opt.apply_cfg_map == APPCONF_MAP_NAME) {
 		ret = set_name(veid, g_p->res.name.name, g_p->res.name.name);
 		if (ret != 0)
@@ -1149,7 +1147,8 @@ err:
 }
 
 static int vps_set(vps_handler *h, envid_t veid,
-		vps_param *g_p, vps_param *vps_p, vps_param *cmd_p)
+		vps_param *g_p, vps_param *vps_p, vps_param *cmd_p,
+		int argc, char **argv)
 {
 	int ret;
 	char fname[STR_SIZE];
@@ -1157,7 +1156,7 @@ static int vps_set(vps_handler *h, envid_t veid,
 	if (veid == 0)
 		ret = set_ve0(h, g_p, vps_p, cmd_p);
 	else
-		ret = set(h, veid, g_p, vps_p, cmd_p);
+		ret = set(h, veid, g_p, vps_p, cmd_p, argc, argv);
 
 	if (cmd_p->opt.save == YES) {
 		if (ret) {
@@ -1538,7 +1537,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 #endif
 	case ACTION_SET:
-		ret = vps_set(h, veid, g_p, vps_p, cmd_p);
+		ret = vps_set(h, veid, g_p, vps_p, cmd_p, argc-1, argv+1);
 		break;
 	case ACTION_STATUS:
 		ret = show_status(h, veid, g_p);
