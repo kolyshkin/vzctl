@@ -251,11 +251,11 @@ for \fBploop\fR layout, ignored otherwise.
 Sets password for the given user in a container, creating the user if
 it does not exists.
 Note that this option is not saved in configuration file at all (so
-\fB--save\fR flag is useless), it is applied to the container (by modifying its
-\fB\f(CR/etc/passwd\fR and \fB\f(CR/etc/shadow\fR files).
+\fB--save\fR flag is useless), it is applied directly to the container,
+by running distribution-specific programs inside the container.
 
-In case container root filesystem is not mounted, it is automatically mounted,
-then all the appropriate file changes are applied, then it is unmounted.
+In case container was not running, it is automatically started
+then all the appropriate changes are applied, then it is stopped.
 
 Note that container should be created before using this option.
 .TP
