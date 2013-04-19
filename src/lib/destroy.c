@@ -218,21 +218,8 @@ static int destroydir(char *dir)
 	sigaction(SIGCHLD, &act, NULL);
 
 	if (!(pid = fork())) {
-		int fd, i;
-
 		setsid();
-		fd = open("/dev/null", O_WRONLY);
-		if (fd != -1) {
-			close(0);
-			close(1);
-			close(2);
-			dup2(fd, 1);
-			dup2(fd, 2);
-		}
-		for (i = 3; i < 1024; i++) {
-			if (i != fd_lock)
-				close(i);
-		}
+		close_fds(1, fd_lock, -1);
 		_destroydir(tmp);
 		_unlock(fd_lock, buf);
 		exit(0);
