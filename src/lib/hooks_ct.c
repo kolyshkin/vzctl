@@ -226,6 +226,7 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	char path[STR_SIZE]; /* long enough for any pid */
 	pid_t task_pid;
 	int ret = VZ_RESOURCE_ERROR;
+	int err;
 	bool joined_mnt_ns = false;
 
 	if (!h->can_join_pidns) {
@@ -246,12 +247,11 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	if (dp == NULL)
 		return VZ_RESOURCE_ERROR;
 
-	if ((ret = container_add_task(veid))) {
-		logger(-1, 0, "Can't add task creator to container: %s", container_error(ret));
-		return VZ_RESOURCE_ERROR;
+	if (err = container_add_task(veid)) {
+		logger(-1, 0, "Can't add task creator to container: %s", container_error(err));
+		goto out;
 	}
 
-	ret = VZ_RESOURCE_ERROR;
 	while ((ep = readdir (dp))) {
 		int fd;
 		if (!strcmp(ep->d_name, "."))
