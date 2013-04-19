@@ -156,13 +156,18 @@ static int _env_create(void *data)
 static int ct_env_create(struct arg_start *arg)
 {
 
-	long stack_size = sysconf(_SC_PAGESIZE);
-	char *child_stack = alloca(stack_size);
+	long stack_size;
+	char *child_stack;
 	int clone_flags;
 	int ret;
 	char procpath[STR_SIZE];
 	char ctpath[STR_SIZE];
 
+	stack_size = get_pagesize();
+	if (stack_size < 0)
+		return VZ_RESOURCE_ERROR;
+
+	child_stack = alloca(stack_size);
 	if (child_stack == NULL) {
 		logger(-1, 0, "Unable to alloc");
 		return VZ_RESOURCE_ERROR;
