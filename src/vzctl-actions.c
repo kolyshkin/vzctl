@@ -1073,12 +1073,12 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	}
 	/* Setup password */
 	if (h != NULL && !list_empty(&cmd_p->res.misc.userpw)) {
-		if (!is_run)
-			if ((ret = vps_start(h, veid, g_p,
-				SKIP_SETUP|SKIP_ACTION_SCRIPT, NULL)))
-			{
+		if (!is_run) {
+			ret = vps_start(h, veid, g_p,
+					SKIP_SETUP|SKIP_ACTION_SCRIPT, NULL);
+			if (ret)
 				goto err;
-			}
+		}
 		ret = vps_pw_configure(h, veid, actions, g_p->res.fs.root,
 			&cmd_p->res.misc.userpw);
 		if (!is_run)
