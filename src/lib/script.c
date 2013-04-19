@@ -288,7 +288,7 @@ int add_reach_runlevel_mark()
 {
 	int fd, found, ret;
 	ssize_t len, w;
-	char buf[4096];
+	char buf[4096 + 1];
 	struct stat st;
 
 	unlink(VZFIFO_FILE);
@@ -342,7 +342,7 @@ int add_reach_runlevel_mark()
 	ret = 0;
 	found = 0;
 	while (1) {
-		len = read(fd, buf, sizeof(buf));
+		len = read(fd, buf, sizeof(buf) - 1);
 		if (len == 0)
 			break;
 		if (len < 0) {
