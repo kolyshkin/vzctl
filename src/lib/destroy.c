@@ -238,6 +238,7 @@ static int destroydir(char *dir)
 		exit(0);
 	} else if (pid < 0)  {
 		logger(-1, errno, "destroydir: Unable to fork");
+		_unlock(fd_lock, buf);
 		ret = VZ_RESOURCE_ERROR;
 	}
 	sleep(1);
