@@ -98,4 +98,14 @@ int vzctl_get_normalized_guid(const char *str, char *buf, int len);
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof((x)[0]))
 
+/* Usage: printf("MAC=" MAC2STR_FMT, MAC2STR(dev)); */
+#define MAC2STR_FMT	"%02X:%02X:%02X:%02X:%02X:%02X"
+#define MAC2STR(dev)	\
+	((unsigned char *)dev)[0],      \
+	((unsigned char *)dev)[1],      \
+	((unsigned char *)dev)[2],      \
+	((unsigned char *)dev)[3],      \
+	((unsigned char *)dev)[4],      \
+	((unsigned char *)dev)[5]
+
 #endif

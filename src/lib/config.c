@@ -1634,14 +1634,6 @@ static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	veth_param *veth_add = &vps_p->res.veth;
 	veth_param *veth_del = &vps_p->del_res.veth;
 
-
-#define STR2MAC(dev)			\
-	((unsigned char *)dev)[0],	\
-	((unsigned char *)dev)[1],	\
-	((unsigned char *)dev)[2],	\
-	((unsigned char *)dev)[3],	\
-	((unsigned char *)dev)[4],	\
-	((unsigned char *)dev)[5]
 	if (conf->id != PARAM_NETIF_ADD)
 		return 0;
 	if (list_empty(&veth_add->dev) && list_empty(&veth_del->dev) &&
@@ -1684,8 +1676,8 @@ static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		}
 		if (dev->addrlen_ve != 0) {
 			sp += snprintf(sp, ep - sp,
-				"mac=%02X:%02X:%02X:%02X:%02X:%02X,",
-				STR2MAC(dev->dev_addr_ve));
+				"mac=" MAC2STR_FMT ",",
+				MAC2STR(dev->dev_addr_ve));
 			if (sp >= ep)
 				break;
 		}
@@ -1697,8 +1689,8 @@ static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		}
 		if (dev->addrlen != 0) {
 			sp += snprintf(sp, ep - sp,
-				"host_mac=%02X:%02X:%02X:%02X:%02X:%02X,",
-				STR2MAC(dev->dev_addr));
+				"host_mac=" MAC2STR_FMT ",",
+				MAC2STR(dev->dev_addr));
 			if (sp >= ep)
 				break;
 		}
@@ -1716,8 +1708,8 @@ static int store_netif(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	free_veth_param(&merged);
 	strcat(buf, "\"");
 	add_str_param(conf_h, buf);
+
 	return 0;
-#undef STR2MAC
 }
 
 static int parse_netif_str_cmd(envid_t veid, const char *str, veth_dev *dev)
