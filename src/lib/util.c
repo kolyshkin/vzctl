@@ -603,7 +603,7 @@ int set_not_blk(int fd)
 
 /** Close all fd.
  * @param close_std	flag for closing the [0-2] fds
- * @param ...		list of fds are skiped, (-1 is the end mark)
+ * @param ...		list of fds to skip (-1 is the end mark)
 */
 void close_fds(int close_std, ...)
 {
@@ -624,7 +624,7 @@ void close_fds(int close_std, ...)
 			close(0); close(1); close(2);
 		}
 	}
-	/* build aray of skiped fds */
+	/* build array of skipped fds */
 	va_start(ap, close_std);
 	skip_fds[0] = -1;
 	for (i = 0; i < ARRAY_SIZE(skip_fds); i++) {
