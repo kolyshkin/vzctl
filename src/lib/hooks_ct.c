@@ -524,22 +524,22 @@ static int ct_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 	snprintf(buf, sizeof(buf), "VNAME=%s", dev->dev_name_ve);
 	envp[i++] = strdup(buf);
 
-	if (dev->dev_addr_ve) {
+	if (dev->addrlen_ve) {
 		snprintf(buf, sizeof(buf), "VMAC=%s", dev->dev_addr_ve);
 		envp[i++] = strdup(buf);
 	}
 
-	if (dev->dev_addr) {
+	if (dev->addrlen) {
 		snprintf(buf, sizeof(buf), "HMAC=%s", dev->dev_addr);
 		envp[i++] = strdup(buf);
 	}
 
-	if (dev->dev_name) {
+	if (dev->dev_name[0]) {
 		snprintf(buf, sizeof(buf), "HNAME=%s", dev->dev_name);
 		envp[i++] = strdup(buf);
 	}
 
-	if (dev->dev_bridge) {
+	if (dev->dev_bridge[0]) {
 		snprintf(buf, sizeof(buf), "BRIDGE=%s", dev->dev_bridge);
 		envp[i++] = strdup(buf);
 	}
