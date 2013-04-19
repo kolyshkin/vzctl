@@ -525,12 +525,14 @@ static int ct_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 	envp[i++] = strdup(buf);
 
 	if (dev->addrlen_ve) {
-		snprintf(buf, sizeof(buf), "VMAC=%s", dev->dev_addr_ve);
+		snprintf(buf, sizeof(buf), "VMAC=" MAC2STR_FMT,
+				MAC2STR(dev->dev_addr_ve));
 		envp[i++] = strdup(buf);
 	}
 
 	if (dev->addrlen) {
-		snprintf(buf, sizeof(buf), "HMAC=%s", dev->dev_addr);
+		snprintf(buf, sizeof(buf), "HMAC=" MAC2STR_FMT,
+				MAC2STR(dev->dev_addr));
 		envp[i++] = strdup(buf);
 	}
 
