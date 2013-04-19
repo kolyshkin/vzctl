@@ -1172,21 +1172,20 @@ static int vps_set(vps_handler *h, envid_t veid,
 					"configuration file!");
 			return ret;
 		}
+
 		get_vps_conf_path(veid, fname, sizeof(fname));
 		/* Warn if config does not exist */
 		if (!stat_file(fname))
-			logger(-1, errno, "WARNING: %s not found",
-					fname);
-		ret = vps_save_config(veid, fname,
-				cmd_p, vps_p, &g_action);
-	} else if (cmd_p->opt.save != NO) {
-		if (list_empty(&cmd_p->res.misc.userpw)) {
-			int is_run = h != NULL && vps_is_run(h, veid);
-			logger(0, 0, "WARNING: Settings were not saved"
-					" to config %s(use --save flag)",
-					is_run ? "and will be lost after CT restart "
-					: "");
-		}
+			logger(-1, errno, "WARNING: %s not found", fname);
+
+		ret = vps_save_config(veid, fname, cmd_p, vps_p, &g_action);
+	}
+	else if ((cmd_p->opt.save != NO) && list_empty(&cmd_p->res.misc.userpw)) {
+		int is_run = h != NULL && vps_is_run(h, veid);
+		logger(0, 0, "WARNING: Settings were not saved"
+				" to config %s(use --save flag)",
+				is_run ? "and will be lost after CT restart "
+				: "");
 	}
 
 	return ret;
