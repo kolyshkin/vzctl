@@ -455,7 +455,7 @@ char *subst_VEID(envid_t veid, char *src)
 	sp = str;
 	se = str + sizeof(str);
 	len = srcp - src; /* Length of src before $VEID */
-	if (len > sizeof(str))
+	if (len >= sizeof(str))
 		return NULL;
 	memcpy(str, src, len);
 	sp += len;
