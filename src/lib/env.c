@@ -249,7 +249,8 @@ int exec_container_init(struct arg_start *arg,
 
 	/* Create /fastboot to skip run fsck */
 	fd = open("/fastboot", O_CREAT | O_RDONLY, 0644);
-	close(fd);
+	if (fd >= 0)
+		close(fd);
 
 	if (arg->res->misc.wait == YES) {
 		if (add_reach_runlevel_mark()) {
