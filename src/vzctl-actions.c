@@ -941,7 +941,7 @@ static int parse_set_opt(envid_t veid, int argc, char *argv[],
 }
 
 static int set_ve0(vps_handler *h, vps_param *g_p,
-	vps_param *vps_p, vps_param *cmd_p)
+	vps_param *vps_p, vps_param *cmd_p, int *warn_save)
 {
 	int ret;
 	ub_param *ub;
@@ -950,7 +950,7 @@ static int set_ve0(vps_handler *h, vps_param *g_p,
 	if (cmd_p->opt.reset_ub == YES) {
 		/* Apply parameters from config */
 		ub = &vps_p->res.ub;
-		cmd_p->opt.save = NO; // suppress savewarning
+		*warn_save = 0;
 	} else {
 		/* Apply parameters from command line */
 		ub = &cmd_p->res.ub;
@@ -998,7 +998,7 @@ static int fix_ip_param(vps_param *conf, vps_param *cmd)
 }
 
 static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
-	vps_param *cmd_p, int argc, char **argv)
+	vps_param *cmd_p, int argc, char **argv, int *warn_save)
 {
 	int ret = 0, is_run;
 	dist_actions *actions = NULL;
@@ -1011,7 +1011,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		ret = check_veth_param(veid, &vps_p->res.veth, &cmd_p->res.veth,
 			&cmd_p->del_res.veth);
 		if (ret) {
-			cmd_p->opt.save = NO;
+			*warn_save = 0;
 			return ret;
 		}
 	}
@@ -1029,14 +1029,14 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	/* Reset UB parameters from config  */
 	if (cmd_p->opt.reset_ub == YES && h != NULL) {
 		ret = vps_set_ublimit(h, veid, &vps_p->res.ub);
-		cmd_p->opt.save = NO; // suppress savewarning
+		*warn_save = 0;
 		return ret;
 	}
 	if (cmd_p->res.name.name != NULL) {
 		ret = set_name(veid, cmd_p->res.name.name,
 				vps_p->res.name.name);
 		if (ret) {
-			cmd_p->opt.save = NO;
+			*warn_save = 0;
 			return ret;
 		}
 	}
@@ -1079,6 +1079,10 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			if (ret)
 				goto err;
 		}
+
+		if (argc == 2) /* only --userpasswd and its value */
+			*warn_save = 0;
+
 		ret = vps_pw_configure(h, veid, actions, g_p->res.fs.root,
 			&cmd_p->res.misc.userpw);
 		if (!is_run)
@@ -1158,12 +1162,13 @@ static int vps_set(vps_handler *h, envid_t veid,
 		int argc, char **argv)
 {
 	int ret;
+	int warn_save = 1;
 	char fname[STR_SIZE];
 
 	if (veid == 0)
-		ret = set_ve0(h, g_p, vps_p, cmd_p);
+		ret = set_ve0(h, g_p, vps_p, cmd_p, &warn_save);
 	else
-		ret = set(h, veid, g_p, vps_p, cmd_p, argc, argv);
+		ret = set(h, veid, g_p, vps_p, cmd_p, argc, argv, &warn_save);
 
 	if (cmd_p->opt.save == YES) {
 		if (ret) {
@@ -1180,7 +1185,7 @@ static int vps_set(vps_handler *h, envid_t veid,
 
 		ret = vps_save_config(veid, fname, cmd_p, vps_p, &g_action);
 	}
-	else if ((cmd_p->opt.save != NO) && list_empty(&cmd_p->res.misc.userpw)) {
+	else if (warn_save) {
 		int is_run = h != NULL && vps_is_run(h, veid);
 		logger(0, 0, "WARNING: Settings were not saved"
 				" to config %s(use --save flag)",
