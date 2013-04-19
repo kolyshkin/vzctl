@@ -274,7 +274,7 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	 * directories to jump to
 	 */
 	if (!joined_mnt_ns && (ret = ct_chroot(root)))
-		return ret;
+		goto out;
 
 	ret = 0;
 
