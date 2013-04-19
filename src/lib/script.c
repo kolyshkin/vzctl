@@ -147,7 +147,7 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		else
 			dup2(fd, 0);
 
-		if (quiet) {
+		if (quiet && fd >= 0) {
 			dup2(fd, 1);
 			dup2(fd, 2);
 		}
