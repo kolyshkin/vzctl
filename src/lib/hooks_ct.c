@@ -260,6 +260,7 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 			goto out;
 		if (setns(fd, 0))
 			logger(-1, errno, "Failed to set context for %s", ep->d_name);
+		close(fd);
 
 		if (!strcmp(ep->d_name, "mnt"))
 			joined_mnt_ns = true;
