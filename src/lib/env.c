@@ -284,6 +284,7 @@ int exec_container_init(struct arg_start *arg,
 		dup2(fd, 0);
 		dup2(fd, 1);
 		dup2(fd, 2);
+		close(fd);
 	}
 
 	logger(10, 0, "Starting init");
