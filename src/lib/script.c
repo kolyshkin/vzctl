@@ -115,7 +115,6 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 	int ret, i, j;
 	char *cmd;
 	struct sigaction act, actold;
-	int out[2];
 	char *envp[ENV_SIZE];
 	struct vzctl_cleanup_handler *ch;
 
@@ -134,11 +133,6 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		logger(2, 0, "Running: %s", cmd);
 		free(cmd);
 	}
-	if (quiet && pipe(out) < 0) {
-		logger(-1, errno, "run_script: unable to create pipe");
-		ret = VZ_RESOURCE_ERROR;
-		goto err;
-	}
 	i = 0;
 	for (i = 0; i < ENV_SIZE - 1 && envp_bash[i] != NULL; i++)
 			envp[i] = envp_bash[i];
@@ -156,13 +150,6 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 		if (quiet) {
 			dup2(fd, 1);
 			dup2(fd, 2);
-		} else {
-/*
-			dup2(out[1], STDOUT_FILENO);
-			dup2(out[1], STDERR_FILENO);
-			close(out[0]);
-			close(out[1]);
-*/
 		}
 		execve(f, argv, envp);
 		logger(-1, errno, "Error exec %s", f);
