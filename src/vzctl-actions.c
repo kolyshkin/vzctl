@@ -1185,7 +1185,7 @@ static int vps_set(vps_handler *h, envid_t veid,
 
 		ret = vps_save_config(veid, fname, cmd_p, vps_p, &g_action);
 	}
-	else if (warn_save) {
+	else if (warn_save && !ret) {
 		int is_run = h != NULL && vps_is_run(h, veid);
 		logger(0, 0, "WARNING: Settings were not saved"
 				" to config %s(use --save flag)",
