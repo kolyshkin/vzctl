@@ -715,8 +715,27 @@ err:
 int vps_start(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *mod)
 {
+	int ret;
+
 	logger(0, 0, "Starting container...");
-	return vps_start_custom(h, veid, param, skip, mod, NULL, NULL);
+	ret = vps_start_custom(h, veid, param, skip, mod, NULL, NULL);
+
+	if (ret == 0) {
+		/* Start was successful, remove the default dump file:
+		 * it is now useless and inconsistent with the fs state
+		 */
+		char buf[STR_SIZE];
+
+		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));
+		if (stat_file(buf) == 1) {
+			logger(0, 0, "Stale CT dump file %s found, removing",
+					buf);
+			if (unlink(buf) < 0)
+				logger(-1, 0, "Can't unlink %s", buf);
+		}
+	}
+
+	return ret;
 }
 
 static int real_env_stop(vps_handler *h, envid_t veid, const char *vps_root,
