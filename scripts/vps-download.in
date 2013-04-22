@@ -114,7 +114,7 @@ show_config()
 
 	cat << =EOF=
 Current $SELF configuration is below. Defaults are built-in and can be
-overwritten by setting an appropriate variables in @PKGCONFDIR@/vz.conf
+overwritten by setting an appropriate variables in @PKGCONFDIR@/download.conf
 
 * Try to update template files (\$UPDATE_TEMPLATE): $UPDATE_TEMPLATE
 * Check template signatures (\$CHECK_TEMPLATE_SIG): $CHECK_TEMPLATE_SIG
