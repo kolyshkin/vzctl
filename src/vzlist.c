@@ -475,8 +475,8 @@ static void print_vswap(struct Cveinfo *p, int index)
 {
 	/* Same conditions as used in is_vswap_config() */
 	int vswap = (p->ubc != NULL) &&
-		(p->ubc->physpages[1] != LONG_MAX) &&
-		(p->ubc->physpages[1] != INT_MAX);
+		(p->ubc->physpages[3] != LONG_MAX) &&
+		(p->ubc->physpages[3] != INT_MAX);
 
 	print_bool("%5s", vswap);
 }
