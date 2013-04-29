@@ -56,7 +56,7 @@ do { \
 		free(param->name); \
 		param->name = NULL; \
 	} \
-} while (0); \
+} while (0);
 
 	FREE_PARAM(hostname)
 	FREE_PARAM(nameserver)
