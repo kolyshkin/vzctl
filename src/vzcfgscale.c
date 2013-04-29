@@ -56,16 +56,16 @@ do { \
 		free(param->name); \
 		param->name = NULL; \
 	} \
-} while (0);
+} while (0)
 
-	FREE_PARAM(hostname)
-	FREE_PARAM(nameserver)
-	FREE_PARAM(searchdomain)
-	FREE_PARAM(tmpl_set)
-	FREE_PARAM(ve_root_orig)
-	FREE_PARAM(ve_private_orig)
-	FREE_PARAM(shared_base_id)
-	FREE_PARAM(templates)
+	FREE_PARAM(hostname);
+	FREE_PARAM(nameserver);
+	FREE_PARAM(searchdomain);
+	FREE_PARAM(tmpl_set);
+	FREE_PARAM(ve_root_orig);
+	FREE_PARAM(ve_private_orig);
+	FREE_PARAM(shared_base_id);
+	FREE_PARAM(templates);
 	ListFree(param->ipadd);
 	param->ipadd =  NULL;
 }

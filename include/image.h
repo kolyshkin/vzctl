@@ -71,7 +71,7 @@ do {								\
 	__cl_h = add_cleanup_handler(cancel_ploop_op, NULL);	\
 	code;							\
 	del_cleanup_handler(__cl_h);				\
-} while(0);
+} while(0)
 
 int is_image_mounted(const char *ve_private);
 int vzctl_create_image(const char *ve_private, struct vzctl_create_image_param *param);
