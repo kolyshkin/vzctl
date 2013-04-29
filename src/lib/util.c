@@ -48,8 +48,7 @@ static const char *unescapestr(char *src)
 
 	if (src == NULL)
 		return NULL;
-	p2 = src;
-	p1 = p2;
+	p1 = p2 = src;
 	fl = 0;
 	while (*p2) {
 		if (*p2 == '\\' && !fl)	{
