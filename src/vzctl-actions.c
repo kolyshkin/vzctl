@@ -1470,7 +1470,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 	int ret = 0, lock_id = -1;
 	struct sigaction act;
 
-	if ((h = vz_open(veid)) == NULL) {
+	if ((h = vz_open(veid, g_p)) == NULL) {
 		/* Accept to run "set --save --force" on any kernel,
 		 * otherwise error out if initialization failed
 		 */

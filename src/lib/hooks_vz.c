@@ -466,7 +466,7 @@ static int vz_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 	return ret;
 }
 
-int vz_do_open(vps_handler *h)
+int vz_do_open(vps_handler *h, vps_param *param)
 {
 	if ((h->vzfd = open(VZCTLDEV, O_RDWR)) < 0) {
 		logger(-1, errno, "Unable to open %s", VZCTLDEV);

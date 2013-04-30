@@ -572,7 +572,7 @@ static int ct_setcontext(envid_t veid)
 	return 0;
 }
 
-int ct_do_open(vps_handler *h)
+int ct_do_open(vps_handler *h, vps_param *param)
 {
 	int ret;
 	char path[STR_SIZE];

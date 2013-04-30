@@ -50,7 +50,7 @@ enum {
  * @param veid		CT ID.
  * @return		handler or NULL on error.
  */
-vps_handler *vz_open(envid_t veid);
+vps_handler *vz_open(envid_t veid, vps_param *param);
 
 /** Close CT handler.
  *
@@ -125,6 +125,6 @@ int exec_container_init(struct arg_start *arg,
 			struct env_create_param3 *create_param);
 
 int set_personality32();
-int vz_do_open(vps_handler *h);
-int ct_do_open(vps_handler *h);
+int vz_do_open(vps_handler *h, vps_param *param);
+int ct_do_open(vps_handler *h, vps_param *param);
 #endif

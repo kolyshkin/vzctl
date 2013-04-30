@@ -72,9 +72,10 @@ static int reset_std()
 /** Allocate and initialize CT handler.
  *
  * @param veid		CT ID.
+ * @param param		CT parameters.
  * @return		handler or NULL on error.
  */
-vps_handler *vz_open(envid_t veid)
+vps_handler *vz_open(envid_t veid, vps_param *param)
 {
 	vps_handler *h = NULL;
 	int ret = -1;
@@ -88,7 +89,7 @@ vps_handler *vz_open(envid_t veid)
 #ifdef VZ_KERNEL_SUPPORTED
 	/* Find out if we are under OpenVZ or upstream kernel */
 	if (stat_file("/proc/vz"))
-		ret = vz_do_open(h);
+		ret = vz_do_open(h, param);
 	else
 #endif
 	{
@@ -96,7 +97,7 @@ vps_handler *vz_open(envid_t veid)
 				"non-OpenVZ kernel");
 		h->vzfd = -1;
 #ifdef HAVE_UPSTREAM
-		ret = ct_do_open(h);
+		ret = ct_do_open(h, param);
 #else
 		logger(-1, 0, "No suitable kernel support compiled in");
 #endif
