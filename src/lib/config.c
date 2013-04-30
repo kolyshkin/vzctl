@@ -128,6 +128,10 @@ static vps_config config[] = {
 {"CONFIGFILE",	NULL, PARAM_CONFIG},
 {"ORIGIN_SAMPLE",NULL,PARAM_CONFIG_SAMPLE},
 {"DISABLED",	NULL, PARAM_DISABLED},
+#ifdef HAVE_UPSTREAM
+{"LOCAL_UID",	NULL, PARAM_LOCAL_UID},
+{"LOCAL_GID",	NULL, PARAM_LOCAL_GID},
+#endif
 /* quota */
 {"DISK_QUOTA",	NULL, PARAM_DISK_QUOTA},
 {"DISKSPACE",	NULL, PARAM_DISKSPACE},
@@ -1363,6 +1367,12 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		ret = conf_store_strlist(conf_h, conf->name,
 			&misc->searchdomain, 0);
 		break;
+	case PARAM_LOCAL_UID:
+		ret = conf_store_ulong(conf_h, conf->name, misc->local_uid);
+		break;
+	case PARAM_LOCAL_GID:
+		ret = conf_store_ulong(conf_h, conf->name, misc->local_gid);
+		break;
 	}
 	return ret;
 }
@@ -1987,6 +1997,13 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		break;
 	case PARAM_IPTABLES:
 		ret = parse_iptables(&vps_p->res.env, val);
+		break;
+
+	case PARAM_LOCAL_UID:
+		conf_parse_ulong(&vps_p->res.misc.local_uid, val);
+		break;
+	case PARAM_LOCAL_GID:
+		conf_parse_ulong(&vps_p->res.misc.local_gid, val);
 		break;
 	case PARAM_LOCKEDPAGES:
 	case PARAM_PRIVVMPAGES:
@@ -2693,6 +2710,8 @@ static void free_misc(misc_param *misc)
 	FREE_P(misc->hostname)
 	FREE_P(misc->description)
 	FREE_P(misc->bootorder)
+	FREE_P(misc->local_uid)
+	FREE_P(misc->local_gid)
 }
 
 static void free_net(net_param *net)
@@ -2861,6 +2880,8 @@ static void merge_misc(misc_param *dst, misc_param *src)
 	MERGE_STR(hostname)
 	MERGE_STR(description)
 	MERGE_INT(onboot)
+	MERGE_P(local_uid)
+	MERGE_P(local_gid)
 	MERGE_P(bootorder)
 	MERGE_INT(wait)
 }

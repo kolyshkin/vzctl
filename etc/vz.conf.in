@@ -39,6 +39,10 @@ DEF_OSTEMPLATE="centos-5"
 ## Filesystem layout for new CTs: either simfs (default) or ploop
 #VE_LAYOUT=ploop
 
+# User namespace configuration
+LOCAL_UID=100000
+LOCAL_GID=100000
+
 ## Load vzwdog module
 VZWDOG="no"
 

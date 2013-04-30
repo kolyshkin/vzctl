@@ -56,6 +56,8 @@ typedef struct {
 	int onboot;
 	unsigned long *bootorder;
 	int wait;
+	unsigned long *local_uid;
+	unsigned long *local_gid;
 } misc_param;
 
 struct mod_action;
