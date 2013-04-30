@@ -132,6 +132,77 @@ rmdir:
 	return ret;
 }
 
+#define add_value(val, var, mult) do { if (val) { var = *val * mult; } } while (0)
+
+static int ct_setlimits(vps_handler *h, envid_t veid, struct ub_struct *ub)
+{
+	unsigned long tcp = 0;
+	unsigned long kmem = 0;
+	unsigned long kmemall = 0;
+	unsigned long mem = 0;
+	unsigned long swap = 0;
+	int pagesize = sysconf(_SC_PAGESIZE);
+
+	add_value(ub->physpages, mem, pagesize);
+	add_value(ub->tcpsndbuf, tcp, 1);
+	add_value(ub->tcprcvbuf, tcp, 1);
+	add_value(ub->swappages, swap, pagesize);
+
+	/*
+	 * OpenVZ beancounters traditionally acconted objects. Also, we could
+	 * always get a very high granularity about which objects we are
+	 * tracking. Our attempt in this implementation is to translate the
+	 * historical beancounters into something that "makes sense" given the
+	 * underlying Linux infrastructure, and provide something that would
+	 * allow for more or less the kind of protection the user asked for.  A
+	 * 1:1 mapping, however, is not possible - and will never be.
+	 *
+	 * Upstream Linux cgroup controllers went in a very different
+	 * direction. First, resources tend to be viewed in its entirety. We
+	 * have entities like "memory", or "kernel memory", instead of a list
+	 * of all internal structures like dentry, siginfo, etc. For network
+	 * buffers, we can specify the total buffer memory instead of send and
+	 * receive buffers, etc.
+	 *
+	 * Also, all accounting is done in pages, not in objects - which is the
+	 * only thing that makes sense if the accounting is done in an
+	 * aggregate manner.  We don't really know the size of those
+	 * structures, so we use an estimate to get a value in pages. This is
+	 * not a stable API of the kernel, so it is bound to change.
+	 *
+	 * Here is the size in bytes of the following structs, in Linux 3.4:
+	 *
+	 * dcache: 248, siginfo: 128, sock: 1072, task 8128
+	 */
+	#define DCACHE 248
+	#define SIGINFO 128
+	#define SOCK 1072
+
+	add_value(ub->kmemsize, kmem, 1);
+	add_value(ub->dcachesize, kmemall, DCACHE);
+	add_value(ub->numtcpsock, kmemall, SOCK);
+	add_value(ub->numsiginfo, kmemall, SIGINFO);
+	add_value(ub->numothersock, kmemall, SOCK);
+	add_value(ub->othersockbuf, kmemall, 1);
+	add_value(ub->numproc, kmemall, 2 * pagesize);
+	add_value(ub->dgramrcvbuf, kmemall, SOCK);
+
+	if (mem)
+		container_apply_config(veid, MEMORY, &mem);
+	if (tcp)
+		container_apply_config(veid, TCP, &tcp);
+
+	kmem = max_ul(kmem, kmemall);
+	if (kmem)
+		container_apply_config(veid, KMEMORY, &kmem);
+
+	if (swap)
+		container_apply_config(veid, SWAP, &swap);
+
+	return 0;
+}
+#undef add_value
+
 static int _env_create(void *data)
 {
 	struct arg_start *arg = data;
@@ -288,77 +359,6 @@ out:
 	closedir(dp);
 	return ret;
 }
-
-#define add_value(val, var, mult) do { if (val) { var = *val * mult; } } while (0)
-
-static int ct_setlimits(vps_handler *h, envid_t veid, struct ub_struct *ub)
-{
-	unsigned long tcp = 0;
-	unsigned long kmem = 0;
-	unsigned long kmemall = 0;
-	unsigned long mem = 0;
-	unsigned long swap = 0;
-	int pagesize = sysconf(_SC_PAGESIZE);
-
-	add_value(ub->physpages, mem, pagesize);
-	add_value(ub->tcpsndbuf, tcp, 1);
-	add_value(ub->tcprcvbuf, tcp, 1);
-	add_value(ub->swappages, swap, pagesize);
-
-	/*
-	 * OpenVZ beancounters traditionally acconted objects. Also, we could
-	 * always get a very high granularity about which objects we are
-	 * tracking. Our attempt in this implementation is to translate the
-	 * historical beancounters into something that "makes sense" given the
-	 * underlying Linux infrastructure, and provide something that would
-	 * allow for more or less the kind of protection the user asked for.  A
-	 * 1:1 mapping, however, is not possible - and will never be.
-	 *
-	 * Upstream Linux cgroup controllers went in a very different
-	 * direction. First, resources tend to be viewed in its entirety. We
-	 * have entities like "memory", or "kernel memory", instead of a list
-	 * of all internal structures like dentry, siginfo, etc. For network
-	 * buffers, we can specify the total buffer memory instead of send and
-	 * receive buffers, etc.
-	 *
-	 * Also, all accounting is done in pages, not in objects - which is the
-	 * only thing that makes sense if the accounting is done in an
-	 * aggregate manner.  We don't really know the size of those
-	 * structures, so we use an estimate to get a value in pages. This is
-	 * not a stable API of the kernel, so it is bound to change.
-	 *
-	 * Here is the size in bytes of the following structs, in Linux 3.4:
-	 *
-	 * dcache: 248, siginfo: 128, sock: 1072, task 8128
-	 */
-	#define DCACHE 248
-	#define SIGINFO 128
-	#define SOCK 1072
-
-	add_value(ub->kmemsize, kmem, 1);
-	add_value(ub->dcachesize, kmemall, DCACHE);
-	add_value(ub->numtcpsock, kmemall, SOCK);
-	add_value(ub->numsiginfo, kmemall, SIGINFO);
-	add_value(ub->numothersock, kmemall, SOCK);
-	add_value(ub->othersockbuf, kmemall, 1);
-	add_value(ub->numproc, kmemall, 2 * pagesize);
-	add_value(ub->dgramrcvbuf, kmemall, SOCK);
-
-	if (mem)
-		container_apply_config(veid, MEMORY, &mem);
-	if (tcp)
-		container_apply_config(veid, TCP, &tcp);
-
-	kmem = max_ul(kmem, kmemall);
-	if (kmem)
-		container_apply_config(veid, KMEMORY, &kmem);
-
-	if (swap)
-		container_apply_config(veid, SWAP, &swap);
-
-	return 0;
-}
-#undef add_value
 
 static int ct_setcpus(vps_handler *h, envid_t veid, struct cpu_param *cpu)
 {
