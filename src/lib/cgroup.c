@@ -56,6 +56,20 @@ static int controller_apply_config(struct cgroup *ct, struct cgroup *parent,
 	} else if (!strcmp("memory", name)) {
 		if ((ret = cgroup_set_value_string(controller, "memory.use_hierarchy", "1")))
 			return ret;
+		/*
+		 * The kernel memory controller cannot flip states from
+		 * unlimited to limited if there are already tasks in it.
+		 * Therefore, we always have to run with *some* value of kmem
+		 * enabled. If we don't do it, we can't start unlimited and
+		 * then use the set command to set any beancounters. We write
+		 * The maximum amount minus two pages, which should effectively
+		 * mean "accounting turned on, but unlimited". This will fail
+		 * if the kmem controller is not present, but that is okay.
+		 */
+		cgroup_set_value_string(controller,
+				"memory.kmem.limit_in_bytes",
+				"9223372036854767712");
+
 	} else if (!strcmp("devices", name)) {
 		if ((ret = cgroup_set_value_string(controller, "devices.deny", "a")))
 			return ret;
