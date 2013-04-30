@@ -60,6 +60,7 @@ libvzctl_la_SOURCES = bitmap.c \
                       util.c \
                       veth.c \
                       vps_configure.c \
+                      ub.c \
                       vzfeatures.c
 
 if HAVE_PLOOP
@@ -74,5 +75,5 @@ libvzctl_la_SOURCES += cgroup.c hooks_ct.c
 endif
 
 if HAVE_VZ_KERNEL
-libvzctl_la_SOURCES += ub.c hooks_vz.c
+libvzctl_la_SOURCES += hooks_vz.c
 endif

@@ -33,11 +33,6 @@
 #include "vzsyscalls.h"
 #include "util.h"
 
-static inline int setublimit(uid_t uid, unsigned long resource,
-	const unsigned long *rlim)
-{
-	return syscall(__NR_setublimit, uid, resource, rlim);
-}
 
 static struct ubname2id {
 	char *name;
@@ -164,6 +159,13 @@ int get_ub_resid(char *name)
 	return -1;
 }
 
+#ifdef VZ_KERNEL_SUPPORTED
+static inline int setublimit(uid_t uid, unsigned long resource,
+	const unsigned long *rlim)
+{
+	return syscall(__NR_setublimit, uid, resource, rlim);
+}
+
 static const char *get_ub_name(unsigned int res_id)
 {
 	int i;
@@ -226,6 +228,7 @@ if (res != NULL) {							\
 
 	return 0;
 }
+#endif
 
 /** Apply UBC resources.
  *

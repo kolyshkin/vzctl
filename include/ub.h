@@ -140,7 +140,6 @@ struct ub_struct {
 };
 typedef struct ub_struct ub_param;
 
-#ifdef VZ_KERNEL_SUPPORTED
 /** Apply UBC resources.
  *
  * @param h		CT handler.
@@ -178,43 +177,4 @@ void add_ub_limit(struct ub_struct *ub, int res_id, unsigned long *limit);
 void free_ub_param(ub_param *ub);
 void merge_ub(ub_param *dst, ub_param *src);
 int is_vswap_config(const ub_param *param);
-#else /* ! VZ_KERNEL_SUPPORTED */
-static inline int vps_set_ublimit(vps_handler *h, envid_t veid, ub_param *ubc)
-{
-	return VZ_BAD_KERNEL;
-}
-static inline int set_ublimit(vps_handler *h, envid_t veid, ub_param *ubc)
-{
-	return VZ_BAD_KERNEL;
-}
-static inline int check_ub(vps_handler *h, ub_param *ub)
-{
-	return VZ_BAD_KERNEL;
-}
-static inline int add_ub_param(ub_param *ub, ub_res *res)
-{
-	return VZ_BAD_KERNEL;
-}
-static inline int vps_read_ubc(envid_t veid, ub_param *ub)
-{
-	return VZ_BAD_KERNEL;
-}
-static inline int get_ub_resid(char *name)
-{
-	return VZ_BAD_KERNEL;
-}
-static inline void add_ub_limit(struct ub_struct *ub, int res_id, unsigned long *limit)
-{
-}
-static inline void free_ub_param(ub_param *ub)
-{
-}
-static inline void merge_ub(ub_param *dst, ub_param *src)
-{
-}
-static inline int is_vswap_config(const ub_param *param)
-{
-	return 0;
-}
-#endif /* VZ_KERNEL_SUPPORTED */
 #endif
