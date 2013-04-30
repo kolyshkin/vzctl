@@ -103,8 +103,7 @@ static void cleanup_destroy_ve(void *data)
 	vps_destroy_dir(d->veid, d->private);
 }
 
-static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
-	dq_param *dq, int layout, int ploop_mode)
+static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
@@ -117,6 +116,10 @@ static int fs_create(envid_t veid, fs_param *fs, tmpl_param *tmpl,
 	char *dst;
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
+	dq_param *dq = &vps_p->res.dq;
+	int layout = vps_p->opt.layout;
+	fs_param *fs = &vps_p->res.fs;
+	tmpl_param *tmpl = &vps_p->res.tmpl;
 	int ploop = (layout == VE_LAYOUT_PLOOP);
 	struct destroy_ve ddata;
 	struct vzctl_cleanup_handler *ch;
@@ -173,6 +176,7 @@ find:
 		/* Create and mount ploop image */
 		struct vzctl_create_image_param param = {};
 		struct vzctl_mount_param mount_param = {};
+		int ploop_mode = vps_p->opt.mode;
 
 		if (ploop_mode < 0)
 			ploop_mode = PLOOP_EXPANDED_MODE;
@@ -388,9 +392,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 				tmpl->ostmpl = full_ostmpl;
 			}
 		}
-		ret = fs_create(veid, fs, tmpl, &vps_p->res.dq,
-						vps_p->opt.layout,
-						vps_p->opt.mode);
+		ret = fs_create(veid, h, vps_p);
 		if (ret)
 			goto err_root;
 	}
