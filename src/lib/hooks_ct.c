@@ -258,6 +258,11 @@ static int ct_env_create(struct arg_start *arg)
 		return VZ_RESOURCE_ERROR;
 	}
 
+	if ((ret = ct_setlimits(arg->h, arg->veid, &arg->res->ub))) {
+		logger(-1, 0, "Could not apply container limits: %s", container_error(ret));
+		return VZ_RESOURCE_ERROR;
+	}
+
 	if ((ret = container_add_task(arg->veid))) {
 		logger(-1, 0, "Can't add task creator to container: %s", container_error(ret));
 		return VZ_RESOURCE_ERROR;
