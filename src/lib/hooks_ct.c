@@ -247,7 +247,7 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	if (dp == NULL)
 		return VZ_RESOURCE_ERROR;
 
-	if (err = container_add_task(veid)) {
+	if ((err = container_add_task(veid))) {
 		logger(-1, 0, "Can't add task creator to container: %s", container_error(err));
 		goto out;
 	}
