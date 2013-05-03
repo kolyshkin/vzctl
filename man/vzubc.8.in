@@ -30,7 +30,7 @@ Make \fBwatch\fR(1) highlight the differences between current and previous
 output. Corresponds to \fBwatch -d\fR option.
 .TP
 .B -wt
-Instruct \fBwatch\fR(1) to now show its title (interval, command, and
+Instruct \fBwatch\fR(1) to not show its title (interval, command, and
 current time at the top of the display, as well as the following blank
 line). Corresponds to \fBwatch -t\fR option.
 .TP
