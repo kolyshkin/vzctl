@@ -26,6 +26,7 @@
 #define DESTR		1
 
 #define PROCMEM		"/proc/meminfo"
+#define PROCCPU		"/proc/cpuinfo"
 #define PROCTHR		"/proc/sys/kernel/threads-max"
 #define PROCVEINFO	"/proc/vz/veinfo"
 

@@ -544,8 +544,8 @@ int get_num_cpu(void)
 	char str[128];
 	int ncpu = 0;
 
-	if ((fd = fopen("/proc/cpuinfo", "r")) == NULL)	{
-		logger(-1, errno, "Cannot open /proc/cpuinfo");
+	if ((fd = fopen(PROCCPU, "r")) == NULL)	{
+		logger(-1, errno, "Cannot open " PROCCPU);
 		return 1;
 	}
 	while (fgets(str, sizeof(str), fd)) {
