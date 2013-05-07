@@ -549,7 +549,8 @@ int get_num_cpu(void)
 		return 1;
 	}
 	while (fgets(str, sizeof(str), fd)) {
-		if (!strncmp(str, "processor", 9))
+		char const proc_ptrn[] = "processor";
+		if (!strncmp(str, proc_ptrn, sizeof(proc_ptrn) - 1))
 			ncpu++;
 	}
 	fclose(fd);
