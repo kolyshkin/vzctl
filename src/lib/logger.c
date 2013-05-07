@@ -55,11 +55,9 @@ static int ploop_log = 0;
 
 static inline void get_date(char *buf, int len)
 {
-	struct tm *p_tm_time;
-	time_t ptime;
+	time_t ptime = time(NULL);
+	struct tm *p_tm_time = localtime(&ptime);
 
-	ptime = time(NULL);
-	p_tm_time = localtime(&ptime);
 	strftime(buf, len, "%Y-%m-%dT%T%z", p_tm_time);
 }
 
