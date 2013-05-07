@@ -192,11 +192,8 @@ void vzctl_init_ploop_log(void)
 {
 	ploop.set_log_file(g_log.file);
 	ploop.set_log_level(g_log.level);
-	if (!g_log.quiet)
-		ploop.set_verbose_level(g_log.level);
-	else
-		ploop.set_verbose_level(PLOOP_LOG_NOCONSOLE);
-
+	ploop.set_verbose_level(g_log.quiet ? PLOOP_LOG_NOCONSOLE
+		: g_log.level);
 	ploop_log = 1;
 }
 #endif
