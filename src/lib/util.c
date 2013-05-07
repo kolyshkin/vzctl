@@ -471,7 +471,7 @@ char *subst_VEID(envid_t veid, char *src)
 	return strdup(str);
 }
 
-int get_pagesize()
+int get_pagesize(void)
 {
 	long pagesize;
 
@@ -538,7 +538,7 @@ int get_swap(unsigned long long *swap)
 	return -1;
 }
 
-int get_num_cpu()
+int get_num_cpu(void)
 {
 	FILE *fd;
 	char str[128];
