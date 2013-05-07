@@ -67,13 +67,8 @@ void logger(int log_level, int err_no, const char *format, ...)
 
 	va_start(ap, format);
 	if (!g_log.quiet && g_log.verbose >= log_level) {
-		FILE *out;
+		FILE *out = (log_level < 0) ? stderr : stdout;
 		va_list ap_save;
-
-		if (log_level < 0)
-			out = stderr;
-		else
-			out = stdout;
 
 		va_copy(ap_save, ap);
 		vfprintf(out, format, ap_save);
