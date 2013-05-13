@@ -158,7 +158,7 @@ _vzctl()
 						    @SCRIPTDIR@/vps-download --list)" -- $cur ) )
 
 				;;
-			--onboot|--disabled|--noatime|--diskquota)
+			--onboot|--disabled|--diskquota)
 				COMPREPLY=( $( compgen -W "yes no" -- $cur ) )
 				;;
 			--setmode)

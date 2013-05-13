@@ -101,8 +101,6 @@ Corresponds to the \fB--diskinodes\fR option.
 Corresponds to the \fB--quotatime\fR option.
 .IP \fBQUOTAUGIDLIMIT\fR="\fInum\fR"
 Corresponds to the \fB--quotaugidlimit\fR option.
-.IP \fBNOATIME\fR="\fByes\fR|\fBno\fR"
-Corresponds to the \fB--noatime\fR option.
 .IP \fBCAPABILITY\fR="\fIcapname\fR:\fBon\fR|\fBoff\fR\ [...]"
 Corresponds to the \fB--capability\fR option.
 

@@ -105,7 +105,6 @@ static struct option set_opt[] = {
 	/*	fs param */
 	{"root",	required_argument, NULL, PARAM_ROOT},
 	{"private",	required_argument, NULL, PARAM_PRIVATE},
-	{"noatime",	required_argument, NULL, PARAM_IGNORED},
 	{"mount_opts",	required_argument, NULL, PARAM_MOUNT_OPTS},
 	/*	template	*/
 	{"ostemplate",	required_argument, NULL, PARAM_OSTEMPLATE},
