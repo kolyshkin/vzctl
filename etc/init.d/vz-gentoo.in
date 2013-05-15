@@ -343,6 +343,8 @@ start() {
 	setup_ve0
 	modify_vzconf
 	start_ve
+	# Try to run vzstats to submit new kernel info
+	vzstats >/dev/null 2>&1
 }
 
 stop() {

@@ -513,6 +513,9 @@ start()
 	fix_updatedb
 	start_ves
 
+	# Try to run vzstats to report new kernel
+	vzstats >/dev/null 2>&1
+
 	rm -f $LOCKFILE
 	touch $SUBSYS_VZ
 }
