@@ -116,6 +116,7 @@ struct arg_start {
 	vps_handler *h;
 	void *data;
 	env_create_FN fn;
+	int userns_p; /* while running in userns, there's extra sync needed */
 };
 
 struct env_create_param3;

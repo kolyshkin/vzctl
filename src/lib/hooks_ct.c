@@ -66,6 +66,8 @@ static int sys_setns(int fd, int nstype)
 # define MS_PRIVATE (1 << 18)
 #endif
 
+#define UID_GID_RANGE 100000 /* how many users per container */
+
 /* This function is there in GLIBC, but not in headers */
 extern int pivot_root(const char * new_root, const char * put_old);
 
@@ -203,16 +205,159 @@ static int ct_setlimits(vps_handler *h, envid_t veid, struct ub_struct *ub)
 }
 #undef add_value
 
+static int write_uid_gid_mapping(vps_handler *h, unsigned long uid, unsigned long gid, pid_t pid)
+{
+	char buf[STR_SIZE];
+	char map[STR_SIZE];
+	int fd;
+	int len;
+	int ret = VZ_RESOURCE_ERROR;
+
+	len = snprintf(map, sizeof(map), "0 %ld %d", uid, UID_GID_RANGE);
+	snprintf(buf, sizeof(buf), "/proc/%d/uid_map", pid);
+	if ((fd = open(buf, O_WRONLY)) < 0)
+		goto out;
+
+	if ((write(fd, map, len) != len))
+		goto out;
+
+	close(fd);
+
+	len = snprintf(map, sizeof(map), "0 %ld %d", gid, UID_GID_RANGE);
+	snprintf(buf, sizeof(map), "/proc/%d/gid_map", pid);
+	if ((fd = open(buf, O_WRONLY)) < 0)
+		goto out;
+
+	if ((write(fd, map, len) != len))
+		goto out;
+	ret = 0;
+out:
+	if (fd >= 0)
+		close(fd);
+	return ret;
+}
+
+/*
+ * Those devices should exist in the container, and be valid device nodes with
+ * user access permission. But we need to be absolutely sure this is the case,
+ * so we will provide our own versions. That could actually happen since some
+ * distributions may come with emptied /dev's, waiting for udev to populate them.
+ * That won't happen, we do it ourselves.
+ */
+static void create_devices(vps_handler *h, envid_t veid, const char *root)
+{
+	unsigned int i;
+	char *devices[] = {
+		"/dev/null",
+		"/dev/zero",
+		"/dev/random",
+		"/dev/urandom",
+	};
+
+	/*
+	 * We will tolerate errors, and keep the container running, because it is
+	 * likely we will be able to boot it to a barely functional state. But
+	 * be vocal about it
+	 */
+	for (i = 0; i < ARRAY_SIZE(devices); i++) {
+		char ct_devname[STR_SIZE];
+		int ret;
+
+		snprintf(ct_devname, sizeof(ct_devname), "%s%s", root, devices[i]);
+
+		/*
+		 * No need to be crazy about file flags. When we bind mount, the
+		 * source permissions will be inherited.
+		 */
+		ret = open(ct_devname, O_RDWR|O_CREAT, 0);
+		if (ret < 0) {
+			logger(-1, errno, "Could not touch device %s", devices[i]);
+			continue;
+		}
+		close(ret);
+
+		ret = mount(devices[i], ct_devname, "", MS_BIND, 0);
+		if (ret < 0)
+			logger(-1, errno, "Could not bind mount device %s", devices[i]);
+	}
+}
+
 static int _env_create(void *data)
 {
 	struct arg_start *arg = data;
 	struct env_create_param3 create_param;
 	int ret;
 
-	if ((ret = ct_chroot(arg->res->fs.root)))
+	if ((arg->userns_p != -1) && (read(arg->userns_p, &ret, sizeof(ret)) != sizeof(ret))) {
+		logger(-1, errno, "Cannot read from user namespace pipe");
+		close(arg->userns_p);
+		return VZ_RESOURCE_ERROR;
+	}
+
+	ret = ct_chroot(arg->res->fs.root);
+	/*
+	 * Technically, because clone will clone both fds, we would have to
+	 * close the other end as well. But we don't even know what it is,
+	 * since our args only include our end of the pipe. This is not a
+	 * problem because right before exec_container_init, we will call
+	 * close_fds and get away with all of them. And if we fail, we'll
+	 * exit anywyay.
+	 */
+	close(arg->userns_p);
+	/* Probably means chroot failed */
+	if (ret)
 		return ret;
 
-	if ((ret = vps_set_cap(arg->veid, &arg->res->env, &arg->res->cap, 1)))
+	if (arg->h->can_join_userns) {
+		int fd, ret;
+		setuid(0);
+		setgid(0);
+		/*
+		 * We need the special flag "newinstance". This is a requirement
+		 * of the userns-aware implementation of devpts as of Linux 3.9.
+		 * Because of that special requirement, we do it here rather than
+		 * later.
+		 */
+		ret = mkdir("/dev/pts", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+		if ((ret < 0) && (errno != EEXIST)) {
+			logger(-1, errno, "Cannot create container's /dev/pts");
+			return VZ_RESOURCE_ERROR;
+		}
+		ret = mount("devpts", "/dev/pts", "devpts", 0, "newinstance");
+		if (ret < 0) {
+			/* No need to cleanup mkdir, since we test for EEXIST */
+			logger(-1, errno, "Cannot mount container's /dev/pts");
+			return VZ_RESOURCE_ERROR;
+		}
+
+		/* /dev/ptmx, if it even exists, would refer to the root ptmx.
+		 * We don't want that, we want our newly created instance to contain
+		 * all ptys. So we bind mount the root device here
+		 */
+		fd = open("/dev/ptmx", O_CREAT, S_IRWXU|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+		if (fd < 0) {
+			logger(-1, errno, "Cannot create container's /dev/ptmx");
+			/*
+			 * No need to umount, we are in a private mnt namespace and it will
+			 * disappear after we fail.
+			 */
+			return VZ_RESOURCE_ERROR;
+		}
+		close(fd);
+		ret = mount("/dev/pts/ptmx", "/dev/ptmx", "", MS_BIND, 0);
+		if (ret < 0) {
+			/* No need to cleanup mkdir, since we test for EEXIST */
+			logger(-1, errno, "Cannot bind mount container's /dev/ptmx");
+			return VZ_RESOURCE_ERROR;
+		}
+	}
+
+	/*
+	 * If we are using the user namespace, we will have the full capability
+	 * set in the target namespace. So we don't need any of that.
+	 */
+	if (!arg->h->can_join_userns &&
+		(ret = vps_set_cap(arg->veid, &arg->res->env, &arg->res->cap, 1)))
 		return ret;
 
 	fill_container_param(arg, &create_param);
@@ -233,6 +378,8 @@ static int ct_env_create(struct arg_start *arg)
 	int ret;
 	char procpath[STR_SIZE];
 	char ctpath[STR_SIZE];
+	int userns_p[2];
+	int err;
 
 	stack_size = get_pagesize();
 	if (stack_size < 0)
@@ -272,16 +419,65 @@ static int ct_env_create(struct arg_start *arg)
 	 * Belong in the setup phase
 	 */
 	clone_flags = SIGCHLD;
-	/* FIXME: USERNS is still work in progress */
 	clone_flags |= CLONE_NEWUTS|CLONE_NEWPID|CLONE_NEWIPC;
 	clone_flags |= CLONE_NEWNET|CLONE_NEWNS;
 
+	if (!arg->h->can_join_userns) {
+		logger(-1, 0, "WARNING: Running container unprivileged. USER_NS not supported");
+
+		userns_p[0] = userns_p[1] = -1;
+	} else {
+		clone_flags |= CLONE_NEWUSER;
+		if (pipe(userns_p) < 0) {
+			logger(-1, errno, "Can not create userns pipe");
+			return VZ_RESOURCE_ERROR;
+		}
+	}
+	arg->userns_p = userns_p[0];
+
+	if (arg->h->can_join_userns) {
+		create_devices(arg->h, arg->veid, arg->res->fs.root);
+	}
+
 	ret = clone(_env_create, child_stack, clone_flags, arg);
-	if (ret  < 0) {
+	close(userns_p[0]);
+	if (ret < 0) {
 		logger(-1, errno, "Unable to clone");
 		/* FIXME: remove ourselves from container first */
+		close(userns_p[1]);
 		destroy_container(arg->veid);
 		return VZ_RESOURCE_ERROR;
+	} else if (arg->h->can_join_userns) {
+		/*
+		 * Now we need to write to the mapping file. It has to be us,
+		 * since CAP_SETUID is required in the parent namespace. vzctl
+		 * is run as root, so we should have it. But our cloned kid
+		 * will start as the overflow uid 65534 in the new namespace.
+		 */
+		if (write_uid_gid_mapping(arg->h, *arg->res->misc.local_uid,
+					  *arg->res->misc.local_gid, ret)) {
+
+			logger(-1, 0, "Can't write to userns mapping file");
+			close(userns_p[1]);
+			destroy_container(arg->veid);
+			return VZ_RESOURCE_ERROR;
+		}
+		/*
+		 * Nothing should proceed userns wide until we have the
+		 * mapping.  That creates many non-deterministic behaviors
+		 * since some runs will execute with the mapping already done,
+		 * while others with the mapping off. This is particularly
+		 * important for setuid, for instance. It will categorically
+		 * fail if called before a mapping is in place.
+		 */
+		if ((userns_p[1] != -1) &&
+			write(userns_p[1], &err, sizeof(err)) != sizeof(err)) {
+			logger(-1, errno, "Unable to write to userns pipe");
+			close(userns_p[1]);
+			destroy_container(arg->veid);
+			return VZ_RESOURCE_ERROR;
+		}
+		close(userns_p[1]);
 	}
 
 	snprintf(procpath, STR_SIZE, "/proc/%d/ns/net", ret);
@@ -304,6 +500,7 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	int ret = VZ_RESOURCE_ERROR;
 	int err;
 	bool joined_mnt_ns = false;
+	int fd;
 
 	if (!h->can_join_pidns) {
 		logger(-1, 0, "Kernel lacks setns for pid namespace");
@@ -328,11 +525,39 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 		goto out;
 	}
 
+	/*
+	 * Because all namespaces are associated with an owner userns,
+	 * and capabilities may be needed for issuing setns syscalls into
+	 * some key target namespaces (like the mount namespace), we will
+	 * first enter the user namespace if it is available. Only then we
+	 * scan all others and join them as they appear
+	 */
+	if (h->can_join_userns) {
+		if (snprintf(path, sizeof(path), "/proc/%d/ns/user", task_pid) < 0)
+			goto out;
+
+		if ((fd = open(path, O_RDONLY)) < 0)
+			goto out;
+
+		if (setns(fd, CLONE_NEWUSER)) {
+			logger(-1, errno, "Failed to set context for user namespace");
+			close(fd);
+			goto out;
+		}
+		close(fd);
+		setuid(0);
+		setgid(0);
+	}
+
+	ret = VZ_RESOURCE_ERROR;
 	while ((ep = readdir (dp))) {
-		int fd;
 		if (!strcmp(ep->d_name, "."))
 			continue;
 		if (!strcmp(ep->d_name, ".."))
+			continue;
+
+		/* already joined */
+		if ((!strcmp(ep->d_name, "user")))
 			continue;
 
 		if (snprintf(path, sizeof(path), "/proc/%d/ns/%s", task_pid, ep->d_name) < 0)
@@ -576,7 +801,9 @@ int ct_do_open(vps_handler *h, vps_param *param)
 {
 	int ret;
 	char path[STR_SIZE];
+	char upath[STR_SIZE];
 	struct stat st;
+	unsigned long *local_uid = param->res.misc.local_uid;
 
 	ret = container_init();
 	if (ret) {
@@ -592,6 +819,9 @@ int ct_do_open(vps_handler *h, vps_param *param)
 	if (snprintf(path, sizeof(path), "/proc/%d/ns/pid", getpid()) < 0)
 		return VZ_RESOURCE_ERROR;
 
+	if (snprintf(upath, sizeof(upath), "/proc/%d/ns/user", getpid()) < 0)
+		return VZ_RESOURCE_ERROR;
+
 	ret = mkdir(NETNS_RUN_DIR, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	if (ret && (errno != EEXIST)) {
@@ -601,6 +831,20 @@ int ct_do_open(vps_handler *h, vps_param *param)
 	}
 
 	h->can_join_pidns = !stat(path, &st);
+	/*
+	 * Being able to join the user namespace is a good indication that the
+	 * user namespace is complete. For a long time, the user namespace
+	 * existed, but were far away from being feature complete.  When
+	 * running in such a kernel, joining the user namespace will just
+	 * cripple our container, since we won't be able to do anything. It is
+	 * only good for people who are okay running containers as root.
+	 *
+	 * It is not enough, however, for user namespaces to be present in the
+	 * kernel. The container must have been setup to use it (we need the
+	 * mapped user to own the files, etc. So we also need to find suitable
+	 * configuration in the config files.
+	 */
+	h->can_join_userns = !stat(upath, &st) && local_uid;
 	h->is_run = ct_is_run;
 	h->enter = ct_enter;
 	h->destroy = ct_destroy;
