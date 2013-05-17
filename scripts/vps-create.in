@@ -22,10 +22,21 @@
 # Required parameters:
 #   VE_PRVT		- path to root of CT private areas
 #   PRIVATE_TEMPLATE	- path to private template used as a source for copying
+#
+# Optional parameters:
+#   UID_OFFSET		- offset to be added to all tar UIDs
+#   GID_OFFSET		- offset to be added to all tar GIDs
 
 . @SCRIPTDIR@/vps-functions
 
 vzcheckvar VE_PRVT PRIVATE_TEMPLATE
+
+chown_preload_if_needed()
+{
+	[ -z "$UID_OFFSET" -o -z "$GID_OFFSET" ] && return
+
+	export LD_PRELOAD=libvzchown.so
+}
 
 create_prvt()
 {
@@ -75,6 +86,9 @@ create_prvt()
 	[ "$AVAIL" -ge "$NEEDED" ] ||
 		vzerror "Insufficient disk space in $VE_PRVT; available: $AVAIL, needed: $NEEDED" ${VZ_FS_NO_DISK_SPACE}
 	CAT=cat
+
+	chown_preload_if_needed
+
 	# Use pv to show nice progress bar if we can
 	pv -V >/dev/null 2>&1 && CAT=pv
 	chmod 700 "$VE_PRVT"

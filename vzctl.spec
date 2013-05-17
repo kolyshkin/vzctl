@@ -183,7 +183,7 @@ Requires: wget
 OpenVZ containers control utility core package
 
 %files core
-%{_libdir}/libvzctl-*.so
+%{_libdir}/libvz*.so
 %dir %{_lockdir}
 %dir %{_dumpdir}
 %dir %{_privdir}

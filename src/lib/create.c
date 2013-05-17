@@ -110,7 +110,7 @@ static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 	char buf[PATH_LEN];
 	int ret;
 	char *arg[2];
-	char *env[4];
+	char *env[6];
 	int quota = 0;
 	int i;
 	char *dst;
@@ -120,9 +120,30 @@ static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 	int layout = vps_p->opt.layout;
 	fs_param *fs = &vps_p->res.fs;
 	tmpl_param *tmpl = &vps_p->res.tmpl;
+	unsigned long uid_offset = 0;
+	unsigned long gid_offset = 0;
 	int ploop = (layout == VE_LAYOUT_PLOOP);
 	struct destroy_ve ddata;
 	struct vzctl_cleanup_handler *ch;
+
+	/*
+	 * All other users will test directly for h->can_join_userns.  Create
+	 * is special, because we still don't have the container config file
+	 * yet, and the user may be requesting it to be disabled in the command
+	 * line. So that value may be outdated.
+	 *
+	 * By now cmd_p is already merged into vps_p. So what we need to do is
+	 * just to test it again. We will force it to false if it is disabled
+	 * here, or keep the old value otherwise.
+	 */
+	if (!(vps_p->res.misc.local_uid) || (!(*vps_p->res.misc.local_uid)))
+		h->can_join_userns = 0;
+
+	if (h->can_join_userns && vps_p->res.misc.local_uid) {
+		uid_offset = *vps_p->res.misc.local_uid;
+		if (uid_offset && vps_p->res.misc.local_gid)
+			gid_offset = *vps_p->res.misc.local_gid;
+	}
 
 	if (ploop && (!dq->diskspace || dq->diskspace[1] <= 0)) {
 		logger(-1, 0, "Error: diskspace not set (required for ploop)");
@@ -215,11 +236,18 @@ find:
 	arg[0] = VPS_CREATE;
 	arg[1] = NULL;
 	snprintf(buf, sizeof(buf), "PRIVATE_TEMPLATE=%s", tarball);
-	env[0] = strdup(buf);
+	i = 0;
+	env[i++] = strdup(buf);
 	snprintf(buf, sizeof(buf), "VE_PRVT=%s", dst);
-	env[1] = strdup(buf);
-	env[2] = strdup(ENV_PATH);
-	env[3] = NULL;
+	env[i++] = strdup(buf);
+	if (!is_vz_kernel(h) && h->can_join_userns) {
+		snprintf(buf, sizeof(buf), "UID_OFFSET=%lu", uid_offset);
+		env[i++] = strdup(buf);
+		snprintf(buf, sizeof(buf), "GID_OFFSET=%lu", gid_offset);
+		env[i++] = strdup(buf);
+	}
+	env[i++] = strdup(ENV_PATH);
+	env[i] = NULL;
 	logger(0, 0, "Creating container private area (%s)", tmpl->ostmpl);
 	ret = run_script(VPS_CREATE, arg, env, 0);
 	free_arg(env);
