@@ -170,6 +170,13 @@ vzadjustmacs()
 # other setups, the bridge is expected to already exist and be valid.
 vzconfbridge()
 {
+	if [ "x$BRIDGE" = "xvenet0" ]; then
+		if [ $(brctl show venet0 2>/dev/null | tail -n+2 | wc -l) -eq 0 ]; then
+			brctl addbr venet0
+			${IP_CMD} link set venet0 up
+		fi
+	fi
+
 	if [ "x$BRIDGE" != "x" ]; then
 		brctl addif $BRIDGE $HNAME >/dev/null 2>&1
 	fi

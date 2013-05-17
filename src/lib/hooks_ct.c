@@ -17,6 +17,7 @@
 #include "logger.h"
 #include "script.h"
 #include "cgroup.h"
+#include "linux/vzctl_venet.h"
 
 #define NETNS_RUN_DIR "/var/run/netns"
 
@@ -735,8 +736,41 @@ static int ct_netdev_ctl(vps_handler *h, envid_t veid, int op, char *name)
 
 static int ct_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
 {
-	logger(-1, 0, "%s not yet supported upstream", __func__);
-	return 0;
+	int ret = -1;
+	char *envp[5];
+	char buf[STR_SIZE];
+	int i = 0;
+
+	if (!h->can_join_pidns) {
+		logger(-1, 0, "Cannot join pid namespace: "
+				"--ipadd is not supported in kernels "
+				"without full pidns support");
+		return VZ_BAD_KERNEL;
+	}
+	envp[i++] = strdup("VNAME=venet0");
+	envp[i++] = strdup("BRIDGE=venet0");
+
+	snprintf(buf, sizeof(buf), "HNAME=venet0.%d", veid);
+	envp[i++] = strdup(buf);
+
+	snprintf(buf, sizeof(buf), "VEID=%d", veid);
+	envp[i++] = strdup(buf);
+
+	envp[i] = NULL;
+
+	if (op == VE_IP_ADD) {
+		char *argv[] = { VPS_NETNS_DEV_ADD, NULL };
+
+		ret = run_script(VPS_NETNS_DEV_ADD, argv, envp, 0);
+	} else  {
+		char *argv[] = { VPS_NETNS_DEV_DEL, NULL };
+
+		ret = run_script(VPS_NETNS_DEV_DEL, argv, envp, 0);
+	}
+	free_arg(envp);
+
+	return ret;
+
 }
 
 /*
