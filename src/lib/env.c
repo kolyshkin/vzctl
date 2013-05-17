@@ -30,6 +30,7 @@
 #include <linux/reboot.h>
 #include <sys/mount.h>
 #include <sys/utsname.h>
+#include <sys/stat.h>
 
 #include "vzerror.h"
 #include "res.h"
@@ -553,6 +554,21 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
+	}
+	if (!is_vz_kernel(h) && h->can_join_userns) {
+		struct stat private_stat;
+		unsigned long *local_uid = res->misc.local_uid;
+		unsigned long *local_gid = res->misc.local_gid;
+
+		stat(res->fs.private, &private_stat);
+		if ((local_uid && (private_stat.st_uid != *local_uid)) ||
+			(local_gid && (private_stat.st_gid != *local_gid))) {
+			logger(-1, 0, "Container private area is owned by %d:%d"
+			", but configuration file says we should run with %lu:%lu.\n"
+			"Refusing to run.", private_stat.st_uid, private_stat.st_gid,
+			*res->misc.local_uid, *res->misc.local_gid);
+			return VZ_FS_BAD_TMPL;
+		}
 	}
 	if ((ret = check_ub(h, &res->ub)))
 		return ret;
