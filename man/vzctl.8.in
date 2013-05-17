@@ -871,6 +871,8 @@ List of available fields can be obtained using \fB-L\fR option.
 .OP --ipadd addr
 .OP --hostname name
 .OP --name name
+.OP --local_uid uid
+.OP --local_gid gid
 .YS
 .IP "" 4
 Creates a new container area. This operation should be done once, before
@@ -922,6 +924,21 @@ a container. Note that this option can be used multiple times.
 
 You can use \fB--hostname\fR \fIname\fR option to set a host name for
 a container.
+
+When running with an upstream Linux Kernel that supports user namespaces (>=
+3.8), the parameters \fB--local_uid\fR and \fB--local_gid\fR can be used to
+select which \fIuid\fR and \fIgid\fR respectively will be used as a base user
+in the host system. Note that user namespaces provide a 1:1 mapping between
+container users and host users. If these options are not specified, the values
+\fBLOCAL_UID\fR and \fBLOCAL_GID\fR from global configuration file
+\fBvz.conf\fR(5) are used. An explicit \fB--local_uid\fR value of 0 will
+disable user namespace support, and run the container as a privileged user. In
+this case, \fB--local_gid\fR is ignored.
+
+\fBWarning:\fR use \fB--local_uid\fR and \fB--local_gid\fR with care, specially
+when migrating containers. In all situations, the container's files in the
+filesystem needs to be correctly owned by the host-side users.
+
 .IP "\fBdestroy\fR | \fBdelete\fR \fICTID\fR" 4
 Removes a container private area by deleting all files, directories and
 the configuration file of this container.

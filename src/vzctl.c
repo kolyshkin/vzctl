@@ -65,6 +65,7 @@ static void usage(int rc)
 "vzctl create <ctid> [--ostemplate <name>] [--config <name>]\n"
 "   [--layout ploop|simfs] [--hostname <name>] [--name <name>] [--ipadd <addr>]\n"
 "   [--diskspace <kbytes>] [--private <path>] [--root <path>]\n"
+"   [--local_uid <UID>] [--local_gid <GID>]\n"
 "vzctl start <ctid> [--force] [--wait]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 #ifdef HAVE_PLOOP

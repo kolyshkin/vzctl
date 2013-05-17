@@ -425,7 +425,7 @@ static int ct_env_create(struct arg_start *arg)
 	clone_flags |= CLONE_NEWNET|CLONE_NEWNS;
 
 	if (!arg->h->can_join_userns) {
-		logger(-1, 0, "WARNING: Running container unprivileged. USER_NS not supported");
+		logger(-1, 0, "WARNING: Running container unprivileged. USER_NS not supported, or runtime disabled");
 
 		userns_p[0] = userns_p[1] = -1;
 	} else {
@@ -848,7 +848,7 @@ int ct_do_open(vps_handler *h, vps_param *param)
 	 * mapped user to own the files, etc. So we also need to find suitable
 	 * configuration in the config files.
 	 */
-	h->can_join_userns = !stat(upath, &st) && local_uid;
+	h->can_join_userns = !stat(upath, &st) && local_uid && (*local_uid != 0);
 	h->is_run = ct_is_run;
 	h->enter = ct_enter;
 	h->destroy = ct_destroy;
