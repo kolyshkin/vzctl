@@ -295,7 +295,6 @@ static int _env_create(void *data)
 		return VZ_RESOURCE_ERROR;
 	}
 
-	ret = ct_chroot(arg->res->fs.root);
 	/*
 	 * Technically, because clone will clone both fds, we would have to
 	 * close the other end as well. But we don't even know what it is,
@@ -305,6 +304,8 @@ static int _env_create(void *data)
 	 * exit anywyay.
 	 */
 	close(arg->userns_p);
+
+	ret = ct_chroot(arg->res->fs.root);
 	/* Probably means chroot failed */
 	if (ret)
 		return ret;
