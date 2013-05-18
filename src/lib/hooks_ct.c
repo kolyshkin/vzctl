@@ -288,7 +288,8 @@ static int _env_create(void *data)
 	struct env_create_param3 create_param;
 	int ret;
 
-	if ((arg->userns_p != -1) && (read(arg->userns_p, &ret, sizeof(ret)) != sizeof(ret))) {
+	if ((arg->userns_p != -1) &&
+			(read(arg->userns_p, &ret, sizeof(ret)) != sizeof(ret))) {
 		logger(-1, errno, "Cannot read from user namespace pipe");
 		close(arg->userns_p);
 		return VZ_RESOURCE_ERROR;
@@ -447,7 +448,9 @@ static int ct_env_create(struct arg_start *arg)
 		close(userns_p[1]);
 		destroy_container(arg->veid);
 		return VZ_RESOURCE_ERROR;
-	} else if (arg->h->can_join_userns) {
+	}
+
+	if (arg->h->can_join_userns) {
 		/*
 		 * Now we need to write to the mapping file. It has to be us,
 		 * since CAP_SETUID is required in the parent namespace. vzctl
@@ -471,7 +474,7 @@ static int ct_env_create(struct arg_start *arg)
 		 * fail if called before a mapping is in place.
 		 */
 		if ((userns_p[1] != -1) &&
-			write(userns_p[1], &err, sizeof(err)) != sizeof(err)) {
+				write(userns_p[1], &err, sizeof(err)) != sizeof(err)) {
 			logger(-1, errno, "Unable to write to userns pipe");
 			close(userns_p[1]);
 			destroy_container(arg->veid);
