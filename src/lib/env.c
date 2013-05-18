@@ -533,6 +533,30 @@ static void fix_cpu(cpu_param *cpu)
 	}
 }
 
+static int check_local_ugid(vps_handler *h, const char *private,
+		unsigned long *uid, unsigned long *gid)
+{
+	struct stat st;
+
+	if (is_vz_kernel(h) && !h->can_join_userns)
+		return 0;
+
+	if (stat(private, &st) < 0) {
+		logger(-1, errno, "Can't stat %s", private);
+		return VZ_SYSTEM_ERROR;
+	}
+
+	if ((uid && (st.st_uid != *uid)) || (gid && (st.st_gid != *gid))) {
+		logger(-1, 0, "Container private area is owned by %d:%d, "
+				"but configuration file says we should run "
+				"with %lu:%lu.\nRefusing to run.",
+				st.st_uid, st.st_gid, *uid, *gid);
+		return VZ_FS_BAD_TMPL;
+	}
+
+	return 0;
+}
+
 int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	skipFlags skip, struct mod_action *mod,
 	env_create_FN fn, void *data)
@@ -555,21 +579,11 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
 	}
-	if (!is_vz_kernel(h) && h->can_join_userns) {
-		struct stat private_stat;
-		unsigned long *local_uid = res->misc.local_uid;
-		unsigned long *local_gid = res->misc.local_gid;
+	ret = check_local_ugid(h, res->fs.private,
+			res->misc.local_uid, res->misc.local_gid);
+	if (ret)
+		return ret;
 
-		stat(res->fs.private, &private_stat);
-		if ((local_uid && (private_stat.st_uid != *local_uid)) ||
-			(local_gid && (private_stat.st_gid != *local_gid))) {
-			logger(-1, 0, "Container private area is owned by %d:%d"
-			", but configuration file says we should run with %lu:%lu.\n"
-			"Refusing to run.", private_stat.st_uid, private_stat.st_gid,
-			*res->misc.local_uid, *res->misc.local_gid);
-			return VZ_FS_BAD_TMPL;
-		}
-	}
 	if ((ret = check_ub(h, &res->ub)))
 		return ret;
 
