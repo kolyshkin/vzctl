@@ -738,6 +738,7 @@ static int ct_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
 {
 	int ret = -1;
 	char *envp[5];
+	char *argv[] = {NULL, NULL};
 	char buf[STR_SIZE];
 	int i = 0;
 
@@ -758,15 +759,13 @@ static int ct_ip_ctl(vps_handler *h, envid_t veid, int op, const char *ipstr)
 
 	envp[i] = NULL;
 
-	if (op == VE_IP_ADD) {
-		char *argv[] = { VPS_NETNS_DEV_ADD, NULL };
+	if (op == VE_IP_ADD)
+		argv[0] = VPS_NETNS_DEV_ADD;
+	else
+		argv[0] = VPS_NETNS_DEV_DEL;
 
-		ret = run_script(VPS_NETNS_DEV_ADD, argv, envp, 0);
-	} else  {
-		char *argv[] = { VPS_NETNS_DEV_DEL, NULL };
+	ret = run_script(argv[0], argv, envp, 0);
 
-		ret = run_script(VPS_NETNS_DEV_DEL, argv, envp, 0);
-	}
 	free_arg(envp);
 
 	return ret;
