@@ -306,6 +306,10 @@ static int _env_create(void *data)
 	 */
 	close(arg->userns_p);
 
+	if (arg->h->can_join_userns) {
+		create_devices(arg->h, arg->veid, arg->res->fs.root);
+	}
+
 	ret = ct_chroot(arg->res->fs.root);
 	/* Probably means chroot failed */
 	if (ret)
@@ -437,10 +441,6 @@ static int ct_env_create(struct arg_start *arg)
 		}
 	}
 	arg->userns_p = userns_p[0];
-
-	if (arg->h->can_join_userns) {
-		create_devices(arg->h, arg->veid, arg->res->fs.root);
-	}
 
 	ret = clone(_env_create, child_stack, clone_flags, arg);
 	close(userns_p[0]);
