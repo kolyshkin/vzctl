@@ -36,7 +36,8 @@ static struct distr_conf {
 	{"SET_DNS", SET_DNS},
 	{"SET_USERPASS", SET_USERPASS},
 	{"SET_UGID_QUOTA", SET_UGID_QUOTA},
-	{"POST_CREATE", POST_CREATE}
+	{"POST_CREATE", POST_CREATE},
+	{"PRE_START", PRE_START},
 };
 
 static int get_action_id(char *name)
@@ -100,6 +101,12 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 				break;
 			d_actions->post_create = strdup(file);
 			break;
+		case PRE_START:
+			if (d_actions->pre_start != NULL)
+				break;
+			d_actions->pre_start = strdup(file);
+			break;
+
 	}
 	return 0;
 }
@@ -115,6 +122,7 @@ void free_dist_actions(dist_actions *d_actions)
 	free(d_actions->set_userpass);
 	free(d_actions->set_ugid_quota);
 	free(d_actions->post_create);
+	free(d_actions->pre_start);
 }
 
 static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)

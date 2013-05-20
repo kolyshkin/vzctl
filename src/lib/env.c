@@ -659,6 +659,26 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		goto err;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
+
+		if (actions.pre_start) {
+			char buf[32];
+			char buf_ns[32];
+			char *envp[3];
+
+			snprintf(buf, sizeof(buf), "VZ_KERNEL=%s",
+					is_vz_kernel(h) ? "yes" : "no");
+			envp[0] = buf;
+			snprintf(buf_ns, sizeof(buf_ns), "USERNS=%s",
+					h->can_join_userns ? "yes" : "no");
+			envp[1] = buf_ns;
+			envp[2] = NULL;
+			if (vps_exec_script(h, veid, res->fs.root, NULL, envp,
+						actions.pre_start, NULL, 0)) {
+				ret = VZ_ACTIONSCRIPT_ERROR;
+				goto err;
+			}
+		}
+
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
 			START_PREFIX);
 		if (stat_file(buf)) {

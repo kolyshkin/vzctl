@@ -1,4 +1,5 @@
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#!/bin/sh
+#  Copyright (C) 2013, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,15 +15,27 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# This configuration file is meant to be used with
-# the Redhat, RHEL, CentOS distribution kit.
 #
+# Most distributions will need some kind of adjustment when running under
+# user namespaces. One example is overriding the loginuid PAM module, that
+# is, so far, meaningless inside a container. This script will apply various
+# fixups if needed.
 
-ADD_IP=redhat-add_ip.sh
-DEL_IP=redhat-del_ip.sh
-SET_HOSTNAME=redhat-set_hostname.sh
-SET_DNS=set_dns.sh
-SET_USERPASS=set_userpass.sh
-SET_UGID_QUOTA=set_ugid_quota.sh
-POST_CREATE=postcreate.sh
-PRE_START=prestart.sh
+fixup_loginuid()
+{
+	local pam_permit="security/pam_permit.so"
+	local pam_loginuid="security/pam_loginuid.so"
+
+	for dir in lib lib64 lib/x86_64-linux-gnu lib/i386-linux-gnu; do
+		[ -f $dir/$pam_loginuid ] || continue
+		mount --bind $dir/$pam_permit $dir/$pam_loginuid
+		break
+	done
+}
+
+[ "x$VZ_KERNEL" = "xyes" ] && exit 0
+[ "x$USERNS" = "xno" ] && exit 0
+
+fixup_loginuid
+
+exit 0
