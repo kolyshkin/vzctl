@@ -440,8 +440,9 @@ int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	}
 	param->rst_fd = rst_fd;
 	param->cmd = cmd;
-	ret = vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE | skip,
-		NULL, restore_fn, param);
+	ret = vps_start_custom(h, veid, vps_p,
+			SKIP_CONFIGURE | SKIP_ACTION_SCRIPT | skip,
+			NULL, restore_fn, param);
 	if (ret)
 		goto err;
 err:
