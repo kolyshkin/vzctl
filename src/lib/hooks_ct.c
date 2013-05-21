@@ -376,28 +376,97 @@ static int _env_create(void *data)
 	return exec_container_init(arg, &create_param);
 }
 
-static int ct_env_create(struct arg_start *arg)
+static int ct_env_create_real(struct arg_start *arg)
 {
 
 	long stack_size;
 	char *child_stack;
 	int clone_flags;
-	int ret;
-	char procpath[STR_SIZE];
-	char ctpath[STR_SIZE];
 	int userns_p[2];
-	int err;
+	int ret, err;
 
 	stack_size = get_pagesize();
 	if (stack_size < 0)
-		return VZ_RESOURCE_ERROR;
+		return -VZ_RESOURCE_ERROR;
 
 	child_stack = alloca(stack_size);
 	if (child_stack == NULL) {
 		logger(-1, 0, "Unable to alloc");
-		return VZ_RESOURCE_ERROR;
+		return -VZ_RESOURCE_ERROR;
 	}
 	child_stack += stack_size;
+
+	/*
+	 * Belong in the setup phase
+	 */
+	clone_flags = SIGCHLD;
+	clone_flags |= CLONE_NEWUTS|CLONE_NEWPID|CLONE_NEWIPC;
+	clone_flags |= CLONE_NEWNET|CLONE_NEWNS;
+
+	if (!arg->h->can_join_userns) {
+		logger(-1, 0, "WARNING: Running container unprivileged. USER_NS not supported, or runtime disabled");
+
+		userns_p[0] = userns_p[1] = -1;
+	} else {
+		clone_flags |= CLONE_NEWUSER;
+		if (pipe(userns_p) < 0) {
+			logger(-1, errno, "Can not create userns pipe");
+			return -VZ_RESOURCE_ERROR;
+		}
+	}
+	arg->userns_p = userns_p[0];
+
+	ret = clone(_env_create, child_stack, clone_flags, arg);
+	close(userns_p[0]);
+	if (ret < 0) {
+		logger(-1, errno, "Unable to clone");
+		/* FIXME: remove ourselves from container first */
+		close(userns_p[1]);
+		destroy_container(arg->veid);
+		return -VZ_RESOURCE_ERROR;
+	}
+
+	if (arg->h->can_join_userns) {
+		/*
+		 * Now we need to write to the mapping file. It has to be us,
+		 * since CAP_SETUID is required in the parent namespace. vzctl
+		 * is run as root, so we should have it. But our cloned kid
+		 * will start as the overflow uid 65534 in the new namespace.
+		 */
+		if (write_uid_gid_mapping(arg->h, *arg->res->misc.local_uid,
+					  *arg->res->misc.local_gid, ret)) {
+
+			logger(-1, 0, "Can't write to userns mapping file");
+			close(userns_p[1]);
+			destroy_container(arg->veid);
+			return -VZ_RESOURCE_ERROR;
+		}
+		/*
+		 * Nothing should proceed userns wide until we have the
+		 * mapping.  That creates many non-deterministic behaviors
+		 * since some runs will execute with the mapping already done,
+		 * while others with the mapping off. This is particularly
+		 * important for setuid, for instance. It will categorically
+		 * fail if called before a mapping is in place.
+		 */
+		if ((userns_p[1] != -1) &&
+				write(userns_p[1], &err, sizeof(err)) != sizeof(err)) {
+			logger(-1, errno, "Unable to write to userns pipe");
+			close(userns_p[1]);
+			destroy_container(arg->veid);
+			return -VZ_RESOURCE_ERROR;
+		}
+		close(userns_p[1]);
+	}
+
+	return ret;
+}
+
+int ct_env_create(struct arg_start *arg)
+{
+	int ret;
+	char procpath[STR_SIZE];
+	char ctpath[STR_SIZE];
 
 	/* non-fatal */
 	if ((ret = ct_destroy(arg->h, arg->veid)))
@@ -422,68 +491,10 @@ static int ct_env_create(struct arg_start *arg)
 		return VZ_RESOURCE_ERROR;
 	}
 
-	/*
-	 * Belong in the setup phase
-	 */
-	clone_flags = SIGCHLD;
-	clone_flags |= CLONE_NEWUTS|CLONE_NEWPID|CLONE_NEWIPC;
-	clone_flags |= CLONE_NEWNET|CLONE_NEWNS;
-
-	if (!arg->h->can_join_userns) {
-		logger(-1, 0, "WARNING: Running container unprivileged. USER_NS not supported, or runtime disabled");
-
-		userns_p[0] = userns_p[1] = -1;
-	} else {
-		clone_flags |= CLONE_NEWUSER;
-		if (pipe(userns_p) < 0) {
-			logger(-1, errno, "Can not create userns pipe");
-			return VZ_RESOURCE_ERROR;
-		}
-	}
-	arg->userns_p = userns_p[0];
-
-	ret = clone(_env_create, child_stack, clone_flags, arg);
-	close(userns_p[0]);
-	if (ret < 0) {
-		logger(-1, errno, "Unable to clone");
-		/* FIXME: remove ourselves from container first */
-		close(userns_p[1]);
-		destroy_container(arg->veid);
-		return VZ_RESOURCE_ERROR;
-	}
-
-	if (arg->h->can_join_userns) {
-		/*
-		 * Now we need to write to the mapping file. It has to be us,
-		 * since CAP_SETUID is required in the parent namespace. vzctl
-		 * is run as root, so we should have it. But our cloned kid
-		 * will start as the overflow uid 65534 in the new namespace.
-		 */
-		if (write_uid_gid_mapping(arg->h, *arg->res->misc.local_uid,
-					  *arg->res->misc.local_gid, ret)) {
-
-			logger(-1, 0, "Can't write to userns mapping file");
-			close(userns_p[1]);
-			destroy_container(arg->veid);
-			return VZ_RESOURCE_ERROR;
-		}
-		/*
-		 * Nothing should proceed userns wide until we have the
-		 * mapping.  That creates many non-deterministic behaviors
-		 * since some runs will execute with the mapping already done,
-		 * while others with the mapping off. This is particularly
-		 * important for setuid, for instance. It will categorically
-		 * fail if called before a mapping is in place.
-		 */
-		if ((userns_p[1] != -1) &&
-				write(userns_p[1], &err, sizeof(err)) != sizeof(err)) {
-			logger(-1, errno, "Unable to write to userns pipe");
-			close(userns_p[1]);
-			destroy_container(arg->veid);
-			return VZ_RESOURCE_ERROR;
-		}
-		close(userns_p[1]);
-	}
+	/* Return PID on success or -VZ_*_ERROR */
+	ret = ct_env_create_real(arg);
+	if (ret < 0)
+		return -ret;
 
 	snprintf(procpath, STR_SIZE, "/proc/%d/ns/net", ret);
 	ret = symlink(procpath, ctpath);
