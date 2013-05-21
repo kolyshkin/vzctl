@@ -121,3 +121,15 @@ SET_UGID_QUOTA=dist-set_ugid_quota.sh
 # Required parameters:
 #   VE_ROOT	- the path to the container root directory (i.e. mount point)
 POST_CREATE=dist-postcreate.sh
+
+# This script is run inside CT right before executing container's init:
+#	vzctl start CTID
+#
+# It is used to perform some specific pre-start hooks, currently for
+# non-vz (i.e. upstream) kernels only.
+#
+# Parameters are passed as environment variables.
+# Required parameters:
+#   VZ_KERNEL	- 'yes' for OpenVZ kernel, 'no' for upstream kernel
+#   USERNS	- 'yes' if user namespace is used (upstream kernel >= 3.9)
+PRE_START=dist-prestart.sh
