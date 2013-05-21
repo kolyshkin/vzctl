@@ -660,6 +660,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 
+		/* Run dist actions PRE_START script */
 		if (actions.pre_start) {
 			char buf[32];
 			char buf_ns[32];
@@ -679,6 +680,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 			}
 		}
 
+		/* Run per-CT $VEID.start script */
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
 			START_PREFIX);
 		if (stat_file(buf)) {
