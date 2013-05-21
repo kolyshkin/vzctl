@@ -75,6 +75,7 @@ libvzctl_la_SOURCES += cgroup.c hooks_ct.c
 
 lib_LTLIBRARIES += libvzchown.la
 libvzchown_la_SOURCES = chown_preload.c
+libvzchown_la_LDFLAGS = -release 1.0
 endif
 
 if HAVE_VZ_KERNEL
