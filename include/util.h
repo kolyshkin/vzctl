@@ -57,6 +57,7 @@ int get_num_cpu(void);
 int get_lowmem(unsigned long long *mem);
 unsigned long max_ul(unsigned long val1, unsigned long val2);
 int get_dump_file(unsigned veid, const char *dumpdir, char *buf, int size);
+int get_state_file(unsigned veid, char *buf, int size);
 int set_not_blk(int fd);
 void close_fds(int close_std, ...);
 int move_config(int veid, int action);

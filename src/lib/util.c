@@ -589,6 +589,11 @@ int get_dump_file(unsigned veid, const char *dumpdir, char *buf, int size)
 			dumpdir != NULL ? dumpdir : DEF_DUMPDIR, veid);
 }
 
+int get_state_file(unsigned veid, char *buf, int size)
+{
+	return snprintf(buf, size, DEF_STATEDIR "/%d.pid", veid);
+}
+
 int set_not_blk(int fd)
 {
 	int oldfl, ret;

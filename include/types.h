@@ -61,6 +61,8 @@ typedef unsigned envid_t;
 #define DEF_DUMPDIR	VZDIR "/dump"
 #define DEF_DUMPFILE	"Dump.%d"
 
+#define DEF_STATEDIR	VZDIR "/state"
+
 /* CT states */
 enum {
 	STATE_STARTING = 1,

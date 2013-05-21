@@ -89,6 +89,10 @@ static int ct_destroy(vps_handler *h, envid_t veid)
 
 	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, veid);
 	unlink(ctpath);
+
+	get_state_file(veid, ctpath, sizeof(ctpath));
+	unlink(ctpath);
+
 	return destroy_container(veid);
 }
 
@@ -383,7 +387,8 @@ static int ct_env_create_real(struct arg_start *arg)
 	char *child_stack;
 	int clone_flags;
 	int userns_p[2];
-	int ret, err;
+	int ret, err, fd;
+	char pidpath[STR_SIZE];
 
 	stack_size = get_pagesize();
 	if (stack_size < 0)
@@ -416,15 +421,26 @@ static int ct_env_create_real(struct arg_start *arg)
 	}
 	arg->userns_p = userns_p[0];
 
+	get_state_file(arg->veid, pidpath, sizeof(pidpath));
+	fd = open(pidpath, O_WRONLY | O_TRUNC | O_CREAT | O_CLOEXEC, 0600);
+	if (fd == -1) {
+		logger(-1, errno, "Unable to create a state file %s", pidpath);
+		return VZ_RESOURCE_ERROR;
+	}
+
 	ret = clone(_env_create, child_stack, clone_flags, arg);
 	close(userns_p[0]);
 	if (ret < 0) {
 		logger(-1, errno, "Unable to clone");
+		close(fd);
 		/* FIXME: remove ourselves from container first */
 		close(userns_p[1]);
 		destroy_container(arg->veid);
 		return -VZ_RESOURCE_ERROR;
 	}
+
+	dprintf(fd, "%d", ret);
+	close(fd);
 
 	if (arg->h->can_join_userns) {
 		/*
