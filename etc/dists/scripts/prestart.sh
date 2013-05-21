@@ -25,13 +25,8 @@
 # destroy all our hand crafted setup. We need to undo it here.
 fixup_udev()
 {
-	if [ -f /etc/fedora-release ]; then
-		return
-	fi
-
-	if [ ! -f /etc/centos-release -a ! -f /etc/redhat-release ]; then
-		return
-	fi
+	[ -f /etc/fedora-release ] && return
+	[ -f /etc/redhat-release ] || return
 
 	# rc.sysinit will touch this file after it finishes.
 	timestamp=$(stat -c %x /.autofsck 2>/dev/null)
