@@ -197,16 +197,14 @@ do {										\
 	}									\
 } while (0)
 
+static int vz_chkpnt(vps_handler *h, envid_t veid,
+		     const fs_param *fs, int cmd, cpt_param *param);
+
 int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 		int cmd, cpt_param *param)
 {
-	int dump_fd = -1;
-	char buf[PATH_LEN];
-	const char *dumpfile = NULL;
-	int cpt_fd, pid, ret;
 	const char *root = fs->root;
 
-	ret = VZ_CHKPNT_ERROR;
 	if (root == NULL) {
 		logger(-1, 0, "Container root (VE_ROOT) is not set");
 		return VZ_VE_ROOT_NOTSET;
@@ -216,6 +214,21 @@ int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 			"container is not running");
 		return VZ_VE_NOT_RUNNING;
 	}
+
+	return vz_chkpnt(h, veid, fs, cmd, param);
+}
+
+static int vz_chkpnt(vps_handler *h, envid_t veid,
+		     const fs_param *fs, int cmd, cpt_param *param)
+{
+	int dump_fd = -1;
+	char buf[PATH_LEN];
+	const char *dumpfile = NULL;
+	int cpt_fd, pid, ret;
+	const char *root = fs->root;
+
+	ret = VZ_CHKPNT_ERROR;
+
 	logger(0, 0, "Setting up checkpoint...");
 	if ((cpt_fd = open(PROC_CPT, O_RDWR)) < 0) {
 		if (errno == ENOENT)
@@ -395,19 +408,29 @@ err_undump:
 	return status;
 }
 
+static int vz_restore(vps_handler *h, envid_t veid, vps_param *vps_p,
+			int cmd, cpt_param *param, skipFlags skip);
+
 int vps_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	cpt_param *param, skipFlags skip)
+{
+	if (vps_is_run(h, veid)) {
+		logger(-1, 0, "Unable to perform restore: "
+			"container already running");
+		return VZ_VE_RUNNING;
+	}
+
+	return vz_restore(h, veid, vps_p, cmd, param, skip);
+}
+
+static int vz_restore(vps_handler *h, envid_t veid, vps_param *vps_p,
+			int cmd, cpt_param *param, skipFlags skip)
 {
 	int ret, rst_fd;
 	int dump_fd = -1;
 	char buf[PATH_LEN];
 	const char *dumpfile = NULL;
 
-	if (vps_is_run(h, veid)) {
-		logger(-1, 0, "Unable to perform restore: "
-			"container already running");
-		return VZ_VE_RUNNING;
-	}
 	logger(0, 0, "Restoring container ...");
 	ret = VZ_RESTORE_ERROR;
 	if ((rst_fd = open(PROC_RST, O_RDWR)) < 0) {
