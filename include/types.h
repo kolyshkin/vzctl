@@ -88,6 +88,18 @@ struct dev_res;
 struct cpu_param;
 struct veth_dev;
 struct meminfo_param;
+struct cpt_param;
+struct vps_param;
+struct fs_param;
+
+typedef enum {
+	SKIP_NONE =		0,
+	SKIP_SETUP =		(1<<0),
+	SKIP_CONFIGURE =	(1<<1),
+	SKIP_ACTION_SCRIPT =	(1<<2),
+	SKIP_UMOUNT =		(1<<3),
+	SKIP_REMOUNT =		(1<<4),
+} skipFlags;
 
 /** CT handler.
  */
@@ -100,6 +112,10 @@ typedef struct vps_handler {
 	int (*enter)(struct vps_handler *h, envid_t veid, const char *root, int flags);
 	int (*destroy)(struct vps_handler *h, envid_t veid);
 	int (*env_create)(struct arg_start *arg);
+	int (*env_chkpnt)(struct vps_handler *h, envid_t veid,
+			  const struct fs_param *fs, int cmd, struct cpt_param *param);
+	int (*env_restore)(struct vps_handler *h, envid_t veid, struct vps_param *vps_p,
+			   int cmd, struct cpt_param *param, skipFlags skip);
 	int (*setlimits)(struct vps_handler *h, envid_t, struct ub_struct *ub);
 	int (*setcpus)(struct vps_handler *h, envid_t, struct cpu_param *cpu);
 	int (*setcontext)(envid_t veid);
@@ -113,15 +129,6 @@ static inline int is_vz_kernel(vps_handler *h)
 {
 	return h && h->vzfd != -1;
 }
-
-typedef enum {
-	SKIP_NONE =		0,
-	SKIP_SETUP =		(1<<0),
-	SKIP_CONFIGURE =	(1<<1),
-	SKIP_ACTION_SCRIPT =	(1<<2),
-	SKIP_UMOUNT =		(1<<3),
-	SKIP_REMOUNT =		(1<<4),
-} skipFlags;
 
 typedef int (* execFn)(void *data);
 
