@@ -226,6 +226,8 @@ OpenVZ containers control utility core package
 %{_scriptdir}/vzevent-stop
 %{_scriptdir}/vzevent-reboot
 %{_scriptdir}/vps-pci
+%{_scriptdir}/vps-cpt
+%{_scriptdir}/vps-rst
 /etc/vz/conf
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_configdir}/osrelease.conf

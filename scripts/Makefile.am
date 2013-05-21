@@ -27,7 +27,9 @@ script_SCRIPTS = \
 	vps-net_del \
 	vzevent-stop \
 	vzevent-reboot \
-	vps-pci
+	vps-pci	\
+	vps-cpt \
+	vps-rst
 
 EXTRA_DIST = \
 	$(script_SCRIPTS:%=%.in)

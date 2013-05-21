@@ -17,6 +17,7 @@
 #include "logger.h"
 #include "script.h"
 #include "cgroup.h"
+#include "cpt.h"
 #include "linux/vzctl_venet.h"
 
 #define NETNS_RUN_DIR "/var/run/netns"
@@ -508,7 +509,11 @@ int ct_env_create(struct arg_start *arg)
 	}
 
 	/* Return PID on success or -VZ_*_ERROR */
-	ret = ct_env_create_real(arg);
+	if (arg->fn)
+		ret = arg->fn(arg->h, arg->veid, &arg->res->fs,
+				arg->wait_p, arg->old_wait_p, arg->err_p, arg->data);
+	else
+		ret = ct_env_create_real(arg);
 	if (ret < 0)
 		return -ret;
 
@@ -861,6 +866,106 @@ static int ct_setcontext(envid_t veid)
 	return 0;
 }
 
+static int ct_chkpnt(vps_handler *h, envid_t veid,
+			const fs_param *fs, int cmd, cpt_param *param)
+{
+	const char *dumpfile = NULL;
+	char statefile[STR_SIZE], buf[STR_SIZE];
+	char *arg[2], *env[4];
+	FILE *sfile;
+	pid_t pid;
+	int ret;
+
+	ret = VZ_CHKPNT_ERROR;
+
+	get_dump_file(veid, param->dumpdir, buf, sizeof(buf));
+	dumpfile = strdup(buf);
+
+	arg[0] = SCRIPTDIR "/vps-cpt";
+	arg[1] = NULL;
+
+	get_state_file(veid, statefile, sizeof(statefile));
+	sfile = fopen(statefile, "r");
+	if (sfile == NULL) {
+		logger(-1, errno, "Unable to open %s", statefile);
+		return VZ_CHKPNT_ERROR;
+	}
+
+	ret = fscanf(sfile, "%d", &pid);
+	if (ret != 1) {
+		logger(-1, errno, "Unable to read PID from %s", statefile);
+		fclose(sfile);
+		return VZ_CHKPNT_ERROR;
+	}
+	fclose(sfile);
+
+	snprintf(buf, sizeof(buf), "VE_ROOT=%s", fs->root);
+	env[0] = strdup(buf);
+	snprintf(buf, sizeof(buf), "VE_PID=%d", pid);
+	env[1] = strdup(buf);
+	snprintf(buf, sizeof(buf), "VE_DUMP_DIR=%s", dumpfile);
+	env[2] = strdup(buf);
+	env[3] = NULL;
+
+	if (run_script(arg[0], arg, env, 0))
+		return ret;
+
+	return 0;
+}
+
+static int ct_env_restore(vps_handler *h, envid_t veid, const fs_param *fs,
+			  int wait_p, int old_wait_p, int err_p, void *data)
+{
+	char *argv[2], *env[4];
+	const char *dumpfile = NULL;
+	const char *statefile = NULL;
+	cpt_param *param = data;
+	char buf[STR_SIZE];
+	pid_t pid = -1;;
+	FILE *sfile;
+
+	get_dump_file(veid, param->dumpdir, buf, sizeof(buf));
+	dumpfile = strdup(buf);
+
+	get_state_file(veid, buf, sizeof(buf));
+	statefile = strdup(buf);
+
+	argv[0] = SCRIPTDIR "/vps-rst";
+	argv[1] = NULL;
+
+	snprintf(buf, sizeof(buf), "VE_ROOT=%s", fs->root);
+	env[0] = strdup(buf);
+	snprintf(buf, sizeof(buf), "VE_DUMP_DIR=%s", dumpfile);
+	env[1] = strdup(buf);
+	snprintf(buf, sizeof(buf), "VE_STATE_FILE=%s", statefile);
+	env[2] = strdup(buf);
+	env[3] = NULL;
+	if (run_script(argv[0], argv, env, 0))
+		return -VZ_RESTORE_ERROR;
+
+	sfile = fopen(statefile, "r");
+	if (sfile == NULL) {
+		logger(-1, errno, "Unable to open %s", statefile);
+		goto err_destroy;
+	}
+
+	if (fscanf(sfile, "%d", &pid) != 1)
+		logger(-1, errno, "Unable to read PID from %s", statefile);
+
+	fclose(sfile);
+err_destroy:
+	if (pid < 0)
+		destroy_container(veid);
+
+	return pid > 0 ? pid : -VZ_RESTORE_ERROR;
+}
+
+static int ct_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
+	cpt_param *param, skipFlags skip)
+{
+	return vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE | skip, NULL, ct_env_restore, param);
+}
+
 int ct_do_open(vps_handler *h, vps_param *param)
 {
 	int ret;
@@ -913,6 +1018,8 @@ int ct_do_open(vps_handler *h, vps_param *param)
 	h->enter = ct_enter;
 	h->destroy = ct_destroy;
 	h->env_create = ct_env_create;
+	h->env_chkpnt = ct_chkpnt;
+	h->env_restore = ct_restore;
 	h->setlimits = ct_setlimits;
 	h->setcpus = ct_setcpus;
 	h->setcontext = ct_setcontext;

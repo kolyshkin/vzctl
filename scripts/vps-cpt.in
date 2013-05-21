@@ -1,0 +1,54 @@
+#!/bin/sh
+#  Copyright (C) 2012, Parallels, Inc. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+# Checkpoint a container using the criu.
+# Useful for running in non-OpenVZ kernels.
+#
+# Parameters are passed in environment variables.
+# Required parameters:
+#   VE_ROOT	- container root directory
+#   VE_DUMP_DIR - directory for saving dump files 
+#   VE_PID	- PID of the init process
+#
+
+exec 1>&2
+. @SCRIPTDIR@/vps-functions
+
+vzcheckvar VE_ROOT
+vzcheckvar VE_PID
+vzcheckvar VE_DUMP_DIR
+
+mkdir $VE_DUMP_DIR &&
+criu dump	--file-locks		\
+		--tcp-established	\
+		--evasive-devices	\
+		--link-remap		\
+		--root $VE_ROOT		\
+		-t $VE_PID		\
+		-D $VE_DUMP_DIR		\
+		-o dump.log		\
+		-vvvv
+if [ $? -ne 0 ]; then
+	[ -d $VE_DUMP_DIR.fail ] && rm -rf $VE_DUMP_DIR.fail
+	mv -f $VE_DUMP_DIR $VE_DUMP_DIR.fail
+	echo Failed to checkpoint the Container
+	echo All dump files and logs were saved in $VE_DUMP_DIR.fail
+	exit 1
+else
+	echo Checkpointing finished successfully
+fi
