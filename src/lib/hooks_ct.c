@@ -963,7 +963,9 @@ err_destroy:
 static int ct_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	cpt_param *param, skipFlags skip)
 {
-	return vps_start_custom(h, veid, vps_p, SKIP_CONFIGURE | skip, NULL, ct_env_restore, param);
+	return vps_start_custom(h, veid, vps_p,
+			SKIP_CONFIGURE | SKIP_ACTION_SCRIPT | skip,
+			NULL, ct_env_restore, param);
 }
 
 int ct_do_open(vps_handler *h, vps_param *param)
