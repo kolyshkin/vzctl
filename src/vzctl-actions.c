@@ -498,7 +498,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 	}
 
 	mounted = vps_is_mounted(root, private);
-	if (!mounted)
+	if (mounted == 0)
 	{
 		ret = vps_mount(h, veid, &g_p->res.fs, &g_p->res.dq,
 				SKIP_ACTION_SCRIPT);
@@ -515,7 +515,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 	ret = system(cmd);
 	free(cmd);
 
-	if (!mounted)
+	if (mounted == 0)
 		vps_umount(h, veid, &g_p->res.fs, SKIP_ACTION_SCRIPT);
 
 	return (ret == 0) ? 0 : VZCTL_E_COMPACT_IMAGE;

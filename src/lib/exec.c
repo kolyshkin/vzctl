@@ -446,7 +446,8 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	if (!(is_run = vps_is_run(h, veid))) {
 		if ((ret = check_ub(h, &vps_p->res.ub)))
 			return ret;
-		if (!(is_mounted = vps_is_mounted(root, private))) {
+		is_mounted = vps_is_mounted(root, private);
+		if (is_mounted == 0) {
 			if ((ret = fsmount(veid, &vps_p->res.fs,
 				&vps_p->res.dq )))
 			{
@@ -469,7 +470,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		retry = 0;
 		while (retry++ < 10 && vps_is_run(h, veid))
 			usleep(500000);
-		if (!is_mounted)
+		if (is_mounted == 0)
 			fsumount(veid, &vps_p->res.fs);
 	}
 	close(rd_p[0]);

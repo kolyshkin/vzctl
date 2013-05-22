@@ -29,6 +29,12 @@
 #include "logger.h"
 #include "vzerror.h"
 
+/* Check if CT private area is mounted
+ * Returns:
+ *   1: mounted
+ *   0: not mounted
+ *  -1: error getting status
+ */
 int vps_is_mounted(const char *root, const char *private)
 {
 	struct stat st1, st2;
