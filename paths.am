@@ -41,3 +41,4 @@ modulesdir  = $(pkglibexecdir)/modules
 
 veipdumpdir = $(localstatedir)/lib/vzctl/veip
 vzrebootdir = $(localstatedir)/lib/vzctl/vzreboot
+vepiddir    = $(localstatedir)/lib/vzctl/vepid

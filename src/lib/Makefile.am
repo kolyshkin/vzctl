@@ -22,6 +22,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include \
               -DPKGCONFDIR=\"$(pkgconfdir)\" \
               -DSCRIPTDIR=\"$(scriptdir)\" \
               -DVZDIR=\"$(vzdir)\" \
+              -DVEPIDDIR=\"$(vepiddir)\" \
               $(XML_CPPFLAGS)
 
 AM_CFLAGS = $(CGROUP_CFLAGS)
