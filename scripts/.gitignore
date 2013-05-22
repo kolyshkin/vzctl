@@ -8,5 +8,7 @@ vps-netns_dev_del
 vzevent-reboot
 vzevent-stop
 vps-pci
+vps-cpt
+vps-rst
 Makefile.in
 Makefile
