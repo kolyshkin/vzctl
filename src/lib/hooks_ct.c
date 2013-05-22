@@ -876,8 +876,6 @@ static int ct_chkpnt(vps_handler *h, envid_t veid,
 	pid_t pid;
 	int ret;
 
-	ret = VZ_CHKPNT_ERROR;
-
 	get_dump_file(veid, param->dumpdir, buf, sizeof(buf));
 	dumpfile = strdup(buf);
 
@@ -907,10 +905,12 @@ static int ct_chkpnt(vps_handler *h, envid_t veid,
 	env[2] = strdup(buf);
 	env[3] = NULL;
 
-	if (run_script(arg[0], arg, env, 0))
-		return ret;
+	ret = run_script(arg[0], arg, env, 0);
+	free_arg(env);
+	if (ret)
+		ret=VZ_CHKPNT_ERROR;
 
-	return 0;
+	return ret;
 }
 
 static int ct_env_restore(vps_handler *h, envid_t veid, const fs_param *fs,
@@ -921,7 +921,8 @@ static int ct_env_restore(vps_handler *h, envid_t veid, const fs_param *fs,
 	const char *statefile = NULL;
 	cpt_param *param = data;
 	char buf[STR_SIZE];
-	pid_t pid = -1;;
+	pid_t pid = -1;
+	int ret;
 	FILE *sfile;
 
 	get_dump_file(veid, param->dumpdir, buf, sizeof(buf));
@@ -940,7 +941,10 @@ static int ct_env_restore(vps_handler *h, envid_t veid, const fs_param *fs,
 	snprintf(buf, sizeof(buf), "VE_STATE_FILE=%s", statefile);
 	env[2] = strdup(buf);
 	env[3] = NULL;
-	if (run_script(argv[0], argv, env, 0))
+
+	ret = run_script(argv[0], argv, env, 0);
+	free_arg(env);
+	if (ret)
 		return -VZ_RESTORE_ERROR;
 
 	sfile = fopen(statefile, "r");
