@@ -913,7 +913,7 @@ static int ct_chkpnt(vps_handler *h, envid_t veid,
 	return ret;
 }
 
-static int ct_env_restore(vps_handler *h, envid_t veid, const fs_param *fs,
+static int ct_restore_fn(vps_handler *h, envid_t veid, const fs_param *fs,
 			  int wait_p, int old_wait_p, int err_p, void *data)
 {
 	char *argv[2], *env[4];
@@ -969,7 +969,7 @@ static int ct_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 {
 	return vps_start_custom(h, veid, vps_p,
 			SKIP_CONFIGURE | SKIP_ACTION_SCRIPT | skip,
-			NULL, ct_env_restore, param);
+			NULL, ct_restore_fn, param);
 }
 
 int ct_do_open(vps_handler *h, vps_param *param)
