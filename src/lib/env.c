@@ -550,7 +550,9 @@ static int check_local_ugid(vps_handler *h, const char *private,
 		logger(-1, 0, "Container private area is owned by %d:%d, "
 				"but configuration file says we should run "
 				"with %lu:%lu.\nRefusing to run.",
-				st.st_uid, st.st_gid, *uid, *gid);
+				st.st_uid, st.st_gid,
+				uid ? *uid : 0,
+				gid ? *gid : 0);
 		return VZ_FS_BAD_TMPL;
 	}
 
