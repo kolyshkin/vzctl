@@ -424,11 +424,12 @@ static int ct_env_create_real(struct arg_start *arg)
 	arg->userns_p = userns_p[0];
 
 	get_state_file(arg->veid, pidpath, sizeof(pidpath));
-	fd = open(pidpath, O_WRONLY | O_TRUNC | O_CREAT | O_CLOEXEC, 0600);
+	fd = open(pidpath, O_WRONLY | O_TRUNC | O_CREAT, 0600);
 	if (fd == -1) {
 		logger(-1, errno, "Unable to create a state file %s", pidpath);
 		return VZ_RESOURCE_ERROR;
 	}
+	fcntl(fd, F_SETFD, FD_CLOEXEC);
 
 	ret = clone(_env_create, child_stack, clone_flags, arg);
 	close(userns_p[0]);
