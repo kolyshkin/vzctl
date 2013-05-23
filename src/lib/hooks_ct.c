@@ -389,7 +389,7 @@ static int ct_env_create_real(struct arg_start *arg)
 	char *child_stack;
 	int clone_flags;
 	int userns_p[2];
-	int ret, err, fd;
+	int ret, fd;
 	char pidpath[STR_SIZE];
 
 	stack_size = get_pagesize();
@@ -445,6 +445,7 @@ static int ct_env_create_real(struct arg_start *arg)
 	close(fd);
 
 	if (arg->h->can_join_userns) {
+		int x = 0;
 		/*
 		 * Now we need to write to the mapping file. It has to be us,
 		 * since CAP_SETUID is required in the parent namespace. vzctl
@@ -468,7 +469,7 @@ static int ct_env_create_real(struct arg_start *arg)
 		 * fail if called before a mapping is in place.
 		 */
 		if ((userns_p[1] != -1) &&
-				write(userns_p[1], &err, sizeof(err)) != sizeof(err)) {
+				write(userns_p[1], &x, sizeof(x)) != sizeof(x)) {
 			logger(-1, errno, "Unable to write to userns pipe");
 			close(userns_p[1]);
 			destroy_container(arg->veid);
