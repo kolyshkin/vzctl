@@ -309,7 +309,8 @@ static int _env_create(void *data)
 	 * close_fds and get away with all of them. And if we fail, we'll
 	 * exit anywyay.
 	 */
-	close(arg->userns_p);
+	if (arg->userns_p != -1)
+		close(arg->userns_p);
 
 	if (arg->h->can_join_userns) {
 		create_devices(arg->h, arg->veid, arg->res->fs.root);
