@@ -458,7 +458,7 @@ fi
 
 S="Starting"
 M="migration"
-[ $check_only -eq 1] && S="Checking"
+[ $check_only -eq 1 ] && S="Checking"
 [ $online -eq 1 ] && M="live migration"
 log 1 "$S $M of CT $VEID to $host"
 unset S M
