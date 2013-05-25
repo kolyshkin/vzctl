@@ -252,6 +252,58 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Fri May 24 2013 Kir Kolyshkin <kir@openvz.org> - 4.3-1
+- New functionality:
+-- vzctl enter/exec now works for upstream kernel 3.8+
+-- vzctl snapshot-[u]mount
+-- user namespace support for upstream kernel 3.9+
+-- vzctl suspend/resume: support upstream 3.x kernel via CRIU (http://criu.org)
+-- vzmigrate: add compatibility pre-checks for CPT version and CPU flags
+-- Add vzstats dependency to rpm package
+- Improvements:
+-- vzctl: introduce cleanup handler mechanism, use for ploop, scripts etc.
+-- vzctl start: add pre-start dist script
+-- vzctl start: remove dumpfile on successful start
+-- vzmigrate: add -o BatchMode=yes to SSH_OPTIONS
+-- vzctl console: recognize ESC as a first character
+-- add vzctl itself to OOM group configuration
+-- bash-completion: add vzctl snapshot-list options
+-- bash-completion: add vzctl snapshot-* --id/--uuid argument
+-- vzctl set --reset_ub: make exclusive
+-- vzctl set: on fail don't warn about missing --save
+-- etc/init.d/vz*: try to run vzstats
+-- vzmigrate: add --check-only (aka --dry-run)
+-- Move container private area check after executing premount scripts
+- Fixes:
+-- vzctl snapshot-list -o desc,device: fix width
+-- vzmigrate: fix ploop-based CT migration wrt symlinks
+-- vzmigrate: improve a few log messages
+-- vzmigrate: fix and optimize IP address checks
+-- vzmigrate: fix checking rsync/vzctl exit code
+-- vps_destroy_dir(): don't call quota on ploop CT
+-- suse-add_ip.sh: remove a bogus warning in no IPs case
+-- src/lib/cpt.c:restore_fn(): log errno
+-- Many (about 40) fixes here and there, found by Coverity
+-- destroydir(): log errno
+-- vzctl set 0 ... --force: don't SEGV on non-ovz kernel
+-- vzctl set --force: require --save
+-- vzctl set --diskspace: require --save for ploop
+-- vps-download: fix config file in --config output
+-- vzlist -o vswap: fix
+-- vzctl start: fix ub limits setting for upstream containers
+-- vzctl restore: don't run action scripts
+-- Fix checking vps_is_mounted() return value
+-- Remove more traces of noatime flag
+- Documentation:
+-- vzcptcheck(8): added
+-- vzctl(8): note vzctl set --name requires --save
+-- vzctl(8): improve --setmode description
+-- vzctl(8): fix and improve description of set --userpasswd
+-- vzctl(8): document snapshot-mount, snapshot-umount
+-- vzctl(8): document --local-gid, local-uid
+-- distribution.conf-template: document PRE_START
+-- other fixes and improvements
+
 * Fri Feb 15 2013 Kir Kolyshkin <kir@openvz.org> - 4.2-1
 - New functionality:
 -- Support for Fedora 18 in container (devices, disk quota, venet IPs, caps)
