@@ -34,7 +34,7 @@
 
 
 
-typedef int (*env_create_FN)(vps_handler *h, envid_t veid, const fs_param *fs,
+typedef int (*env_create_FN)(vps_handler *h, envid_t veid, const vps_res *res,
 			int wait_p, int old_wait_p, int err_p, void *data);
 
 /** Stop modes.

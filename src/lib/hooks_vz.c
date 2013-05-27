@@ -260,7 +260,7 @@ static int vz_do_env_create(struct arg_start *arg)
 		if (fn == NULL) {
 			ret = _env_create(h, (void *)arg);
 		} else {
-			ret = fn(h, veid, &res->fs, wait_p, old_wait_p, err_p, data);
+			ret = fn(h, veid, res, wait_p, old_wait_p, err_p, data);
 		}
 env_err:
 		if (ret)
@@ -713,7 +713,7 @@ err:
 	return ret;
 }
 
-static int restore_fn(vps_handler *h, envid_t veid, const fs_param *fs,
+static int restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 			int wait_p, int old_wait_p, int err_p, void *data)
 {
 	int status, len, len1, ret;

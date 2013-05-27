@@ -513,7 +513,7 @@ int ct_env_create(struct arg_start *arg)
 
 	/* Return PID on success or -VZ_*_ERROR */
 	if (arg->fn)
-		ret = arg->fn(arg->h, arg->veid, &arg->res->fs,
+		ret = arg->fn(arg->h, arg->veid, arg->res,
 				arg->wait_p, arg->old_wait_p, arg->err_p, arg->data);
 	else
 		ret = ct_env_create_real(arg);
@@ -916,7 +916,7 @@ static int ct_chkpnt(vps_handler *h, envid_t veid,
 	return ret;
 }
 
-static int ct_restore_fn(vps_handler *h, envid_t veid, const fs_param *fs,
+static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 			  int wait_p, int old_wait_p, int err_p, void *data)
 {
 	char *argv[2], *env[4];
@@ -937,7 +937,7 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const fs_param *fs,
 	argv[0] = SCRIPTDIR "/vps-rst";
 	argv[1] = NULL;
 
-	snprintf(buf, sizeof(buf), "VE_ROOT=%s", fs->root);
+	snprintf(buf, sizeof(buf), "VE_ROOT=%s", res->fs.root);
 	env[0] = strdup(buf);
 	snprintf(buf, sizeof(buf), "VE_DUMP_DIR=%s", dumpfile);
 	env[1] = strdup(buf);
