@@ -890,7 +890,10 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		ret = real_env_stop(h, veid, root, stop_mode);
 		exit(ret);
 	}
-	if (wait_child(pid, 0)) /* reboot/halt failed, retry with kill */
+
+	ret = wait_child(pid, 0);
+	/* Sometimes reboot/halt returns 1 but still stops the CT */
+	if (ret != 0 && ret != 1) /* failed, retry with kill */
 		goto kill_vps;
 
 	for (i = 0; i < MAX_SHTD_TM; i++) {
