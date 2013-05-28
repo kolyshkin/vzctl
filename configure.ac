@@ -1,4 +1,4 @@
-#  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -52,8 +52,12 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 # Disable build of static libraries by default.
 AC_DISABLE_STATIC
 
+# If AC_USE_SYSTEM_EXTENSIONS is available (autoconf >= 2.60),
+# use it. Otherwise, use old AC_GNU_SOURCE
+m4_ifdef([AC_USE_SYSTEM_EXTENSIONS],
+	 [AC_USE_SYSTEM_EXTENSIONS], [AC_GNU_SOURCE])
+
 # Checks for programs.
-m4_ifdef([AC_USE_SYSTEM_EXTENSIONS], [AC_USE_SYSTEM_EXTENSIONS])
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
