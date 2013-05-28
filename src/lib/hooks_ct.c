@@ -971,7 +971,7 @@ static int ct_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 	cpt_param *param, skipFlags skip)
 {
 	return vps_start_custom(h, veid, vps_p,
-			SKIP_CONFIGURE | SKIP_ACTION_SCRIPT | skip,
+			SKIP_CONFIGURE | skip,
 			NULL, ct_restore_fn, param);
 }
 

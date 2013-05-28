@@ -660,7 +660,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	{
 		goto err;
 	}
-	if (!(skip & SKIP_ACTION_SCRIPT)) {
+	if (!(skip & SKIP_ACTION_SCRIPT) && !fn) {
 
 		/* Run dist actions PRE_START script */
 		if (actions.pre_start) {
