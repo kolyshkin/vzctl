@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "types.h"
 #include "quota.h"
@@ -31,7 +32,7 @@
 
 int is_vzquota_available(void)
 {
-	return stat_file(VZQUOTA);
+	return (access(VZQUOTA, X_OK) == 0);
 }
 
 void quota_inc(dq_param *param, int delta)
