@@ -64,6 +64,7 @@ static inline void get_date(char *buf, int len)
 void logger(int log_level, int err_no, const char *format, ...)
 {
 	va_list ap;
+	int tmp_errno = errno;
 
 	va_start(ap, format);
 	if (!g_log.quiet && g_log.verbose >= log_level) {
@@ -92,6 +93,7 @@ void logger(int log_level, int err_no, const char *format, ...)
 		fflush(g_log.fp);
 	}
 	va_end(ap);
+	errno = tmp_errno;
 }
 
 int set_log_file(char *file)
