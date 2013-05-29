@@ -414,10 +414,6 @@ int vzctl_env_mount_snapshot(unsigned veid, char *ve_private, char *mnt, char *g
 	struct vzctl_snapshot_tree *tree = NULL;
 	struct vzctl_mount_param param = {};
 
-	if (guid == NULL)
-		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
-				"Failed to mount snapshot: "
-				"snapshot uuid not specified");
 	if (ve_private == NULL)
 		return vzctl_err(VZ_VE_PRIVATE_NOTSET, 0,
 				"Failed to mount snapshot: "
@@ -462,10 +458,6 @@ free_tree:
 
 int vzctl_env_umount_snapshot(unsigned veid, char *ve_private, char *guid)
 {
-	if (guid == NULL)
-		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
-				"Failed to umount snapshot: "
-				"snapshot uuid not specified");
 	if (ve_private == NULL)
 		return vzctl_err(VZ_VE_PRIVATE_NOTSET, 0,
 				"Failed to umount snapshot: "
