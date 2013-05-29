@@ -2360,7 +2360,7 @@ vps_param *reread_vps_config(envid_t veid)
 	char fname[PATH_MAX];
 
 	get_vps_conf_path(veid, fname, sizeof(fname));
-	if (stat_file(fname))
+	if (stat_file(fname) != 1)
 		goto err;
 
 	gparam = init_vps_param();
