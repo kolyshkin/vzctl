@@ -75,7 +75,7 @@ int ve_private_is_ploop(const char *private)
 
 	GET_DISK_DESCRIPTOR(image, private);
 
-	return stat_file(image);
+	return (stat_file(image) == 1);
 }
 
 int check_ploop_size(unsigned long size)

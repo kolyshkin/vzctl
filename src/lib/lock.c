@@ -103,7 +103,7 @@ int vps_lock(envid_t veid, char *dir, char *status)
 
 	if (check_var(dir, "lockdir is not set"))
 		return -1;
-	if (!stat_file(dir))
+	if (stat_file(dir) != 1)
 		if (make_dir(dir, 1))
 			return -1;
 	/* Create temp lock file */

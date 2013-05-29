@@ -84,7 +84,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	} else
 		snprintf(guid, sizeof(guid), "%s", param->guid);
 	GET_SNAPSHOT_XML(fname, fs->private)
-	if (stat_file(fname)) {
+	if (stat_file(fname) == 1) {
 		ret = vzctl_read_snapshot_tree(fname, tree);
 		if (ret) {
 			logger(-1, 0, "Failed to read %s", fname);
@@ -257,7 +257,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	/* restore ve.conf */
 	vzctl_get_snapshot_ve_conf(fs->private, guid, fname, sizeof(fname));
-	if (stat_file(fname)) {
+	if (stat_file(fname) == 1) {
 		get_vps_conf_path(veid, ve_conf_tmp, sizeof(ve_conf_tmp) - 4);
 		strcat(ve_conf_tmp, ".tmp");
 		if (cp_file(ve_conf_tmp, fname))
@@ -280,7 +280,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	/* resume CT in case dump file exists (no rollback, ignore error) */
 	vzctl_get_snapshot_dumpfile(fs->private, guid, dumpfile, sizeof(dumpfile));
-	if (stat_file(dumpfile)) {
+	if (stat_file(dumpfile) == 1) {
 		vps_param *param;
 
 		param = reread_vps_config(veid);
@@ -379,7 +379,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 		goto err1;
 
 	vzctl_get_snapshot_dumpfile(fs->private, guid, fname, sizeof(fname));
-	if (stat_file(fname)) {
+	if (stat_file(fname) == 1) {
 		logger(1, 0, "Deleting CT dump %s", fname);
 		if (unlink(fname))
 			logger(-1, errno, "Failed to delete dump %s",
@@ -388,7 +388,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 
 	// delete ve.conf
 	vzctl_get_snapshot_ve_conf(fs->private, guid, fname, sizeof(fname));
-	if (stat_file(fname) && unlink(fname))
+	if (stat_file(fname) == 1 && unlink(fname))
 		logger(-1, errno, "Failed to delete %s", fname);
 
 	// move snapshot.xml to its place

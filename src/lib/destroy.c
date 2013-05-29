@@ -175,7 +175,7 @@ static int destroydir(char *dir)
 	}
 	snprintf(tmp, sizeof(tmp), "%s/vztmp", root);
 	free(root);
-	if (!stat_file(tmp)) {
+	if (stat_file(tmp) != 1) {
 		if (mkdir(tmp, 0755)) {
 			logger(-1, errno, "Can't create tmp dir %s", tmp);
 			return VZ_FS_DEL_PRVT;

@@ -2391,7 +2391,7 @@ static int read_conf(char *fname, list_head_t *conf_h)
 	FILE *fp;
 	char str[16384];
 
-	if (!stat_file(fname))
+	if (stat_file(fname) != 1)
 		return 0;
 	if (!(fp = fopen(fname, "r")))
 		return -1;
@@ -2499,7 +2499,7 @@ int vps_save_config(envid_t veid, char *path, vps_param *new_p,
 	list_head_init(&new_conf);
 	if (old_p == NULL) {
 		tmp_old_p = init_vps_param();
-		if (stat_file(path))
+		if (stat_file(path) == 1)
 			vps_parse_config(veid, path, tmp_old_p, action);
 		old_p = tmp_old_p;
 	}

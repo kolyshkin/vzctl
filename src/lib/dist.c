@@ -61,7 +61,7 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 	if ((id = get_action_id(name)) < 0)
 		return 0;
 	snprintf(file, sizeof(file), "%s/%s/%s", dir, DIST_SCRIPTS, action);
-	if (!stat_file(file)) {
+	if (stat_file(file) != 1) {
 		logger(-1, 0, "Action script %s not found", file);
 		return 0;
 	}
@@ -135,7 +135,7 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 		ep = buf + strlen(buf);
 		do {
 			snprintf(file, len, "%s/%s.conf", dir, buf);
-			if (stat_file(file))
+			if (stat_file(file) == 1)
 				return 0;
 			while (ep > buf && *ep !=  '-') --ep;
 			*ep = 0;
@@ -151,7 +151,7 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 			"in CT config, "
 			"using defaults from %s/%s", dir, DIST_CONF_DEF);
 	}
-	if (!stat_file(file)) {
+	if (stat_file(file) != 1) {
 		logger(-1, 0, "Distribution configuration file "
 			       "%s/%s not found", dir, file);
 		return VZ_NO_DISTR_CONF;

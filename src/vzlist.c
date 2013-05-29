@@ -1560,13 +1560,13 @@ static int get_mounted_status()
 		if (veinfo[i].status == VE_RUNNING)
 			continue;
 		if (veinfo[i].private == NULL ||
-			!stat_file(veinfo[i].private))
+			stat_file(veinfo[i].private) != 1)
 		{
 			veinfo[i].hide = 1;
 			continue;
 		}
 		get_dump_file(veinfo[i].veid, dumpdir, buf, sizeof(buf));
-		if (stat_file(buf))
+		if (stat_file(buf) == 1)
 			veinfo[i].status = VE_SUSPENDED;
 		if (veinfo[i].root == NULL)
 			continue;

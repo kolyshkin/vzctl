@@ -426,7 +426,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 	const char *root = vps_p->res.fs.root;
 	const char *private = vps_p->res.fs.private;
 
-	if (!stat_file(script))	{
+	if (stat_file(script) != 1) {
 		logger(-1, 0, "Script not found: %s", script);
 		return VZ_NOSCRIPT;
 	}
@@ -438,7 +438,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		return VZ_VE_ROOT_NOTSET;
 	if (check_var(vps_p->res.fs.private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
-	if (!stat_file(vps_p->res.fs.private)) {
+	if (stat_file(vps_p->res.fs.private) != 1) {
 		logger(-1, 0, "Container private area %s does not exist",
 			vps_p->res.fs.private);
 		return VZ_FS_NOPRVT;

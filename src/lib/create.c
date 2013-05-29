@@ -156,7 +156,7 @@ find:
 		snprintf(tarball, sizeof(tarball), "%s/cache/%s.tar%s",
 				fs->tmpl, tmpl->ostmpl, ext[i]);
 		logger(1, 0, "Looking for %s", tarball);
-		if (stat_file(tarball))
+		if (stat_file(tarball) == 1)
 			break;
 	}
 	if (ext[i] == NULL) {
@@ -170,7 +170,7 @@ find:
 	if (make_dir(fs->private, 0))
 		return VZ_FS_NEW_VE_PRVT;
 	snprintf(tmp_dir, sizeof(tmp_dir), "%s.tmp", fs->private);
-	if (stat_file(tmp_dir)) {
+	if (stat_file(tmp_dir) == 1) {
 		logger(-1, 0, "Warning: Temp dir %s already exists, deleting",
 			tmp_dir);
 		if (del_dir(tmp_dir)) {
@@ -304,13 +304,11 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 
 	get_vps_conf_path(veid, dst, sizeof(dst));
 	sample_config = NULL;
-	cfg_exists = 0;
-	if (stat_file(dst))
-		cfg_exists = 1;
+	cfg_exists = (stat_file(dst) == 1);
 	if (cmd_p->opt.config != NULL) {
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			cmd_p->opt.config);
-		if (!stat_file(src)) {
+		if (stat_file(src) != 1) {
 			logger(-1, errno, "Sample config %s not found", src);
 			ret = VZ_CP_CONFIG;
 			goto err;
@@ -327,7 +325,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		snprintf(src, sizeof(src),  VPS_CONF_DIR "ve-%s.conf-sample",
 			vps_p->opt.config);
 		/* Bail out if CONFIGFILE is wrong in /etc/vz/vz.conf */
-		if (!stat_file(src)) {
+		if (stat_file(src) != 1) {
 			logger(-1, errno, "Sample config %s not found", src);
 			logger(-1, 0, "Fix the value of CONFIGFILE in "
 					GLOBAL_CFG);
@@ -413,7 +411,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			ret = VZ_VE_OSTEMPLATE_NOTSET;
 			goto err_cfg;
 		}
-		if (stat_file(VZOSTEMPLATE)) {
+		if (stat_file(VZOSTEMPLATE) == 1) {
 			full_ostmpl = get_ostemplate_name(tmpl->ostmpl);
 			if (full_ostmpl != NULL) {
 				free(tmpl->ostmpl);

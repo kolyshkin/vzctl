@@ -89,7 +89,7 @@ vps_handler *vz_open(envid_t veid, vps_param *param)
 
 #ifdef VZ_KERNEL_SUPPORTED
 	/* Find out if we are under OpenVZ or upstream kernel */
-	if (stat_file("/proc/vz"))
+	if (stat_file("/proc/vz") == 1)
 		ret = vz_do_open(h, param);
 	else
 #endif
@@ -262,7 +262,7 @@ int exec_container_init(struct arg_start *arg,
 	}
 
 	mount("proc", "/proc", "proc", 0, 0);
-	if (stat_file("/sys"))
+	if (stat_file("/sys") == 1)
 		mount("sysfs", "/sys", "sysfs", 0, 0);
 
 	if (create_param->feature_mask & VE_FEATURE_NFSD) {
@@ -689,7 +689,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		/* Run per-CT $VEID.start script */
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
 			START_PREFIX);
-		if (stat_file(buf)) {
+		if (stat_file(buf) == 1) {
 			if (vps_exec_script(h, veid, res->fs.root, NULL, NULL,
 				buf, NULL, 0))
 			{
@@ -975,7 +975,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), VPS_CONF_DIR "%d.%s", veid,
 			STOP_PREFIX);
-		if (stat_file(buf)) {
+		if (stat_file(buf) == 1) {
 			if (vps_exec_script(h, veid, res->fs.root, NULL, NULL,
 				buf, NULL, 0))
 			{

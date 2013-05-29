@@ -65,7 +65,7 @@ int read_script(const char *fname, char *include, char **buf)
 		} else {
 			sprintf(inc, "%s", include);
 		}
-		if (stat_file(inc))
+		if (stat_file(inc) == 1)
 			len = read_script(inc, NULL, buf);
 		free(inc);
 		if (len < 0)
@@ -118,7 +118,7 @@ int run_script(const char *f, char *argv[], char *env[], int quiet)
 	char *envp[ENV_SIZE];
 	struct vzctl_cleanup_handler *ch;
 
-	if (!stat_file(f)) {
+	if (stat_file(f) != 1) {
 		logger(-1, 0, "File %s not found", f);
 		return VZ_NOSCRIPT;
 	}
@@ -176,7 +176,7 @@ int run_pre_script(int veid, char *script)
 	char buf[STR_SIZE];
 	int ret;
 
-	if (!stat_file(script))
+	if (stat_file(script) != 1)
 		return 0;
 	/* cmd parameters */
 	arg[0] = script;

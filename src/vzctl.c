@@ -298,7 +298,7 @@ int main(int argc, char *argv[], char *envp[])
 		goto error;
 	}
 	get_vps_conf_path(veid, buf, sizeof(buf));
-	if (stat_file(buf)) {
+	if (stat_file(buf) == 1) {
 		if (vps_parse_config(veid, buf, vps_p, &g_action)) {
 			ret = VZ_NOCONFIG;
 			goto error;
