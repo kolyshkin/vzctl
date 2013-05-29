@@ -100,23 +100,21 @@ char *parse_line(char *str, char *ltoken, int lsz, char **err)
 	return ret;
 }
 
-/*
-	1 - exist
-	0 - does not exist
-	-1 - error
-*/
+/** Check if given file exists
+ * Returns:
+ *  1 - file exists
+ *  0 - file does not exist
+ * -1 - some system error
+ */
 int stat_file(const char *file)
 {
-	struct stat st;
-
-	if (stat(file, &st)) {
-		if (errno != ENOENT) {
-			logger(-1, errno, "Can't stat %s", file);
-			return -1;
-		}
+	if (access(file, F_OK) == 0)
+		return 1;
+	if (errno == ENOENT)
 		return 0;
-	}
-	return 1;
+
+	logger(-1, errno, "Can't access file %s", file);
+	return -1;
 }
 
 /** Check if a directory is empty
