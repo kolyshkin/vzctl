@@ -856,9 +856,9 @@ err:
 		close(dump_fd);
 	if (!ret) {
 		logger(0, 0, "Restoring completed successfully");
-		if (cmd == CMD_RESTORE)
-			if (dumpfile)
-				unlink(dumpfile);
+		if ((cmd == CMD_RESTORE) && (dumpfile) &&
+				!(skip & SKIP_DUMPFILE_UNLINK))
+			unlink(dumpfile);
 	}
 	return ret;
 }

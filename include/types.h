@@ -99,6 +99,7 @@ typedef enum {
 	SKIP_ACTION_SCRIPT =	(1<<2),
 	SKIP_UMOUNT =		(1<<3),
 	SKIP_REMOUNT =		(1<<4),
+	SKIP_DUMPFILE_UNLINK =	(1<<5),
 } skipFlags;
 
 /** CT handler.

@@ -286,7 +286,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		param = reread_vps_config(veid);
 		cpt.dumpfile = dumpfile;
 		if (vps_restore(h, veid, (param) ? param : g_p,
-					CMD_RESTORE, &cpt, SKIP_NONE))
+					CMD_RESTORE, &cpt, SKIP_DUMPFILE_UNLINK))
 			logger(-1, 0, "Failed to resume Container");
 		free_vps_param(param);
 	}
