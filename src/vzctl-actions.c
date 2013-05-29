@@ -1327,19 +1327,18 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 
 static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 {
-	int exist = 0, mounted = 0, run = 0, suspended = 0;
+	int exist, mounted, run, suspended = 0;
 	char buf[STR_SIZE];
 	fs_param *fs = &param->res.fs;
 
 	get_vps_conf_path(veid, buf, sizeof(buf));
-	if (fs->private != NULL && stat_file(fs->private) && stat_file(buf))
-		exist = 1;
+	exist = (fs->private != NULL && stat_file(fs->private) == 1
+			&& stat_file(buf) == 1);
 	mounted = (vps_is_mounted(fs->root, fs->private) == 1);
 	run = vps_is_run(h, veid);
 	if (exist && !run) {
 		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));
-		if (stat_file(buf))
-			suspended = 1;
+		suspended = (stat_file(buf) == 1);
 	}
 	printf("CTID %d %s %s %s%s\n", veid,
 		exist ? "exist" : "deleted",
