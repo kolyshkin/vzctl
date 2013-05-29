@@ -634,10 +634,14 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	 * sending data.
 	 */
 	if (pipe(old_wait_p) < 0) {
+		close(wait_p[0]);
+		close(wait_p[1]);
 		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
 	}
 	if (pipe(err_p) < 0) {
+		close(old_wait_p[0]);
+		close(old_wait_p[1]);
 		close(wait_p[0]);
 		close(wait_p[1]);
 		logger(-1, errno, "Can not create pipe");
@@ -750,6 +754,8 @@ err:
 				!(skip & SKIP_UMOUNT))
 			vps_umount(h, veid, &res->fs, skip);
 	}
+	close(old_wait_p[0]);
+	close(old_wait_p[1]);
 	close(wait_p[0]);
 	close(wait_p[1]);
 	close(err_p[0]);
