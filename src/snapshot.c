@@ -83,7 +83,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 			goto err;
 	} else
 		snprintf(guid, sizeof(guid), "%s", param->guid);
-	GET_SNAPSHOT_XML(fname, fs->private)
+	GET_SNAPSHOT_XML(fname, fs->private);
 	if (stat_file(fname) == 1) {
 		ret = vzctl_read_snapshot_tree(fname, tree);
 		if (ret) {
@@ -196,7 +196,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	if (!is_snapshot_supported(fs->private))
 		return VZCTL_E_SWITCH_SNAPSHOT;
 
-	GET_SNAPSHOT_XML(fname, fs->private)
+	GET_SNAPSHOT_XML(fname, fs->private);
 	if (stat_file(fname) != 1)
 		return vzctl_err(VZCTL_E_SWITCH_SNAPSHOT, 0,
 				"Unable to find snapshot by uuid %s", guid);
@@ -348,7 +348,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 	if (!is_snapshot_supported(fs->private))
 		return VZCTL_E_DELETE_SNAPSHOT;
 
-	GET_SNAPSHOT_XML(fname, fs->private)
+	GET_SNAPSHOT_XML(fname, fs->private);
 	if (stat_file(fname) != 1)
 		return vzctl_err(VZCTL_E_DELETE_SNAPSHOT, 0,
 				"Unable to find snapshot by uuid %s", guid);

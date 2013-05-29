@@ -324,7 +324,7 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 	if (!is_snapshot_supported(ve_private))
 		return VZCTL_E_LIST_SNAPSHOT;
 
-	GET_SNAPSHOT_XML(fname, ve_private)
+	GET_SNAPSHOT_XML(fname, ve_private);
 	if (stat_file(fname) != 1) {
 		print_hdr(no_hdr);
 		return 0;
