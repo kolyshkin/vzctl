@@ -188,11 +188,12 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	char fname[PATH_MAX];
 	char snap_xml_tmp[PATH_MAX];
 	char ve_conf_tmp[PATH_MAX] = "";
-	char topdelta_fname[PATH_MAX] = "";
-	char dd_tmp[PATH_MAX] = "";
 	char dumpfile[PATH_MAX];
+	char guid_buf[39];
+	const char *guid_tmp = NULL;
 	struct vzctl_snapshot_tree *tree = NULL;
 	struct ploop_disk_images_data *di = NULL;
+	struct ploop_snapshot_switch_param param = {};
 
 	if (!is_snapshot_supported(fs->private))
 		return VZCTL_E_SWITCH_SNAPSHOT;
@@ -234,10 +235,14 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		goto err1;
 	/* freeze */
 	if (run) {
-		/* do not destroy current top delta */
+		/* preserve current top delta with 'guid_tmp' for rollback */
+		if (ploop.uuid_generate(guid_buf, sizeof(guid_buf)))
+			return vzctl_err(VZCTL_E_SWITCH_SNAPSHOT, 0,
+					"Can't generate ploop uuid: %s",
+					ploop.get_last_error());
+		guid_tmp = guid_buf;
 		flags = PLOOP_SNAP_SKIP_TOPDELTA_DESTROY;
-		if (ploop.get_top_delta_fname(di, topdelta_fname, sizeof(topdelta_fname)))
-			goto err1;
+
 		ret = vps_chkpnt(h, veid, fs, CMD_SUSPEND, &cpt);
 		if (ret)
 			goto err1;
@@ -245,17 +250,15 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		if (vps_umount(h, veid, fs, 0))
 			goto err1;
 	}
-	/* switch snapshot */
-	/* preserve DiskDescriptor.xml -> DiskDescriptor.xml.orig */
-	snprintf(dd_tmp, sizeof(dd_tmp), "%s.orig", fname);
-	if (cp_file(dd_tmp, fname))
-		goto err1;
 
-	PLOOP_CLEANUP(ret = ploop.switch_snapshot(di, guid, flags));
-	if (ret) {
-		unlink(dd_tmp);
+	/* switch snapshot */
+	param.guid = (char *)guid; /* FIXME remove casts after ploop 1.7 */
+	param.guid_old = (char *)guid_tmp;
+	param.flags = flags;
+	PLOOP_CLEANUP(ret = ploop.switch_snapshot_ex(di, &param));
+	if (ret)
 		goto err2;
-	}
+
 	/* restore ve.conf */
 	vzctl_get_snapshot_ve_conf(fs->private, guid, fname, sizeof(fname));
 	if (stat_file(fname) == 1) {
@@ -295,11 +298,9 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	if (rename(snap_xml_tmp, fname))
 		logger(-1, errno, "Failed to rename %s %s", snap_xml_tmp, fname);
 
-	/* cleanup */
-	if (dd_tmp[0] != '\0' && unlink(dd_tmp))
-		logger(-1, errno, "Failed to unlink %s", dd_tmp);
-	if (topdelta_fname[0] != '\0' && unlink(topdelta_fname))
-		logger(-1, errno, "Failed to unlink %s", topdelta_fname);
+	/* remove temporary snapshot */
+	if (guid_tmp != NULL)
+		vzctl_delete_snapshot(fs->private, guid_tmp);
 
 	logger(0, 0, "Container has been successfully switched "
 			"to another snapshot");
@@ -307,21 +308,17 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	goto out;
 
 err3:
-	/* Restore original DiskDescriptor.xml */
-	GET_DISK_DESCRIPTOR(fname, fs->private);
-	if (rename(dd_tmp, fname)) {
-		logger(-1, errno, "Failed to rename %s -> %s",
-				dd_tmp, fname);
-		goto err2;
+	if (guid_tmp != NULL) {
+		param.guid = (char *)guid_tmp; /* FIXME remove casts after ploop 1.7 */
+		param.guid_old = NULL;
+		param.flags = PLOOP_SNAP_SKIP_TOPDELTA_CREATE;
+		PLOOP_CLEANUP(ploop.switch_snapshot_ex(di, &param));
 	}
-	/* remove new top delta */
-	if (ploop.get_top_delta_fname(di, topdelta_fname, sizeof(topdelta_fname)) == 0)
-		if (unlink(topdelta_fname))
-			logger(-1, errno, "Failed to unlink %s", topdelta_fname);
 
 err2:
-	if (cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_RESUME, 0))
+	if (run && cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_RESUME, 0))
 		logger(-1, 0, "Failed to resume Container on error");
+
 err1:
 	unlink(snap_xml_tmp);
 
