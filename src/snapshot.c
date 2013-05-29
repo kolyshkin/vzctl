@@ -154,6 +154,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 
 err2:
 	// merge top_delta
+	merge_param.guid = guid;
 	PLOOP_CLEANUP(ret = ploop.merge_snapshot(di, &merge_param));
 	if (ret)
 		logger(-1, 0, "Rollback failed, ploop_merge_snapshot %s: %s [%d]",
