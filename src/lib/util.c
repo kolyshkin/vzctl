@@ -102,7 +102,7 @@ char *parse_line(char *str, char *ltoken, int lsz, char **err)
 
 /*
 	1 - exist
-	0 - does't exist
+	0 - does not exist
 	-1 - error
 */
 int stat_file(const char *file)
@@ -110,8 +110,10 @@ int stat_file(const char *file)
 	struct stat st;
 
 	if (stat(file, &st)) {
-		if (errno != ENOENT)
+		if (errno != ENOENT) {
+			logger(-1, errno, "Can't stat %s", file);
 			return -1;
+		}
 		return 0;
 	}
 	return 1;
