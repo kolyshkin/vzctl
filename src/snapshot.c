@@ -146,7 +146,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	// move snapshot.xml to its place
 	GET_SNAPSHOT_XML(fname, fs->private);
 	if (rename(tmp, fname))
-		logger(-1, 0, "Failed to rename %s -> %s", tmp, fname);
+		logger(-1, errno, "Failed to rename %s -> %s", tmp, fname);
 	logger(0, 0, "Snapshot %s has been successfully created",
 			guid);
 	ret = 0;
@@ -292,7 +292,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	GET_SNAPSHOT_XML(fname, fs->private);
 	if (rename(snap_xml_tmp, fname))
-		logger(-1, 0, "Failed to rename %s %s", snap_xml_tmp, fname);
+		logger(-1, errno, "Failed to rename %s %s", snap_xml_tmp, fname);
 
 	/* cleanup */
 	if (dd_tmp[0] != '\0' && unlink(dd_tmp))
@@ -394,7 +394,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 	// move snapshot.xml to its place
 	GET_SNAPSHOT_XML(fname, fs->private);
 	if (rename(tmp, fname))
-		logger(-1, 0, "Failed to rename %s %s", tmp, fname);
+		logger(-1, errno, "Failed to rename %s %s", tmp, fname);
 
 	logger(0, 0, "Snapshot %s has been successfully deleted", guid);
 	vzctl_free_snapshot_tree(tree);
