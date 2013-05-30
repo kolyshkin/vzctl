@@ -925,11 +925,12 @@ static int ct_chkpnt(vps_handler *h, envid_t veid,
 static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 			  int wait_p, int old_wait_p, int err_p, void *data)
 {
-	char *argv[2], *env[4];
+	char *argv[2], *env[5];
 	const char *dumpfile = NULL;
 	const char *statefile = NULL;
 	cpt_param *param = data;
-	char buf[STR_SIZE];
+	veth_dev *veth;
+	char buf[STR_SIZE], *pbuf;
 	pid_t pid = -1;
 	int ret;
 	FILE *sfile;
@@ -949,7 +950,16 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 	env[1] = strdup(buf);
 	snprintf(buf, sizeof(buf), "VE_STATE_FILE=%s", statefile);
 	env[2] = strdup(buf);
-	env[3] = NULL;
+
+	pbuf = buf;
+	pbuf += snprintf(buf, sizeof(buf), "VE_VETH_DEVS=");
+	list_for_each(veth, &res->veth.dev, list) {
+		pbuf += snprintf(pbuf, sizeof(buf) - (pbuf - buf),
+				"%s=%s\n", veth->dev_name_ve, veth->dev_name);
+	}
+	env[3] = strdup(buf);
+
+	env[4] = NULL;
 
 	ret = run_script(argv[0], argv, env, 0);
 	free_arg(env);

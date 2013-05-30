@@ -25,6 +25,7 @@
 #   VE_ROOT       - container root directory
 #   VE_DUMP_DIR   - directory for saving dump files
 #   VE_STATE_FILE - file to write CT init PID to
+#   VE_VETH_DEVS  - pair of veth names (CT=HW\n)
 
 exec 1>&2
 . @SCRIPTDIR@/vps-functions
@@ -32,6 +33,12 @@ exec 1>&2
 vzcheckvar VE_ROOT
 vzcheckvar VE_STATE_FILE
 vzcheckvar VE_DUMP_DIR
+vzcheckvar VE_VETH_DEVS
+
+veth_args=""
+for dev in $VE_VETH_DEVS; do
+	veth_args="$veth_args --veth-pair $dev"
+done
 
 criu restore	--file-locks		\
 		--tcp-established	\
@@ -42,7 +49,9 @@ criu restore	--file-locks		\
 		-D $VE_DUMP_DIR		\
 		-o restore.log		\
 		-vvvv			\
-		--pidfile $VE_STATE_FILE
+		--pidfile $VE_STATE_FILE \
+		$veth_args
+
 if [ $? -eq 0 ]; then
 	rm -rf $VE_DUMP_DIR
 else
