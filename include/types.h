@@ -49,6 +49,7 @@ typedef unsigned envid_t;
 #define YES		1
 #define NO		2
 
+#define CFG		2
 #define ADD		0
 #define DEL		1
 
@@ -100,6 +101,7 @@ typedef enum {
 	SKIP_UMOUNT =		(1<<3),
 	SKIP_REMOUNT =		(1<<4),
 	SKIP_DUMPFILE_UNLINK =	(1<<5),
+	SKIP_VETH_CREATE =	(1<<6),
 } skipFlags;
 
 /** CT handler.

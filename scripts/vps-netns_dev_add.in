@@ -40,11 +40,14 @@
 vzcheckvar VEID
 vzcheckvar VNAME
 vzcheckvar HNAME
+vzcheckvar ACTION
 
 if [ "x$HNAME" = "x$VNAME" ]; then
 	vzmoveif
 else
-	vzcreatepair
+	if [ "$ACTION" = "add" ]; then
+		vzcreatepair
+	fi
 	vzadjustmacs
 	vzconfbridge
 fi

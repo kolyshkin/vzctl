@@ -111,9 +111,9 @@ static int veth_ctl(vps_handler *h, envid_t veid, int op, veth_param *list,
 			break;
 	}
 	logger(0, 0, "%s veth devices: %s",
-		op == ADD ? "Configure" : "Deleting", buf);
+		(op == ADD || op == CFG) ? "Configure" : "Deleting", buf);
 	list_for_each(tmp, dev_h, list) {
-		if (op == ADD) {
+		if (op == ADD || op == CFG) {
 			if ((ret = h->veth_ctl(h, veid, ADD, tmp)))
 				break;
 			if ((ret = run_vznetcfg(veid, tmp)))
@@ -407,8 +407,10 @@ int vps_setup_veth(vps_handler *h, envid_t veid, dist_actions *actions,
 		veth_ctl(h, veid, DEL, veth_del, 0);
 	}
 	if (!list_empty(&veth_add->dev)) {
+		int op = (skip & SKIP_VETH_CREATE) ? CFG : ADD;
+
 		fill_veth_dev_name(&veth_old, veth_add);
-		ret = veth_ctl(h, veid, ADD, veth_add, 1);
+		ret = veth_ctl(h, veid, op, veth_add, 1);
 	}
 	if (!list_empty(&veth_old.dev))
 		free_veth_param(&veth_old);
