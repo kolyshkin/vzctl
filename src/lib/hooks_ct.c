@@ -395,12 +395,12 @@ static int ct_env_create_real(struct arg_start *arg)
 
 	stack_size = get_pagesize();
 	if (stack_size < 0)
-		return -VZ_RESOURCE_ERROR;
+		return VZ_RESOURCE_ERROR;
 
 	child_stack = alloca(stack_size);
 	if (child_stack == NULL) {
 		logger(-1, 0, "Unable to alloc");
-		return -VZ_RESOURCE_ERROR;
+		return VZ_RESOURCE_ERROR;
 	}
 	child_stack += stack_size;
 
@@ -419,7 +419,7 @@ static int ct_env_create_real(struct arg_start *arg)
 		clone_flags |= CLONE_NEWUSER;
 		if (pipe(userns_p) < 0) {
 			logger(-1, errno, "Can not create userns pipe");
-			return -VZ_RESOURCE_ERROR;
+			return VZ_RESOURCE_ERROR;
 		}
 	}
 	arg->userns_p = userns_p[0];
@@ -440,7 +440,7 @@ static int ct_env_create_real(struct arg_start *arg)
 		/* FIXME: remove ourselves from container first */
 		close(userns_p[1]);
 		destroy_container(arg->veid);
-		return -VZ_RESOURCE_ERROR;
+		return VZ_RESOURCE_ERROR;
 	}
 
 	dprintf(fd, "%d", ret);
@@ -460,7 +460,7 @@ static int ct_env_create_real(struct arg_start *arg)
 			logger(-1, 0, "Can't write to userns mapping file");
 			close(userns_p[1]);
 			destroy_container(arg->veid);
-			return -VZ_RESOURCE_ERROR;
+			return VZ_RESOURCE_ERROR;
 		}
 		/*
 		 * Nothing should proceed userns wide until we have the
@@ -475,7 +475,7 @@ static int ct_env_create_real(struct arg_start *arg)
 			logger(-1, errno, "Unable to write to userns pipe");
 			close(userns_p[1]);
 			destroy_container(arg->veid);
-			return -VZ_RESOURCE_ERROR;
+			return VZ_RESOURCE_ERROR;
 		}
 		close(userns_p[1]);
 	}
@@ -485,10 +485,10 @@ static int ct_env_create_real(struct arg_start *arg)
 	if (symlink(pidpath, ctpath)) {
 		logger(-1, errno, "Can't symlink into netns file %s", ctpath);
 		destroy_container(arg->veid);
-		return -VZ_RESOURCE_ERROR;
+		return VZ_RESOURCE_ERROR;
 	}
 
-	return ret;
+	return 0;
 }
 
 int ct_env_create(struct arg_start *arg)
@@ -525,10 +525,8 @@ int ct_env_create(struct arg_start *arg)
 				arg->wait_p, arg->old_wait_p, arg->err_p, arg->data);
 	else
 		ret = ct_env_create_real(arg);
-	if (ret < 0)
-		return -ret;
 
-	return 0;
+	return ret;
 }
 
 static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
@@ -931,9 +929,7 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 	cpt_param *param = data;
 	veth_dev *veth;
 	char buf[STR_SIZE], *pbuf;
-	pid_t pid = -1;
 	int ret;
-	FILE *sfile;
 
 	get_dump_file(veid, param->dumpdir, buf, sizeof(buf));
 	dumpfile = strdup(buf);
@@ -970,24 +966,12 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 
 	ret = run_script(argv[0], argv, env, 0);
 	free_arg(env);
-	if (ret)
-		return -VZ_RESTORE_ERROR;
-
-	sfile = fopen(statefile, "r");
-	if (sfile == NULL) {
-		logger(-1, errno, "Unable to open %s", statefile);
-		goto err_destroy;
+	if (ret) {
+		destroy_container(veid);
+		return VZ_RESTORE_ERROR;
 	}
 
-	if (fscanf(sfile, "%d", &pid) != 1)
-		logger(-1, errno, "Unable to read PID from %s", statefile);
-
-	fclose(sfile);
-err_destroy:
-	if (pid < 0)
-		destroy_container(veid);
-
-	return pid > 0 ? pid : -VZ_RESTORE_ERROR;
+	return 0;
 }
 
 static int ct_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
