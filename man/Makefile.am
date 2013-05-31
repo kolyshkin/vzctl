@@ -55,7 +55,7 @@ check-man-dates:
 		DATE="$$(LANG=C git log -1 --format='format:%cD' \
 			$${FILE} | awk '{print $$2, $$3, $$4}')" && \
 		echo $$FILE: $$DATE && \
-		sed -e "1s%\(\.TH \w\w* [0-9] \"\)[0-9]* \w\w* [0-9][0-9][0-9][0-9]%\1$${DATE}%" -i $${FILE}; \
+		sed -e "1,20s%\(^\.TH \w\w* [0-9] \"\)[0-9]* \w\w* [0-9][0-9][0-9][0-9]%\1$${DATE}%" -i $${FILE}; \
 	done
 	git diff $(SRCS)
 .PHONY: check-man-dates
