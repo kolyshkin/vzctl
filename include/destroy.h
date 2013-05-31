@@ -22,4 +22,5 @@
 int vps_destroy_dir(envid_t veid, char *dir);
 int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs,  cpt_param *cpt);
 int del_dir(char *dir);
+int destroy_dump(envid_t veid, const char *dumpdir);
 #endif
