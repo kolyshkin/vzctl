@@ -15,49 +15,35 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-#
-# Resume a container using CRIU (http://criu.org).
-# Useful with recent upstream (i.e. non-OpenVZ) kernels.
-# Requires criu to be installed.
+# This script is called by CRIU (http://criu.org) after creating namespaces.
 #
 # Parameters are passed in environment variables.
 # Required parameters:
-#   VE_ROOT       - container root directory
-#   VE_DUMP_DIR   - directory for saving dump files
-#   VE_STATE_FILE - file to write CT init PID to
-#   VE_VETH_DEVS  - pair of veth names (CT=HW\n)
+#   VZCTL_PID	  - pid of vzctl
+#   STATUSFD	  - file descriptor for sending signal to vzctl
+#   WAITFD	  - file descriptor for receiving signal from vzctl
+#   VE_STATE_FILE - file with PID of container init process
+#   VE_NETNS_FILE - file, which used by ip netns
+#   CRTOOLS_SCRIPT_ACTION - current action (set by criu)
 
 exec 1>&2
 . @SCRIPTDIR@/vps-functions
 
-vzcheckvar VE_ROOT
+vzcheckvar CRTOOLS_SCRIPT_ACTION
+[ "$CRTOOLS_SCRIPT_ACTION" = "setup-namespaces" ] || exit 0
+
+vzcheckvar VZCTL_PID
+vzcheckvar STATUSFD
+vzcheckvar WAITFD
+vzcheckvar VE_NETNS_FILE
 vzcheckvar VE_STATE_FILE
-vzcheckvar VE_DUMP_DIR
-vzcheckvar VE_VETH_DEVS
 
-veth_args=""
-for dev in $VE_VETH_DEVS; do
-	veth_args="$veth_args --veth-pair $dev"
-done
+set -e
 
-ns_script=@SCRIPTDIR@/vps-rst-env
+pid=$(cat $VE_STATE_FILE)
+ln -s /proc/$pid/ns/net $VE_NETNS_FILE
 
-criu restore	--file-locks		\
-		--tcp-established	\
-		--evasive-devices	\
-		--link-remap		\
-		--root $VE_ROOT		\
-		--restore-detached	\
-		--action-script $ns_script \
-		-D $VE_DUMP_DIR		\
-		-o restore.log		\
-		-vvvv			\
-		--pidfile $VE_STATE_FILE \
-		$veth_args
+printf '\0\0\0\0' > /proc/$VZCTL_PID/fd/$STATUSFD
+ret=$(cat /proc/$VZCTL_PID/fd/$WAITFD | hexdump -e '"%d"' -n 4)
 
-if [ $? -eq 0 ]; then
-	rm -rf $VE_DUMP_DIR
-else
-	echo The restore log was saved in $VE_DUMP_DIR/restore.log
-	exit 1
-fi
+[ "$ret" -eq "0" ]

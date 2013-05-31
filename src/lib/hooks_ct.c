@@ -391,6 +391,7 @@ static int ct_env_create_real(struct arg_start *arg)
 	int userns_p[2];
 	int ret, fd;
 	char pidpath[STR_SIZE];
+	char ctpath[STR_SIZE];
 
 	stack_size = get_pagesize();
 	if (stack_size < 0)
@@ -479,13 +480,20 @@ static int ct_env_create_real(struct arg_start *arg)
 		close(userns_p[1]);
 	}
 
+	snprintf(ctpath, STR_SIZE, "%s/%d", NETNS_RUN_DIR, arg->veid);
+	snprintf(pidpath, STR_SIZE, "/proc/%d/ns/net", ret);
+	if (symlink(pidpath, ctpath)) {
+		logger(-1, errno, "Can't symlink into netns file %s", ctpath);
+		destroy_container(arg->veid);
+		return -VZ_RESOURCE_ERROR;
+	}
+
 	return ret;
 }
 
 int ct_env_create(struct arg_start *arg)
 {
 	int ret;
-	char procpath[STR_SIZE];
 	char ctpath[STR_SIZE];
 
 	/* non-fatal */
@@ -519,14 +527,6 @@ int ct_env_create(struct arg_start *arg)
 		ret = ct_env_create_real(arg);
 	if (ret < 0)
 		return -ret;
-
-	snprintf(procpath, STR_SIZE, "/proc/%d/ns/net", ret);
-	ret = symlink(procpath, ctpath);
-	if (ret) {
-		logger(-1, errno, "Can't symlink into netns file %s", ctpath);
-		destroy_container(arg->veid);
-		return VZ_RESOURCE_ERROR;
-	}
 
 	return 0;
 }
@@ -925,7 +925,7 @@ static int ct_chkpnt(vps_handler *h, envid_t veid,
 static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 			  int wait_p, int old_wait_p, int err_p, void *data)
 {
-	char *argv[2], *env[5];
+	char *argv[2], *env[9];
 	const char *dumpfile = NULL;
 	const char *statefile = NULL;
 	cpt_param *param = data;
@@ -958,8 +958,15 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 				"%s=%s\n", veth->dev_name_ve, veth->dev_name);
 	}
 	env[3] = strdup(buf);
-
-	env[4] = NULL;
+	snprintf(buf, sizeof(buf), "VZCTL_PID=%d", getpid());
+	env[4] = strdup(buf);
+	snprintf(buf, sizeof(buf), "STATUSFD=%d", STDIN_FILENO);
+	env[5] = strdup(buf);
+	snprintf(buf, sizeof(buf), "WAITFD=%d", wait_p);
+	env[6] = strdup(buf);
+	snprintf(buf, sizeof(buf), "VE_NETNS_FILE=%s/%d", NETNS_RUN_DIR, veid);
+	env[7] = strdup(buf);
+	env[8] = NULL;
 
 	ret = run_script(argv[0], argv, env, 0);
 	free_arg(env);
