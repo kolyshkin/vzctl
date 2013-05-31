@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "14 Jan 2013" "OpenVZ" "Containers"
+.TH vzctl 8 "17 May 2013" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS

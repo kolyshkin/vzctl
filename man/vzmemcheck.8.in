@@ -1,4 +1,4 @@
-.TH vzmemcheck 8 "6 Jun 2011" "OpenVZ" "Containers"
+.TH vzmemcheck 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzmemcheck \- show information about host memory parameters
 .SH SYNOPSIS

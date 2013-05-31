@@ -1,4 +1,4 @@
-.TH vzcpucheck 8 "6 Jun 2011" "OpenVZ" "Containers"
+.TH vzcpucheck 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzcpucheck \- show information about the CPU power and utilization.
 .SH SYNOPSIS

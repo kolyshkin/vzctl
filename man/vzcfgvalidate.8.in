@@ -1,4 +1,4 @@
-.TH vzcfgvalidate 8 "28 Jun 2011" "OpenVZ" "Containers"
+.TH vzcfgvalidate 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzcfgvalidate \- validate a container configuration file
 .SH SYNOPSIS

@@ -1,4 +1,4 @@
-.TH vzpid 8 "6 Jun 2011" "OpenVZ" "Containers"
+.TH vzpid 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzpid \- display the CT ID given the process ID
 .SH SYNOPSIS

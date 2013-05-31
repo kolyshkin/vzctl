@@ -1,4 +1,4 @@
-.TH vzcalc 8 "10 Dec 2009" "OpenVZ" "Containers"
+.TH vzcalc 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzcalc \- calculate resource usage of a container
 .SH SYNOPSIS

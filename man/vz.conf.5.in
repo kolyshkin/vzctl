@@ -1,4 +1,4 @@
-.TH vz.conf 5 "28 Jun 2011" "OpenVZ" "Containers"
+.TH vz.conf 5 "5 Dec 2012" "OpenVZ" "Containers"
 .SH NAME
 vz.conf \- global OpenVZ configuration file
 .SH SYNOPSIS

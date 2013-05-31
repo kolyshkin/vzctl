@@ -1,4 +1,4 @@
-.TH ctid.conf 5 "16 Nov 2010" "OpenVZ" "Containers"
+.TH ctid.conf 5 "13 May 2013" "OpenVZ" "Containers"
 .SH NAME
 \fIctid\fR.conf \- configuration file for an OpenVZ container.
 .SH SYNOPSIS

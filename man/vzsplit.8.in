@@ -1,4 +1,4 @@
-.TH vzsplit 8 "6 Jun 2011" "OpenVZ" "Containers"
+.TH vzsplit 8 "18 Mar 2012" "OpenVZ" "Containers"
 .SH NAME
 vzsplit \- generate a sample container configuration file
 .SH SYNOPSIS
