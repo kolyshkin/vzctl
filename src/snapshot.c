@@ -252,8 +252,8 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 
 	/* switch snapshot */
-	param.guid = (char *)guid; /* FIXME remove casts after ploop 1.7 */
-	param.guid_old = (char *)guid_tmp;
+	param.guid = guid;
+	param.guid_old = guid_tmp;
 	param.flags = flags;
 	PLOOP_CLEANUP(ret = ploop.switch_snapshot_ex(di, &param));
 	if (ret)
@@ -309,7 +309,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 
 err3:
 	if (guid_tmp != NULL) {
-		param.guid = (char *)guid_tmp; /* FIXME remove casts after ploop 1.7 */
+		param.guid = guid_tmp;
 		param.guid_old = NULL;
 		param.flags = PLOOP_SNAP_SKIP_TOPDELTA_CREATE;
 		PLOOP_CLEANUP(ploop.switch_snapshot_ex(di, &param));
