@@ -228,6 +228,7 @@ OpenVZ containers control utility core package
 %{_scriptdir}/vps-pci
 %{_scriptdir}/vps-cpt
 %{_scriptdir}/vps-rst
+%{_scriptdir}/vps-rst-env
 /etc/vz/conf
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_configdir}/osrelease.conf
