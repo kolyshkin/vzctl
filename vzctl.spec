@@ -23,7 +23,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.3
+Version: 4.3.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -253,6 +253,36 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Mon Jun  3 2013 Kir Kolyshkin <kir@openvz.org> - 4.3.1-1
+- New functionality:
+-- vzctl restore with CRIU: restore veth devices
+- Fixes:
+-- vzmigrate: fix a typo leading to missing `]' warning (harmless)
+-- configure.ac: set _GNU_SOURCE for older autoconf
+-- vzctl stop: don't kill CT right away if halt exited with 1
+-- vzctl restore/start: fix running mount script (#2603)
+-- vps_start_custom(): close old_wait_p fds
+-- stat_file(): print error if other than ENOENT
+-- vzctl snapshot-switch: do apply config saved on snapshot
+-- vzctl snapshot-switch: don't remove dump file
+-- fix checking stat_file() return code
+-- vzctl create: umount ploop device if interrupted
+-- src/snapshot.c: log errno after failed rename
+-- vzctl start/destroy: fix criu dump removal
+-- vzctl restore: synchronize criu with vzctl
+-- vzctl --help: fix copyright years
+- Improvements:
+-- logger(): don't spoil errno
+-- Macro GET_DUMP_FILE is internal, move to .c
+-- is_vzquota_available(): use access() and check for x bit
+-- stat_file(): use access() instead of stat()
+-- vzctl_env_[u]mount_snapshot: rm guid check
+-- vzctl_env_create_snapshot(): explicitly specify guid on rollback
+-- vzctl_env_switch_snapshot(): rework using ploop_switch_snapshot_ex()
+-- vzctl restore: more consistent error printing
+- Documentation:
+-- man: fix pages' dates
+
 * Fri May 24 2013 Kir Kolyshkin <kir@openvz.org> - 4.3-1
 - New functionality:
 -- vzctl enter/exec now works for upstream kernel 3.8+
