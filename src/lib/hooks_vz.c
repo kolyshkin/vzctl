@@ -720,6 +720,7 @@ static int restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 	cpt_param *param = (cpt_param *) data;
 	char buf[PIPE_BUF];
 	int error_pipe[2];
+	const char *fail = "";
 
 	status = VZ_RESTORE_ERROR;
 	if (param == NULL)
@@ -763,7 +764,7 @@ static int restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 
 	logger(0, 0, "\tundump...");
 	if (ioctl(param->rst_fd, CPT_UNDUMP, 0) != 0) {
-		logger(-1, errno, "Error: undump failed");
+		fail = "undump failed";
 		goto err_undump;
 	}
 	/* Now we wait until CT setup will be done */
@@ -772,13 +773,13 @@ static int restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 		clean_hardlink_dir("/");
 		logger(0, 0, "\tresume...");
 		if (ioctl(param->rst_fd, CPT_RESUME, 0)) {
-			logger(-1, errno, "Error: resume failed");
+			fail = "resume failed";
 			goto err_undump;
 		}
 	} else if (param->cmd == CMD_UNDUMP && !param->ctx) {
 		logger(0, 0, "\tget context...");
 		if (ioctl(param->rst_fd, CPT_GET_CONTEXT, veid) < 0) {
-			logger(-1, errno, "Can not get context");
+			fail = "can not get context";
 			goto err_undump;
 		}
 	}
@@ -792,7 +793,7 @@ err_pipe:
 	return status;
 
 err_undump:
-	logger(-1, 0, "Restoring failed:");
+	logger(-1, errno, "Restore error, %s", fail);
 	while ((len = read(error_pipe[0], buf, PIPE_BUF)) > 0) {
 		do {
 			len1 = write(STDERR_FILENO, buf, len);
