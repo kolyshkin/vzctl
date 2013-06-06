@@ -39,6 +39,9 @@
 #include "logger.h"
 #include "util.h"
 
+extern void clean_hardlink_dir(const char *mntdir) __attribute__((weak));
+void clean_hardlink_dir(const char *mntdir) {}
+
 int cpt_cmd(vps_handler *h, envid_t veid, const char *root,
 		int action, int cmd, unsigned int ctx)
 {
