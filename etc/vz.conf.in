@@ -35,7 +35,7 @@ TEMPLATE=@VZDIR@/template
 VE_ROOT=@VZDIR@/root/$VEID
 VE_PRIVATE=@VZDIR@/private/$VEID
 CONFIGFILE="basic" # Use vswap-256m on RHEL6 kernel
-DEF_OSTEMPLATE="centos-5"
+DEF_OSTEMPLATE="centos-6-x86"
 ## Filesystem layout for new CTs: either simfs (default) or ploop
 #VE_LAYOUT=ploop
 
