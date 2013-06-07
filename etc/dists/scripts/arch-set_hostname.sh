@@ -44,7 +44,13 @@ function set_hostname()
 	[ -z "${hostname}" ] && return 0
 
 	# update /etc/rc.conf
-	put_param ${cfgfile} HOSTNAME ${hostname}
+	if [ -f ${cfgfile} ]; then
+		put_param ${cfgfile} HOSTNAME ${hostname}
+	fi
+
+	# update /etc/hostname
+	echo ${hostname} > /etc/hostname
+
 	hostname ${hostname}
 }
 

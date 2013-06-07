@@ -25,6 +25,8 @@ OLDCFGFILE=/etc/rc.conf
 CFGPATH=/etc/network.d
 NETCFG=/etc/conf.d/netcfg
 
+CTLPATH=/etc/netctl
+
 function old_remove_all_ve_aliases()
 {
 	local ve_if_name
@@ -91,9 +93,11 @@ function del_ip()
 		ip_conv $ipm
 
 		if [ -z "$_IPV6ADDR" ] ; then
-			ve_if=`grep -H "ADDR='${ip}'" "${CFGPATH}/${VENET_DEV}_*" 2> /dev/null | awk -F: '{print$1}' | sed "s/.*${VENET_DEV}_//"`
+			ve_if=`grep -H "ADDR='${_IP}'" "${CFGPATH}/${VENET_DEV}"_* 2> /dev/null | awk -F: '{print$1}' | sed "s/.*${VENET_DEV}_//"`
+			del_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "addr add ${_IP}/${_MASK} broadcast 0.0.0.0 dev ${VENET_DEV}"
 		else
-			ve_if=`grep -H "ADDR6='${ip}/128'" "${CFGPATH}/${VENET_DEV}_*" 2> /dev/null | awk -F: '{print$1}' | sed "s/.*${VENET_DEV}_//"`
+			ve_if=`grep -H "ADDR6='${_IP}/128'" "${CFGPATH}/${VENET_DEV}"_* 2> /dev/null | awk -F: '{print$1}' | sed "s/.*${VENET_DEV}_//"`
+			del_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "addr add ${_IP}/${_MASK} dev ${VENET_DEV}"
 		fi
 
 		if [ -z "$ve_if" ] ; then
@@ -105,11 +109,43 @@ function del_ip()
 
 		del_param3 "${NETCFG}" "NETWORKS" "${VENET_DEV}_${ve_if}"
 	done
+
+	netcfg "${VENET_DEV}"
 }
 
+function netctl_del_ip()
+{
+	local ipm
+
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		remove_all_ve_aliases
+		return 0
+	fi
+
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if [ -z "$_IPV6ADDR" ]; then
+			del_param3 "${CTLPATH}/${VENET_DEV}" "Address" "$_IP/$_MASK"
+		else
+			del_param3 "${CTLPATH}/${VENET_DEV}" "Address6" "$_IP/$_MASK"
+		fi
+	done
+
+	if [ "${VE_STATE}" = "running" ]; then
+		netctl restart ${VENET_DEV}
+	fi
+}
+
+newcfg=
 if [ -d "${CFGPATH}" ] ; then
+	newcfg=1
 	del_ip
-else
+fi
+if [ -d "${CTLPATH}" ] ; then
+	newcfg=1
+	netctl_del_ip
+fi
+if [ -z $newcfg ] ; then
 	old_del_ip
 fi
 

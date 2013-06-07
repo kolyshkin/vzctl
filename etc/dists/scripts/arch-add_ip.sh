@@ -25,6 +25,8 @@ OLDCFGFILE=/etc/rc.conf
 CFGPATH=/etc/network.d
 NETCFG=/etc/conf.d/netcfg
 
+CTLPATH=/etc/netctl
+
 function old_remove_all_ve_aliases()
 {
 	local ve_if_name
@@ -139,10 +141,15 @@ function setup_network()
 	echo "CONNECTION='ethernet'
 DESCRIPTION='${VENET_DEV}'
 INTERFACE='${VENET_DEV}'
-IP='static'
-ADDR='127.0.0.2'
+IP='static'" > "${CFGPATH}/${VENET_DEV}" || error "Could not write ${CFGPATH}/${VENET_DEV}" $VZ_FS_NO_DISK_SPACE
+	if [ ! -d /etc/systemd ]; then
+		echo "ADDR='127.0.0.2'
 NETMASK='32'
-GATEWAY='0.0.0.0'" > "${CFGPATH}/${VENET_DEV}" || error "Could not write ${CFGPATH}/${VENET_DEV}" $VZ_FS_NO_DISK_SPACE
+GATEWAY='0.0.0.0'" >> "${CFGPATH}/${VENET_DEV}" || error "Could not write ${CFGPATH}/${VENET_DEV}" $VZ_FS_NO_DISK_SPACE
+	else
+		add_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "addr add 127.0.0.2/32 broadcast 0.0.0.0 dev ${VENET_DEV}"
+		add_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "route add default dev ${VENET_DEV}"
+	fi
 
 	add_param3 "${NETCFG}" "NETWORKS" "${VENET_DEV}"
 
@@ -171,6 +178,9 @@ INTERFACE='${VENET_DEV}:${ifnum}'
 IP='static'
 ADDR='${ip}'
 NETMASK='${netmask}'" > "${CFGPATH}/${VENET_DEV}_${ifnum}" || error "Could not write ${CFGPATH}/${VENET_DEV}_${ifnum}" $VZ_FS_NO_DISK_SPACE
+		if [ -d /etc/systemd ]; then
+			add_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "addr add ${ip}/${netmask} broadcast 0.0.0.0 dev ${VENET_DEV}"
+		fi
 	else
 		# Don't do anything if address already exists
 		grep -q "ADDR6='${ip}'" "${CFGPATH}/${VENET_DEV}_*" 2> /dev/null
@@ -184,6 +194,13 @@ INTERFACE='${VENET_DEV}:${ifnum}'
 IP6='static'
 POST_UP='ip route add ::/0 dev ${VENET_DEV}'
 ADDR6='${ip}/${netmask}'" > "${CFGPATH}/${VENET_DEV}_${ifnum}" || error "Could not write ${CFGPATH}/${VENET_DEV}_${ifnum}" $VZ_FS_NO_DISK_SPACE
+		if [ -d /etc/systemd ]; then
+			add_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "addr add ${ip}/${netmask} dev ${VENET_DEV}"
+			grep -q "['\\\"]-6 route add default" "${CFGPATH}/${VENET_DEV}" 2> /dev/null
+			if [ "$?" -ne "0" ] ; then
+				add_param3 "${CFGPATH}/${VENET_DEV}" "IPCFG" "-6 route add default dev ${VENET_DEV}"
+			fi
+		fi
 	fi
 
 	# add device entry to NETWORKS
@@ -221,7 +238,9 @@ function add_ip()
 		remove_all_ve_aliases
 	fi
 
-	setup_network
+	if [ "${VE_STATE}" != "running" ]; then
+		setup_network
+	fi
 
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm
@@ -235,12 +254,102 @@ function add_ip()
 
 	if [ "${VE_STATE}" = "running" ] ; then
 		rc.d restart net-profiles
+		netcfg "${VENET_DEV}"
 	fi
 }
 
+function netctl_setup_network()
+{
+	echo "# This configuration file is auto-generated.
+Description='VPS ethernet connection'
+Interface=${VENET_DEV}
+Connection=ethernet
+IP=static
+IP6=static
+" > "${CTLPATH}/${VENET_DEV}" || error "Could not write ${CTLPATH}/${VENET_DEV}" $VZ_FS_NO_DISK_SPACE
+
+	if [ ! -f "/etc/hosts" ]; then
+		echo "127.0.0.1 localhost.localdomain localhost" > /etc/hosts || error "Could not write /etc/hosts" $VZ_FS_NO_DISK_SPACE
+	fi
+
+	netctl enable ${VENET_DEV}
+}
+
+function netctl_create_config()
+{
+	local ip=$1
+	local netmask=$2
+	local isinet6=$3
+
+	if [ -z "$isinet6" ]; then
+		# Don't do anything if address already exists
+		grep -q "Address.*${ip}/${netmask}" "${CTLPATH}/${VENET_DEV}" 2> /dev/null
+		if [ "$?" -eq "0" ]; then
+			return 0
+		fi
+		add_param3 "${CTLPATH}/${VENET_DEV}" "Address" "${ip}/${netmask}"
+
+		# Don't do anything if route already exists
+		grep -q "Routes=" "${CTLPATH}/${VENET_DEV}" 2> /dev/null
+		if [ "$?" -eq "0" ]; then
+			return 0
+		fi
+		add_param3 "${CTLPATH}/${VENET_DEV}" "Routes" "default dev ${VENET_DEV}"
+	else
+		# Don't do anything if address already exists
+		grep -q "Address6.*${ip}/${netmask}" "${CTLPATH}/${VENET_DEV}" 2> /dev/null
+		if [ "$?" -eq "0" ]; then
+			return 0
+		fi
+		add_param3 "${CTLPATH}/${VENET_DEV}" "Address6" "${ip}/${netmask}"
+
+		# Don't do anything if route already exists
+		grep -q "Routes6=" "${CTLPATH}/${VENET_DEV}" 2> /dev/null
+		if [ "$?" -eq "0" ]; then
+			return 0
+		fi
+		add_param3 "${CTLPATH}/${VENET_DEV}" "Routes6" "default dev ${VENET_DEV}"
+	fi
+}
+
+function netctl_add_ip()
+{
+	local ipm
+
+	if [ "x${VE_STATE}" = "xstarting" ]; then
+		remove_all_ve_aliases
+	fi
+	if [ "x${IPDELALL}" = "xyes" ]; then
+		remove_all_ve_aliases
+	fi
+	if [ "${VE_STATE}" != "running" ]; then
+		netctl_setup_network
+	fi
+
+	for ipm in ${IP_ADDR}; do
+		ip_conv $ipm
+		if [ -z "$_IPV6ADDR" ]; then
+			netctl_create_config "${_IP}" "${_MASK}"
+		else
+			netctl_create_config "${_IP}" "${_MASK}" 1
+		fi
+	done
+
+	if [ "${VE_STATE}" = "running" ]; then
+		netctl restart ${VENET_DEV}
+	fi
+}
+
+newcfg=
 if [ -d "${CFGPATH}" ] ; then
+	newcfg=1
 	add_ip
-else
+fi
+if [ -d "${CTLPATH}" ] ; then
+	newcfg=1
+	netctl_add_ip
+fi
+if [ -z newcfg ] ; then
 	old_add_ip
 fi
 
