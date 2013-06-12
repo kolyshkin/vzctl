@@ -554,13 +554,16 @@ fi
 # Check that IP_ADDRESSes are not in use on dest
 # remove extra spaces and netmasks
 IP_X=$(echo $IP_ADDRESS " " | sed 's@/[0-9][0-9]*[[:space:]]@ @g')
-log 2 "Checking IPs on destination node: $IP_X"
-# remove extra spaces, replace spaces with |
-IP_X=$(echo $IP_X | sed 's/ /|/g')
-# do check
-if [ $($SSH "root@$host" "grep -cwE \"$IP_X\" /proc/vz/veip") -gt 0 ]; then
-	log 0 "IP address(es) already in use on destination node"
-	exit $MIG_ERR_IP_IN_USE
+# Only do the check if we have IP(s)
+if echo $IP_X | grep -q '[0-9a-f]'; then
+	log 2 "Checking IPs on destination node: $IP_X"
+	# remove extra spaces, replace spaces with |
+	IP_X=$(echo $IP_X | sed 's/ /|/g')
+	# do check
+	if [ $($SSH "root@$host" "grep -cwE \"$IP_X\" /proc/vz/veip") -gt 0 ]; then
+		log 0 "IP address(es) already in use on destination node"
+		exit $MIG_ERR_IP_IN_USE
+	fi
 fi
 
 if [ $check_only -eq 1 ]; then
