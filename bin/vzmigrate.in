@@ -513,6 +513,13 @@ if [ $online -eq 1 ]; then
 	else
 		check_cpt_props
 	fi
+	# Check ipv6 kernel module
+	if test -d /sys/module/ipv6; then
+		if ! $SSH "root@$host" test -d /sys/module/ipv6; then
+			log 0 "Module ipv6 is not loaded on the destination node"
+			exit $MIG_ERR_OVZ_NOT_RUNNING
+		fi
+	fi
 fi
 
 log 2 "Loading $vzconf and $vpsconf files"
