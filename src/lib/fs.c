@@ -171,16 +171,13 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 				veid, PRE_MOUNT_PREFIX);
 		}
 	}
+
 	if (stat_file(fs->private) != 1) {
 		logger(-1, 0, "Container private area %s does not exist",
 				fs->private);
 		return VZ_FS_NOPRVT;
 	}
-	if (stat_file(fs->private) != 1) {
-		logger(-1, 0, "Container private area %s does not exist",
-				fs->private);
-		return VZ_FS_NOPRVT;
-	}
+
 	if ((ret = fsmount(veid, fs, dq)))
 		return ret;
 	/* Execute per-CT & global mount scripts */
