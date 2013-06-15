@@ -78,20 +78,6 @@ int ve_private_is_ploop(const char *private)
 	return (stat_file(image) == 1);
 }
 
-int check_ploop_size(unsigned long size)
-{
-	const unsigned long max_size = /* 2T - 2G - 1M, in Kb */
-		(2ull << 30) - (2ull << 20) - (1 << 10);
-
-	if (size < max_size)
-		return 0;
-
-	logger(-1, 0, "Error: diskspace is set too big for ploop: %lu KB "
-			"(max size is %lu KB)", size, max_size - 1);
-
-	return -1;
-}
-
 #ifdef HAVE_PLOOP
 /* This should only be called once */
 static int load_ploop_lib(void)
@@ -327,9 +313,6 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 				"CT private is not specified");
 		return VZ_VE_PRIVATE_NOTSET;
 	}
-
-	if (check_ploop_size(newsize) < 0)
-		return VZ_DISKSPACE_NOT_SET;
 
 	GET_DISK_DESCRIPTOR(fname, ve_private);
 	ret = ploop.read_disk_descr(&di, fname);
@@ -575,8 +558,6 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Error: diskspace not set");
 		return VZ_DISKSPACE_NOT_SET;
 	}
-	if (check_ploop_size(dq->diskspace[1]) < 0)
-		return VZ_DISKSPACE_NOT_SET;
 
 	snprintf(new_private, sizeof(new_private), "%s.ploop", fs->private);
 	if (make_dir_mode(new_private, 1, 0600) != 0)

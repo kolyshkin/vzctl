@@ -60,7 +60,6 @@ struct vzctl_mount_param {
 int is_ploop_supported(void);
 int get_ploop_type(const char *type);
 int ve_private_is_ploop(const char *private);
-int check_ploop_size(unsigned long size);
 
 #ifdef HAVE_PLOOP
 extern struct ploop_functions ploop;
