@@ -530,7 +530,8 @@ static long long get_mul(char c)
 
 /* This function parses string in form xxx[GMKPB]
  */
-static const char *parse_ul_sfx(const char *str, unsigned long long *val, int divisor)
+static const char *parse_ul_sfx(const char *str, unsigned long long *val,
+		int divisor, int allow_unlimited)
 {
 	long long n;
 	char *tail;
@@ -538,7 +539,7 @@ static const char *parse_ul_sfx(const char *str, unsigned long long *val, int di
 
 	if (!str || !val)
 		return NULL;
-	if (!strncmp(str, "unlimited", 9)) {
+	if (allow_unlimited && !strncmp(str, "unlimited", 9)) {
 		*val = LONG_MAX;
 		return str + 9;
 	}
@@ -572,12 +573,13 @@ static const char *parse_ul_sfx(const char *str, unsigned long long *val, int di
 /* This function parses string in form xxx[GMKPB]:yyy[GMKPB]
  * If :yyy is omitted, it is set to xxx.
  */
-static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
+static int parse_twoul_sfx(const char *str, unsigned long *val,
+		int divisor, int allow_unlimited)
 {
 	unsigned long long tmp;
 	int ret = 0;
 
-	if (!(str = parse_ul_sfx(str, &tmp, divisor)))
+	if (!(str = parse_ul_sfx(str, &tmp, divisor, allow_unlimited)))
 		return ERR_INVAL;
 	if (tmp > LONG_MAX) {
 		tmp = LONG_MAX;
@@ -585,7 +587,7 @@ static int parse_twoul_sfx(const char *str, unsigned long *val, int divisor)
 	}
 	val[0] = tmp;
 	if (*str == ':') {
-		str = parse_ul_sfx(++str, &tmp, divisor);
+		str = parse_ul_sfx(++str, &tmp, divisor, allow_unlimited);
 		if (!str || *str != '\0')
 			return ERR_INVAL;
 		if (tmp > LONG_MAX) {
@@ -657,7 +659,7 @@ static int parse_ub(vps_param *vps_p, const char *val, int id, int divisor)
 
 	if (conf_get_by_id(config, id) == NULL)
 		return ERR_OTHER;
-	ret = parse_twoul_sfx(val, res.limit, divisor);
+	ret = parse_twoul_sfx(val, res.limit, divisor, 1);
 	if (ret && ret != ERR_LONG_TRUNC)
 		return ret;
 	res.res_id = id;
@@ -695,7 +697,7 @@ static int parse_vswap(ub_param *ub, const char *val, int id, int force)
 	if (conf_get_by_id(config, id) == NULL)
 		return ERR_OTHER;
 
-	tail = parse_ul_sfx(val, &tmp, 1);
+	tail = parse_ul_sfx(val, &tmp, 1, 1);
 	if (tail == NULL)
 		return ERR_INVAL;
 	if (*tail != '\0')
@@ -972,7 +974,7 @@ static int parse_dq(unsigned long **param, const char *val, int sfx)
 	tmp = malloc(sizeof(unsigned long) * 2);
 	if (tmp == NULL)
 		return ERR_NOMEM;
-	ret = parse_twoul_sfx(val, tmp, sfx ? 1024 : 0);
+	ret = parse_twoul_sfx(val, tmp, sfx ? 1024 : 0, 0);
 	if (ret && ret != ERR_LONG_TRUNC) {
 		free(tmp);
 		return ret;
