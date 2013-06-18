@@ -11,5 +11,6 @@ vps-pci
 vps-cpt
 vps-rst
 vps-rst-env
+vz-postinstall
 Makefile.in
 Makefile

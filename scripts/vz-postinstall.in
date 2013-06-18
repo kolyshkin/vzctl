@@ -1,0 +1,86 @@
+#!/bin/bash
+# OpenVZ post-install script
+# Copyright (C) 2009-2013, Parallels, Inc. Licensed under GNU GPL.
+#
+# 1. tune /etc/sysctl.conf
+# 2. disable selinux
+
+
+# Error out
+fatal()
+{
+	echo "$0: FATAL ERROR:" $* 1>&2
+	exit 1
+}
+
+# Checks if the file exists and is writable
+# $*: file name(s)
+check_file()
+{
+	local file
+
+	for file in $*; do
+		test -a $file || fatal "$file not found"
+		test -w $file || fatal "$file is not writable"
+	done
+}
+
+# Changes the value of param, or adds it.
+# $1: file name
+# $2: parameter name
+# $3: new parameter value
+change_param()
+{
+	local file=$1 p=$2 v=$3
+	# Escape dots, to be used for regexps
+	local pp=${p//./\\.}
+
+	# Check if param is there
+	if grep -q "^[ \t]*${p}[ \t]*=.*" $file; then
+		# Replace the value
+		sed -i -e \
+			"s/^\([ \t]*${p}[ \t]*=[ \t]*\).*\$/\1${v}/" \
+			$file
+	else # Add the param
+		# If EOL is missing at the last line, fix
+		sed -i -e '$q' $file
+		# Add param
+		echo "${p}=${v}" >> $file
+	fi
+}
+
+# Modifies and reloads sysctl parameters
+tune_sysctl()
+{
+	local file=/etc/sysctl.conf
+
+	check_file $file
+	change_param $file net.ipv4.ip_forward			1
+	change_param $file net.ipv4.conf.default.proxy_arp	0
+	change_param $file net.ipv4.conf.all.rp_filter		1
+	change_param $file kernel.sysrq				1
+	change_param $file net.ipv4.conf.default.send_redirects	1
+	change_param $file net.ipv4.conf.all.send_redirects	0
+	sysctl -q -p
+}
+
+# Disables SELinux
+disable_selinux()
+{
+	local file=/etc/sysconfig/selinux
+
+	# If there's no /etc/sysconfig, just skip
+	test -d $(dirname $file) || return
+
+	# If there's no $file, create it
+	test -a $file || touch $file
+
+	# Check we can write to it
+	check_file $file
+
+	# Put SELINUX=disabled
+	change_param $file SELINUX disabled
+}
+
+disable_selinux
+tune_sysctl

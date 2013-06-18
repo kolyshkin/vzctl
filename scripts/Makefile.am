@@ -30,7 +30,8 @@ script_SCRIPTS = \
 	vps-pci	\
 	vps-cpt \
 	vps-rst \
-	vps-rst-env
+	vps-rst-env \
+	vz-postinstall
 
 EXTRA_DIST = \
 	$(script_SCRIPTS:%=%.in)
