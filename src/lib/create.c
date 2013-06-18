@@ -43,7 +43,7 @@
 #include "cleanup.h"
 
 #define VPS_CREATE	SCRIPTDIR "/vps-create"
-#define VPS_DOWNLOAD	SCRIPTDIR "/vps-download"
+#define VPS_DOWNLOAD	SBINDIR "/vztmpl-dl"
 #define VZOSTEMPLATE	"/usr/bin/vzosname"
 
 static int vps_postcreate(envid_t veid, vps_res *res);

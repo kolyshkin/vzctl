@@ -19,7 +19,6 @@ include $(top_srcdir)/pathsubst.am
 
 script_SCRIPTS = \
 	vps-create \
-	vps-download \
 	vps-functions \
 	vps-net_add \
 	vps-netns_dev_add \

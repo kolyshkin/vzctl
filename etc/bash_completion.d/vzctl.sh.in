@@ -155,7 +155,7 @@ _vzctl()
 				local vztmpl=`grep ^TEMPLATE @PKGCONFDIR@/vz.conf | cut -d "=" -f 2`
 				COMPREPLY=( $( compgen -W "$(command ls $vztmpl/cache/*.tar{,.gz,.xz,.bz2} 2>/dev/null |
 						    sed -e "s#^$vztmpl/cache/##" -e 's#\.tar\.*[gbxz2]*$##';
-						    @SCRIPTDIR@/vps-download --list)" -- $cur ) )
+						    @SBINDIR@/vztmpl-dl --list)" -- $cur ) )
 
 				;;
 			--onboot|--disabled|--diskquota)

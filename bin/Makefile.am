@@ -19,6 +19,7 @@ sbin_SCRIPTS = vzcpucheck \
                vzmigrate \
                vznetcfg \
                vzpid \
+               vztmpl-dl \
                vznetaddbr \
                vzifup-post \
                vzubc

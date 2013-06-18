@@ -183,7 +183,7 @@ Requires: bash
 Requires: gawk
 Requires: sed
 Requires: grep
-# requires for bash_completion and vps-download
+# requires for bash_completion and vztmpl-dl
 Requires: wget
 
 %description core
@@ -208,6 +208,7 @@ OpenVZ containers control utility core package
 %{_sbindir}/vzctl
 %{_sbindir}/arpsend
 %{_sbindir}/ndsend
+%{_sbindir}/vztmpl-dl
 %{_logrdir}/vzctl
 %{_distconfdir}/distribution.conf-template
 %{_distconfdir}/default
@@ -226,7 +227,6 @@ OpenVZ containers control utility core package
 %{_scriptdir}/vps-netns_dev_add
 %{_scriptdir}/vps-netns_dev_del
 %{_scriptdir}/vps-create
-%{_scriptdir}/vps-download
 %{_scriptdir}/vzevent-stop
 %{_scriptdir}/vzevent-reboot
 %{_scriptdir}/vps-pci
