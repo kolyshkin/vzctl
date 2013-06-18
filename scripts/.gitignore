@@ -10,5 +10,6 @@ vzevent-stop
 vps-pci
 vps-cpt
 vps-rst
+vps-rst-env
 Makefile.in
 Makefile
