@@ -61,7 +61,7 @@ tune_sysctl()
 	change_param $file kernel.sysrq				1
 	change_param $file net.ipv4.conf.default.send_redirects	1
 	change_param $file net.ipv4.conf.all.send_redirects	0
-	sysctl -q -p
+	sysctl -q -p 2>/dev/null
 }
 
 # Disables SELinux
