@@ -114,6 +114,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/vzcalc.8.*
 %{_mandir}/man8/vzpid.8.*
 %{_mandir}/man8/vzcpucheck.8.*
+%{_mandir}/man8/vztmpl-dl.8.*
 %{_mandir}/man8/vzubc.8.*
 %{_mandir}/man8/vzlist.8.*
 %{_mandir}/man8/vzifup-post.8.*
