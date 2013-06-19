@@ -279,7 +279,7 @@ err:
  * Otherwise return -1.
  */
 static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
-		vps_param *cmd_p)
+		vps_param *cmd_p, skipFlags skip)
 {
 	char buf[STR_SIZE];
 	char *dumpdir = g_p->res.cpt.dumpdir;
@@ -294,7 +294,7 @@ static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	cmd_p->res.cpt.dumpdir = dumpdir;
 
 	return vps_restore(h, veid, g_p, CMD_RESTORE, &cmd_p->res.cpt,
-			SKIP_UMOUNT);
+			skip | SKIP_UMOUNT);
 }
 
 static int start(vps_handler *h, envid_t veid, vps_param *g_p,
@@ -324,14 +324,15 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 		logger(-1, 0, "Container is already running");
 		return VZ_VE_RUNNING;
 	}
+	/* Set skip flags */
+	if (cmd_p->opt.skip_setup == YES)
+		skip |= SKIP_SETUP;
 	/* Try restore first */
-	ret = try_restore(h, veid, g_p, cmd_p);
+	ret = try_restore(h, veid, g_p, cmd_p, skip);
 	if (ret == 0)
 		return ret;
 	if (ret != -1) /* We tried to restore */
 		skip |= SKIP_REMOUNT; /* Do not remount just mounted fs */
-	if (cmd_p->opt.skip_setup == YES)
-		skip |= SKIP_SETUP;
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
 	ret = vps_start(h, veid, g_p, skip, &g_action);
 
