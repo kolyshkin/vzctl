@@ -128,6 +128,7 @@ typedef struct {
 	int apply_cfg_map;
 	int reset_ub;
 	int skip_umount;
+	int skip_fsck;
 } vps_opt;
 
 struct log_s {

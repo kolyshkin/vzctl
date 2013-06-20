@@ -35,7 +35,7 @@
 
 int vps_is_run(vps_handler *h, envid_t veid);
 
-int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
+int fsmount(envid_t veid, fs_param *fs, dq_param *dq, int fsck)
 {
 	int ret;
 
@@ -54,6 +54,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq)
 			param.target = fs->root;
 			param.quota = is_2nd_level_quota_on(dq);
 			param.mount_data = fs->mount_opts;
+			param.fsck = fsck;
 			ret = vzctl_mount_image(fs->private, &param);
 		}
 #else
@@ -148,6 +149,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 {
 	char buf[PATH_LEN];
 	int ret, i;
+	int fsck = ! (skip & SKIP_FSCK);
 
 	if (check_var(fs->root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
@@ -178,7 +180,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 		return VZ_FS_NOPRVT;
 	}
 
-	if ((ret = fsmount(veid, fs, dq)))
+	if ((ret = fsmount(veid, fs, dq, fsck)))
 		return ret;
 	/* Execute per-CT & global mount scripts */
 	if (!(skip & SKIP_ACTION_SCRIPT)) {

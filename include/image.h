@@ -54,6 +54,7 @@ struct vzctl_mount_param {
 	char *target;
 	int quota;
 	char *mount_data;
+	int fsck;
 	char dummy[32];
 };
 

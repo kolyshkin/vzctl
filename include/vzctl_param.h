@@ -153,5 +153,7 @@
 #define PARAM_LOCAL_UID		397
 #define PARAM_LOCAL_GID		398
 
+#define PARAM_SKIP_FSCK		399
+
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

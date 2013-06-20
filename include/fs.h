@@ -63,9 +63,10 @@ int vps_is_mounted(const char *root, const char *private);
  * @param veid		CT ID.
  * @param fs		file system parameters.
  * @param dq		disk quota parameters.
+ * @param fsck		fsck parameter for ploop mount
  * @return		0 on success.
  */
-int fsmount(envid_t veid, fs_param *fs, dq_param *dq);
+int fsmount(envid_t veid, fs_param *fs, dq_param *dq, int fsck);
 
 /** Mount CT and run mount action script if exists.
  *

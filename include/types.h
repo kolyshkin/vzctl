@@ -102,6 +102,7 @@ typedef enum {
 	SKIP_REMOUNT =		(1<<4),
 	SKIP_DUMPFILE_UNLINK =	(1<<5),
 	SKIP_VETH_CREATE =	(1<<6),
+	SKIP_FSCK =		(1<<7),
 } skipFlags;
 
 /** CT handler.

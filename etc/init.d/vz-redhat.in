@@ -318,7 +318,7 @@ start_ves()
 			fi
 		fi
 		rm -f $VZREBOOTDIR/$veid
-		msg=`$VZCTL start ${veid} 2>&1`
+		msg=`$VZCTL start ${veid} --skip-fsck 2>&1`
 		print_result "$msg"
 	done
 	for veid in ${need_restart}; do

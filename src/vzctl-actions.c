@@ -221,6 +221,7 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 		{"wait", no_argument, NULL, PARAM_WAIT},
 		{"fast", no_argument, NULL, PARAM_FAST},
 		{"skip-umount", no_argument, NULL, PARAM_SKIP_UMOUNT},
+		{"skip-fsck", no_argument, NULL, PARAM_SKIP_FSCK},
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -259,6 +260,11 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 			else
 				goto err;
 			break;
+		case PARAM_SKIP_FSCK:
+			if (start)
+				param->opt.skip_fsck = YES;
+			else
+				goto err;
 		default:
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
@@ -327,6 +333,8 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	/* Set skip flags */
 	if (cmd_p->opt.skip_setup == YES)
 		skip |= SKIP_SETUP;
+	if (cmd_p->opt.skip_fsck == YES)
+		skip |= SKIP_FSCK;
 	/* Try restore first */
 	ret = try_restore(h, veid, g_p, cmd_p, skip);
 	if (ret == 0)

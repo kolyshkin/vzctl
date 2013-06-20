@@ -16,6 +16,7 @@ vzctl \- perform various operations on an OpenVZ container
 [\fIflags\fR] \fBstart\fR \fICTID\fR
 .OP --wait
 .OP --force
+.OP --skip-fsck
 .SY vzctl
 [\fIflags\fR] \fBstop\fR \fICTID\fR
 .OP --fast
@@ -25,6 +26,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --wait
 .OP --force
 .OP --fast
+.OP --skip-fsck
 .SY vzctl
 [\fIflags\fR] \fBsuspend\fR | \fBresume\fR \fICTID\fR
 .OP --dumpfile name
@@ -942,13 +944,16 @@ filesystem needs to be correctly owned by the host-side users.
 .IP "\fBdestroy\fR | \fBdelete\fR \fICTID\fR" 4
 Removes a container private area by deleting all files, directories and
 the configuration file of this container.
-.IP "\fBstart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR]" 4
+.IP "\fBstart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR] [\fB--skip-fsck\fR]" 4
 Mounts (if necessary) and starts a container. Unless \fB--wait\fR option
 is specified, \fBvzctl\fR will return immediately; otherwise an attempt to
 wait till the default runlevel is reached will be made by \fBvzctl\fR.
 
 Specify \fB--force\fR if you want to start a container which is disabled
 (see \fB--disabled\fR).
+
+Specify \fB--skip-fsck\fR to skip fsck for ploop-based container filesystem
+(this option is used by vz initscript).
 
 Note that this command can lead to execution of \fBpremount\fR, \fBmount\fR
 and \fBstart\fR action scripts (see \fBACTION SCRIPTS\fR below).
@@ -962,7 +967,7 @@ unclean container shutdown.
 Note that this command can lead to execution of \fBstop\fR,
 \fBumount\fR and \fBpostumount\fR action scripts
 (see \fBACTION SCRIPTS\fR below).
-.IP "\fBrestart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR] [\fB--fast\fR]" 4
+.IP "\fBrestart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR] [\fB--fast\fR] [\fB--skip-fsck\fR]" 4
 Restarts a container, i.e. stops it if it is running, and starts again.
 Accepts all the \fBstart\fR and \fBstop\fR options.
 

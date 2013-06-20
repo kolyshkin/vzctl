@@ -90,7 +90,7 @@ _vzctl()
 		--capability --devnodes --devices --applyconfig \
 		--name --ioprio --setmode --meminfo --bootorder --features \
 		--reset_ub"
-	local vzctl_start_opts="--wait --force"
+	local vzctl_start_opts="--wait --force --skip-fsck"
 	local vzctl_stop_opts="--fast --skip-umount"
 	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 	local vzctl_snapshot_create_opts="--id --name --description \
