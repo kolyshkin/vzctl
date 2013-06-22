@@ -530,7 +530,7 @@ static void fix_cpu(cpu_param *cpu)
 {
 	if (cpu->units == NULL && cpu->weight == NULL) {
 		cpu->units = malloc(sizeof(*cpu->units));
-		*cpu->units = UNLCPUUNITS;
+		*cpu->units = DEF_CPUUNITS;
 	}
 }
 

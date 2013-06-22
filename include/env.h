@@ -27,12 +27,7 @@
  */
 #define MAX_SHTD_TM		120
 #define MIN_NUMIPTENT		16
-/* default cpu units values */
-#define LHTCPUUNITS		250
-#define UNLCPUUNITS		1000
-#define HNCPUUNITS		1000
-
-
+#define DEF_CPUUNITS		1000
 
 typedef int (*env_create_FN)(vps_handler *h, envid_t veid, const vps_res *res,
 			int wait_p, int old_wait_p, int err_p, void *data);

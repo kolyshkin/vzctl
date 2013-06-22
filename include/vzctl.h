@@ -52,11 +52,6 @@ typedef enum {
 #endif
 } act_t;
 
-/* default cpu units values */
-#define LHTCPUUNITS		250
-#define UNLCPUUNITS		1000
-#define HNCPUUNITS		1000
-
 /* setmode flags */
 enum {
 	SET_NONE = 0,
