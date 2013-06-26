@@ -358,6 +358,14 @@ static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
 	return conf_store_str(conf, name, buf);
 }
 
+static int conf_store_int(list_head_t *conf, char *name, int val)
+{
+	char buf[] = "2147483647"; /* INT_MAX */
+
+	snprintf(buf, sizeof(buf), "%d", val);
+	return conf_store_str(conf, name, buf);
+}
+
 static int conf_store_bitmap(list_head_t *conf, char *name,
 			     unsigned long *val, int nmaskbits)
 {
@@ -432,18 +440,12 @@ static int parse_ioprio(int id, io_param *io, char *val)
 static int store_ioprio(vps_param *old_p, vps_param *vps_p,
 				 vps_config *conf, list_head_t *conf_h)
 {
-	io_param *io_param;
-	char buf[20];
-
-	io_param = &vps_p->res.io;
+	io_param *io_param = &vps_p->res.io;
 
 	if (conf->id != PARAM_IOPRIO || io_param->ioprio < 0)
 		return 0;
 
-	snprintf(buf, sizeof(buf), "%s=\"%d\"", conf->name, io_param->ioprio);
-	add_str_param(conf_h, buf);
-
-	return 0;
+	return conf_store_int(conf_h, conf->name, io_param->ioprio);
 }
 
 /******************** Iptables *************************/
