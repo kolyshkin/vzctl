@@ -148,6 +148,8 @@ static struct option set_opt[] = {
 	{"ram",		required_argument, NULL, PARAM_RAM},
 	{"swap",	required_argument, NULL, PARAM_SWAP},
 
+	{"stop-timeout", required_argument, NULL, PARAM_STOP_TIMEOUT},
+
 	{NULL, 0, NULL, 0}
 };
 
@@ -912,6 +914,11 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 			logger(-1, 0, "Error: unable to use"
 				 " --name option without --save");
 			return VZ_SET_NAME_ERROR;
+		}
+		if (param->res.misc.stop_timeout >= 0) {
+			logger(-1, 0, "Error: unable to use"
+				" --stop-timeout option without --save");
+			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 		if (param->opt.save_force) {
 			logger(-1, 0, "Error: --force is useless "

@@ -144,6 +144,7 @@ static vps_config config[] = {
 {"FEATURES",	NULL, PARAM_FEATURES},
 {"IOPRIO",	NULL, PARAM_IOPRIO},
 {"BOOTORDER",	NULL, PARAM_BOOTORDER},
+{"STOP_TIMEOUT", NULL, PARAM_STOP_TIMEOUT},
 
 /* These ones are either known parameters for global config file,
  * or some obsoleted parameters used in the past. In both cases
@@ -1374,6 +1375,9 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	case PARAM_LOCAL_GID:
 		ret = conf_store_ulong(conf_h, conf->name, misc->local_gid);
 		break;
+	case PARAM_STOP_TIMEOUT:
+		ret = conf_store_int(conf_h, conf->name, misc->stop_timeout);
+		break;
 	}
 	return ret;
 }
@@ -2223,6 +2227,14 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_MOUNT_OPTS:
 		ret = conf_parse_str(&vps_p->res.fs.mount_opts, val);
 		break;
+	case PARAM_STOP_TIMEOUT:
+		if (vps_p->res.misc.stop_timeout != -1)
+			return ERR_DUP;
+		if (parse_int(val, &int_id))
+			return ERR_INVAL;
+		if (int_id < 0)
+			return ERR_INVAL;
+		vps_p->res.misc.stop_timeout = int_id;
 	case PARAM_IGNORED:
 		/* Well known but ignored parameter */
 		break;
@@ -2579,6 +2591,7 @@ vps_param *init_vps_param()
 	param->res.meminfo.mode = -1;
 	param->res.io.ioprio = -1;
 	param->opt.mode = -1;
+	param->res.misc.stop_timeout = -1;
 
 	return param;
 }
@@ -2885,6 +2898,7 @@ static void merge_misc(misc_param *dst, misc_param *src)
 	MERGE_P(local_gid)
 	MERGE_P(bootorder)
 	MERGE_INT(wait)
+	MERGE_INT2(stop_timeout)
 }
 
 static void merge_dq(dq_param *dst, dq_param *src)

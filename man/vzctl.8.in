@@ -110,6 +110,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --disabled \fByes\fR|\fBno
 .OP --name name
 .OP --description string
+.OP --stop-timeout seconds
 .\" Networking
 .OP --ipadd addr
 .OP --ipdel addr\fR|\fBall\fR
@@ -273,6 +274,13 @@ option can not be used without \fB--save\fR.
 .TP
 \fB--description\fR \fIstring\fR
 Add a textual description for a container.
+.TP
+\fB--stop-timeout\fR \fIseconds\fR
+Sets a time to wait for container to stop on \fBvzctl stop\fR before
+forcibly killing it, in seconds. Note this option can not be used
+without \fB--save\fR flag.
+
+Special value of \fB0\fR means to use compiled-in default.
 
 .SS3 Networking
 .TP
@@ -963,6 +971,13 @@ Normally, \fBhalt\fR(8) is executed
 inside a container; option \fB--fast\fR makes \fBvzctl\fR use
 \fBreboot\fR(2) syscall instead which is faster but can lead to
 unclean container shutdown.
+
+Note that \fBvzctl stop\fR is not asyncronous, in other words vzctl waits
+for container's init to exit (unless \fB--fast\fR is given), which can
+take up to a few minutes. Default wait timeout is 120 seconds; it can be
+changed globally, by setting \fBSTOP_TIMEOUT\fR in \fBvz.conf\fR(5),
+or per container (\fBSTOP_TIMEOUT\fR in \fBctid.conf\fR(5), see
+\fB--stop-timeout\fR).
 
 Note that this command can lead to execution of \fBstop\fR,
 \fBumount\fR and \fBpostumount\fR action scripts

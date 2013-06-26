@@ -58,6 +58,7 @@ typedef struct {
 	int wait;
 	unsigned long *local_uid;
 	unsigned long *local_gid;
+	int stop_timeout;
 } misc_param;
 
 struct mod_action;

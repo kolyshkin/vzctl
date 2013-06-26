@@ -43,6 +43,8 @@ Corresponds to \fB--mount_opts\fR option.
 Corresponds to the \fB--disabled\fR option.
 .IP \fBORIGIN_SAMPLE\fR="\fIname\fR"
 Name of container sample configuration which the container is based on.
+.IP \fBSTOP_TIMEOUT\fR="\fInumber\fR"
+Corresponds to the \fB--stop-timeout\fR option.
 
 .SS Resource management parameters
 

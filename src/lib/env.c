@@ -48,7 +48,7 @@
 #include "destroy.h"
 
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
-		int stop_mode);
+		int stop_mode, int timeout);
 
 /*
  * Reset standard file descriptors to /dev/null in case they are closed.
@@ -747,7 +747,7 @@ err:
 	}
 	if (ret) {
 		if (vps_is_run(h, veid))
-			env_stop(h, veid, res->fs.root, M_KILL);
+			env_stop(h, veid, res->fs.root, M_KILL, 0);
 		/* restore original quota values */
 		if (!ploop)
 			vps_set_quota(veid, &res->dq);
@@ -864,9 +864,12 @@ static int wait_child(int pid, int ignore_kill)
 }
 
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
-		int stop_mode)
+		int stop_mode, int timeout)
 {
 	int i, pid, ret, tout = 0;
+
+	if (timeout <= 0)
+		timeout = DEF_STOP_TIMEOUT;
 
 	if (stop_mode == M_KILL)
 		goto kill_vps;
@@ -895,7 +898,7 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 	if (ret != 0 && ret != 1) /* failed, retry with kill */
 		goto kill_vps;
 
-	for (i = 0; i < DEF_STOP_TIMEOUT; i++) {
+	for (i = 0; i < timeout; i++) {
 		sleep(1);
 		if (!vps_is_run(h, veid)) {
 			ret = 0;
@@ -924,7 +927,7 @@ kill_vps:
 
 wait:
 	ret = VZ_STOP_ERROR;
-	for (i = 0; i < DEF_STOP_TIMEOUT; i++) {
+	for (i = 0; i < timeout; i++) {
 		usleep(500000);
 		if (!vps_is_run(h, veid)) {
 			ret = 0;
@@ -958,6 +961,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	int ret;
 	char buf[64];
 	vps_res *res = &param->res;
+	int tm = res->misc.stop_timeout;
 
 	if (check_var(res->fs.root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
@@ -981,7 +985,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 	if (is_vz_kernel(h))
 		get_vps_ip(h, veid, &param->del_res.net.ip);
 
-	if ((ret = env_stop(h, veid, res->fs.root, stop_mode)))
+	if ((ret = env_stop(h, veid, res->fs.root, stop_mode, tm)))
 		goto end;
 
 	mod_cleanup(h, veid, action, param);

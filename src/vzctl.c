@@ -102,6 +102,7 @@ static void usage(int rc)
 "   [--features <name:on|off>] [--name <vename>] [--ioprio <N>]\n"
 "   [--pci_add [<domain>:]<bus>:<slot>.<func>] [--pci_del <d:b:s.f>]\n"
 "   [--iptables <name>] [--disabled <yes|no>]\n"
+"   [--stop-timeout <seconds>\n"
 "   [UBC parameters]\n"
 "\n"
 "UBC parameters (N - items, P - pages, B - bytes):\n"
