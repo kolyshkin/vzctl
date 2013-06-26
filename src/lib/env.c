@@ -895,7 +895,7 @@ static int env_stop(vps_handler *h, envid_t veid, const char *root,
 	if (ret != 0 && ret != 1) /* failed, retry with kill */
 		goto kill_vps;
 
-	for (i = 0; i < MAX_SHTD_TM; i++) {
+	for (i = 0; i < DEF_STOP_TIMEOUT; i++) {
 		sleep(1);
 		if (!vps_is_run(h, veid)) {
 			ret = 0;
@@ -924,7 +924,7 @@ kill_vps:
 
 wait:
 	ret = VZ_STOP_ERROR;
-	for (i = 0; i < MAX_SHTD_TM; i++) {
+	for (i = 0; i < DEF_STOP_TIMEOUT; i++) {
 		usleep(500000);
 		if (!vps_is_run(h, veid)) {
 			ret = 0;

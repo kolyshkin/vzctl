@@ -450,7 +450,7 @@ int hackish_empty_container(envid_t veid)
 	}
 
 	ret = 0;
-	for (i = 0; i < MAX_SHTD_TM; i++) {
+	for (i = 0; i < DEF_STOP_TIMEOUT; i++) {
 		if (!container_is_running(veid))
 			goto out;
 		usleep(500000);

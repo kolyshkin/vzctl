@@ -25,7 +25,7 @@
 
 /** Shutdown timeout.
  */
-#define MAX_SHTD_TM		120
+#define DEF_STOP_TIMEOUT	120
 #define MIN_NUMIPTENT		16
 #define DEF_CPUUNITS		1000
 
