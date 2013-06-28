@@ -846,11 +846,8 @@ static int ct_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 		envp[i++] = strdup(buf);
 	}
 
-	if (op == ADD)
-		snprintf(buf, sizeof(buf), "ACTION=add");
-	else
-		snprintf(buf, sizeof(buf), "ACTION=cfg");
-	envp[i++] = strdup(buf);
+	if (op == CFG)
+		envp[i++] = strdup("SKIP_CREATE=yes");
 
 	envp[i] = NULL;
 
