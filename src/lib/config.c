@@ -1376,7 +1376,9 @@ static int store_misc(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		ret = conf_store_ulong(conf_h, conf->name, misc->local_gid);
 		break;
 	case PARAM_STOP_TIMEOUT:
-		ret = conf_store_int(conf_h, conf->name, misc->stop_timeout);
+		if (misc->stop_timeout >= 0)
+			ret = conf_store_int(conf_h, conf->name,
+					misc->stop_timeout);
 		break;
 	}
 	return ret;
