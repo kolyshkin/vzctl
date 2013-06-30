@@ -122,7 +122,7 @@ static int _unlink(const char *s)
 {
 	if (unlink(s)) {
 		logger(-1, errno, "Unable to unlink %s", s);
-		return -1;
+		return VZ_FS_DEL_PRVT;
 	}
 	return 0;
 
@@ -141,7 +141,7 @@ static int destroydir(char *dir)
 	if (lstat(dir, &st)) {
 		if (errno != ENOENT) {
 			logger(-1, errno, "Unable to lstat %s", dir);
-			return -1;
+			return VZ_FS_DEL_PRVT;
 		}
 		return 0;
 	}
@@ -151,7 +151,7 @@ static int destroydir(char *dir)
 		i = readlink(dir, tmp, sizeof(tmp) - 1);
 		if (i == -1) {
 			logger(-1, errno, "Unable to readlink %s", dir);
-			return -1;
+			return VZ_FS_DEL_PRVT;
 		}
 		tmp[i] = '\0';
 		logger(-1, 0, "Warning: container private area %s "
@@ -171,7 +171,7 @@ static int destroydir(char *dir)
 	root = get_fs_root(dir);
 	if (root == NULL) {
 		logger(-1, 0, "Unable to get root for %s", dir);
-		return -1;
+		return VZ_FS_DEL_PRVT;
 	}
 	snprintf(tmp, sizeof(tmp), "%s/vztmp", root);
 	free(root);
