@@ -527,12 +527,7 @@ int vzctl_umount_snapshot(unsigned envid, const char *ve_private, char *guid)
 	return 0;
 }
 
-/* Convert a CT to ploop layout
- * 1) mount CT
- * 2) create & mount image
- * 3) cp VE_ROOT -> image
- * 4) update ve_layout
- */
+/* Convert a CT to ploop layout */
 int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		fs_param *fs, dq_param *dq, int mode)
 {
