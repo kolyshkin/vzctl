@@ -558,7 +558,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	}
 
 	snprintf(new_private, sizeof(new_private), "%s.ploop", fs->private);
-	if (make_dir_mode(new_private, 1, 0600) != 0)
+	if (make_dir_mode(new_private, 1, 0700) != 0)
 		return VZ_CANT_CREATE_DIR;
 
 	param.mode = mode;
