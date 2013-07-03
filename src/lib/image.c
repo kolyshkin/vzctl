@@ -607,6 +607,13 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	if (rename(new_private, fs->private)) {
 		logger(-1, errno, "Can't rename %s to %s",
 				new_private, fs->private);
+
+		/* try to restore old private back */
+		if (rename(tmp_private, fs->private)) {
+			logger(-1, errno, "Can't restore old private area, "
+					"mv %s %s failed, please fix!",
+					tmp_private, fs->private);
+		}
 		ret = VZ_SYSTEM_ERROR;
 		goto err;
 	}
