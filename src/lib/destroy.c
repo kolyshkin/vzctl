@@ -45,7 +45,7 @@
 
 const char destroy_dir_magic[]="vzctl-rm-me.";
 
-static int destroydir(char *dir);
+int destroydir(char *dir);
 
 int del_dir(char *dir)
 {
@@ -128,7 +128,7 @@ static int _unlink(const char *s)
 
 }
 
-static int destroydir(char *dir)
+int destroydir(char *dir)
 {
 	char buf[STR_SIZE];
 	char tmp[STR_SIZE];

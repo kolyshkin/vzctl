@@ -536,6 +536,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	int ret, ret2;
 	char cmd[STR_SIZE];
 	char new_private[STR_SIZE];
+	char tmp_private[STR_SIZE];
 
 	if (ve_private_is_ploop(fs->private)) {
 		logger(0, 0, "CT is already on ploop");
@@ -588,14 +589,36 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		ret = ret2;
 		goto err;
 	}
-	/* Finally, del the old private and replace it with the new one */
-	del_dir(fs->private);
-	rename(new_private, fs->private);
+	/* Move current private to tmp_private */
+	snprintf(tmp_private, sizeof(tmp_private), "%s.XXXXXX", fs->private);
+	if (mkdtemp(tmp_private) == NULL) {
+		logger(-1, errno, "Can't create directory %s", tmp_private);
+		ret = VZ_CANT_CREATE_DIR;
+		goto err;
+	}
+	if (rename(fs->private, tmp_private)) {
+		logger(-1, errno, "Can't rename %s to %s",
+				fs->private, tmp_private);
+		unlink(tmp_private);
+		ret = VZ_SYSTEM_ERROR;
+		goto err;
+	}
+	/* Move new private to its place */
+	if (rename(new_private, fs->private)) {
+		logger(-1, errno, "Can't rename %s to %s",
+				new_private, fs->private);
+		ret = VZ_SYSTEM_ERROR;
+		goto err;
+	}
+	/* Fix its mode just in case */
+	chmod(fs->private, 0700);
+	/* Finally, del the old private */
+	destroydir(tmp_private);
 	logger(0, 0, "Container was successfully converted "
 			"to the ploop layout");
 err:
 	if (ret != 0)
-		del_dir(new_private);
+		destroydir(new_private);
 	return ret;
 }
 
