@@ -22,8 +22,10 @@ VZFASTBOOT=no
 # By default automatically assigned.
 #VE_ROUTE_SRC_DEV="eth0"
 
-# Controls which interfaces to send ARP requests and modify ARP tables on.
-NEIGHBOUR_DEVS=detect
+# Uncomment to limit CT IP ARP announces only to network interfaces
+# having IPs within the same IP network as a container IP.
+# Leave commented out to use all interfaces.
+#NEIGHBOUR_DEVS=detect
 
 ## Fail if there is another machine in the network with the same IP
 ERROR_ON_ARPFAIL="no"
