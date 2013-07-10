@@ -13,6 +13,7 @@
 
 #include "vzerror.h"
 #include "env.h"
+#include "exec.h"
 #include "util.h"
 #include "logger.h"
 #include "script.h"
@@ -536,9 +537,8 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	char path[STR_SIZE]; /* long enough for any pid */
 	pid_t task_pid;
 	int ret = VZ_RESOURCE_ERROR;
-	int err;
 	bool joined_mnt_ns = false;
-	int fd;
+	int fd, err;
 
 	if (!h->can_join_pidns) {
 		logger(-1, 0, "Kernel lacks setns for pid namespace");
@@ -621,8 +621,25 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 	if (!joined_mnt_ns && (ret = ct_chroot(root)))
 		goto out;
 
-	ret = 0;
+	/*
+	 * setns() of the pid namespace unlike unsharing of other namespaces
+	 * does not take affect immediately.  Instead it affects the children
+	 * created with fork and clone.
+	 */
+	task_pid = fork();
+	if (task_pid < 0) {
+		logger(-1, errno, "Unable to fork");
+		goto out;
+	}
 
+	ret = 0;
+	if (task_pid == 0)
+		goto out;
+
+	close_fds(false, -1);
+
+	ret = env_wait(task_pid);
+	exit(ret);
 out:
 	closedir(dp);
 	return ret;

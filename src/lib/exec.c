@@ -124,9 +124,15 @@ int env_wait(int pid)
 {
 	int ret, status;
 
-	while ((ret = waitpid(pid, &status, 0)) == -1)
-		if (errno != EINTR)
+	do {
+		ret = waitpid(pid, &status, 0);
+		if (ret == -1) {
+			if (errno == EINTR)
+				continue;
 			break;
+		}
+	} while (WIFSTOPPED(status) || WIFCONTINUED(status));
+
 	if (ret == pid) {
 		ret = VZ_SYSTEM_ERROR;
 		if (WIFEXITED(status))
