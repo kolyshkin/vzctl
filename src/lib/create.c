@@ -103,10 +103,12 @@ static void cleanup_destroy_ve(void *data)
 	vps_destroy_dir(d->veid, d->private);
 }
 
+#ifdef HAVE_PLOOP
 static void cleanup_umount_ploop(void *data)
 {
 	vzctl_umount_image((const char *)data);
 }
+#endif
 
 static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 {
@@ -129,7 +131,10 @@ static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 	unsigned long gid_offset = 0;
 	int ploop = (layout == VE_LAYOUT_PLOOP);
 	struct destroy_ve ddata;
-	struct vzctl_cleanup_handler *ch, *ploop_ch = NULL;
+	struct vzctl_cleanup_handler *ch;
+#ifdef HAVE_PLOOP
+	struct vzctl_cleanup_handler *ploop_ch = NULL;
+#endif
 
 	/*
 	 * All other users will test directly for h->can_join_userns.  Create
