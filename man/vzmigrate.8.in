@@ -56,7 +56,6 @@ example) occurs during first migration attempt.
 
 .TP
 .B --live
---live
 Perform live migration: instead of restarting a container, checkpoint
 and restore are used, so there is no container downtime or service
 interruption. Additional steps are performed to minimize the time
