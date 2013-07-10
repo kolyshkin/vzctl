@@ -533,17 +533,17 @@ VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 log 2 "Getting remote VE_ROOT and VE_PRIVATE"
 eval $($SSH root@$host "sh -c 'VEID='$VEID'; source /etc/vz/vz.conf && echo VE_ROOT_REMOTE=\$VE_ROOT && echo VE_PRIVATE_REMOTE=\$VE_PRIVATE'")
 if [ -z "$VE_ROOT_REMOTE" -o -z "$VE_PRIVATE_REMOTE" ]; then
-        log 0 "Failed to get remote VE_ROOT/VE_PRIVATE"
-        exit $MIG_ERR_CANT_READ_REMOTE_CONFIG
+	log 0 "Failed to get remote VE_ROOT/VE_PRIVATE"
+	exit $MIG_ERR_CANT_READ_REMOTE_CONFIG
 fi
 
 if [ $VE_PRIVATE != $VE_PRIVATE_REMOTE ]; then
-        log 1 "Remote VE_PRIVATE path differs from local $VEID.conf"
-        log 1 "Using $VE_PRIVATE_REMOTE for syncing"
+	log 1 "Remote VE_PRIVATE path differs from local $VEID.conf"
+	log 1 "Using $VE_PRIVATE_REMOTE for syncing"
 fi
 if [ $VE_ROOT != $VE_ROOT_REMOTE ]; then
-        log 1 "Remote VE_ROOT path differs from local $VEID.conf"
-        log 1 "Using $VE_ROOT_REMOTE for syncing"
+	log 1 "Remote VE_ROOT path differs from local $VEID.conf"
+	log 1 "Using $VE_ROOT_REMOTE for syncing"
 fi
 
 DDXML=$VE_PRIVATE/root.hdd/DiskDescriptor.xml
