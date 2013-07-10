@@ -203,9 +203,7 @@ int vzctl_mount_image(const char *ve_private, struct vzctl_mount_param *param)
 	mount_param.target = param->target;
 	mount_param.quota = param->quota;
 	mount_param.mount_data = param->mount_data;
-/* FIXME: enable after ploop release
 	mount_param.fsck = param->fsck;
- */
 
 	PLOOP_CLEANUP(ret = ploop.mount_image(di, &mount_param));
 	if (ret) {

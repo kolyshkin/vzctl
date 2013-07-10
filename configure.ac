@@ -164,7 +164,12 @@ AS_IF([test "x$with_ploop" = "x+ploop"],
 The ploop library headers not found or way too old. You need to either
 install recent ploop library headers (most probably ploop-devel package),
 or use ./configure --without-ploop] ) ]
-	) ]
+	)
+	AC_CHECK_MEMBER([struct ploop_mount_param.fsck], ,
+		[ AC_MSG_ERROR( [
+The ploop library headers are too old. You need ploop 1.8 or later] ) ],
+		[[#include "ploop/libploop.h"]])
+	]
 )
 
 AS_IF([test "x$with_ploop" = "x+ploop"],
