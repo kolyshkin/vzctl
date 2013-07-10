@@ -267,6 +267,7 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 				param->opt.skip_fsck = YES;
 			else
 				goto err;
+			break;
 		default:
 			ret = VZ_INVALID_PARAMETER_SYNTAX;
 			break;
