@@ -35,6 +35,8 @@ times=0
 compact=0
 snapshot=0
 check_only=0
+ignore_cpu=0
+ignore_ipv6=0
 confdir="@PKGCONFDIR@/conf"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
@@ -102,6 +104,12 @@ Options:
 	Do not perform actual migration, stop after preliminary checks.
 	This is used to check if a CT can possibly be migrated. Combine
 	with --live to enable more checks for live migration case.
+-f, --nodeps[=<check>[,<check> ...]]
+	Continue migration, ignoring some or all preliminary check failures.
+	Particular checks can be ignored by providing an argument to
+	--nodeps option. The following options can be used (comma-separated):
+	  * cpu		- ignore cpu capabilities check
+	  * ipv6	- ignore ipv6 module check
 -v
 	Verbose mode. Causes vzmigrate to print debugging messages about
 	its progress (including some time statistics). Multiple -v options
@@ -151,6 +159,10 @@ log () {
 		shift
 		echo "   $@"
 	fi
+}
+
+ignore_msg() {
+	log 1 "Ignoring the above error (migration can fail)..."
 }
 
 # Executes command and returns result of execution
@@ -348,8 +360,12 @@ check_cpt_props() {
 	elif ! logexec 1 vzcptcheck caps $VEID $caps; then
 		log 0 "Error: CPU capabilities check failed!"
 		log 0 "Destination node CPU is not compatible"
-		log 0 "Can't continue live migration"
-		exit $MIG_ERR_UNSUP_CPU
+		if [ $ignore_cpu -eq 1 ]; then
+			ignore_msg
+		else
+			log 0 "Can't continue live migration"
+			exit $MIG_ERR_UNSUP_CPU
+		fi
 	fi
 }
 
@@ -394,6 +410,30 @@ while [ ! -z "$1" ]; do
 		;;
 	--check-only|--dry-run)
 		check_only=1
+		;;
+	-f|--nodeps)
+		ignore_cpu=1
+		ignore_ipv6=1
+		;;
+	-f=*|--nodeps=*)
+		opt=$(echo $1 | sed -e 's/=.*$//g')
+		for arg in $(echo $1 | sed -e 's/^.*=//g' -e 's/,/ /g'); do
+			case $arg in
+			    cpu|cpu_check)
+				ignore_cpu=1
+				;;
+			    ipv6)
+				ignore_ipv6=1
+				;;
+			    all)
+				ignore_cpu=1
+				ignore_ipv6=1
+				;;
+			    *)
+				bad_usage "unknown $opt argument: $arg"
+				;;
+			esac
+		done
 		;;
 	--ssh=*)
 		SSH_OPTIONS="$SSH_OPTIONS $(echo $1 | cut -c7-)"
@@ -531,7 +571,11 @@ if [ $online -eq 1 ]; then
 	if test -d /sys/module/ipv6; then
 		if ! $SSH "root@$host" test -d /sys/module/ipv6; then
 			log 0 "Module ipv6 is not loaded on the destination node"
-			exit $MIG_ERR_OVZ_NOT_RUNNING
+			if [ $ignore_ipv6 -eq 1 ]; then
+				ignore_msg
+			else
+				exit $MIG_ERR_OVZ_NOT_RUNNING
+			fi
 		fi
 	fi
 fi

@@ -13,6 +13,7 @@ vzmigrate \- migrate a container between two OpenVZ servers
 .OP -c\fR|\fB--compact
 .OP -s\fR|\fB--snapshot
 .OP --check-only\fR|\fB--dry-run
+.OP -f\fR|\fB--nodeps\fR[\fB=\fIcheck\fR[\fB,\fIcheck\fR\ ...]]
 .OP -t\fR|\fB--times
 .OP -v
 .I destination_address CTID
@@ -77,6 +78,17 @@ before migration. Works for ploop only, ignored otherwise.
 Do not perform actual migration, stop after preliminary checks.
 This is used to check if a CT can possibly be migrated. Combine
 with \fB--live\fR to enable more checks for live migration case.
+
+.TP
+\fB-f\fR|\fB--nodeps\fR[\fB=\fIcheck\fR[\fB,\fIcheck\fR\ ...\]\]
+Continue migration, ignoring some or all preliminary check failures.
+Particular checks can be ignored by providing an argument to
+\fB--nodeps\fR option. The following options can be used
+(comma-separated):
+.br
+\(bu \fBcpu\fR	\- ignore cpu capabilities check;
+.br
+\(bu \fBipv6\fR	\- ignore ipv6 module check.
 
 .TP
 \fB-t\fR, \fB--times\fR
