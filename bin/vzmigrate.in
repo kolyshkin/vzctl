@@ -74,8 +74,7 @@ usage() {
 	cat << EOF
 This program is used for container migration to another node.
 Usage:
-vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--live] [-v]
-	destination_address <CTID>
+  vzmigrate [option ...] destination_address <CTID>
 Options:
 -r, --remove-area yes|no
 	Whether to remove container on source host after successful migration.
