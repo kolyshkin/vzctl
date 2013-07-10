@@ -71,7 +71,7 @@ if ! echo ":${PATH}:" | fgrep -q ':@SBINDIR@:'; then
 fi
 
 usage() {
-	cat >&2 <<EOF
+	cat << EOF
 This program is used for container migration to another node.
 Usage:
 vzmigrate [-r yes|no] [--ssh=<options>] [--keep-dst] [--live] [-v]
@@ -121,6 +121,18 @@ Notes:
 	public key to destination node and be able to connect without
 	entering a password.
 EOF
+	exit 0
+}
+
+bad_usage() {
+	cat << EOF 2>&1
+Invalid usage: $*
+
+For command line syntax, please check
+  vzmigrate --help
+  man vzmigrate
+EOF
+
 	exit $MIG_ERR_USAGE
 }
 
@@ -342,9 +354,7 @@ check_cpt_props() {
 	fi
 }
 
-if [ $# -lt 2 ]; then
-	usage
-fi
+[ $# = 0 ] && usage
 
 while [ ! -z "$1" ]; do
 	case "$1" in
@@ -364,13 +374,14 @@ while [ ! -z "$1" ]; do
 		verbose=$((verbose+4))
 		;;
 	--remove-area|-r)
+		opt=$1
 		shift
 		if [ "$1" = "yes" ]; then
 			remove_area=1
 		elif [ "$1" = "no" ]; then
 			remove_area=0
 		else
-			usage
+			bad_usage "Bad argument for $opt: $1"
 		fi
 		;;
 	--keep-dst)
@@ -394,6 +405,9 @@ while [ ! -z "$1" ]; do
 		;;
 	--times|-t)
 		times=1
+		;;
+	-h|--help|--usage|-?)
+		usage
 		;;
 	*)
 		break
@@ -426,14 +440,14 @@ SSH="ssh $SSH_OPTIONS"
 SCP="scp $SCP_OPTIONS"
 export RSYNC_RSH="$SSH"
 
+[ $# -lt 2 ] && bad_usage "not enough parameters"
+
 host=$1
 shift
 VEID=$1
 shift
 
-if [ -z "$host" -o -z "$VEID" -o $# -ne 0 ]; then
-	usage
-fi
+[ $# -gt 0 ] && bad_usage "too many parameters"
 
 # Support CT names as well
 if echo $VEID | egrep -qv '^[[:digit:]]+$'; then
