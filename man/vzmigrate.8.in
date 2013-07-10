@@ -73,7 +73,6 @@ Create a container snapshot (i.e. run \fBvzctl snapshot\fR)
 before migration. Works for ploop only, ignored otherwise.
 
 .TP
-
 \fB--check-only\fR, \fB--dry-run\fR
 Do not perform actual migration, stop after preliminary checks.
 This is used to check if a CT can possibly be migrated. Combine
