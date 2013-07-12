@@ -36,6 +36,8 @@ vpsconfdir  = $(pkgconfdir)/conf
 distconfdir = $(pkgconfdir)/dists
 namesdir    = $(pkgconfdir)/names
 
+# automake < 1.10.2 does not set pkglibexecdir
+pkglibexecdir = $(libexecdir)/@PACKAGE@
 scriptdir   = $(pkglibexecdir)/scripts
 modulesdir  = $(pkglibexecdir)/modules
 
