@@ -32,6 +32,10 @@ AC_CONFIG_SRCDIR([src/vzctl.c])
 # FIXME: dirty hack, may not work with some autoconf versions.
 test $sysconfdir = '${prefix}/etc' && sysconfdir=/etc
 
+# Similar problem with localstatedir, which should be /var not /usr/var
+# See https://bugzilla.openvz.org/show_bug.cgi?id=2637#c2
+test $localstatedir = '${prefix}/var' && localstatedir=/var
+
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -246,6 +250,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
        target: $target
        prefix: $prefix
    sysconfdir: $sysconfdir
+localstatedir: $localstatedir
        libdir: $libdir
         vzdir: $vzdir
      features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup $with_vz
