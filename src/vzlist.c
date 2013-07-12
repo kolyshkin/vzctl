@@ -1612,20 +1612,19 @@ out:
 	return ret;
 }
 
-static int get_ves_cpunum()
+static void get_ves_cpunum()
 {
 	int i;
 
 	if (access("/proc/vz/fairsched/", F_OK))
 		/* pre-RHEL6 kernel */
-		return -1;
+		return;
 
 	for (i = 0; i < n_veinfo; i++) {
 		if ((veinfo[i].hide) || (veinfo[i].status != VE_RUNNING))
 			continue;
 		get_ve_cpunum(&veinfo[i]);
 	}
-	return 0;
 }
 
 static int get_ves_cpu()
@@ -1788,9 +1787,8 @@ static int collect()
 	if (check_param(RES_CPU))
 		if (!only_stopped_ve && (ret = get_ves_cpu()))
 			return ret;
-	if (check_param(RES_CPUNUM))
-		if (!only_stopped_ve && (ret = get_ves_cpunum()))
-			return ret;
+	if (check_param(RES_CPUNUM) && !only_stopped_ve)
+	       get_ves_cpunum();
 	read_ves_param();
 	get_mounted_status();
 	get_ves_layout();
