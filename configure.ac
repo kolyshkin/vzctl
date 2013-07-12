@@ -239,16 +239,16 @@ AC_ARG_VAR(vzdir, [Common prefix for a few OpenVZ-related directories,
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
-         CC: $CC ($($CC --version | head -n1))
-     CFLAGS: '$CFLAGS'
-      build: $build
-       host: $host
-     target: $target
-     prefix: $prefix
- sysconfdir: $sysconfdir
-     libdir: $libdir
-      vzdir: $vzdir
-   features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup $with_vz
+           CC: $CC ($($CC --version | head -n1))
+       CFLAGS: '$CFLAGS'
+        build: $build
+         host: $host
+       target: $target
+       prefix: $prefix
+   sysconfdir: $sysconfdir
+       libdir: $libdir
+        vzdir: $vzdir
+     features: $enable_bashcomp $enable_logrotate $enable_udev $with_ploop $with_cgroup $with_vz
 "])
 
 AS_IF([test "x$with_vz" = "x-vz" -a "x$with_cgroup" = "x-cgroup"],
