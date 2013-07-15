@@ -118,6 +118,99 @@ static int vps_hostnm_configure(vps_handler *h, envid_t veid,
 	return ret;
 }
 
+struct resolv_conf_data {
+	int set;
+	char *nameserver;
+	char *searchdomain;
+};
+
+/* Read nameserver and search/domain lines from HW's /etc/resolv.conf
+ *
+ * We have to process resolv.conf the same way as system does,
+ * so this function is partly based on GLIBC implementation
+ * (resolv/res_init.c:__res_vinit()) which in turn
+ * is taken from BIND 8.
+ */
+static int read_resolv_conf(struct resolv_conf_data *r)
+{
+	const char *file = "/etc/resolv.conf";
+	FILE *fp;
+	char buf[STR_SIZE];
+	char nsrv[STR_SIZE] = "";
+	char *srch = NULL;
+
+	if (r->set)
+		return 0;
+
+	r->set = 1;
+
+#define MATCH(line, name) \
+	(!strncmp(line, name, sizeof(name) - 1) && \
+	 (line[sizeof(name) - 1] == ' ' || \
+	  line[sizeof(name) - 1] == '\t'))
+
+	fp = fopen(file, "r");
+	if (!fp) {
+		logger(-1, errno, "Can't open %s", file);
+		return -1;
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		char *cp, *ep;
+
+		/* skip comments */
+		if (*buf == ';' || *buf == '#')
+			continue;
+		/* read default domain name */
+		if (MATCH(buf, "domain") || MATCH(buf, "search")) {
+			cp = buf + 6;
+			while (*cp == ' ' || *cp == '\t')
+				cp++;
+			if ((*cp == '\0') || (*cp == '\n'))
+				continue;
+			if ((ep = strchr(cp, '\n')) != NULL)
+				*ep = '\0';
+			/* As per resolv.conf(5), if there's more than
+			 * one line, only the last line is used
+			 */
+			if (srch)
+				free(srch);
+			srch = strdup(cp);
+			continue;
+		}
+		if (MATCH(buf, "nameserver")) {
+			cp = buf + 10;
+			while (*cp == ' ' || *cp == '\t')
+				cp++;
+			if ((*cp == '\0') || (*cp == '\n'))
+				continue;
+			if ((ep = strchr(cp, '\n')) != NULL)
+				*ep = '\0';
+			/* nameserver entries are accumulated */
+			if (nsrv[0])
+				*--cp=' ';
+			strncat(nsrv, cp, sizeof(nsrv));
+			continue;
+		}
+	}
+#undef MATCH
+
+	fclose(fp);
+
+	asprintf(&r->nameserver, "NAMESERVER=%s", nsrv);
+	asprintf(&r->searchdomain, "SEARCHDOMAIN=%s", srch);
+	free(srch);
+
+	return 0;
+}
+
+static void free_resolv_conf(struct resolv_conf_data *r)
+{
+	if (r->nameserver)
+		free(r->nameserver);
+	if (r->searchdomain)
+		free(r->searchdomain);
+}
+
 static int vps_dns_configure(vps_handler *h, envid_t veid,
 	dist_actions *actions, const char *root, misc_param *net, int state)
 {
@@ -125,6 +218,7 @@ static int vps_dns_configure(vps_handler *h, envid_t veid,
 	char *str;
 	const char *script;
 	int ret, i;
+	struct resolv_conf_data resolv_conf = {};
 
 	if (list_empty(&net->searchdomain) &&
 		list_empty(&net->nameserver))
@@ -138,12 +232,26 @@ static int vps_dns_configure(vps_handler *h, envid_t veid,
 	}
 	i = 0;
 	if (!list_empty(&net->searchdomain)) {
-		str = list2str("SEARCHDOMAIN", &net->searchdomain);
+		str = list_first_entry(&net->searchdomain, str_param, list)->val;
+		if (strcmp(str, "inherit") == 0) {
+			read_resolv_conf(&resolv_conf);
+			str = strdup(resolv_conf.searchdomain);
+		}
+		else
+			str = list2str("SEARCHDOMAIN", &net->searchdomain);
+
 		if (str != NULL)
 			envp[i++] = str;
 	}
 	if (!list_empty(&net->nameserver)) {
-		str = list2str("NAMESERVER", &net->nameserver);
+		str = list_first_entry(&net->nameserver, str_param, list)->val;
+		if (strcmp(str, "inherit") == 0) {
+			read_resolv_conf(&resolv_conf);
+			str = strdup(resolv_conf.nameserver);
+		}
+		else
+			str = list2str("NAMESERVER", &net->nameserver);
+
 		if (str != NULL)
 			envp[i++] = str;
 	}
@@ -152,6 +260,7 @@ static int vps_dns_configure(vps_handler *h, envid_t veid,
 	ret = vps_exec_script(h, veid, root, NULL, envp, script, DIST_FUNC,
 		SCRIPT_EXEC_TIMEOUT);
 	free_arg(envp);
+	free_resolv_conf(&resolv_conf);
 
 	return ret;
 }

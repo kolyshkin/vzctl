@@ -116,10 +116,13 @@ Corresponds to the \fB--ipadd\fR option.
 Corresponds to the \fB--hostname\fR option.
 .IP \fBNAMESERVER\fR="\fIip\fR\ [\fIip\fR\ ...]"
 Corresponds to the \fB--nameserver\fR option. Several name server addresses
-are divided by spaces.
+are divided by spaces. If set to \fBinherit\fR, values from host system's
+\fB/etc/resolv.conf\fR are used.
 .IP \fBSEARCHDOMAIN\fR="\fIdomain\fR\ [\fIdomain\fR\ ...]"
 Corresponds to the \fB--searchdomain\fR option. Several search domains
-are divided by spaces.
+are divided by spaces. If set to \fBinherit\fR, values from host system's
+\fB/etc/resolv.conf\fR are used.
+
 .SH SEE ALSO
 .BR vzctl (8),
 .BR vzcfgvalidate (8),

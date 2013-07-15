@@ -303,12 +303,18 @@ Sets DNS server IP address for a container. If you want to set several
 nameservers, you should do it at once, so use \fB--nameserver\fR option
 multiple times in one call to \fBvzctl\fR, as all the name server values
 set in previous calls to \fBvzctl\fR are overwritten.
+
+A special value of \fBinherit\fR can be used to auto-propagate nameserver
+value(s) from the host system's \fB/etc/resolv.conf\fR file.
 .TP
 \fB--searchdomain\fR \fIname\fR
 Sets DNS search domains for a container. If you want to set several search
 domains, you should do it at once, so use \fB--searchdomain\fR option
 multiple times in one call to \fBvzctl\fR, as all the search domain values
 set in previous calls to \fBvzctl\fR are overwritten.
+
+A special value of \fBinherit\fR can be used to auto-propagate search domain
+value(s) from the host system's \fB/etc/resolv.conf\fR file.
 .TP
 \fB--netif_add\fR \fIifname[\fR,\fImac\fR,\fIhost_ifname\fR,\fIhost_mac\fR,\fIbridge]\fR
 Adds a virtual Ethernet device (veth) to a given container. Here \fIifname\fR

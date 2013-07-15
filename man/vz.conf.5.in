@@ -126,6 +126,14 @@ to \fB--iptables\fR option.
 .IP \fBSTOP_TIMEOUT\fR="\fInumber\fR"
 Time to wait for a container to shut down on \fBvzctl stop\fR,
 before forcibly killing it, in seconds. Hardcoded to 120 if not set.
+.IP \fBNAMESERVER\fR="\fIip\fR\ [\fIip\fR\ ...]"
+Default value for containers nameserver(s). Several name server addresses
+are divided by spaces. If set to \fBinherit\fR, values from host system's
+\fB/etc/resolv.conf\fR are used.
+.IP \fBSEARCHDOMAIN\fR="\fIdomain\fR\ [\fIdomain\fR\ ...]"
+Default value for containers search domains. Several search domains
+are divided by spaces. If set to \fBinherit\fR, values from host system's
+\fB/etc/resolv.conf\fR are used.
 .PP
 Most of the other parameters that appear in per-container configuration files
 \fBctid.conf\fR(5) can be also set here. Still, it is recommended to keep
