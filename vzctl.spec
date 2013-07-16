@@ -59,7 +59,7 @@ i.e. create, start, shutdown, set various options and limits etc.
 %setup -q
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" %configure \
+CFLAGS="%{optflags}" %configure \
 	vzdir=%{_vzdir} \
 	--enable-bashcomp \
 	--enable-logrotate \
