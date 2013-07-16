@@ -472,7 +472,7 @@ int vzctl_mount_snapshot(unsigned envid, const char *ve_private,
 			goto err;
 		}
 	} else {
-		mount_param.guid = (char *)param->guid;
+		mount_param.guid = param->guid;
 	}
 	mount_param.target = param->target;
 	ploop.set_component_name(di,
