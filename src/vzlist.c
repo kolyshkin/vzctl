@@ -1431,6 +1431,54 @@ error:
 #endif
 
 #ifdef HAVE_UPSTREAM
+
+static int is_ve_running(const char *cgrp)
+{
+	struct cgroup *ct;
+	int ret = -1;
+	struct cgroup_controller *ve;
+	char *bufp = NULL;
+
+	ct = cgroup_new_cgroup(cgrp);
+
+	if ((ret = cgroup_get_cgroup(ct)) < 0) {
+		fprintf(stderr, "Failed to read cgroup info (%s)",
+					cgroup_strerror(ret));
+		goto cleanup;
+	}
+
+	if (!(ve = cgroup_get_controller(ct, "ve"))) {
+		logger(-1, 0, "Failed to attach ve controller");
+		goto cleanup;
+	}
+
+	if (cgroup_get_value_string(ve, "ve.state", &bufp) || 1) {
+		/* we're running on the mainstream kernel,
+		 * check cgroup isn't empty */
+		void *handle = NULL;
+		pid_t pid;
+
+		ret = cgroup_get_task_begin(cgrp, "ve", &handle, &pid);
+		if (ret == 0) {
+			cgroup_get_task_end(&handle);
+			ret = 1;
+		} else if (ret == ECGEOF) {
+			cgroup_get_task_end(&handle);
+			ret = 0;
+		} else {
+			fprintf(stderr, "task interation error: %s",
+						cgroup_strerror(ret));
+			ret = -1;
+		}
+	} else {
+		ret = strcmp(bufp, "RUNNING") ? 0 : 1;
+	}
+
+cleanup:
+	cgroup_free(&ct);
+	return ret;
+}
+
 static int get_run_ve_cgroup(int update) {
 	int ret;
 	void *handle = NULL;
@@ -1449,12 +1497,20 @@ static int get_run_ve_cgroup(int update) {
 
 			memset(&ve, 0, sizeof(struct Cveinfo));
 			ve.veid = name_to_veid(info.path);
-			ve.status = VE_RUNNING;
-			if (update)
-				update_ve(ve.veid, ve.ip, ve.status);
-			else
-				add_elem(&ve);
 
+			if ((ret = is_ve_running(info.path)) < 0) {
+				cgroup_walk_tree_end(&handle);
+				return -1;
+			}
+
+			if (ret == 1) {
+				ve.status = VE_RUNNING;
+
+				if (update)
+					update_ve(ve.veid, ve.ip, ve.status);
+				else
+					add_elem(&ve);
+			}
 		}
 		ret = cgroup_walk_tree_next(1, &handle, &info, base_level);
 	}
