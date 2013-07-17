@@ -16,6 +16,7 @@ int create_container(envid_t veid);
 int start_container(envid_t veid);
 int container_add_task(envid_t veid);
 pid_t get_pid_from_container(envid_t veid);
+envid_t name_to_veid(const char *str);
 
 static inline const char *container_error(int ret)
 {

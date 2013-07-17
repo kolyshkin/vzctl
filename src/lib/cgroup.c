@@ -546,6 +546,26 @@ out_free:
 	cgroup_free(&ct);
 	return pid;
 }
+
+envid_t name_to_veid(const char *str)
+{
+	long veid;
+	char *endptr;
+	char prefix[CT_MAX_STR_SIZE];
+	size_t prefixlen;
+
+	snprintf(prefix, sizeof(prefix), "%s-", CT_BASE_STRING + 1);
+	prefixlen = strlen(prefix);
+
+	if (strncmp(prefix, str, prefixlen))
+		return -1;
+
+	veid = strtol(str + prefixlen, &endptr, 10);
+	if (*endptr != '\0')
+		return -1;
+	return veid;
+}
+
 int container_init(void)
 {
 	return cgroup_init();

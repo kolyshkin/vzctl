@@ -45,6 +45,8 @@
 #include "types.h"
 #include "image.h"
 #include "vzfeatures.h"
+#include "env.h"
+#include "cgroup.h"
 
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
@@ -76,17 +78,35 @@ char logbuf[32];
 static int get_run_ve_proc(int);
 #if HAVE_VZLIST_IOCTL
 static int get_run_ve_ioctl(int);
+#endif
+#ifdef HAVE_UPSTREAM
+static int get_run_ve_cgroup(int);
+#endif
 static inline int get_run_ve(int update)
 {
 	int ret;
-	ret = get_run_ve_ioctl(update);
-	if (ret)
-		ret = get_run_ve_proc(update);
-	return ret;
-}
+	int kernel_type;
+
+	if ((kernel_type = get_kernel_type()) < 0)
+		return -1;
+
+	if (kernel_type == KERNEL_VZ_OLD) {
+#if HAVE_VZLIST_IOCTL
+		ret = get_run_ve_ioctl(update);
+		if (ret)
+			ret = get_run_ve_proc(update);
+		return ret;
 #else
-#define get_run_ve get_run_ve_proc
+		ret = get_run_ve_proc(update);
+		return ret;
 #endif
+	}
+#ifdef HAVE_UPSTREAM
+	else {
+		return get_run_ve_cgroup(update);
+	}
+#endif
+}
 
 #define FOR_ALL_UBC(func)	\
 	func(kmemsize)		\
@@ -1407,6 +1427,49 @@ out:
 	close(vzctlfd);
 error:
 	return ret;
+}
+#endif
+
+#ifdef HAVE_UPSTREAM
+static int get_run_ve_cgroup(int update) {
+	int ret;
+	void *handle = NULL;
+	struct cgroup_file_info info;
+	int base_level;
+	struct Cveinfo ve;
+
+	if (container_init())
+		return -1;
+
+	ret = cgroup_walk_tree_begin("ve", "/", 1, &handle, &info, &base_level);
+	cgroup_walk_tree_set_flags(&handle, CGROUP_WALK_TYPE_PRE_DIR);
+	while (ret == 0) {
+		if (info.type == CGROUP_FILE_TYPE_DIR &&
+				strlen(info.path) > 0) {
+
+			memset(&ve, 0, sizeof(struct Cveinfo));
+			ve.veid = name_to_veid(info.path);
+			ve.status = VE_RUNNING;
+			if (update)
+				update_ve(ve.veid, ve.ip, ve.status);
+			else
+				add_elem(&ve);
+
+		}
+		ret = cgroup_walk_tree_next(1, &handle, &info, base_level);
+	}
+
+	if (ret != ECGEOF) {
+		fprintf(stderr, "cgroup error: %s !\n", cgroup_strerror(ret));
+		return -1;
+	}
+
+	cgroup_walk_tree_end(&handle);
+
+	if (!update)
+		qsort(veinfo, n_veinfo, sizeof(struct Cveinfo), id_sort_fn);
+
+	return 0;
 }
 #endif
 
