@@ -153,7 +153,7 @@ add_ip()
 			setup_network
 		else
 			# IP_ADDR empty, do we need to remove old ones?
-			if grep -q -F -w "${VENET_DEV}" ${CFGFILE}; then
+			if grep -v "^#" ${CFGFILE} | grep -q -F -w "${VENET_DEV}"; then
 				setup_network
 			fi
 		fi
