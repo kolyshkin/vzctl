@@ -23,7 +23,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.3.1
+Version: 4.4
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -259,6 +259,46 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Wed Jul 17 2013 Kir Kolyshkin <kir@openvz.org> - 4.4-1
+- New functionality:
+-- vztmpl-dl script to aid in template downloading/updating
+-- nameserver/searchdomain auto-propagation from the host (#2301)
+-- vzctl start: do fsck for ploop, add --skip-fsck (#2615)
+-- add --stop-timeout/STOP_TIMEOUT option (#2621)
+-- vzmigrate: use remote VZ_PRIVATE and VE_ROOT (#2523)
+-- Introduce vz-postinstall script (set sysctl.conf, disable selinux)
+-- vzmigrate: add -f, ability to ignore some checks (#2643)
+-- distscripts: update for newer Arch Linux (#2617)
+-- etc/vz.conf: set default OS template to centos-6-x86
+-- etc/vz.conf: comment out NEIGHBOUR_DEVS by default
+- Fixes:
+-- vzmigrate: fix check for IPs when there are none (#2620)
+-- Deny "unlimited" value for DISKSPACE/DISKINODES
+-- scripts/vps-netns_dev_add: rework config action (#2637)
+-- vzctl convert: fix final renames (#2638)
+-- vzctl convert: rename old private back if failed (#2638)
+-- vzctl convert: fix new directory mode to be 0700 not 0600
+-- scripts/vps-rst: make VE_VETH_DEVS optional (#2659)
+-- fix compilation on arches without support for VZ (RH #971821)
+-- vzlist -j: fix to work on RHEL5 kernel (#2661)
+-- fix exec to really enter into pidns on upstream kernel (#2658)
+-- debian-add_ip.sh: ignore comments when looking for venet0 (#2674)
+-- destroydir(): don't return -1
+-- create.c: fix warnings compiling w/o ploop
+-- build fix for automake < 1.10.2
+- Improvements:
+-- vzmigrate: check ipv6 module on dest (#2555)
+-- Remove check for ploop size (let ploop decide)
+-- vzmigrate: improve invalid cmdline handling
+-- [build] configure: set localstatedir to w/o prefix (#2637#c2)
+- Documentation:
+-- add vztmpl-dl(8)
+-- vzctl(8), vz.conf(5), ctid.conf(5): "inherit" for nameserver/searchdomain
+-- vzctl(8): describe new options --skip-fsck, --stop-timeout
+-- vzmigrate(8): describe new option -f/--nodeps
+-- vzmigrate(8): remove duplicate --live option description
+-- vzmigrate --help: simplify synopsys
+
 * Mon Jun  3 2013 Kir Kolyshkin <kir@openvz.org> - 4.3.1-1
 - New functionality:
 -- vzctl restore with CRIU: restore veth devices
