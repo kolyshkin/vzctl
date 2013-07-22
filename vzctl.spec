@@ -1,25 +1,11 @@
 %define _initddir %_sysconfdir/init.d
 %define _vzdir /vz
-%define _lockdir %{_vzdir}/lock
-%define _dumpdir %{_vzdir}/dump
-%define _privdir %{_vzdir}/private
-%define _rootdir %{_vzdir}/root
-%define _cachedir %{_vzdir}/template/cache
-%define _veipdir /var/lib/vzctl/veip
-%define _vzrebootdir /var/lib/vzctl/vzreboot
-%define _vepiddir /var/lib/vzctl/vepid
-%define _pkglibdir %_libexecdir/vzctl
-%define _scriptdir %_pkglibdir/scripts
+%define _scriptdir %_libexecdir/vzctl/scripts
 %define _configdir %_sysconfdir/vz
 %define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
 %define _netdir	%_sysconfdir/sysconfig/network-scripts
-%define _logrdir %_sysconfdir/logrotate.d
 %define _distconfdir %{_configdir}/dists
-%define _namesdir %{_configdir}/names
 %define _distscriptdir %{_distconfdir}/scripts
-%define _udevrulesdir %_sysconfdir/udev/rules.d
-%define _bashcdir %_sysconfdir/bash_completion.d
-
 
 Summary: OpenVZ containers control utility
 Name: vzctl
@@ -118,8 +104,8 @@ rm -rf %{buildroot}
 %{_mandir}/man8/vzubc.8.*
 %{_mandir}/man8/vzlist.8.*
 %{_mandir}/man8/vzifup-post.8.*
-%{_udevrulesdir}/*
-%{_bashcdir}/*
+%{_sysconfdir}/udev/rules.d/*
+%{_sysconfdir}/bash_completion.d/*
 %config /etc/sysconfig/vz
 %ghost %config(missingok) /etc/sysconfig/vzeventd
 
@@ -192,16 +178,16 @@ OpenVZ containers control utility core package
 
 %files core
 %{_libdir}/libvz*.so
-%dir %{_lockdir}
-%dir %{_dumpdir}
-%dir %{_privdir}
-%dir %{_rootdir}
-%dir %{_cachedir}
-%dir %{_veipdir}
-%dir %{_vzrebootdir}
-%dir %{_vepiddir}
+%dir %{_vzdir}/lock
+%dir %{_vzdir}/dump
+%dir %{_vzdir}/private
+%dir %{_vzdir}/root
+%dir %{_vzdir}/template/cache
+%dir /var/lib/vzctl/veip
+%dir /var/lib/vzctl/vzreboot
+%dir /var/lib/vzctl/vepid
 %dir %{_configdir}
-%dir %{_namesdir}
+%dir %{_configdir}/names
 %dir %{_vpsconfdir}
 %dir %{_distconfdir}
 %dir %{_distscriptdir}
@@ -210,7 +196,7 @@ OpenVZ containers control utility core package
 %{_sbindir}/arpsend
 %{_sbindir}/ndsend
 %{_sbindir}/vztmpl-dl
-%{_logrdir}/vzctl
+%{_sysconfdir}/logrotate.d/vzctl
 %{_distconfdir}/distribution.conf-template
 %{_distconfdir}/default
 %{_distscriptdir}/*.sh
@@ -220,8 +206,8 @@ OpenVZ containers control utility core package
 %{_mandir}/man8/ndsend.8.*
 %{_mandir}/man5/ctid.conf.5.*
 %{_mandir}/man5/vz.conf.5.*
-%dir %{_pkglibdir}
-%dir %{_scriptdir}
+%dir %_libexecdir/vzctl
+%dir %_libexecdir/vzctl/scripts
 %{_scriptdir}/vps-functions
 %{_scriptdir}/vps-net_add
 %{_scriptdir}/vps-net_del
