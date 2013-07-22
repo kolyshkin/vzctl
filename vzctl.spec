@@ -183,9 +183,9 @@ OpenVZ containers control utility core package
 %dir %{_vzdir}/private
 %dir %{_vzdir}/root
 %dir %{_vzdir}/template/cache
-%dir /var/lib/vzctl/veip
-%dir /var/lib/vzctl/vzreboot
-%dir /var/lib/vzctl/vepid
+%dir %{_sharedstatedir}/vzctl/veip
+%dir %{_sharedstatedir}/vzctl/vzreboot
+%dir %{_sharedstatedir}/vzctl/vepid
 %dir %{_configdir}
 %dir %{_configdir}/names
 %dir %{_vpsconfdir}
