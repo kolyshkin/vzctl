@@ -311,7 +311,7 @@ int cp_file(char *dst, char *src)
 
 void get_vps_conf_path(envid_t veid, char *buf, int len)
 {
-	snprintf(buf, len, VPS_CONF_DIR "%d.conf", veid);
+	snprintf(buf, len, VPS_CONF_DIR "/%d.conf", veid);
 }
 
 char *arg2str(char **arg)
@@ -649,7 +649,7 @@ static void __move_config(int veid, int action, const char *prefix)
 	char conf[PATH_LEN];
 	char newconf[PATH_LEN];
 
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "%d.%s", veid, prefix);
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "/%d.%s", veid, prefix);
 	snprintf(newconf, sizeof(newconf), "%s." DESTR_PREFIX, conf);
 	action == BACKUP ? rename(conf, newconf) : unlink(newconf);
 }

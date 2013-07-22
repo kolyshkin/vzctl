@@ -890,7 +890,7 @@ static int apply_param_from_cfg(int veid, vps_param *param, char *cfg)
 
 	if (cfg == NULL)
 		return 0;
-	snprintf(conf, sizeof(conf), VPS_CONF_DIR "ve-%s.conf-sample", cfg);
+	snprintf(conf, sizeof(conf), VPS_CONF_DIR "/ve-%s.conf-sample", cfg);
 	if (stat_file(conf) != 1) {
 		logger(-1, 0, "Sample config file not found: %s", conf);
 		return VZ_APPLY_CONFIG_ERROR;
