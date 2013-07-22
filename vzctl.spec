@@ -1,9 +1,9 @@
-%define _initddir %_sysconfdir/init.d
+%define _initddir %{_sysconfdir}/init.d
 %define _vzdir /vz
-%define _scriptdir %_libexecdir/vzctl/scripts
-%define _configdir %_sysconfdir/vz
-%define _vpsconfdir %_sysconfdir/sysconfig/vz-scripts
-%define _netdir	%_sysconfdir/sysconfig/network-scripts
+%define _scriptdir %{_libexecdir}/vzctl/scripts
+%define _configdir %{_sysconfdir}/vz
+%define _vpsconfdir %{_sysconfdir}/sysconfig/vz-scripts
+%define _netdir	%{_sysconfdir}/sysconfig/network-scripts
 %define _distconfdir %{_configdir}/dists
 %define _distscriptdir %{_distconfdir}/scripts
 
@@ -206,8 +206,8 @@ OpenVZ containers control utility core package
 %{_mandir}/man8/ndsend.8.*
 %{_mandir}/man5/ctid.conf.5.*
 %{_mandir}/man5/vz.conf.5.*
-%dir %_libexecdir/vzctl
-%dir %_libexecdir/vzctl/scripts
+%dir %{_libexecdir}/vzctl
+%dir %{_libexecdir}/vzctl/scripts
 %{_scriptdir}/vps-functions
 %{_scriptdir}/vps-net_add
 %{_scriptdir}/vps-net_del
