@@ -590,12 +590,12 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'f':
-			len = strlen(optarg) + strlen(VPS_CONF_DIR) +
+			len = strlen(optarg) + strlen(VPSCONFDIR) +
 				strlen("/ve-.conf-sample");
 			name = (char *)vz_malloc(len + 1);
 			if (!name)
 				exit(1);
-			sprintf(name, VPS_CONF_DIR "/ve-%s.conf-sample", optarg);
+			sprintf(name, VPSCONFDIR "/ve-%s.conf-sample", optarg);
 			if (!stat(name, &st)) {
 				logger(-1, 0, "File %s already exist",
 					name);

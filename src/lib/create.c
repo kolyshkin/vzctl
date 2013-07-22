@@ -318,7 +318,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 	sample_config = NULL;
 	cfg_exists = (stat_file(dst) == 1);
 	if (cmd_p->opt.config != NULL) {
-		snprintf(src, sizeof(src), VPS_CONF_DIR "/ve-%s.conf-sample",
+		snprintf(src, sizeof(src), VPSCONFDIR "/ve-%s.conf-sample",
 			cmd_p->opt.config);
 		if (stat_file(src) != 1) {
 			logger(-1, errno, "Sample config %s not found", src);
@@ -334,7 +334,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		}
 		sample_config = cmd_p->opt.config;
 	} else if (vps_p->opt.config != NULL) {
-		snprintf(src, sizeof(src), VPS_CONF_DIR "/ve-%s.conf-sample",
+		snprintf(src, sizeof(src), VPSCONFDIR "/ve-%s.conf-sample",
 			vps_p->opt.config);
 		/* Bail out if CONFIGFILE is wrong in /etc/vz/vz.conf */
 		if (stat_file(src) != 1) {

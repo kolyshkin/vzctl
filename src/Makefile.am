@@ -23,6 +23,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include \
               -I$(top_builddir)/include \
               -DSBINDIR=\"$(sbindir)\" \
               -DPKGCONFDIR=\"$(pkgconfdir)\" \
+              -DVPSCONFDIR=\"$(vpsconfdir)\" \
               -DSCRIPTDIR=\"$(scriptdir)\" \
               -DVZDIR=\"$(vzdir)\" \
               -DMODULESDIR=\"$(modulesdir)\"

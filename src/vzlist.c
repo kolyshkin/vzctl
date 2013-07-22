@@ -1154,7 +1154,7 @@ static int read_ves_param()
 	for (i = 0; i < n_veinfo; i++) {
 		veid = veinfo[i].veid;
 		param = init_vps_param();
-		snprintf(buf, sizeof(buf), VPS_CONF_DIR "/%d.conf", veid);
+		snprintf(buf, sizeof(buf), VPSCONFDIR "/%d.conf", veid);
 		vps_parse_config(veid, buf, param, NULL);
 		merge_conf(&veinfo[i], &param->res, &param->opt);
 		if (veinfo[i].root == NULL)
@@ -1666,7 +1666,7 @@ static int get_ve_list()
 	struct Cveinfo ve;
 	char str[6];
 
-	dp = opendir(VPS_CONF_DIR);
+	dp = opendir(VPSCONFDIR);
 	if (dp == NULL) {
 		return -1;
 	}

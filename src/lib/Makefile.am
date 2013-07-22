@@ -20,6 +20,7 @@ include $(top_srcdir)/paths.am
 AM_CPPFLAGS = -I$(top_srcdir)/include \
               -DSBINDIR=\"$(sbindir)\" \
               -DPKGCONFDIR=\"$(pkgconfdir)\" \
+              -DVPSCONFDIR=\"$(vpsconfdir)\" \
               -DSCRIPTDIR=\"$(scriptdir)\" \
               -DVZDIR=\"$(vzdir)\" \
               -DVEPIDDIR=\"$(vepiddir)\" \

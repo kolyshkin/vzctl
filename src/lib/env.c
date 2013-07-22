@@ -688,7 +688,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 		}
 
 		/* Run per-CT $VEID.start script */
-		snprintf(buf, sizeof(buf), VPS_CONF_DIR "/%d.%s", veid,
+		snprintf(buf, sizeof(buf), VPSCONFDIR "/%d.%s", veid,
 			START_PREFIX);
 		if (stat_file(buf) == 1) {
 			if (vps_exec_script(h, veid, res->fs.root, NULL, NULL,
@@ -970,7 +970,7 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
-		snprintf(buf, sizeof(buf), VPS_CONF_DIR "/%d.%s", veid,
+		snprintf(buf, sizeof(buf), VPSCONFDIR "/%d.%s", veid,
 			STOP_PREFIX);
 		if (stat_file(buf) == 1) {
 			if (vps_exec_script(h, veid, res->fs.root, NULL, NULL,

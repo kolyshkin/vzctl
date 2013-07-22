@@ -20,7 +20,6 @@
 
 #define GLOBAL_CFG		PKGCONFDIR "/vz.conf"
 #define OSRELEASE_CFG		PKGCONFDIR "/osrelease.conf"
-#define VPS_CONF_DIR		PKGCONFDIR "/conf"
 #define DIST_DIR		PKGCONFDIR "/dists"
 #define VENAME_DIR		PKGCONFDIR "/names"
 
@@ -34,8 +33,8 @@
 #define VPS_NETNS_DEV_DEL	SCRIPTDIR "/vps-netns_dev_del"
 #define VPS_PCI			SCRIPTDIR "/vps-pci"
 
-/* User-defined scripts are in VPS_CONF_DIR */
-#define USER_CREATE_SCRIPT	VPS_CONF_DIR "/vps.create"
+/* User-defined scripts are in VPSCONFDIR */
+#define USER_CREATE_SCRIPT	VPSCONFDIR "/vps.create"
 
 #ifndef __ENVID_T_DEFINED__
 typedef unsigned envid_t;

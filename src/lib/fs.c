@@ -161,7 +161,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 	}
 	/* Execute pre mount scripts */
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
-		snprintf(buf, sizeof(buf), "%s/vps.%s", VPS_CONF_DIR,
+		snprintf(buf, sizeof(buf), "%s/vps.%s", VPSCONFDIR,
 			PRE_MOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
@@ -169,7 +169,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 						"premount script %s", buf);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
-			snprintf(buf, sizeof(buf), "%s/%d.%s", VPS_CONF_DIR,
+			snprintf(buf, sizeof(buf), "%s/%d.%s", VPSCONFDIR,
 				veid, PRE_MOUNT_PREFIX);
 		}
 	}
@@ -184,7 +184,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 		return ret;
 	/* Execute per-CT & global mount scripts */
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
-		snprintf(buf, sizeof(buf), "%s/vps.%s", VPS_CONF_DIR,
+		snprintf(buf, sizeof(buf), "%s/vps.%s", VPSCONFDIR,
 			MOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
@@ -193,7 +193,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 				fsumount(veid, fs);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
-			snprintf(buf, sizeof(buf), "%s/%d.%s", VPS_CONF_DIR,
+			snprintf(buf, sizeof(buf), "%s/%d.%s", VPSCONFDIR,
 				veid, MOUNT_PREFIX);
 		}
 	}
@@ -217,7 +217,7 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 		return 0;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
-		snprintf(buf, sizeof(buf), "%s/%d.%s", VPS_CONF_DIR,
+		snprintf(buf, sizeof(buf), "%s/%d.%s", VPSCONFDIR,
 			veid, UMOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
@@ -225,14 +225,14 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 					buf);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
-			snprintf(buf, sizeof(buf), "%s/vps.%s", VPS_CONF_DIR,
+			snprintf(buf, sizeof(buf), "%s/vps.%s", VPSCONFDIR,
 				UMOUNT_PREFIX);
 		}
 	}
 	if (!(ret = fsumount(veid, fs)))
 		logger(0, 0, "Container is unmounted");
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
-		snprintf(buf, sizeof(buf), "%s/%d.%s", VPS_CONF_DIR,
+		snprintf(buf, sizeof(buf), "%s/%d.%s", VPSCONFDIR,
 			veid, POST_UMOUNT_PREFIX);
 		for (i = 0; i < 2; i++) {
 			if (run_pre_script(veid, buf)) {
@@ -240,7 +240,7 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 						"postumount script %s",	buf);
 				return VZ_ACTIONSCRIPT_ERROR;
 			}
-			snprintf(buf, sizeof(buf), "%s/vps.%s", VPS_CONF_DIR,
+			snprintf(buf, sizeof(buf), "%s/vps.%s", VPSCONFDIR,
 				POST_UMOUNT_PREFIX);
 		}
 	}
