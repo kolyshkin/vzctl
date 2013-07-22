@@ -56,15 +56,15 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 make DESTDIR=%{buildroot} vpsconfdir=%{_vpsconfdir} \
 	install install-redhat-from-spec
-ln -s ../sysconfig/vz-scripts %{buildroot}/%{_configdir}/conf
+ln -s ../sysconfig/vz-scripts %{buildroot}%{_configdir}/conf
 ln -s ../vz/vz.conf %{buildroot}/etc/sysconfig/vz
 # Needed for %ghost in %files section below
 touch %{buildroot}/etc/sysconfig/vzeventd
 # This could go to vzctl-lib-devel, but since we don't have it...
-rm -f %{buildroot}/%{_libdir}/libvzctl.la
-rm -f %{buildroot}/%{_libdir}/libvzctl.so
-rm -f %{buildroot}/%{_libdir}/libvzchown.la
-rm -f %{buildroot}/%{_libdir}/libvzchown.so.*
+rm -f %{buildroot}%{_libdir}/libvzctl.la
+rm -f %{buildroot}%{_libdir}/libvzctl.so
+rm -f %{buildroot}%{_libdir}/libvzchown.la
+rm -f %{buildroot}%{_libdir}/libvzchown.so.*
 
 %clean
 rm -rf %{buildroot}
