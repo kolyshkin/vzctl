@@ -57,7 +57,7 @@ fi
 # If $VE_ROOT/reboot file is present, rm it and restart CT
 (
 	. @PKGCONFDIR@/vz.conf
-	. $CONF_DIR/$VEID.conf
+	. @VPSCONFDIR@/$VEID.conf
 	test -f $VE_ROOT/reboot || exit 0
 	$(awk '$2 == "'$VE_ROOT'" && $4 !~ "^rw" {
 		print "mount -oremount,rw",$1,$2}' /proc/mounts)
