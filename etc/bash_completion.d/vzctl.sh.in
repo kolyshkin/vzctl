@@ -165,7 +165,7 @@ _vzctl()
 				COMPREPLY=( $( compgen -W "restart ignore" -- $cur ) )
 				;;
 			--config|--applyconfig)
-				local configs=$(command ls -1 @PKGCONFDIR@/conf/*.conf-sample |
+				local configs=$(command ls -1 @VPSCONFDIR@/*.conf-sample |
 						    cut -d "-" -f 2- | sed -e 's#.conf-sample$##')
 
 				COMPREPLY=( $( compgen -W "$configs" -- $cur ) )
