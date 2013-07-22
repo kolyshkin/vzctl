@@ -235,7 +235,7 @@ OpenVZ containers control utility core package
 %{_scriptdir}/vps-rst
 %{_scriptdir}/vps-rst-env
 %{_scriptdir}/vz-postinstall
-%dir %{_configdir}/conf
+%{_configdir}/conf
 %config(noreplace) %{_configdir}/vz.conf
 %config(noreplace) %{_configdir}/osrelease.conf
 %config(noreplace) %{_configdir}/download.conf
