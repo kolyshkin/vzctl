@@ -58,6 +58,8 @@ make DESTDIR=%{buildroot} vpsconfdir=%{_vpsconfdir} \
 	install install-redhat-from-spec
 ln -s ../sysconfig/vz-scripts %{buildroot}%{_configdir}/conf
 ln -s ../vz/vz.conf %{buildroot}/etc/sysconfig/vz
+# Some use /var/lib/vz instead of /vz; make them happy
+ln -s ../..%{_vzdir} %{buildroot}%{_sharedstatedir}/vz
 # Needed for %ghost in %files section below
 touch %{buildroot}/etc/sysconfig/vzeventd
 # This could go to vzctl-lib-devel, but since we don't have it...
@@ -192,6 +194,7 @@ OpenVZ containers control utility core package
 %dir %{_distconfdir}
 %dir %{_distscriptdir}
 %dir %{_vzdir}
+%{_sharedstatedir}/vz
 %{_sbindir}/vzctl
 %{_sbindir}/arpsend
 %{_sbindir}/ndsend
