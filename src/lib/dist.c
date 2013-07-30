@@ -131,7 +131,7 @@ static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)
 	char *ep;
 
 	if (dist_name != NULL) {
-		snprintf(buf, sizeof(buf), "%s", dist_name);
+		snprintf(buf, sizeof(buf), "%s", basename(dist_name));
 		ep = buf + strlen(buf);
 		do {
 			snprintf(file, len, "%s/%s.conf", dir, buf);
