@@ -455,6 +455,26 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 			free(cmd_p->res.tmpl.ostmpl);
 		cmd_p->res.tmpl.ostmpl = strdup(basename(tmpl->ostmpl));
 	}
+	/* In case userns is not available at the time of creation,
+	 * we should store LOCAL_UID=0 and LOCAL_GID=0 to CT config,
+	 * otherwise it will fail to start.
+	 */
+	if (!h->can_join_userns) {
+		if (!cmd_p->res.misc.local_uid)
+			cmd_p->res.misc.local_uid =
+				vz_malloc(sizeof(unsigned long));
+		if (!cmd_p->res.misc.local_uid)
+			goto err_names;
+
+		if (!cmd_p->res.misc.local_gid)
+			cmd_p->res.misc.local_gid =
+				vz_malloc(sizeof(unsigned long));
+		if (!cmd_p->res.misc.local_gid)
+			goto err_names;
+
+		*cmd_p->res.misc.local_uid = 0;
+		*cmd_p->res.misc.local_gid = 0;
+	}
 	if ((ret = vps_save_config(veid, dst, cmd_p, vps_p, action)))
 		goto err_names;
 
