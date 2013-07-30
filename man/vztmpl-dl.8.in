@@ -14,16 +14,27 @@ The main purpose of this utility is to download a precreated container tarballs
 directly from the command line, and is also used by \fBvzctl create\fR.
 .SH OPTIONS
 .TP
-.B --no-gpg-check
-Do not check GPG signatures of downloaded files. By default, GPG check
+.B --gpg-check
+Check GPG signatures of downloaded files. By default, GPG check
 is performed if
+.B CHECK_TEMPLATE_SIG
+is set to
+.B yes
+in
+.B \fB/etc/vz/download.conf\fR file,
 .BR gpg (1)
-tool is installed and the OpenVZ public key is available
+tool is installed, and the OpenVZ public key is available
 in the gpg keyring. See \fBEXAMPLES\fR section below on how to install
 OpenVZ public key.
 .TP
+.B --no-gpg-check
+Do not check GPG signatures.
+.TP
+.B --update
+Update (re-download) existing templates.
+.TP
 .B --no-update
-Do not try to update (re-download) existing templates.
+Do not try to update existing templates.
 .TP
 .B --config
 Output current configuration. The tool has built-in configuration
@@ -46,8 +57,8 @@ Default is \fByes\fR.
 Setting to \fBno\fR has the same effect as using \fB--no-update\fR option.
 .TP
 .B CHECK_TEMPLATE_SIG
-Default is \fByes\fR.
-Setting to \fBno\fR has the same effect as using \fB--no-gpg-check\fR option.
+Default is \fBno\fR.
+Setting to \fByes\fR has the same effect as using \fB--gpg-check\fR option.
 .TP
 .B TMPL_REPO_PREFIX
 URL repo prefix. Default is

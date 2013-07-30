@@ -55,7 +55,7 @@ test -r @PKGCONFDIR@/download.conf && . @PKGCONFDIR@/download.conf
 
 : ${TMPL_SUFFIXES="tar.gz"}
 : ${GPG_KEY="security@openvz.org"}
-: ${CHECK_TEMPLATE_SIG="yes"}
+: ${CHECK_TEMPLATE_SIG="no"}
 : ${UPDATE_TEMPLATE="yes"}
 
 vzcheckvar TEMPLATE
@@ -69,7 +69,9 @@ Usage:
   $SELF [option ...] template [template ...]
   $SELF --config | --help | --list
 Options:
+  --gpg-check		Check GPG signatures of downloaded files
   --no-gpg-check	Do not check GPG signatures
+  --update		Update templates even if they exist locally
   --no-update		Do not try to update existing templates
   --config		Output current configuration
   --list		Output list of templates available for download
@@ -151,8 +153,16 @@ list()
 # Parse arguments
 while echo $1 | grep -q '^-'; do
 	case $1 in
+	   --gpg-check)
+		CHECK_TEMPLATE_SIG=yes
+		shift
+		;;
 	   --no-gpg-check)
 		CHECK_TEMPLATE_SIG=no
+		shift
+		;;
+	   --update)
+		UPDATE_TEMPLATE=yes
 		shift
 		;;
 	   --no-update)
