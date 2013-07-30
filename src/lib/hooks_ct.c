@@ -295,12 +295,7 @@ static int mount_devpts(void)
 
 	setuid(0);
 	setgid(0);
-	/*
-	 * We need the special flag "newinstance". This is a requirement
-	 * of the userns-aware implementation of devpts as of Linux 3.9.
-	 * Because of that special requirement, we do it here rather than
-	 * later.
-	 */
+
 	ret = mkdir("/dev/pts", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 	if ((ret < 0) && (errno != EEXIST)) {
 		logger(-1, errno, "Cannot create container's /dev/pts");
@@ -370,11 +365,9 @@ static int _env_create(void *data)
 	if (ret)
 		return ret;
 
-	if (arg->h->can_join_userns) {
-		ret = mount_devpts();
-		if (ret)
-			return ret;
-	}
+	ret = mount_devpts();
+	if (ret)
+		return ret;
 
 	/*
 	 * If we are using the user namespace, we will have the full capability
