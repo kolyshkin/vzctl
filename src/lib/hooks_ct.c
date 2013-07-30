@@ -999,8 +999,6 @@ static int ct_restore(vps_handler *h, envid_t veid, vps_param *vps_p, int cmd,
 int ct_do_open(vps_handler *h, vps_param *param)
 {
 	int ret;
-	char path[STR_SIZE];
-	char upath[STR_SIZE];
 	struct stat st;
 	unsigned long *local_uid = param->res.misc.local_uid;
 
@@ -1015,12 +1013,6 @@ int ct_do_open(vps_handler *h, vps_param *param)
 		return VZ_RESOURCE_ERROR;
 	}
 
-	if (snprintf(path, sizeof(path), "/proc/%d/ns/pid", getpid()) < 0)
-		return VZ_RESOURCE_ERROR;
-
-	if (snprintf(upath, sizeof(upath), "/proc/%d/ns/user", getpid()) < 0)
-		return VZ_RESOURCE_ERROR;
-
 	ret = mkdir(NETNS_RUN_DIR, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	if (ret && (errno != EEXIST)) {
@@ -1029,7 +1021,7 @@ int ct_do_open(vps_handler *h, vps_param *param)
 		return VZ_RESOURCE_ERROR;
 	}
 
-	h->can_join_pidns = !stat(path, &st);
+	h->can_join_pidns = !stat("/proc/self/ns/pid", &st);
 	/*
 	 * Being able to join the user namespace is a good indication that the
 	 * user namespace is complete. For a long time, the user namespace
@@ -1043,7 +1035,8 @@ int ct_do_open(vps_handler *h, vps_param *param)
 	 * mapped user to own the files, etc. So we also need to find suitable
 	 * configuration in the config files.
 	 */
-	h->can_join_userns = !stat(upath, &st) && local_uid && (*local_uid != 0);
+	h->can_join_userns = !stat("/proc/self/ns/user", &st) &&
+				local_uid && (*local_uid != 0);
 	h->is_run = ct_is_run;
 	h->enter = ct_enter;
 	h->destroy = ct_destroy;
