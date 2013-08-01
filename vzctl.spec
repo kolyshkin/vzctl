@@ -151,8 +151,8 @@ if %{_initddir}/vz status >/dev/null 2>&1; then
 	fi
 fi
 
-# Run post-install script
-%{_scriptdir}/vz-postinstall
+# Run post-install script only when installing
+test $1 -eq 1 && %{_scriptdir}/vz-postinstall
 
 exit 0
 
