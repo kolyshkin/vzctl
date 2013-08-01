@@ -57,7 +57,6 @@ tune_sysctl()
 	check_file $file
 	change_param $file net.ipv4.ip_forward			1
 	change_param $file net.ipv4.conf.default.proxy_arp	0
-	change_param $file net.ipv4.conf.all.rp_filter		1
 	change_param $file kernel.sysrq				1
 	change_param $file net.ipv4.conf.default.send_redirects	1
 	change_param $file net.ipv4.conf.all.send_redirects	0
