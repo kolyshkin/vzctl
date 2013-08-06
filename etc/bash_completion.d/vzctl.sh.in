@@ -151,12 +151,7 @@ _vzctl()
 			# flag or option
 			case $prev in
 			--ostemplate)
-				# get the template path from the vz.conf
-				local vztmpl=`grep ^TEMPLATE @PKGCONFDIR@/vz.conf | cut -d "=" -f 2`
-				COMPREPLY=( $( compgen -W "$(command ls $vztmpl/cache/*.tar{,.gz,.xz,.bz2} 2>/dev/null |
-						    sed -e "s#^$vztmpl/cache/##" -e 's#\.tar\.*[gbxz2]*$##';
-						    @SBINDIR@/vztmpl-dl --list)" -- $cur ) )
-
+				COMPREPLY=( $( compgen -W "$(@SBINDIR@/vztmpl-dl --list-all)" -- $cur ) )
 				;;
 			--onboot|--disabled|--diskquota)
 				COMPREPLY=( $( compgen -W "yes no" -- $cur ) )

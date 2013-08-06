@@ -67,14 +67,17 @@ usage()
 	cat << =EOF= 1>&2
 Usage:
   $SELF [option ...] template [template ...]
-  $SELF --config | --help | --list
+  $SELF --list-remove | --list-local | --list-all
+  $SELF --config | --help
 Options:
   --gpg-check		Check GPG signatures of downloaded files
   --no-gpg-check	Do not check GPG signatures
   --update		Update templates even if they exist locally
   --no-update		Do not try to update existing templates
+  --list-remote		Output list of templates available for download
+  --list-local		Output list of templates available locally
+  --list-all		Output combined list of templates
   --config		Output current configuration
-  --list		Output list of templates available for download
   --help		Print this help
 Arguments:
   template		An OS template name (like centos-6-x86_64)
@@ -134,7 +137,7 @@ overwritten by setting an appropriate variables in @PKGCONFDIR@/download.conf
 
 # There's no generic way to ask a web server about list of files
 # in a directory, so we rely on having a .listing file next to templates.
-list()
+list_remote()
 {
 	local url
 	local cache=/tmp/$SELF-list
@@ -148,6 +151,12 @@ list()
 	fi
 
 	cat $cache
+}
+
+list_local()
+{
+	ls ${TCACHEDIR}/*.tar{,.gz,.xz,.bz2} 2>/dev/null |
+		  sed -e "s#^${TCACHEDIR}/##" -e 's#\.tar\.*[gbxz2]*$##'
 }
 
 # Parse arguments
@@ -173,8 +182,16 @@ while echo $1 | grep -q '^-'; do
 		show_config
 		exit 0
 		;;
-	   --list)
-		list
+	   --list-all)
+		(list_local; list_remote) | sort | uniq
+		exit 0
+		;;
+	   --list-remote)
+		list_remote
+		exit 0
+		;;
+	   --list-local)
+		list_local
 		exit 0
 		;;
 	   --help)

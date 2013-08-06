@@ -7,7 +7,10 @@ vztmpl-dl \- download/list/update OpenVZ templates
 .OP --no-update
 \fItemplate\fR [\fItemplate\fR ...]
 .SY vztmpl-dl
-.BR --config | --list | --help
+.BR --list-local | --list-remote | --list-all
+.SY vztmpl-dl
+.BR --config | --help
+.YS
 .SH DESCRIPTION
 The main purpose of this utility is to download a precreated container tarballs
 (also known as templates) from the OpenVZ download server. It can be used
@@ -36,14 +39,20 @@ Update (re-download) existing templates.
 .B --no-update
 Do not try to update existing templates.
 .TP
-.B --config
-Output current configuration. The tool has built-in configuration
-which can be overwritten by options in \fB/etc/vz/download.conf\fR file.
-.TP
-.B --list
+.B --list-remote
 Output list of templates available for download. This option is also used
 by \fBvzctl\fR(8) bash-completion script to complete \fB--ostemplate\fR
 option arguments.
+.TP
+.B --list-local
+Output list of templates available locally.
+.TP
+.B --list-all
+Output combined list of templates.
+.TP
+.B --config
+Output current configuration. The tool has built-in configuration
+which can be overwritten by options in \fB/etc/vz/download.conf\fR file.
 .TP
 .B --help
 Output help.
