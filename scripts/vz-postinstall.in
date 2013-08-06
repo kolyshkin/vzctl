@@ -60,6 +60,9 @@ tune_sysctl()
 	change_param $file kernel.sysrq				1
 	change_param $file net.ipv4.conf.default.send_redirects	1
 	change_param $file net.ipv4.conf.all.send_redirects	0
+# https://bugzilla.openvz.org/2641
+	change_param $file net.bridge.bridge-nf-call-ip6tables	1
+	change_param $file net.bridge.bridge-nf-call-iptables	1
 	sysctl -q -p 2>/dev/null
 }
 
