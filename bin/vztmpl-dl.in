@@ -155,8 +155,9 @@ list_remote()
 
 list_local()
 {
-	ls ${TCACHEDIR}/*.tar{,.gz,.xz,.bz2} 2>/dev/null |
-		  sed -e "s#^${TCACHEDIR}/##" -e 's#\.tar\.*[gbxz2]*$##'
+	ls ${TCACHEDIR}/*.tar    ${TCACHEDIR}/*.tar.gz  \
+	   ${TCACHEDIR}/*.tar.xz ${TCACHEDIR}/*.tar.bz2	2>/dev/null |
+		sed -e "s#^${TCACHEDIR}/##" -e 's#\.tar\.*[gbxz2]*$##'
 }
 
 # Parse arguments
