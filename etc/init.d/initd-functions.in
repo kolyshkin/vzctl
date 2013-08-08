@@ -116,7 +116,8 @@ vzdaemon_stop()
 	   debian)
 		local p=$1
 		shift
-		start-stop-daemon --stop --quiet --exec @SBINDIR@/$p -- $*
+		start-stop-daemon --stop --quiet --oknodo \
+			--exec @SBINDIR@/$p -- $*
 		;;
 	esac
 }
