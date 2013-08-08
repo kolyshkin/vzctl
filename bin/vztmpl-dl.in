@@ -57,6 +57,8 @@ test -r @PKGCONFDIR@/download.conf && . @PKGCONFDIR@/download.conf
 : ${GPG_KEY="security@openvz.org"}
 : ${CHECK_TEMPLATE_SIG="no"}
 : ${UPDATE_TEMPLATE="yes"}
+: ${IGNORE_ERRORS="no"}
+unset UPDATE_LIST
 
 vzcheckvar TEMPLATE
 TCACHEDIR=$TEMPLATE/cache
@@ -67,13 +69,16 @@ usage()
 	cat << =EOF= 1>&2
 Usage:
   $SELF [option ...] <template> [<template> ...]
+  $SELF [option ...] --update-all
   $SELF --list-remove | --list-local | --list-all
   $SELF --config | --help
 Options:
   --gpg-check		Check GPG signatures of downloaded files
   --no-gpg-check	Do not check GPG signatures
+  --ignore-errors	Don't abort if a template can't be downloaded
   --update		Update templates even if they exist locally
   --no-update		Do not try to update existing templates
+  --update-all		Try to update all locally available templates
   --list-remote		Output list of templates available for download
   --list-local		Output list of templates available locally
   --list-all		Output combined list of templates
@@ -171,12 +176,22 @@ while echo $1 | grep -q '^-'; do
 		CHECK_TEMPLATE_SIG=no
 		shift
 		;;
+	   --ignore-errors)
+		IGNORE_ERRORS=yes
+		shift
+		;;
 	   --update)
 		UPDATE_TEMPLATE=yes
 		shift
 		;;
 	   --no-update)
 		UPDATE_TEMPLATE=no
+		shift
+		;;
+	   --update-all)
+		UPDATE_LIST=$(list_local)
+		UPDATE_TEMPLATE=yes
+		IGNORE_ERRORS=yes
 		shift
 		;;
 	   --config)
@@ -205,9 +220,16 @@ while echo $1 | grep -q '^-'; do
 	esac
 done
 
-if [ $# -lt 1 ]; then
-	echo "$SELF ERROR: no arguments" 1>&2
-	usage 3
+if [ -n "$UPDATE_LIST" ]; then
+	if [ $# -gt 1 ]; then
+		echo "$SELF ERROR: too many arguments" 1>&2
+		usage 3
+	fi
+else
+	if [ $# -lt 1 ]; then
+		echo "$SELF ERROR: no arguments" 1>&2
+		usage 3
+	fi
 fi
 
 check_sig()
@@ -285,8 +307,22 @@ download()
 
 gpg_working
 
-for TMPL in $*; do
+FAILED_TMPL=""
+for TMPL in ${UPDATE_LIST:-$*}; do
 	download $TMPL
 	RET=$?
-	test $RET -eq 0 || exit $RET
+	if [ $RET -ne 0 ]; then
+		if [ "$IGNORE_ERRORS" = "yes" ]; then
+			FAILED_TMPL="$FAILED_TMPL $TMPL"
+		else
+			exit $RET
+		fi
+	fi
 done
+
+if [ ! -z "$FAILED_TMPL" ]; then
+	echo WARNING: the following templates were not found remotely and can\'t be updated:
+	for TMPL in $FAILED_TMPL; do
+		echo " " $TMPL 1>&2
+	done
+fi

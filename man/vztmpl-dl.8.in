@@ -3,9 +3,11 @@
 vztmpl-dl \- download/list/update OpenVZ templates
 .SH SYNOPSIS
 .SY vztmpl-dl
-.OP --no-gpg-check
-.OP --no-update
+[ \fIoption\fR ... ]
 \fItemplate\fR [\fItemplate\fR ...]
+.SY vztmpl-dl
+[ \fIoption\fR ... ]
+.B --update-all
 .SY vztmpl-dl
 .BR --list-local | --list-remote | --list-all
 .SY vztmpl-dl
@@ -15,6 +17,10 @@ vztmpl-dl \- download/list/update OpenVZ templates
 The main purpose of this utility is to download a precreated container tarballs
 (also known as templates) from the OpenVZ download server. It can be used
 directly from the command line, and is also used by \fBvzctl create\fR.
+
+Usually one or more template names are required, except if one of
+\fB--update-all\fR, \fB--list\fR*, \fB--config\fR or \fB--help\fR
+is used.
 .SH OPTIONS
 .TP
 .B --gpg-check
@@ -33,11 +39,24 @@ OpenVZ public key.
 .B --no-gpg-check
 Do not check GPG signatures.
 .TP
+.B --ignore-errors
+Keep processing templates from the list and return 0 exit code, even if
+some template failed to download. Without this option, \fBvztmpl-dl\fR
+aborts upon first download failure.
+.TP
 .B --update
 Update (re-download) existing templates.
 .TP
 .B --no-update
 Do not try to update existing templates.
+.TP
+.B --update-all
+Try to update all templates that are available locally. Note that there is
+no need to specify individual templates. This options implicitly assumes
+.B --update
+and
+.B --ignore-errors
+options.
 .TP
 .B --list-remote
 Output list of templates available for download. This option is also used
