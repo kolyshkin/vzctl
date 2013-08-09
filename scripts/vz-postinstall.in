@@ -37,7 +37,9 @@ change_param()
 
 	# Check if param is there
 	if grep -q "^[ \t]*${p}[ \t]*=.*" $file; then
+		grep -q "^[ \t]*${p}[ \t]*=[ \t]*${v}$" $file && return
 		# Replace the value
+		echo "vz-postinstall: $file: set $p = $v"
 		sed -i -e \
 			"s/^\([ \t]*${p}[ \t]*=[ \t]*\).*\$/\1${v}/" \
 			$file
@@ -45,6 +47,7 @@ change_param()
 		# If EOL is missing at the last line, fix
 		sed -i -e '$q' $file
 		# Add param
+		echo "vz-postinstall: $file: add $p = $v"
 		echo "${p}=${v}" >> $file
 	fi
 }
