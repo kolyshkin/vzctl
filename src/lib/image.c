@@ -94,7 +94,12 @@ static int load_ploop_lib(void)
 		void *padding[32];
 	} src = { {0}, {0} };
 
-	h = dlopen("libploop.so", RTLD_LAZY);
+	h = dlopen("libploop.so.1", RTLD_LAZY);
+	if (!h && (errno == ENOENT || errno == ESRCH))
+		/* ploop-lib < 1.9 had no .so version
+		 * FIXME: remove this later
+		 */
+		h = dlopen("libploop.so", RTLD_LAZY);
 	if (!h) {
 		logger(-1, 0, "Can't load ploop library: %s", dlerror());
 		logger(-1, 0, "Please install ploop packages!");
