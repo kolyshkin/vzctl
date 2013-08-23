@@ -188,7 +188,7 @@ static int read_resolv_conf(struct resolv_conf_data *r)
 			/* nameserver entries are accumulated */
 			if (nsrv[0])
 				*--cp=' ';
-			strncat(nsrv, cp, sizeof(nsrv));
+			strncat(nsrv, cp, sizeof(nsrv) - strlen(nsrv) - 1);
 			continue;
 		}
 	}
