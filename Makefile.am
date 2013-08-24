@@ -77,3 +77,6 @@ rpms: dist-bzip2
 	rpmbuild -ba vzctl.spec
 
 .PHONY: rpms
+
+# Add optional local rules
+-include Makefile.local
