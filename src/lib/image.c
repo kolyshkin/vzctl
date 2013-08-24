@@ -95,7 +95,7 @@ static int load_ploop_lib(void)
 	} src = { {0}, {0} };
 
 	h = dlopen("libploop.so.1", RTLD_LAZY);
-	if (!h && (errno == ENOENT || errno == ESRCH))
+	if (!h)
 		/* ploop-lib < 1.9 had no .so version
 		 * FIXME: remove this later
 		 */
