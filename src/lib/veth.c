@@ -152,13 +152,42 @@ int parse_hwaddr(const char *str, char *addr)
 	return 0;
 }
 
+static char * get_hwid(void)
+{
+	static char *hwid = NULL;
+	FILE *fp;
+	int len;
+	static char mac[18] = "00:00:00:00:00:00";
+	char buf[127];
+	const char *cmd = "ip a l | grep -F -m 1 'link/ether' 2>/dev/null";
+
+	if (hwid != NULL)
+		return hwid;
+
+	fp = popen(cmd, "r");
+	if (fp == NULL)
+		goto err;
+
+	len = fread(buf, 1, sizeof(buf) - 1, fp);
+	if (len > 0) {
+		buf[len] = 0;
+		sscanf(buf, "%*[^l]link/ether %17s", mac);
+	}
+err:
+	hwid = mac;
+	pclose(fp);
+
+	return hwid;
+}
+
+
 void generate_mac(int veid, char *dev_name, char *mac)
 {
 	int len, i;
 	unsigned int hash, tmp;
 	char data[128];
 
-	snprintf(data, sizeof(data), "%s:%d:%ld ", dev_name, veid, time(NULL));
+	snprintf(data, sizeof(data), "%s:%d:%s ", dev_name, veid, get_hwid());
 	hash = veid;
 	len = strlen(data) - 1;
 	for (i = 0; i < len; i++) {
