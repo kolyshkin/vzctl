@@ -621,7 +621,10 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		goto err;
 	}
 	/* Fix its mode just in case */
-	chmod(fs->private, 0700);
+	if (chmod(fs->private, 0700))
+		/* Too late to rollback, so just issue a warning */
+		logger(-1, errno, "Warning: chmod(%s, 0700) failed",
+				fs->private);
 	/* Finally, del the old private */
 	destroydir(tmp_private);
 	logger(0, 0, "Container was successfully converted "
