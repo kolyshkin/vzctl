@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.4
+Version: 4.5
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -250,6 +250,44 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Fri Aug 23 2013 Kir Kolyshkin <kir@openvz.org> - 4.5-1
+- New functionality:
+-- vztmpl-dl: add --upload-all, --ignore-errors
+-- vztmpl-dl: add --list-remote, --list-local
+-- vztmpl-dl: do not check GPG signatures by default
+-- vztmpl-dl: add --gpg-check and --update options
+-- vz-postinstall: enable iptables for bridges (#2641)
+-- vz-postinstall: be verbose about what we do
+-- vzmigrate: support for VE_PRIVATE being a symlink (#2694)
+- Fixes:
+-- ndsend: fix option field in sending packets (#2709)
+-- libvzchown: link to -ldl (#2705)
+-- vps_create(): save LOCAL_UID/GID=0 if !userns for upstream CT
+-- vzctl.spec: run vz-postinstall on a fresh install only
+-- vz-postinstall: do not change rp_filter sysctl
+-- vzmigrate: remove a bashism
+-- vzctl create: fix running postcreate action wrt --ostemplate path/tmpl
+-- vzctl create: use proper version of basename()
+-- vzdaemon_stop(): don't return error if stopped already
+-- read_resolv_conf(): fix potential buffer overflow
+-- vzctl_env_switch_snapshot: fix leak on error path
+-- vzctl_env_convert_ploop(): check chmod return code
+- Improvements:
+-- veth: improve veth random MAC generation (#2695)
+-- vzctl start: always mount /dev/pts for upstream CT
+-- vzmigrate: add / to paths for rsync (#2686)
+-- load_ploop_lib(): load .so.1, try .so too (for ploop-1.9)
+-- scripts: use VPSCONFDIR instead of PKGCONFDIR/conf
+-- vzctl.spec: add /var/lib/vz as a symlink to /vz
+-- vzctl.spec: don't mark symlink as %dir
+-- vzctl.spec: remove a bunch of defines
+-- vzctl.spec: use %_sharedstatedir not /var/lib
+-- vzctl.spec: quote rpm macros
+-- vzctl.spec: remove extra slashes
+- Documentation:
+-- vztmpl-dl: improve usage
+-- vztmpl-dl(8): describe new options
+
 * Wed Jul 17 2013 Kir Kolyshkin <kir@openvz.org> - 4.4-1
 - New functionality:
 -- vztmpl-dl script to aid in template downloading/updating
