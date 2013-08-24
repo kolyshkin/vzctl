@@ -6,6 +6,8 @@
 %define _netdir	%{_sysconfdir}/sysconfig/network-scripts
 %define _distconfdir %{_configdir}/dists
 %define _distscriptdir %{_distconfdir}/scripts
+# Some older systems have sharedstatedir as /usr/com
+%define _sharedstatedir /var/lib
 
 Summary: OpenVZ containers control utility
 Name: vzctl
