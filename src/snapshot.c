@@ -236,10 +236,11 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	/* freeze */
 	if (run) {
 		/* preserve current top delta with 'guid_tmp' for rollback */
-		if (ploop.uuid_generate(guid_buf, sizeof(guid_buf)))
-			return vzctl_err(VZCTL_E_SWITCH_SNAPSHOT, 0,
-					"Can't generate ploop uuid: %s",
+		if (ploop.uuid_generate(guid_buf, sizeof(guid_buf))) {
+			logger(-1, 0, "Can't generate ploop uuid: %s",
 					ploop.get_last_error());
+			goto err1;
+		}
 		guid_tmp = guid_buf;
 		flags = PLOOP_SNAP_SKIP_TOPDELTA_DESTROY;
 
