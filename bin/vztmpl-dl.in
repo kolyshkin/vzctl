@@ -70,7 +70,7 @@ usage()
 Usage:
   $SELF [option ...] <template> [<template> ...]
   $SELF [option ...] --update-all
-  $SELF --list-remove | --list-local | --list-all
+  $SELF --list-remove | --list-local | --list-all | --list-orphans
   $SELF --config | --help
 Options:
   --gpg-check		Check GPG signatures of downloaded files
@@ -82,6 +82,7 @@ Options:
   --list-remote		Output list of templates available for download
   --list-local		Output list of templates available locally
   --list-all		Output combined list of templates
+  --list-orphans	Output list of local templates NOT available remotely
   --config		Output current configuration
   --help		Print this help
 Arguments:
@@ -165,6 +166,19 @@ list_local()
 		sed -e "s#^${TCACHEDIR}/##" -e 's#\.tar\.*[gbxz2]*$##'
 }
 
+list_orphans()
+{
+	local LOCAL=$(list_local)
+	local REMOTE=$(list_remote)
+	local t
+
+	for t in $LOCAL; do
+		if ! echo "$REMOTE" | grep -q "^$t$"; then
+			echo $t
+		fi
+	done | sort | uniq
+}
+
 # Parse arguments
 while echo $1 | grep -q '^-'; do
 	case $1 in
@@ -208,6 +222,10 @@ while echo $1 | grep -q '^-'; do
 		;;
 	   --list-local)
 		list_local
+		exit 0
+		;;
+	   --list-orphans)
+		list_orphans
 		exit 0
 		;;
 	   --help)

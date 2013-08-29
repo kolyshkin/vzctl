@@ -9,7 +9,7 @@ vztmpl-dl \- download/list/update OpenVZ templates
 [ \fIoption\fR ... ]
 .B --update-all
 .SY vztmpl-dl
-.BR --list-local | --list-remote | --list-all
+.BR --list-local | --list-remote | --list-all | --list-orphans
 .SY vztmpl-dl
 .BR --config | --help
 .YS
@@ -68,6 +68,11 @@ Output list of templates available locally.
 .TP
 .B --list-all
 Output combined list of templates.
+.TP
+.B --list-orphans
+Output list of local templates not available remotely. In trivial scenario
+this will give the list of old templates that are no longer officially
+supported.
 .TP
 .B --config
 Output current configuration. The tool has built-in configuration
