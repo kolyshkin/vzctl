@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.5
+Version: 4.5.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -252,6 +252,11 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Wed Aug 28 2013 Kir Kolyshkin <kir@openvz.org> - 4.5.1-1
+- Fixes:
+-- Fix loading older (<1.9) ploop library (#2719)
+-- Fix installing rpm for people using /var/lib/vz (#2722)
+
 * Fri Aug 23 2013 Kir Kolyshkin <kir@openvz.org> - 4.5-1
 - New functionality:
 -- vztmpl-dl: add --upload-all, --ignore-errors
