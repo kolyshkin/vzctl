@@ -60,9 +60,8 @@ make DESTDIR=%{buildroot} vpsconfdir=%{_vpsconfdir} \
 	install install-redhat-from-spec
 ln -s ../sysconfig/vz-scripts %{buildroot}%{_configdir}/conf
 ln -s ../vz/vz.conf %{buildroot}/etc/sysconfig/vz
-# Some use /var/lib/vz instead of /vz; make them happy
-ln -s ../..%{_vzdir} %{buildroot}%{_sharedstatedir}/vz
 # Needed for %ghost in %files section below
+touch %{buildroot}%{_sharedstatedir}/vz
 touch %{buildroot}/etc/sysconfig/vzeventd
 # This could go to vzctl-lib-devel, but since we don't have it...
 rm -f %{buildroot}%{_libdir}/libvzctl.la
@@ -145,6 +144,9 @@ else # RedHat/Fedora/CentOS case
 	fi
 fi
 
+# Some use /var/lib/vz instead of /vz; create a compatibility symlink
+test -a %{_sharedstatedir}/vz || ln -s ../..%{_vzdir} %{_sharedstatedir}/vz
+
 # (Upgrading from <= vzctl-3.0.24)
 # If vz is running and vzeventd is not, start it
 if %{_initddir}/vz status >/dev/null 2>&1; then
@@ -196,7 +198,7 @@ OpenVZ containers control utility core package
 %dir %{_distconfdir}
 %dir %{_distscriptdir}
 %dir %{_vzdir}
-%{_sharedstatedir}/vz
+%ghost %{_sharedstatedir}/vz
 %{_sbindir}/vzctl
 %{_sbindir}/arpsend
 %{_sbindir}/ndsend
