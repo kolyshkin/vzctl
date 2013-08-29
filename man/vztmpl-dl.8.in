@@ -50,6 +50,18 @@ Update (re-download) existing templates.
 .B --no-update
 Do not try to update existing templates.
 .TP
+.TP
+.B --quiet
+Be less talkative (currently it only adds --quiet flag to
+.BR wget (1)
+).
+.TP
+.B --no-quiet
+Be more talkative (this can be used to negate the effect of
+.B QUIET=yes
+in
+.BR download.conf.
+.TP
 .B --update-all
 Try to update all templates that are available locally. Note that there is
 no need to specify individual templates. This options implicitly assumes
@@ -92,6 +104,10 @@ Setting to \fBno\fR has the same effect as using \fB--no-update\fR option.
 .B CHECK_TEMPLATE_SIG
 Default is \fBno\fR.
 Setting to \fByes\fR has the same effect as using \fB--gpg-check\fR option.
+.TP
+.B QUIET
+Default is \fBno\fR.
+Setting to \fByes\fR has the same effect as using \fB--quiet\fR option.
 .TP
 .B TMPL_REPO_PREFIX
 URL repo prefix. Default is

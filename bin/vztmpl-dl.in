@@ -58,7 +58,9 @@ test -r @PKGCONFDIR@/download.conf && . @PKGCONFDIR@/download.conf
 : ${CHECK_TEMPLATE_SIG="no"}
 : ${UPDATE_TEMPLATE="yes"}
 : ${IGNORE_ERRORS="no"}
+: ${QUIET="no"}
 unset UPDATE_LIST
+unset WGET_QUIET
 
 vzcheckvar TEMPLATE
 TCACHEDIR=$TEMPLATE/cache
@@ -78,6 +80,8 @@ Options:
   --ignore-errors	Don't abort if a template can't be downloaded
   --update		Update templates even if they exist locally
   --no-update		Do not try to update existing templates
+  --quiet		Be less talkative (shut up wget)
+  --no-quiet		Be more talkative
   --update-all		Try to update all locally available templates
   --list-remote		Output list of templates available for download
   --list-local		Output list of templates available locally
@@ -202,6 +206,14 @@ while echo $1 | grep -q '^-'; do
 		UPDATE_TEMPLATE=no
 		shift
 		;;
+	   --quiet)
+		QUIET=yes
+		shift
+		;;
+	   --no-quiet)
+		QUIET=no
+		shift
+		;;
 	   --update-all)
 		UPDATE_LIST=$(list_local)
 		UPDATE_TEMPLATE=yes
@@ -237,6 +249,10 @@ while echo $1 | grep -q '^-'; do
 		;;
 	esac
 done
+
+if [ "$QUIET" = "yes" ]; then
+	WGET_QUIET="--quiet"
+fi
 
 if [ -n "$UPDATE_LIST" ]; then
 	if [ $# -gt 1 ]; then
@@ -283,7 +299,7 @@ do_download()
 	local ret
 
 	trap "rm -f ${dst}" INT TERM
-	wget -P $(dirname ${dst}) -N ${src}
+	wget $WGET_QUIET -P $(dirname ${dst}) -N ${src}
 	ret=$?
 	trap - INT TERM
 	if test $ret -eq 0; then
