@@ -13,6 +13,7 @@
 int container_is_running(envid_t veid);
 int destroy_container(envid_t veid);
 int create_container(envid_t veid);
+int start_container(envid_t veid);
 int container_add_task(envid_t veid);
 pid_t get_pid_from_container(envid_t veid);
 

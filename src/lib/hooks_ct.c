@@ -360,6 +360,9 @@ static int _env_create(void *data)
 		create_devices(arg->h, arg->veid, arg->res->fs.root);
 	}
 
+	if ((ret = start_container(arg->veid)))
+		return VZ_RESOURCE_ERROR;
+
 	ret = ct_chroot(arg->res->fs.root);
 	/* Probably means chroot failed */
 	if (ret)

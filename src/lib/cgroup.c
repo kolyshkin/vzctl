@@ -312,6 +312,54 @@ int create_container(envid_t veid)
 	return ret;
 }
 
+int start_container(envid_t veid)
+{
+	char cgrp[CT_MAX_STR_SIZE];
+	struct cgroup *ct;
+	int ret;
+	struct cgroup_controller *ve;
+	char *bufp = NULL;
+
+	veid_to_name(cgrp, veid);
+	ct = cgroup_new_cgroup(cgrp);
+
+	if ((ret = cgroup_get_cgroup(ct)) < 0) {
+		logger(-1, 0, "Failed to read cgroup info (%s)",
+					cgroup_strerror(ret));
+		goto cleanup;
+	}
+
+	if (!(ve = cgroup_get_controller(ct, "ve"))) {
+		logger(-1, 0, "Failed to attach to ve controller");
+		goto cleanup;
+	}
+
+	if (cgroup_get_value_string(ve, "ve.state", &bufp)) {
+		/* OK, we're running on the mainstream kernel */
+		goto cleanup;
+	}
+
+	cgroup_free(&ct);
+
+	ct = cgroup_new_cgroup(cgrp);
+
+	if (!(ve = cgroup_add_controller(ct, "ve"))) {
+		logger(-1, 0, "Failed to attach to ve controller");
+		goto cleanup;
+	}
+
+	cgroup_set_value_string(ve, "ve.state", "START");
+	if ((ret = cgroup_modify_cgroup(ct))) {
+		logger(-1, 0, "Failed to set ve state (%s)",
+					cgroup_strerror(ret));
+		goto cleanup;
+	}
+
+cleanup:
+	cgroup_free(&ct);
+	return ret;
+}
+
 /* libcgroup is lame. This should be done with the cgroup structure, not the
  * cgroup name
  */
