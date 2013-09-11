@@ -81,6 +81,7 @@ vps_handler *vz_open(envid_t veid, vps_param *param)
 {
 	vps_handler *h = NULL;
 	int ret = -1;
+	int kernel_type;
 
 	h = calloc(1, sizeof(*h));
 	if (h == NULL)
@@ -88,9 +89,13 @@ vps_handler *vz_open(envid_t veid, vps_param *param)
 
 	h->stdfd = reset_std();
 
+	if ((kernel_type = get_kernel_type()) < 0)
+		return NULL;
+
 #ifdef VZ_KERNEL_SUPPORTED
-	/* Find out if we are under OpenVZ or upstream kernel */
-	if (stat_file("/proc/vz") == 1)
+	/* Find out if we have to use syscalls/ioctl interface
+	 * (kernel is OpenVZ with rel <3.6.11) */
+	if (kernel_type == KERNEL_VZ_26)
 		ret = vz_do_open(h, param);
 	else
 #endif
@@ -1001,4 +1006,27 @@ int vps_stop(vps_handler *h, envid_t veid, vps_param *param, int stop_mode,
 end:
 	free_str_param(&param->del_res.net.ip);
 	return ret;
+}
+
+int get_kernel_type()
+{
+	struct utsname uts;
+
+	if (uname(&uts) != 0) {
+		logger(-1, errno, "Error in uname()");
+		return -1;
+	}
+
+	if (stat_file("/proc/vz")) {
+		if (strncmp(uts.release, "3.", 2) == 0)
+			return KERNEL_VZ_3X;
+		else if (strncmp(uts.release, "2.6.", 4) == 0)
+			return KERNEL_VZ_26;
+		else {
+			logger(-1, 0, "Unknown kernel version: %s", uts.release);
+			return -1;
+		}
+	} else {
+		return KERNEL_NONVZ;
+	}
 }

@@ -123,4 +123,13 @@ int exec_container_init(struct arg_start *arg,
 int set_personality32();
 int vz_do_open(vps_handler *h, vps_param *param);
 int ct_do_open(vps_handler *h, vps_param *param);
+
+enum {
+	KERNEL_VZ_26 = 1,
+	KERNEL_VZ_3X,
+	KERNEL_NONVZ,
+};
+
+int get_kernel_type();
+
 #endif
