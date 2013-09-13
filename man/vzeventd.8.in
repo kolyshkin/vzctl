@@ -22,7 +22,7 @@ Current list of known events and associated \fBvzeventd\fR actions are:
 Ignore.
 .TP
 .B stop
-Run /usr/libexec/vzctl/scripts/vzevent-stop. This script takes care of removing
+Run @SCRIPTDIR@/vzevent-stop. This script takes care of removing
 ARP and routing records for the given CT from CT0.
 .TP
 .B mount
@@ -32,7 +32,7 @@ Ignore.
 Ignore.
 .TP
 .B reboot
-Run /usr/libexec/vzctl/scripts/vzevent-reboot. This script takes care of
+Run @SCRIPTDIR@/vzevent-reboot. This script takes care of
 rebooting a given CT.
 .SH OPTIONS
 .TP

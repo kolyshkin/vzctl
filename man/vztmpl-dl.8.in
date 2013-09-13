@@ -30,7 +30,7 @@ is performed if
 is set to
 .B yes
 in
-.B \fB/etc/vz/download.conf\fR file,
+.B \fB@PKGCONFDIR@/download.conf\fR file,
 .BR gpg (1)
 tool is installed, and the OpenVZ public key is available
 in the gpg keyring. See \fBEXAMPLES\fR section below on how to install
@@ -88,13 +88,13 @@ supported.
 .TP
 .B --config
 Output current configuration. The tool has built-in configuration
-which can be overwritten by options in \fB/etc/vz/download.conf\fR file.
+which can be overwritten by options in \fB@PKGCONFDIR@/download.conf\fR file.
 .TP
 .B --help
 Output help.
 .SH CONFIGURATION
 The tool has a built-in configuration defaults, which can be changed
-by editing \fB/etc/vz/download.conf\fR file. The following parameters
+by editing \fB@PKGCONFDIR@/download.conf\fR file. The following parameters
 can be set:
 .TP
 .B UPDATE_TEMPLATE
@@ -148,18 +148,18 @@ To download (or update) centos-6 templates:
   vztmpl-dl centos-6-x86 centos-6-x86_64
 .EE
 .P
-To use \fByandex.ru\fR mirror (in \fB/etc/vz/download.conf\fR):
+To use \fByandex.ru\fR mirror (in \fB@PKGCONFDIR@/download.conf\fR):
 .EX
   TMPL_REPO_PREFIX="http://mirror.yandex.ru/mirrors/download.openvz.org/template/precreated"
 .EE
 .P
-To enable beta templates (in \fB/etc/vz/download.conf\fR):
+To enable beta templates (in \fB@PKGCONFDIR@/download.conf\fR):
 .EX
   TEMPLATE_REPOS="${TEMPLATE_REPOS} ${TMPL_REPO_PREFIX}/beta/"
 .EE
 .SH FILES
 .EX
-/etc/vz/download.conf
+@PKGCONFDIR@/download.conf
 /vz/template/cache
 .EE
 .SH SEE ALSO

@@ -779,7 +779,7 @@ Delete a PCI device from the container.
 
 Note that \fBvps-pci\fR configuration script is executed by \fBvzctl\fR
 then configuring PCI devices. The script is usually located at
-\fB/usr/libexec/vzctl/scripts/\fR.
+\fB@SCRIPTDIR@/\fR.
 
 .SS3 Features management
 .TP
@@ -793,7 +793,7 @@ once, comma-separated.
 .TP
 \fB--applyconfig\fR \fIname\fR
 Read container parameters from the container sample configuration file
-\fB\f(CW/etc/vz/conf/ve-\fIname\fR\fB\f(CW.conf-sample\fR, and
+\fB\f(CW@VPSCONFDIR@/ve-\fIname\fR\fB\f(CW.conf-sample\fR, and
 apply them, if \fB--save\fR option specified save to the container config file.
 The following parameters are not changed: \fBHOSTNAME\fR, \fBIP_ADDRESS\fR,
 \fBOSTEMPLATE\fR, \fBVE_ROOT\fR, and \fBVE_PRIVATE\fR.
@@ -819,7 +819,7 @@ in-kernel state of a running container, and to restore it later.
 \fBsuspend\fR|\fBchkpnt\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
 This command suspends a container to a dump file
 If an option \fB--dumpfile\fR is not set, default
-dump file name \fB/vz/dump/Dump.\fICTID\fR is used.
+dump file name \fB@VZDIR@/dump/Dump.\fICTID\fR is used.
 .TP 4
 \fBresume\fR|\fBrestore\fR \fICTID\fR [\fB--dumpfile\fR \fIname\fR]
 This command restores a container from the dump file created by the
@@ -1103,7 +1103,7 @@ a specific \fBvzctl\fR command is run for a container. The following
 \fBvzctl\fR commands can trigger execution of action scripts:
 \fBstart\fR, \fBstop\fR, \fBrestart\fR, \fBmount\fR and \fBumount\fR.
 
-Action scripts are located in the \fB/etc/vz/conf/\fR directory. There
+Action scripts are located in the \fB@VPSCONFDIR@/\fR directory. There
 are global and per-CT scripts. Global scripts have a literal prefix of
 \fBvps.\fR and are executed for all containers. Per-CT scripts have
 a \fICTID\fB.\fR numeric prefix and are executed for the given container
@@ -1149,15 +1149,15 @@ those from global and per-CT configuration files.
 .PP
 Here is an example of a mount script, which makes host system's
 /mnt/disk available to container(s). Script name can either be
-\fB/etc/vz/conf/vps.mount\fR or \fB/etc/vz/conf/\fICTID\fB.mount\fR.
+\fB@VPSCONFDIR@/vps.mount\fR or \fB@VPSCONFDIR@/\fICTID\fB.mount\fR.
 .PP
 .EX
    # If one of these files does not exist then something
    # is really broken
-   [ -f /etc/sysconfig/vz ] || exit 1
+   [ -f @PKGCONFDIR@/vz.conf ] || exit 1
    [ -f $VE_CONFFILE ] || exit 1
    # Source both files. Note the order is important.
-   . /etc/vz/vz.conf
+   . @PKGCONFDIR@/vz.conf
    . $VE_CONFFILE
    SRC=/mnt/disk
    DST=/mnt/disk
@@ -1395,10 +1395,10 @@ To permanently remove this container:
 .EE
 .SH FILES
 .EX
-/etc/vz/vz.conf
-/etc/vz/conf/\fICTID\fB\f(CR.conf
-/etc/vz/conf/vps.{premount,mount,umount,postumount}
-/etc/vz/conf/\fICTID\fB\f(CR.{premount,mount,start,stop,umount,postumount}
+@PKGCONFDIR@/vz.conf
+@VPSCONFDIR@/\fICTID\fB\f(CR.conf
+@VPSCONFDIR@/vps.{premount,mount,umount,postumount}
+@VPSCONFDIR@/\fICTID\fB\f(CR.{premount,mount,start,stop,umount,postumount}
 /proc/vz/veinfo
 /proc/vz/vzquota
 /proc/user_beancounters

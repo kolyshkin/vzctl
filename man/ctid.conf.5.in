@@ -2,10 +2,10 @@
 .SH NAME
 \fIctid\fR.conf \- configuration file for an OpenVZ container.
 .SH SYNOPSIS
-\fB/etc/vz/conf/\fICTID\fB.conf\fR
+\fB@VPSCONFDIR@/\fICTID\fB.conf\fR
 .SH DESCRIPTION
 This is a configuration file for a container. It is stored as
-\fB/etc/vz/conf/\fR\fICTID\fB.conf\fR, where \fICTID\fR
+\fB@VPSCONFDIR@/\fR\fICTID\fB.conf\fR, where \fICTID\fR
 is the numeric ID of the given container.
 .PP
 Configuration file consists of lines in the form

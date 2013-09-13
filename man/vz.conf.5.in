@@ -2,7 +2,7 @@
 .SH NAME
 vz.conf \- global OpenVZ configuration file
 .SH SYNOPSIS
-.B /etc/vz/vz.conf
+.B @PKGCONFDIR@/vz.conf
 .SH DESCRIPTION
 This is the global configuration file for OpenVZ.
 It consists of lines in the form
@@ -91,7 +91,7 @@ Default OS template to create a container from. Corresponds to
 \fB--ostemplate\fR option of \fBvzctl create\fR.
 .IP \fBCONFIGFILE\fR=\fIname\fR
 Default configuration file
-(\f(CW\fB/etc/vz/conf/ve-\fIname\fR\f(CW\fB.conf-sample\fR)
+(\f(CW\fB@VPSCONFDIR@/ve-\fIname\fR\f(CW\fB.conf-sample\fR)
 used to create a new container. Corresponds to \fB--config\fR
 option of \fBvzctl create\fR.
 .IP \fBVE_LAYOUT\fR=\fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBplain\fR|\fBexpanded\fR|\fBraw\fR}]

@@ -32,7 +32,7 @@ Specify the number of containers.
 .BI -f \ conf_name
 Specify the configuration sample name to write configuration to, instead of
 standard output. The file created will be named
-/etc/vz/conf/ve-\fIconf_name\fR.conf-sample.
+@VPSCONFDIR@/ve-\fIconf_name\fR.conf-sample.
 .TP
 .BI -s \ swapsize
 Specify the swap size in Kbytes. If this option is not given,
