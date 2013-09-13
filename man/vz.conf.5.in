@@ -28,7 +28,7 @@ Value of this parameter sets \fBcpuunits\fR for CT0 (host system).
 Enables or disables logging. This parameter can be set to \fByes\fR or
 \fBno\fR, default is \fByes\fR.
 .IP \fBLOGFILE\fR=\fIfile\fR
-Set location of log file, default is \f(CR/var/log/vzctl.log\fR.
+Set location of log file.
 .IP "\fBLOG_LEVEL\fR=\fInumber\fR"
 Set the logging level for the log file (does not affect console output).
 The greater the \fInumber\fR is, the more information will be logged
