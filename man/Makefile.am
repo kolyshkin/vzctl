@@ -15,6 +15,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+include $(top_srcdir)/pathsubst.am
+
 man_MANS = \
  vzctl.8 \
  vzlist.8 \
@@ -48,8 +50,11 @@ GROFF_HTML_OPTS=-Thtml -t -man -msafer
 
 EXTRA_DIST = $(SRCS) toc.man.in toc.sh html2wiki.sh macros.tmac
 
-%: %.in macros.tmac
-	$(AM_V_GEN)cat $(srcdir)/macros.tmac $< > $@
+%.8: %.8.in macros.tmac
+	$(AM_V_GEN)cat $(srcdir)/macros.tmac $< | $(pathsubst) > $@
+
+%.5: %.5.in macros.tmac
+	$(AM_V_GEN)cat $(srcdir)/macros.tmac $< | $(pathsubst) > $@
 
 check-man-dates:
 	for FILE in $(SRCS); do \
