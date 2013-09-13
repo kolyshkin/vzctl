@@ -1106,7 +1106,7 @@ a specific \fBvzctl\fR command is run for a container. The following
 Action scripts are located in the \fB/etc/vz/conf/\fR directory. There
 are global and per-CT scripts. Global scripts have a literal prefix of
 \fBvps.\fR and are executed for all containers. Per-CT scripts have
-a \fICTID\fR numeric prefix and are executed for the given container
+a \fICTID\fB.\fR numeric prefix and are executed for the given container
 only.
 
 Please note scripts are executed in a host system (CT0) context,
