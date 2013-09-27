@@ -406,7 +406,6 @@ static int ct_env_create_real(struct arg_start *arg)
 		logger(-1, 0, "Unable to alloc");
 		return VZ_RESOURCE_ERROR;
 	}
-	child_stack += stack_size;
 
 	/*
 	 * Belong in the setup phase
@@ -436,7 +435,11 @@ static int ct_env_create_real(struct arg_start *arg)
 	}
 	fcntl(fd, F_SETFD, FD_CLOEXEC);
 
-	ret = clone(_env_create, child_stack, clone_flags, arg);
+#ifdef __ia64__
+	ret = __clone2(_env_create, child_stack, stack_size, clone_flags, arg);
+#else
+	ret = clone(_env_create, child_stack + stack_size, clone_flags, arg);
+#endif
 	close(userns_p[0]);
 	if (ret < 0) {
 		logger(-1, errno, "Unable to clone");
