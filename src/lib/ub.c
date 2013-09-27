@@ -178,14 +178,10 @@ static const char *get_ub_name(unsigned int res_id)
 
 int set_ublimit(vps_handler *h, envid_t veid, ub_param *ub)
 {
-	int vswap = is_vswap_config(ub);
-	const unsigned long unlim_ub[2] = {LONG_MAX, LONG_MAX};
 	const unsigned long *res;
 
 #define SET_UB_LIMIT(name, id)						\
 res = ub->name;								\
-if (vswap && !res)							\
-	res = unlim_ub;							\
 if (res != NULL) {							\
 	if (setublimit(veid, id, res)) {				\
 		logger(-1, errno, "setublimit %s %lu:%lu failed",	\
