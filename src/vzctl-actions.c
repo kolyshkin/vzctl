@@ -1044,8 +1044,15 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		if (ret != 0)
 			return ret;
 	}
+
+	is_run = h != NULL && vps_is_run(h, veid);
+
 	/* Reset UB parameters from config  */
-	if (cmd_p->opt.reset_ub == YES && h != NULL) {
+	if (cmd_p->opt.reset_ub == YES) {
+		if (!is_run) {
+			logger(-1, 0, "Container is not running");
+			return VZ_VE_NOT_RUNNING;
+		}
 		ret = vps_set_ublimit(h, veid, &vps_p->res.ub);
 		*warn_save = 0;
 		return ret;
@@ -1058,7 +1065,6 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			return ret;
 		}
 	}
-	is_run = h != NULL && vps_is_run(h, veid);
 	if (is_run) {
 		if (cmd_p->res.fs.private_orig != NULL) {
 			free(cmd_p->res.fs.private_orig);
