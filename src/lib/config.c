@@ -2850,6 +2850,32 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_STR(apply_cfg)
 }
 
+void merge_ub(ub_param *dst, ub_param *src)
+{
+	MERGE_P2(kmemsize)
+	MERGE_P2(lockedpages)
+	MERGE_P2(privvmpages)
+	MERGE_P2(shmpages)
+	MERGE_P2(numproc)
+	MERGE_P2(physpages)
+	MERGE_P2(vmguarpages)
+	MERGE_P2(oomguarpages)
+	MERGE_P2(numtcpsock)
+	MERGE_P2(numflock)
+	MERGE_P2(numpty)
+	MERGE_P2(numsiginfo)
+	MERGE_P2(tcpsndbuf)
+	MERGE_P2(tcprcvbuf)
+	MERGE_P2(othersockbuf)
+	MERGE_P2(dgramrcvbuf)
+	MERGE_P2(numothersock)
+	MERGE_P2(numfile)
+	MERGE_P2(dcachesize)
+	MERGE_P2(numiptent)
+	MERGE_P2(avnumproc)
+	MERGE_P2(swappages)
+}
+
 static void merge_fs(fs_param *dst, fs_param *src)
 {
 	MERGE_STR(root)

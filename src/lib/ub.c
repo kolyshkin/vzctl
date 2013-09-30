@@ -334,41 +334,6 @@ int add_ub_param(ub_param *ub, ub_res *res)
 	return 0;
 }
 
-void merge_ub(ub_param *dst, ub_param *src)
-{
-#define MERGE_P2(x)						\
-if ((src->x) != NULL) {						\
-	if ((dst->x) == NULL)					\
-		dst->x = malloc(sizeof(*(dst->x)) * 2);		\
-	dst->x[0] = src->x[0];					\
-	dst->x[1] = src->x[1];					\
-}
-
-	MERGE_P2(kmemsize)
-	MERGE_P2(lockedpages)
-	MERGE_P2(privvmpages)
-	MERGE_P2(shmpages)
-	MERGE_P2(numproc)
-	MERGE_P2(physpages)
-	MERGE_P2(vmguarpages)
-	MERGE_P2(oomguarpages)
-	MERGE_P2(numtcpsock)
-	MERGE_P2(numflock)
-	MERGE_P2(numpty)
-	MERGE_P2(numsiginfo)
-	MERGE_P2(tcpsndbuf)
-	MERGE_P2(tcprcvbuf)
-	MERGE_P2(othersockbuf)
-	MERGE_P2(dgramrcvbuf)
-	MERGE_P2(numothersock)
-	MERGE_P2(numfile)
-	MERGE_P2(dcachesize)
-	MERGE_P2(numiptent)
-	MERGE_P2(avnumproc)
-	MERGE_P2(swappages)
-#undef MERGE_P2
-}
-
 /** Read UBC resources current usage from /proc/user_beancounters
  *
  * @param veid		CT ID.
