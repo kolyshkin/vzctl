@@ -2237,6 +2237,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		if (int_id < 0)
 			return ERR_INVAL;
 		vps_p->res.misc.stop_timeout = int_id;
+		break;
 	case PARAM_IGNORED:
 		/* Well known but ignored parameter */
 		break;
