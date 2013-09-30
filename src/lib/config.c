@@ -49,7 +49,7 @@
 #include "image.h"
 
 static int _page_size;
-static int check_name(char *name);
+static int check_name(const char *name);
 
 static vps_config config[] = {
 /*	Op	*/
@@ -204,7 +204,7 @@ static int opt_get_by_id(struct option *opt, int id)
 	return -1;
 }
 
-static conf_struct *find_conf_line(list_head_t *head, char *name,
+static conf_struct *find_conf_line(list_head_t *head, const char *name,
 	char delim)
 {
 	conf_struct *conf;
@@ -2626,9 +2626,9 @@ int get_veid_by_name(const char *name)
 	return -1;
 }
 
-static int check_name(char *name)
+static int check_name(const char *name)
 {
-	char *p;
+	const char *p;
 	const char *validchars = " -+_.";
 
 	for (p = name; *p != '\0'; p++) {
