@@ -127,8 +127,8 @@ static inline void list_moveall(list_head_t *src, list_head_t *dst)
 	     tmp = list_entry(tmp->field.next, typeof(*tmp), field))
 
 
-char *list2str_c(char *name, char c, list_head_t *head);
-char *list2str(char *name, list_head_t *head);
+char *list2str_c(const char *name, char c, list_head_t *head);
+char *list2str(const char *name, list_head_t *head);
 int add_str_param(list_head_t *head, const char *str);
 int add_str_param2(list_head_t *head, char *str);
 int add_str2list(list_head_t *head, const char *val);

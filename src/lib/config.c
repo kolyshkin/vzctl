@@ -308,8 +308,8 @@ static int conf_parse_guid(char **dst, const char *val)
 	return conf_parse_str(dst, guid);
 }
 
-static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val,
-		int allow_empty)
+static int conf_store_strlist(list_head_t *conf, const char *name,
+		list_head_t *val, int allow_empty)
 {
 	char *str;
 
@@ -324,7 +324,7 @@ static int conf_store_strlist(list_head_t *conf, char *name, list_head_t *val,
 	return 0;
 }
 
-static int conf_store_str(list_head_t *conf, char *name, const char *val)
+static int conf_store_str(list_head_t *conf, const char *name, const char *val)
 {
 	char *buf;
 	int len;
@@ -341,14 +341,15 @@ static int conf_store_str(list_head_t *conf, char *name, const char *val)
 	return 0;
 }
 
-static int conf_store_yesno(list_head_t *conf, char *name, int val)
+static int conf_store_yesno(list_head_t *conf, const char *name, int val)
 {
 	if (!val)
 		return 0;
 	return conf_store_str(conf, name, val == YES ? "yes" : "no");
 }
 
-static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
+static int conf_store_ulong(list_head_t *conf, const char *name,
+		unsigned long *val)
 {
 	char buf[] = "18446744073709551615"; /* ULONG_MAX on 64 bit */
 
@@ -359,7 +360,7 @@ static int conf_store_ulong(list_head_t *conf, char *name, unsigned long *val)
 	return conf_store_str(conf, name, buf);
 }
 
-static int conf_store_int(list_head_t *conf, char *name, int val)
+static int conf_store_int(list_head_t *conf, const char *name, int val)
 {
 	char buf[] = "2147483647"; /* INT_MAX */
 
@@ -367,7 +368,7 @@ static int conf_store_int(list_head_t *conf, char *name, int val)
 	return conf_store_str(conf, name, buf);
 }
 
-static int conf_store_bitmap(list_head_t *conf, char *name,
+static int conf_store_bitmap(list_head_t *conf, const char *name,
 			     unsigned long *val, int nmaskbits)
 {
 	int ret;
@@ -1414,7 +1415,8 @@ static inline int parse_cpumask(cpumask_t **dst, const char *str)
 	return conf_parse_bitmap((unsigned long **)dst, CPUMASK_NBITS, str);
 }
 
-static inline int store_cpumask(list_head_t *conf, char *name, cpumask_t *val)
+static inline int store_cpumask(list_head_t *conf, const char *name,
+		cpumask_t *val)
 {
 	return conf_store_bitmap(conf, name, cpumask_bits(val), CPUMASK_NBITS);
 }

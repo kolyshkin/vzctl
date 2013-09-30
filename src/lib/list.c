@@ -22,7 +22,7 @@
 
 #include "list.h"
 
-char *list2str_c(char *name, char c, list_head_t *head)
+char *list2str_c(const char *name, char c, list_head_t *head)
 {
 	char *buf = NULL, *tmp;
 	int buf_len, len, r;
@@ -80,7 +80,7 @@ char *list2str_c(char *name, char c, list_head_t *head)
 	return buf;
 }
 
-char *list2str(char *name, list_head_t *head)
+char *list2str(const char *name, list_head_t *head)
 {
 	return list2str_c(name, 0, head);
 }
