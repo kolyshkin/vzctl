@@ -141,6 +141,29 @@ struct ub_struct {
 };
 typedef struct ub_struct ub_param;
 
+#define FOR_ALL_UBC(func)	\
+	func(kmemsize)		\
+	func(lockedpages)	\
+	func(privvmpages)	\
+	func(shmpages)		\
+	func(numproc)		\
+	func(physpages)		\
+	func(vmguarpages)	\
+	func(oomguarpages)	\
+	func(numtcpsock)	\
+	func(numflock)		\
+	func(numpty)		\
+	func(numsiginfo)	\
+	func(tcpsndbuf)		\
+	func(tcprcvbuf)		\
+	func(othersockbuf)	\
+	func(dgramrcvbuf)	\
+	func(numothersock)	\
+	func(dcachesize)	\
+	func(numfile)		\
+	func(numiptent)		\
+	func(swappages)
+
 /** Apply UBC resources.
  *
  * @param h		CT handler.

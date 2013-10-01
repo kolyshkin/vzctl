@@ -88,29 +88,6 @@ static inline int get_run_ve(int update)
 #define get_run_ve get_run_ve_proc
 #endif
 
-#define FOR_ALL_UBC(func)	\
-	func(kmemsize)		\
-	func(lockedpages)	\
-	func(privvmpages)	\
-	func(shmpages)		\
-	func(numproc)		\
-	func(physpages)		\
-	func(vmguarpages)	\
-	func(oomguarpages)	\
-	func(numtcpsock)	\
-	func(numflock)		\
-	func(numpty)		\
-	func(numsiginfo)	\
-	func(tcpsndbuf)		\
-	func(tcprcvbuf)		\
-	func(othersockbuf)	\
-	func(dgramrcvbuf)	\
-	func(numothersock)	\
-	func(dcachesize)	\
-	func(numfile)		\
-	func(numiptent)		\
-	func(swappages)
-
 /* Print functions */
 static void print_json_str(const char *s)
 {
