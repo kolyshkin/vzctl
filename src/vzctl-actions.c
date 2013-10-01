@@ -1168,6 +1168,8 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 
 	/* Only try to apply parameters on a supported kernel */
 	if (h) {
+		fill_vswap_ub(&g_p->res.ub, &cmd_p->res.ub);
+
 		/* If CT is not running, call this anyway to get relevant
 		 * errors messages like "Can't set CPU: CT is not running"
 		 */

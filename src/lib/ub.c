@@ -335,6 +335,51 @@ int add_ub_param(ub_param *ub, ub_res *res)
 	return 0;
 }
 
+/** Set secondary beancounters in vswap mode,
+ *  if they were not set explicitly,
+ *  based on ram, swap and overcommit.
+ *
+ *  @param cfg		UBC parameters from CT config
+ *  @param cmd		UBC parameters from command line
+ */
+int fill_vswap_ub(ub_param *cfg, ub_param *cmd)
+{
+	float ovc = 0;
+	unsigned long ram, swap;
+
+#define SET(param, val) do {						\
+	if (!cmd->param && !cfg->param) {				\
+		cmd->param = vz_malloc(sizeof(unsigned long)*2);	\
+		if (!cmd->param)					\
+			goto enomem;					\
+		cmd->param[0] = cmd->param[1] = (val);			\
+	} } while (0)
+
+	if (!is_vswap_config(cfg) && !is_vswap_config(cmd))
+		return 0;
+
+	ram = (cmd->physpages ? : cfg->physpages)[1];
+	swap = (cmd->swappages ? : cfg->swappages)[1];
+	if (cmd->vm_overcommit)
+		ovc = *cmd->vm_overcommit;
+	else if (cfg->vm_overcommit)
+		ovc = *cfg->vm_overcommit;
+
+	SET(lockedpages, ram);
+	SET(oomguarpages, ram);
+	SET(vmguarpages, ram + swap);
+	if (ovc)
+		SET(privvmpages, (ram + swap) * ovc);
+	else
+		SET(privvmpages, LONG_MAX);
+#undef SET
+
+	return 0;
+
+enomem:
+	return VZ_RESOURCE_ERROR;
+}
+
 /** Read UBC resources current usage from /proc/user_beancounters
  *
  * @param veid		CT ID.

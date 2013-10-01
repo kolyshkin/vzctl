@@ -175,6 +175,7 @@ int add_ub_param(ub_param *ub, ub_res *res);
 int vps_read_ubc(envid_t veid, ub_param *ub);
 int get_ub_resid(char *name);
 void add_ub_limit(struct ub_struct *ub, int res_id, unsigned long *limit);
+int fill_vswap_ub(ub_param *cfg, ub_param *cmd);
 void free_ub_param(ub_param *ub);
 int is_vswap_config(const ub_param *param);
 #endif

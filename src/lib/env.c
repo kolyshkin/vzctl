@@ -621,6 +621,9 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 			quota_inc(&res->dq, -100);
 	}
 
+	if ((ret = fill_vswap_ub(&res->ub, &res->ub)))
+		return ret;
+
 	if (pipe(wait_p) < 0) {
 		logger(-1, errno, "Can not create pipe");
 		return VZ_RESOURCE_ERROR;
