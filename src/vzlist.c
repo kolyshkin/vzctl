@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -498,6 +498,20 @@ static void print_ ## name(struct Cveinfo *p, int index)		\
 PRINT_DQ(diskspace)
 PRINT_DQ(diskinodes)
 
+static void print_vm_overcommit(struct Cveinfo *p, int index)
+{
+	if (fmt_json) {
+		printf("%g", p->vm_overcommit);
+		return;
+	}
+
+	if (p->vm_overcommit == 0)
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%6s", "-");
+	else
+		p_buf += snprintf(p_buf, e_buf - p_buf, "%6g",
+			p->vm_overcommit);
+}
+
 /* Sort functions */
 
 static inline int check_empty_param(const void *val1, const void *val2)
@@ -732,6 +746,8 @@ UBC_FIELD(swappages, SWAPP),
 {"features", "FEATURES", "%-15s", 0, RES_NONE, print_features, none_sort_fn},
 {"vswap", "VSWAP", "%5s", 0, RES_NONE, print_vswap, none_sort_fn},
 {"disabled", "DISABL", "%6s", 0, RES_NONE, print_disabled, none_sort_fn},
+{"vm_overcommit", "VM_OVC", "%6s", 0, RES_NONE,
+	print_vm_overcommit, none_sort_fn},
 };
 
 static void *x_malloc(int size)
@@ -1046,6 +1062,10 @@ FOR_ALL_UBC(MERGE_UBC)
 
 #undef MERGE_UBC
 	}
+
+	if (res->ub.vm_overcommit != NULL)
+		ve->vm_overcommit = *res->ub.vm_overcommit;
+
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
 		ve->ip = strdup(list2str(NULL, &res->net.ip));
 	}

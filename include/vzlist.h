@@ -114,6 +114,7 @@ struct Cveinfo {
 	int layout; // VE_LAYOUT_*
 	unsigned long long features_mask;
 	unsigned long long features_known;
+	float vm_overcommit;
 };
 
 #define RES_NONE	0
