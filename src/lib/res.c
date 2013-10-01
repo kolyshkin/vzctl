@@ -89,7 +89,8 @@ static int vps_2quota_perm(vps_handler *h, int veid, dev_t device)
 }
 
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
-	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
+	fs_param *fs, ub_param *ub, vps_param *param,
+	int vps_state, skipFlags skip,
 	struct mod_action *action)
 {
 	int ret;
@@ -98,7 +99,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (skip & SKIP_SETUP)
 		return 0;
 	if (vps_state != STATE_STARTING) {
-		if ((ret = vps_set_ublimit(h, veid, &res->ub)))
+		if ((ret = vps_set_ublimit(h, veid, ub ? : &res->ub)))
 			return ret;
 	}
 	if ((ret = vps_net_ctl(h, veid, DEL, &param->del_res.net, actions,

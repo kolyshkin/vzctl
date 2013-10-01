@@ -663,7 +663,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (ret)
 		goto err;
 
-	if ((ret = vps_setup_res(h, veid, &actions, &res->fs, param,
+	if ((ret = vps_setup_res(h, veid, &actions, &res->fs, NULL, param,
 		STATE_STARTING, skip, mod)))
 	{
 		goto err;

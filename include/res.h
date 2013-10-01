@@ -166,13 +166,15 @@ typedef struct vps_param vps_param;
  * @param veid		CT ID.
  * @param actions	distribution action scripts.
  * @param fs		CT FS parameters
+ * @param ub		CT UBC parameters (if NULL taken from param)
  * @param param		CT parameters.
  * @param vps_state	CT state.
  * @param action	external modules.
  * @return		0 on success.
  */
 int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
-	fs_param *fs, vps_param *param, int vps_state, skipFlags skip,
+	fs_param *fs, ub_param *ub, vps_param *param,
+	int vps_state, skipFlags skip,
 	struct mod_action *action);
 int need_configure(vps_res *res);
 

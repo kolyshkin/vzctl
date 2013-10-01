@@ -1170,13 +1170,18 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 
 	/* Only try to apply parameters on a supported kernel */
 	if (h) {
-		fill_vswap_ub(&g_p->res.ub, &cmd_p->res.ub);
+		ub_param calc_ub = {};
+
+		merge_ub(&calc_ub, &cmd_p->res.ub);
+		fill_vswap_ub(&g_p->res.ub, &calc_ub);
 
 		/* If CT is not running, call this anyway to get relevant
 		 * errors messages like "Can't set CPU: CT is not running"
 		 */
-		ret = vps_setup_res(h, veid, actions, &g_p->res.fs, cmd_p,
+		ret = vps_setup_res(h, veid, actions,
+				&g_p->res.fs, &calc_ub, cmd_p,
 				STATE_RUNNING, SKIP_NONE, &g_action);
+		free_ub_param(&calc_ub);
 	}
 err:
 	free_dist_actions(actions);
