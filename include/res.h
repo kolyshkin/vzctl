@@ -90,7 +90,7 @@ typedef struct vps_res {
 	net_param net;		/**< network parameters. */
 	cpu_param cpu;		/**< cpu parameters. */
 	dev_param dev;		/**< device parameters. */
-	ub_param ub;		/**< UBC aprameters. */
+	ub_param ub;		/**< UBC parameters. */
 	cap_param cap;		/**< capability parameters. */
 	dq_param dq;		/**< disk quota parameters. */
 	cpt_param cpt;		/**< chekpointing parameters */
