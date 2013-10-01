@@ -326,6 +326,8 @@ int fill_vswap_ub(ub_param *cfg, ub_param *cmd)
 	SET(lockedpages, ram);
 	SET(oomguarpages, ram);
 	SET(vmguarpages, ram + swap);
+	/* Limit for oomguarpages and vmguarpages should be unlimited */
+	cmd->oomguarpages[1] = cmd->vmguarpages[1] = LONG_MAX;
 	if (ovc)
 		SET(privvmpages, (ram + swap) * ovc);
 	else
