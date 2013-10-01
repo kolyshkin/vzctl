@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "17 May 2013" "OpenVZ" "Containers"
+.TH vzctl 8 "1 Oct 2013" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -150,6 +150,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --swappages pages
 .OP --ram bytes
 .OP --swap bytes
+.OP --vm_overcommit float
 .\" CPU fair scheduler
 .OP --cpuunits num
 .OP --cpulimit num
@@ -396,10 +397,30 @@ Actually, the option is a shortcut for setting \fB--physpages\fR limit
 Set swap space available to a container.
 Actually, the option is a shortcut for setting \fB--swappages\fR limit
 (the barrier is set to 0).
+.TP
+\fB--vm_overcommit\fR \fIfloat\fR
+Set VM overcommitment value to \fIfloat\fR. If set, it is used to calculate
+\fBprivmmpages\fR parameter in case it is not set explicitly (see below).
+Default value is \fB0\fR, meaning unlimited privvmpages.
 .PP
-Note that \fBvzctl\fR checks if running kernel is VSwap capable, and
+\fBvzctl\fR checks if running kernel is VSwap capable, and
 refuses to use these parameters otherwise. This behavior can be overriden
 by using \fB--force\fR flag before parameters.
+.PP
+In VSwap mode, all beancounters other than RAM and swap become optional.
+Note though that if some optional beancounters are not set, they are
+calculated and set by vzctl implicitly, using the following formulae:
+.PP
+.B \(bu lockedpages.barrier = oomguarpages.barrier = ram
+.PP
+.B \(bu lockedpages.limit = oomguarpages.limit = unlimited
+.PP
+.B \(bu vmguarpages.barrier = vmguarpages.limit = ram + swap
+.PP
+.B \(bu privvmpages.barrier = privvmpages.limit = (ram + swap) * vm_overcommit
+.PP
+(if \fBvm_overcommit\fR is \fB0\fR or not set, \fBprivvmpages\fR
+is set to "unlimited")
 .PP
 Here is an example of setting container 777 to have
 512 megabytes of RAM and 1 gigabyte of swap:
