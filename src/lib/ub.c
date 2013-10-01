@@ -277,6 +277,7 @@ void free_ub_param(ub_param *ub)
 	FREE_P(numiptent)
 	FREE_P(avnumproc)
 	FREE_P(swappages)
+	FREE_P(vm_overcommit)
 #undef FREE_P
 }
 

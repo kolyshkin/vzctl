@@ -145,6 +145,7 @@ static vps_config config[] = {
 {"IOPRIO",	NULL, PARAM_IOPRIO},
 {"BOOTORDER",	NULL, PARAM_BOOTORDER},
 {"STOP_TIMEOUT", NULL, PARAM_STOP_TIMEOUT},
+{"VM_OVERCOMMIT", NULL, PARAM_VM_OVERCOMMIT},
 
 /* These ones are either known parameters for global config file,
  * or some obsoleted parameters used in the past. In both cases
@@ -276,6 +277,20 @@ static int conf_parse_ulong(unsigned long **dst, const char *valstr)
 	return 0;
 }
 
+static int conf_parse_float(float **dst, const char *valstr)
+{
+	float val;
+	if (*dst != NULL)
+		return ERR_DUP;
+	if (sscanf(valstr, "%f", &val) != 1)
+		return ERR_INVAL;
+	*dst = malloc(sizeof(float));
+	if (*dst == NULL)
+		return ERR_NOMEM;
+	**dst = val;
+
+	return 0;
+}
 static int conf_parse_bitmap(unsigned long **dst, int nmaskbits,
 			     const char *valstr)
 {
@@ -365,6 +380,14 @@ static int conf_store_int(list_head_t *conf, const char *name, int val)
 	char buf[] = "2147483647"; /* INT_MAX */
 
 	snprintf(buf, sizeof(buf), "%d", val);
+	return conf_store_str(conf, name, buf);
+}
+
+static int conf_store_float(list_head_t *conf, const char *name, float val)
+{
+	char buf[] = "1.34567e+12";
+
+	snprintf(buf, sizeof(buf), "%g", val);
 	return conf_store_str(conf, name, buf);
 }
 
@@ -760,6 +783,11 @@ if (ub->res != NULL) {							\
 	ADD_UB_PARAM(avnumproc, PARAM_AVNUMPROC)
 	ADD_UB_PARAM(swappages, PARAM_SWAPPAGES)
 #undef ADD_UB_PARAM
+
+	if (ub->vm_overcommit && ub->vm_overcommit != 0) {
+		conf = conf_get_by_id(config, PARAM_VM_OVERCOMMIT);
+		conf_store_float(conf_h, conf->name, *ub->vm_overcommit);
+	}
 
 	return 0;
 }
@@ -2047,6 +2075,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_vswap(&vps_p->res.ub, val, id,
 				vps_p->opt.save_force);
 		break;
+	case PARAM_VM_OVERCOMMIT:
+		ret = conf_parse_float(&vps_p->res.ub.vm_overcommit, val);
+		break;
 	case PARAM_CAP:
 		ret = parse_cap(val, &vps_p->res.cap);
 		break;
@@ -2874,6 +2905,7 @@ void merge_ub(ub_param *dst, ub_param *src)
 	MERGE_P2(numiptent)
 	MERGE_P2(avnumproc)
 	MERGE_P2(swappages)
+	MERGE_P(vm_overcommit)
 }
 
 static void merge_fs(fs_param *dst, fs_param *src)

@@ -137,6 +137,7 @@ struct ub_struct {
 	unsigned long *numiptent;
 	unsigned long *avnumproc;
 	unsigned long *swappages;
+	float *vm_overcommit;
 };
 typedef struct ub_struct ub_param;
 
