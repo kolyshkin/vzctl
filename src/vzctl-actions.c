@@ -83,6 +83,8 @@ static struct option set_opt[] = {
 	{"numiptent",	required_argument, NULL, PARAM_NUMIPTENT},
 	{"avnumproc",	required_argument, NULL, PARAM_AVNUMPROC},
 	{"swappages",	required_argument, NULL, PARAM_SWAPPAGES},
+	{"vm_overcommit",
+			required_argument, NULL, PARAM_VM_OVERCOMMIT},
 	/*	Capability */
 	{"capability",	required_argument, NULL, PARAM_CAP},
 	/*	Network	*/

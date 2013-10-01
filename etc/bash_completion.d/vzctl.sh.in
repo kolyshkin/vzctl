@@ -83,7 +83,7 @@ _vzctl()
 		--dgramrcvbuf --oomguarpages --lockedpages --privvmpages \
 		--shmpages --numfile --numflock --numpty --numsiginfo \
 		--dcachesize --numiptent --physpages --swappages \
-		--cpuunits --cpulimit --cpus --cpumask \
+		--vm_overcommit --cpuunits --cpulimit --cpus --cpumask \
 		--iptables --netdev_add --netdev_del --netif_add --netif_del \
 		--diskquota --mount_opts \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
