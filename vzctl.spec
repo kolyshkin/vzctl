@@ -156,7 +156,7 @@ if %{_initddir}/vz status >/dev/null 2>&1; then
 fi
 
 # Run post-install script only when installing
-test $1 -eq 1 && %{_scriptdir}/vz-postinstall
+test $1 -eq 1 && %{_scriptdir}/vz-postinstall selinux
 
 exit 0
 

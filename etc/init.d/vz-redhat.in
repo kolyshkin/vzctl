@@ -472,6 +472,13 @@ start()
 		print_failure
 		return 1
 	fi
+
+	# One-time sysctl.conf setup
+	if test -z "$SKIP_SYSCTL_SETUP"; then
+		@SCRIPTDIR@/vz-postinstall sysctl
+		echo "SKIP_SYSCTL_SETUP=yes" >> ${VZCONF}
+	fi
+
 	__echo "Starting OpenVZ: "
 	load_modules "${IPT_MODULES}"
 	for mod in $PRELOAD_MODULES; do

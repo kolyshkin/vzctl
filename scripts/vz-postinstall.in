@@ -87,5 +87,14 @@ disable_selinux()
 	change_param $file SELINUX disabled
 }
 
-disable_selinux
-tune_sysctl
+case $1 in
+	selinux)
+		disable_selinux
+		;;
+	sysctl)
+		tune_sysctl
+		;;
+	*)
+		echo "Usage: $0 selinux | sysctl" 1>&2
+		exit 1
+esac

@@ -63,6 +63,11 @@ the reboot time. If a container fails to suspend, it will be stopped anyway.
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
 Value of this parameter is a directory in which all container template data are
 stored.
+.IP \fBSKIP_SYSCTL_SETUP\fR=\fByes\fR
+If this parameter is not present, \fBinit.d/vz start \fR sets some
+\fBsysctl.conf\fR(5) parameters required or recommended by OpenVZ
+(with the help of \fBvz-postinstall sysctl\fR script), and then
+adds this parameter to \fBvz.conf\fR.
 
 .SS Network interface parameters
 
