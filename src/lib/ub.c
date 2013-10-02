@@ -305,12 +305,13 @@ int fill_vswap_ub(ub_param *cfg, ub_param *cmd)
 	float ovc = 0;
 	unsigned long ram, swap;
 
-#define SET(param, val) do {						\
+#define SET(param, bar, lim) do {					\
 	if (!cmd->param && !cfg->param) {				\
 		cmd->param = vz_malloc(sizeof(unsigned long)*2);	\
 		if (!cmd->param)					\
 			goto enomem;					\
-		cmd->param[0] = cmd->param[1] = (val);			\
+		cmd->param[0] = (bar);					\
+		cmd->param[1] = (lim);					\
 	} } while (0)
 
 	if (!is_vswap_config(cfg) && !is_vswap_config(cmd))
@@ -323,15 +324,13 @@ int fill_vswap_ub(ub_param *cfg, ub_param *cmd)
 	else if (cfg->vm_overcommit)
 		ovc = *cfg->vm_overcommit;
 
-	SET(lockedpages, ram);
-	SET(oomguarpages, ram);
-	SET(vmguarpages, ram + swap);
-	/* Limit for oomguarpages and vmguarpages should be unlimited */
-	cmd->oomguarpages[1] = cmd->vmguarpages[1] = LONG_MAX;
+	SET(lockedpages, ram, ram);
+	SET(oomguarpages, ram, LONG_MAX);
+	SET(vmguarpages, ram + swap, LONG_MAX);
 	if (ovc)
-		SET(privvmpages, (ram + swap) * ovc);
+		SET(privvmpages, (ram + swap) * ovc, (ram + swap) * ovc);
 	else
-		SET(privvmpages, LONG_MAX);
+		SET(privvmpages, LONG_MAX, LONG_MAX);
 #undef SET
 
 	return 0;
