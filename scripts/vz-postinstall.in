@@ -29,6 +29,7 @@ check_file()
 # $1: file name
 # $2: parameter name
 # $3: new parameter value
+# $4: optional 'noadd' if you don't want to add a non-existing parameter
 change_param()
 {
 	local file=$1 p=$2 v=$3
@@ -43,7 +44,7 @@ change_param()
 		sed -i -e \
 			"s/^\([ \t]*${p}[ \t]*=[ \t]*\).*\$/\1${v}/" \
 			$file
-	else # Add the param
+	elif "x$4" != 'xnoadd'; then  # Add the param
 		# If EOL is missing at the last line, fix
 		sed -i -e '$q' $file
 		# Add param
@@ -64,8 +65,8 @@ tune_sysctl()
 	change_param $file net.ipv4.conf.default.send_redirects	1
 	change_param $file net.ipv4.conf.all.send_redirects	0
 # https://bugzilla.openvz.org/2641
-	change_param $file net.bridge.bridge-nf-call-ip6tables	1
-	change_param $file net.bridge.bridge-nf-call-iptables	1
+	change_param $file net.bridge.bridge-nf-call-ip6tables	1 noadd
+	change_param $file net.bridge.bridge-nf-call-iptables	1 noadd
 	sysctl -q -p 2>/dev/null
 }
 
