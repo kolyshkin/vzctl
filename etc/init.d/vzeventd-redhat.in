@@ -32,14 +32,15 @@ load_module() {
 }
 
 check() {
+	local param=/sys/module/vzevent/parameters/reboot_event
+
 	__echo "Checking vzevent kernel module ..."
 
 	if ! lsmod | fgrep -qw vzevent; then
 		print_failure
 		return 1
 	fi
-	if ! cat /sys/module/vzevent/{,parameters/}reboot_event 2>/dev/null | \
-			fgrep -qw 1; then
+	if ! cat $param | fgrep -qw 1; then
 		print_failure
 		print_warning "vzevent module should be loaded with reboot_event=1 parameter"
 		echo
