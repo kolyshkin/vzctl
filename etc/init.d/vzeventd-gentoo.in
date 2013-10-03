@@ -26,11 +26,10 @@ load_module() {
 	fi
 
 	local param=/sys/module/vzevent/parameters/reboot_event
+	echo 1 > "${param}"
 	if ! grep -Fqw 1 "${param}"; then
 		ewarn "vzevent module should be loaded with reboot_event=1 parameter"
-		ewarn "setting reboot_event to 1..."
-		ewarn "echo 1 > ${param}"
-		echo 1 > "${param}"
+		return 1
 	fi
 	return 0
 }
