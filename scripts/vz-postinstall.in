@@ -44,7 +44,7 @@ change_param()
 		sed -i -e \
 			"s/^\([ \t]*${p}[ \t]*=[ \t]*\).*\$/\1${v}/" \
 			$file
-	elif "x$4" != 'xnoadd'; then  # Add the param
+	elif test "x$4" != 'xnoadd'; then  # Add the param
 		# If EOL is missing at the last line, fix
 		sed -i -e '$q' $file
 		# Add param
