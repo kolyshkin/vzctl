@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # vzeventd	This shell script takes care of starting and stopping
 #               vzeventd daemon for OpenVZ.
@@ -52,7 +52,7 @@ check() {
 }
 
 start() {
-	[ "$EUID" != "0" ] && exit 4
+	[ "$(id -u)" != "0" ] && exit 4
 	[ -x @SBINDIR@/vzeventd ] || exit 5
 	check_vzkernel > /dev/null
 	[ -r /etc/sysconfig/vzeventd ] && . /etc/sysconfig/vzeventd
@@ -63,7 +63,7 @@ start() {
 	load_module
 	check || exit 1
 
-	echo -n $"Starting $prog: "
+	echo -n "Starting $prog: "
 	vzdaemon_start $prog $OPTIONS
 	RETVAL=$?
 	echo
@@ -72,8 +72,8 @@ start() {
 }
 
 stop() {
-	[ "$EUID" != "0" ] && exit 4
-	echo -n $"Shutting down $prog: "
+	[ "$(id -u)" != "0" ] && exit 4
+	echo -n "Shutting down $prog: "
 	vzdaemon_stop $prog
 	RETVAL=$?
 	echo
@@ -106,6 +106,6 @@ case "$1" in
 	exit 3
 	;;
    *)
-	echo $"Usage: $0 {start|stop|status|restart|try-restart|force-reload}"
+	echo "Usage: $0 {start|stop|status|restart|try-restart|force-reload}"
 	exit 2
 esac
