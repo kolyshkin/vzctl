@@ -452,7 +452,7 @@ static void store_features(unsigned long long mask, unsigned long long known,
 	add_str_param(conf_h, buf);
 }
 
-static int parse_ioprio(int id, io_param *io, char *val)
+static int parse_ioprio(io_param *io, char *val)
 {
 	if (parse_int(val, &io->ioprio))
 		return ERR_INVAL;
@@ -2236,7 +2236,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_features(&vps_p->res.env, val);
 		break;
 	case PARAM_IOPRIO:
-		if (parse_ioprio(id, &vps_p->res.io, val))
+		if (parse_ioprio(&vps_p->res.io, val))
 			return ERR_INVAL;
 		break;
 	case PARAM_BOOTORDER:
