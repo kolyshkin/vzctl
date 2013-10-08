@@ -125,6 +125,7 @@ struct Cveinfo {
 #define RES_CPUSTAT	5
 #define RES_CPU		6
 #define RES_CPUNUM	7
+#define RES_STATUS	8
 
 struct Cfield {
 	char *name;

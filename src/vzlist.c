@@ -698,7 +698,7 @@ static struct Cfield field_names[] =
 {"ip", "IP_ADDR", "%-15s", 0, RES_IP, print_ip, ip_sort_fn},
 {"nameserver", "NAMESERVER", "%-15s", 0, RES_NONE, print_nameserver, nameserver_sort_fn},
 {"searchdomain", "SEARCHDOMAIN", "%-15s", 0, RES_NONE, print_searchdomain, searchdomain_sort_fn},
-{"status", "STATUS", "%-9s", 0, RES_NONE, print_status, status_sort_fn},
+{"status", "STATUS", "%-9s", 0, RES_STATUS, print_status, status_sort_fn},
 /*	UBC	*/
 UBC_FIELD(kmemsize, KMEMSIZE),
 UBC_FIELD(lockedpages, LOCKEDP),
@@ -1787,7 +1787,8 @@ static int collect()
 	if (check_param(RES_CPUNUM) && !only_stopped_ve)
 	       get_ves_cpunum();
 	read_ves_param();
-	get_mounted_status();
+	if (check_param(RES_STATUS))
+		get_mounted_status();
 	get_ves_layout();
 	if (check_param(RES_QUOTA)) {
 		get_run_quota_stat();
