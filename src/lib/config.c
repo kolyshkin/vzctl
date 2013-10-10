@@ -224,6 +224,31 @@ static conf_struct *find_conf_line(list_head_t *head, const char *name,
 	return NULL;
 }
 
+static long long get_mul(char c)
+{
+	switch (c) {
+	case 'T':
+	case 't':
+		return 1024ll * 1024 * 1024 * 1024;
+	case 'G':
+	case 'g':
+		return 1024 * 1024 * 1024;
+	case 'M':
+	case 'm':
+		return 1024 * 1024;
+	case 'K':
+	case 'k':
+		return 1024;
+	case 'P':
+	case 'p':
+		return _page_size;
+	case 'B':
+	case 'b':
+		return 1;
+	}
+	return -1;
+}
+
 static int parse_setmode(vps_param *vps_p, const char *val)
 {
 	if (!strcmp(val, "ignore"))
@@ -531,30 +556,6 @@ static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 
 /********************** UB **************************************/
-static long long get_mul(char c)
-{
-	switch (c) {
-	case 'T':
-	case 't':
-		return 1024ll * 1024 * 1024 * 1024;
-	case 'G':
-	case 'g':
-		return 1024 * 1024 * 1024;
-	case 'M':
-	case 'm':
-		return 1024 * 1024;
-	case 'K':
-	case 'k':
-		return 1024;
-	case 'P':
-	case 'p':
-		return _page_size;
-	case 'B':
-	case 'b':
-		return 1;
-	}
-	return -1;
-}
 
 /* This function parses string in form xxx[GMKPB]
  */
