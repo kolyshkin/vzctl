@@ -2237,8 +2237,7 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = parse_features(&vps_p->res.env, val);
 		break;
 	case PARAM_IOPRIO:
-		if (parse_ioprio(&vps_p->res.io, val))
-			return ERR_INVAL;
+		ret = parse_ioprio(&vps_p->res.io, val);
 		break;
 	case PARAM_BOOTORDER:
 		ret = conf_parse_ulong(&vps_p->res.misc.bootorder, val);
