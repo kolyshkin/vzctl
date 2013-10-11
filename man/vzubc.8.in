@@ -40,6 +40,9 @@ Refresh interval for \fBwatch\fR(1), in seconds (corresponds to \fBwatch -n \fIt
 .BR -q , \ --quiet
 Quiet mode. In this mode, \fBvzubc\fR only shows beancounters with fails and
 those with held/maxheld values close to limits.
+.BR -v , \ --verbose
+Verbose mode. In this mode, \fBvzubc\fR also shows beancounters with
+barrier set to \fBunlimited\fR (those are hidden by default).
 .TP
 .BI -qh \ ratio
 Quiet threshold for held to limit ratio. Default is \fB0.5\fR (50%).

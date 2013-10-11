@@ -1,6 +1,6 @@
 #!/bin/sh
 # vzubc - a tool for displaying OpenVZ user beancounters.
-# Copyright (C) 2011-2012, Parallels, Inc. All rights reserved.
+# Copyright (C) 2011-2013, Parallels, Inc. All rights reserved.
 # Licensed under GNU GPL v2 or later version.
 
 umask 0077
@@ -30,6 +30,8 @@ Usage: vzubc [option ...] [<ctid> ...]
      Quiet mode (only show beancounters with fails and close to limits).
      -qh <ratio>: quiet threshold for held/limit ratio (default: $Q_HELD)
      -qm <ratio>: quiet threshold for maxheld/limit ratio (default: $Q_MAXHELD)
+ -v, --verbose:
+     Verbose mode (show unlimited beancounters as well).
  -r, --relative:
      Relative mode, show fail counters delta compared to previous run.
      -rc: clear all saved fail counter data for relative mode
@@ -105,6 +107,9 @@ while test $# -gt 0; do
 		Q_MAXHELD=$2
 		shift
 		;;
+	-v|--verbose)
+		verbose=1
+		;;
 	-r|--relative)
 		relative=1
 		;;
@@ -162,6 +167,11 @@ if test -n "$thr" -a -z "$color" -a -z "$quiet"; then
 	usage 1
 fi
 
+if test -n "$quiet" -a -n "$verbose"; then
+	echo "Error: options --quiet and --verbose can't be used together" 1>&2
+	usage 1
+fi
+
 if test -z "$FILE"; then
 	# No file name given, substitute sane default
 	FILE=/proc/bc/resources
@@ -187,7 +197,8 @@ fi
 # Re-exec ourselves under watch
 test -z "$watch" || exec watch $WATCH_ARGS -- $0 $ARGV -W
 
-cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " -v quiet="$quiet" \
+cat $FILE | LANG=C awk -v CTIDS=" ${CTIDS} " \
+	-v quiet="$quiet" -v verbose="$verbose" \
 	-v qheld="$Q_HELD" -v qmaxheld="$Q_MAXHELD" \
 	-v rel="$relative" -v storedir="$STOREDIR" \
 	-v inc="$incremental" $AWK_COLORS \
@@ -222,13 +233,18 @@ function dp(p, d) {
 	return r "%"
 }
 
+function unlim(barrier, limit) {
+	if ((barrier == 9223372036854775807) || (barrier == 2147483647))
+		return 1;
+
+	return 0;
+}
+
 function important(id, held, maxheld, barrier, limit, failcnt) {
 	if (failcnt > 0)
 		return 2;
 	if (barrier == 0)
 		barrier = limit;
-	if ((barrier == 9223372036854775807) || (barrier == 2147483647))
-		return 0;
 	if (held > barrier)
 		return 2;
 	if (held > barrier * qheld)
@@ -334,10 +350,12 @@ BEGIN {
 		}
 	}
 	imp=important(id, held, maxheld, barrier, limit, failcnt)
-	if ((quiet) && (!imp) && (dh==0)) {
+	unl=unlim(barrier, limit)
+	if ((((quiet) && (!imp)) || ((!verbose) && (unl))) && (dh==0)) {
 		id=""
 		next
 	}
+	if ((!verbose) && (unl))
 	if (header != "") {
 		if (printed)
 			print ""
