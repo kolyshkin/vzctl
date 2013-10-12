@@ -262,7 +262,10 @@ int exec_container_init(struct arg_start *arg,
 		}
 	}
 
-	mount("proc", "/proc", "proc", 0, 0);
+	if (access("/proc", F_OK) == 0 && mount("proc", "/proc", "proc", 0, 0))
+		return vzctl_err(VZ_SYSTEM_ERROR, errno,
+				"Failed to mount /proc");
+
 	if (stat_file("/sys") == 1)
 		mount("sysfs", "/sys", "sysfs", 0, 0);
 
