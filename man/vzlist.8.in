@@ -77,10 +77,9 @@ List only containers with descriptions matching the \fIpattern\fR.
 list all available format specifiers that can be used for
 both output (\fB-o\fR, \fB--output\fR) and the sorting order
 (\fB-s\fR, \fB--sort\fR).
-
+.P
 For the user beancounter fields, if suffix is not specified, current usage
 (a.k.a. "held") value is show. One can also use the following suffixes:
-.RS
 .TP
 .B .m
 maxheld
@@ -102,7 +101,7 @@ soft limit
 .TP
 .B .h
 hard limit
-.RE
+.P
 Note that for JSON output suffixes are not allowed.
 .SH EXAMPLES
 .TP
