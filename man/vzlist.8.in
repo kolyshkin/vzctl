@@ -47,7 +47,7 @@ Suppress trimming long fields. Usable for scripts.
 .IP "\fB-j\fR, \fB--json\fR"
 Output in JSON format. By default, all possible fields are printed.
 .IP "\fB-o\fR, \fB--output\fR \fIfield\fR[,\fIfield\fR...]"
-Display only the specified \fIfield\fRs (see \fBStandard fields\fR
+Display only the specified \fIfield\fRs (see \fBPossible fields\fR
 subsection below).
 .IP \fB-1\fR
 Synonym for \fB-H -octid\fR, i.e. only show container IDs, one per line.
