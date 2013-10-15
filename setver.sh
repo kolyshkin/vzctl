@@ -53,6 +53,17 @@ GIT_R=$(echo $GIT_DESC | sed 's/^[^-]*-\([1-9][0-9]*\)-g/\1.git./')
 test "$GIT_V" = "$GIT_R" && GIT_R="1"
 GIT_VR="${GIT_V}-${GIT_R}"
 
+BUILDID=$(cat .build-id 2>/dev/null || echo 0)
+if test "${GIT_VR}" = "$(cat .version-id 2>/dev/null)"; then
+	BUILDID=$((BUILDID+1))
+	GIT_R="${GIT_R}.${BUILDID}"
+	GIT_VR="${GIT_VR}.${BUILDID}"
+else
+	echo "${GIT_VR}" > .version-id
+	BUILDID=0
+fi
+echo "${BUILDID}" > .build-id
+
 CONF_V=$(grep AC_INIT $CONFIGURE_AC | \
 		sed 's/^[^,]*,[ ]\([^,]*\),.*$/\1/')
 
