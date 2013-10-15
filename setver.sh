@@ -1,6 +1,12 @@
 #!/bin/sh
 
-while test -n "$1"; do
+OPTS=$(getopt -o biUFvof --long \
+	build,install,update,freshen,verbose,oldpackage \
+	-n 'setver.sh' -- "$@")
+
+eval set -- "$OPTS"
+
+while true; do
 	case $1 in
 	   -b|--build)
 		build=yes
@@ -22,6 +28,9 @@ while test -n "$1"; do
 		;;
 	   -o|--oldpackage)
 		oldpackage="--oldpackage"
+		;;
+	   --)
+		break
 		;;
 	   *)
 		echo "Invalid argument: $1" 1>&2
