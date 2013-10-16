@@ -416,6 +416,12 @@ ip_conv() {
 }
 
 quota_tools_support_ext4() {
+	# First a hack for RHEL5 which supports ext4 since quota-3.13-4.el5
+	test -n "$(rpm -q --qf '%{version}.%{release}\n' quota 2>/dev/null |
+		   awk -F . '$NF=="el5" && ($2>13 || ($2==13 && $3>3))')" &&
+		return 0
+
+	# Now, check other systems, that should have quota > 3.16
 	quotacheck -V | awk '/ version /{
 		i=split($4, a, ".");
 		if (i < 2) {
@@ -440,7 +446,7 @@ setup_quota_ploop() {
 		rm -f /aquota.group
 	elif [ ! -f "/aquota.user" -o ! -f "/aquota.group" ]; then
 		quota_tools_support_ext4 || exit 1
-		quotacheck -anugmM
+		quotacheck -anugmM -F vfsv0
 	fi
 }
 
