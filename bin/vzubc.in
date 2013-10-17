@@ -355,7 +355,6 @@ BEGIN {
 		id=""
 		next
 	}
-	if ((!verbose) && (unl))
 	if (header != "") {
 		if (printed)
 			print ""
