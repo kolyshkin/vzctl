@@ -455,7 +455,7 @@ int vps_run_script(vps_handler *h, envid_t veid, char *script, vps_param *vps_p)
 		is_mounted = vps_is_mounted(root, private);
 		if (is_mounted == 0) {
 			if ((ret = fsmount(veid, &vps_p->res.fs,
-				&vps_p->res.dq, SKIP_FSCK)))
+				&vps_p->res.dq, 0)))
 			{
 				return ret;
 			}

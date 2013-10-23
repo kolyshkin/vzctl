@@ -523,7 +523,7 @@ static int vps_postcreate(envid_t veid, vps_res *res)
 		ret = 0;
 		goto err;
 	}
-	ret = fsmount(veid, &res->fs, &res->dq, SKIP_FSCK);
+	ret = fsmount(veid, &res->fs, &res->dq, 0);
 	if (ret)
 		goto err;
 	arg[0] = actions.post_create;
