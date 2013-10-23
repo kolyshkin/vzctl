@@ -414,8 +414,16 @@ static void console_winch(int sig)
 
 	if (ioctl(0, TIOCGWINSZ, &ws))
 		warn("Unable to get window size");
-	else if (ioctl(tty, TIOCSWINSZ, &ws))
-		warn("Unable to set window size");
+	else {
+		if (sig == 0) {	/* just attached */
+			/* force a redraw by "changing" the term size */
+			ws.ws_row++;
+			ioctl(tty, TIOCSWINSZ, &ws);
+			ws.ws_row--;
+		}
+		if (ioctl(tty, TIOCSWINSZ, &ws))
+			warn("Unable to set window size");
+	}
 }
 
 static void sak(void)
@@ -455,7 +463,7 @@ int do_console_attach(vps_handler *h, envid_t veid, int ttyno)
 
 	signal(SIGCHLD, child_handler);
 	signal(SIGWINCH, console_winch);
-	console_winch(SIGWINCH);
+	console_winch(0);
 
 	fprintf(stderr, "Attached to CT %d (ESC . to detach)\n", veid);
 	if ((pid = fork()) < 0) {
