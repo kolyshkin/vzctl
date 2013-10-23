@@ -90,6 +90,7 @@ rm -rf %{buildroot}
 %{_sbindir}/vzcfgvalidate
 %{_sbindir}/vzmigrate
 %{_sbindir}/vzifup-post
+%{_sbindir}/vzoversell
 %{_sbindir}/vzubc
 %{_netdir}/ifup-venet
 %{_netdir}/ifdown-venet

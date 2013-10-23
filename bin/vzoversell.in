@@ -1,0 +1,214 @@
+#!/bin/sh
+# Copyright (C) 2013, Parallels, Inc. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+# This script checks oversell levels for memory and swap
+# for VSwap-based container. Think of it as a replacement
+# for vzmemcheck.
+
+ram=$(awk  '/^MemTotal:/  {print $2/4}' < /proc/meminfo)
+swap=$(awk '/^SwapTotal:/ {print $2/4}' < /proc/meminfo)
+
+procbc=$1
+test -z "$1" && procbc=/proc/bc/resources
+
+awk -v ram=$ram -v swap=$swap < $procbc '
+
+# converts a value to human-readable form
+# v: value
+# m: 1 if value is in 4K pages, 0 if in bytes
+function hr(v, m) {
+	if ((v == 9223372036854775807) || (v == 2147483647) || (v == 0))
+		return "- ";
+	i=1
+	# translate pages to KB
+	if (m) {
+		v = v*4
+		i++
+	}
+	while (v >= 1024) {
+		v=v/1024
+		i++
+	}
+	fmt="%d%c"
+		if (v < 100)
+			fmt="%.3g%c"
+	return sprintf(fmt, v, substr(" KMGTPEZY", i, 1))
+}
+
+# hr() for pages
+function hp(v) {
+	return hr(v, 1);
+}
+
+# hr() for bytes
+function hb(v) {
+	return hr(v, 0);
+}
+
+function dp(p, d) {
+	if ((d == 0) || (d == 9223372036854775807) || (d == 2147483647))
+		return "- "
+	r = sprintf("%.1f", p / d * 100);
+	fmt="%d"
+	if (r < 10)
+		fmt="%.1g"
+	r = sprintf(fmt, r)
+	if (r == 0)
+		return "- "
+	return r "%"
+}
+
+function header() {
+	printf("           --------- RAM ---------  -------- Swap ---------  Flags\n");
+	printf("            used  peak limit fails   used  peak limit fails\n");
+}
+
+function footer() {
+	printf("           ----- ----- ----- -----  ----- ----- ----- -----\n");
+	printf(" TOTAL     %5s %5s %5s %5s  %5s %5s %5s %5s\n\n",
+		hp(t_ram_held), hp(t_ram_maxheld),
+		hp(t_ram_limit), hb(t_ram_failcnt),
+		hp(t_swap_held), hp(t_swap_maxheld),
+		hp(t_swap_limit), hb(t_swap_failcnt));
+
+	printf("RAM        available: %5s  allocated: %5s  oversell: %s\n",
+		hp(ram), hp(t_ram_limit), dp(t_ram_limit, ram));
+	printf("Swap       available: %5s  allocated: %5s  oversell: %s\n",
+		hp(swap), hp(t_swap_limit), dp(t_swap_limit, swap));
+	printf("RAM+Swap   available: %5s  allocated: %5s  oversell: %s\n",
+		hp(ram+swap), hp(t_ram_limit+t_swap_limit),
+		dp(t_ram_limit+t_swap_limit, ram+swap));
+
+	if (t_flags != "") {
+		printf("\nFlags:\n");
+		if (t_flags ~ "R")
+			printf("  R: non-VSwap container, RAM limit guessed " \
+				"based on privvmpages\n");
+		if (t_flags ~ "S")
+			printf("  S: unlimited swap (ok for non-vswap), " \
+				"not counted into total swap limit\n");
+		if (t_flags ~ "f")
+			printf("  f: RAM failctl > 0 (swap used), use vzubc" \
+				"to check details\n");
+		if (t_flags ~ "F")
+			printf("  F: beancounter failctl > 0, use vzubc " \
+				"to check details\n");
+	}
+
+}
+
+function process_ct() {
+	if (bcid <= 0)
+		return
+
+	flags=""
+
+	if (ram_limit == 0 || ram_limit == 2147483647 || ram_limit == 9223372036854775807) {
+		# Non-VSwap config!
+		flags="R"
+		# Roughly guess limit based on privvmpages / vm_overcommit
+		ram_limit=vm_limit/2
+	}
+	if (swap_limit == 2147483647 || swap_limit == 9223372036854775807) {
+		# Hmm, unlimited swap?
+		flags=flags"S"
+		swap_limit = 0
+	}
+	if (failcnt > 0)
+		if (failctl == ram_failcnt)
+			flags=flags"f"
+		else
+			flags=flags"F"
+
+	t_ram_held	+= ram_held;
+	t_ram_maxheld	+= ram_maxheld;
+	t_ram_limit	+= ram_limit;
+	t_ram_failcnt   += ram_failcnt;
+	t_swap_held	+= swap_held;
+	t_swap_maxheld	+= swap_maxheld;
+	t_swap_limit	+= swap_limit;
+	t_swap_failcnt	+= swap_failcnt;
+
+	t_flags = t_flags flags;
+
+	printf("%10d %5s %5s %5s %5s  %5s %5s %5s %5s  %s\n",
+		bcid,
+		hp(ram_held), hp(ram_maxheld),
+		hp(ram_limit), hb(ram_failcnt),
+		hp(swap_held), hp(swap_maxheld),
+		hp(swap_limit), hb(swap_failcnt),
+		flags);
+}
+
+BEGIN {
+	bcid=-1
+	t_flags=""
+	header()
+}
+/^Version: / {
+	if ($2 != "2.5") {
+		print "Error: unknown version:",
+			$2 > "/dev/stderr"
+		exit 1
+	}
+	next
+}
+/^[[:space:]]*uid / {
+	next
+}
+/^[[:space:]]*dummy/ {
+	next
+}
+/^[[:space:]]*[0-9]+:/ {
+	bcid=int($1)
+	failcnt=$7
+	next
+}
+/^[[:space:]]*privvmpages/ {
+	vm_held=$2
+	vm_maxheld=$3
+	vm_limit=$5
+	vm_failcnt=$6
+	failcnt += $6
+	next
+}
+/^[[:space:]]*physpages/ {
+	ram_held=$2
+	ram_maxheld=$3
+	ram_limit=$5
+	ram_failcnt=$6
+	failcnt += $6
+	next
+}
+
+{
+	if (bcid > 0)
+		failcnt += $6
+}
+
+/^[[:space:]]*swappages/ {
+	swap_held=$2
+	swap_maxheld=$3
+	swap_limit=$5
+	swap_failcnt=$6
+
+	process_ct()
+}
+END {
+	footer()
+}'
