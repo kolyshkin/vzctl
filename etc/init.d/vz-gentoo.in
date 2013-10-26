@@ -28,8 +28,8 @@ check_config() {
 		: ${PRELOAD_MODULES:="af_packet"}
 		: ${MODULES:="vzmon vzdquota vzdev"}
 		: ${MIGRATE_MODULES:="vzcpt vzrst"}
-		: ${NET_MODULES="vznetdev vznet vzethdev"}
-		: ${PLOOP_MODULES="ploop pfmt_ploop1 pfmt_raw pio_direct pio_nfs"}
+		: ${NET_MODULES:="vznetdev vznet vzethdev"}
+		: ${PLOOP_MODULES:="ploop pfmt_ploop1 pfmt_raw pio_direct pio_nfs"}
 
 		# check if you should load vzwdog module
 		[ "${VZWDOG}" = "yes" ] && MODULES="${MODULES} vzwdog"
