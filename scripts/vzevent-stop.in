@@ -40,7 +40,8 @@ clear_ve_net()
 }
 
 # If vzctl stop is running -- let it finish the job
-ps -o cmd= -C vzctl 2>/dev/null | egrep -qw "(stop|restart) $VEID" && exit 0
+ps -o cmd= -C vzctl 2>/dev/null | \
+	egrep -qw "(stop|restart|chkpnt|suspend) $VEID" && exit 0
 
 I=1
 while vzctl --quiet status $VEID | fgrep -w running; do
