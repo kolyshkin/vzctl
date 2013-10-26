@@ -370,8 +370,8 @@ stop_ves()
 			for veid in $velist; do
 				echo $msg $veid
 				if [ "$stage" = "stop" ]; then
-					# Unset cpulimit for CT to stop fast
-					$VZCTL set $veid --cpulimit 0 >/dev/null 2>&1
+					# Unset limits for CT to stop fast
+					$VZCTL set $veid --cpulimit 0 --iolimit 0 --iopslimit 0 >/dev/null 2>&1
 				fi
 				$VZCTL --skiplock $stage $veid >/dev/null 2>&1 &
 				pids="$pids $!"
