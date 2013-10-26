@@ -344,7 +344,7 @@ stop_ves()
 	velist=$(vzlist -1 2>/dev/null)
 	for veid in $velist; do
 		# Equalize cpuunits for all CTs
-		$VZCTL set $veid --cpuunits 2000 --cpulimit 0 >/dev/null 2>&1
+		$VZCTL set $veid --cpuunits 2000 >/dev/null 2>&1
 		# Save to vzreboot list
 		touch $VZREBOOTDIR/$veid
 	done
