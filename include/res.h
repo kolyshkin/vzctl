@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -65,6 +65,8 @@ struct mod_action;
 
 typedef struct {
 	int ioprio;
+	int iolimit;
+	int iopslimit;
 } io_param;
 
 typedef struct name_param {

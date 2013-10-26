@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -85,6 +85,8 @@ struct Ccpu {
 
 struct Cio {
 	int ioprio;
+	int iolimit;
+	int iopslimit;
 };
 
 struct Cveinfo {
@@ -126,6 +128,7 @@ struct Cveinfo {
 #define RES_CPU		6
 #define RES_CPUNUM	7
 #define RES_STATUS	8
+#define RES_IO		9
 
 struct Cfield {
 	char *name;

@@ -182,8 +182,10 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .\" Apply config
 .OP --applyconfig name
 .OP --applyconfig_map group
-.\" I/O prio
+.\" I/O
 .OP --ioprio num
+.OP --iolimit mbps
+.OP --iopslimit iops
 .\" Options
 .OP --save
 .OP --force
@@ -825,12 +827,35 @@ possible value for \fIgroup\fR is \fBname\fR:
 to restore container name based on \fBNAME\fR
 variable in container configuration file.
 
-.SS3 I/O priority management
+.SS3 I/O scheduling
 .TP
 \fB--ioprio\fR \fIpriority\fR
-Assigns I/O priority to container. \fIPriority\fR range is \fB0-7\fR.
+Assigns disk I/O priority to container. \fIPriority\fR range is \fB0-7\fR.
 The greater \fIpriority\fR is, the more time for I/O activity container has.
 By default each container has \fIpriority\fR of \fB4\fR.
+.TP
+\fB--iolimit\fR \fIlimit\fR[\fBB\fR|\fBK\fR|\fBM\fR|\fBG\fR]
+Assigns disk I/O bandwidth limit for a container. Value is either a number
+with an optional suffix, or a literal string \fBunlimited\fR.
+Value of \fB0\fR means "unlimited". By default a container has no I/O limit.
+Maximum allowed limit is 2 gigabytes per second; values exceeding the limit
+are truncated.
+
+If no suffix is provided, the \fIlimit\fR is assumed to be in megabytes
+per second. Available suffixes are:
+.br
+\(bu \fBb\fR, \fBB\fR -- bytes per second;
+.br
+\(bu \fBk\fR, \fBK\fR -- kilobytes per second;
+.br
+\(bu \fBm\fR, \fBM\fR -- megabytes per second (default);
+.br
+\(bu \fBg\fR, \fBG\fR -- gigabytes per second;
+.TP
+\fB--iopslimit\fR \fIiops\fR
+Assigns IOPS limit for a container, in number of input/output operations
+per second. Value is a number or a literal string \fBunlimited\fR.
+Value of \fB0\fR means "unlimited". By default a container has no IOPS limit.
 
 .SS Suspending and resuming
 

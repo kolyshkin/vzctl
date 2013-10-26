@@ -143,6 +143,8 @@ static vps_config config[] = {
 
 {"FEATURES",	NULL, PARAM_FEATURES},
 {"IOPRIO",	NULL, PARAM_IOPRIO},
+{"IOLIMIT",	NULL, PARAM_IOLIMIT},
+{"IOPSLIMIT",	NULL, PARAM_IOPSLIMIT},
 {"BOOTORDER",	NULL, PARAM_BOOTORDER},
 {"STOP_TIMEOUT", NULL, PARAM_STOP_TIMEOUT},
 {"VM_OVERCOMMIT", NULL, PARAM_VM_OVERCOMMIT},
@@ -488,15 +490,97 @@ static int parse_ioprio(io_param *io, char *val)
 	return 0;
 }
 
-static int store_ioprio(vps_param *old_p, vps_param *vps_p,
+static int parse_iolimit(io_param *io, char *val, int def_mul)
+{
+	char *tail;
+	unsigned long long tmp;
+	long long n;
+	int ret = 0;
+
+	if (!strcmp(val, "unlimited")) {
+		io->iolimit = 0;
+		return 0;
+	}
+
+	errno = 0;
+	tmp = strtoull(val, &tail, 10);
+	if (errno == ERANGE)
+		goto inval;
+
+	if (tmp > INT_MAX) {
+		tmp = INT_MAX;
+		ret = ERR_LONG_TRUNC;
+	}
+
+	if (*tail != '\0') {
+		n = get_mul(*tail++);
+
+		if ((n < 0) || (*tail != '\0'))
+			goto inval;
+
+		tmp = tmp * n;
+	} else {
+		tmp *= def_mul;
+	}
+
+	/* After multiplication, truncate again */
+	if (tmp > INT_MAX) {
+		tmp = INT_MAX;
+		ret = ERR_LONG_TRUNC;
+	}
+
+	io->iolimit = tmp;
+
+	return ret;
+
+inval:
+	io->iolimit = -1;
+
+	return ERR_INVAL;
+}
+
+static int parse_iopslimit(io_param *io, char *val)
+{
+	int tmp;
+
+	if (parse_int(val, &tmp))
+		goto inval;
+
+	if (tmp < 0)
+		goto inval;
+
+	io->iopslimit = tmp;
+
+	return 0;
+
+inval:
+	io->iopslimit = -1;
+
+	return ERR_INVAL;
+}
+
+static int store_io(vps_param *old_p, vps_param *vps_p,
 				 vps_config *conf, list_head_t *conf_h)
 {
 	io_param *io_param = &vps_p->res.io;
+	int val = -1;
 
-	if (conf->id != PARAM_IOPRIO || io_param->ioprio < 0)
+	switch (conf->id) {
+		case PARAM_IOPRIO:
+			val = io_param->ioprio;
+			break;
+		case PARAM_IOLIMIT:
+			val = io_param->iolimit;
+			break;
+		case PARAM_IOPSLIMIT:
+			val = io_param->iopslimit;
+			break;
+	}
+
+	if (val < 0)
 		return 0;
 
-	return conf_store_int(conf_h, conf->name, io_param->ioprio);
+	return conf_store_int(conf_h, conf->name, val);
 }
 
 /******************** Iptables *************************/
@@ -2239,6 +2323,18 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_IOPRIO:
 		ret = parse_ioprio(&vps_p->res.io, val);
 		break;
+	case PARAM_IOLIMIT:
+	case PARAM_IOLIMIT_MB:
+		ret = parse_iolimit(&vps_p->res.io, val,
+				/* value from cmdline is in MB/s
+				 * unless a suffix is provided;
+				 * value from config is in B/s.
+				 */
+				(id == PARAM_IOLIMIT_MB) ? 1024*1024 : 1);
+		break;
+	case PARAM_IOPSLIMIT:
+		ret = parse_iopslimit(&vps_p->res.io, val);
+		break;
 	case PARAM_BOOTORDER:
 		ret = conf_parse_ulong(&vps_p->res.misc.bootorder, val);
 		break;
@@ -2303,7 +2399,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_meminfo(old_p, vps_p, conf, conf_h);
 		store_netif(old_p, vps_p, conf, conf_h);
 		store_name(old_p, vps_p, conf, conf_h);
-		store_ioprio(old_p, vps_p, conf, conf_h);
+		store_io(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }
@@ -2627,6 +2723,8 @@ vps_param *init_vps_param()
 	list_head_init(&param->del_res.veth.dev);
 	param->res.meminfo.mode = -1;
 	param->res.io.ioprio = -1;
+	param->res.io.iolimit = -1;
+	param->res.io.iopslimit = -1;
 	param->opt.mode = -1;
 	param->res.misc.stop_timeout = -1;
 
@@ -3016,6 +3114,8 @@ static void merge_name(name_param *dst, name_param *src)
 
 static void merge_io(io_param *dst, io_param *src) {
 	MERGE_INT2(ioprio)
+	MERGE_INT2(iolimit)
+	MERGE_INT2(iopslimit)
 }
 
 static int merge_res(vps_res *dst, vps_res *src)

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -157,6 +157,9 @@
 #define PARAM_STOP_TIMEOUT	400
 
 #define PARAM_VM_OVERCOMMIT	401
+#define PARAM_IOLIMIT		402
+#define PARAM_IOLIMIT_MB	403
+#define PARAM_IOPSLIMIT		404
 
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

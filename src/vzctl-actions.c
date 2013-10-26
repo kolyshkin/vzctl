@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2012, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -143,6 +143,8 @@ static struct option set_opt[] = {
 	{"name",	required_argument, NULL, PARAM_NAME},
 	{"features",	required_argument, NULL, PARAM_FEATURES},
 	{"ioprio",	required_argument, NULL, PARAM_IOPRIO},
+	{"iolimit",	required_argument, NULL, PARAM_IOLIMIT_MB},
+	{"iopslimit",	required_argument, NULL, PARAM_IOPSLIMIT},
 	{"description",	required_argument, NULL, PARAM_DESCRIPTION},
 	{"bootorder",	required_argument, NULL, PARAM_BOOTORDER},
 
@@ -983,7 +985,7 @@ static int set_ve0(vps_handler *h, vps_param *g_p,
 	ret = vps_set_ublimit(h, 0, ub);
 	if (ret)
 		return ret;
-	if ((ret = ve_ioprio_set(h, 0, &cmd_p->res.io)))
+	if ((ret = vps_set_io(h, 0, &cmd_p->res.io)))
 		return ret;
 	if (cpu != NULL)
 		if ((ret = hn_set_cpu(cpu)))

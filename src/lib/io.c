@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2007-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 
 #include <errno.h>
 #include <sys/syscall.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
+#include <linux/vziolimit.h>
 #include "list.h"
 #include "res.h"
 #include "vzerror.h"
@@ -31,12 +33,9 @@ static int ioprio_set(int which, int who, int ioprio)
 	return syscall(__NR_ioprio_set, which, who, ioprio);
 }
 
-int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param)
+int vzctl_set_ioprio(vps_handler *h, envid_t veid, int ioprio)
 {
-	int ioprio;
 	int ret;
-
-	ioprio = io_param->ioprio;
 
 	if (ioprio < 0)
 		return 0;
@@ -56,4 +55,111 @@ int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param)
 	}
 
 	return 0;
+}
+
+int vzctl_set_iolimit(vps_handler *h, envid_t veid, int limit)
+{
+	int ret;
+	struct iolimit_state io;
+
+	if (limit < 0)
+		return 0;
+
+	io.id = veid;
+	/* Values hardcoded according to PCLIN-27604 */
+	io.speed = limit;
+	io.burst = limit * 3;
+	io.latency = 10*1000;
+	logger(0, 0, "Setting iolimit: %d bytes/sec", limit);
+	ret = ioctl(h->vzfd, VZCTL_SET_IOLIMIT, &io);
+	if (ret) {
+		if (errno == ESRCH)
+			return vzctl_err(VZ_VE_NOT_RUNNING, 0,
+					"Container is not running");
+		else if (errno == ENOTTY)
+			return vzctl_err(0, 0, "Warning: iolimit feature "
+					"is not supported by the kernel; "
+					"iolimit configuration is skipped");
+
+		return vzctl_err(VZ_SET_IO, errno, "Unable to set iolimit");
+	}
+
+	return 0;
+}
+
+int vzctl_set_iopslimit(vps_handler *h, envid_t veid, int limit)
+{
+	int ret;
+	struct iolimit_state io;
+
+	if (limit < 0)
+		return 0;
+
+	io.id = veid;
+	/* Values hardcoded according to PCLIN-27604 */
+	io.speed = limit;
+	io.burst = limit * 3;
+	io.latency = 10*1000;
+	logger(0, 0, "Setting iopslimit: %d iops", limit);
+	ret = ioctl(h->vzfd, VZCTL_SET_IOPSLIMIT, &io);
+	if (ret) {
+		if (errno == ESRCH)
+			return vzctl_err(VZ_VE_NOT_RUNNING, 0,
+					"Container is not running");
+		else if (errno == ENOTTY)
+			return vzctl_err(0, 0, "Warning: iopslimit feature "
+					"is not supported by the kernel; "
+					"iopslimit configuration is skipped");
+
+		return vzctl_err(VZ_SET_IO, errno,
+				"Unable to set iopslimit");
+	}
+
+	return 0;
+}
+
+int vps_set_io(vps_handler *h, envid_t veid, io_param *io)
+{
+	int ret;
+
+	if (!io)
+		return 0;
+
+	ret = vzctl_set_ioprio(h, veid, io->ioprio);
+	if (ret)
+		return ret;
+
+	ret = vzctl_set_iolimit(h, veid, io->iolimit);
+	if (ret)
+		return ret;
+
+	ret = vzctl_set_iopslimit(h, veid, io->iopslimit);
+
+	return ret;
+}
+
+int vzctl_get_iolimit(int vzfd, envid_t veid, int *limit)
+{
+	int ret;
+	struct iolimit_state io;
+
+	io.id = veid;
+	ret = ioctl(vzfd, VZCTL_GET_IOLIMIT, &io);
+	if (ret == 0)
+		*limit = io.speed;
+
+	return ret;
+}
+
+int vzctl_get_iopslimit(int vzfd, envid_t veid, int *limit)
+{
+	int ret;
+	struct iolimit_state io;
+
+	io.id = veid;
+	ret = ioctl(vzfd, VZCTL_GET_IOPSLIMIT, &io);
+	if (ret == 0)
+		*limit = io.speed;
+
+	return ret;
 }

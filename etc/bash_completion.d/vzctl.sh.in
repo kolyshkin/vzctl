@@ -88,7 +88,8 @@ _vzctl()
 		--diskquota --mount_opts \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--capability --devnodes --devices --applyconfig \
-		--name --ioprio --setmode --meminfo --bootorder --features \
+		--name --ioprio --iolimit --iopslimit \
+		--setmode --meminfo --bootorder --features \
 		--reset_ub --stop-timeout"
 	local vzctl_start_opts="--wait --force --skip-fsck"
 	local vzctl_stop_opts="--fast --skip-umount"

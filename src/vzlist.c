@@ -45,6 +45,7 @@
 #include "types.h"
 #include "image.h"
 #include "vzfeatures.h"
+#include "io.h"
 
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
@@ -298,19 +299,28 @@ static void print_cpu ## name(struct Cveinfo *p, int index)	\
 PRINT_CPU(limit)
 PRINT_CPU(units)
 
-static void print_ioprio(struct Cveinfo *p, int index)
-{
-	if (fmt_json) {
-		printf("%d", (p->io.ioprio < 0) ? 0 : p->io.ioprio);
-		return;
-	}
-
-	if (p->io.ioprio < 0)
-		p_buf += snprintf(p_buf, e_buf - p_buf, "%3s", "-");
-	else
-		p_buf += snprintf(p_buf, e_buf - p_buf, "%3d",
-			p->io.ioprio);
+#define PRINT_IO(name, fmt, min)				\
+static void print_io ## name(struct Cveinfo *p, int index)	\
+{								\
+	int i = p->io.io ## name;				\
+								\
+	if (fmt_json) {						\
+		printf("%d", (i < 0) ? 0 : i);			\
+		return;						\
+	}							\
+								\
+	if (i < min)						\
+		p_buf += snprintf(p_buf, e_buf - p_buf,		\
+				fmt "s", "-");			\
+	else							\
+		p_buf += snprintf(p_buf, e_buf - p_buf,		\
+				fmt "d", i);			\
 }
+
+PRINT_IO(prio, "%3", 0)
+PRINT_IO(limit, "%10", 1)
+PRINT_IO(pslimit, "%4", 1)
+#undef PRINT_IO
 
 static void print_bool(const char *fmt, int val)
 {
@@ -598,11 +608,17 @@ static int bootorder_sort_fn(const void *val1, const void *val2)
 	return (*r1 > *r2);
 }
 
-static int ioprio_sort_fn(const void *val1, const void *val2)
-{
-	return ((const struct Cveinfo *)val1)->io.ioprio >
-		((const struct Cveinfo *)val2)->io.ioprio;
+#define IO_SORT_FN(name)						\
+static int io ## name ## _sort_fn(const void *val1, const void *val2)	\
+{									\
+	return ((const struct Cveinfo *)val1)->io.io ## name >		\
+		((const struct Cveinfo *)val2)->io.io ## name;		\
 }
+
+IO_SORT_FN(prio)
+IO_SORT_FN(limit)
+IO_SORT_FN(pslimit)
+#undef IO_SORT_FN
 
 static int cpunum_sort_fn(const void *val1, const void *val2)
 {
@@ -738,6 +754,8 @@ UBC_FIELD(swappages, SWAPP),
 {"cpus", "CPUS", "%5s", 0, RES_CPUNUM, print_cpunum, cpunum_sort_fn},
 
 {"ioprio", "IOP", "%3s", 0, RES_NONE, print_ioprio, ioprio_sort_fn},
+{"iolimit", "IOLIMIT", "%10s", 0, RES_IO, print_iolimit, iolimit_sort_fn},
+{"iopslimit", "IOPS", "%4s", 0, RES_IO, print_iopslimit, iopslimit_sort_fn},
 
 {"onboot", "ONBOOT", "%6s", 0, RES_NONE, print_onboot, none_sort_fn},
 {"bootorder", "BOOTORDER", "%10s", 0, RES_NONE,
@@ -1119,7 +1137,11 @@ FOR_ALL_UBC(MERGE_UBC)
 		ve->bootorder = x_malloc(sizeof(*ve->bootorder));
 		*ve->bootorder = *res->misc.bootorder;
 	}
+
 	ve->io.ioprio = res->io.ioprio;
+	ve->io.iolimit = res->io.iolimit;
+	ve->io.iopslimit = res->io.iopslimit;
+
 	if (ve->cpunum == -1 && res->cpu.vcpus != NULL)
 		ve->cpunum = *res->cpu.vcpus;
 	ve->features_mask  = res->env.features_mask;
@@ -1655,6 +1677,28 @@ static int get_ves_cpu()
 	return 0;
 }
 
+static int update_ves_io(void)
+{
+	int limit, i;
+
+	if ((vzctlfd = open(VZCTLDEV, O_RDWR)) < 0)
+		return 1;
+
+	for (i = 0; i < n_veinfo; i++) {
+		if ((veinfo[i].hide) || (veinfo[i].status != VE_RUNNING))
+			continue;
+
+		if (vzctl_get_iolimit(vzctlfd, veinfo[i].veid, &limit) == 0)
+			veinfo[i].io.iolimit = limit;
+
+		if (vzctl_get_iopslimit(vzctlfd, veinfo[i].veid, &limit) == 0)
+			veinfo[i].io.iopslimit = limit;
+	}
+	close(vzctlfd);
+
+	return 0;
+}
+
 static int get_ve_list()
 {
 	DIR *dp;
@@ -1787,6 +1831,8 @@ static int collect()
 	if (check_param(RES_CPUNUM) && !only_stopped_ve)
 	       get_ves_cpunum();
 	read_ves_param();
+	if (check_param(RES_IO))
+		update_ves_io();
 	if (check_param(RES_STATUS))
 		get_mounted_status();
 	get_ves_layout();

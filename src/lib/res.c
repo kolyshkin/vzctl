@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		return ret;
 	if ((ret = vps_meminfo_set(h, veid, &res->meminfo, param, vps_state)))
 		return ret;
-	if ((ret = ve_ioprio_set(h, veid, &res->io)))
+	if ((ret = vps_set_io(h, veid, &res->io)))
 		return ret;
 	/* Setup 2nd-level quota */
 	if (is_2nd_level_quota_on(&res->dq)) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2008, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2008-2013, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,4 +23,11 @@
 #define IOPRIO_CLASS_SHIFT	13
 #define IOPRIO_CLASS_BE		2
 
-extern int ve_ioprio_set(vps_handler *h, envid_t veid, io_param *io_param);
+int vps_set_io(vps_handler *h, envid_t veid, io_param *io);
+
+int vzctl_set_ioprio(vps_handler *h, envid_t veid, int prio);
+int vzctl_set_iolimit(vps_handler *h, envid_t veid, int limit);
+int vzctl_set_iopslimit(vps_handler *h, envid_t veid, int limit);
+
+int vzctl_get_iolimit(int vzfd, envid_t veid, int *limit);
+int vzctl_get_iopslimit(int vzfd, envid_t veid, int *limit);
