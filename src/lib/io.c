@@ -44,9 +44,8 @@ int vzctl_set_ioprio(vps_handler *h, envid_t veid, int ioprio)
 			ioprio | IOPRIO_CLASS_BE << IOPRIO_CLASS_SHIFT);
 	if (ret) {
 		if (errno == EINVAL) {
-			logger(-1, 0, "Warning: ioprio feature is not "
-					"supported by the kernel, ioprio "
-					"configuration is skipped");
+			logger(-1, 0, "Warning: ioprio not supported "
+					"by the kernel, skipping");
 			return 0;
 		}
 
@@ -78,9 +77,8 @@ int vzctl_set_iolimit(vps_handler *h, envid_t veid, int limit)
 			return vzctl_err(VZ_VE_NOT_RUNNING, 0,
 					"Container is not running");
 		else if (errno == ENOTTY)
-			return vzctl_err(0, 0, "Warning: iolimit feature "
-					"is not supported by the kernel; "
-					"iolimit configuration is skipped");
+			return vzctl_err(0, 0, "Warning: iolimit not "
+					"supported by the kernel, skipping");
 
 		return vzctl_err(VZ_SET_IO, errno, "Unable to set iolimit");
 	}
@@ -109,9 +107,8 @@ int vzctl_set_iopslimit(vps_handler *h, envid_t veid, int limit)
 			return vzctl_err(VZ_VE_NOT_RUNNING, 0,
 					"Container is not running");
 		else if (errno == ENOTTY)
-			return vzctl_err(0, 0, "Warning: iopslimit feature "
-					"is not supported by the kernel; "
-					"iopslimit configuration is skipped");
+			return vzctl_err(0, 0, "Warning: iopslimit not "
+					"supported by the kernel, skipping");
 
 		return vzctl_err(VZ_SET_IO, errno,
 				"Unable to set iopslimit");
