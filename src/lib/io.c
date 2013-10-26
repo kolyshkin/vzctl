@@ -70,7 +70,8 @@ int vzctl_set_iolimit(vps_handler *h, envid_t veid, int limit)
 	io.speed = limit;
 	io.burst = limit * 3;
 	io.latency = 10*1000;
-	logger(0, 0, "Setting iolimit: %d bytes/sec", limit);
+	logger(0, 0, "Setting iolimit: %d %s", limit,
+			(limit != 0) ? "bytes/sec" : "(unlimited)");
 	ret = ioctl(h->vzfd, VZCTL_SET_IOLIMIT, &io);
 	if (ret) {
 		if (errno == ESRCH)
@@ -100,7 +101,8 @@ int vzctl_set_iopslimit(vps_handler *h, envid_t veid, int limit)
 	io.speed = limit;
 	io.burst = limit * 3;
 	io.latency = 10*1000;
-	logger(0, 0, "Setting iopslimit: %d iops", limit);
+	logger(0, 0, "Setting iopslimit: %d %s", limit,
+			(limit != 0) ? "iops" : "(unlimited)");
 	ret = ioctl(h->vzfd, VZCTL_SET_IOPSLIMIT, &io);
 	if (ret) {
 		if (errno == ESRCH)
