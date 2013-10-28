@@ -173,9 +173,10 @@ static char * get_hwid(void)
 		buf[len] = 0;
 		sscanf(buf, "%*[^l]link/ether %17s", mac);
 	}
+	pclose(fp);
+
 err:
 	hwid = mac;
-	pclose(fp);
 
 	return hwid;
 }
