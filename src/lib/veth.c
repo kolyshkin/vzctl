@@ -157,7 +157,7 @@ static char * get_hwid(void)
 	static char *hwid = NULL;
 	FILE *fp;
 	int len;
-	static char mac[18] = "00:00:00:00:00:00";
+	static char mac[] = "00:00:00:00:00:00";
 	char buf[127];
 	const char *cmd = "ip a l | grep -F -m 1 'link/ether' 2>/dev/null";
 
