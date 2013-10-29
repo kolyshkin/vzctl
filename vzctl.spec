@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.5
+Version: 4.6
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -253,6 +253,50 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Tue Oct 29 2013 Kir Kolyshkin <kir@openvz.org> - 4.6-1
+- New functionality:
+-- Add iolimit and iopslimit (need kernel >= 042stab084.2)
+-- Add optional VM_OVERCOMMIT/--vm_overcommit parameter
+-- In VSwap mode, set some secondary UBCs if unset:
+--- lockedpages=oomguarpages=ram
+--- vmguarpages=ram+swap
+--- privvmpages=(ram+swap)*vm_overcommit (if set)
+-- vzoversell: add
+-- vztmpl-dl: add --list-orphans
+-- vztmpl-dl: add --quiet/--no-quiet
+-- vzubc: don't show unlimited ubcs by default; add -v to show
+-- vzlist: add new fields (vm_overcommit, iolimit, iopslimit)
+- Fixes:
+-- Fix quota on ploop for RHEL5 CT
+-- vzctl console: hack to force redraw on reattach
+-- set_ublimit(): don't set unknown UBs to unlim (#2760)
+-- init.d/vzeventd: set reboot_event (#2764)
+-- arch.conf: add POST_CREATE (#2371)
+-- configure: fix libdir for Debian/Ubuntu case
+-- ct_env_create_real(): fix build for IA64
+-- vzctl create, vzctl exec: do skip fsck
+-- init.d/vz-gentoo: fix setting default for NET_MODULES and PLOOP_MODULES
+-- init.d/vz-redhat: don't reset cpulimits for all CTs
+- Improvements:
+-- Add a way to not modify sysctl.conf on installation (#2375)
+-- vzctl set --reset_ub: only allow for running CT
+-- init.d/vzeventd-redhat: switch to strict bash
+-- vz-postinstall: don't add bridge params to sysctl.conf
+-- vzlist: skip mounted status check if not needed
+-- vzubc: print errors to stderr
+-- vzctl start: don't start CT if /proc mount failed
+-- vzevent-stop: check for suspend/chkpnt
+-- init.d/vz*: unset io limits before stopping CT
+-- [build] setver.sh: add build_id, use getopt
+-- assorted minor code improvements
+- Documentation:
+-- vzctl(8), ctid.conf(5): document vm_overcommit
+-- vzctl(8): fix per-CT action script prefix
+-- vz.conf(5): LOGFILE don't have a default
+-- man: don't hardcode configurable paths
+-- vzlist(8): fix a subsection reference
+-- vzlist(8): fix indentation
+
 * Wed Aug 28 2013 Kir Kolyshkin <kir@openvz.org> - 4.5.1-1
 - Fixes:
 -- Fix loading older (<1.9) ploop library (#2719)
