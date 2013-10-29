@@ -17,30 +17,51 @@
 #
 veidmark='envID:'
 namemark='Name:'
+vpidmark='VPid:'
+showCTPID=0
+opShowCTPID='END {printf("%d\t%d\t%s\t%s\n", pid, vpid, veid, name)}'
+opShowDef='END {printf("%d\t%s\t%s\n", pid, veid, name)}'
 
 usage()
 {
-	echo 'Usage: vzpid <pid> ...'
-	echo '       vzpid -'
+	echo 'Usage: vzpid [-p] <pid> ...'
+	echo '       vzpid [-p] -'
 }
 
 header()
 {
-	printf '%s\t%s\t%s\n' 'Pid' 'CTID' 'Name'
+	if [ "$showCTPID" -ne 0 ]; then
+		printf '%s\t%s\t%s\t%s\n' 'Pid' 'CT/Pid' 'CTID' 'Name'
+	else
+		printf '%s\t%s\t%s\n' 'Pid' 'CTID' 'Name'
+	fi
 }
 
 getveid()
 {
+	local opShow
 	local pid="$1"
 
 	[ -f "/proc/$pid/status" ] || return
+
+	if [ "$showCTPID" -ne 0 ]; then
+		opShow="$opShowCTPID"
+	else
+		opShow="$opShowDef"
+	fi
+
 	awk -v "pid=$pid" '
-BEGIN {veid=0; name=""}
+BEGIN {veid=0; name=""; vpid=0}
 ($1 == "'"$namemark"'") {name = $2}
+($1 == "'"$vpidmark"'") {vpid = $2}
 ($1 == "'"$veidmark"'") {veid = $2}
-END {printf("%d\t%s\t%s\n", pid, veid, name)}
-	' <"/proc/$pid/status"
+'"$opShow" <"/proc/$pid/status"
 }
+
+if [ "$1" = '-p' ]; then
+	showCTPID=1
+	shift
+fi
 
 if [ $# -eq 0 ]; then
 	usage >&2

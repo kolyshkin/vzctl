@@ -3,8 +3,10 @@
 vzpid \- display the CT ID given the process ID
 .SH SYNOPSIS
 .SY vzpid
+.OP -p
 \fIpid\fR [...]
 .SY vzpid
+.OP -p
 .B -
 .YS
 .SH DESCRIPTION
@@ -14,6 +16,10 @@ This script displays the CT ID the process with the given \fIpid\fR belongs to.
 .I pid
 The \fIpid\fR of the process to display the CT ID of. Can be specified
 multiple times.
+.TP
+.TP
+.B -p
+Also show the corresponding in-container PID(s).
 .TP
 .B -
 Read PID(s) from the standard input.
