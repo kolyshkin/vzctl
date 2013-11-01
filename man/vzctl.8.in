@@ -80,7 +80,8 @@ or HN) and performs direct manipulations with containers (CTs).
 .PP
 Containers can be referred to by either numeric \fICTID\fR or
 by name (see \fB--name\fR option). Note that CT ID <= 100 are reserved for
-OpenVZ internal purposes.
+OpenVZ internal purposes. A numeric ID should not be more than
+\fB2147483644\fR.
 .SH OPTIONS
 
 .SS Flags
