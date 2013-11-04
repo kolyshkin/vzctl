@@ -63,6 +63,7 @@ ln -s ../vz/vz.conf %{buildroot}/etc/sysconfig/vz
 # Needed for %ghost in %files section below
 touch %{buildroot}%{_sharedstatedir}/vz
 touch %{buildroot}/etc/sysconfig/vzeventd
+touch %{buildroot}/etc/modprobe.d/openvz.conf
 # This could go to vzctl-lib-devel, but since we don't have it...
 rm -f %{buildroot}%{_libdir}/libvzctl.la
 rm -f %{buildroot}%{_libdir}/libvzctl.so
@@ -112,6 +113,7 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/*
 %config /etc/sysconfig/vz
 %ghost %config(missingok) /etc/sysconfig/vzeventd
+%ghost %config(missingok) /etc/modprobe.d/openvz.conf
 
 %post
 /bin/rm -rf /dev/vzctl
@@ -154,6 +156,28 @@ if %{_initddir}/vz status >/dev/null 2>&1; then
 	if ! %{_initddir}/vzeventd status >/dev/null 2>&1; then
 		%{_initddir}/vzeventd start
 	fi
+fi
+
+# Disable VE0 conntracks by default
+file='/etc/modprobe.d/openvz.conf'
+line='options nf_conntrack ip_conntrack_disable_ve0=1'
+if ! grep -wq 'ip_conntrack_disable_ve0' $file 2>/dev/null; then
+	echo "$line" >> $file
+cat << EOF
+============================================================================
+Due to conntrack impact on venet performance, conntrack need to be disabled
+on the host system (it will still work for containers).
+
+Adding the following option to $file:
+
+	$line
+
+This change will take effect only after the next reboot.
+
+NOTE: IF YOU NEED conntrack functionality, edit $file NOW,
+changing =1 to =0. DO NOT REMOVE the line, or it will be re-added!
+============================================================================
+EOF
 fi
 
 # Run post-install script only when installing
