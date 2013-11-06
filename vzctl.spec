@@ -63,6 +63,7 @@ ln -s ../vz/vz.conf %{buildroot}/etc/sysconfig/vz
 # Needed for %ghost in %files section below
 touch %{buildroot}%{_sharedstatedir}/vz
 touch %{buildroot}/etc/sysconfig/vzeventd
+mkdir %{buildroot}/etc/modprobe.d
 touch %{buildroot}/etc/modprobe.d/openvz.conf
 # This could go to vzctl-lib-devel, but since we don't have it...
 rm -f %{buildroot}%{_libdir}/libvzctl.la
@@ -174,8 +175,8 @@ Adding the following option to $file:
 
 This change will take effect only after the next reboot.
 
-NOTE: IF YOU NEED conntrack functionality, edit $file NOW,
-changing =1 to =0. DO NOT REMOVE the line, or it will be re-added!
+NOTE: IF YOU NEED conntrack functionality, edit $file
+NOW, changing =1 to =0. DO NOT REMOVE the line, or it will be re-added!
 ============================================================================
 EOF
 fi
