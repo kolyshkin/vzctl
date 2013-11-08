@@ -318,7 +318,15 @@ int fill_vswap_ub(ub_param *cfg, ub_param *cmd)
 		return 0;
 
 	ram = (cmd->physpages ? : cfg->physpages)[1];
-	swap = (cmd->swappages ? : cfg->swappages)[1];
+	if (cmd->swappages)
+		swap = cmd->swappages[1];
+	else if (cfg->swappages)
+		swap = cfg->swappages[1];
+	else {/* swap not set, but required */
+		logger(-1, 0, "Error: required UB parameter (swap) not set");
+		return VZ_NOTENOUGHUBCPARAMS;
+	}
+
 	if (cmd->vm_overcommit)
 		ovc = *cmd->vm_overcommit;
 	else if (cfg->vm_overcommit)
