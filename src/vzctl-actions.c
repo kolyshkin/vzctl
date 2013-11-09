@@ -913,6 +913,15 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 
+	/* VSwap config requires SWAPPAGES to be set */
+	if ((is_vswap_config(&param->res.ub) ||
+			is_vswap_config(&param->g_param->res.ub)) &&
+			(!param->res.ub.swappages &&
+			 !param->g_param->res.ub.swappages)) {
+		logger(-1, 0, "Error: required UB parameter (swap) not set");
+		return VZ_NOTENOUGHUBCPARAMS;
+	}
+
 	/* A few options require --save flag */
 	if (!param->opt.save) {
 		if (param->res.name.name != NULL) {
