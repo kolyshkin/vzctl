@@ -40,7 +40,7 @@ _get_ves()
 				grep '^simfs ' | \
 				sed 's/^simfs *//' | $rm_empty
 			;;
-		snapshot*)
+		compact|snapshot*)
 			# CTs on ploop
 			(@SBINDIR@/vzlist -H -a -o layout,ctid;
 			 @SBINDIR@/vzlist -H -a -o layout,name) 2>/dev/null | \
