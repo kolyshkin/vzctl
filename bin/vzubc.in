@@ -281,14 +281,14 @@ BEGIN {
 	}
 	next
 }
-/^[[:space:]]*uid / {
+/^[	 ]*uid / {
 	next
 }
-/^[[:space:]]*dummy/ {
+/^[	 ]*dummy/ {
 	id=""
 	next
 }
-/^[[:space:]]*[0-9]+:/ {
+/^[	 ]*[0-9]+:/ {
 	header=""
 	bcid=int($1)
 	if ((CTIDS !~ /^[ ]*$/) && (CTIDS !~ " " bcid " ")) {
@@ -306,7 +306,7 @@ BEGIN {
 	limit=$6
 	failcnt=$7
 }
-/^[[:space:]]*[a-z]+/ {
+/^[	 ]*[a-z]+/ {
 	id=$1
 	held=$2
 	maxheld=$3
