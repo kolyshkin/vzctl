@@ -69,7 +69,7 @@ static void usage(int rc)
 "vzctl start <ctid> [--force] [--wait] [--skip-fsck]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"
 #ifdef HAVE_PLOOP
-"vzctl convert <ctid> [--layout ploop[:mode]] [--diskspace <kbytes>]\n"
+"vzctl convert <ctid> [--layout ploop[:mode]]\n"
 "vzctl compact <ctid>\n"
 "vzctl snapshot <ctid> [--id <uuid>] [--name <name>] [--description <desc>]\n"
 "   [--skip-suspend]\n"
