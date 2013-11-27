@@ -614,7 +614,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 #endif
 	}
 
-	if (vps_is_mounted(res->fs.root, res->fs.private) == 0) {
+	if (vps_is_mounted(res->fs.root, res->fs.private) != 1) {
 		/* increase quota to perform setup */
 		if (!ploop)
 			quota_inc(&res->dq, 100);
