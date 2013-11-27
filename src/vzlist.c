@@ -1570,7 +1570,7 @@ static int get_ves_cpustat()
 	return 0;
 }
 
-static int get_mounted_status()
+static int get_mounted_status(int detailed)
 {
 	int i;
 	char buf[512];
@@ -1584,6 +1584,8 @@ static int get_mounted_status()
 			veinfo[i].hide = 1;
 			continue;
 		}
+		if (!detailed)
+			continue;
 		get_dump_file(veinfo[i].veid, dumpdir, buf, sizeof(buf));
 		if (stat_file(buf) == 1)
 			veinfo[i].status = VE_SUSPENDED;
@@ -1833,8 +1835,7 @@ static int collect()
 	read_ves_param();
 	if (check_param(RES_IO))
 		update_ves_io();
-	if (check_param(RES_STATUS))
-		get_mounted_status();
+	get_mounted_status(check_param(RES_STATUS));
 	get_ves_layout();
 	if (check_param(RES_QUOTA)) {
 		get_run_quota_stat();
