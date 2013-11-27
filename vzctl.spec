@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.6
+Version: 4.6.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -253,6 +253,15 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Wed Nov 27 2013 Kir Kolyshkin <kir@openvz.org> - 4.6.1-1
+- Fixes:
+-- vzctl set: require swap to be set for VSwap
+-- fill_vswap_ub(): fix a potential segfault
+-- ndsend: clear reserved2 field (#2804)
+-- vzubc: fix to work in old mawk (#2793)
+-- vzlist: fix bogus CTIDs in list (#2830)
+-- vzctl start: don't fail if VE_ROOT does not exist (#2807)
+
 * Tue Oct 29 2013 Kir Kolyshkin <kir@openvz.org> - 4.6-1
 - New functionality:
 -- Add iolimit and iopslimit (need kernel >= 042stab084.2)
