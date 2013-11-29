@@ -229,7 +229,7 @@ int destroydir(char *dir)
 	}
 	sleep(1);
 	sigaction(SIGCHLD, &actold, NULL);
-	_unlock(fd_lock, buf);
+
 	return ret;
 }
 
