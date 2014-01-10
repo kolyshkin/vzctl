@@ -36,6 +36,18 @@ fix_networking_conf()
 		mv -f ${cfg}.$$ ${cfg}
 }
 
+# Set up loopback device
+setup_lo()
+{
+	grep -qw lo ${CFGFILE} && return
+
+	cat << EOF >> ${CFGFILE}
+# Auto generated ${LOOPBACK} interface
+auto ${LOOPBACK}
+iface ${LOOPBACK} inet loopback
+EOF
+}
+
 setup_network()
 {
 	echo "# This configuration file is auto-generated.
@@ -57,12 +69,8 @@ setup_network()
 	if [ -f ${CFGFILE}.template ]; then
 		cat ${CFGFILE}.template >> ${CFGFILE}
 	fi
-	# Set up loopback
-	if ! grep -qw lo ${CFGFILE}; then
-		echo "# Auto generated ${LOOPBACK} interface
-auto ${LOOPBACK}
-iface ${LOOPBACK} inet loopback" >> ${CFGFILE}
-	fi
+
+	setup_lo
 
 	# Set up /etc/hosts
 	if [ ! -f $HOSTFILE ]; then
@@ -155,6 +163,8 @@ add_ip()
 			# IP_ADDR empty, do we need to remove old ones?
 			if grep -v "^#" ${CFGFILE} | grep -q -F -w "${VENET_DEV}"; then
 				setup_network
+			else
+				setup_lo
 			fi
 		fi
 	elif ! grep -q -E "^auto ${VENET_DEV}([^:]|$)" ${CFGFILE} 2>/dev/null; then
