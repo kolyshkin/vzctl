@@ -103,6 +103,16 @@ int ct_chroot(const char *root)
 	char oldroot[] = "vzctl-old-root.XXXXXX";
 	int ret = VZ_RESOURCE_ERROR;
 
+	/* root must be bind-mounted to itself to not show what is under it
+	 *
+	 * Linux kernel commit 5ff9d8a6
+	 * "vfs: Lock in place mounts from more privileged users"
+	 */
+	if (mount(root, root, NULL, MS_BIND, NULL)) {
+		logger(-1, errno, "Can't bind-mount root %s", root);
+		return ret;
+	}
+
 	if (chdir(root)) {
 		logger(-1, errno, "Can't chdir %s", root);
 		return ret;
