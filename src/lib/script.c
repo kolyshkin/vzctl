@@ -322,8 +322,7 @@ int add_reach_runlevel_mark()
 	}
 	/* Add a line to /etc/inittab */
 	if ((fd = open(INITTAB_FILE, O_RDWR | O_APPEND)) == -1) {
-		fprintf(stderr, "Unable to open " INITTAB_FILE " %s\n",
-			strerror(errno));
+		fprintf(stderr, "Can't open " INITTAB_FILE ": %m\n");
 		return -1;
 	}
 	ret = 0;
@@ -333,9 +332,8 @@ int add_reach_runlevel_mark()
 		if (len == 0)
 			break;
 		if (len < 0) {
-			fprintf(stderr, "Unable to read from " INITTAB_FILE
-				" %s\n",
-				strerror(errno));
+			fprintf(stderr, "Can't read from " INITTAB_FILE
+					": %m\n");
 			ret = -1;
 			break;
 		}
@@ -348,13 +346,13 @@ int add_reach_runlevel_mark()
 	if (!found) {
 		if (write(fd, INITTAB_ACTION, sizeof(INITTAB_ACTION) - 1) == -1)
 		{
-			fprintf(stderr, "Unable to write to " INITTAB_FILE
-				" %s\n",
-				strerror(errno));
+			fprintf(stderr, "Can't write to " INITTAB_FILE
+				":%m\n");
 			ret = -1;
 		}
 	}
 	close(fd);
+
 	return ret;
 }
 
