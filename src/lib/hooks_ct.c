@@ -138,6 +138,21 @@ int ct_chroot(const char *root)
 		goto rmdir;
 	}
 
+	/* proc and sysfs must be mounted before unmounting oldroot
+	 * because of Linux kernel commit e51db7
+	 * "userns: Better restrictions on when proc and sysfs can be mounted"
+	 */
+
+	if (mount("proc", "/proc", "proc", 0, 0)) {
+		logger(-1, errno, "Failed to mount /proc");
+		goto rmdir;
+	}
+
+	if (mount("sysfs", "/sys", "sysfs", 0, 0)) {
+		logger(-1, errno, "Failed to mount /sys");
+		goto rmdir;
+	}
+
 	if (umount2(oldroot, MNT_DETACH)) {
 		logger(-1, 0, "Can't umount old mounts");
 		goto rmdir;

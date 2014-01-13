@@ -31,6 +31,8 @@
 #include <sys/mount.h>
 #include <sys/utsname.h>
 #include <sys/stat.h>
+#include <sys/vfs.h>
+#include <linux/magic.h>
 
 #include "vzerror.h"
 #include "res.h"
@@ -244,6 +246,7 @@ int exec_container_init(struct arg_start *arg,
 	int fd, ret;
 	char *argv[] = {"init", "-z", "      ", NULL};
 	char *envp[] = {"HOME=/", "TERM=linux", NULL};
+	struct statfs sfs;
 
 	/* Clear supplementary group IDs */
 	setgroups(0, NULL);
@@ -262,7 +265,12 @@ int exec_container_init(struct arg_start *arg,
 		}
 	}
 
-	if (access("/proc", F_OK) == 0 && mount("proc", "/proc", "proc", 0, 0))
+	if (statfs("/proc", &sfs))
+		return vzctl_err(VZ_SYSTEM_ERROR, errno,
+				"statfs on /proc failed");
+
+	if (sfs.f_type != PROC_SUPER_MAGIC &&
+	    mount("proc", "/proc", "proc", 0, 0))
 		return vzctl_err(VZ_SYSTEM_ERROR, errno,
 				"Failed to mount /proc");
 
