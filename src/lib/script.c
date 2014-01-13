@@ -274,6 +274,7 @@ int setup_env_quota(const struct setup_env_quota_param *param)
 int add_reach_runlevel_mark()
 {
 	int fd, found, ret;
+	int is_upstart = 0, is_systemd = 0;
 	ssize_t len, w;
 	char buf[4096 + 1];
 	struct stat st;
@@ -286,6 +287,7 @@ int add_reach_runlevel_mark()
 	}
 	/* Create upstart specific script */
 	if (!stat(EVENTS_DIR_UBUNTU, &st)) {
+		is_upstart = 1;
 		fd = open(EVENTS_FILE_UBUNTU, O_WRONLY|O_TRUNC|O_CREAT, 0644);
 		if (fd == -1) {
 			fprintf(stderr, "Unable to create "
@@ -302,8 +304,8 @@ int add_reach_runlevel_mark()
 					strerror(errno));
 			return -1;
 		}
-		return 0;
 	} else if (!stat(EVENTS_DIR, &st)) {
+		is_upstart = 1;
 		fd = open(EVENTS_FILE, O_WRONLY|O_TRUNC|O_CREAT, 0644);
 		if (fd == -1) {
 			fprintf(stderr, "Unable to create " EVENTS_FILE
@@ -318,8 +320,31 @@ int add_reach_runlevel_mark()
 					strerror(errno));
 			return -1;
 		}
-		return 0;
 	}
+
+	/* Check for systemd */
+	if (!is_upstart &&
+		       (len = readlink("/sbin/init", buf, sizeof(buf)-1)) > 0)
+	{
+		char *p;
+
+		buf[len] = 0;
+		if ((p = strrchr(buf, '/')) == NULL)
+			p = buf;
+		else
+			p++;
+		if (strncmp(p, "systemd", sizeof("systemd") - 1) == 0)
+			is_systemd = 1;
+	}
+
+	if (access(INITTAB_FILE, F_OK)) {
+		if (is_upstart || is_systemd)
+			return 0;
+
+		fprintf(stderr, "Error: " INITTAB_FILE " not found: %m\n");
+		return -1;
+	}
+
 	/* Add a line to /etc/inittab */
 	if ((fd = open(INITTAB_FILE, O_RDWR | O_APPEND)) == -1) {
 		fprintf(stderr, "Can't open " INITTAB_FILE ": %m\n");
