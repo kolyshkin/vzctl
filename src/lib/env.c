@@ -32,7 +32,6 @@
 #include <sys/utsname.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
-#include <linux/magic.h>
 
 #include "vzerror.h"
 #include "res.h"
@@ -48,6 +47,10 @@
 #include "image.h"
 #include "readelf.h"
 #include "destroy.h"
+
+#ifndef PROC_SUPER_MAGIC
+#define PROC_SUPER_MAGIC	0x9fa0
+#endif
 
 static int env_stop(vps_handler *h, envid_t veid, const char *root,
 		int stop_mode, int timeout);
