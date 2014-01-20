@@ -314,49 +314,6 @@ static void create_devices(vps_handler *h, envid_t veid, const char *root)
 	}
 }
 
-static int mount_devpts(void)
-{
-	int fd, ret;
-
-	setuid(0);
-	setgid(0);
-
-	ret = mkdir("/dev/pts", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
-	if ((ret < 0) && (errno != EEXIST)) {
-		logger(-1, errno, "Cannot create container's /dev/pts");
-		return VZ_RESOURCE_ERROR;
-	}
-	ret = mount("devpts", "/dev/pts", "devpts", 0, "newinstance");
-	if (ret < 0) {
-		/* No need to cleanup mkdir, since we test for EEXIST */
-		logger(-1, errno, "Cannot mount container's /dev/pts");
-		return VZ_RESOURCE_ERROR;
-	}
-
-	/* /dev/ptmx, if it even exists, would refer to the root ptmx.
-	 * We don't want that, we want our newly created instance to contain
-	 * all ptys. So we bind mount the root device here
-	 */
-	fd = open("/dev/ptmx", O_CREAT, S_IRWXU|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-	if (fd < 0) {
-		logger(-1, errno, "Cannot create container's /dev/ptmx");
-		/*
-		 * No need to umount, we are in a private mnt namespace and it will
-		 * disappear after we fail.
-		 */
-		return VZ_RESOURCE_ERROR;
-	}
-	close(fd);
-	ret = mount("/dev/pts/ptmx", "/dev/ptmx", "", MS_BIND, 0);
-	if (ret < 0) {
-		/* No need to cleanup mkdir, since we test for EEXIST */
-		logger(-1, errno, "Cannot bind mount container's /dev/ptmx");
-		return VZ_RESOURCE_ERROR;
-	}
-
-	return 0;
-}
-
 static int _env_create(void *data)
 {
 	struct arg_start *arg = data;
@@ -390,9 +347,8 @@ static int _env_create(void *data)
 	if (ret)
 		return ret;
 
-	ret = mount_devpts();
-	if (ret)
-		return ret;
+	setuid(0);
+	setgid(0);
 
 	/*
 	 * If we are using the user namespace, we will have the full capability
