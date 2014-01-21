@@ -1662,17 +1662,17 @@ static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 		if (!strncmp("ifname=", p, 7)) {
 			p += 7;
 			len = next - p;
-			if (len > IFNAMSIZE)
+			if (len + 1 > IFNAMSIZE)
 				return ERR_INVAL;
 			if (dev->dev_name_ve[0] == '\0')
-				strncpy(dev->dev_name_ve, p, len);
+				snprintf(dev->dev_name_ve, IFNAMSIZE, "%s", p);
 		} else if (!strncmp("host_ifname=", p, 12)) {
 			p += 12;
 			len = next - p;
-			if (len > IFNAMSIZE)
+			if (len + 1 > IFNAMSIZE)
 				return ERR_INVAL;
 			if (dev->dev_name[0] == '\0')
-				strncpy(dev->dev_name, p, len);
+				snprintf(dev->dev_name, IFNAMSIZE, "%s", p);
 		} else if (!strncmp("mac=", p, 4)) {
 			p += 4;
 			len = next - p;
@@ -1710,10 +1710,10 @@ static int parse_netif_str(envid_t veid, const char *str, veth_dev *dev)
 		} else if (!strncmp("bridge=", p, 7)) {
 			p += 7;
 			len = next - p;
-			if (len > IFNAMSIZE)
+			if (len + 1 > IFNAMSIZE)
 				return ERR_INVAL;
 			if (dev->dev_bridge[0] == '\0')
-				strncpy(dev->dev_bridge, p, len);
+				snprintf(dev->dev_bridge, IFNAMSIZE, "%s", p);
 		}
 		p = ++next;
 	} while (p < ep);
