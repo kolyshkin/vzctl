@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <dirent.h>
+#include <sys/vfs.h>
 
 #include "vzerror.h"
 #include "env.h"
@@ -108,7 +109,7 @@ int ct_chroot(const char *root)
 	 * Linux kernel commit 5ff9d8a6
 	 * "vfs: Lock in place mounts from more privileged users"
 	 */
-	if (mount(root, root, NULL, MS_BIND, NULL)) {
+	if (mount(root, root, NULL, MS_BIND | MS_REC, NULL)) {
 		logger(-1, errno, "Can't bind-mount root %s", root);
 		return ret;
 	}
@@ -269,51 +270,6 @@ out:
 	return ret;
 }
 
-/*
- * Those devices should exist in the container, and be valid device nodes with
- * user access permission. But we need to be absolutely sure this is the case,
- * so we will provide our own versions. That could actually happen since some
- * distributions may come with emptied /dev's, waiting for udev to populate them.
- * That won't happen, we do it ourselves.
- */
-static void create_devices(vps_handler *h, envid_t veid, const char *root)
-{
-	unsigned int i;
-	char *devices[] = {
-		"/dev/null",
-		"/dev/zero",
-		"/dev/random",
-		"/dev/urandom",
-	};
-
-	/*
-	 * We will tolerate errors, and keep the container running, because it is
-	 * likely we will be able to boot it to a barely functional state. But
-	 * be vocal about it
-	 */
-	for (i = 0; i < ARRAY_SIZE(devices); i++) {
-		char ct_devname[STR_SIZE];
-		int ret;
-
-		snprintf(ct_devname, sizeof(ct_devname), "%s%s", root, devices[i]);
-
-		/*
-		 * No need to be crazy about file flags. When we bind mount, the
-		 * source permissions will be inherited.
-		 */
-		ret = open(ct_devname, O_RDWR|O_CREAT, 0);
-		if (ret < 0) {
-			logger(-1, errno, "Could not touch device %s", devices[i]);
-			continue;
-		}
-		close(ret);
-
-		ret = mount(devices[i], ct_devname, "", MS_BIND, 0);
-		if (ret < 0)
-			logger(-1, errno, "Could not bind mount device %s", devices[i]);
-	}
-}
-
 static int _env_create(void *data)
 {
 	struct arg_start *arg = data;
@@ -337,10 +293,6 @@ static int _env_create(void *data)
 	 */
 	if (arg->userns_p != -1)
 		close(arg->userns_p);
-
-	if (arg->h->can_join_userns) {
-		create_devices(arg->h, arg->veid, arg->res->fs.root);
-	}
 
 	ret = ct_chroot(arg->res->fs.root);
 	/* Probably means chroot failed */
@@ -400,9 +352,23 @@ static int ct_env_create_real(struct arg_start *arg)
 
 		userns_p[0] = userns_p[1] = -1;
 	} else {
+		char devpath[PATH_MAX];
+
 		clone_flags |= CLONE_NEWUSER;
 		if (pipe(userns_p) < 0) {
 			logger(-1, errno, "Can not create userns pipe");
+			return VZ_RESOURCE_ERROR;
+		}
+
+		/* Unshare mntns to not affect the host system */
+		if (unshare(CLONE_NEWNS)) {
+			logger(-1, errno, "Can not unshare mount namespace");
+			return VZ_RESOURCE_ERROR;
+		}
+
+		snprintf(devpath, sizeof(devpath), "%s/dev", arg->res->fs.root);
+		if (mount("dev", devpath, "devtmpfs", 0, NULL)) {
+			logger(-1, errno, "Can not mount devtmpfs");
 			return VZ_RESOURCE_ERROR;
 		}
 	}

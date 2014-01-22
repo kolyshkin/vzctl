@@ -41,10 +41,6 @@ fixup_udev()
 		fi
 		break
 	done
-
-	umount /dev/pts
-	umount /dev/shm
-	umount /dev -l
 }
 
 fixup_loginuid()
