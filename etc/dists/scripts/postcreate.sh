@@ -123,15 +123,15 @@ _sc()
 
 set_file_caps()
 {
-	# Perform this only for Fedora 15 to 19
-	grep -qEw '1[5-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
+	# Fedora 15+
+	grep -qEw '1[5-9]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
 
 	_sc 0sAQAAAgkAAAAAAAAAAAAAAAAAAAA= /usr/libexec/pt_chown
 	_sc 0sAQAAAsIAAAAAAAAAAAAAAAAAAAA= /usr/sbin/suexec
 	_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
 
-	# also, for Fedora 18+
-	grep -qEw '1[89]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
+	# Fedora 18+
+	grep -qEw '1[89]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
 	_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /usr/sbin/arping /usr/sbin/clockdiff
 	_sc 0sAQAAAgIACAAAAAAAAAAAAAAAAAA= /usr/bin/systemd-detect-virt
 }
