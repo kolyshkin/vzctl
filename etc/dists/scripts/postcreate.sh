@@ -123,6 +123,11 @@ _sc()
 
 set_file_caps()
 {
+	# openSUSE 13.1+
+	if grep -qw 'opensuse:13' ${VE_ROOT}/etc/os-release 2>/dev/null; then
+		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
+	fi
+
 	# Fedora 15+
 	grep -qEw '1[5-9]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
 
