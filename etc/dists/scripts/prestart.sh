@@ -21,28 +21,6 @@
 # is, so far, meaningless inside a container. This script will apply various
 # fixups if needed.
 
-# Legacy udev will try to mount its own /dev in tmpfs, which will in turn
-# destroy all our hand crafted setup. We need to undo it here.
-fixup_udev()
-{
-	[ -f /etc/fedora-release ] && return
-	[ -f /etc/redhat-release ] || return
-
-	# rc.sysinit will touch this file after it finishes.
-	timestamp=$(stat -c %x /.autofsck 2>/dev/null)
-	i=0
-	while true; do
-		newstamp=$(stat -c %x /.autofsck 2>/dev/null)
-		if [ "x$newstamp" = "x$timestamp" ]; then
-			sleep 0.5
-			i=$((i+1))
-			[ $i -gt 10 ] && return
-			continue
-		fi
-		break
-	done
-}
-
 fixup_loginuid()
 {
 	local pam_permit="security/pam_permit.so"
@@ -58,7 +36,6 @@ fixup_loginuid()
 [ "x$VZ_KERNEL" = "xyes" ] && exit 0
 [ "x$USERNS" = "xno" ] && exit 0
 
-fixup_udev &
 fixup_loginuid
 
 exit 0
