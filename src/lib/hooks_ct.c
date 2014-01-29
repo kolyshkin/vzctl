@@ -104,6 +104,11 @@ int ct_chroot(const char *root)
 	char oldroot[] = "vzctl-old-root.XXXXXX";
 	int ret = VZ_RESOURCE_ERROR;
 
+	if (mount("", "/", NULL, MS_PRIVATE|MS_REC, NULL) < 0) {
+		logger(-1, errno, "Can't remount root with MS_PRIVATE");
+		return ret;
+	}
+
 	/* root must be bind-mounted to itself to not show what is under it
 	 *
 	 * Linux kernel commit 5ff9d8a6
@@ -116,11 +121,6 @@ int ct_chroot(const char *root)
 
 	if (chdir(root)) {
 		logger(-1, errno, "Can't chdir %s", root);
-		return ret;
-	}
-
-	if (mount("", "/", NULL, MS_PRIVATE|MS_REC, NULL) < 0) {
-		logger(-1, errno, "Can't remount root with MS_PRIVATE");
 		return ret;
 	}
 
