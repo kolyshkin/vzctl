@@ -220,6 +220,7 @@ find:
 			goto err;
 		}
 		mount_param.target = fs->root;
+		mount_param.mount_data = fs->mount_opts;
 		ret = vzctl_mount_image(tmp_dir, &mount_param);
 		if (ret)
 			goto err;
