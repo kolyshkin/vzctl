@@ -47,6 +47,10 @@ RPM_SPEC=${NAME}.spec
 
 # Try to figure out version from git
 GIT_DESC=$(git describe --tags | sed s'/^[^0-9]*-\([0-9].*\)$/\1/')
+if test -z "$GIT_DESC"; then
+	echo "Can't figure out version from git -- aborting" 1>&2
+	exit 2
+fi
 				# 3.0.28-1-gf784152
 GIT_V=$(echo $GIT_DESC | awk -F - '{print $1}')
 GIT_R=$(echo $GIT_DESC | awk -F - '{print $2}')
