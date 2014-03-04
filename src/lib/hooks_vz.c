@@ -505,7 +505,10 @@ static int setup_hardlink_dir(const char *mntdir, int cpt_fd)
 	int fd, res = 0;
 
 	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
-	mkdir(buf, 0711);
+	if (mkdir(buf, 0711) && errno != EEXIST)
+		return vzctl_err(VZCTL_E_SYSTEM, errno,
+				"Unable to create hardlink directory %s",
+				buf);
 
 	fd = open(buf, O_RDONLY | O_NOFOLLOW | O_DIRECTORY);
 	if (fd < 0) {
