@@ -1992,6 +1992,10 @@ int main(int argc, char **argv)
 		qsort(g_ve_list, n_ve_list, sizeof(*g_ve_list), id_sort_fn);
 	}
 	init_log(NULL, 0, 0, 0, 0, NULL);
+#ifdef HAVE_PLOOP
+	if (is_ploop_supported())
+		ploop.set_verbose_level(PLOOP_LOG_NOSTDOUT);
+#endif
 	if (build_field_order(f_order))
 		return 1;
 	if (getuid()) {
