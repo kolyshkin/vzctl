@@ -747,8 +747,11 @@ static int restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 	close(error_pipe[1]);
 
 	ret = ioctl(param->rst_fd, CPT_SET_LOCKFD2, wait_p);
-	if (ret < 0 && errno == EINVAL)
+	if (ret < 0 && errno == EINVAL) {
+		logger(0, 0, "Warning: old kernel -- CPT_SET_LOCKFD2 "
+				"not supported");
 		ret = ioctl(param->rst_fd, CPT_SET_LOCKFD, old_wait_p);
+	}
 	if (ret < 0) {
 		logger(-1, errno, "Can't set lockfd");
 		goto err;
