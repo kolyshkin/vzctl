@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# In case of a fresh git checkout, prepare the sources
+test -f aclocal.m4 || ./autogen.sh
+test -f Makefile || ./configure
+
 OPTS=$(getopt -o biUFvof --long \
 	build,install,update,freshen,verbose,oldpackage \
 	-n 'setver.sh' -- "$@")
