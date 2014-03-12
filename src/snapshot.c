@@ -289,6 +289,9 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		vps_param *param;
 
 		param = reread_vps_config(veid);
+		if (param && g_p->res.net.skip_arpdetect)
+			param->res.net.skip_arpdetect =
+				g_p->res.net.skip_arpdetect;
 		cpt.dumpfile = dumpfile;
 		if (vps_restore(h, veid, (param) ? param : g_p,
 					CMD_RESTORE, &cpt, SKIP_DUMPFILE_UNLINK))

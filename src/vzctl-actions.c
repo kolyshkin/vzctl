@@ -734,6 +734,32 @@ static int parse_snapshot_delete_opt(envid_t veid, int argc, char **argv,
 	return ret;
 }
 
+static int parse_snapshot_switch_opt(envid_t veid, int argc, char **argv,
+		vps_param *param)
+{
+	int ret;
+	struct option *opt;
+	static struct option snapshot_switch_options[] =
+	{
+	{"id",  required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"uuid", required_argument, NULL, PARAM_SNAPSHOT_GUID},
+	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
+	{ NULL, 0, NULL, 0 }
+	};
+
+	opt = mod_make_opt(snapshot_switch_options, &g_action, NULL);
+	if (opt == NULL)
+		return VZ_RESOURCE_ERROR;
+	ret = parse_opt(veid, argc, argv, opt, snapshot_switch_options, param);
+	free(opt);
+
+	if (ret == 0 && param->snap.guid == NULL)
+		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+			"Invalid syntax: snapshot id is missing");
+
+	return ret;
+}
+
 static int parse_snapshot_mount_opt(envid_t veid, int argc, char **argv,
 		vps_param *param)
 {
@@ -1480,8 +1506,10 @@ int parse_action_opt(envid_t veid, act_t action, int argc, char *argv[],
 	case ACTION_SNAPSHOT_CREATE:
 		ret = parse_snapshot_create_opt(veid, argc, argv, param);
 		break;
-	case ACTION_SNAPSHOT_DELETE:
 	case ACTION_SNAPSHOT_SWITCH:
+		ret = parse_snapshot_switch_opt(veid, argc, argv, param);
+		break;
+	case ACTION_SNAPSHOT_DELETE:
 	case ACTION_SNAPSHOT_UMOUNT:
 		ret = parse_snapshot_delete_opt(veid, argc, argv, param);
 		break;
@@ -1658,6 +1686,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 				&g_p->res.fs, cmd_p->snap.guid);
 		break;
 	case ACTION_SNAPSHOT_SWITCH:
+		g_p->res.net.skip_arpdetect = cmd_p->res.net.skip_arpdetect;
 		ret = vzctl_env_switch_snapshot(h, veid, g_p, &g_p->res.fs,
 				cmd_p->snap.guid);
 		break;
