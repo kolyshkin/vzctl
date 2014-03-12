@@ -273,11 +273,11 @@ _vzctl()
 				case ${cmd} in
 				    snapshot-umount)
 					# For umount, only give mounted IDs
-					ids="`@SBINDIR@/vzctl snapshot-list $ve -H -ouuid,device 2>/dev/null | awk 'NF==2 {print $1}' | tr -d '{}'`"
+					ids="`@SBINDIR@/vzctl --quiet snapshot-list $ve -H -ouuid,device 2>/dev/null | awk 'NF==2 {print $1}' | tr -d '{}'`"
 					;;
 				    snapshot-*)
 					# For other commands, give all IDs
-					ids="`@SBINDIR@/vzctl snapshot-list $ve -H -ouuid 2>/dev/null | tr -d '{}'`"
+					ids="`@SBINDIR@/vzctl --quiet snapshot-list $ve -H -ouuid 2>/dev/null | tr -d '{}'`"
 					;;
 				    *)
 					# Do not give anything for other cmds
