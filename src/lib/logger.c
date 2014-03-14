@@ -143,7 +143,8 @@ void set_log_verbose(int level)
 	g_log.verbose = level;
 #ifdef HAVE_PLOOP
 	if (ploop_log)
-		ploop.set_verbose_level(level);
+		ploop.set_verbose_level(g_log.quiet ?
+				PLOOP_LOG_NOCONSOLE : level);
 #endif
 }
 
@@ -155,7 +156,8 @@ void set_log_quiet(int quiet) {
 	g_log.quiet = quiet;
 #ifdef HAVE_PLOOP
 	if (ploop_log)
-		ploop.set_verbose_level(PLOOP_LOG_NOCONSOLE);
+		ploop.set_verbose_level(g_log.quiet ?
+				PLOOP_LOG_NOCONSOLE : g_log.verbose);
 #endif
 }
 
@@ -168,23 +170,14 @@ int init_log(char *file, envid_t veid, int enable, int level, int quiet,
 	if ((ret = set_log_file(file)))
 		return ret;
 	g_log.enable = enable;
-	set_log_level(level);
-	set_log_verbose(level);
 	g_log.veid = veid;
 	g_log.quiet = quiet;
+	set_log_level(level);
+	set_log_verbose(level);
 	if (progname != NULL)
 		snprintf(g_log.prog, sizeof(g_log.prog), "%s", progname);
 	else
 		g_log.prog[0] = 0;
-
-#ifdef HAVE_PLOOP
-	if (ploop_log) {
-		ploop.set_log_file(file);
-		ploop.set_log_level(level);
-		if (!quiet)
-			ploop.set_verbose_level(level);
-	}
-#endif
 
 	return 0;
 }
@@ -194,8 +187,8 @@ void vzctl_init_ploop_log(void)
 {
 	ploop.set_log_file(g_log.file);
 	ploop.set_log_level(g_log.level);
-	ploop.set_verbose_level(g_log.quiet ? PLOOP_LOG_NOCONSOLE
-		: g_log.level);
+	ploop.set_verbose_level(g_log.quiet ?
+			PLOOP_LOG_NOCONSOLE : g_log.verbose);
 	ploop_log = 1;
 }
 #endif
