@@ -27,7 +27,11 @@ VZFASTBOOT=no
 # Leave commented out to use all interfaces.
 #NEIGHBOUR_DEVS=detect
 
-## Fail if there is another machine in the network with the same IP
+## Uncomment to skip ARP queries checking for CT IP being used
+## by some other machine on the network
+#SKIP_ARPDETECT=yes
+
+## Comment out to fail CT start if ARP query detects CT IP being used
 ERROR_ON_ARPFAIL="no"
 
 ## Template parameters
