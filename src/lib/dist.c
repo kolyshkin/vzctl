@@ -65,49 +65,39 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 		logger(-1, 0, "Action script %s not found", file);
 		return 0;
 	}
+
+#define ASSIGN(name)			\
+	if (d_actions->name == NULL)		\
+		d_actions->name = strdup(file)
+
 	switch (id) {
 		case ADD_IP:
-			if (d_actions->add_ip != NULL)
-				break;
-			d_actions->add_ip = strdup(file);
+			ASSIGN(add_ip);
 			break;
 		case DEL_IP:
-			if (d_actions->del_ip != NULL)
-				break;
-			d_actions->del_ip = strdup(file);
+			ASSIGN(del_ip);
 			break;
 		case SET_HOSTNAME:
-			if (d_actions->set_hostname != NULL)
-				break;
-			d_actions->set_hostname = strdup(file);
+			ASSIGN(set_hostname);
 			break;
 		case SET_DNS:
-			if (d_actions->set_dns != NULL)
-				break;
-			d_actions->set_dns = strdup(file);
+			ASSIGN(set_dns);
 			break;
 		case SET_USERPASS:
-			if (d_actions->set_userpass != NULL)
-				break;
-			d_actions->set_userpass = strdup(file);
+			ASSIGN(set_userpass);
 			break;
 		case SET_UGID_QUOTA:
-			if (d_actions->set_ugid_quota != NULL)
-				break;
-			d_actions->set_ugid_quota = strdup(file);
+			ASSIGN(set_ugid_quota);
 			break;
 		case POST_CREATE:
-			if (d_actions->post_create != NULL)
-				break;
-			d_actions->post_create = strdup(file);
+			ASSIGN(post_create);
 			break;
 		case PRE_START:
-			if (d_actions->pre_start != NULL)
-				break;
-			d_actions->pre_start = strdup(file);
+			ASSIGN(pre_start);
 			break;
-
 	}
+#undef ADD_DIST_SCRIPT
+
 	return 0;
 }
 
