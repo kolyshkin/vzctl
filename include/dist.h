@@ -22,14 +22,16 @@
 #define	DIST_FUNC		"functions"
 #define	DIST_SCRIPTS		"scripts"
 
-#define	ADD_IP			1
-#define	DEL_IP			2
-#define	SET_HOSTNAME		3
-#define	SET_DNS			4
-#define	SET_USERPASS		5
-#define	SET_UGID_QUOTA		6
-#define	POST_CREATE		7
-#define	PRE_START		8
+enum {
+	ADD_IP = 1,
+	DEL_IP,
+	SET_HOSTNAME,
+	SET_DNS,
+	SET_USERPASS,
+	SET_UGID_QUOTA,
+	POST_CREATE,
+	PRE_START,
+};
 
 typedef struct {
 	char *def_ostmpl;
