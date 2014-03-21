@@ -31,6 +31,7 @@ enum {
 	SET_UGID_QUOTA,
 	POST_CREATE,
 	PRE_START,
+	SET_CONSOLE,
 };
 
 typedef struct {
@@ -50,6 +51,7 @@ typedef struct dist_actions {
 	char *set_ugid_quota;	/**< setup 2level quota. */
 	char *post_create;	/**< sostcreate actions. */
 	char *pre_start;	/**< pre start actions. */
+	char *set_console;	/**< for vzctl console. */
 } dist_actions;
 
 /* Read distribution specific actions configuration file.

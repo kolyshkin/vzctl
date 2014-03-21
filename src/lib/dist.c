@@ -38,6 +38,7 @@ static struct distr_conf {
 	{"SET_UGID_QUOTA", SET_UGID_QUOTA},
 	{"POST_CREATE", POST_CREATE},
 	{"PRE_START", PRE_START},
+	{"SET_CONSOLE", SET_CONSOLE},
 };
 
 static int get_action_id(char *name)
@@ -95,6 +96,9 @@ static int add_dist_action(dist_actions *d_actions, char *name, char *action,
 		case PRE_START:
 			ASSIGN(pre_start);
 			break;
+		case SET_CONSOLE:
+			ASSIGN(set_console);
+			break;
 	}
 #undef ADD_DIST_SCRIPT
 
@@ -113,6 +117,7 @@ void free_dist_actions(dist_actions *d_actions)
 	free(d_actions->set_ugid_quota);
 	free(d_actions->post_create);
 	free(d_actions->pre_start);
+	free(d_actions->set_console);
 }
 
 static int get_dist_conf_name(char *dist_name, char *dir, char *file, int len)

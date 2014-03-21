@@ -133,3 +133,12 @@ POST_CREATE=dist-postcreate.sh
 #   VZ_KERNEL	- 'yes' for OpenVZ kernel, 'no' for upstream kernel
 #   USERNS	- 'yes' if user namespace is used (upstream kernel >= 3.9)
 PRE_START=dist-prestart.sh
+
+# This script is run inside CT before executing container's init:
+#	vzctl start CTID
+#
+# It is used to configure getty autostart for terminals
+# /dev/tty1 (aka /dev/console) # and /dev/tty2.
+#
+# There are no parameters to this script.
+SET_CONSOLE=set_console.sh

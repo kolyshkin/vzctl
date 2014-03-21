@@ -142,6 +142,12 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 			return ret;
 	}
 
+	if (vps_state == STATE_STARTING && actions->set_console &&
+			vps_exec_script(h, veid, res->fs.root, NULL, NULL,
+				actions->set_console, NULL, 0)) {
+		return VZ_ACTIONSCRIPT_ERROR;
+	}
+
 	if (!(skip & SKIP_CONFIGURE))
 		vps_configure(h, veid, actions, fs, param, vps_state);
 	/* Setup quota limits after configure steps */
