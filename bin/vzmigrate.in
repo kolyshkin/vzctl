@@ -194,11 +194,11 @@ undo_act_scripts () {
 
 undo_private () {
 	if [ $keep_dst -eq 0 ]; then
-                if [ -L "$VE_PRIVATE_REMOTE" ]; then
-		        $SSH "root@$host" "rm -rf $(readlink -f $VE_PRIVATE_REMOTE) && rm -f $VE_PRIVATE_REMOTE"
-                else
-		        $SSH "root@$host" "rm -rf $VE_PRIVATE_REMOTE"
-                fi
+		if [ -L "$VE_PRIVATE_REMOTE" ]; then
+			$SSH "root@$host" "rm -rf $(readlink -f $VE_PRIVATE_REMOTE) && rm -f $VE_PRIVATE_REMOTE"
+		else
+			$SSH "root@$host" "rm -rf $VE_PRIVATE_REMOTE"
+		fi
 	fi
 	undo_act_scripts
 }
@@ -701,13 +701,13 @@ log 2 "Creating remote container private dir"
 
 # if VE_PRIVATE is a symlink, create VE_PRIVATE_REMOTE as a symlink
 if [ -L "$VE_PRIVATE" ]; then
-        VE_PRIVATE_TARGET=$(readlink -f "$VE_PRIVATE")
+	VE_PRIVATE_TARGET=$(readlink -f "$VE_PRIVATE")
 
-        if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE_TARGET && ln -s $VE_PRIVATE_TARGET $VE_PRIVATE_REMOTE"; then
-                log 0 "Failed to make+symlink private area directory"
-                undo_private
-                exit $MIG_ERR_COPY
-        fi
+	if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE_TARGET && ln -s $VE_PRIVATE_TARGET $VE_PRIVATE_REMOTE"; then
+		log 0 "Failed to make+symlink private area directory"
+		undo_private
+		exit $MIG_ERR_COPY
+	fi
 fi
 
 if ! $SSH "root@$host" "mkdir -p $VE_PRIVATE_REMOTE"; then
