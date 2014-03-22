@@ -322,7 +322,7 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 	}
 
 	/* do not pollute stdout with some debug messages */
-	set_verbose(-1);
+	set_log_verbose(-1);
 
 	if (!is_snapshot_supported(ve_private))
 		return VZCTL_E_LIST_SNAPSHOT;
