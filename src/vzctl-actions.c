@@ -153,6 +153,9 @@ static struct option set_opt[] = {
 	{"swap",	required_argument, NULL, PARAM_SWAP},
 
 	{"stop-timeout", required_argument, NULL, PARAM_STOP_TIMEOUT},
+	{"offline-resize",  no_argument, NULL, PARAM_OFFLINE_RESIZE},
+		/* Alias for PVC compatibility */
+		{"offline", no_argument, NULL, PARAM_OFFLINE_RESIZE},
 
 	{NULL, 0, NULL, 0}
 };
@@ -948,6 +951,19 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 		return VZ_NOTENOUGHUBCPARAMS;
 	}
 
+	/* --offline-resize can only be used with --diskspace on ploop */
+	if (param->res.dq.offline_resize == YES) {
+		if (!param->res.dq.diskspace) {
+			logger(-1, 0, "Error: option --offline-resize "
+					"can only be used with --diskspace");
+			return VZ_INVALID_PARAMETER_SYNTAX;
+		}
+		if (!ve_private_is_ploop(param->g_param->res.fs.private)) {
+			logger(0, 0, "Warning: option --offline-resize "
+					"only makes sense for a ploop CT");
+		}
+	}
+
 	/* A few options require --save flag */
 	if (!param->opt.save) {
 		if (param->res.name.name != NULL) {
@@ -1169,9 +1185,24 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			ret=VZ_PLOOP_UNSUP;
 			goto err;
 		}
+		/* offline resize requires unmounted container */
+		if (cmd_p->res.dq.offline_resize == YES) {
+			int is_mounted = (vps_is_mounted(g_p->res.fs.root,
+						g_p->res.fs.private) == 1);
+
+			if (is_run || is_mounted) {
+				logger(-1, 0, "Option --offline-resize "
+						"can't be used on a "
+						"%s container",
+						is_run ? "running"
+							: "mounted");
+				ret = VZ_INVALID_PARAMETER_VALUE;
+				goto err;
+			}
+		}
 #ifdef HAVE_PLOOP
 		if ((ret = vzctl_resize_image(g_p->res.fs.private,
-						cmd_p->res.dq.diskspace[1])))
+						&cmd_p->res.dq)))
 			goto err;
 #endif
 	}

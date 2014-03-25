@@ -43,6 +43,7 @@ typedef struct {
 	unsigned long *diskinodes;	/**< disk inodes limit. */
 	unsigned long *exptime;		/**< quota expiration time. */
 	unsigned long *ugidlimit;	/**< user/group quota limit. */
+	int offline_resize;		/**< ploop offline resize. */
 } dq_param;
 
 int is_vzquota_available(void);

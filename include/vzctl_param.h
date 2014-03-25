@@ -161,5 +161,7 @@
 #define PARAM_IOLIMIT_MB	403
 #define PARAM_IOPSLIMIT		404
 
+#define PARAM_OFFLINE_RESIZE	422
+
 #define PARAM_LINE		"e:p:f:t:i:l:k:a:b:n:x:h"
 #endif

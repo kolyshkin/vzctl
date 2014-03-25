@@ -2227,6 +2227,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_QUOTAUGIDLIMIT:
 		ret = conf_parse_ulong(&vps_p->res.dq.ugidlimit, val);
 		break;
+	case PARAM_OFFLINE_RESIZE:
+		vps_p->res.dq.offline_resize = YES;
+		break;
 	case PARAM_DEVICES:
 		ret = parse_dev(vps_p, val);
 		break;

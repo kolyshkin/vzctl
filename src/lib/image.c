@@ -304,10 +304,12 @@ int vzctl_convert_image(const char *ve_private, int mode)
 	return ret;
 }
 
-int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
+int vzctl_resize_image(const char *ve_private, dq_param *dq)
 {
 	int ret;
 	struct ploop_disk_images_data *di;
+	unsigned long long newsize = dq->diskspace[1];
+	int offline = dq->offline_resize;
 	struct ploop_resize_param param = {};
 	char fname[PATH_MAX];
 
@@ -327,6 +329,7 @@ int vzctl_resize_image(const char *ve_private, unsigned long long newsize)
 		return VZCTL_E_RESIZE_IMAGE;
 	}
 	param.size = newsize * 2; /* Kb to 512b sectors */
+	param.offline_resize = (offline == YES);
 	PLOOP_CLEANUP(ret = ploop.resize_image(di, &param));
 	if (ret) {
 		logger(-1, 0, "Failed to resize image: %s [%d]",

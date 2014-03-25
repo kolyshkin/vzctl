@@ -710,7 +710,15 @@ First parameter is soft limit, second is hard limit.
 For \fBploop\fR layout, initiates the procedure of resizing
 the ploop image file to the new size. Since there is no soft/hard
 limit concept in ploop, second \fInum\fR, if specified, is ignored.
-Note that such resize is NOT performed on container start, so
+
+By default, ploop resize is done online, i.e. on a mounted ploop.
+This is a preferred way of doing resize. Although, in a rare case
+a container was using lots of disk space and should now be resized
+to a much smaller size, an offline resize might be more appropriate.
+In this case, make sure the container is stopped and unmounted and
+use additional \fB--offline-resize\fR option
+
+Note that ploop resize is NOT performed on container start, so
 for consistency \fB--diskspace\fR must be used together
 with \fB--save\fR flag.
 
