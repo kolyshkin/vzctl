@@ -736,7 +736,7 @@ fi
 
 if [ "$compact" -eq 1 ]; then
 	log 1 "Compacting container image"
-	if ! logexec 2 vzctl compact $VEID ; then
+	if ! logexec 2 $VZCTL compact $VEID ; then
 		log 0 "Failed to compact container image"
 		undo_root
 	fi
