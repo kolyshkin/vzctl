@@ -748,6 +748,7 @@ static int parse_snapshot_switch_opt(envid_t veid, int argc, char **argv,
 	{"uuid", required_argument, NULL, PARAM_SNAPSHOT_GUID},
 	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
 	{"skip-resume", no_argument, NULL, PARAM_SNAPSHOT_SKIP_RESUME},
+	{"skip-config", no_argument, NULL, PARAM_SNAPSHOT_SKIP_CONFIG},
 	{ NULL, 0, NULL, 0 }
 	};
 
