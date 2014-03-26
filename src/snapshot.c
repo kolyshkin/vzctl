@@ -193,7 +193,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	const char *guid_tmp = NULL;
 	struct vzctl_snapshot_tree *tree = NULL;
 	struct ploop_disk_images_data *di = NULL;
-	struct ploop_snapshot_switch_param param = {};
+	struct ploop_snapshot_switch_param switch_param = {};
 
 	if (!is_snapshot_supported(fs->private))
 		return VZCTL_E_SWITCH_SNAPSHOT;
@@ -253,10 +253,10 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 
 	/* switch snapshot */
-	param.guid = guid;
-	param.guid_old = guid_tmp;
-	param.flags = flags;
-	PLOOP_CLEANUP(ret = ploop.switch_snapshot_ex(di, &param));
+	switch_param.guid = guid;
+	switch_param.guid_old = guid_tmp;
+	switch_param.flags = flags;
+	PLOOP_CLEANUP(ret = ploop.switch_snapshot_ex(di, &switch_param));
 	if (ret)
 		goto err2;
 
@@ -313,10 +313,10 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 
 err3:
 	if (guid_tmp != NULL) {
-		param.guid = guid_tmp;
-		param.guid_old = NULL;
-		param.flags = PLOOP_SNAP_SKIP_TOPDELTA_CREATE;
-		PLOOP_CLEANUP(ploop.switch_snapshot_ex(di, &param));
+		switch_param.guid = guid_tmp;
+		switch_param.guid_old = NULL;
+		switch_param.flags = PLOOP_SNAP_SKIP_TOPDELTA_CREATE;
+		PLOOP_CLEANUP(ploop.switch_snapshot_ex(di, &switch_param));
 	}
 
 err2:
