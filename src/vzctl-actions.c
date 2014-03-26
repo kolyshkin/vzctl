@@ -1718,8 +1718,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 	case ACTION_SNAPSHOT_SWITCH:
 		g_p->res.net.skip_arpdetect = cmd_p->res.net.skip_arpdetect;
-		ret = vzctl_env_switch_snapshot(h, veid, g_p, &g_p->res.fs,
-				cmd_p->snap.guid);
+		ret = vzctl_env_switch_snapshot(h, veid, g_p, &cmd_p->snap);
 		break;
 	case ACTION_SNAPSHOT_LIST:
 		ret = vzctl_env_snapshot_list(argc, argv, veid,

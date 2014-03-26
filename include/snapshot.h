@@ -50,7 +50,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 		const struct vzctl_snapshot_param *param);
 
 int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid, vps_param *g_p,
-		const fs_param *fs, const char *guid);
+		const struct vzctl_snapshot_param *param);
 
 int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 		const char *guid);

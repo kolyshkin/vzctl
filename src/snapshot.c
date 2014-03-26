@@ -180,11 +180,13 @@ out:
 }
 
 int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
-		vps_param *g_p,	const fs_param *fs, const char *guid)
+		vps_param *g_p, const struct vzctl_snapshot_param *param)
 {
 	int ret, run;
 	int flags = 0;
 	cpt_param cpt = {};
+	const char *guid = param->guid;
+	fs_param *fs = &g_p->res.fs;
 	char fname[PATH_MAX];
 	char snap_xml_tmp[PATH_MAX];
 	char ve_conf_tmp[PATH_MAX] = "";
