@@ -171,6 +171,9 @@ Destination node CPU incompatibility.
 .TP
 .B 19 EXIT_CANT_READ_REMOTE_CONFIG
 Unable to read remote vz.conf.
+.TP
+.B 20 EXIT_LOCKED
+Can't lock container (already locked).
 
 .SH SEE ALSO
 .BR rsync (1),

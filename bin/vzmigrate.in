@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2000-2013, Parallels, Inc. All rights reserved.
+# Copyright (C) 2000-2014, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -66,6 +66,7 @@ MIG_ERR_UNSUP_PLOOP=16
 MIG_ERR_UNSUP_CPT_VER=17
 MIG_ERR_UNSUP_CPU=18
 MIG_ERR_CANT_READ_REMOTE_CONFIG=19
+MIG_ERR_LOCKED=20
 
 # For local vzctl to work, make sure @SBINDIR@ is in $PATH
 if ! echo ":${PATH}:" | fgrep -q ':@SBINDIR@:'; then
@@ -180,9 +181,45 @@ logexec () {
 	fi
 }
 
+lock_ct() {
+	local f
+	local pid
+	local ret
+
+	f=/vz/lock/$VEID.lck
+
+	set -C # noclobber, i.e. open with O_EXCL
+	if echo $$ > $f; then
+		log 1 "Locked CT $1"
+		ret=0
+	else
+		pid=$(cat $f)
+		log 0 "ERROR: CT $1 already locked by PID $pid" 1>&2
+		logexec 1 ps -f -p $pid
+		ret=1
+	fi
+
+	set +C
+	return $ret
+}
+
+undo_lock() {
+	local f
+	local pid
+
+	f=/vz/lock/$VEID.lck
+	pid=$(cat $f)
+	if [ $pid -ne $$ ] ; then
+		log 0 "Error: unexpected PID $pid in $f (expecting $$)"
+	else
+		rm -f $f
+	fi
+}
+
 undo_conf () {
 	$SSH "root@$host" "$VZCTL set $VEID --name '' --save > /dev/null"
 	$SSH "root@$host" "rm -f $vpsconf"
+	undo_lock
 }
 
 undo_act_scripts () {
@@ -224,7 +261,7 @@ undo_sync () {
 }
 
 undo_suspend () {
-	logexec 2 $VZCTL chkpnt $VEID --resume
+	logexec 2 $VZCTL_L chkpnt $VEID --resume
 	undo_sync
 }
 
@@ -242,9 +279,9 @@ undo_copy_dump () {
 
 undo_stop () {
 	if [ "$state" = "running" ]; then
-		$VZCTL start $VEID
+		$VZCTL_L start $VEID
 	elif [ "$mounted" = "mounted" ]; then
-		$VZCTL mount $VEID
+		$VZCTL_L mount $VEID
 	fi
 	undo_sync
 }
@@ -483,6 +520,7 @@ RSYNC="rsync $RSYNC_OPTIONS"
 SSH="ssh $SSH_OPTIONS"
 SCP="scp $SCP_OPTIONS"
 export RSYNC_RSH="$SSH"
+VZCTL_L="$VZCTL --skiplock"
 
 [ $# -lt 2 ] && bad_usage "not enough parameters"
 
@@ -509,14 +547,19 @@ if [ ! -r "$vzconf" ]; then
 	exit $MIG_ERR_NOEXIST
 fi
 
-get_status $($VZCTL status $VEID)
+# Lock the container so no one else can fuss with it
+lock_ct || exit $MIG_ERR_LOCKED
+
+get_status $($VZCTL_L status $VEID)
 if [ "$exist" = "deleted" ]; then
 	log 0 "CT #$VEID doesn't exist"
+	undo_lock
 	exit $MIG_ERR_NOEXIST
 fi
 
 if [ $online -eq 1 -a "$state" != "running" ]; then
 	log 0 "Can't perform live migration of a stopped container"
+	undo_lock
 	exit $MIG_ERR_VPS_IS_STOPPED
 fi
 
@@ -531,6 +574,7 @@ unset S M
 if ! logexec 2 $SSH root@$host /bin/true; then
 	log 0 "Can't connect to destination address using public key"
 	log 0 "Please put your public key to destination node"
+	undo_lock
 	exit $MIG_ERR_CANT_CONNECT
 fi
 
@@ -538,6 +582,7 @@ fi
 if ! logexec 2 $SSH root@$host /etc/init.d/vz status ; then
 	log 0 "OpenVZ is not running on the target machine"
 	log 0 "Can't continue migration"
+	undo_lock
 	exit $MIG_ERR_OVZ_NOT_RUNNING
 fi
 
@@ -546,12 +591,14 @@ if [ $online -eq 1 ]; then
 	if [ ! -f /proc/cpt ]; then
 		log 0 "vzcpt module is not loaded on the source node"
 		log 0 "Can't continue live migration"
+		undo_lock
 		exit $MIG_ERR_OVZ_NOT_RUNNING
 	fi
 	if ! logexec 2 $SSH root@$host "test -f /proc/rst";
 	then
 		log 0 "vzrst module is not loaded on the destination node"
 		log 0 "Can't continue live migration"
+		undo_lock
 		exit $MIG_ERR_OVZ_NOT_RUNNING
 	fi
 fi
@@ -580,6 +627,7 @@ if [ $online -eq 1 ]; then
 			if [ $ignore_ipv6 -eq 1 ]; then
 				ignore_msg
 			else
+				undo_lock
 				exit $MIG_ERR_OVZ_NOT_RUNNING
 			fi
 		fi
@@ -597,6 +645,7 @@ log 2 "Getting remote VE_ROOT and VE_PRIVATE"
 eval $($SSH root@$host "sh -c 'VEID='$VEID'; . /etc/vz/vz.conf && echo VE_ROOT_REMOTE=\$VE_ROOT && echo VE_PRIVATE_REMOTE=\$VE_PRIVATE'")
 if [ -z "$VE_ROOT_REMOTE" -o -z "$VE_PRIVATE_REMOTE" ]; then
 	log 0 "Failed to get remote VE_ROOT/VE_PRIVATE"
+	undo_lock
 	exit $MIG_ERR_CANT_READ_REMOTE_CONFIG
 fi
 
@@ -620,6 +669,7 @@ if [ "$PLOOP" = "yes" ]; then
 	log 2 "Checking if ploop is supported on destination node"
 	if ! logexec 2 $SSH "root@$host" ploop getdev ; then
 		log 0 "Destination node does not support ploop, can't migrate"
+		undo_lock
 		exit $MIG_ERR_UNSUP_PLOOP
 	fi
 
@@ -627,6 +677,7 @@ if [ "$PLOOP" = "yes" ]; then
 		# Online ploop migration: exclude top delta
 		if ! get_ploop_info; then
 			log 0 "Can't get ploop information"
+			undo_lock
 			exit $MIG_ERR_COPY
 		fi
 		RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
@@ -649,11 +700,13 @@ if echo $IP_X | grep -q '[0-9a-f]'; then
 	# do check
 	if [ $($SSH "root@$host" "grep -cwE \"$IP_X\" /proc/vz/veip") -gt 0 ]; then
 		log 0 "IP address(es) already in use on destination node"
+		undo_lock
 		exit $MIG_ERR_IP_IN_USE
 	fi
 fi
 
 if [ $check_only -eq 1 ]; then
+	undo_lock
 	exit 0
 fi
 
@@ -662,6 +715,7 @@ log 1 "Preparing remote node"
 log 2 "Copying config file"
 if ! logexec 2 $SCP $vpsconf root@$host:$vpsconf ; then
 	log 0 "Failed to copy config file"
+	undo_lock
 	exit $MIG_ERR_COPY
 fi
 
@@ -737,7 +791,7 @@ fi
 
 if [ "$compact" -eq 1 ]; then
 	log 1 "Compacting container image"
-	if ! logexec 2 $VZCTL compact $VEID ; then
+	if ! logexec 2 $VZCTL_L compact $VEID ; then
 		log 0 "Failed to compact container image"
 		undo_root
 	fi
@@ -745,7 +799,7 @@ fi
 
 if [ "$snapshot" -eq 1 ]; then
 	log 1 "Creating a container snapshot"
-	if ! logexec 2 $VZCTL snapshot $VEID ; then
+	if ! logexec 2 $VZCTL_L snapshot $VEID ; then
 		log 0 "Failed to snapshot a container"
 		undo_root
 	fi
@@ -767,7 +821,7 @@ if [ $online -eq 1 ]; then
 	if [ "$PLOOP" != "yes" ]; then
 		time_suspend=$(date +%s.%N)
 		log 2 "Suspending container"
-		if ! logexec 2 $VZCTL chkpnt $VEID --suspend ; then
+		if ! logexec 2 $VZCTL_L chkpnt $VEID --suspend ; then
 			log 0 "Failed to suspend container"
 			undo_sync
 			exit $MIG_ERR_CHECKPOINT
@@ -775,9 +829,9 @@ if [ $online -eq 1 ]; then
 	else
 		log 2 "Copying top ploop delta with CT suspend"
 		TMPF=$(mktemp)
-		if ! ploop_copy "date '+%s.%N' > $TMPF; $VZCTL chkpnt $VEID --suspend"; then
+		if ! ploop_copy "date '+%s.%N' > $TMPF; $VZCTL_L chkpnt $VEID --suspend"; then
 			log 0 "Failed to copy top ploop delta"
-			$VZCTL chkpnt $VEID --resume 2>/dev/null
+			$VZCTL_L chkpnt $VEID --resume 2>/dev/null
 			rm -f $TMPF
 			undo_sync
 			exit $MIG_ERR_COPY
@@ -788,7 +842,7 @@ if [ $online -eq 1 ]; then
 	fi
 
 	log 2 "Dumping container"
-	if ! logexec 2 $VZCTL chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
+	if ! logexec 2 $VZCTL_L chkpnt $VEID --dump --dumpfile $VE_DUMPFILE ; then
 		log 0 "Failed to dump container"
 		undo_suspend
 		exit $MIG_ERR_CHECKPOINT
@@ -805,30 +859,30 @@ else
 	if [ "$state" = "running" ]; then
 		if [ "$PLOOP" != "yes" ]; then
 			log 1 "Stopping container"
-			if ! logexec 2 $VZCTL stop $VEID ; then
+			if ! logexec 2 $VZCTL_L stop $VEID ; then
 				log 0 "Failed to stop container"
 				undo_sync
 				exit $MIG_ERR_STOP_SOURCE
 			fi
 		else
 			log 1 "Copying top ploop delta with CT stop"
-			if ! ploop_copy "$VZCTL stop $VEID --skip-umount"; then
+			if ! ploop_copy "$VZCTL_L stop $VEID --skip-umount"; then
 				log 0 "Failed to copy top ploop delta"
-				$VZCTL start $VEID 2>/dev/null
+				$VZCTL_L start $VEID 2>/dev/null
 				undo_sync
 				exit $MIG_ERR_COPY
 			fi
 			log 1 "Unmounting container"
-			if ! logexec 2 $VZCTL umount $VEID ; then
+			if ! logexec 2 $VZCTL_L umount $VEID ; then
 				log 0 "Failed to umount container"
-				$VZCTL start $VEID 2>/dev/null
+				$VZCTL_L start $VEID 2>/dev/null
 				undo_sync
 				exit $MIG_ERR_STOP_SOURCE
 			fi
 		fi
 	elif [ "$mounted" = "mounted" ]; then
 		log 1 "Unmounting container"
-		if ! logexec 2 $VZCTL umount $VEID ; then
+		if ! logexec 2 $VZCTL_L umount $VEID ; then
 			log 0 "Failed to umount container"
 			undo_sync
 			exit $MIG_ERR_STOP_SOURCE
@@ -894,8 +948,8 @@ if [ $online -eq 1 ]; then
 	log 1 "Cleaning up"
 
 	log 2 "Killing container"
-	logexec 2 $VZCTL chkpnt $VEID --kill
-	logexec 2 $VZCTL umount $VEID
+	logexec 2 $VZCTL_L chkpnt $VEID --kill
+	logexec 2 $VZCTL_L umount $VEID
 
 	log 2 "Removing dumpfiles"
 	rm -f "$VE_DUMPFILE"
@@ -929,8 +983,10 @@ fi
 
 if [ $remove_area -eq 1 ]; then
 	log 2 "Destroying container"
-	logexec 2 $VZCTL destroy $VEID
+	logexec 2 $VZCTL_L destroy $VEID
 else
 	# Move config as veid.migrated to allow backward migration
 	mv -f $vpsconf $vpsconf.migrated
 fi
+
+undo_lock
