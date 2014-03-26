@@ -515,6 +515,11 @@ if [ "$exist" = "deleted" ]; then
 	exit $MIG_ERR_NOEXIST
 fi
 
+if [ $online -eq 1 -a "$state" != "running" ]; then
+	log 0 "Can't perform live migration of a stopped container"
+	exit $MIG_ERR_VPS_IS_STOPPED
+fi
+
 S="Starting"
 M="migration"
 [ $check_only -eq 1 ] && S="Checking"
@@ -554,12 +559,8 @@ fi
 dst_exist=$($SSH "root@$host" "$VZCTL status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
 	log 0 "CT #$VEID already exists on destination node"
+	undo_lock
 	exit $MIG_ERR_EXISTS
-fi
-
-if [ $online -eq 1 -a "$state" != "running" ]; then
-	log 0 "Can't perform live migration of a stopped container"
-	exit $MIG_ERR_VPS_IS_STOPPED
 fi
 
 if [ $online -eq 1 ]; then
