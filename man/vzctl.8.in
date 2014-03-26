@@ -38,7 +38,11 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --skip-suspend
 .OP --skip-config
 .SY vzctl
-[\fIflags\fR] \fBsnapshot-switch\fR | \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+[\fIflags\fR] \fBsnapshot-switch\fR \fICTID\fR
+.OP --skip-resume
+\fB--id\fR \fIuuid\fR
+.SY vzctl
+[\fIflags\fR] \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 .SY vzctl
 [\fIflags\fR] \fBsnapshot-mount\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 \fB--target\fR \fIdir\fR
@@ -905,11 +909,11 @@ Options \fB--name\fR and \fB--description\fR can be used to specify the
 snapshot name and description, respectively. Name is displayed by
 \fBsnapshot-list\fR.
 .TP 4
-\fBsnapshot-switch\fR \fICTID\fR \fB--id\fR \fIuuid\fR
+\fBsnapshot-switch\fR \fICTID\fR [\fB--skip-resume\fR] \fB--id\fR \fIuuid\fR
 Switches the container to a snapshot identified by \fIuuid\fR.
 Note that the current container state and its file system state is lost!
-If given snapshot contains CT memory dump, it is restored, otherwise
-container is stopped.
+If given snapshot contains CT memory dump, and option \fB--skip-resume\fR
+is not specified, container is restored, otherwise it is stopped.
 .TP 4
 \fBsnapshot-delete\fR \fICTID\fR \fB--id\fR \fIuuid\fR
 Removes a specified snapshot.

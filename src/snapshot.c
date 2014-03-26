@@ -287,7 +287,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	/* resume CT in case dump file exists (no rollback, ignore error) */
 	vzctl_get_snapshot_dumpfile(fs->private, guid, dumpfile, sizeof(dumpfile));
-	if (stat_file(dumpfile) == 1) {
+	if (stat_file(dumpfile) == 1 &&	!(param->flags & SNAPSHOT_SKIP_RESUME)) {
 		vps_param *param;
 
 		param = reread_vps_config(veid);

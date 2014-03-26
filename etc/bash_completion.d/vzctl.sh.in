@@ -96,6 +96,7 @@ _vzctl()
 	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 	local vzctl_snapshot_create_opts="--id --name --description \
 		--skip-suspend --skip-config"
+	local vzctl_snapshot_switch_opts="--id --skip-resume"
 	local vzctl_snapshot_mount_opts="--id --target"
 	local vzctl_snapshot_list_opts="-H --no-header -o --output --id \
 		-L --list --help"
@@ -322,7 +323,10 @@ _vzctl()
 					snapshot)
 						COMPREPLY=( $( compgen -W "$vzctl_snapshot_create_opts" -- $cur ) )
 						;;
-					snapshot-switch|snapshot-delete|snapshot-umount)
+					snapshot-switch)
+						COMPREPLY=( $( compgen -W "$vzctl_snapshot_switch_opts" -- $cur ) )
+						;;
+					snapshot-delete|snapshot-umount)
 						COMPREPLY=( $( compgen -W "--id" -- $cur ) )
 						;;
 					snapshot-mount)
