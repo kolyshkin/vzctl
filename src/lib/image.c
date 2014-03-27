@@ -304,12 +304,11 @@ int vzctl_convert_image(const char *ve_private, int mode)
 	return ret;
 }
 
-int vzctl_resize_image(const char *ve_private, dq_param *dq)
+int vzctl_resize_image(const char *ve_private,
+		unsigned long long newsize, int offline)
 {
 	int ret;
 	struct ploop_disk_images_data *di;
-	unsigned long long newsize = dq->diskspace[1];
-	int offline = dq->offline_resize;
 	struct ploop_resize_param param = {};
 	char fname[PATH_MAX];
 

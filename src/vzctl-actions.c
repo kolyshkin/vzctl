@@ -1205,7 +1205,8 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		}
 #ifdef HAVE_PLOOP
 		if ((ret = vzctl_resize_image(g_p->res.fs.private,
-						&cmd_p->res.dq)))
+						cmd_p->res.dq.diskspace[1],
+						cmd_p->res.dq.offline_resize)))
 			goto err;
 #endif
 	}
