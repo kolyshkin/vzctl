@@ -980,7 +980,8 @@ Using value other than \fBexpanded\fR is not recommended and is currently
 not supported.
 
 You can use \fB--diskspace\fR and \fB--diskinodes\fR options to specify
-container file system size.
+container file system size. Note that for \fBploop\fR layout, you will
+not be able to change inodes value later.
 
 If \fBDISKSPACE\fR is not specified either in the sample configuration file
 used for creation or in global configuration file \fBvz.conf\fR(5),

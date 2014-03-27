@@ -44,6 +44,7 @@
 struct vzctl_create_image_param {
 	int mode;
 	unsigned long size;
+	unsigned long inodes;	/* number of inodes */
 };
 
 struct vzctl_mount_param {

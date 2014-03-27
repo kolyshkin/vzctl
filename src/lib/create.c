@@ -210,6 +210,8 @@ find:
 			ploop_mode = PLOOP_EXPANDED_MODE;
 		param.mode = ploop_mode;
 		param.size = dq->diskspace[1]; // limit
+		if (dq->diskinodes)
+			param.inodes = dq->diskinodes[1];
 		ret = vzctl_create_image(tmp_dir, &param);
 		if (ret)
 			goto err;

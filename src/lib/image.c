@@ -38,6 +38,10 @@
 #include "destroy.h"
 #include "cleanup.h"
 
+#ifndef MAX
+#define MAX(a, b)	((a) > (b) ? (a) : (b))
+#endif
+
 #define DEFAULT_FSTYPE		"ext4"
 #define SNAPSHOT_MOUNT_ID	"snap"
 
@@ -253,6 +257,7 @@ int vzctl_create_image(const char *ve_private,
 	struct ploop_create_param create_param = {};
 	char dir[PATH_MAX];
 	char image[PATH_MAX];
+	unsigned long size_by_inodes;
 
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
@@ -265,9 +270,15 @@ int vzctl_create_image(const char *ve_private,
 	snprintf(image, sizeof(image), "%s/root.hdd", dir);
 
 	logger(0, 0, "Creating image: %s size=%luK", image, param->size);
+	/* size by inodes is calculated based on ext4 bytes per inode ratio
+	 * (mke2fs -i or mke2fs.conf's inode_ratio) which is assumed to be
+	 * set to 16384, i.e. one inode per 16K disk space.
+	 */
+	size_by_inodes = param->inodes * 16;
 	create_param.mode = param->mode;
 	create_param.fstype = DEFAULT_FSTYPE;
-	create_param.size = param->size * 2; /* Kb to 512b sectors */
+	/* KB to 512b sector conversion */
+	create_param.size = 2 * MAX(param->size, size_by_inodes);
 	create_param.image = image;
 	PLOOP_CLEANUP(ret = ploop.create_image(&create_param));
 	if (ret) {
@@ -275,6 +286,17 @@ int vzctl_create_image(const char *ve_private,
 		logger(-1, 0, "Failed to create image: %s [%d]",
 				ploop.get_last_error(), ret);
 		return VZCTL_E_CREATE_IMAGE;
+	}
+	if (param->size < size_by_inodes) {
+		/* A larger size image was created due to inodes requirement,
+		 * so let's resize it down to requested size (by ballooning)
+		 */
+		ret = vzctl_resize_image(ve_private, param->size, NO);
+		if (ret) {
+			rmdir(dir);
+			/* Error is printed by vzctl_resize_image */
+			return ret;
+		}
 	}
 	return 0;
 }
@@ -569,6 +591,8 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 
 	param.mode = mode;
 	param.size = dq->diskspace[1]; // limit
+	if (dq->diskinodes)
+		param.inodes = dq->diskinodes[1];
 	ret = vzctl_create_image(new_private, &param);
 	if (ret)
 		goto err;
