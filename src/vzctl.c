@@ -64,7 +64,7 @@ static void usage(int rc)
 "\n"
 "vzctl create <ctid> [--ostemplate <name>] [--config <name>]\n"
 "   [--layout ploop|simfs] [--hostname <name>] [--name <name>] [--ipadd <addr>]\n"
-"   [--diskspace <kbytes>] [--private <path>] [--root <path>]\n"
+"   [--diskspace <kbytes>] [--diskinodes <NUM> [--private <path>] [--root <path>]\n"
 "   [--local_uid <UID>] [--local_gid <GID>]\n"
 "vzctl start <ctid> [--force] [--wait] [--skip-fsck]\n"
 "vzctl destroy | mount | umount | stop | restart | status <ctid>\n"

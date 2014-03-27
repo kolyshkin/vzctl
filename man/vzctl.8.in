@@ -944,6 +944,7 @@ List of available fields can be obtained using \fB-L\fR option.
 .OP --config name
 .OP --layout \fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
 .OP --diskspace kbytes
+.OP --diskinodes num
 .OP --private path
 .OP --root path
 .OP --ipadd addr
@@ -978,10 +979,12 @@ disk image format after a colon. Possible ploop formats are \fBexpanded\fR,
 Using value other than \fBexpanded\fR is not recommended and is currently
 not supported.
 
-You can use \fB--diskspace\fR option to specify container file system size.
-If DISKSPACE is not specified either in the sample configuration file used
-or in global configuration file \fBvz.conf\fR(5), this parameter
-is required for \fBploop\fR layout.
+You can use \fB--diskspace\fR and \fB--diskinodes\fR options to specify
+container file system size.
+
+If \fBDISKSPACE\fR is not specified either in the sample configuration file
+used for creation or in global configuration file \fBvz.conf\fR(5),
+\fB--diskspace\fR parameter is required for \fBploop\fR layout.
 
 Suffixes \fBG\fR, \fBM\fR, \fBK\fR can also be specified
 (see \fBResource limits\fR section for more info on suffixes).
