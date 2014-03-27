@@ -238,6 +238,8 @@ int destroy_dump(envid_t veid, const char *dumpdir)
 	char buf[128];
 
 	get_dump_file(veid, dumpdir, buf, sizeof(buf));
+	if (stat_file(buf) == 0)
+		return 0;
 
 	logger(1, 0, "Removing CT dump %s", buf);
 	if (unlink(buf) == 0)
