@@ -943,7 +943,7 @@ List of available fields can be obtained using \fB-L\fR option.
 .OP --ostemplate name
 .OP --config name
 .OP --layout \fBsimfs\fR|\fBploop\fR[\fB:\fR{\fBexpanded\fR|\fBplain\fR|\fBraw\fR}]
-.OP --diskspace \fIkbytes\fR
+.OP --diskspace kbytes
 .OP --private path
 .OP --root path
 .OP --ipadd addr
