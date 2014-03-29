@@ -229,6 +229,13 @@ undo_act_scripts () {
 	undo_conf
 }
 
+undo_dump_file() {
+	if [ -n "$DUMP_FILE" ] ; then
+		$SSH "root@$host" "rm -f $DUMPDIR_REMOTE/$DUMP_FILE"
+	fi
+	undo_act_scripts
+}
+
 undo_private () {
 	if [ $keep_dst -eq 0 ]; then
 		if [ -L "$VE_PRIVATE_REMOTE" ]; then
@@ -237,7 +244,7 @@ undo_private () {
 			$SSH "root@$host" "rm -rf $VE_PRIVATE_REMOTE"
 		fi
 	fi
-	undo_act_scripts
+	undo_dump_file
 }
 
 undo_root () {
@@ -313,6 +320,7 @@ get_status() {
 	exist=$3
 	mounted=$4
 	state=$5
+	suspended=$6
 }
 
 get_time () {
@@ -644,7 +652,8 @@ VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 log 2 "Getting remote VE_ROOT and VE_PRIVATE"
 eval $($SSH root@$host "sh -c 'VEID='$VEID'; . /etc/vz/vz.conf && \
 	echo VE_ROOT_REMOTE=\$VE_ROOT && \
-	echo VE_PRIVATE_REMOTE=\$VE_PRIVATE'")
+	echo VE_PRIVATE_REMOTE=\$VE_PRIVATE && \
+	echo DUMPDIR_REMOTE=\$DUMPDIR'")
 if [ -z "$VE_ROOT_REMOTE" -o -z "$VE_PRIVATE_REMOTE" ]; then
 	log 0 "Failed to get remote VE_ROOT/VE_PRIVATE"
 	undo_lock
@@ -747,10 +756,22 @@ if [ -n "$act_scripts" ]; then
 	fi
 fi
 
+test -z "$DUMPDIR" && DUMPDIR=@VZDIR@/dump
+test -z "$DUMPDIR_REMOTE" && DUMPDIR=@VZDIR@/dump
+if [ "$suspended" = "suspended" ]; then
+	DUMP_FILE=Dump.$VEID
+	log 2 "Copying dump file"
+	if ! logexec 2 $SCP $DUMPDIR/$DUMP_FILE root@$host:$DUMPDIR_REMOTE/ ; then
+		log 0 "Failed to copy dump file"
+		undo_act_scripts
+		exit $MIG_ERR_COPY
+	fi
+fi
+
 log 2 "Creating remote container root dir"
 if ! $SSH "root@$host" "mkdir -p $VE_ROOT_REMOTE"; then
 	log 0 "Failed to make container root directory"
-	undo_act_scripts
+	undo_dump_file
 	exit $MIG_ERR_COPY
 fi
 
