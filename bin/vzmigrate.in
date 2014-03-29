@@ -642,7 +642,9 @@ VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
 log 2 "Getting remote VE_ROOT and VE_PRIVATE"
-eval $($SSH root@$host "sh -c 'VEID='$VEID'; . /etc/vz/vz.conf && echo VE_ROOT_REMOTE=\$VE_ROOT && echo VE_PRIVATE_REMOTE=\$VE_PRIVATE'")
+eval $($SSH root@$host "sh -c 'VEID='$VEID'; . /etc/vz/vz.conf && \
+	echo VE_ROOT_REMOTE=\$VE_ROOT && \
+	echo VE_PRIVATE_REMOTE=\$VE_PRIVATE'")
 if [ -z "$VE_ROOT_REMOTE" -o -z "$VE_PRIVATE_REMOTE" ]; then
 	log 0 "Failed to get remote VE_ROOT/VE_PRIVATE"
 	undo_lock
