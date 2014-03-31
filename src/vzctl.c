@@ -213,7 +213,9 @@ int main(int argc, char *argv[], char *envp[])
 #endif
 	} else if (!strcmp(argv[1], "status")) {
 		action = ACTION_STATUS;
-		quiet = 1;
+		verbose = -1;
+		verbose_custom = 1;
+		set_log_verbose(verbose); /* only stderr messages */
 	} else if (!strcmp(argv[1], "suspend") || !strcmp(argv[1], "chkpnt")) {
 		action = ACTION_SUSPEND;
 	} else if (!strcmp(argv[1], "resume") || !strcmp(argv[1], "restore")) {
@@ -233,6 +235,9 @@ int main(int argc, char *argv[], char *envp[])
 		action = ACTION_SNAPSHOT_DELETE;
 	} else if (!strcmp(argv[1], "snapshot-list")) {
 		action = ACTION_SNAPSHOT_LIST;
+		verbose = -1;
+		verbose_custom = 1;
+		set_log_verbose(verbose); /* only stderr messages */
 	} else if (!strcmp(argv[1], "snapshot-mount")) {
 		action = ACTION_SNAPSHOT_MOUNT;
 	} else if (!strcmp(argv[1], "snapshot-umount")) {
