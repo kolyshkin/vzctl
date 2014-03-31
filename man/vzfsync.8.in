@@ -1,0 +1,56 @@
+.TH vzfsync 8 "31 Mar 2014" "OpenVZ" "Containers"
+.SH NAME
+vzfsync \- perform fsync/fdatasync/fadvise on files
+.SH SYNOPSIS
+.SY vzfsync
+{
+.BR -s , --sync
+|
+.BR -d , --datasync
+}
+.OP -n\fR,\fB--dontneed
+.B file
+.OP file ...
+.YS
+.SY vzfsync
+.B --help
+.YS
+.SH DESCRIPTION
+This utility performs
+.BR fsync (2)
+or
+.BR fdatasync(2)
+for every supplied file name.
+It can also optionally perform
+.BR posix_fadvise (2)
+with the argument of
+.BR POSIX_FADV_DONTNEED .
+.P
+It is used from within
+.BR vzmigrate (8)
+utility for live migration, right after copying ploop delta files
+(and before suspending a container) to sync those copied files to disk
+in order to optimize subsequent ploop mount time and, utlimately,
+container frozen time.
+.SH OPTIONS
+.TP
+.BR -s , --sync
+Perform fsync.
+.TP
+.BR -d , --datasync
+Perform fdatasync.
+.TP
+.BR -n , --dontneed
+Perform posix_fadvise(POSIX_FADV_DONTNEED).
+.SH EXIT STATUS
+Returns 0 upon success, or an appropriate error code in case of an error:
+.IP 1
+Invalid usage
+.IP 2
+Failed to perform some requested operations on one or many files.
+.SH SEE ALSO
+.BR fsync (2),
+.BR fdatasync (2),
+.BR posix_fadvise (2).
+.SH LICENSE
+Copyright (C) 2014, Parallels, Inc. Licensed under GNU GPL v2.

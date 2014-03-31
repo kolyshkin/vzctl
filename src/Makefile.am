@@ -34,12 +34,15 @@ sbin_PROGRAMS = arpsend \
                 vzcfgvalidate \
                 vzcptcheck \
                 vzctl \
+                vzfsync \
                 vzlist \
                 vzmemcheck \
                 vzsplit \
                 vzeventd
 
 VZCTL_LIBS = lib/libvzctl.la
+
+vzfsync_SOURCES = vzfsync.c
 
 arpsend_SOURCES = arpsend.c
 
