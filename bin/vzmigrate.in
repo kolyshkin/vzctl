@@ -558,7 +558,7 @@ fi
 # Lock the container so no one else can fuss with it
 lock_ct || exit $MIG_ERR_LOCKED
 
-get_status $($VZCTL_L status $VEID)
+get_status $($VZCTL_L --quiet status $VEID)
 if [ "$exist" = "deleted" ]; then
 	log 0 "CT #$VEID doesn't exist"
 	undo_lock
@@ -611,7 +611,7 @@ if [ $online -eq 1 ]; then
 	fi
 fi
 
-dst_exist=$($SSH "root@$host" "$VZCTL status $VEID" | awk '{print $3}')
+dst_exist=$($SSH "root@$host" "$VZCTL --quiet status $VEID" | awk '{print $3}')
 if [ "$dst_exist" = "exist" ]; then
 	log 0 "CT #$VEID already exists on destination node"
 	undo_lock
