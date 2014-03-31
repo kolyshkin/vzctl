@@ -34,11 +34,11 @@ static int usage(int rc)
 	FILE *out = (rc == 0)? stdout : stderr;
 
 	fprintf(out,
-"Usage:	vzcpttest <command> [argument ...]\n"
-" [S]	vzcpttest version		show cpt in-kernel version\n"
-" [D]	vzcpttest version <ver>		test if <ver> version is supported\n"
-" [D]	vzcpttest caps			show CPU capabilities\n"
-" [S]	vzcpttest caps <veid> <caps>	test if <caps> work for <veid>\n"
+"Usage:	vzcptcheck <command> [argument ...]\n"
+" [S]	vzcptcheck version		show cpt in-kernel version\n"
+" [D]	vzcptcheck version <ver>	test if <ver> version is supported\n"
+" [D]	vzcptcheck caps			show CPU capabilities\n"
+" [S]	vzcptcheck caps <veid> <caps>	test if <caps> work for <veid>\n"
 "\n"
 "[S] -- run this on source node\n"
 "[D] -- run on destination node\n"
