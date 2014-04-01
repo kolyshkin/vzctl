@@ -31,7 +31,7 @@ struct iptables_s {
 
 #define IPTABLES_GEN(name, mask) { name, mask##_MOD, mask }
 
-static struct iptables_s iptables[] = {
+static struct iptables_s _g_iptables[] = {
 #ifdef VZCTL_ENV_CREATE_DATA
 	IPTABLES_GEN("ip_tables",	VE_IP_IPTABLES),
 	IPTABLES_GEN("iptable_filter",	VE_IP_FILTER),
@@ -66,29 +66,34 @@ static struct iptables_s iptables[] = {
 #endif
 #endif /* VZCTL_ENV_CREATE_DATA */
 	IPTABLES_GEN("ipt_owner",	VE_IP_MATCH_OWNER),
+	{ NULL }
 };
 
-static struct iptables_s *find_ipt(const char *name)
+static struct iptables_s *find_ipt_by_name(struct iptables_s *ipt,
+		const char *name)
 {
-	int i;
+	struct iptables_s *p;
 
-	for (i = 0; i < (int)ARRAY_SIZE(iptables); i++)
-		if (!strcmp(name, iptables[i].name))
-			return &iptables[i];
+	for (p = ipt; p->name != NULL; p++)
+		if (!strcmp(name, p->name))
+			return p;
+
 	return NULL;
 }
 
 void ipt_mask2str(unsigned long long mask, char *buf, int size)
 {
-	int i, r;
+	int r;
 	char *sp, *ep;
+	struct iptables_s *p;
 
+	*buf = '\0';
 	sp = buf;
 	ep = buf + size;
-	for (i = 0;  i < (int)ARRAY_SIZE(iptables); i++) {
-		if (!(mask & iptables[i].id))
+	for (p = _g_iptables; p->name != NULL; p++) {
+		if (!(mask & p->id))
 			continue;
-		r = snprintf(sp, ep - sp, "%s ", iptables[i].name);
+		r = snprintf(sp, ep - sp, "%s ", p->name);
 		if (r < 0 || sp + r >= ep)
 			break;
 		sp += r;
@@ -97,15 +102,15 @@ void ipt_mask2str(unsigned long long mask, char *buf, int size)
 
 unsigned long long get_ipt_mask(unsigned long long ids)
 {
-	unsigned long long mask;
-	int i;
+	unsigned long long mask = 0;
+	struct iptables_s *p;
 
 	if (!ids)
 		return VE_IP_DEFAULT;
-	mask = 0;
-	for (i = 0;  i < (int)ARRAY_SIZE(iptables); i++) {
-		if (iptables[i].id & ids)
-			mask |= iptables[i].mask;
+
+	for (p = _g_iptables; p->name != NULL; p++) {
+		if (p->id & ids)
+			mask |= p->mask;
 	}
 	return mask;
 }
@@ -117,7 +122,7 @@ int parse_iptables(env_param_t *env, char *val)
 	int ret = 0;
 
 	for_each_strtok(token, val, "\t ,") {
-		ipt = find_ipt(token);
+		ipt = find_ipt_by_name(_g_iptables, token);
 		if (!ipt) {
 			logger(-1, 0, "Warning: Unknown iptable module: %s,"
 				" skipped", token);
