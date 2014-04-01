@@ -585,26 +585,6 @@ static int store_io(vps_param *old_p, vps_param *vps_p,
 }
 
 /******************** Iptables *************************/
-static int parse_iptables(env_param_t *env, char *val)
-{
-	char *token;
-	struct iptables_s *ipt;
-	int ret = 0;
-
-	for_each_strtok(token, val, "\t ,") {
-		ipt = find_ipt(token);
-		if (!ipt) {
-			logger(-1, 0, "Warning: Unknown iptable module: %s,"
-				" skipped", token);
-			ret = ERR_INVAL_SKIP;
-			continue;
-		}
-		env->ipt_mask |= ipt->mask;
-	}
-
-	return ret;
-}
-
 static void store_iptables(unsigned long long ipt_mask, vps_config *conf,
 	list_head_t *conf_h)
 {

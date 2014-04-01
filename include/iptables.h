@@ -18,14 +18,10 @@
 #ifndef	_IPTABLES_H_
 #define _IPTABLES_H_
 
-struct iptables_s {
-	char *name;
-	unsigned long long id;
-	unsigned long long mask;
-};
+#include "res.h"
 
-struct iptables_s *find_ipt(const char *name);
 void ipt_mask2str(unsigned long long mask, char *buf, int size);
 unsigned long long get_ipt_mask(unsigned long long mask);
+int parse_iptables(env_param_t *env, char *val);
 
 #endif //_IPTABLES_H_

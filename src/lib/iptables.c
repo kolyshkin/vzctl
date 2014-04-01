@@ -23,6 +23,12 @@
 #include "util.h"
 #include "iptables.h"
 
+struct iptables_s {
+	char *name;
+	unsigned long long id;
+	unsigned long long mask;
+};
+
 #define IPTABLES_GEN(name, mask) { name, mask##_MOD, mask }
 
 static struct iptables_s iptables[] = {
@@ -62,7 +68,7 @@ static struct iptables_s iptables[] = {
 	IPTABLES_GEN("ipt_owner",	VE_IP_MATCH_OWNER),
 };
 
-struct iptables_s *find_ipt(const char *name)
+static struct iptables_s *find_ipt(const char *name)
 {
 	int i;
 
@@ -102,4 +108,24 @@ unsigned long long get_ipt_mask(unsigned long long ids)
 			mask |= iptables[i].mask;
 	}
 	return mask;
+}
+
+int parse_iptables(env_param_t *env, char *val)
+{
+	char *token;
+	struct iptables_s *ipt;
+	int ret = 0;
+
+	for_each_strtok(token, val, "\t ,") {
+		ipt = find_ipt(token);
+		if (!ipt) {
+			logger(-1, 0, "Warning: Unknown iptable module: %s,"
+				" skipped", token);
+			ret = ERR_INVAL_SKIP;
+			continue;
+		}
+		env->ipt_mask |= ipt->mask;
+	}
+
+	return ret;
 }
