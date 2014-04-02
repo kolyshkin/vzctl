@@ -1065,7 +1065,7 @@ static int store_tmpl(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 }
 
 /***********************Quota***************************/
-static int parse_dq(unsigned long **param, const char *val, int sfx)
+static int parse_dq(unsigned long **param, const char *val, int divisor)
 {
 	int ret;
 	unsigned long *tmp;
@@ -1073,7 +1073,7 @@ static int parse_dq(unsigned long **param, const char *val, int sfx)
 	tmp = malloc(sizeof(unsigned long) * 2);
 	if (tmp == NULL)
 		return ERR_NOMEM;
-	ret = parse_twoul_sfx(val, tmp, sfx ? 1024 : 0, 0);
+	ret = parse_twoul_sfx(val, tmp, divisor, 0);
 	if (ret && ret != ERR_LONG_TRUNC) {
 		free(tmp);
 		return ret;
@@ -2192,13 +2192,13 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_DISKSPACE:
 		if (vps_p->res.dq.diskspace != NULL)
 			return ERR_DUP;
-		if (parse_dq(&vps_p->res.dq.diskspace, val, 1))
+		if (parse_dq(&vps_p->res.dq.diskspace, val, 1024))
 			return ERR_INVAL;
 		break;
 	case PARAM_DISKINODES:
 		if (vps_p->res.dq.diskinodes != NULL)
 			return ERR_DUP;
-		if (parse_dq(&vps_p->res.dq.diskinodes, val, 0))
+		if (parse_dq(&vps_p->res.dq.diskinodes, val, 1))
 			return ERR_INVAL;
 		break;
 	case PARAM_QUOTATIME:
