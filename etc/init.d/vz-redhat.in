@@ -169,24 +169,6 @@ is_running()
 	[ -f $SUBSYS_VZ ] || return 1
 }
 
-modify_vzconf()
-{
-	# For vswap-enabled kernel (like RHEL6 042test or greater),
-	# use vswap config for CT. Don't do it if CONFIGFILE= is modified
-
-	egrep -q 'test|stab' /proc/vz/version 2>/dev/null || return 0
-
-	local cfg_old='^CONFIGFILE="basic" # Use vswap-256m on RHEL6 kernel$'
-	local cfg_new='CONFIGFILE="vswap-256m"'
-	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
-	if test $kv -ge 42; then
-		if grep -q "$cfg_old" $VZCONF; then
-			sed -i "s/${cfg_old}/${cfg_new}/" $VZCONF
-			print_warning "Setting $cfg_new in $VZCONF"
-		fi
-	fi
-}
-
 # Add /vz to PRUNEPATHS in /etc/updatedb.conf so updatedb won't:
 # 1 clog its database with lots of file entries
 # 2 interfere with vzctl umount
@@ -522,7 +504,6 @@ start()
 
 	start_net
 	setup_ve0
-	modify_vzconf
 	fix_updatedb
 	start_ves
 

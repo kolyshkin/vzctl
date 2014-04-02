@@ -277,25 +277,6 @@ umount_ve() {
 	done
 }
 
-modify_vzconf()
-{
-	# For vswap-enabled kernel (like RHEL6 042test or greater),
-	# use vswap config for CT. Don't do it if CONFIGFILE= is modified
-
-	egrep -q 'test|stab' /proc/vz/version 2>/dev/null || return 0
-
-	local cfg_old='^CONFIGFILE="basic" # Use vswap-256m on RHEL6 kernel$'
-	local cfg_new='CONFIGFILE="vswap-256m"'
-	local kv=$(cat /proc/vz/version | sed 's/\(test\|stab\).*$//')
-	if test $kv -ge 42; then
-		if grep -q "$cfg_old" $VZCONF; then
-			sed -i "s/${cfg_old}/${cfg_new}/" $VZCONF
-			ewarn "Setting $cfg_new in $VZCONF"
-		fi
-	fi
-}
-
-
 start() {
 	check_config || return
 
@@ -342,7 +323,6 @@ start() {
 
 	start_net
 	setup_ve0
-	modify_vzconf
 	start_ve
 	# Try to run vzstats to submit new kernel info
 	vzstats >/dev/null 2>&1
