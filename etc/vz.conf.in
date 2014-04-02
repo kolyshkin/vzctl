@@ -43,8 +43,8 @@ VE_PRIVATE=@VZDIR@/private/$VEID
 CONFIGFILE="basic" # Use vswap-256m on RHEL6 kernel
 DEF_OSTEMPLATE="centos-6-x86"
 NAMESERVER=inherit # Copy from host system's /etc/resolv.conf
-## Filesystem layout for new CTs: either simfs (default) or ploop
-#VE_LAYOUT=ploop
+## Filesystem layout for new CTs: either simfs or ploop
+VE_LAYOUT=ploop
 
 # User namespace configuration
 LOCAL_UID=100000
