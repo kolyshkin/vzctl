@@ -40,7 +40,7 @@ NUMIPTENT="128:128"
 
 # Disk quota parameters (in form of softlimit:hardlimit)
 DISKSPACE="2G:2.2G"
-DISKINODES="200000:220000"
+DISKINODES="131072:144179"
 QUOTATIME="0"
 
 # CPU fair scheduler parameter
