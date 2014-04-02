@@ -265,7 +265,6 @@ OpenVZ containers control utility core package
 %config(noreplace) %{_distconfdir}/*.conf
 %config %{_vpsconfdir}/ve-basic.conf-sample
 %config %{_vpsconfdir}/ve-light.conf-sample
-%config %{_vpsconfdir}/ve-unlimited.conf-sample
 %config %{_vpsconfdir}/ve-vswap-256m.conf-sample
 %config %{_vpsconfdir}/ve-vswap-512m.conf-sample
 %config %{_vpsconfdir}/ve-vswap-1024m.conf-sample
