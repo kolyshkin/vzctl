@@ -21,7 +21,11 @@
 #include "res.h"
 
 void ipt_mask2str(unsigned long long mask, char *buf, int size);
-unsigned long long get_ipt_mask(unsigned long long mask);
+unsigned long long get_ipt_mask(env_param_t *p);
 int parse_iptables(env_param_t *env, char *val);
+
+/* New NETFILTER functionality, obsoleting IPTABLES mask */
+const char* netfilter_mask2str(unsigned long id);
+int parse_netfilter(env_param_t *env, const char *val);
 
 #endif //_IPTABLES_H_

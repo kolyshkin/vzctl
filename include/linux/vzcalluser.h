@@ -190,6 +190,10 @@ enum ve_ipt_mods {
 	VE_IP_TARGET_TCPMSS | VE_IP_MATCH_TCPMSS |	\
 	VE_IP_MATCH_TTL | VE_IP_MATCH_LENGTH)
 
+/* used by netfilter option */
+#define VE_IP_ALL		(~0ULL)
+#define VE_IP_NONE		(0ULL)
+
 #define VE_IPT_CMP(x,y)		(((x) & (y)) == (y))
 
 struct vzctl_env_create_cid {

@@ -33,6 +33,7 @@
 struct env_param {
 	envid_t veid;
 	unsigned long long ipt_mask;
+	unsigned long nf_mask;	/* netfilter */
 
 	/*
 	 * features_known is the set of features that are present

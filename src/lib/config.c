@@ -62,6 +62,7 @@ static vps_config config[] = {
 {"VERBOSE",	NULL, PARAM_VERBOSE},
 
 {"IPTABLES",	NULL, PARAM_IPTABLES},
+{"NETFILTER",	NULL, PARAM_NETFILTER},
 /*	UB	*/
 {"KMEMSIZE",	NULL, PARAM_KMEMSIZE},
 {"LOCKEDPAGES",	NULL, PARAM_LOCKEDPAGES},
@@ -607,6 +608,12 @@ static int store_env(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		if (!env->ipt_mask)
 			break;
 		store_iptables(env->ipt_mask, conf, conf_h);
+		break;
+	case PARAM_NETFILTER:
+		if (!env->nf_mask)
+			break;
+		conf_store_str(conf_h, conf->name,
+				netfilter_mask2str(env->nf_mask));
 		break;
 	case PARAM_FEATURES:
 		if (!env->features_known)
@@ -2100,9 +2107,17 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		*vps_p->log.verbose = int_id;
 		break;
 	case PARAM_IPTABLES:
+		/* TODO:
+		 * vzctl  4.8: warn the option is obsoleted by netfilter
+		 * vzctl  4.9: ignore from command line with a warning
+		 * vzctl 4.10: ignore from configuration file?
+		 * vzctl 4.11: remove?
+		 */
 		ret = parse_iptables(&vps_p->res.env, val);
 		break;
-
+	case PARAM_NETFILTER:
+		ret = parse_netfilter(&vps_p->res.env, val);
+		break;
 	case PARAM_LOCAL_UID:
 		conf_parse_ulong(&vps_p->res.misc.local_uid, val);
 		break;
@@ -3066,6 +3081,7 @@ static void merge_env(env_param_t *dst, env_param_t *src)
 {
 	MERGE_INT(veid)
 	MERGE_INT(ipt_mask)
+	MERGE_INT(nf_mask)
 	MERGE_INT(features_mask)
 	MERGE_INT(features_known)
 }

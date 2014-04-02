@@ -100,18 +100,16 @@ void ipt_mask2str(unsigned long long mask, char *buf, int size)
 	}
 }
 
-unsigned long long get_ipt_mask(unsigned long long ids)
+static unsigned long long get_iptables_mask(unsigned long long ids)
 {
 	unsigned long long mask = 0;
 	struct iptables_s *p;
-
-	if (!ids)
-		return VE_IP_DEFAULT;
 
 	for (p = _g_iptables; p->name != NULL; p++) {
 		if (p->id & ids)
 			mask |= p->mask;
 	}
+
 	return mask;
 }
 
@@ -133,4 +131,84 @@ int parse_iptables(env_param_t *env, char *val)
 	}
 
 	return ret;
+}
+
+/* Netfilter functionality, replacing iptables */
+
+#define VE_NF_STATELESS	\
+	(VE_IP_FILTER | VE_IP_MANGLE)
+#define VE_NF_STATELESS6 \
+	(VE_IP_FILTER6 | VE_IP_MANGLE6)
+#define VE_NF_STATEFUL \
+	(VE_NF_STATELESS | VE_NF_CONNTRACK | VE_IP_CONNTRACK | \
+	 VE_IP_CONNTRACK_FTP | VE_IP_CONNTRACK_IRC)
+#define VE_NF_STATEFUL6 \
+	(VE_NF_STATELESS6 | VE_NF_CONNTRACK | VE_IP_CONNTRACK)
+
+enum {
+	VZCTL_NF_DISABLED = 1,
+	VZCTL_NF_STATELESS,
+	VZCTL_NF_STATEFUL,
+	VZCTL_NF_FULL,
+};
+
+static struct iptables_s _g_netfilter[] = {
+	{"disabled",	VZCTL_NF_DISABLED,	VE_IP_NONE},
+	{"stateless",	VZCTL_NF_STATELESS,	VE_NF_STATELESS | VE_NF_STATELESS6},
+	{"stateful",	VZCTL_NF_STATEFUL,	VE_NF_STATEFUL | VE_NF_STATEFUL6},
+	{"full",	VZCTL_NF_FULL,		VE_IP_ALL},
+	{ NULL }
+};
+
+const char* netfilter_mask2str(unsigned long id)
+{
+	struct iptables_s *p;
+
+	for (p = _g_netfilter; p->name != NULL; p++)
+		if (p->id == id)
+			return p->name;
+
+	return NULL;
+}
+
+int parse_netfilter(env_param_t *env, const char *val)
+{
+	struct iptables_s *p;
+
+	p = find_ipt_by_name(_g_netfilter, val);
+	if (p == NULL) {
+		logger(-1, 0, "Incorrect netfilter value: %s", val);
+		return ERR_INVAL;
+	}
+
+	env->nf_mask = p->id;
+
+	return 0;
+}
+
+static unsigned long long get_netfilter_mask(unsigned long id)
+{
+	struct iptables_s *p;
+
+	for (p = _g_netfilter; p->name != NULL; p++)
+		if (p->id == id)
+			return p->mask;
+
+	return 0;
+}
+
+unsigned long long get_ipt_mask(env_param_t *p)
+{
+	if (p->nf_mask) {
+#if 0	/* TODO: enable some time later */
+		if (p->ipt_mask)
+			logger(0, 0, "Warning: IPTABLES obsoleted by "
+					"NETFILTER and is ignored, please "
+					"remove it from CT config");
+#endif
+		return get_netfilter_mask(p->nf_mask);
+	} else if (p->ipt_mask)
+		return get_iptables_mask(p->ipt_mask);
+
+	return VE_IP_DEFAULT;
 }

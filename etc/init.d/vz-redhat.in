@@ -64,7 +64,13 @@ if [ "${MODULES_DISABLED}" != "yes" ]; then
 	if [ "${VZWDOG}" = "yes" ]; then
 		MODULES="${MODULES} vzwdog"
 	fi
-	test -z "$IPTABLES_MODULES" && IPTABLES_MODULES="$IPTABLES"
+	if [ -z "$IPTABLES_MODULES" ]; then
+		if [ -n "$IPTABLES" ]; then
+			echo "WARNING: IPTABLES in vz.conf is obsoleted, " 1>&2
+			echo "please use IPTABLES_MODULES instead" 1>&2
+			IPTABLES_MODULES="$IPTABLES"
+		fi
+	fi
 	IPT_MODULES="ip_tables ${IPTABLES_MODULES} xt_tcpudp"
 	if [ "${IPV6}" = "yes" ]; then
 		IPT_MODULES="${IPT_MODULES} ${IP6TABLES}"

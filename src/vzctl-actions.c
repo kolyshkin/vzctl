@@ -60,6 +60,7 @@ static struct option set_opt[] = {
 			required_argument, NULL, PARAM_APPLYCONFIG_MAP},
 	{"reset_ub",	no_argument, NULL, PARAM_RESET_UB},
 	{"iptables",	required_argument, NULL, PARAM_IPTABLES},
+	{"netfilter",	required_argument, NULL, PARAM_NETFILTER},
 	/*	UB	*/
 	{"kmemsize",	required_argument, NULL, PARAM_KMEMSIZE},
 	{"lockedpages",	required_argument, NULL, PARAM_LOCKEDPAGES},
@@ -845,11 +846,13 @@ static int check_set_mode(vps_handler *h, envid_t veid, int setmode, int apply,
 	/* If iptables mask is set and it differs from the old one.
 	 * FIXME: we don't catch the case when the new set is empty
 	 * and the old one is not (vzctl set --iptables '') */
-	if (new_res->env.ipt_mask &&
-			new_res->env.ipt_mask != old_res->env.ipt_mask)
+	if (	(new_res->env.ipt_mask &&
+			new_res->env.ipt_mask != old_res->env.ipt_mask) ||
+		(new_res->env.nf_mask &&
+			new_res->env.nf_mask  != old_res->env.nf_mask))
 	{
 		if (loud)
-			logger(-1, 0, "Unable to set iptables "
+			logger(-1, 0, "Unable to set iptables/netfilter "
 					"on a running container");
 		found++;
 	}

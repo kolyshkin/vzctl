@@ -49,3 +49,5 @@ QUOTATIME="0"
 
 # CPU fair scheduler parameter
 CPUUNITS="250"
+
+NETFILTER="stateless"

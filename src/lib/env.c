@@ -223,7 +223,7 @@ void fill_container_param(struct arg_start *arg,
 			 struct env_create_param3 *create_param)
 {
 	memset(create_param, 0, sizeof(*create_param));
-	create_param->iptables_mask = get_ipt_mask(arg->res->env.ipt_mask);
+	create_param->iptables_mask = get_ipt_mask(&arg->res->env);
 	logger(3, 0, "Setting iptables mask %#10.8llx",
 			(unsigned long long) create_param->iptables_mask);
 	clean_hardlink_dir("/");

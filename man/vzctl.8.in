@@ -166,6 +166,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --meminfo \fBnone\fR|\fImode\fR:\fIvalue
 .\" iptables control
 .OP --iptables name\fR[\fB,\fR...]
+.OP --netfilter \fBdisabled\fR|\fBstateless\fR|\fBstateful\fR|\fBfull\fR
 .\" Network device control
 .OP --netdev_add ifname
 .OP --netdev_del ifname
@@ -674,9 +675,32 @@ You can use the following modes for \fImode\fR:
 
 Default is \fBprivvmpages:1\fR.
 
-.SS3 iptables control parameters
+.SS3 Netfilter (iptables) control parameters
+.TP
+.BR --netfilter\ disabled | stateless | stateful | full
+Restrict access to netfilter/iptables modules for a container.
+This option replaces obsoleted \fB--iptables\fR.
+
+The following arguments can be used:
+.br
+ \(bu \fBdisabled\fR -- no iptables allowed
+.br
+ \(bu \fBstateless\fR -- everything but conntracks and
+NAT is allowed (i.e. filter and mangle)
+.br
+ \(bu\ \fBstateful\fR -- everything but NAT is allowed
+.br
+ \(bu\ \fBfull\fR -- all netfilter functionality
+
+Note that changing this parameter requires container
+restart, so consider using \fB--setmode\fR option.
 .TP
 \fB--iptables\fR \fIname\fR[\fB,\fR...]
+.B Note
+this option is obsoleted,
+.B --netfilter
+should be used instead.
+
 Allow to use the functionality of \fIname\fR iptables module inside
 the container. Multiple comma-separated \fIname\fRs can be specified.
 

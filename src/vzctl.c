@@ -127,6 +127,28 @@ static void usage(int rc)
 	exit(rc);
 }
 
+/* Do various checks on global config,
+ * issue warnings and/or fix things.
+ */
+void validate_global_config(vps_param *gparam) {
+	if (gparam->res.env.nf_mask) {
+		logger(0, 0, "Warning: NETFILTER should not be set in "
+				GLOBAL_CFG ", ignoring");
+		logger(0, 0, "Please remove NETFILTER from " GLOBAL_CFG
+				"to get rid of this warning");
+		gparam->res.env.nf_mask = 0;
+	}
+#if 0	/* TODO: enable past vzctl 4.7 */
+	if (gparam->res.env.ipt_mask) {
+		/* TODO: ignore global iptables in vzctl 4.8? */
+		logger(0, 0, "Warning: please don't use IPTABLES in "
+				GLOBAL_CFG ", it is obsoleted by "
+				"per-CT netfilter option and will be "
+				"ignored in a future version");
+	}
+#endif
+}
+
 int main(int argc, char *argv[], char *envp[])
 {
 	act_t action = -1;
@@ -296,6 +318,8 @@ int main(int argc, char *argv[], char *envp[])
 	{
 		goto error;
 	}
+	validate_global_config(gparam);
+
 	if (veid == 0 && action != ACTION_SET) {
 		fprintf(stderr, "Only set actions are allowed for CT0\n");
 		ret = VZ_INVALID_PARAMETER_VALUE;

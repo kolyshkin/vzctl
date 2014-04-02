@@ -45,3 +45,5 @@ NUMIPTENT="unlimited"
 
 # Disk quota parameters (in form of softlimit:hardlimit)
 DISK_QUOTA="no"
+
+NETFILTER="stateless"

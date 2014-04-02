@@ -85,7 +85,7 @@ _vzctl()
 		--shmpages --numfile --numflock --numpty --numsiginfo \
 		--dcachesize --numiptent --physpages --swappages \
 		--vm_overcommit --cpuunits --cpulimit --cpus --cpumask \
-		--iptables --netdev_add --netdev_del --netif_add --netif_del \
+		--netfilter --netdev_add --netdev_del --netif_add --netif_del \
 		--diskquota --mount_opts \
 		--diskspace --diskinodes --quotatime --quotaugidlimit \
 		--capability --devnodes --devices --applyconfig \
@@ -102,11 +102,7 @@ _vzctl()
 	local vzctl_snapshot_list_opts="-H --no-header -o --output --id \
 		-L --list --help"
 
-	local iptables_names="iptable_filter iptable_mangle ipt_limit
-		ipt_multiport ipt_tos ipt_TOS ipt_REJECT ipt_TCPMSS
-		ipt_tcpmss ipt_ttl ipt_LOG ipt_length ip_conntrack
-		ip_conntrack_ftp ip_conntrack_irc ipt_conntrack ipt_state
-		ipt_helper iptable_nat ip_nat_ftp ip_nat_irc ipt_REDIRECT"
+	local netfilter_names="disabled stateless stateful full"
 
 	local cap_names="chown dac_override dac_read_search fowner fsetid kill
 		setgid setuid setpcap linux_immutable net_bind_service
@@ -171,8 +167,8 @@ _vzctl()
 			--layout)
 				COMPREPLY=( $( compgen -W "ploop ploop:expanded ploop:plain ploop:raw simfs" -- $cur ) )
 				;;
-			--iptables)
-				COMPREPLY=( $( compgen -W "$iptables_names" -- $cur ) )
+			--netfilter)
+				COMPREPLY=( $( compgen -W "$netfilter_names" -- $cur ) )
 				;;
 			--netdev*)
 				local devs=`ip addr show | awk '/^[0-9]/ && /UP/ && !/venet/ && !/lo/ \
