@@ -845,7 +845,7 @@ if [ "$PLOOP" = "yes" ]; then
 		if ! logexec 1 $SSH root@$host "vzfsync \
 			--datasync --dontneed \
 			\$(ploop snapshot-list -u $TOP_UUID \
-				-H -s -o fname $DDXML)"
+				-H -o fname $DDXML | sed 1d)"
 		then
 			log 1 "Error from vzfsync, but moving on"
 		fi
