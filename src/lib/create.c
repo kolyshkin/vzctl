@@ -397,6 +397,15 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		ret = VZ_FS_PRVT_AREA_EXIST;
 		goto err_cfg;
 	}
+
+	if (vps_p->opt.layout == 0) {
+#ifdef HAVE_PLOOP
+		vps_p->opt.layout = VE_LAYOUT_PLOOP;
+#else
+		vps_p->opt.layout = VE_LAYOUT_SIMFS;
+#endif
+	}
+
 	if (vps_p->opt.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
 		ret = VZ_PLOOP_UNSUP;
 		goto err_cfg;
