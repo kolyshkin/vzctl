@@ -391,7 +391,7 @@ static int compare_osrelease(const char *cur, const char *min)
   * and set it if needed. */
 static void get_osrelease(vps_res *res)
 {
-	const char *dist;
+	char *dist;
 	char osrelease[MAX_OSREL_LEN] = "";
 	struct utsname uts;
 	char *suffix;
@@ -402,10 +402,13 @@ static void get_osrelease(vps_res *res)
 		return;
 
 	read_osrelease_conf(dist, osrelease);
-	if (osrelease[0] == '\0')
+	if (osrelease[0] == '\0') {
+		free(dist);
 		return;
+	}
 
 	logger(1, 0, "Found osrelease %s for dist %s", osrelease, dist);
+	free(dist);
 
 	/* Check if current osrelease is sufficient */
 	if (uname(&uts) != 0) {
