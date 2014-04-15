@@ -124,6 +124,7 @@ static int calculate(int numerator, int verbose)
 	if ((fd = fopen(PROCUBC, "r")) == NULL) {
 		fprintf(stderr, "Unable to open file " PROCUBC ": %s\n",
 			strerror(errno));
+		free(velist);
 		return 1;
 	}
 
