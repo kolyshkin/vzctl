@@ -890,8 +890,8 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 			  int wait_p, int old_wait_p, int err_p, void *data)
 {
 	char *argv[2], *env[9];
-	const char *dumpfile = NULL;
-	const char *statefile = NULL;
+	char *dumpfile = NULL;
+	char *statefile = NULL;
 	cpt_param *param = data;
 	veth_dev *veth;
 	char buf[STR_SIZE], *pbuf;
@@ -912,6 +912,8 @@ static int ct_restore_fn(vps_handler *h, envid_t veid, const vps_res *res,
 	env[1] = strdup(buf);
 	snprintf(buf, sizeof(buf), "VE_STATE_FILE=%s", statefile);
 	env[2] = strdup(buf);
+	free(dumpfile);
+	free(statefile);
 
 	pbuf = buf;
 	pbuf += snprintf(buf, sizeof(buf), "VE_VETH_DEVS=");
