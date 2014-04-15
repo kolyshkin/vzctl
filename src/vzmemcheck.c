@@ -114,15 +114,16 @@ static int calculate(int numerator, int verbose)
 	if (get_lowmem(&mem.lowmem))
 		return 1;
 
-	if ((fd = fopen(PROCUBC, "r")) == NULL) {
-		fprintf(stderr, "Unable to open file " PROCUBC ": %s\n",
-			strerror(errno));
-		return 1;
-	}
 	venum = get_running_ve_list(&velist);
 	if (venum < 0) {
 		fprintf(stderr, "Can't get list of running CTs: %s\n",
 				strerror(-venum));
+		return 1;
+	}
+
+	if ((fd = fopen(PROCUBC, "r")) == NULL) {
+		fprintf(stderr, "Unable to open file " PROCUBC ": %s\n",
+			strerror(errno));
 		return 1;
 	}
 
