@@ -736,14 +736,14 @@ int get_running_ve_list(envid_t **ves)
 	int venum = 0;
 	int ves_size = 256;
 
+	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
+		return -errno;
+	}
 
 	*ves = malloc(ves_size * sizeof(envid_t));
 	if (*ves == NULL)
 		return -ENOMEM;
 
-	if ((fp = fopen(PROCVEINFO, "r")) == NULL) {
-		return -errno;
-	}
 	while (!feof(fp)) {
 		res = fscanf(fp, "%d %*[^\n]", &veid);
 		if (res != 1 || !veid)
