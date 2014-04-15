@@ -843,15 +843,14 @@ static int ct_setcontext(envid_t veid)
 static int ct_chkpnt(vps_handler *h, envid_t veid,
 			const fs_param *fs, int cmd, cpt_param *param)
 {
-	const char *dumpfile = NULL;
+	char dumpfile[PATH_MAX];
 	char statefile[STR_SIZE], buf[STR_SIZE];
 	char *arg[2], *env[4];
 	FILE *sfile;
 	pid_t pid;
 	int ret;
 
-	get_dump_file(veid, param->dumpdir, buf, sizeof(buf));
-	dumpfile = strdup(buf);
+	get_dump_file(veid, param->dumpdir, dumpfile, sizeof(dumpfile));
 
 	arg[0] = SCRIPTDIR "/vps-cpt";
 	arg[1] = NULL;
