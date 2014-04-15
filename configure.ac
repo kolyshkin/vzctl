@@ -17,7 +17,7 @@
 
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(vzctl, 4.6, devel@openvz.org)
+AC_INIT(vzctl, 4.7, devel@openvz.org)
 AC_CONFIG_SRCDIR([src/vzctl.c])
 
 # Change sysconfdir default since otherwise some important files

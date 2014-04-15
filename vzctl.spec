@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.6
+Version: 4.7
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -280,6 +280,69 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Wed Apr  2 2014 Kir Kolyshkin <kir@openvz.org> - 4.7-1
+- New functionality and important changes:
+-- Disable conntrack for VE0 by default (#2755)
+-- vzctl set --diskspace: add --offline-resize (#2281)
+-- vzctl create: use ploop by default
+-- vzctl create, vzctl convert: honor diskinodes for ploop (#2898)
+-- vzctl create: add --diskinodes
+-- vzctl set: new option --netfilter to replace --iptables
+-- vzmigrate: support for copying CT dump file
+-- vzmigrate: introduce/use vzfsync for ploop (to shorten CT freeze time)
+-- bash-completion: CTIDs on ploop for compact
+-- vzctl create: honor MOUNT_OPTS
+-- vzctl console: add set_console dist script (#2865)
+-- vzctl snapshot-switch: add --skip_arpdetect option
+-- vzctl snapshot-switch: add --skip-resume, --skip-config
+-- vzctl set --diskinodes, DISKINODES: allow suffixes (KMG)
+-- vzpid: new option "-p" to show in-container PID(s)
+-- etc/vz.conf: add SKIP_ARPDETECT example
+-- etc/vz.conf: use ploop by default
+-- etc/vz.conf: use vswap config by default
+-- etc/vz.conf: merge IP6TABLES to IPTABLES_MODULES
+- Fixes:
+-- vzctl destroy: fix locking (#2814)
+-- debian-add_ip.sh: setup loopback device at least (#2859)
+-- vzctl start --wait: fix for non-standard Debian 7
+-- postcreate.sh: add Fedora 20+
+-- postcreate.sh: set file caps for suse 13.1+
+-- vzmigrate: fix ploop for diff VE_PRIVATE case (#2875)
+-- vzmigrate: hide ploop getdev output
+-- vzctl status, snapshot-list: don't mess with stdout even when verbose
+-- vzlist: don't spoil output with ploop messages
+-- logger.c: fix wrt ploop logging
+-- etc/network/if-up.d/vzifup-post: fix for Debian Wheezy (#2914)
+-- hooks_ct.c: bind-mount root to itself (fix for kernel v3.11+)
+-- hooks_ct: mount /proc and /sys before umounting old root
+-- bash_completion: replace exit with return
+-- bash_completion.d: add --quiet to vzctl
+-- vzmigrate: call vzctl status with --quiet
+-- vzcptcheck: fix program name in usage
+- Improvements:
+-- add_reach_runlevel_mark(): improve error messages
+-- set(): don't ignore fail from fill_vswap_ub()
+-- vzctl restore: warn in CPT_SET_LOCKFD2 not supported
+-- config.c: add SKIP_ARPDETECT to ignored list
+-- vzmigrate: lock CT locally
+-- vzmigrate --live: check for running CT earlier
+-- destroy_dump(): don't log "Removing" if no dump
+-- etc/conf/*sample: tune DISKINODES for ploop diskspace/diskinodes ratio
+-- etc/conf/ve-unlimited.conf-sample: remove
+-- hooks_ct: remove non-working devpts mount
+-- hooks_ct: mount devtmpfs in CT
+-- ct_chroot(): do not change a set of CT0's mounts
+-- parse_netif_str(): improve NETIF= param parsing
+-- setup_hardlink_dir(): show error if mkdir() failed
+- Documentation:
+-- vzctl(8): document MAX_VEID (#2784)
+-- vzctl --help: fix convert synopsys
+- Build system:
+-- setver.sh: rework buildid
+-- setver.sh: make it work on fresh git source
+-- autogen.sh, setver.sh: fix build from screwed git repo
+-- vzctl.spec: require bridge-utils (as we use brctl)
+
 * Wed Nov 27 2013 Kir Kolyshkin <kir@openvz.org> - 4.6.1-1
 - Fixes:
 -- vzctl set: require swap to be set for VSwap
