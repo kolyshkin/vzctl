@@ -1085,7 +1085,7 @@ FOR_ALL_UBC(MERGE_UBC)
 		ve->vm_overcommit = *res->ub.vm_overcommit;
 
 	if (ve->ip == NULL && !list_empty(&res->net.ip)) {
-		ve->ip = strdup(list2str(NULL, &res->net.ip));
+		ve->ip = list2str(NULL, &res->net.ip);
 	}
 	if (ve->quota == NULL && (
 		res->dq.diskspace != NULL ||
@@ -1122,9 +1122,9 @@ FOR_ALL_UBC(MERGE_UBC)
 			ve->name = strdup(res->name.name);
 	}
 	if (!list_empty(&res->misc.nameserver))
-		ve->nameserver = strdup(list2str(NULL, &res->misc.nameserver));
+		ve->nameserver = list2str(NULL, &res->misc.nameserver);
 	if (!list_empty(&res->misc.searchdomain))
-		ve->searchdomain = strdup(list2str(NULL, &res->misc.searchdomain));
+		ve->searchdomain = list2str(NULL, &res->misc.searchdomain);
 
 	if (res->fs.root != NULL)
 		ve->root = strdup(res->fs.root);
