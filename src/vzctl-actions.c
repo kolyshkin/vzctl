@@ -1081,7 +1081,6 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 {
 	int ret = 0, is_run;
 	dist_actions *actions = NULL;
-	char *dist_name;
 
 	fix_ip_param(g_p, cmd_p);
 	if (!list_empty(&cmd_p->res.veth.dev) ||
@@ -1146,15 +1145,18 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		need_configure(&cmd_p->del_res) ||
 		!list_empty(&cmd_p->res.misc.userpw))
 	{
+		char *dist_name;
+
 		actions = vz_malloc(sizeof(*actions));
 		if (!actions)
 			return VZ_RESOURCE_ERROR;
 		dist_name = get_dist_name(&g_p->res.tmpl);
-		if ((ret = read_dist_actions(dist_name, DIST_DIR, actions))) {
+		ret = read_dist_actions(dist_name, DIST_DIR, actions);
+		free(dist_name);
+		if (ret) {
 			free(actions);
 			return ret;
 		}
-		free(dist_name);
 	}
 	/* Setup password */
 	if (h != NULL && !list_empty(&cmd_p->res.misc.userpw)) {
