@@ -101,7 +101,7 @@ some output.
 Increments logging level up from the default. Can be used multiple times.
 Default value is set to the value of \fBVERBOSE\fR parameter in the global
 configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
-\fBViERBOSE\fR parameter.
+\fBVERBOSE\fR parameter.
 
 .SS Setting container parameters
 .SY set
