@@ -21,7 +21,7 @@
 #define MAXCPUUNITS		500000
 #define MINCPUUNITS		8
 
-#define CPUMASK_NBITS		1024
+#define CPUMASK_NBITS		4096
 #define CPUMASK_NBYTES		(CPUMASK_NBITS / (8 * sizeof(unsigned long)))
 typedef struct {
 	unsigned long bits[CPUMASK_NBYTES];
