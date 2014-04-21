@@ -101,7 +101,7 @@ static void usage(int rc)
 "   [--netif_del <ifname>]\n"
 "   [--applyconfig <name>] [--applyconfig_map <name>]\n"
 "   [--features <name:on|off>] [--name <vename>]\n"
-"   [--ioprio <N>] [--iolimit <N>] --iopslimit <N>\n"
+"   [--ioprio <N>] [--iolimit <N>] [--iopslimit <N>]\n"
 "   [--pci_add [<domain>:]<bus>:<slot>.<func>] [--pci_del <d:b:s.f>]\n"
 "   [--iptables <name>] [--disabled <yes|no>]\n"
 "   [--stop-timeout <seconds>\n"
