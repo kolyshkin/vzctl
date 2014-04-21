@@ -1512,17 +1512,6 @@ static int parse_cpulimit(unsigned long **param, const char *str)
 	return 0;
 }
 
-static inline int parse_cpumask(cpumask_t **dst, const char *str)
-{
-	return conf_parse_bitmap((unsigned long **)dst, CPUMASK_NBITS, str);
-}
-
-static inline int store_cpumask(list_head_t *conf, const char *name,
-		cpumask_t *val)
-{
-	return conf_store_bitmap(conf, name, cpumask_bits(val), CPUMASK_NBITS);
-}
-
 static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
@@ -1542,7 +1531,8 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		conf_store_ulong(conf_h, conf->name, cpu->vcpus);
 		break;
 	case PARAM_CPUMASK:
-		store_cpumask(conf_h, conf->name, cpu->mask);
+		conf_store_bitmap(conf_h, conf->name,
+				cpu->mask->bits, CPUMASK_NBITS);
 		break;
 	}
 	return 0;
@@ -2260,7 +2250,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = conf_parse_ulong(&vps_p->res.cpu.vcpus, val);
 		break;
 	case PARAM_CPUMASK:
-		ret = parse_cpumask(&vps_p->res.cpu.mask, val);
+		ret = conf_parse_bitmap(
+				(unsigned long **)&vps_p->res.cpu.mask,
+				CPUMASK_NBITS, val);
 		break;
 	case PARAM_MEMINFO:
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
