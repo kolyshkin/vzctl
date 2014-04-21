@@ -144,9 +144,9 @@ int set_cpumask(envid_t veid, cpumask_t *mask)
 	static char maskstr[CPUMASK_NBITS * 2];
 
 	bitmap_snprintf(maskstr, CPUMASK_NBITS * 2,
-			cpumask_bits(mask), CPUMASK_NBITS);
+			mask->bits, CPUMASK_NBITS);
 	logger(0, 0, "Setting CPU mask: %s", maskstr);
-	if (fairsched_cpumask(veid, sizeof(cpumask_t), cpumask_bits(mask))) {
+	if (fairsched_cpumask(veid, sizeof(cpumask_t), mask->bits)) {
 		logger(-1, errno, "fairsched_cpumask");
 		return VZ_SETFSHD_ERROR;
 	}

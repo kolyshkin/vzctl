@@ -609,7 +609,7 @@ static int ct_setcpus(vps_handler *h, envid_t veid, struct cpu_param *cpu)
 
 	if (cpu->mask)
 		ret = container_apply_config(veid, CPUMASK,
-					     cpumask_bits(cpu->mask));
+					     cpu->mask->bits);
 
 	if (cpu->limit != NULL && *cpu->limit)
 		max_lim = min_ul(*cpu->limit, max_lim);

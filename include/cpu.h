@@ -26,7 +26,6 @@
 typedef struct {
 	unsigned long bits[CPUMASK_NBYTES];
 } cpumask_t;
-#define cpumask_bits(maskp)	((maskp)->bits)
 
 /** Data structure for cpu parameters.
  */
