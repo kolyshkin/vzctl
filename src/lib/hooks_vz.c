@@ -272,21 +272,38 @@ env_err:
 
 static int vz_setcpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 {
-	int ret = 0;
+	int ret;
 
-	if (cpu->limit != NULL)
+	if (cpu->limit) {
 		ret = set_cpulimit(veid, *cpu->limit);
+		if (ret)
+			return ret;
+	}
 
-	if (cpu->units != NULL)
+	if (cpu->units) {
 		ret = set_cpuunits(veid, *cpu->units);
-	else if (cpu->weight != NULL)
+		if (ret)
+			return ret;
+	}
+	else if (cpu->weight) {
 		ret = set_cpuweight(veid, *cpu->weight);
+		if (ret)
+			return ret;
+	}
 
-	if (cpu->vcpus != NULL)
+	if (cpu->vcpus) {
 		ret = env_set_vcpus(veid, *cpu->vcpus);
-	if (cpu->mask != NULL)
+		if (ret)
+			return ret;
+	}
+
+	if (cpu->mask) {
 		ret = set_cpumask(veid, cpu->mask);
-	return ret;
+		if (ret)
+			return ret;
+	}
+
+	return 0;
 }
 
 static int vz_set_devperm(vps_handler *h, envid_t veid, dev_res *dev)
