@@ -741,8 +741,10 @@ int get_running_ve_list(envid_t **ves)
 	}
 
 	*ves = malloc(ves_size * sizeof(envid_t));
-	if (*ves == NULL)
+	if (*ves == NULL) {
+		fclose(fp);
 		return -ENOMEM;
+	}
 
 	while (!feof(fp)) {
 		res = fscanf(fp, "%d %*[^\n]", &veid);
