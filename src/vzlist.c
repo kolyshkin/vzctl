@@ -1481,6 +1481,7 @@ static int get_ve_ploop_info(struct Cveinfo *ve)
 	char descr[PATH_MAX];
 	struct ploop_info i = {};
 
+	ploop.set_verbose_level(PLOOP_LOG_NOSTDOUT);
 	GET_DISK_DESCRIPTOR(descr, ve->private);
 	if (ploop.get_info_by_descr(descr, &i))
 		return -1;
@@ -1992,10 +1993,6 @@ int main(int argc, char **argv)
 		qsort(g_ve_list, n_ve_list, sizeof(*g_ve_list), id_sort_fn);
 	}
 	init_log(NULL, 0, 0, 0, 0, NULL);
-#ifdef HAVE_PLOOP
-	if (is_ploop_supported())
-		ploop.set_verbose_level(PLOOP_LOG_NOSTDOUT);
-#endif
 	if (build_field_order(f_order))
 		return 1;
 	if (getuid()) {
