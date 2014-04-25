@@ -491,12 +491,14 @@ void clean_hardlink_dir(const char *mntdir)
 
 		snprintf(buf, sizeof(buf), "%s/%s/%s",
 				mntdir, CPT_HARDLINK_DIR, ep->d_name);
-		unlink(buf);
+		if (unlink(buf))
+			logger(-1, errno, "Warning: unlink %s failed", buf);
 	}
 	closedir(dp);
 
 	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
-	rmdir(buf);
+	if (rmdir(buf))
+		logger(-1, errno, "Warning: rmdir %s failed", buf);
 }
 
 static int setup_hardlink_dir(const char *mntdir, int cpt_fd)
