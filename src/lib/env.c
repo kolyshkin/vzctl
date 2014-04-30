@@ -375,8 +375,7 @@ static int compare_osrelease(const char *cur, const char *min)
 
 	ret = sscanf(min, "%d.%d.%d", &min_a, &min_b, &min_c);
 	if (ret < 2) {
-		logger(-1, 0, "Unable to parse value (%s) from "
-				OSRELEASE_CFG, min);
+		logger(-1, 0, "Unable to parse kernel osrelease (%s)", min);
 		return -1;
 	}
 
@@ -386,6 +385,26 @@ static int compare_osrelease(const char *cur, const char *min)
 	return 0;
 }
 #undef KVER
+
+/* Checks if the current kernel version >= min_version
+ *
+ * Return value:
+ *	-1: error
+ *	 0: current kernel is sufficient
+ *	 1: current kernel is too old
+ */
+int check_min_kernel_version(const char *min_version)
+{
+	struct utsname uts;
+
+	/* Check if currrent kernel is equal or greater than min_version */
+	if (uname(&uts) != 0) {
+		logger(-1, errno, "Error in uname()");
+		return -1;
+	}
+
+	return compare_osrelease(uts.release, min_version);
+}
 
 /** Find out if a container needs setting osrelease,
   * and set it if needed. */
