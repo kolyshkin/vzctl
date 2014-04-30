@@ -145,6 +145,8 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (vps_state == STATE_STARTING &&
 			!(skip & SKIP_CONFIGURE) &&
 			actions->set_console &&
+			is_vz_kernel(h) &&
+			check_min_kernel_version("2.6.32") == 0 &&
 			vps_exec_script(h, veid, res->fs.root, NULL, NULL,
 				actions->set_console, NULL, 0)) {
 		return VZ_ACTIONSCRIPT_ERROR;

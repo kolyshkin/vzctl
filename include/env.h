@@ -123,4 +123,5 @@ int exec_container_init(struct arg_start *arg,
 int set_personality32();
 int vz_do_open(vps_handler *h, vps_param *param);
 int ct_do_open(vps_handler *h, vps_param *param);
+int check_min_kernel_version(const char *min_version);
 #endif
