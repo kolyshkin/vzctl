@@ -17,7 +17,10 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <linux/vzcalluser.h>
 #include <linux/fairsched.h>
 #include <errno.h>
@@ -77,6 +80,24 @@ static inline int fairsched_cpumask(unsigned int id,
 #endif
 	return ret;
 }
+
+static inline int fairsched_nodemask(unsigned int id,
+		unsigned int masksize, unsigned long *mask)
+{
+	int ret = ENOTSUP;
+/*
+ * fairsched_nodemask is available only in vz kernel >= 042stab043
+ * which do not support platforms different from x86.
+ */
+#if defined(__i386__) || defined(__x86_64__)
+
+	ret = syscall(__NR_fairsched_nodemask, id, masksize, mask);
+	if (ret && errno == ENOSYS)
+		ret = 0;
+#endif
+	return ret;
+}
+
 #else /* ! VZ_KERNEL_SUPPORTED */
 static inline int fairsched_chwt(unsigned int id, unsigned wght)
 {
@@ -94,6 +115,12 @@ static inline int fairsched_vcpus(unsigned int id, unsigned vcpus)
 }
 
 static inline int fairsched_cpumask(unsigned int id,
+		unsigned int masksize, unsigned long *mask)
+{
+	return ENOTSUP;
+}
+
+static inline int fairsched_nodemask(unsigned int id,
 		unsigned int masksize, unsigned long *mask)
 {
 	return ENOTSUP;
@@ -146,10 +173,85 @@ int set_cpumask(envid_t veid, cpumask_t *mask)
 	bitmap_snprintf(maskstr, CPUMASK_NBITS * 2,
 			mask->bits, CPUMASK_NBITS);
 	logger(0, 0, "Setting CPU mask: %s", maskstr);
-	if (fairsched_cpumask(veid, sizeof(cpumask_t), mask->bits)) {
+	if (fairsched_cpumask(veid, sizeof(mask->bits), mask->bits)) {
 		logger(-1, errno, "fairsched_cpumask");
 		return VZ_SETFSHD_ERROR;
 	}
+	return 0;
+}
+
+int set_nodemask(envid_t veid, nodemask_t *mask)
+{
+	static char maskstr[NODEMASK_NBITS * 2];
+
+	bitmap_snprintf(maskstr, NODEMASK_NBITS * 2,
+			mask->bits, NODEMASK_NBITS);
+	logger(0, 0, "Setting NUMA node mask: %s", maskstr);
+	if (fairsched_nodemask(veid, sizeof(mask->bits), mask->bits)) {
+		logger(-1, errno, "fairsched_nodemask");
+		return VZ_SETFSHD_ERROR;
+	}
+	return 0;
+}
+
+static int numa_node_to_cpu(int nid, unsigned long *cpumask, int size,
+		int suppress_warning)
+{
+	DIR *d;
+	struct dirent *de;
+	char path[64];
+	char *endp;
+	int nmaskbits = size * 8;
+
+	sprintf(path, "/sys/devices/system/node/node%d", nid);
+	d = opendir(path);
+	if (!d) {
+		if (errno == ENOENT && suppress_warning)
+			return 0;
+		return vzctl_err(-1, errno, "NUMA: Failed to open %s", path);
+	}
+
+	while ((de = readdir(d)) != NULL) {
+		int cpu;
+
+		if (strncmp(de->d_name, "cpu", 3))
+			continue;
+		cpu = strtoul(de->d_name + 3, &endp, 10);
+		if (!*endp && cpu >= 0 && cpu < nmaskbits)
+			bitmap_set_bit(cpu, cpumask);
+	}
+	closedir(d);
+
+	return 0;
+}
+
+int get_node_cpumask(nodemask_t *nodemask, cpumask_t *cpumask)
+{
+	int n;
+	int nmaskbits = sizeof(nodemask->bits) * 8;
+	int all;
+
+	/* Find out if all bits are set, i.e. --nodemask all
+	 * Used to silence warnings about absent NUMA nodes
+	 * printed by from numa_node_to_cpu().
+	 *
+	 * Unfortunately, there is no way to distinguish
+	 * --nodemask 0-4095 from from --nodemask all so
+	 * there will be no warnings in either case.
+	 */
+	all = (nmaskbits == bitmap_find_first_zero_bit(
+				nodemask->bits, nmaskbits));
+
+	bzero(cpumask->bits, sizeof(cpumask->bits));
+	for (n = 0; n < nmaskbits; n++) {
+		if (!bitmap_test_bit(n, nodemask->bits))
+			continue;
+
+		if (numa_node_to_cpu(n, cpumask->bits,
+					sizeof(cpumask->bits), all))
+			continue;
+	}
+
 	return 0;
 }
 
@@ -191,11 +293,8 @@ int hn_set_cpu(cpu_param *cpu)
  */
 int vps_set_cpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 {
-	if (cpu->limit == NULL &&
-		cpu->units == NULL &&
-		cpu->weight == NULL &&
-		cpu->vcpus == NULL &&
-		cpu->mask == NULL)
+	if (!cpu->limit && !cpu->units && !cpu->weight && !cpu->vcpus &&
+			!cpu->mask && !cpu->nodemask && !cpu->cpumask_auto)
 	{
 		return 0;
 	}

@@ -121,6 +121,7 @@ static vps_config config[] = {
 {"CPULIMIT",	NULL, PARAM_CPULIMIT},
 {"CPUS",	NULL, PARAM_VCPUS},
 {"CPUMASK",	NULL, PARAM_CPUMASK},
+{"NODEMASK",	NULL, PARAM_NODEMASK},
 /* create param	*/
 {"ONBOOT",	NULL, PARAM_ONBOOT},
 {"CONFIGFILE",	NULL, PARAM_CONFIG},
@@ -1531,8 +1532,15 @@ static int store_cpu(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		conf_store_ulong(conf_h, conf->name, cpu->vcpus);
 		break;
 	case PARAM_CPUMASK:
+		if (cpu->cpumask_auto)
+			conf_store_str(conf_h, conf->name, "auto");
+		else
+			conf_store_bitmap(conf_h, conf->name,
+					cpu->mask->bits, CPUMASK_NBITS);
+		break;
+	case PARAM_NODEMASK:
 		conf_store_bitmap(conf_h, conf->name,
-				cpu->mask->bits, CPUMASK_NBITS);
+				cpu->nodemask->bits, NODEMASK_NBITS);
 		break;
 	}
 	return 0;
@@ -2250,9 +2258,17 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = conf_parse_ulong(&vps_p->res.cpu.vcpus, val);
 		break;
 	case PARAM_CPUMASK:
-		ret = conf_parse_bitmap(
+		if (strcmp(val, "auto") == 0)
+			vps_p->res.cpu.cpumask_auto = 1;
+		else
+			ret = conf_parse_bitmap(
 				(unsigned long **)&vps_p->res.cpu.mask,
 				CPUMASK_NBITS, val);
+		break;
+	case PARAM_NODEMASK:
+		ret = conf_parse_bitmap(
+				(unsigned long **)&vps_p->res.cpu.nodemask,
+				NODEMASK_NBITS, val);
 		break;
 	case PARAM_MEMINFO:
 		ret = parse_meminfo(&vps_p->res.meminfo, val);
@@ -2880,6 +2896,7 @@ static void free_cpu(cpu_param *cpu)
 	FREE_P(cpu->limit)
 	FREE_P(cpu->vcpus)
 	FREE_P(cpu->mask);
+	FREE_P(cpu->nodemask);
 }
 
 static void free_dq(dq_param *dq)
@@ -3005,6 +3022,7 @@ static void merge_cpu(cpu_param *dst, cpu_param *src)
 	MERGE_P(limit)
 	MERGE_P(vcpus)
 	MERGE_P(mask);
+	MERGE_P(nodemask);
 }
 
 #define	MERGE_LIST(x)							\

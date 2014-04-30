@@ -297,10 +297,28 @@ static int vz_setcpu(vps_handler *h, envid_t veid, cpu_param *cpu)
 			return ret;
 	}
 
-	if (cpu->mask) {
+	if (cpu->mask && !cpu->cpumask_auto) {
 		ret = set_cpumask(veid, cpu->mask);
 		if (ret)
 			return ret;
+	}
+
+	if (cpu->nodemask) {
+		ret = set_nodemask(veid, cpu->nodemask);
+		if (ret)
+			return ret;
+
+		if (!cpu->mask || cpu->cpumask_auto) {
+			cpumask_t mask;
+
+			ret = get_node_cpumask(cpu->nodemask, &mask);
+			if (ret)
+				return ret;
+
+			ret = set_cpumask(veid, &mask);
+			if (ret)
+				return ret;
+		}
 	}
 
 	return 0;

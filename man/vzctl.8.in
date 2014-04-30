@@ -161,7 +161,8 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --cpuunits num
 .OP --cpulimit num
 .OP --cpus num
-.OP --cpumask cpus\fR|\fBall
+.OP --cpumask cpus\fR|\fBauto\fR|\fBall
+.OP --nodemask nodes\fR|\fBall
 .\" Meminfo
 .OP --meminfo \fBnone\fR|\fImode\fR:\fIvalue
 .\" iptables control
@@ -644,14 +645,21 @@ limit is \fB0\fR (no CPU limit).
 \fB--cpus\fR \fInum\fR
 sets number of CPUs available in the container.
 .TP
-\fB--cpumask\fR \fIcpus\fR | \fBall\fR
-sets list of allowed CPUs for the container.
-Input format is a comma-separated list of decimal numbers and ranges.
+\fB--cpumask\fR \fIcpus\fR | \fBauto\fR | \fBall\fR
+Sets list of allowed CPUs for the container.
+Input format is a comma-separated list of decimal numbers and/or ranges.
 Consecutively set bits are shown as two hyphen-separated decimal numbers,
 the smallest and largest bit numbers set in the range.
 For example, if you want the container to execute on CPUs 0, 1, 2, 7,
 you should pass \fB0-2,7\fR.
 Default value is \fBall\fR (the container can execute on any CPU).
+If used with the \fB--nodemask\fR option, value of \fBauto\fR
+assigns all CPUs from the specified NUMA node to a container.
+.TP
+\fB--nodemask\fR \fInodes\fR | \fBall\fR
+Sets list of allowed NUMA nodes for the container. Input format is the same
+as for \fB--cpumask\fR. Note that \fB--nodemask\fR must be used with the
+\fB--cpumask\fR option.
 
 .SS3 Memory output parameters
 .PP

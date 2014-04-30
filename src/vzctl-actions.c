@@ -117,6 +117,7 @@ static struct option set_opt[] = {
 	{"cpulimit",	required_argument, NULL, PARAM_CPULIMIT},
 	{"cpus",	required_argument, NULL, PARAM_VCPUS},
 	{"cpumask",	required_argument, NULL, PARAM_CPUMASK},
+	{"nodemask",	required_argument, NULL, PARAM_NODEMASK},
 	/*	create param	*/
 	{"onboot",	required_argument, NULL, PARAM_ONBOOT},
 	{"setmode",	required_argument, NULL, PARAM_SETMODE},
@@ -968,6 +969,17 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 			logger(0, 0, "Warning: option --offline-resize "
 					"only makes sense for a ploop CT");
 		}
+	}
+	/* --nodemask requires --cpumask */
+	if (param->res.cpu.nodemask &&
+			!(param->res.cpu.mask || param->res.cpu.cpumask_auto)) {
+		logger(-1, 0, "Error: option --nodemask requires --cpumask");
+		return VZ_INVALID_PARAMETER_SYNTAX;
+	}
+	/* --cpumask auto doesn't make sense without --nodemask */
+	if (param->res.cpu.cpumask_auto && !param->res.cpu.nodemask) {
+		logger(-1, 0, "Error: --cpumask auto requires --nodemask");
+		return VZ_INVALID_PARAMETER_SYNTAX;
 	}
 
 	/* A few options require --save flag */
