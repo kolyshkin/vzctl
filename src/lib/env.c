@@ -363,18 +363,18 @@ static void read_osrelease_conf(const char *dist, char *osrelease)
 #define KVER(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 static int compare_osrelease(const char *cur, const char *min)
 {
-	int cur_a, cur_b, cur_c;
-	int min_a, min_b, min_c;
+	int cur_a, cur_b, cur_c = 0;
+	int min_a, min_b, min_c = 0;
 	int ret;
 
 	ret = sscanf(cur, "%d.%d.%d", &cur_a, &cur_b, &cur_c);
-	if (ret != 3) {
+	if (ret < 2) {
 		logger(-1, 0, "Unable to parse kernel osrelease (%s)", cur);
 		return -1;
 	}
 
 	ret = sscanf(min, "%d.%d.%d", &min_a, &min_b, &min_c);
-	if (ret != 3) {
+	if (ret < 2) {
 		logger(-1, 0, "Unable to parse value (%s) from "
 				OSRELEASE_CFG, min);
 		return -1;
