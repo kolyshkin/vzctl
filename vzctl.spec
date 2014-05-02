@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.7
+Version: 4.7.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -280,6 +280,12 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Fri May  2 2014 Kir Kolyshkin <kir@openvz.org> - 4.7.1-1
+* vzlist: don't complain about missing ploop-lib (#2952)
+* setup_console: don't execute on older kernels (#2961)
+* clean_hardlink_dir(): note unlink/rmdir errors
+* vzctl(8): fix a typo
+
 * Wed Apr  2 2014 Kir Kolyshkin <kir@openvz.org> - 4.7-1
 - New functionality and important changes:
 -- Disable conntrack for VE0 by default (#2755)
