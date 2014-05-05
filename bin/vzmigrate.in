@@ -683,16 +683,6 @@ if [ "$PLOOP" = "yes" ]; then
 		undo_lock
 		exit $MIG_ERR_UNSUP_PLOOP
 	fi
-
-	if [ "$state" = "running" ]; then
-		# Online ploop migration: exclude top delta
-		if ! get_ploop_info; then
-			log 0 "Can't get ploop information"
-			undo_lock
-			exit $MIG_ERR_COPY
-		fi
-		RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
-	fi
 else
 	# non-ploop case: can use sparse rsync, can't do compact/snapshot
 	RSYNC1_OPTIONS="--sparse"
@@ -826,6 +816,16 @@ if [ "$snapshot" -eq 1 ]; then
 		log 0 "Failed to snapshot a container"
 		undo_root
 	fi
+fi
+
+if [ "$PLOOP" = "yes" -a "$state" = "running" ]; then
+	# Online ploop migration: exclude top delta
+	if ! get_ploop_info; then
+		log 0 "Can't get ploop information"
+		undo_root
+		exit $MIG_ERR_COPY
+	fi
+	RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
 fi
 
 log 1 "Syncing private"
