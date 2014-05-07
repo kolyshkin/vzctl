@@ -321,7 +321,7 @@ start_ves()
 
 stop_ves()
 {
-	local veid velist i iter pid pids msg stage stages
+	local veid velist i iter pid pids msg stage stages ret
 
 	if ! get_veinfo; then
 		return
@@ -352,28 +352,46 @@ stop_ves()
 				;;
 		esac
 		for i in 0 1 2; do
-			iter=0;
+			iter=0
 			pids=
+			header=
 			velist=$(vzlist -H -o ctid -sbootorder 2>/dev/null)
 			for veid in $velist; do
-				echo $msg $veid
 				if [ "$stage" = "stop" ]; then
 					# Unset limits for CT to stop fast
 					$VZCTL set $veid --cpulimit 0 --iolimit 0 --iopslimit 0 >/dev/null 2>&1
 				fi
+				if [ -z "${header}" ]; then
+					__echo "$msg:"
+					header=1
+				fi
+				__echo " ${veid}"
 				$VZCTL --skiplock $stage $veid >/dev/null 2>&1 &
-				pids="$pids $!"
+				pid=$!
+				eval VE_${pid}=${veid}
+				pids="$pids $pid"
 				iter=$(($iter+1))
-				if [ ${iter} -gt ${PARALLEL} ]; then
+				if [ ${iter} -ge ${PARALLEL} ]; then
+					echo
 					for pid in ${pids}; do
+						veid=`eval echo \\$VE_${pid}`
+						unset VE_${pid}
+						__echo "Container ${veid} $stage: "
 						wait ${pid}
+						print_result
 					done
 					pids=
 					iter=0
+					header=
 				fi
 			done
+			[ -n "${pids}" ] && echo
 			for pid in $pids; do
+				veid=`eval echo \\$VE_${pid}`
+				unset VE_${pid}
+				__echo "Container ${veid} $stage: "
 				wait $pid
+				print_result
 			done
 		done
 	done
