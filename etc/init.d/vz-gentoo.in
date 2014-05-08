@@ -221,17 +221,22 @@ stop_ve() {
 			pids=
 			velist=$(vzlist -H -o ctid -sbootorder 2>/dev/null)
 			for veid in ${velist}; do
-				ebegin "$msg $veid"
 				if [ "$stage" = "stop" ]; then
 					# Unset limits for CT to stop fast
 					$VZCTL set $veid --cpulimit 0 --iolimit 0 --iopslimit 0 >/dev/null 2>&1
 				fi
 				${VZCTL} --skiplock $stage ${veid} >/dev/null 2>&1 &
-				pids="${pids} $!"
+				pid=$!
+				eval VE_${pid}=${veid}
+				pids="${pids} $pid"
 				let iter++
 				if [ ${iter} -ge ${VE_PARALLEL} ]; then
 					for pid in ${pids}; do
+						veid=`eval echo \\$VE_${pid}`
+						unset VE_${pid}
+						ebegin "$msg $veid"
 						wait ${pid}
+						eend $?
 					done
 					pids=
 					iter=0
@@ -239,7 +244,11 @@ stop_ve() {
 			done
 
 			for pid in ${pids}; do
+				veid=`eval echo \\$VE_${pid}`
+				unset VE_${pid}
+				ebegin "$msg $veid"
 				wait ${pid}
+				eend $?
 			done
 		done
 	done
