@@ -181,8 +181,8 @@ start_ve() {
 
 get_parallel()
 {
-	[ -n "${PARALLEL}" ] && return
-	PARALLEL=`awk '
+	[ -n "${VE_PARALLEL}" -a "${VE_PARALLEL" != "0" ] && return
+	VE_PARALLEL=`awk '
 BEGIN { num=0; }
 $1 == "processor" { num++; }
 END { print num * 4; }' /proc/cpuinfo`
@@ -229,7 +229,7 @@ stop_ve() {
 				${VZCTL} --skiplock $stage ${veid} >/dev/null 2>&1 &
 				pids="${pids} $!"
 				let iter++
-				if [ ${iter} -gt ${PARALLEL} ]; then
+				if [ ${iter} -ge ${VE_PARALLEL} ]; then
 					for pid in ${pids}; do
 						wait ${pid}
 					done

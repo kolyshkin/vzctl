@@ -82,9 +82,6 @@ fi
 
 VEINFO=""
 RETVAL=0
-# Number of the containers to stop in parallel.
-# In case of empty value the number of CTs is calculated as 'num_cpu * 4'
-PARALLEL=
 cd /
 
 get_kernel_version()
@@ -146,8 +143,8 @@ umount_cgroups()
 
 get_parallel()
 {
-	[ -n "${PARALLEL}" ] && return
-	PARALLEL=`awk '
+	[ -n "${VE_PARALLEL}" -a "${VE_PARALLEL}" != "0" ] && return
+	VE_PARALLEL=`awk '
 BEGIN { num=0; }
 $1 == "processor" { num++; }
 END { print num * 4; }' /proc/cpuinfo`
@@ -320,7 +317,7 @@ start_ves()
 		eval VE_${pid}=${veid}
 		pids="$pids $pid"
 		let iter++
-		if [ ${iter} -ge ${PARALLEL} ]; then
+		if [ ${iter} -ge ${VE_PARALLEL} ]; then
 			echo
 			for pid in ${pids}; do
 				veid=`eval echo \\$VE_${pid}`
@@ -406,7 +403,7 @@ stop_ves()
 				eval VE_${pid}=${veid}
 				pids="$pids $pid"
 				iter=$(($iter+1))
-				if [ ${iter} -ge ${PARALLEL} ]; then
+				if [ ${iter} -ge ${VE_PARALLEL} ]; then
 					echo
 					for pid in ${pids}; do
 						veid=`eval echo \\$VE_${pid}`

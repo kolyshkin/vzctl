@@ -60,6 +60,10 @@ If the value of this parameter is set to \fBsuspend\fR or not set at all,
 the running containers, instead of stopping them. Suspended containers when
 will be restored on \fBvz start\fR. This feature usually helps to decrease
 the reboot time. If a container fails to suspend, it will be stopped anyway.
+.IP \fBVE_PARALLEL\fR=\fInumber\fR
+A number of containers to be started or stopped simultaneously on node
+startup or shutdown. If not specified, the number is calculated based
+on amount of CPU cores. Used by the \fBvz\fR initscript.
 .IP \fBTEMPLATE\fR=\fIdirectory\fR
 Value of this parameter is a directory in which all container template data are
 stored.
