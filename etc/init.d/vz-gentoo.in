@@ -133,7 +133,7 @@ stop_net() {
 }
 
 start_ve() {
-	local veid velist msg need_restart=""
+	local veid velist msg iter=0 pid pids need_restart=""
 
 	# CTs that were running before a reboot
 	velist=$(ls $VZREBOOTDIR)
@@ -150,7 +150,6 @@ start_ve() {
 	sysctl -q -w net.ipv4.route.src_check=0
 
 	for veid in ${velist}; do
-		ebegin "Starting CT ${veid}"
 		if [ "${VZFASTBOOT}" = "yes" -a "${DISK_QUOTA}" = "yes" ]; then
 			${VZQUOTA} stat ${veid} >/dev/null 2>&1
 			if [ $? -eq 6 ]; then
@@ -161,8 +160,30 @@ start_ve() {
 			fi
 		fi
 		rm -f $VZREBOOTDIR/$veid
-		msg=$(${VZCTL} start ${veid} --skip-fsck 2>&1)
-		eend $? "${msg}"
+		${VZCTL} start ${veid} --skip-fsck 2>&1 &
+		pid=$!
+		eval VE_${pid}=${veid}
+		pids="${pids} $pid"
+		let iter++
+		if [ ${iter} -ge ${VE_PARALLEL} ]; then
+			for pid in ${pids}; do
+				veid=`eval echo \\$VE_${pid}`
+				unset VE_${pid}
+				ebegin "Starting CT $veid"
+				wait ${pid}
+				eend $?
+			done
+			pids=
+			iter=0
+		fi
+	done
+
+	for pid in ${pids}; do
+		veid=`eval echo \\$VE_${pid}`
+		unset VE_${pid}
+		ebegin "Starting CT $veid"
+		wait ${pid}
+		eend $?
 	done
 
 	for veid in ${need_restart}; do
