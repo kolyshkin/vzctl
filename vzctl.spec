@@ -162,24 +162,35 @@ if %{_initddir}/vz status >/dev/null 2>&1; then
 	fi
 fi
 
-# Disable VE0 conntracks by default
+# Disable VE0 conntracks if they are not used (#2755)
 file='/etc/modprobe.d/openvz.conf'
-line='options nf_conntrack ip_conntrack_disable_ve0=1'
-if ! grep -wq 'ip_conntrack_disable_ve0' $file 2>/dev/null; then
-	echo "$line" >> $file
-cat << EOF
+line='options nf_conntrack ip_conntrack_disable_ve0'
+if ! grep -wq 'ip_conntrack_disable_ve0' /etc/modprobe.d/* 2>/dev/null; then
+	cat << EOF
 ============================================================================
+EOF
+	if /sbin/iptables -S -t nat | grep -qEw 'SNAT|DNAT|MASQUERADE'; then
+		# conntracks are used
+		disable=0
+	else
+		disable=1
+		cat << EOF
 Due to conntrack impact on venet performance, conntrack need to be disabled
 on the host system (it will still work for containers).
 
+EOF
+
+	fi
+	echo "$line=$disable" >> $file
+	cat << EOF
 Adding the following option to $file:
 
-	$line
+	$line=$disable
 
 This change will take effect only after the next reboot.
 
-NOTE: IF YOU NEED conntrack functionality, edit $file
-NOW, changing =1 to =0. DO NOT REMOVE the line, or it will be re-added!
+NOTE: if you need to change this setting, edit $file
+now. DO NOT REMOVE the line, or it will be re-added!
 ============================================================================
 EOF
 fi
