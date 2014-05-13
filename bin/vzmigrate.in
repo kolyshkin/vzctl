@@ -20,8 +20,7 @@
 
 
 ACT_SCRIPTS_SFX="start stop mount umount premount postumount"
-# blowfish is a fast block cipher, much faster then 3des
-SSH_OPTIONS="-c blowfish -o BatchMode=yes"
+SSH_OPTIONS="-o BatchMode=yes"
 SCP_OPTIONS=$SSH_OPTIONS
 RSYNC_OPTIONS="-aHAX --delete --numeric-ids"
 VZCTL=vzctl
