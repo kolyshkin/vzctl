@@ -989,6 +989,11 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 				 " --name option without --save");
 			return VZ_SET_NAME_ERROR;
 		}
+		if (param->res.tmpl.ostmpl) {
+			logger(-1, 0, "Error: unable to use"
+				" --ostemplate option without --save");
+			return VZ_INVALID_PARAMETER_SYNTAX;
+		}
 		if (param->res.misc.stop_timeout >= 0) {
 			logger(-1, 0, "Error: unable to use"
 				" --stop-timeout option without --save");
