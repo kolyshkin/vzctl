@@ -116,6 +116,7 @@ configuration file \fBvz.conf\fR(5), or to \fB0\fR if not set by
 .OP --disabled \fByes\fR|\fBno
 .OP --name name
 .OP --description string
+.OP --ostemplate string
 .OP --stop-timeout seconds
 .\" Networking
 .OP --ipadd addr
@@ -285,6 +286,14 @@ option can not be used without \fB--save\fR.
 .TP
 \fB--description\fR \fIstring\fR
 Add a textual description for a container.
+.TP
+\fB--ostemplate\fR \fIstring\fR
+Sets a new value of \fBOSTEMPLATE\fR parameter in container
+configuration file
+.BR ctid.conf (5).
+Requires \fB--save\fR flag. Useful after a change/upgrade of
+a distribution running inside container, as vzctl uses the value
+of OSTEMPLATE to run distribution-specific scripts.
 .TP
 \fB--stop-timeout\fR \fIseconds\fR
 Sets a time to wait for container to stop on \fBvzctl stop\fR before
