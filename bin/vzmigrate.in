@@ -36,6 +36,9 @@ snapshot=0
 check_only=0
 ignore_cpu=0
 ignore_ipv6=0
+ssh_mux=0
+ssh_mux_pid=
+ssh_mux_sock=
 confdir="@VPSCONFDIR@"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
@@ -202,6 +205,11 @@ lock_ct() {
 	return $ret
 }
 
+undo_ssh_mux() {
+	[ -n "$ssh_mux_pid" ] && kill -TERM $ssh_mux_pid
+	[ -f "$ssh_mux_sock" ] && rm -f $ssh_mux_sock
+}
+
 undo_lock() {
 	local f
 	local pid
@@ -213,6 +221,7 @@ undo_lock() {
 	else
 		rm -f $f
 	fi
+	undo_ssh_mux
 }
 
 undo_conf () {
@@ -494,6 +503,9 @@ while [ ! -z "$1" ]; do
 	--times|-t)
 		times=1
 		;;
+	--ssh-mux)
+		ssh_mux=1
+		;;
 	-h|--help|--usage|-?)
 		usage
 		;;
@@ -542,6 +554,12 @@ if echo $VEID | egrep -qv '^[[:digit:]]+$'; then
 fi
 vpsconf="$confdir/$VEID.conf"
 
+SSH_NOMUX="ssh $SSH_OPTIONS"
+if [ $ssh_mux -eq 1 ]; then
+	ssh_mux_sock=/tmp/.vzmigrate-ssh-$$-$host-$VEID
+	SSH_OPTIONS="$SSH_OPTIONS -o ControlPath=$ssh_mux_sock"
+	SCP_OPTIONS="$SCP_OPTIONS -o ControlPath=$ssh_mux_sock"
+fi
 SSH="ssh $SSH_OPTIONS"
 SCP="scp $SCP_OPTIONS"
 
@@ -576,6 +594,13 @@ M="migration"
 [ $online -eq 1 ] && M="live migration"
 log 1 "$S $M of CT $VEID to $host"
 unset S M
+
+# Set up master SSH channel
+if [ $ssh_mux -eq 1 ]; then
+	$SSH -M root@$host sleep 3600 \
+		</dev/null >/dev/null 2>&1 &
+	ssh_mux_pid=$!
+fi
 
 # Try to connect to destination
 if ! logexec 2 $SSH root@$host /bin/true; then
