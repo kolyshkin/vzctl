@@ -523,12 +523,6 @@ if [ $verbose -gt 3 ]; then
 	SCP_OPTIONS="$SCP_OPTIONS -v"
 fi
 
-RSYNC="rsync $RSYNC_OPTIONS"
-SSH="ssh $SSH_OPTIONS"
-SCP="scp $SCP_OPTIONS"
-export RSYNC_RSH="$SSH"
-VZCTL_L="$VZCTL --skiplock"
-
 [ $# -lt 2 ] && bad_usage "not enough parameters"
 
 host=$1
@@ -546,8 +540,14 @@ if echo $VEID | egrep -qv '^[[:digit:]]+$'; then
 		exit $MIG_ERR_NOEXIST
 	fi
 fi
-
 vpsconf="$confdir/$VEID.conf"
+
+SSH="ssh $SSH_OPTIONS"
+SCP="scp $SCP_OPTIONS"
+
+RSYNC="rsync $RSYNC_OPTIONS"
+export RSYNC_RSH="$SSH"
+VZCTL_L="$VZCTL --skiplock"
 
 if [ ! -r "$vzconf" ]; then
 	log 0 "Can't read global config file $vzconf"
