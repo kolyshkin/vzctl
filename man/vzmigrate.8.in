@@ -7,6 +7,7 @@ vzmigrate \- migrate a container between two OpenVZ servers
 .SY vzmigrate
 .OP -r\fR|\fB--remove-area\ \fByes\fR|\fBno
 .OP --ssh=\fIssh_options
+.OP --ssh-mux
 .OP --rsync=\fIrsync_options
 .OP --keep-dst
 .OP --live
@@ -41,6 +42,11 @@ migrated container. Default is \fByes\fR.
 \fB--ssh=\fIoptions\fR
 Additional \fIoptions\fR that will be passed to ssh while establishing
 connection to destination HN.
+
+.TP
+.B --ssh-mux
+Enable ssh channel multiplexing, establishing and reusing a single
+ssh connection to remote server. This speeds up live migration.
 
 .TP
 \fB--rsync=\fIoptions\fR

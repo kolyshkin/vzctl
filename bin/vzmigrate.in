@@ -87,6 +87,8 @@ Options:
 	Additional options that will be passed to ssh while establishing
 	connection to destination host. Please be careful with options
 	passed, DO NOT pass destination hostname.
+--ssh-mux
+	Use ssh connection multiplexion (speeds up live migration).
 --rsync=<rsync options>
 	Additional options that will be passed to rsync.
 --keep-dst
