@@ -597,7 +597,7 @@ unset S M
 
 # Set up master SSH channel
 if [ $ssh_mux -eq 1 ]; then
-	$SSH -M root@$host sleep 3600 \
+	$SSH -M root@$host 'while :; do echo; sleep 5; done' \
 		</dev/null >/dev/null 2>&1 &
 	ssh_mux_pid=$!
 fi
