@@ -865,20 +865,22 @@ if [ $RET != 24 ] && [ $RET != 0 ]; then
 fi
 
 if [ "$PLOOP" = "yes" ]; then
-	if $SSH root@$host "vzfsync >/dev/null 2>&1"; then
-		log 2 "Calling vzfsync on ploop deltas"
-		TOP_UUID='{5fbaabe3-6958-40ff-92a7-860e329aab41}'
-		if ! logexec 1 $SSH root@$host "vzfsync \
-			--datasync --dontneed \
-			\$(ploop snapshot-list -u $TOP_UUID \
-				-H -o fname $DDXML | sed 1d)"
-		then
-			log 1 "Error from vzfsync, but moving on"
+	TOP_UUID='{5fbaabe3-6958-40ff-92a7-860e329aab41}'
+	vzfsync_files=$($SSH "root@$host" ploop snapshot-list \
+		-u $TOP_UUID -H -o fname $DDXML | sed 1d)
+	if [ -n "$vzfsync_files" ]; then
+		if $SSH root@$host "vzfsync >/dev/null 2>&1"; then
+			log 2 "Calling vzfsync on ploop deltas"
+			if ! logexec 1 $SSH root@$host "vzfsync \
+				--datasync --dontneed $vzfsync_files"
+			then
+				log 1 "Error from vzfsync, but moving on"
+			fi
+		else
+			log 1 "Warning: no vzfsync on $host," \
+				"skipping deltas fsync"
+			log 1 "Please upgrade vzctl on $host"
 		fi
-	else
-		log 1 "Warning: no vzfsync on $host," \
-			"skipping deltas fsync"
-		log 1 "Please upgrade vzctl on $host"
 	fi
 fi
 
