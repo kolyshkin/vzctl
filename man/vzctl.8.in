@@ -17,6 +17,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --wait
 .OP --force
 .OP --skip-fsck
+.OP --skip-remount
 .SY vzctl
 [\fIflags\fR] \fBstop\fR \fICTID\fR
 .OP --fast
@@ -27,6 +28,7 @@ vzctl \- perform various operations on an OpenVZ container
 .OP --force
 .OP --fast
 .OP --skip-fsck
+.OP --skip-remount
 .SY vzctl
 [\fIflags\fR] \fBsuspend\fR | \fBresume\fR \fICTID\fR
 .OP --dumpfile name
@@ -1065,7 +1067,7 @@ filesystem needs to be correctly owned by the host-side users.
 .IP "\fBdestroy\fR | \fBdelete\fR \fICTID\fR" 4
 Removes a container private area by deleting all files, directories and
 the configuration file of this container.
-.IP "\fBstart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR] [\fB--skip-fsck\fR]" 4
+.IP "\fBstart\fR \fICTID\fR [\fB--wait\fR] [\fB--force\fR] [\fB--skip-fsck\fR] [\fB--skip-remount\fR]" 4
 Mounts (if necessary) and starts a container. Unless \fB--wait\fR option
 is specified, \fBvzctl\fR will return immediately; otherwise an attempt to
 wait till the default runlevel is reached will be made by \fBvzctl\fR.
@@ -1075,6 +1077,10 @@ Specify \fB--force\fR if you want to start a container which is disabled
 
 Specify \fB--skip-fsck\fR to skip fsck for ploop-based container filesystem
 (this option is used by vz initscript).
+
+By default, if a container to be started happens to be already mounted,
+it is unmounted and mounted again. This behavior can be turned off
+by using \fB--skip-remount\fR flag.
 
 Note that this command can lead to execution of \fBpremount\fR, \fBmount\fR
 and \fBstart\fR action scripts (see \fBACTION SCRIPTS\fR below).

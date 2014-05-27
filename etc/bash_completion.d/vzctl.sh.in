@@ -92,7 +92,7 @@ _vzctl()
 		--name --ioprio --iolimit --iopslimit \
 		--setmode --meminfo --bootorder --features \
 		--reset_ub --stop-timeout --offline-resize"
-	local vzctl_start_opts="--wait --force --skip-fsck"
+	local vzctl_start_opts="--wait --force --skip-fsck --skip-remount"
 	local vzctl_stop_opts="--fast --skip-umount"
 	local vzctl_restart_opts="$vzctl_start_opts $vzctl_stop_opts"
 	local vzctl_snapshot_create_opts="--id --name --description \

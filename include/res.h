@@ -133,6 +133,7 @@ typedef struct {
 	int reset_ub;
 	int skip_umount;
 	int skip_fsck;
+	int skip_remount;
 } vps_opt;
 
 struct log_s {

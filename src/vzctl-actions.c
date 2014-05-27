@@ -238,6 +238,7 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 		{"fast", no_argument, NULL, PARAM_FAST},
 		{"skip-umount", no_argument, NULL, PARAM_SKIP_UMOUNT},
 		{"skip-fsck", no_argument, NULL, PARAM_SKIP_FSCK},
+		{"skip-remount", no_argument, NULL, PARAM_SKIP_REMOUNT},
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -279,6 +280,12 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 		case PARAM_SKIP_FSCK:
 			if (start)
 				param->opt.skip_fsck = YES;
+			else
+				goto err;
+			break;
+		case PARAM_SKIP_REMOUNT:
+			if (start)
+				param->opt.skip_remount = YES;
 			else
 				goto err;
 			break;
@@ -354,6 +361,8 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 		skip |= SKIP_SETUP;
 	if (cmd_p->opt.skip_fsck == YES)
 		skip |= SKIP_FSCK;
+	if (cmd_p->opt.skip_remount == YES)
+		skip |= SKIP_REMOUNT;
 	/* Try restore first */
 	ret = try_restore(h, veid, g_p, cmd_p, skip);
 	if (ret == 0)
@@ -641,6 +650,7 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 	{"flags",	required_argument, NULL, PARAM_CPU_FLAGS},
 	{"context",	required_argument, NULL, PARAM_CPTCONTEXT},
 	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
+	{"skip-remount", no_argument, NULL, PARAM_SKIP_REMOUNT},
 	{ NULL, 0, NULL, 0 }
 	};
 
@@ -676,6 +686,9 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 			break;
 		case PARAM_SKIPARPDETECT:
 			vps_p->res.net.skip_arpdetect = YES;
+			break;
+		case PARAM_SKIP_REMOUNT:
+			vps_p->opt.skip_remount = YES;
 			break;
 		default:
 			/* Error is printed by getopt_long() */
@@ -1449,6 +1462,7 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	vps_param *cmd_p)
 {
 	int cmd;
+	int skip = SKIP_NONE;
 
 	cmd = cmd_p->res.cpt.cmd;
 	merge_vps_param(g_p, cmd_p);
@@ -1456,7 +1470,11 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 	if (cmd == CMD_KILL || cmd == CMD_RESUME)
 		return cpt_cmd(h, veid, g_p->res.fs.root,
 				CMD_RESTORE, cmd, cmd_p->res.cpt.ctx);
-	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt, SKIP_NONE);
+
+	if (cmd_p->opt.skip_remount == YES)
+		skip |= SKIP_REMOUNT;
+
+	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt, skip);
 }
 
 static int show_status(vps_handler *h, envid_t veid, vps_param *param)
