@@ -162,6 +162,15 @@ static struct option set_opt[] = {
 	{NULL, 0, NULL, 0}
 };
 
+#define CHECK_EXTRA_ARGV					\
+if (optind < argc) {						\
+	fprintf(stderr, "Invalid extra arguments: ");		\
+	while (optind < argc)					\
+		fprintf(stderr, "%s ", argv[optind++]);		\
+	fprintf(stderr, "\n");					\
+	return VZ_INVALID_PARAMETER_SYNTAX;			\
+}
+
 static int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 	struct option *internal_opt, vps_param *param)
 {
@@ -212,13 +221,9 @@ static int parse_opt(envid_t veid, int argc, char *argv[], struct option *opt,
 				return VZ_SYSTEM_ERROR;
 		}
 	}
-	if (optind < argc) {
-		printf ("non-option ARGV-elements: ");
-		while (optind < argc)
-			printf ("%s ", argv[optind++]);
-		printf ("\n");
-		return VZ_INVALID_PARAMETER_SYNTAX;
-	}
+
+	CHECK_EXTRA_ARGV
+
 	return 0;
 }
 
@@ -282,6 +287,8 @@ static int parse_startstop_opt(int argc, char **argv, vps_param *param,
 			break;
 		}
 	}
+
+	CHECK_EXTRA_ARGV
 
 	return ret;
 
@@ -606,6 +613,9 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 	}
+
+	CHECK_EXTRA_ARGV
+
 	/* Do full checkpointing */
 	if (!cpt->cmd)
 		cpt->cmd = CMD_CHKPNT;
@@ -672,6 +682,9 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 	}
+
+	CHECK_EXTRA_ARGV
+
 	/* Do full restore */
 	if (!cpt->cmd)
 		cpt->cmd = CMD_RESTORE;
