@@ -602,11 +602,7 @@ static int parse_chkpnt_opt(int argc, char **argv, vps_param *vps_p)
 			vps_p->res.net.skip_arpdetect = YES;
 			break;
 		default:
-			if (option_index < 0)
-				logger(-1, 0, "Invalid option -%c", c);
-			else
-				logger(-1, 0, "Invalid option --%s",
-					chkpnt_options[option_index].name);
+			/* Error is printed by getopt_long() */
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 	}
@@ -672,11 +668,7 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 			vps_p->res.net.skip_arpdetect = YES;
 			break;
 		default:
-			if (option_index < 0)
-				logger(-1, 0, "Invalid option -%c", c);
-			else
-				logger(-1, 0, "Invalid option --%s",
-					restore_options[option_index].name);
+			/* Error is printed by getopt_long() */
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 	}
