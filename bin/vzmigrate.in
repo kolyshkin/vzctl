@@ -39,6 +39,7 @@ ignore_ipv6=0
 ssh_mux=0
 ssh_mux_pid=
 ssh_mux_sock=
+suspend_opts=
 confdir="@VPSCONFDIR@"
 vzconf="@PKGCONFDIR@/vz.conf"
 tmpdir="/var/tmp"
@@ -441,7 +442,7 @@ print_times() {
 }
 
 check_cpt_props() {
-	local version caps
+	local version
 
 	log 2 "Checking for CPT version compatibility"
 	version=$(vzcptcheck version)
@@ -455,10 +456,10 @@ check_cpt_props() {
 	fi
 
 	log 2 "Checking for CPU flags compatibility"
-	caps=$($SSH root@$host vzcptcheck caps)
-	if [ $? -ne 0 -o "$caps" = "" ]; then
+	CPU_CAPS=$($SSH root@$host vzcptcheck caps)
+	if [ $? -ne 0 -o "$CPU_CAPS" = "" ]; then
 		log 1 "Warning: can't get remote CPU caps, skipping check"
-	elif ! logexec 1 vzcptcheck caps $VEID $caps; then
+	elif ! logexec 1 vzcptcheck caps $VEID $CPU_CAPS; then
 		log 0 "Error: CPU capabilities check failed!"
 		log 0 "Destination node CPU is not compatible"
 		if [ $ignore_cpu -eq 1 ]; then
@@ -929,10 +930,14 @@ if [ $online -eq 1 ]; then
 
 	log 1 "Live migrating container..."
 
+	if [ -n "$CPU_CAPS" ]; then
+		suspend_opts="$suspend_opts --flags $CPU_CAPS"
+	fi
+
 	if [ "$PLOOP" != "yes" ]; then
 		time_suspend=$(date +%s.%N)
 		log 2 "Suspending container"
-		if ! logexec 2 $VZCTL_L chkpnt $VEID --suspend ; then
+		if ! logexec 2 $VZCTL_L chkpnt $VEID --suspend $suspend_opts; then
 			log 0 "Failed to suspend container"
 			undo_sync
 			exit $MIG_ERR_CHECKPOINT
@@ -940,7 +945,7 @@ if [ $online -eq 1 ]; then
 	else
 		log 2 "Copying top ploop delta with CT suspend"
 		TMPF=$(mktemp)
-		if ! ploop_copy "date '+%s.%N' > $TMPF; $VZCTL_L chkpnt $VEID --suspend"; then
+		if ! ploop_copy "date '+%s.%N' > $TMPF; $VZCTL_L chkpnt $VEID --suspend $suspend_opts"; then
 			log 0 "Failed to copy top ploop delta"
 			$VZCTL_L chkpnt $VEID --resume 2>/dev/null
 			rm -f $TMPF
