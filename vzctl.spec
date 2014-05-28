@@ -36,6 +36,7 @@ BuildRequires: libcgroup-devel >= 0.37
 Requires: rsync
 Requires: gawk
 Requires: openssh
+Requires: socat
 Requires: bridge-utils
 # Virtual provides for newer RHEL6 kernel
 Provides: virtual-vzkernel-install = 2.0.0

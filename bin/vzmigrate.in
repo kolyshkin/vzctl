@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright (C) 2000-2014, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -350,9 +350,16 @@ get_ploop_info() {
 	PLOOP_DEV="${dev}"
 }
 
+ploop_copy_old() {
+	log 1 "Falling back to non-feedback ploop copy"
+
+	ploop copy -s $dev -F "$cmd 1>&2" | $cat | \
+		$SSH "root@$host" ploop copy -d $delta_dst
+}
+
 # Copy top delta with write tracker and CT stop/suspend
 ploop_copy() {
-	local cmd dev delta_src delta_dst cat size
+	local cmd dev delta_src delta_dst cat size err pid port
 
 	cmd=$*
 	dev=/dev/$PLOOP_DEV
@@ -368,8 +375,41 @@ ploop_copy() {
 		size=$(du -b $delta_src | awk '{print $1}')
 		test -n "$size" && cat="pv -s $size"
 	fi
-	ploop copy -s $dev -F "$cmd 1>&2" | $cat | \
-		$SSH "root@$host" ploop copy -d $delta_dst
+
+	# Check if remote side supports ploop copy with feedback
+	err=$($SSH "root@$host" ploop copy -i0 -f1 -d /dev/null \
+			</dev/null >/dev/null 2>&1; echo $?)
+	if [ $err -eq 38 ]; then
+		log 1 "WARNING: ploop tools on $host is old, please update"
+		ploop_copy_old
+		return
+	fi
+
+	# Set up two-way channel for ploop copy with feedback
+	port=2335
+	$SSH_NOMUX -L $port:$host:$port root@$host "socat TCP-LISTEN:$port " \
+		"EXEC:ploop\ copy\ -d\ $delta_dst\ -i0\ -f1" &
+	pid=$!
+	sleep 1
+
+	# check if ssh is still there
+	if ! kill -0 $pid; then
+		log 0 "Failed to setup remote ploop copy"
+		ploop_copy_old
+		return
+	fi
+
+	# FIXME bashism here! I would use socat, but can't find a way
+	# to check ploop copy exit status
+	exec 33<>/dev/tcp/localhost/$port
+	if ! ploop copy -s $dev -F "$cmd 1>&2" -o33 -f33; then
+		log 0 "ploop copy -s $dev failed"
+		kill -TERM $pid 2>/dev/null
+		return 1
+	fi
+
+	exec 33>&- # close fd 33
+	return 0
 }
 
 print_times() {
