@@ -47,6 +47,7 @@ PLOOP=no
 RSYNC1_OPTIONS=
 PLOOP_DEV=
 TOP_DELTA=
+VVVV=
 
 # Errors:
 MIG_ERR_USAGE=1
@@ -388,7 +389,7 @@ ploop_copy() {
 	# Set up two-way channel for ploop copy with feedback
 	port=2335
 	$SSH_NOMUX -L $port:$host:$port root@$host "socat TCP-LISTEN:$port " \
-		"EXEC:ploop\ copy\ -d\ $delta_dst\ -i0\ -f1" &
+		"EXEC:ploop\ $VVVV\ copy\ -d\ $delta_dst\ -i0\ -f1" &
 	pid=$!
 	sleep 1
 
@@ -402,7 +403,7 @@ ploop_copy() {
 	# FIXME bashism here! I would use socat, but can't find a way
 	# to check ploop copy exit status
 	exec 33<>/dev/tcp/localhost/$port
-	if ! ploop copy -s $dev -F "$cmd 1>&2" -o33 -f33; then
+	if ! ploop $VVVV copy -s $dev -F "$cmd 1>&2" -o33 -f33; then
 		log 0 "ploop copy -s $dev failed"
 		kill -TERM $pid 2>/dev/null
 		return 1
@@ -562,7 +563,7 @@ if [ $verbose -gt 0 ]; then
 	times=1
 fi
 if [ $verbose -gt 1 ]; then
-
+	VVVV="-vvvv"	# for ploop copy
 	RSYNC_OPTIONS="$RSYNC_OPTIONS -v"
 	VZCTL="$VZCTL --verbose"
 fi
