@@ -390,7 +390,7 @@ ploop_copy() {
 	# Set up two-way channel for ploop copy with feedback
 	port=2335
 	$SSH_NOMUX -L 127.0.0.1:$port:127.0.0.1:$port root@$host \
-		"vznnc l $port ploop $VVVV copy -d $delta_dst -i0 -f1" &
+		"vznnc -l -p $port ploop $VVVV copy -d $delta_dst -i0 -f1" &
 	pid=$!
 	sleep 1
 
@@ -401,7 +401,7 @@ ploop_copy() {
 		return
 	fi
 
-	if ! vznnc c $port ploop $VVVV copy -s $dev -F "$cmd 1>&2" -o1 -f0; then
+	if ! vznnc -c -p $port ploop $VVVV copy -s $dev -F "$cmd 1>&2" -o1 -f0; then
 		log 0 "ploop copy -s $dev failed"
 		kill -TERM $pid 2>/dev/null
 		return 1

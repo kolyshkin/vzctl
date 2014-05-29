@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <getopt.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -32,30 +33,52 @@
 #define SELF "vznnc"
 
 void usage(void) {
-	fprintf(stderr, "Usage: " SELF " {l|c} PORT CMD [arg ...]\n");
+	fprintf(stderr, "Usage: " SELF " {-l|-c} -p PORT CMD [arg ...]\n");
 
 	exit(1);
 }
 
 int main(int argc, char *argv[])
 {
-	int sockfd, connfd, port;
+	int sockfd, connfd, port = -1;
 	socklen_t cl_len;
 	struct sockaddr_in srv_addr = {}, cl_addr = {};
-	int l = -1;
+	int lis = 0, con = 0;
 	int yes = 1;
 
-	if (argc < 4)
-		usage();
+	while (1) {
+		int c;
 
-	if (strcmp(argv[1], "l") == 0)
-		l = 1;
-	else if (strcmp(argv[1], "c") == 0)
-		l = 0;
-	else
-		usage();
+		c = getopt(argc, argv, "lcp:");
+		if (c == -1)
+			break;
+		switch (c) {
+			case 'l':
+				lis++;
+				break;
+			case 'c':
+				con++;
+				break;
+			case 'p':
+				port = atoi(optarg);
+				break;
+			default:
+				usage();
+		}
+	}
 
-	port = atoi(argv[2]);
+	if (lis && con) {
+		fprintf(stderr, SELF ": options -l and -c are exclusive\n");
+		usage();
+	}
+
+	if (!lis && !con) {
+		fprintf(stderr, SELF ": either -l or -c is required\n");
+		usage();
+	}
+
+	if (argc - optind < 1)
+		usage();
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
@@ -72,7 +95,7 @@ int main(int argc, char *argv[])
 	srv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	srv_addr.sin_port = htons(port);
 
-	if (l) { /* listen */
+	if (lis) { /* listen */
 		if (bind(sockfd, (struct sockaddr *) &srv_addr,
 					sizeof(srv_addr)) < 0) {
 			perror(SELF ": bind()");
@@ -89,7 +112,7 @@ int main(int argc, char *argv[])
 		}
 		close(sockfd);
 	}
-	else { /* connect */
+	else /* if (con) */ { /* connect */
 		if (connect(sockfd, (struct sockaddr *)&srv_addr,
 					sizeof(srv_addr)) < 0) {
 			perror(SELF ": connect()");
@@ -104,7 +127,7 @@ int main(int argc, char *argv[])
 	dup2(connfd, 1);
 	close(connfd);
 
-	execvp(argv[3], argv+3);
+	execvp(argv[optind], argv+optind);
 
 	perror(SELF ": execvp()");
 	return 127;

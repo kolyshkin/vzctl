@@ -4,10 +4,11 @@ vznnc \- run a program connected to a socket
 .SH SYNOPSIS
 .SY vznnc
 {
-.BR l
+.B -l
 |
-.BR c
+.B -c
 }
+.B -p
 .I port
 .I program
 [\fIarg\fR \fI...\fR]
@@ -18,13 +19,13 @@ and stdout connected to the socket.
 
 .SH OPTIONS
 .TP
-.B l
+.B -l
 Listen on a specified TCP port at localhost.
 .TP
-.B c
+.B -c
 Connect to a specified TCP port at localhost.
 .TP
-.I port
+\fB-p\fR \fIport\fR
 Port number.
 .TP
 \fIprogram\fR [ \fIarg\fR \fI...\fR ]
