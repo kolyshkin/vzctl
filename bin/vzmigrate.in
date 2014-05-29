@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright (C) 2000-2014, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -390,8 +390,7 @@ ploop_copy() {
 	# Set up two-way channel for ploop copy with feedback
 	port=2335
 	$SSH_NOMUX -L localhost:$port:$host:$port root@$host \
-		"socat TCP-LISTEN:$port " \
-		"EXEC:ploop\ $VVVV\ copy\ -d\ $delta_dst\ -i0\ -f1" &
+		"vznnc l $port ploop $VVVV copy -d $delta_dst -i0 -f1" &
 	pid=$!
 	sleep 1
 
@@ -402,16 +401,12 @@ ploop_copy() {
 		return
 	fi
 
-	# FIXME bashism here! I would use socat, but can't find a way
-	# to check ploop copy exit status
-	exec 33<>/dev/tcp/localhost/$port
-	if ! ploop $VVVV copy -s $dev -F "$cmd 1>&2" -o33 -f33; then
+	if ! vznnc c $port ploop $VVVV copy -s $dev -F "$cmd 1>&2" -o1 -f0; then
 		log 0 "ploop copy -s $dev failed"
 		kill -TERM $pid 2>/dev/null
 		return 1
 	fi
 
-	exec 33>&- # close fd 33
 	return 0
 }
 
