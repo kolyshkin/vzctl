@@ -389,7 +389,8 @@ ploop_copy() {
 
 	# Set up two-way channel for ploop copy with feedback
 	port=2335
-	$SSH_NOMUX -L $port:$host:$port root@$host "socat TCP-LISTEN:$port " \
+	$SSH_NOMUX -L localhost:$port:$host:$port root@$host \
+		"socat TCP-LISTEN:$port " \
 		"EXEC:ploop\ $VVVV\ copy\ -d\ $delta_dst\ -i0\ -f1" &
 	pid=$!
 	sleep 1
