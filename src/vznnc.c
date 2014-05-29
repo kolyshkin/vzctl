@@ -41,10 +41,9 @@ void usage(void) {
 int main(int argc, char *argv[])
 {
 	int sockfd, connfd, port = -1;
-	socklen_t cl_len;
-	struct sockaddr_in srv_addr = {}, cl_addr = {};
+	struct sockaddr_in srv_addr = {};
 	int lis = 0, con = 0;
-	int yes = 1;
+	const int yes = 1;
 
 	while (1) {
 		int c;
@@ -96,6 +95,9 @@ int main(int argc, char *argv[])
 	srv_addr.sin_port = htons(port);
 
 	if (lis) { /* listen */
+		struct sockaddr_in cl_addr = {};
+		socklen_t cl_len = sizeof(cl_addr);
+
 		if (bind(sockfd, (struct sockaddr *) &srv_addr,
 					sizeof(srv_addr)) < 0) {
 			perror(SELF ": bind()");
@@ -104,7 +106,6 @@ int main(int argc, char *argv[])
 
 		listen(sockfd, 0);
 
-		cl_len = sizeof(cl_addr);
 		connfd = accept(sockfd, (struct sockaddr *)&cl_addr, &cl_len);
 		if (connfd < 0) {
 			perror(SELF ": accept()");
