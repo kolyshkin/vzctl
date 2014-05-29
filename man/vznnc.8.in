@@ -1,0 +1,46 @@
+.TH vznnc 8 "29 May 2014" "OpenVZ" "Containers"
+.SH NAME
+vznnc \- run a program connected to a socket
+.SH SYNOPSIS
+.SY vznnc
+{
+.BR l
+|
+.BR c
+}
+.I port
+.I program
+[\fIarg\fR \fI...\fR]
+.SH DESCRIPTION
+This "nano-netcat" utility can be used to either listen on or connect to
+a TCP port at localhost, and run a specified \fIprogram\fR with its stdin
+and stdout connected to the socket.
+
+.SH OPTIONS
+.TP
+.B l
+Listen on a specified TCP port at localhost.
+.TP
+.B c
+Connect to a specified TCP port at localhost.
+.TP
+.I port
+Port number.
+.TP
+\fIprogram\fR [ \fIarg\fR \fI...\fR ]
+Program to run, with optional arguments.
+.SH EXIT STATUS
+Returns \fIprogram\fR exit status upon success, or one of the following
+codes in case of an error:
+.IP 1
+Invalid usage
+.IP 127
+Error executing \fIprogram\fR.
+.IP 220
+Network-related error.
+.SH SEE ALSO
+.BR nc (3),
+.BR netcat (3),
+.BR socat (2).
+.SH LICENSE
+Copyright (C) 2014, Parallels, Inc. Licensed under GNU GPL v2.

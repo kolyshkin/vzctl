@@ -91,6 +91,7 @@ rm -rf %{buildroot}
 %{_sbindir}/vzcalc
 %{_sbindir}/vzcptcheck
 %{_sbindir}/vzfsync
+%{_sbindir}/vznnc
 %{_sbindir}/vzpid
 %{_sbindir}/vzcfgvalidate
 %{_sbindir}/vzmigrate
@@ -104,6 +105,7 @@ rm -rf %{buildroot}
 %{_mandir}/man8/vzmigrate.8.*
 %{_mandir}/man8/vzcptcheck.8.*
 %{_mandir}/man8/vzfsync.8.*
+%{_mandir}/man8/vznnc.8.*
 %{_mandir}/man8/vzsplit.8.*
 %{_mandir}/man8/vzcfgvalidate.8.*
 %{_mandir}/man8/vzmemcheck.8.*

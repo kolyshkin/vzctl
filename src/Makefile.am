@@ -35,6 +35,7 @@ sbin_PROGRAMS = arpsend \
                 vzcptcheck \
                 vzctl \
                 vzfsync \
+                vznnc \
                 vzlist \
                 vzmemcheck \
                 vzsplit \
@@ -43,6 +44,8 @@ sbin_PROGRAMS = arpsend \
 VZCTL_LIBS = lib/libvzctl.la
 
 vzfsync_SOURCES = vzfsync.c
+
+vznnc_SOURCES = vznnc.c
 
 arpsend_SOURCES = arpsend.c
 

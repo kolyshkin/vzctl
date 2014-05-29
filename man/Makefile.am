@@ -29,6 +29,7 @@ man_MANS = \
  vzmigrate.8 \
  vzcptcheck.8 \
  vzfsync.8 \
+ vznnc.8 \
  vztmpl-dl.8 \
  arpsend.8 \
  ndsend.8 \
