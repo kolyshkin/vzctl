@@ -104,7 +104,10 @@ int main(int argc, char *argv[])
 			return FAIL;
 		}
 
-		listen(sockfd, 0);
+		if (listen(sockfd, 0) < 0) {
+			perror(SELF ": listen()");
+			return FAIL;
+		}
 
 		connfd = accept(sockfd, (struct sockaddr *)&cl_addr, &cl_len);
 		if (connfd < 0) {
