@@ -118,6 +118,11 @@ int main(int argc, char *argv[])
 		usage();
 	}
 
+	if (port < 0) {
+		fprintf(stderr, SELF ": option -p is required\n");
+		usage();
+	}
+
 	if (argc - optind < 1)
 		usage();
 
