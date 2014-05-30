@@ -10,6 +10,7 @@ vznnc \- run a program connected to a socket
 }
 .B -p
 .I port
+.OP --
 .I program
 [\fIarg\fR \fI...\fR]
 .SH DESCRIPTION
@@ -27,6 +28,19 @@ Connect to a specified TCP port at localhost.
 .TP
 \fB-p\fR \fIport\fR
 Port number.
+.TP
+.B --
+This is a separator between
+.B vznnc
+own arguments and
+.I program
+arguments, so that latter won't be processed by
+.BR vznnc .
+It is required in case there are any arguments to
+.I program
+that start with the dash
+.RB ( - )
+character, and is optional otherwise.
 .TP
 \fIprogram\fR [ \fIarg\fR \fI...\fR ]
 Program to run, with optional arguments.
