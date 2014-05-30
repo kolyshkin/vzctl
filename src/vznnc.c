@@ -34,7 +34,8 @@
 #define SELF "vznnc"
 
 void usage(void) {
-	fprintf(stderr, "Usage: " SELF " {-l|-c} -p PORT CMD [arg ...]\n");
+	fprintf(stderr,
+		"Usage: " SELF " {-l|-c} -p PORT [-f FD] CMD [arg ...]\n");
 
 	exit(1);
 }
@@ -84,13 +85,13 @@ int main(int argc, char *argv[])
 {
 	int sockfd, connfd, port = -1;
 	struct sockaddr_in srv_addr = {};
-	int lis = 0, con = 0;
+	int lis = 0, con = 0, fd = -1;
 	const int yes = 1;
 
 	while (1) {
 		int c;
 
-		c = getopt(argc, argv, "lcp:");
+		c = getopt(argc, argv, "lcp:f:");
 		if (c == -1)
 			break;
 		switch (c) {
@@ -102,6 +103,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'p':
 				port = atoi(optarg);
+				break;
+			case 'f':
+				fd = atoi(optarg);
 				break;
 			default:
 				usage();
@@ -165,6 +169,7 @@ int main(int argc, char *argv[])
 			return FAIL;
 		}
 		close(sockfd);
+		sockfd = -1;
 	}
 	else /* if (con) */ { /* connect */
 		if (connect(sockfd, (struct sockaddr *)&srv_addr,
@@ -175,11 +180,24 @@ int main(int argc, char *argv[])
 		connfd = sockfd;
 	}
 
-	close(0);
-	close(1);
-	dup2(connfd, 0);
-	dup2(connfd, 1);
-	close(connfd);
+	if (fd < 0) {
+		/* redirect stdin/stdout */
+		close(0);
+		close(1);
+		dup2(connfd, 0);
+		dup2(connfd, 1);
+		close(connfd);
+	}
+	else {
+		if (fd != connfd) {
+			close(fd); /* just in case */
+			if (dup2(connfd, fd) != fd) {
+				perror(SELF ": dup2()");
+				return FAIL;
+			}
+			close(connfd);
+		}
+	}
 
 	execvp(argv[optind], argv+optind);
 

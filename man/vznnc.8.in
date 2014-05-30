@@ -10,13 +10,14 @@ vznnc \- run a program connected to a socket
 }
 .B -p
 .I port
+.OP -f fd
 .OP --
 .I program
 [\fIarg\fR \fI...\fR]
 .SH DESCRIPTION
 This "nano-netcat" utility can be used to either listen on or connect to
 a TCP port at localhost, and run a specified \fIprogram\fR with its stdin
-and stdout connected to the socket.
+and stdout (or a specified file descriptor) connected to the socket.
 
 .SH OPTIONS
 .TP
@@ -28,6 +29,11 @@ Connect to a specified TCP port at localhost.
 .TP
 \fB-p\fR \fIport\fR
 Port number.
+.TP
+\fB-f\fR \fIfd\fR
+File descriptor ID. If this option is not set, stdin and stdout are closed
+and are connected to the socket, otherwise they are left intact, and the
+specified \fIfd\fR is used.
 .TP
 .B --
 This is a separator between
@@ -63,6 +69,13 @@ command on a remote server, using openssh port forwarding:
  ssh -L localhost:$PORT:localhost:$PORT $REMOTE_SERVER \\
 	vznnc -l -p $PORT -- ploop copy -d $FILE -i0 -o1
 .EE
+
+To do the same, but with stdin and stdout intact, using file descriptor 5
+for communication:
+
+.EX
+ ssh -L localhost:$PORT:localhost:$PORT $REMOTE_SERVER \\
+	vznnc -l -p $PORT -f 5 -- ploop copy -d $FILE -i5 -o5
 .SH SEE ALSO
 .BR nc (3),
 .BR netcat (3),
