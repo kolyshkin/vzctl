@@ -397,7 +397,7 @@ ploop_copy() {
 	sleep 1
 
 	# check if ssh is still there
-	if ! kill -0 $pid; then
+	if ! kill -0 $pid 2>/dev/null; then
 		log 0 "Failed to setup remote ploop copy"
 		ploop_copy_old
 		return
