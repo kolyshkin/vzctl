@@ -53,6 +53,16 @@ Invalid usage
 Error executing \fIprogram\fR.
 .IP 220
 Network-related error.
+.SH EXAMPLES
+To run receiving side of
+.B ploop copy
+command on a remote server, using openssh port forwarding:
+
+.EX
+ PORT=2345
+ ssh -L localhost:$PORT:localhost:$PORT $REMOTE_SERVER \\
+	vznnc -l -p $PORT -- ploop copy -d $FILE -i0 -o1
+.EE
 .SH SEE ALSO
 .BR nc (3),
 .BR netcat (3),
