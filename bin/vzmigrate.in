@@ -474,7 +474,7 @@ parse_nodeps() {
 	local opt arg args
 
 	opt=$1
-	args=$(echo $2 | sed 's/,/ /g')
+	args=$(echo $2 | sed -e 's/^=//' -e 's/,/ /g')
 
 	if [ -z "$args" ]; then
 		ignore_cpu=1
@@ -503,22 +503,23 @@ parse_nodeps() {
 
 [ $# = 0 ] && usage
 
-while [ ! -z "$1" ]; do
+OPTS=$(getopt -n 'vzmigrate' -o vr:csf::th \
+	--longoptions live,online,remove-area:,keep-dst \
+	--longoptions compact,snapshot,check-only,dry-run \
+	--longoptions nodeps::,ssh:,rsync:,times,ssh-mux,help,usage \
+	-- "$@")
+
+[ $? -eq 0 ] || bad_usage
+
+eval set -- "$OPTS"
+
+while true; do
 	case "$1" in
 	--live|--online)
 		online=1
 		;;
 	-v)
 		verbose=$((verbose+1)) # can just be 'let verbose++' in bash
-		;;
-	-vv)
-		verbose=$((verbose+2))
-		;;
-	-vvv)
-		verbose=$((verbose+3))
-		;;
-	-vvvv)
-		verbose=$((verbose+4))
 		;;
 	--remove-area|-r)
 		opt=$1
@@ -545,19 +546,17 @@ while [ ! -z "$1" ]; do
 		;;
 	-f|--nodeps)
 		opt=$1
-		parse_nodeps $opt ""
+		shift
+		parse_nodeps $opt $1
 		;;
-	-f=*|--nodeps=*)
-		opt=$(echo $1 | sed -e 's/=.*$//g')
-		arg=$(echo $1 | sed -e 's/^.*=//g')
-		parse_nodeps $opt $arg
-		;;
-	--ssh=*)
-		SSH_OPTIONS="$SSH_OPTIONS $(echo $1 | cut -c7-)"
+	--ssh)
+		shift
+		SSH_OPTIONS="$SSH_OPTIONS $1"
 		SCP_OPTIONS="`echo $SSH_OPTIONS | sed 's/-p/-P/1'`"
 		;;
-	--rsync=*)
-		RSYNC_OPTIONS="$RSYNC_OPTIONS $(echo $1 | cut -c9-)"
+	--rsync)
+		shift
+		RSYNC_OPTIONS="$RSYNC_OPTIONS $1"
 		;;
 	--times|-t)
 		times=1
@@ -568,8 +567,12 @@ while [ ! -z "$1" ]; do
 	-h|--help|--usage)
 		usage
 		;;
-	*)
+	--)
+		shift
 		break
+		;;
+	*)
+		bad_usage ": unknown option $1"
 		;;
 	esac
 	shift
