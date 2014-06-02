@@ -204,7 +204,7 @@ lock_ct() {
 	else
 		pid=$(cat $f)
 		log 0 "CT $1 already locked by PID $pid" 1>&2
-		logexec 1 ps -f -p $pid
+		test -n "$pid" && logexec 1 ps -f -p $pid
 		ret=1
 	fi
 
