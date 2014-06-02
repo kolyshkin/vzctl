@@ -470,6 +470,37 @@ check_cpt_props() {
 	fi
 }
 
+parse_nodeps() {
+	local opt arg args
+
+	opt=$1
+	args=$(echo $2 | sed 's/,/ /g')
+
+	if [ -z "$args" ]; then
+		ignore_cpu=1
+		ignore_ipv6=1
+		return
+	fi
+
+	for arg in $args; do
+		case $arg in
+			cpu|cpu_check)
+				ignore_cpu=1
+				;;
+			ipv6)
+				ignore_ipv6=1
+				;;
+			all)
+				ignore_cpu=1
+				ignore_ipv6=1
+				;;
+			*)
+				bad_usage ": unknown $opt argument: $arg"
+				;;
+		esac
+	done
+}
+
 [ $# = 0 ] && usage
 
 while [ ! -z "$1" ]; do
@@ -513,28 +544,13 @@ while [ ! -z "$1" ]; do
 		check_only=1
 		;;
 	-f|--nodeps)
-		ignore_cpu=1
-		ignore_ipv6=1
+		opt=$1
+		parse_nodeps $opt ""
 		;;
 	-f=*|--nodeps=*)
 		opt=$(echo $1 | sed -e 's/=.*$//g')
-		for arg in $(echo $1 | sed -e 's/^.*=//g' -e 's/,/ /g'); do
-			case $arg in
-			    cpu|cpu_check)
-				ignore_cpu=1
-				;;
-			    ipv6)
-				ignore_ipv6=1
-				;;
-			    all)
-				ignore_cpu=1
-				ignore_ipv6=1
-				;;
-			    *)
-				bad_usage ": unknown $opt argument: $arg"
-				;;
-			esac
-		done
+		arg=$(echo $1 | sed -e 's/^.*=//g')
+		parse_nodeps $opt $arg
 		;;
 	--ssh=*)
 		SSH_OPTIONS="$SSH_OPTIONS $(echo $1 | cut -c7-)"
