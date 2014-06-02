@@ -19,7 +19,7 @@ vzmigrate \- migrate a container between two OpenVZ servers
 .OP -v
 .I destination_address CTID
 .SY vzmigrate
-.BR -h | --help | --usage | -?
+.BR -h | --help | --usage
 .YS
 .SH DESCRIPTION
 This utility is used to migrate a container from one (source) Hardware Node (HN)
@@ -109,7 +109,7 @@ its progress. Note that \fB-v\fR automatically implies \fB-t\fR.
 Multiple \fB-v\fR options increase the verbosity.
 
 .TP
-.BR -h | --help | --usage | -?
+.BR -h | --help | --usage
 Print usage info and exit.
 
 .SH EXAMPLES

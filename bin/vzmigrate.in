@@ -565,7 +565,7 @@ while [ ! -z "$1" ]; do
 	--ssh-mux)
 		ssh_mux=1
 		;;
-	-h|--help|--usage|-?)
+	-h|--help|--usage)
 		usage
 		;;
 	*)
