@@ -196,14 +196,14 @@ lock_ct() {
 
 	set -C # noclobber, i.e. open with O_EXCL
 	if echo $$ > $f; then
-		log 1 "Locked CT $1"
+		log 1 "Locked CT $VEID"
 		ret=0
 	elif ! test -f $f; then
-		log 0 "Can't lock CT"
+		log 0 "Can't lock CT $VEID"
 		exit 1
 	else
 		pid=$(cat $f)
-		log 0 "CT $1 already locked by PID $pid" 1>&2
+		log 0 "CT $VEID already locked by PID $pid" 1>&2
 		test -n "$pid" && logexec 1 ps -f -p $pid
 		ret=1
 	fi
