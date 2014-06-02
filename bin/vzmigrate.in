@@ -140,7 +140,7 @@ EOF
 
 bad_usage() {
 	cat << EOF 2>&1
-Invalid usage: $*
+Invalid usage$*
 
 For command line syntax, please check
   vzmigrate --help
@@ -497,7 +497,7 @@ while [ ! -z "$1" ]; do
 		elif [ "$1" = "no" ]; then
 			remove_area=0
 		else
-			bad_usage "Bad argument for $opt: $1"
+			bad_usage ": bad argument for $opt: $1"
 		fi
 		;;
 	--keep-dst)
@@ -531,7 +531,7 @@ while [ ! -z "$1" ]; do
 				ignore_ipv6=1
 				;;
 			    *)
-				bad_usage "unknown $opt argument: $arg"
+				bad_usage ": unknown $opt argument: $arg"
 				;;
 			esac
 		done
@@ -578,14 +578,14 @@ if [ $verbose -gt 3 ]; then
 	SCP_OPTIONS="$SCP_OPTIONS -v"
 fi
 
-[ $# -lt 2 ] && bad_usage "not enough parameters"
+[ $# -lt 2 ] && bad_usage ": not enough parameters"
 
 host=$1
 shift
 VEID=$1
 shift
 
-[ $# -gt 0 ] && bad_usage "too many parameters"
+[ $# -gt 0 ] && bad_usage ": too many parameters"
 
 # Support CT names as well
 if echo $VEID | egrep -qv '^[[:digit:]]+$'; then
