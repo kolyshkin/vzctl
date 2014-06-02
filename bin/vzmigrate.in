@@ -579,13 +579,12 @@ if [ $verbose -gt 3 ]; then
 fi
 
 [ $# -lt 2 ] && bad_usage ": not enough parameters"
+[ $# -gt 2 ] && bad_usage ": too many parameters: $@"
 
 host=$1
 shift
 VEID=$1
 shift
-
-[ $# -gt 0 ] && bad_usage ": too many parameters"
 
 # Support CT names as well
 if echo $VEID | egrep -qv '^[[:digit:]]+$'; then
