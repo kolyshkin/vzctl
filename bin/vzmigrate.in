@@ -198,6 +198,9 @@ lock_ct() {
 	if echo $$ > $f; then
 		log 1 "Locked CT $1"
 		ret=0
+	elif ! test -f $f; then
+		log 0 "Can't lock CT"
+		exit 1
 	else
 		pid=$(cat $f)
 		log 0 "CT $1 already locked by PID $pid" 1>&2
