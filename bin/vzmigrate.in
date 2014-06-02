@@ -200,7 +200,7 @@ lock_ct() {
 		ret=0
 	else
 		pid=$(cat $f)
-		log 0 "ERROR: CT $1 already locked by PID $pid" 1>&2
+		log 0 "CT $1 already locked by PID $pid" 1>&2
 		logexec 1 ps -f -p $pid
 		ret=1
 	fi
@@ -221,7 +221,7 @@ undo_lock() {
 	f=/vz/lock/$VEID.lck
 	pid=$(cat $f)
 	if [ $pid -ne $$ ] ; then
-		log 0 "Error: unexpected PID $pid in $f (expecting $$)"
+		log 0 "unexpected PID $pid in $f (expecting $$)"
 	else
 		rm -f $f
 	fi
@@ -448,7 +448,7 @@ check_cpt_props() {
 	if [ $? -ne 0 -o "$version" = "" ]; then
 		log 1 "Warning: can't get local CPT version, skipping check"
 	elif ! logexec 1 $SSH root@$host vzcptcheck version $version; then
-		log 0 "Error: CPT version check failed on destination node!"
+		log 0 "CPT version check failed on destination node!"
 		log 0 "Destination node kernel is too old, please upgrade"
 		log 0 "Can't continue live migration"
 		exit $MIG_ERR_UNSUP_CPT_VER
@@ -459,7 +459,7 @@ check_cpt_props() {
 	if [ $? -ne 0 -o "$CPU_CAPS" = "" ]; then
 		log 1 "Warning: can't get remote CPU caps, skipping check"
 	elif ! logexec 1 vzcptcheck caps $VEID $CPU_CAPS; then
-		log 0 "Error: CPU capabilities check failed!"
+		log 0 "CPU capabilities check failed!"
 		log 0 "Destination node CPU is not compatible"
 		if [ $ignore_cpu -eq 1 ]; then
 			ignore_msg
