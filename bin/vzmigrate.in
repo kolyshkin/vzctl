@@ -90,7 +90,7 @@ Options:
 	connection to destination host. Please be careful with options
 	passed, DO NOT pass destination hostname.
 --ssh-mux
-	Use ssh connection multiplexion (speeds up live migration).
+	Use ssh connection multiplexing (speeds up live migration).
 --rsync=<rsync options>
 	Additional options that will be passed to rsync.
 --keep-dst
