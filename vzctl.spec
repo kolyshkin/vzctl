@@ -174,6 +174,8 @@ EOF
 	if /sbin/iptables -S -t nat | grep -qEw 'SNAT|DNAT|MASQUERADE'; then
 		# conntracks are used
 		disable=0
+	elif /sbin/iptables -S | grep -qEw 'state (RELATED|ESTABLISHED)'; then
+		disable=0
 	else
 		disable=1
 		cat << EOF
