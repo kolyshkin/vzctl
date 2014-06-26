@@ -516,6 +516,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 	int ret;
 	const char *private	= g_p->res.fs.private;
 	const char *root	= g_p->res.fs.root;
+	char *path = ENV_PATH;
 	char fname[PATH_MAX];
 
 	if (check_var(root, "VE_ROOT is not set"))
@@ -550,6 +551,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 		return VZ_RESOURCE_ERROR;
 	}
 	logger(1, 0, "Executing %s", cmd);
+	putenv(path);
 	ret = system(cmd);
 	free(cmd);
 
