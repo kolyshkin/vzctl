@@ -6,7 +6,7 @@
 .ne (2v + 1u)
 .if \\n[.$] \&\\$*
 ..
-.TH vzctl 8 "1 Oct 2013" "OpenVZ" "Containers"
+.TH vzctl 8 "3 Jul 2014" "OpenVZ" "Containers"
 .SH NAME
 vzctl \- perform various operations on an OpenVZ container
 .SH SYNOPSIS
@@ -700,19 +700,25 @@ Default is \fBprivvmpages:1\fR.
 Restrict access to netfilter/iptables modules for a container.
 This option replaces obsoleted \fB--iptables\fR.
 
-The following arguments can be used:
-.br
- \(bu \fBdisabled\fR -- no iptables allowed
-.br
- \(bu \fBstateless\fR -- everything but conntracks and
-NAT is allowed (i.e. filter and mangle)
-.br
- \(bu\ \fBstateful\fR -- everything but NAT is allowed
-.br
- \(bu\ \fBfull\fR -- all netfilter functionality
-
 Note that changing this parameter requires container
 restart, so consider using \fB--setmode\fR option.
+
+The following arguments can be used:
+.RS
+.TP
+.B \(bu disabled
+no modules are allowed
+.TP
+.B \(bu stateless
+all modules except NAT and conntracks
+are allowed (i.e. filter and mangle); this is the default
+.TP
+.B \(bu stateful
+all modules except NAT are allowed
+.TP
+.B \(bu full
+all modules are allowed
+.RE
 .TP
 \fB--iptables\fR \fIname\fR[\fB,\fR...]
 .B Note
