@@ -123,22 +123,31 @@ _sc()
 
 set_file_caps()
 {
+	local rhel7
+	local f15	# or greater
+	local f18	# or greater
+
 	# openSUSE 13.1+
 	if grep -qw 'opensuse:13' ${VE_ROOT}/etc/os-release 2>/dev/null; then
 		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
 	fi
 
-	# Fedora 15+
-	grep -qEw '1[5-9]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
+	rhel7=$(grep 'release 7' ${VE_ROOT}/etc/redhat-release 2>/dev/null)
+	f15=$(grep -Ew '1[5-9]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null)
+	f18=$(grep -Ew '1[89]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null)
 
-	_sc 0sAQAAAgkAAAAAAAAAAAAAAAAAAAA= /usr/libexec/pt_chown
-	_sc 0sAQAAAsIAAAAAAAAAAAAAAAAAAAA= /usr/sbin/suexec
-	_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
+	# Fedora 15+/RHEL7
+	if [ -n "$rhel7" -o -n "$f15" ]; then
+		_sc 0sAQAAAgkAAAAAAAAAAAAAAAAAAAA= /usr/libexec/pt_chown
+		_sc 0sAQAAAsIAAAAAAAAAAAAAAAAAAAA= /usr/sbin/suexec
+		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
+	fi
 
-	# Fedora 18+
-	grep -qEw '1[89]|2[0-9]' ${VE_ROOT}/etc/fedora-release 2>/dev/null || return
-	_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /usr/sbin/arping /usr/sbin/clockdiff
-	_sc 0sAQAAAgIACAAAAAAAAAAAAAAAAAA= /usr/bin/systemd-detect-virt
+	# Fedora 18+/RHEL7
+	if [ -n "$rhel7" -o -n "$f18" ]; then
+		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /usr/sbin/arping /usr/sbin/clockdiff
+		_sc 0sAQAAAgIACAAAAAAAAAAAAAAAAAA= /usr/bin/systemd-detect-virt
+	fi
 }
 
 [ -z "${VE_ROOT}" ] && exit 1
