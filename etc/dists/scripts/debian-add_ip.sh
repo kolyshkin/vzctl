@@ -23,6 +23,8 @@ LOOPBACK=lo
 CFGFILE=/etc/network/interfaces
 HOSTFILE=/etc/hosts
 
+need_restart=
+
 fix_networking_conf()
 {
 	local cfg="/etc/init/networking.conf"
@@ -127,6 +129,7 @@ iface ${VENET_DEV}:${ifnum} inet static
 
 	else
 	    sed -i -e "s/iface ${VENET_DEV} inet6 manual/iface ${VENET_DEV} inet6 manual\n\tup ifconfig ${VENET_DEV} add ${ip}\/${mask}\n\tdown ifconfig ${VENET_DEV} del ${ip}\/${mask}/" ${CFGFILE}.bak
+	    need_restart=yes
 	fi
 
 }
@@ -198,11 +201,8 @@ add_ip()
 		mv -f ${CFGFILE}.bak ${CFGFILE}
 	fi
 	if [ "x${VE_STATE}" = "xrunning" ]; then
-		if [ -x /usr/sbin/invoke-rc.d ] ; then
-			/usr/sbin/invoke-rc.d networking restart > /dev/null 2>&1
-		else
-			/etc/init.d/networking restart > /dev/null 2>&1
-		fi
+		[ -n "${need_restart}" ] && /sbin/ifdown venet0 2>/dev/null
+		/sbin/ifup -a --force 2>/dev/null
 	fi
 }
 
