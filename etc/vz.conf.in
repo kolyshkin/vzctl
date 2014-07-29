@@ -54,7 +54,7 @@ LOCAL_GID=100000
 VZWDOG="no"
 
 ## WARNING: IPTABLES parameter is deprecated,
-## use per-сontainer (not global!) NETFILTER instead
+## use per-container (not global!) NETFILTER instead
 
 ## iptables kernel modules to be loaded by init.d/vz script
 IPTABLES_MODULES="ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length ip6_tables ip6table_filter ip6table_mangle ip6t_REJECT"
