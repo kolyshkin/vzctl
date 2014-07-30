@@ -381,6 +381,9 @@ ploop_copy() {
 		test -n "$size" && cat="pv -s $size"
 	fi
 
+	# Remove top delta on dst
+	$SSH "root@$host" rm -f $delta_dst
+
 	# Check if remote side supports ploop copy with feedback
 	err=$($SSH "root@$host" ploop copy -i0 -f1 -d /dev/null \
 			</dev/null >/dev/null 2>&1; echo $?)
@@ -913,7 +916,7 @@ if [ "$PLOOP" = "yes" -a "$state" = "running" ]; then
 		undo_root
 		exit $MIG_ERR_COPY
 	fi
-	RSYNC1_OPTIONS="--exclude $TOP_DELTA --delete-excluded"
+	RSYNC1_OPTIONS="--exclude $TOP_DELTA"
 fi
 
 log 1 "Syncing private"
