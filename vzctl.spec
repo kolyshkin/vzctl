@@ -28,8 +28,8 @@ Requires: fileutils
 Requires: vzctl-core = %{version}-%{release}
 Requires: tar
 Requires: vzstats
-Conflicts: ploop-lib < 1.8-1
-BuildRequires: ploop-devel >= 1.8-1
+Conflicts: ploop-lib < 1.12-1
+BuildRequires: ploop-devel >= 1.12-1
 BuildRequires: libxml2-devel >= 2.6.16
 BuildRequires: libcgroup-devel >= 0.37
 # requires for vzmigrate purposes

@@ -275,6 +275,26 @@ int vzctl_create_image(const char *ve_private,
 	 * set to 16384, i.e. one inode per 16K disk space.
 	 */
 	size_by_inodes = param->inodes * 16;
+	if (ploop.get_max_size) { /* available since ploop 1.12 */
+		unsigned long long max;
+
+		if (ploop.get_max_size(0, &max)) {
+			logger(-1, 0, "Error in ploop_get_max_size()");
+			return VZ_SYSTEM_ERROR;
+		}
+		max /= 2; /* sectors to KB */
+
+		if (size_by_inodes > max) {
+			logger(-1, 0, "Error: diskinodes value specified "
+					"(%lu) is too high.\n"
+					"Maximum allowed diskinodes value "
+					"is %llu.",
+					param->inodes,
+					max / 16);
+			return VZ_INVALID_PARAMETER_VALUE;
+
+		}
+	}
 	create_param.mode = param->mode;
 	create_param.fstype = DEFAULT_FSTYPE;
 	/* KB to 512b sector conversion */
