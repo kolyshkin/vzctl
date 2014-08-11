@@ -547,6 +547,10 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 		if ((!strcmp(ep->d_name, "user")))
 			continue;
 
+		/* Done later */
+		if ((!strcmp(ep->d_name, "mnt")))
+			continue;
+
 		if (snprintf(path, sizeof(path), "/proc/%d/ns/%s", task_pid, ep->d_name) < 0)
 			goto out;
 		if ((fd = open(path, O_RDONLY)) < 0)
@@ -554,9 +558,15 @@ static int ct_enter(vps_handler *h, envid_t veid, const char *root, int flags)
 		if (setns(fd, 0))
 			logger(-1, errno, "Failed to set context for %s", ep->d_name);
 		close(fd);
-
-		if (!strcmp(ep->d_name, "mnt"))
-			joined_mnt_ns = true;
+	}
+	/* Join mount ns */
+	if (snprintf(path, sizeof(path), "/proc/%d/ns/mnt", task_pid) < 0)
+		goto out;
+	if ((fd = open(path, O_RDONLY)) >= 0) {
+		if (setns(fd, 0))
+			logger(-1, errno, "Failed to set context for mnt");
+		close(fd);
+		joined_mnt_ns = true;
 	}
 
 	/*
