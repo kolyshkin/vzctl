@@ -190,6 +190,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	char fname[PATH_MAX];
 	char snap_xml_tmp[PATH_MAX];
 	char ve_conf_tmp[PATH_MAX] = "";
+	char ve_conf_old[PATH_MAX] = "";
 	char dumpfile[PATH_MAX];
 	char guid_buf[39];
 	const char *guid_tmp = NULL;
@@ -290,6 +291,9 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	if (ve_conf_tmp[0] != '\0') {
 		get_vps_conf_path(veid, fname, sizeof(fname));
+		strncpy(ve_conf_old, fname, sizeof(ve_conf_old - 4));
+		strcat(ve_conf_old, ".old");
+		cp_file(ve_conf_old, fname);
 		if (rename(ve_conf_tmp, fname))
 			logger(-1, errno, "Failed to rename %s -> %s",
 					ve_conf_tmp, fname);
@@ -314,7 +318,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			if (param->flags & SNAPSHOT_MUST_RESUME) {
 				logger(-1, 0, "Error: failed to resume CT");
 				free_vps_param(vps_p);
-				goto err3;
+				goto err4;
 			}
 			else {
 				/* no rollback, ignore restore error */
@@ -337,6 +341,15 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			"to another snapshot");
 	ret = 0;
 	goto out;
+
+err4:
+	/* Restore config */
+	if (ve_conf_old[0] != '\0') {
+		get_vps_conf_path(veid, fname, sizeof(fname));
+		if (rename(ve_conf_old, fname))
+			logger(-1, errno, "Failed to rename %s to %s",
+					ve_conf_old, fname);
+	}
 
 err3:
 	if (guid_tmp != NULL) {
