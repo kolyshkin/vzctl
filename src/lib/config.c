@@ -2364,6 +2364,9 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 	case PARAM_SNAPSHOT_SKIP_RESUME:
 		vps_p->snap.flags |= SNAPSHOT_SKIP_RESUME;
 		break;
+	case PARAM_SNAPSHOT_MUST_RESUME:
+		vps_p->snap.flags |= SNAPSHOT_MUST_RESUME;
+		break;
 	case PARAM_SNAPSHOT_MOUNT_TARGET:
 		ret = conf_parse_str(&vps_p->snap.target, val);
 		break;

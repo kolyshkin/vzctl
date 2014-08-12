@@ -150,6 +150,7 @@ struct vzctl_snapshot_param {
 #define SNAPSHOT_SKIP_SUSPEND	1 << 1
 #define SNAPSHOT_SKIP_CONFIG	1 << 2
 #define SNAPSHOT_SKIP_RESUME	1 << 3
+#define SNAPSHOT_MUST_RESUME	1 << 4
 	int flags;
 	char *target;	/* snapshot mount point */
 };

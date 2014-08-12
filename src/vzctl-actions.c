@@ -772,6 +772,7 @@ static int parse_snapshot_switch_opt(envid_t veid, int argc, char **argv,
 	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
 	{"skip-resume", no_argument, NULL, PARAM_SNAPSHOT_SKIP_RESUME},
 	{"skip-config", no_argument, NULL, PARAM_SNAPSHOT_SKIP_CONFIG},
+	{"must-resume",	no_argument, NULL, PARAM_SNAPSHOT_MUST_RESUME},
 	{ NULL, 0, NULL, 0 }
 	};
 
@@ -781,9 +782,17 @@ static int parse_snapshot_switch_opt(envid_t veid, int argc, char **argv,
 	ret = parse_opt(veid, argc, argv, opt, snapshot_switch_options, param);
 	free(opt);
 
-	if (ret == 0 && param->snap.guid == NULL)
-		return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
-			"Invalid syntax: snapshot id is missing");
+	if (ret == 0) {
+	       if (param->snap.guid == NULL)
+		       return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+				"Invalid syntax: snapshot id is missing");
+
+	       if ((param->snap.flags & SNAPSHOT_SKIP_RESUME) &&
+		   (param->snap.flags & SNAPSHOT_MUST_RESUME))
+		       return vzctl_err(VZ_INVALID_PARAMETER_SYNTAX, 0,
+				"Invalid syntax: --skip-resume and "
+				"--must-resume can not be used together");
+	}
 
 	return ret;
 }

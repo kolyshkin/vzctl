@@ -223,6 +223,15 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		logger(-1, 0, "Failed to read %s", fname);
 		goto err;
 	}
+
+	vzctl_get_snapshot_dumpfile(fs->private, guid,
+			dumpfile, sizeof(dumpfile));
+
+	if ((param->flags & SNAPSHOT_MUST_RESUME) && stat_file(dumpfile) != 1) {
+		logger(-1, 0, "Error: no dump in snapshot, unable to resume");
+		goto err;
+	}
+
 	logger(0, 0, "Switching to snapshot %s", guid);
 	vzctl_snapshot_tree_set_current(tree, guid);
 	GET_SNAPSHOT_XML_TMP(snap_xml_tmp, fs->private);
@@ -285,20 +294,36 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 			logger(-1, errno, "Failed to rename %s -> %s",
 					ve_conf_tmp, fname);
 	}
-	/* resume CT in case dump file exists (no rollback, ignore error) */
-	vzctl_get_snapshot_dumpfile(fs->private, guid, dumpfile, sizeof(dumpfile));
+	/* resume CT in case dump file exists */
 	if (stat_file(dumpfile) == 1 &&	!(param->flags & SNAPSHOT_SKIP_RESUME)) {
-		vps_param *param;
+		vps_param *vps_p;
 
-		param = reread_vps_config(veid);
-		if (param && g_p->res.net.skip_arpdetect)
-			param->res.net.skip_arpdetect =
+		vps_p = reread_vps_config(veid);
+		if (vps_p && g_p->res.net.skip_arpdetect)
+			vps_p->res.net.skip_arpdetect =
 				g_p->res.net.skip_arpdetect;
 		cpt.dumpfile = dumpfile;
-		if (vps_restore(h, veid, (param) ? param : g_p,
-					CMD_RESTORE, &cpt, SKIP_DUMPFILE_UNLINK))
-			logger(-1, 0, "Failed to resume Container");
-		free_vps_param(param);
+		if (vps_restore(h, veid, (vps_p) ? vps_p : g_p,
+					CMD_RESTORE, &cpt, SKIP_DUMPFILE_UNLINK)) {
+			/*
+			 * We have switched to a new snapshot, but
+			 * the restore from a dump file failed.
+			 * Treat it either as a warning or an error,
+			 * depending on the --must-resume flag being set.
+			 */
+			if (param->flags & SNAPSHOT_MUST_RESUME) {
+				logger(-1, 0, "Error: failed to resume CT");
+				free_vps_param(vps_p);
+				goto err3;
+			}
+			else {
+				/* no rollback, ignore restore error */
+				logger(0, 0, "Warning: failed to resume CT, "
+					"ignoring (use --must-resume "
+					"to treat as error)");
+			}
+		}
+		free_vps_param(vps_p);
 	}
 	GET_SNAPSHOT_XML(fname, fs->private);
 	if (rename(snap_xml_tmp, fname))
