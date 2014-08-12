@@ -348,7 +348,7 @@ err3:
 
 err2:
 	if (run && cpt_cmd(h, veid, fs->root, CMD_CHKPNT, CMD_RESUME, 0))
-		logger(-1, 0, "Failed to resume Container on error");
+		logger(-1, 0, "Failed to resume container during rollback");
 
 err1:
 	unlink(snap_xml_tmp);
