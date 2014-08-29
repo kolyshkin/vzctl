@@ -457,6 +457,7 @@ check_cpt_props() {
 		log 0 "CPT version check failed on destination node!"
 		log 0 "Destination node kernel is too old, please upgrade"
 		log 0 "Can't continue live migration"
+		undo_lock
 		exit $MIG_ERR_UNSUP_CPT_VER
 	fi
 
@@ -471,6 +472,7 @@ check_cpt_props() {
 			ignore_msg
 		else
 			log 0 "Can't continue live migration"
+			undo_lock
 			exit $MIG_ERR_UNSUP_CPU
 		fi
 	fi
