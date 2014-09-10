@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # In case of a fresh git checkout, prepare the sources
-test -f ./configure || ./autogen.sh
-test -f Makefile || ./configure
+test -f ./configure || ./autogen.sh || exit 1
+test -f Makefile || ./configure || exit 1
 
 OPTS=$(getopt -o biUFvof --long \
 	build,install,update,freshen,verbose,oldpackage \
