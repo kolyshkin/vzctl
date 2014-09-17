@@ -139,7 +139,7 @@ set_file_caps()
 	# Fedora 15+/RHEL7
 	if [ -n "$rhel7" -o -n "$f15" ]; then
 		_sc 0sAQAAAgkAAAAAAAAAAAAAAAAAAAA= /usr/libexec/pt_chown
-		_sc 0sAQAAAsIAAAAAAAAAAAAAAAAAAAA= /usr/sbin/suexec
+		_sc 0sAQAAAsAAAAAAAAAAAAAAAAAAAAA= /usr/sbin/suexec
 		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
 	fi
 
