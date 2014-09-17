@@ -470,7 +470,7 @@ static void print_vswap(struct Cveinfo *p, int index)
 
 static void print_disabled(struct Cveinfo *p, int index)
 {
-	print_bool("%6s", p->disabled);
+	print_bool("%6s", p->disabled == YES);
 }
 
 static void print_dq(struct Cveinfo *p, size_t res_off, int index)
