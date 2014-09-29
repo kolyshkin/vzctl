@@ -34,6 +34,7 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 #include <limits.h>
+#include <math.h>
 #include <linux/vzcalluser.h>
 
 #include "vzlist.h"
@@ -1671,7 +1672,7 @@ static int get_ves_cpu()
 			continue;
 		}
 		if (id && !veid) {
-			rate = (rate * 100) / 1024;
+			rate = rint((double)rate * 100 / 1024);
 			weight = MAXCPUUNITS / weight;
 			update_cpu(id, rate, weight);
 		}

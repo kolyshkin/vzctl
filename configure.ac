@@ -96,6 +96,11 @@ AC_CHECK_LIB(util, openpty,
 
 AC_SUBST(UTIL_LIBS)
 
+AC_CHECK_LIB(m, rint,
+	MATH_LIBS="-lm", AC_MSG_ERROR([libm not found]),)
+
+AC_SUBST(MATH_LIBS)
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h \
 	sys/file.h sys/ioctl.h sys/mount.h sys/param.h sys/socket.h \
