@@ -1,0 +1,6 @@
+This should fix bug #3011
+
+https://bugzilla.openvz.org/3011
+
+Reported-by: Evgenii Terechkov <evg@altlinux.org>
+Reported-by: Aleksandar Ivanisevic <aleksandar@ivanisevic.de>
