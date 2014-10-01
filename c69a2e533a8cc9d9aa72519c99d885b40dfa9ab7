@@ -1,6 +1,8 @@
-This should fix bug #3011
+This should fix bugs #3011, #3053
 
 https://bugzilla.openvz.org/3011
+https://bugzilla.openvz.org/3053
 
 Reported-by: Evgenii Terechkov <evg@altlinux.org>
 Reported-by: Aleksandar Ivanisevic <aleksandar@ivanisevic.de>
+Reported-by: Pavel Odintsov <pavel.odintsov@gmail.com>
