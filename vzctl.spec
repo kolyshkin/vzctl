@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.7
+Version: 4.8
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -295,6 +295,62 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Mon Oct  6 2014 Kir Kolyshkin <kir@openvz.org> - 4.8-1
+- New functionality and important changes:
+-- vzctl set: add NUMA --nodemask (sponsored by FastVPS)
+-- vzmigrate: speed up by using se ploop copy with feedback if available
+-- vzmigrate: speed up by reusing ssh connection
+-- init.d/vz: show CT stop status
+-- init.d/vz: implement parallel CT start (#2954, #2084)
+-- init.d/vz, vz.conf: use/expose VE_PARALLEL
+-- vzctl start,restore: add --skip-remount
+-- vzctl snapshot-switch: add --must-restore
+-- vzmigrate: ability to run ploop copy with timestamps
+- Fixes:
+-- vzctl.spec: disable VE0 conntracks only if unused (#2755)
+-- vzmigrate: fix for --snapshot (#2907)
+-- vzmigrate: don't run vzfsync if there is no need (#3055)
+-- vzmigrate: undo_lock if check_cpt_props failed
+-- vzmigrate: don't exit 1 on success
+-- vzlist: fix showing DISABLED (#3029)
+-- vzlist: fix cpulimit rounding (#3063)
+-- redhat-set_hostname.sh: fix for F15+/RHEL7 (#3051)
+-- vzctl compact: use built-in PATH (#2990)
+-- postcreate.sh: fix caps for suexec
+- Improvements:
+-- debian-add_ip.sh: support for Ubuntu 14.04
+-- postcreate.sh: add RHEL7/CentOS7 support
+-- vzctl create --diskinodes: check for max ploop size
+-- vzctl set --ostemplate: require --save (#2909)
+-- vzmigrate: don't specify default cipher
+-- vzmigrate: use getopt for option parsing
+-- vzmigrate: detect "can't lock CT" error
+-- vzmigrate: don't use rsync --delete-excluded
+-- cpumask: allow for up to 4096 CPUs
+-- vz_setcpu(): don't ignore errors from set_cpu*
+-- fixed a few memory leaks and non-closed fds reported by Coverity
+-- compare_osrelease(): fix for 3.x kernels
+-- parse_{chkpnt,restore}_opt: don't print error twice
+-- parse*opt(): add/improve extra args check
+-- vzctl create: improve "no ploop" error message
+- Documentation:
+-- vznnc(8): add
+-- vzctl --help: fix iolimit
+-- vzctl(8): document set --ostemplate (#2909)
+-- vzctl(8): add --nodemask, --must-restore, --skip-remount
+-- vzctl(8): improve --netfilter
+-- vz.conf(5): document VE_PARALLEL
+-- vzmigrate(8), vzmigrate --help: document --ssh-mux
+- Build system:
+-- setver.sh: check for ./configure to run autogen
+-- setver.sh: abort if autogen.sh/configure fails
+
+* Fri May  2 2014 Kir Kolyshkin <kir@openvz.org> - 4.7.2-1
+- vzlist: don't complain about missing ploop-lib (#2952)
+- setup_console: don't execute on older kernels (#2961)
+- clean_hardlink_dir(): note unlink/rmdir errors
+- vzctl(8): fix a typo
+
 * Wed Apr  2 2014 Kir Kolyshkin <kir@openvz.org> - 4.7-1
 - New functionality and important changes:
 -- Disable conntrack for VE0 by default (#2755)
