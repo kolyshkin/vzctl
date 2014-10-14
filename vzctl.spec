@@ -171,10 +171,10 @@ if ! grep -wq 'ip_conntrack_disable_ve0' /etc/modprobe.d/* 2>/dev/null; then
 	cat << EOF
 ============================================================================
 EOF
-	if /sbin/iptables -S -t nat | grep -qEw 'SNAT|DNAT|MASQUERADE'; then
+	if /sbin/iptables -L -n -t nat | grep -qEw 'SNAT|DNAT|MASQUERADE'; then
 		# conntracks are used
 		disable=0
-	elif /sbin/iptables -S | grep -qEw 'state (RELATED|ESTABLISHED)'; then
+	elif /sbin/iptables -L -n | grep -qEw 'state|ctstate'; then
 		disable=0
 	else
 		disable=1
