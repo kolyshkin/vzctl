@@ -268,6 +268,10 @@ int exec_container_init(struct arg_start *arg,
 		}
 	}
 
+	if (mkdir("/proc", 0555) && errno != EEXIST)
+		return vzctl_err(VZ_SYSTEM_ERROR, errno,
+				"Can't mkdir /proc");
+
 	if (statfs("/proc", &sfs))
 		return vzctl_err(VZ_SYSTEM_ERROR, errno,
 				"statfs on /proc failed");
