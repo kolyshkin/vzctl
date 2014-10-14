@@ -306,6 +306,9 @@ int exec_container_init(struct arg_start *arg,
 	}
 
 	logger(10, 0, "Starting init");
+
+	close_fds(0, arg->err_p, -1);
+
 	execve("/sbin/init", argv, envp);
 	execve("/etc/init", argv, envp);
 	execve("/bin/init", argv, envp);

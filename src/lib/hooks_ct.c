@@ -287,8 +287,8 @@ static int _env_create(void *data)
 	 * Technically, because clone will clone both fds, we would have to
 	 * close the other end as well. But we don't even know what it is,
 	 * since our args only include our end of the pipe. This is not a
-	 * problem because right before exec_container_init, we will call
-	 * close_fds and get away with all of them. And if we fail, we'll
+	 * problem because we will call close_fds in exec_container_init()
+	 * and get away with all of them. And if we fail, we'll
 	 * exit anywyay.
 	 */
 	if (arg->userns_p != -1)
@@ -311,10 +311,6 @@ static int _env_create(void *data)
 		return ret;
 
 	fill_container_param(arg, &create_param);
-
-	/* Close all fds except stdin. stdin is status pipe */
-	close(STDERR_FILENO); close(STDOUT_FILENO);
-	close_fds(0, arg->wait_p, arg->err_p, -1);
 
 	return exec_container_init(arg, &create_param);
 }

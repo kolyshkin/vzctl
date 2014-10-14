@@ -152,8 +152,6 @@ static int _env_create(vps_handler *h, void *data)
 	int ret;
 	struct arg_start *arg = data;
 	envid_t veid = arg->veid;
-	int wait_p = arg->wait_p;
-	int err_p = arg->err_p;
 
 	fill_container_param(arg, &create_param);
 
@@ -162,10 +160,6 @@ static int _env_create(vps_handler *h, void *data)
 	env_create_data.flags = VE_CREATE | VE_EXCLUSIVE;
 	env_create_data.data = &create_param;
 	env_create_data.datalen = sizeof(create_param);
-
-	/* Close all fds except stdin. stdin is status pipe */
-	close(STDERR_FILENO); close(STDOUT_FILENO);
-	close_fds(0, wait_p, err_p, h->vzfd, -1);
 
 try:
 	ret = vz_env_create_data_ioctl(h, &env_create_data);
