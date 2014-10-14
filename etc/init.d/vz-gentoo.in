@@ -202,7 +202,7 @@ start_ve() {
 
 get_parallel()
 {
-	[ -n "${VE_PARALLEL}" -a "${VE_PARALLEL" != "0" ] && return
+	[ -n "${VE_PARALLEL}" -a "${VE_PARALLEL}" != "0" ] && return
 	VE_PARALLEL=`awk '
 BEGIN { num=0; }
 $1 == "processor" { num++; }
