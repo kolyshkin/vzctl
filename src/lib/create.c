@@ -408,7 +408,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 
 	if (vps_p->opt.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
 		logger(-1, 0, "Alternatively, if you can't or don't want to use ploop, please");
-		logger(-1, 0, "add --layout simfs option, or set VE_LAYOUT=simfs in" GLOBAL_CFG);
+		logger(-1, 0, "add --layout simfs option, or set VE_LAYOUT=simfs in " GLOBAL_CFG);
 		ret = VZ_PLOOP_UNSUP;
 		goto err_cfg;
 	}
