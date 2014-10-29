@@ -295,7 +295,7 @@ undo_dump () {
 }
 
 undo_copy_dump () {
-	$SSH "root@$host" "rm -f $VE_DUMPFILE"
+	$SSH "root@$host" "rm -f $VE_DUMPFILE_REMOTE"
 	undo_suspend
 }
 
@@ -747,7 +747,6 @@ log 2 "Loading $vzconf and $vpsconf files"
 
 . "$vzconf"
 . "$vpsconf"
-VE_DUMPFILE="$tmpdir/dump.$VEID"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
 log 2 "Getting remote VE_ROOT and VE_PRIVATE"
@@ -769,6 +768,12 @@ if [ $VE_ROOT != $VE_ROOT_REMOTE ]; then
 	log 1 "Remote VE_ROOT path differs from local $VEID.conf"
 	log 1 "Using $VE_ROOT_REMOTE for syncing"
 fi
+
+test -z "$DUMPDIR" && DUMPDIR=@VZDIR@/dump
+test -z "$DUMPDIR_REMOTE" && DUMPDIR=@VZDIR@/dump
+VE_DUMPFILE_SFX="tmp-dump.$VEID"
+VE_DUMPFILE="$DUMPDIR/$VE_DUMPFILE_SFX"
+VE_DUMPFILE_REMOTE="$DUMPDIR_REMOTE/$VE_DUMPFILE_SFX"
 
 DDXML=$VE_PRIVATE/root.hdd/DiskDescriptor.xml
 if [ -f $DDXML ]; then
@@ -847,8 +852,6 @@ if [ -n "$act_scripts" ]; then
 	fi
 fi
 
-test -z "$DUMPDIR" && DUMPDIR=@VZDIR@/dump
-test -z "$DUMPDIR_REMOTE" && DUMPDIR=@VZDIR@/dump
 if [ "$suspended" = "suspended" ]; then
 	DUMP_FILE=Dump.$VEID
 	log 2 "Copying dump file"
@@ -999,7 +1002,7 @@ if [ $online -eq 1 ]; then
 
 	log 2 "Copying dumpfile"
 	time_copy_dump=$(date +%s.%N)
-	if ! logexec 2 $SCP $VE_DUMPFILE root@$host:$VE_DUMPFILE ; then
+	if ! logexec 2 $SCP $VE_DUMPFILE root@$host:$VE_DUMPFILE_REMOTE ; then
 		log 0 "Failed to copy dump"
 		undo_dump
 		exit $MIG_ERR_COPY
@@ -1080,7 +1083,7 @@ if [ $online -eq 1 ]; then
 	log 2 "Undumping container"
 	time_undump=$(date +%s.%N)
 	if ! logexec 2 $SSH root@$host $VZCTL restore $VEID --undump \
-			--dumpfile $VE_DUMPFILE --skip_arpdetect ; then
+			--dumpfile $VE_DUMPFILE_REMOTE --skip_arpdetect ; then
 		log 0 "Failed to undump container"
 		undo_copy_quota
 		exit $MIG_ERR_RESTORE_VPS
@@ -1102,7 +1105,7 @@ if [ $online -eq 1 ]; then
 
 	log 2 "Removing dumpfiles"
 	rm -f "$VE_DUMPFILE"
-	$SSH "root@$host" "rm -f $VE_DUMPFILE"
+	$SSH "root@$host" "rm -f $VE_DUMPFILE_REMOTE"
 else
 	if [ "$state" = "running" ]; then
 		log 1 "Starting container"
