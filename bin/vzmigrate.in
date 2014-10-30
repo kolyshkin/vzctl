@@ -192,7 +192,7 @@ lock_ct() {
 	local pid
 	local ret
 
-	f=/vz/lock/$VEID.lck
+	f=$LOCKDIR/$VEID.lck
 
 	set -C # noclobber, i.e. open with O_EXCL
 	if echo $$ > $f; then
@@ -221,7 +221,7 @@ undo_lock() {
 	local f
 	local pid
 
-	f=/vz/lock/$VEID.lck
+	f=$LOCKDIR/$VEID.lck
 	pid=$(cat $f)
 	if [ $pid -ne $$ ] ; then
 		log 0 "unexpected PID $pid in $f (expecting $$)"
@@ -649,6 +649,8 @@ if [ ! -r "$vzconf" ]; then
 	exit $MIG_ERR_NOEXIST
 fi
 
+log 2 "Loading $vzconf"
+. "$vzconf"
 # Lock the container so no one else can fuss with it
 lock_ct || exit $MIG_ERR_LOCKED
 
@@ -743,9 +745,7 @@ if [ $online -eq 1 ]; then
 	fi
 fi
 
-log 2 "Loading $vzconf and $vpsconf files"
-
-. "$vzconf"
+log 2 "Loading $vpsconf"
 . "$vpsconf"
 VE_QUOTADUMP="$tmpdir/quotadump.$VEID"
 
