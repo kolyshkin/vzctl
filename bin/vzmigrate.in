@@ -368,7 +368,7 @@ ploop_copy_old() {
 
 # Copy top delta with write tracker and CT stop/suspend
 ploop_copy() {
-	local cmd dev delta_src delta_dst cat size err pid port iter
+	local cmd dev delta_src delta_dst cat size err pid port try
 
 	cmd=$*
 	dev=/dev/$PLOOP_DEV
@@ -398,8 +398,8 @@ ploop_copy() {
 	fi
 
 	# Set up two-way channel for ploop copy with feedback
-	iter=0
-	while [ $iter -lt 5 ]; do
+	try=0
+	while [ $try -lt 5 ]; do
 		# Try different ports in the range 1024..32767
 		port=$(awk 'BEGIN { srand(); print int(rand()*31744) + 1024 }')
 		log 1 "Trying port $port"
@@ -412,10 +412,10 @@ ploop_copy() {
 
 		# check if ssh is still there
 		kill -0 $pid 2>/dev/null && break
-		let iter=iter+1
+		let try=try+1
 	done
 
-	if [ $iter = 5 ]; then
+	if [ $try = 5 ]; then
 		log 0 "Failed to setup remote ploop copy"
 		ploop_copy_old
 		return
