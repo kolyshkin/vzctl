@@ -1673,7 +1673,7 @@ static int get_ves_cpu()
 		}
 		if (id && !veid) {
 			rate = rint((double)rate * 100 / 1024);
-			weight = MAXCPUUNITS / weight;
+			weight = rint((double)MAXCPUUNITS / weight);
 			update_cpu(id, rate, weight);
 		}
 	}
