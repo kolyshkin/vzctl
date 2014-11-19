@@ -311,7 +311,6 @@ start_ves()
 		fi
 		__echo " ${veid}"
 
-		rm -f $VZREBOOTDIR/$veid
 		$VZCTL start ${veid} >/dev/null 2>&1 &
 		pid=$!
 		eval VE_${pid}=${veid}

@@ -159,7 +159,6 @@ start_ve() {
 				fi
 			fi
 		fi
-		rm -f $VZREBOOTDIR/$veid
 		${VZCTL} start ${veid} --skip-fsck 2>&1 &
 		pid=$!
 		eval VE_${pid}=${veid}
