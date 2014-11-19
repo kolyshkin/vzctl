@@ -103,7 +103,7 @@ function footer() {
 			printf("  S: unlimited swap (ok for non-vswap), " \
 				"not counted into total swap limit\n");
 		if (t_flags ~ "f")
-			printf("  f: RAM failctl > 0 (swap used), use vzubc" \
+			printf("  f: RAM failctl > 0 (swap used), use vzubc " \
 				"to check details\n");
 		if (t_flags ~ "F")
 			printf("  F: beancounter failctl > 0, use vzubc " \
