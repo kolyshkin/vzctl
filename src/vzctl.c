@@ -326,11 +326,8 @@ int main(int argc, char *argv[], char *envp[])
 		fprintf(stderr, "Only set actions are allowed for CT0\n");
 		ret = VZ_INVALID_PARAMETER_VALUE;
 		goto error;
-	} else if (veid < 0) {
-		fprintf(stderr, "Bad CT ID %d\n", veid);
-		ret = VZ_INVALID_PARAMETER_VALUE;
-		goto error;
 	}
+
 	get_vps_conf_path(veid, buf, sizeof(buf));
 	if (stat_file(buf) == 1) {
 		if (vps_parse_config(veid, buf, vps_p, &g_action)) {
