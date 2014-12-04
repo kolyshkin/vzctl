@@ -291,7 +291,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	}
 	if (ve_conf_tmp[0] != '\0') {
 		get_vps_conf_path(veid, fname, sizeof(fname));
-		strncpy(ve_conf_old, fname, sizeof(ve_conf_old - 4));
+		strncpy(ve_conf_old, fname, sizeof(ve_conf_old) - 4);
 		strcat(ve_conf_old, ".old");
 		cp_file(ve_conf_old, fname);
 		if (rename(ve_conf_tmp, fname))
