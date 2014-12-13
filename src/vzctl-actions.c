@@ -653,6 +653,7 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 	{"context",	required_argument, NULL, PARAM_CPTCONTEXT},
 	{"skip_arpdetect", no_argument, NULL, PARAM_SKIPARPDETECT},
 	{"skip-remount", no_argument, NULL, PARAM_SKIP_REMOUNT},
+	{"skip-fsck",	no_argument, NULL, PARAM_SKIP_FSCK},
 	{ NULL, 0, NULL, 0 }
 	};
 
@@ -691,6 +692,9 @@ static int parse_restore_opt(int argc, char **argv, vps_param *vps_p)
 			break;
 		case PARAM_SKIP_REMOUNT:
 			vps_p->opt.skip_remount = YES;
+			break;
+		case PARAM_SKIP_FSCK:
+			vps_p->opt.skip_fsck = YES;
 			break;
 		default:
 			/* Error is printed by getopt_long() */
@@ -1485,6 +1489,8 @@ static int restore(vps_handler *h, envid_t veid, vps_param *g_p,
 
 	if (cmd_p->opt.skip_remount == YES)
 		skip |= SKIP_REMOUNT;
+	if (cmd_p->opt.skip_fsck == YES)
+		skip |= SKIP_FSCK;
 
 	return vps_restore(h, veid, g_p, cmd, &cmd_p->res.cpt, skip);
 }
