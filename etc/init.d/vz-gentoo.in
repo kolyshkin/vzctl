@@ -29,7 +29,7 @@ check_config() {
 		: ${MODULES:="vzmon vzdquota vzdev"}
 		: ${MIGRATE_MODULES:="vzcpt vzrst"}
 		: ${NET_MODULES:="vznetdev vznet vzethdev"}
-		: ${PLOOP_MODULES:="ploop pfmt_ploop1 pfmt_raw pio_direct pio_nfs"}
+		: ${PLOOP_MODULES:="ploop pfmt_ploop1 pfmt_raw pio_direct pio_nfs pio_kaio"}
 		: ${MISC_MODULES:="vziolimit"}
 
 		# check if you should load vzwdog module
