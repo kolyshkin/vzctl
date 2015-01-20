@@ -49,6 +49,7 @@ function setup_network()
 	echo "DEVICE=${VENET_DEV}
 BOOTPROTO=static
 ONBOOT=yes
+ARPCHECK=\"no\"
 IPADDR=127.0.0.1
 NETMASK=255.255.255.255
 BROADCAST=0.0.0.0
@@ -93,6 +94,7 @@ function create_config()
 
 	echo "DEVICE=${VENET_DEV}:${ifnum}
 ONBOOT=yes
+ARPCHECK=\"no\"
 IPADDR=${ip}
 NETMASK=${netmask}" > $file ||
 	error "Can't write to file $file" ${VZ_FS_NO_DISK_SPACE}
