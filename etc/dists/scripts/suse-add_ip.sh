@@ -106,7 +106,7 @@ IPADDR=127.0.0.1" > ${IFCFG} ||
 	# Set default route to venet0 only if there are IPs
 	# and there is no other default route
 	rm -f ${ROUTES}
-	if [ -n "${IP_ADDR}" ] && ! grep -qw ^default ${IFCFG_DIR}/ifroute-*; then
+	if [ -n "${IP_ADDR}" ] && ! grep -qw ^default ${IFCFG_DIR}/ifroute-* 2>/dev/null; then
 		cat << EOF > ${ROUTES}
 default - - ${VENET_DEV}
 default :: - ${VENET_DEV}
