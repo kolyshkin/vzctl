@@ -315,7 +315,7 @@ start_ves()
 		pid=$!
 		eval VE_${pid}=${veid}
 		pids="$pids $pid"
-		let iter++
+		iter=$(($iter+1))
 		if [ ${iter} -ge ${VE_PARALLEL} ]; then
 			echo
 			for pid in ${pids}; do
