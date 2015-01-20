@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2015, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@ function del_ip()
 		ids=`grep -E "^IPADDR_.*=${_IP}$" ${IFCFG} 2>/dev/null |
 			sed 's/^IPADDR_\(.*\)=.*/\1/'`
 		for id in ${ids}; do
-			sed -e "/^IPADDR_${id}=/{
-				N
-				/$/d
-}" < ${IFCFG} > ${IFCFG}.bak && mv -f ${IFCFG}.bak ${IFCFG}
+			sed -e "/^IPADDR_${id}=/d" -e "/^LABEL_${id}=/d" \
+			    -e "/^NETMASK_${id}=/d" -e "/^PREFIXLEN_${id}=/d" \
+				< ${IFCFG} > ${IFCFG}.bak && \
+					mv -f ${IFCFG}.bak ${IFCFG}
 			ifconfig ${VENET_DEV}:${id} down 2>/dev/null
 		done
 	done

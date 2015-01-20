@@ -118,9 +118,11 @@ EOF
 function create_config()
 {
 	local ip=$1
-	local ifnum=$2
+	local mask=$2
+	local ifnum=$3
 
 	echo "IPADDR_${ifnum}=${ip}
+PREFIXLEN_${ifnum}=${mask}
 LABEL_${ifnum}=${ifnum}" >> ${IFCFG} ||
 	error "Can't write to file ${IFCFG}" ${VZ_FS_NO_DISK_SPACE}
 }
@@ -156,7 +158,7 @@ function add_ip()
 				found=1
 			fi
 		done
-		create_config ${_IP} ${ifnum}
+		create_config "${_IP}" "${_MASK}" "${ifnum}"
 	done
 	if [ "x${VE_STATE}" = "xrunning" ]; then
 		ifdown $VENET_DEV  >/dev/null 2>&1
