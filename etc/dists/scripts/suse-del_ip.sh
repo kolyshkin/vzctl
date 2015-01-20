@@ -21,6 +21,7 @@
 VENET_DEV=venet0
 IFCFG_DIR=/etc/sysconfig/network
 IFCFG="${IFCFG_DIR}/ifcfg-${VENET_DEV}"
+ROUTES=${IFCFG_DIR}/ifroute-${VENET_DEV}
 
 function del_ip()
 {
@@ -29,6 +30,7 @@ function del_ip()
 	if [ "x${IPDELALL}" = "xyes" ]; then
 		ifdown ${VENET_DEV} 2>/dev/null
 		rm -f ${IFCFG} 2>/dev/null
+		rm -f ${ROUTES} 2>/dev/null
 		return
 	fi
 	for ipm in ${IP_ADDR}; do
