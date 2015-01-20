@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (C) 2000-2008, Parallels, Inc. All rights reserved.
+#  Copyright (C) 2000-2015, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -32,12 +32,58 @@ function get_aliases()
 	IFNUMLIST=`grep -e "^LABEL_" ${IFCFG} | sed 's/^LABEL_\(.*\)=.*/\1/'`
 }
 
-# Fix a bug in sles9 ifup-route script
+function fix_wicked_route()
+{
+	local wickedfile=/etc/wicked/extensions/netconfig
+	local venet_route_file=/etc/wicked/extensions/venet_route
+	local mark='# Set up venet routing v1'
+
+	[ ! -f ${wickedfile} ] && return 0
+
+	if ! grep -q 'venet_route' ${wickedfile}; then
+		sed -i -e "/info)/ a\
+			$venet_route_file \$ifname add
+		" -e "/remove)/ a\
+			$venet_route_file \$ifname del
+		" ${wickedfile}
+	fi
+
+	fgrep -q "$mark" $venet_route_file 2>/dev/null || \
+		cat > $venet_route_file << EOL
+#!/bin/bash
+$mark
+
+DEVICE=\$1
+ACTION=\$2
+PROTO=""
+VENET="venet0"
+VENET_CONF="/etc/sysconfig/network/ifroute-\$VENET"
+
+[ "x\$DEVICE" != "x\$VENET" ] && exit 0
+[ "x\$ACTION" != "xadd" -a "x\$ACTION" != "xdel" ] && exit 0
+
+fgrep -q "default - - \$VENET" \$VENET_CONF 2>/dev/null
+[ \$? -eq 0 ] && PROTO="-4"
+fgrep -q "default :: - \$VENET" \$VENET_CONF 2>/dev/null
+[ \$? -eq 0 ] && PROTO="\$PROTO -6"
+
+for proto in \$PROTO; do
+	ip \$proto route \$ACTION default dev \$VENET >/dev/null 2>&1
+done
+
+exit 0
+EOL
+	chmod 0755 $venet_route_file
+}
+
 function fix_ifup_route()
 {
 	local file=/etc/sysconfig/network/scripts/ifup-route
 	local str='run_iproute $ACTION to $TYPE $DEST via $GWAY $IFACE $IPOPTS'
-	if grep -q "$str" $file; then
+
+	is_wicked && fix_wicked_route
+
+	if [ -f ${file} ] && grep -q "$str" $file; then
 		sed -i -e "/$str/s/via \$GWAY/\${GWAY:+via \$GWAY}/" $file
 	fi
 }
