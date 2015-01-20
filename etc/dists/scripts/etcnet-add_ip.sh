@@ -106,7 +106,7 @@ add_ip6() {
 	local ip="$1"; shift
 	local mask="$1"; shift
 
-	[ "${IPV6}" != "yes" ] && return
+	[ "${IPV6}" != "yes" ] && return 0
 
 	if ! grep -qw "$ip" ".tmp/$VENET_DEV/ipv6address" 2>/dev/null; then
 		echo "2000::/3 dev $VENET_DEV" > ".tmp/$VENET_DEV/ipv6route" ||

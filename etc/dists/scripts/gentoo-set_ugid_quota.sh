@@ -48,11 +48,9 @@ start() {
 	fi
 	[ -e "\$dev" ] || mknod \$dev b $MAJOR $MINOR
 	quotaon -aug
-	return
 }
 
 stop() {
-	return
 }
 EOF
 	chmod 755 ${SCRIPTANAME}

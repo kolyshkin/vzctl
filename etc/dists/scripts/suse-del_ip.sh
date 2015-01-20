@@ -31,7 +31,7 @@ function del_ip()
 		ifdown ${VENET_DEV} 2>/dev/null
 		rm -f ${IFCFG} 2>/dev/null
 		rm -f ${ROUTES} 2>/dev/null
-		return
+		return 0
 	fi
 	for ipm in ${IP_ADDR}; do
 		ip_conv $ipm

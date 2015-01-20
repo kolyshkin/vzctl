@@ -43,7 +43,7 @@ create_dev()
 fix_shell_console()
 {
 	[ -f $SYSTEMD_DIR/console-getty.service ] &&
-		return
+		return 0
 
 	echo '#  This file is part of systemd.
 #
@@ -113,7 +113,7 @@ setup_upstart_console()
 		getty='exec /sbin/getty 38400'
 	else
 		echo "Unable to find suitable getty, console setup is skipped"
-		return
+		return 0
 	fi
 
 	echo "start on stopped rc RUNLEVEL=[2345]
@@ -134,7 +134,7 @@ setup_upstart_event_console()
 		getty='exec /sbin/getty 38400'
 	else
 		echo "Unable to find suitable getty console setup is skipped"
-		return
+		return 0
 	fi
 
 	echo "start on stopped rc2
@@ -163,7 +163,7 @@ setup_inittab()
 		getty2='/sbin/agetty tty2 38400'
 	else
 		echo "Unable to find suitable getty, console setup is skipped"
-		return
+		return 0
 	fi
 	line="1:2345:respawn:$getty1"
 	if ! grep -q "$line" /etc/inittab; then

@@ -28,7 +28,7 @@ function get_aliases()
 {
 	IFNUMLIST=
 
-	[ -f ${IFCFG} ] || return
+	[ -f ${IFCFG} ] || return 0
 	IFNUMLIST=`grep -e "^LABEL_" ${IFCFG} | sed 's/^LABEL_\(.*\)=.*/\1/'`
 }
 

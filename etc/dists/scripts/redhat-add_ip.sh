@@ -102,7 +102,7 @@ NETMASK=${netmask}" > $file ||
 
 function add_ip6()
 {
-	[ "${IPV6}" != "yes" ] && return
+	[ "${IPV6}" != "yes" ] && return 0
 	if ! grep -qw "$1" ${IFCFG} 2>/dev/null; then
 		setup6_network
 		add_param ${IFCFG} IPV6ADDR_SECONDARIES "$1/$2"

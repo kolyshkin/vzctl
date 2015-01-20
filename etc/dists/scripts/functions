@@ -253,7 +253,7 @@ del_param3() {
 	local name="$2"
 	local value="$3"
 
-	[ ! -f $file ] && return
+	[ ! -f $file ] && return 0
 
 	if grep -E "^$name=\(.*\)" $file>/dev/null 2>&1; then
 		${CP} ${file} ${file}.$$ || error "Can't copy file $file" $VZ_FS_NO_DISK_SPACE
@@ -264,7 +264,7 @@ del_param3() {
 		fi
 		mv -f ${file}.$$ ${file}
 	else
-		return
+		return 0
 	fi
 }
 
@@ -298,7 +298,7 @@ change_hostname()
 	if [ "${host}" = "localhost" -o "${host}" = "localhost.localdomain" ];
 	then
 		put_param2 ${cfg} "127.0.0.1" "localhost.localdomain localhost"
-		return
+		return 0
 	fi
 	${CP} ${cfg} ${cfg}.$$ ||
 		error "Can't copy file ${cfg}" $VZ_FS_NO_DISK_SPACE
@@ -411,7 +411,7 @@ ip_conv() {
 			_MASK=128
 		fi
 	fi
-	echo $ipm | grep -q ':' && return
+	echo $ipm | grep -q ':' && return 0
 	_NETMASK=$(cidr2mask $_MASK)
 }
 
