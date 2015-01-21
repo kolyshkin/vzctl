@@ -109,11 +109,46 @@ static void cleanup_umount_ploop(void *data)
 }
 #endif
 
+/* Check if a directory is a mount point
+ *
+ * Returns:
+ *   1: a mount point
+ *   0: not a mount point
+ *  -1: error
+ */
+int is_mount_point(const char *dir)
+{
+	struct stat st1, st2;
+	char parent[PATH_MAX];
+
+	if (!dir)
+		return -1;
+
+	if (stat(dir, &st1)) {
+		logger(-1, errno, "stat(%s)", dir);
+		return -1;
+	}
+
+	if (!S_ISDIR(st1.st_mode)) {
+		logger(-1, 0, "Path %s is not a directory", dir);
+		return -1;
+	}
+
+	snprintf(parent, sizeof(parent), "%s/..", dir);
+	if (stat(parent, &st2)) {
+		logger(-1, errno, "stat(%s)", parent);
+		return -1;
+	}
+
+	return (st1.st_dev != st2.st_dev);
+}
+
 static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 {
 	char tarball[PATH_LEN];
 	char tmp_dir[PATH_LEN];
 	char buf[PATH_LEN];
+	char *private;
 	int ret;
 	char *arg[2];
 	char *env[6];
@@ -176,8 +211,27 @@ find:
 	/* Lock CT area */
 	if (make_dir(fs->private, 0))
 		return VZ_FS_NEW_VE_PRVT;
-	snprintf(tmp_dir, sizeof(tmp_dir), "%s.tmp", fs->private);
-	if (stat_file(tmp_dir) == 1) {
+
+	switch (is_mount_point(fs->private)) {
+		case 0:
+			snprintf(tmp_dir, sizeof(tmp_dir),
+					"%s.tmp", fs->private);
+			private = tmp_dir;
+			break;
+		case 1:
+			/* VE_PRIVATE is a mount point, so we can't use
+			 * tmp_dir; have to use VE_PRIVATE directly
+			 */
+			private = fs->private;
+			tmp_dir[0] = '\0';
+			break;
+		case -1:
+			ret = VZ_FS_NEW_VE_PRVT;
+			goto err;
+			break;
+	}
+
+	if (tmp_dir[0] && stat_file(tmp_dir) == 1) {
 		logger(-1, 0, "Warning: Temp dir %s already exists, deleting",
 			tmp_dir);
 		if (del_dir(tmp_dir)) {
@@ -185,15 +239,15 @@ find:
 			goto err;
 		}
 	}
-	if (make_dir(tmp_dir, 1)) {
-		logger(-1, errno, "Unable to create directory %s", tmp_dir);
+	if (make_dir(private, 1)) {
+		logger(-1, errno, "Unable to create directory %s", private);
 		ret = VZ_FS_NEW_VE_PRVT;
 		goto err;
 	}
-	untar_to = tmp_dir;
+	untar_to = private;
 
 	ddata.veid = veid;
-	ddata.private = tmp_dir;
+	ddata.private = private;
 	ch = add_cleanup_handler(cleanup_destroy_ve, &ddata);
 
 	if (ploop) {
@@ -212,7 +266,7 @@ find:
 		param.size = dq->diskspace[1]; // limit
 		if (dq->diskinodes)
 			param.inodes = dq->diskinodes[1];
-		ret = vzctl_create_image(tmp_dir, &param);
+		ret = vzctl_create_image(private, &param);
 		if (ret)
 			goto err;
 
@@ -223,12 +277,12 @@ find:
 		}
 		mount_param.target = fs->root;
 		mount_param.mount_data = fs->mount_opts;
-		ret = vzctl_mount_image(tmp_dir, &mount_param);
+		ret = vzctl_mount_image(private, &mount_param);
 		if (ret)
 			goto err;
 
 		/* If interrupted, umount ploop */
-		ploop_ch = add_cleanup_handler(cleanup_umount_ploop, &tmp_dir);
+		ploop_ch = add_cleanup_handler(cleanup_umount_ploop, &private);
 
 		untar_to = fs->root;
 #endif
@@ -242,8 +296,8 @@ find:
 		if (!quota_ctl(veid, QUOTA_STAT))
 			quota_off(veid, 0);
 		quota_ctl(veid, QUOTA_DROP);
-		quota_init(veid, tmp_dir, dq);
-		quota_on(veid, tmp_dir, dq);
+		quota_init(veid, private, dq);
+		quota_on(veid, private, dq);
 		quota = 1;
 	}
 	arg[0] = VPS_CREATE;
@@ -266,7 +320,7 @@ find:
 	free_arg(env);
 #ifdef HAVE_PLOOP
 	if (ploop)
-		vzctl_umount_image(tmp_dir);
+		vzctl_umount_image(private);
 	del_cleanup_handler(ploop_ch);
 #endif
 	if (ret)
@@ -281,7 +335,7 @@ find:
 	/* Unlock CT area */
 	rmdir(fs->private);
 	del_cleanup_handler(ch);
-	if (rename(tmp_dir, fs->private)) {
+	if (tmp_dir[0] && rename(tmp_dir, fs->private)) {
 		logger(-1, errno, "Can't rename %s to %s", tmp_dir, fs->private);
 		ret = VZ_FS_NEW_VE_PRVT;
 	}
@@ -292,7 +346,8 @@ err:
 		quota_ctl(veid, QUOTA_DROP);
 	}
 	rmdir(fs->private); /* remove VE_PRIVATE if empty */
-	del_dir(tmp_dir);
+	if (tmp_dir[0])
+		del_dir(tmp_dir);
 
 	return ret;
 }
