@@ -119,7 +119,7 @@ static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 	char *env[6];
 	int quota = 0;
 	int i;
-	char *dst;
+	char *untar_to;
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
 	dq_param *dq = &vps_p->res.dq;
@@ -190,10 +190,10 @@ find:
 		ret = VZ_FS_NEW_VE_PRVT;
 		goto err;
 	}
-	dst = tmp_dir;
+	untar_to = tmp_dir;
 
 	ddata.veid = veid;
-	ddata.private = dst;
+	ddata.private = tmp_dir;
 	ch = add_cleanup_handler(cleanup_destroy_ve, &ddata);
 
 	if (ploop) {
@@ -230,7 +230,7 @@ find:
 		/* If interrupted, umount ploop */
 		ploop_ch = add_cleanup_handler(cleanup_umount_ploop, &tmp_dir);
 
-		dst = fs->root;
+		untar_to = fs->root;
 #endif
 	}
 	if (!ploop &&
@@ -251,7 +251,7 @@ find:
 	snprintf(buf, sizeof(buf), "PRIVATE_TEMPLATE=%s", tarball);
 	i = 0;
 	env[i++] = strdup(buf);
-	snprintf(buf, sizeof(buf), "VE_PRVT=%s", dst);
+	snprintf(buf, sizeof(buf), "VE_PRVT=%s", untar_to);
 	env[i++] = strdup(buf);
 	if (!is_vz_kernel(h) && h->can_join_userns) {
 		snprintf(buf, sizeof(buf), "UID_OFFSET=%lu", uid_offset);
