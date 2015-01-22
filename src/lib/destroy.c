@@ -268,14 +268,14 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 		logger(0, 0, "Container is currently mounted (umount first)");
 		return VZ_FS_MOUNTED;
 	}
-	if ((ret = vps_destroy_dir(veid, fs->private)))
-		return ret;
+	ret = vps_destroy_dir(veid, fs->private);
 	move_config(veid, BACKUP);
 	if (destroy_dump(veid, cpt != NULL ? cpt->dumpdir : NULL) < 0)
 		logger(-1, errno, "Warning: failed to remove dump file");
 	if (rmdir(fs->root) < 0)
 		logger(-1, errno, "Warning: failed to remove %s", fs->root);
-	logger(0, 0, "Container private area was destroyed");
+	if (!ret)
+		logger(0, 0, "Container private area was destroyed");
 
-	return 0;
+	return ret;
 }
