@@ -143,6 +143,8 @@ int dir_empty(const char *dir)
 			continue;
 		if (!strcmp(ep->d_name, ".."))
 			continue;
+		if (!strcmp(ep->d_name, "lost+found"))
+			continue;
 		/* Not empty */
 		ret = 0;
 		break;
