@@ -125,6 +125,8 @@ int is_mount_point(const char *dir)
 		return -1;
 
 	if (stat(dir, &st1)) {
+		if (errno == ENOENT) /* not a mount point */
+			return 0;
 		logger(-1, errno, "stat(%s)", dir);
 		return -1;
 	}
