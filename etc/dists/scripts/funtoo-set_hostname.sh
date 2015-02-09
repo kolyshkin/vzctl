@@ -1,4 +1,5 @@
-#  Copyright (C) 2010-2011, Parallels, Inc. All rights reserved.
+#!/bin/bash
+#  Copyright (C) 2000-2009, Parallels, Inc. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,14 +15,30 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# This configuration file is meant to be used with Funtoo Linux
-# (http://www.funtoo.org), a Gentoo Linux-based distribution.
+#
+# This script sets hostname inside Funtoo based CT.
+#
+# Some parameters are passed in environment variables.
+# Required parameters:
+# Optional parameters:
+#   HOSTNM
+#       Sets host name for this CT. Modifies /etc/conf.d/hostname
 
-ADD_IP=funtoo-add_ip.sh
-DEL_IP=funtoo-del_ip.sh
-SET_HOSTNAME=funtoo-set_hostname.sh
-SET_DNS=funtoo-set_dns.sh
-SET_USERPASS=set_userpass.sh
-SET_UGID_QUOTA=gentoo-set_ugid_quota.sh
-POST_CREATE=postcreate.sh
-SET_CONSOLE=set_console.sh
+function set_hostname()
+{
+	local cfgfile=$1
+	local hostname=$2
+
+	[ -z "${hostname}" ] && return 0
+
+	if grep -qe "^HOSTNAME=" ${cfgfile} >/dev/null 2>&1; then
+		del_param ${cfgfile} "HOSTNAME"
+	fi
+	put_param "${cfgfile}" "hostname" "${hostname}"
+	hostname ${hostname}
+}
+
+change_hostname /etc/hosts "${HOSTNM}" "${IP_ADDR}"
+set_hostname /etc/conf.d/hostname "${HOSTNM}"
+
+exit 0
