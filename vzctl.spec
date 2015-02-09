@@ -202,6 +202,7 @@ fi
 
 # Run post-install script only when installing
 test $1 -eq 1 && %{_scriptdir}/vz-postinstall selinux
+%{_scriptdir}/vz-postinstall yum
 
 exit 0
 
@@ -209,6 +210,8 @@ exit 0
 if [ $1 = 0 ]; then
 	/sbin/chkconfig --del vz >/dev/null 2>&1
 	/sbin/chkconfig --del vzeventd >/dev/null 2>&1
+	sed -i -e '/^exclude=kernel$/d' \
+		-e '/^# Added by OpenVZ/d' /etc/yum.conf
 fi
 
 %package core

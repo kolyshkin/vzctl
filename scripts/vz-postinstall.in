@@ -88,6 +88,27 @@ disable_selinux()
 	change_param $file SELINUX disabled
 }
 
+# Disables updating kernel package so we stay with OpenVZ kernel
+disable_kernel()
+{
+	local file=/etc/yum.conf
+
+	# if there is no file, nothing to do
+	test -a $file || return 0
+
+	# Check we can write to it
+	check_file $file
+
+	if ! grep -qE '^exclude=kernel$' $file; then
+		echo "vz-postinstall: $file: add exclude=kernel"
+		cat << EOF >> $file
+
+# Added by OpenVZ -- don't let distro kernels to replace OpenVZ ones
+exclude=kernel
+EOF
+	fi
+}
+
 case $1 in
 	selinux)
 		disable_selinux
@@ -95,7 +116,10 @@ case $1 in
 	sysctl)
 		tune_sysctl
 		;;
+	yum)
+		disable_kernel
+		;;
 	*)
-		echo "Usage: $0 selinux | sysctl" 1>&2
+		echo "Usage: $0 selinux | sysctl | yum" 1>&2
 		exit 1
 esac
