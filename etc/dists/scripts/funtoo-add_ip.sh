@@ -18,15 +18,6 @@
 # This script configures IP alias(es) inside Funtoo-based CT with
 # OpenRC used as services/startup/shutdown system.
 #
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IP address(es) to add
-#                   (several addresses should be divided by space)
-# Optional parameters:
-#   VE_STATE      - state of CT; could be one of:
-#                     starting | stopping | running | stopped
-#   IPDELALL	  - delete all old interfaces
-#
 # Note that modern versions of vzctl runs this script even if there
 # are not venet IPs to add to the CT, which resulted in netif.venet0
 # being created even when venet wasn't enabled for this container.

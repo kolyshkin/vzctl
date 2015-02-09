@@ -17,12 +17,6 @@
 #
 #
 # This script sets hostname inside Funtoo based CT.
-#
-# Some parameters are passed in environment variables.
-# Required parameters:
-# Optional parameters:
-#   HOSTNM
-#       Sets host name for this CT. Modifies /etc/conf.d/hostname
 
 function set_hostname()
 {

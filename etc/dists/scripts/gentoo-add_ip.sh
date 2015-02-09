@@ -18,16 +18,7 @@
 #
 # This script configures IP alias(es) inside Gentoo based CT with
 # baselayout-1/openrc used as services/startup/shutdown system.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IP address(es) to add
-#                   (several addresses should be divided by space)
-# Optional parameters:
-#   VE_STATE      - state of CT; could be one of:
-#                     starting | stopping | running | stopped
-#   IPDELALL	  - delete all old interfaces
-#
+
 VENET_DEV=venet0
 IFCFG=/etc/conf.d/net
 SCRIPT=/etc/runlevels/default/net.${VENET_DEV}

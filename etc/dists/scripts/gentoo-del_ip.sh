@@ -18,13 +18,7 @@
 #
 # This script deletes IP alias(es) inside CT for Gentoo like distros.
 # For usage info see ve-alias_del(5) man page.
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   IP_ADDR       - IPs to delete, several addresses should be divided by space
-# Optional parameters:
-#   VE_STATE      - state of CT; could be one of:
-#                     starting | stopping | running | stopped
+
 VENET_DEV=venet0
 CFGFILE=/etc/conf.d/net
 

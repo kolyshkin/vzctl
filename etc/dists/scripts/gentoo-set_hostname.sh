@@ -18,12 +18,6 @@
 #
 # This script sets hostname inside Gentoo based CT with
 # baselayout-1/openrc used as services/stratup/shutdown system.
-#
-# Some parameters are passed in environment variables.
-# Required parameters:
-# Optional parameters:
-#   HOSTNM
-#       Sets host name for this CT. Modifies /etc/conf.d/hostname
 
 # Return true if we have old baselayout-1.x based CT and false if not.
 # Note: /etc/gentoo-release has nothing to do with init system

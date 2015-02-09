@@ -17,11 +17,6 @@
 #
 #
 # This script configures quota startup script inside CT
-#
-# Parameters are passed in environment variables.
-# Required parameters:
-#   MINOR	- root device minor number
-#   MAJOR	- root device major number
 
 setup_vzquota() {
 	SCRIPTANAME='/etc/init.d/vzquota'
