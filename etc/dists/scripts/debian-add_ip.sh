@@ -41,7 +41,7 @@ fix_networking_conf()
 # Set up loopback device
 setup_lo()
 {
-	grep -qw lo ${CFGFILE} && return 0
+	grep -qw lo ${CFGFILE} 2>/dev/null && return 0
 
 	cat << EOF >> ${CFGFILE}
 # Auto generated ${LOOPBACK} interface
