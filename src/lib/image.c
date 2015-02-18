@@ -442,6 +442,9 @@ int vzctl_delete_snapshot(const char *ve_private, const char *guid)
 		return VZCTL_E_DELETE_SNAPSHOT;
 	}
 	PLOOP_CLEANUP(ret = ploop.delete_snapshot(di, guid));
+	if (ret == SYSEXIT_NOSNAP)
+		/* ignore: snapshot already deleted */
+		ret = 0;
 	if (ret) {
 		logger(-1, 0, "Failed to delete snapshot: %s [%d]",
 				ploop.get_last_error(), ret);

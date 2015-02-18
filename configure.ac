@@ -184,6 +184,11 @@ or use ./configure --without-ploop] ) ]
 		[ AC_MSG_ERROR( [
 The ploop library headers are too old. You need ploop 1.8 or later] ) ],
 		[[#include "ploop/libploop.h"]])
+	AC_CHECK_DECL(SYSEXIT_NOSNAP, ,
+		[ AC_MSG_ERROR( [
+The ploop library headers are too old. You need ploop 1.13 or later] ) ],
+		[[#include "ploop/libploop.h"]])
+
 	]
 )
 
