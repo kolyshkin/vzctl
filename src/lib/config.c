@@ -1216,10 +1216,8 @@ static int parse_dev(vps_param *vps_p, char *val)
 	for_each_strtok(token, val, " ") {
 		if (parse_devices_str(token, &dev))
 			return ERR_INVAL;
-		if (add_dev_param(&vps_p->res.dev, &dev)) {
-			free(dev.name);
+		if (add_dev_param(&vps_p->res.dev, &dev))
 			return ERR_NOMEM;
-		}
 	}
 
 	return 0;
