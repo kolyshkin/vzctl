@@ -1330,12 +1330,13 @@ static int parse_devnodes(vps_param *vps_p, char *val)
 	dev_res dev;
 
 	for_each_strtok(token, val, " ") {
+		int ret;
 		if (parse_devnodes_str(token, &dev))
 			return ERR_INVAL;
-		if (add_dev_param(&vps_p->res.dev, &dev)) {
-			free(dev.name);
+		ret = add_dev_param(&vps_p->res.dev, &dev);
+		free(dev.name);
+		if (ret)
 			return ERR_NOMEM;
-		}
 	}
 
 	return 0;

@@ -59,7 +59,7 @@ int create_static_dev(const char *root, const char *name, const char *alias,
 int vps_set_devperm(vps_handler *h, envid_t veid, const char *root,
 		dev_param *dev);
 int set_devperm(vps_handler *h, envid_t veid, dev_res *dev);
-int add_dev_param(dev_param *dev, dev_res *res);
+int add_dev_param(dev_param *dev, const dev_res *res);
 void free_dev_param(dev_param *dev);
 
 int vps_set_pci(vps_handler *h, envid_t veid, int op, const char *root,
