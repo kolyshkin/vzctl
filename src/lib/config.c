@@ -1413,6 +1413,17 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	}
 	if (sp != buf)
 		strcat(buf, "\"");
+	else {
+		/* Special case: removing all devices.
+		 * If both odev and ndev lists are non-empty
+		 * but the resulting string is, it means all devices
+		 * were deleted. In order for merge_conf() to report
+		 * configuration has changed we need to print something.
+		 */
+		 if (!list_empty(&odev->dev) && !list_empty (&ndev->dev))
+			 snprintf(buf, sizeof(buf),
+					 "%s=\"\"", conf->name);
+	}
 	add_str_param(conf_h, buf);
 	return 0;
 }
