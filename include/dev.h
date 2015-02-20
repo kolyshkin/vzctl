@@ -46,7 +46,7 @@ typedef struct {
 } pci_param;
 
 int create_static_dev(const char *root, const char *name, const char *alias,
-		mode_t mode, dev_t dev);
+		mode_t mode, dev_t dev, int rm);
 
 /** Allow/disallow access to devices on host system from CT.
  *

@@ -210,7 +210,7 @@ static int mk_vzquota_link()
 	}
 	fs = vz_fs_get_name();
 	/* make dev */
-	create_static_dev(NULL, fs, "root", S_IFBLK|S_IXGRP, st.st_dev);
+	create_static_dev(NULL, fs, "root", S_IFBLK|S_IXGRP, st.st_dev, 0);
 
 	snprintf(buf, sizeof(buf), PROC_QUOTA "%08lx" QUOTA_U,
 		(unsigned long)st.st_dev);
@@ -233,7 +233,7 @@ int setup_env_quota(const struct setup_env_quota_param *param)
 		return mk_vzquota_link();
 	/* ploop */
 	if (create_static_dev(NULL, param->dev_name, "root",
-				S_IFBLK|S_IXGRP, param->dev))
+				S_IFBLK|S_IXGRP, param->dev, 0))
 		return -1;
 	return system("quotaon -a");
 }

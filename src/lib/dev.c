@@ -36,10 +36,10 @@
 #include "logger.h"
 #include "script.h"
 
-/* Create an /etc/tmpfiles.d entry for systemd from Fedora 18+ */
+/* Create or remove an /etc/tmpfiles.d entry for systemd from Fedora 18+ */
 static int create_tmpfiles_d_entry(const char *prefix,
 		const char *name, const char *alias,
-		mode_t mode, dev_t dev)
+		mode_t mode, dev_t dev, int rm)
 {
 	FILE *fp;
 	char buf[PATH_MAX];
@@ -53,6 +53,11 @@ static int create_tmpfiles_d_entry(const char *prefix,
 
 	snprintf(buf, sizeof(buf), "%setc/tmpfiles.d/device-%s.conf",
 			prefix, alias);
+	if (rm) {
+		unlink(buf);
+		return 0;
+	}
+
 	logger(2, 0, "Creating %s", buf);
 	fp = fopen(buf, "w");
 	if (fp == NULL)
@@ -65,8 +70,11 @@ static int create_tmpfiles_d_entry(const char *prefix,
 	return 0;
 }
 
+/* Parameters:
+ *   rm: 1 to remove a device
+ */
 int create_static_dev(const char *root, const char *name, const char *alias,
-		mode_t mode, dev_t dev)
+		mode_t mode, dev_t dev, int rm)
 {
 	char buf[PATH_MAX];
 	const char *device;
@@ -99,13 +107,13 @@ int create_static_dev(const char *root, const char *name, const char *alias,
 
 		snprintf(buf, sizeof(buf), "%s%s/%s", prefix, dirs[i], device);
 		unlink(buf);
-		if (mknod(buf, mode, dev)) {
+		if (!rm && mknod(buf, mode, dev)) {
 			logger(-1, errno, "Failed to mknod %s", buf);
 			ret = 1;
 		}
 	}
 
-	create_tmpfiles_d_entry(prefix, device, alias, mode, dev);
+	create_tmpfiles_d_entry(prefix, device, alias, mode, dev, rm);
 
 	return ret;
 }
@@ -113,16 +121,18 @@ int create_static_dev(const char *root, const char *name, const char *alias,
 static int dev_create(const char *root, dev_res *dev)
 {
 	char buf[PATH_MAX];
-	struct stat st;
+	struct stat st = {};
+	const int rm = (dev->mask == 0); /* perms set to none */
 
 	if (!dev->name)
 		return 0;
 	if (check_var(root, "VE_ROOT is not set"))
 		return VZ_VE_ROOT_NOTSET;
 
+
 	/* Get device information from CT0 ... */
 	snprintf(buf, sizeof(buf), "/dev/%s", dev->name);
-	if (stat(buf, &st)) {
+	if (!rm && stat(buf, &st)) {
 		if (errno == ENOENT)
 			logger(-1, 0, "Incorrect name or no such device %s",
 				buf);
@@ -130,14 +140,14 @@ static int dev_create(const char *root, dev_res *dev)
 			logger(-1, errno, "Unable to stat device %s", buf);
 		return VZ_SET_DEVICES;
 	}
-	if (!S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode)) {
+	if (!rm && !S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode)) {
 		logger(-1, 0, "The %s is not block or character device", buf);
 		return VZ_SET_DEVICES;
 	}
 
-	/* ... and create it in CT */
+	/* ... and create or remove it in CT */
 	if (create_static_dev(root, dev->name, NULL,
-				st.st_mode, st.st_rdev) != 0)
+				st.st_mode, st.st_rdev, rm) != 0)
 		return VZ_SET_DEVICES;
 
 	return 0;
