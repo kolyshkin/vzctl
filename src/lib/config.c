@@ -1346,22 +1346,62 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
 	char buf[STR_SIZE];
-	dev_param *dev = &vps_p->res.dev;
+	dev_param *odev = &old_p->res.dev; /* from ve.conf */
+	dev_param *ndev = &vps_p->res.dev; /* from cmdline (set --devnodes) */
 	dev_res *res;
 	int r;
 	char *sp, *ep;
 
 	if (conf->id != PARAM_DEVNODES)
 		return 0;
-	if (list_empty(&dev->dev))
+	if (list_empty(&odev->dev) && list_empty (&ndev->dev))
 		return 0;
+
 	sp = buf;
 	*sp = 0;
 	ep = buf + sizeof(buf) - 1;
-	list_for_each (res, &dev->dev, list) {
+
+	/* First, go through odev, adding all entries
+	 * unless they also present in ndev.
+	 */
+	list_for_each (res, &odev->dev, list) {
+		int in_ndev = 0;
 		/* Devices with no names (--devices) are handled by
 		 * store_dev(), so skip those here */
 		if (!res->name)
+			continue;
+		/* Skip devices with 'none' permissions */
+		if (!res->mask)
+			continue;
+		/* Skip devices present in ndev */
+		if (! list_empty (&ndev->dev)) {
+			dev_res *nres;
+
+			list_for_each(nres, &ndev->dev, list)
+				if (!strcmp(res->name, nres->name)) {
+					in_ndev = 1;
+					continue;
+				}
+		}
+		if (in_ndev)
+			continue;
+		if (sp == buf)
+			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
+		r = snprintf(sp, ep - sp, "%s:%s ", res->name,
+			devperm2str(res->mask));
+		sp += r;
+		if ((r < 0) || (sp >= ep))
+			break;
+
+	}
+
+	list_for_each (res, &ndev->dev, list) {
+		/* Devices with no names (--devices) are handled by
+		 * store_dev(), so skip those here */
+		if (!res->name)
+			continue;
+		/* Skip devices with 'none' permissions */
+		if (!res->mask)
 			continue;
 		if (sp == buf)
 			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
