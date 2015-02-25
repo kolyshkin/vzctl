@@ -153,6 +153,7 @@ static int _env_create(vps_handler *h, void *data)
 	struct arg_start *arg = data;
 	envid_t veid = arg->veid;
 
+	clean_hardlink_dir("/");
 	fill_container_param(arg, &create_param);
 
 	env_create_data.veid = veid;

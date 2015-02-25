@@ -226,7 +226,6 @@ void fill_container_param(struct arg_start *arg,
 	create_param->iptables_mask = get_ipt_mask(&arg->res->env);
 	logger(3, 0, "Setting iptables mask %#10.8llx",
 			(unsigned long long) create_param->iptables_mask);
-	clean_hardlink_dir("/");
 	if (arg->res->cpu.vcpus != NULL)
 		create_param->total_vcpus = *arg->res->cpu.vcpus;
 
