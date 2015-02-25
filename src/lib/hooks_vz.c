@@ -154,6 +154,7 @@ static int _env_create(vps_handler *h, void *data)
 	envid_t veid = arg->veid;
 
 	clean_hardlink_dir("/");
+	create_hardlink_dir();
 	fill_container_param(arg, &create_param);
 
 	env_create_data.veid = veid;
@@ -502,50 +503,72 @@ static int vz_veth_ctl(vps_handler *h, envid_t veid, int op, veth_dev *dev)
 }
 
 /* with mix of md5sum: try generate unique name */
-#define CPT_HARDLINK_DIR ".cpt_hardlink_dir_a920e4ddc233afddc9fb53d26c392319"
+#define CPT_HARDLINK_DIR "/.cpt_hardlink_dir_a920e4ddc233afddc9fb53d26c392319"
 
 void clean_hardlink_dir(const char *mntdir)
 {
-	char buf[STR_SIZE];
+	char buf[PATH_MAX];
 	struct dirent *ep;
+	struct stat st;
 	DIR *dp;
 
-	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
+	snprintf(buf, sizeof(buf), "%s%s", mntdir, CPT_HARDLINK_DIR);
+	if (stat(buf, &st))
+		/* If we can't stat it we can't clean it */
+		return;
+	if (!S_ISDIR(st.st_mode)) {
+		unlink(buf);	/* if file was created by someone */
+		return;
+	}
 
-	unlink(buf);		/* if file was created by someone */
 	if (!(dp = opendir(buf)))
 		return;
 	while ((ep = readdir(dp))) {
 		if (!strcmp(ep->d_name, ".") || !strcmp(ep->d_name, ".."))
 			continue;
 
-		snprintf(buf, sizeof(buf), "%s/%s/%s",
+		snprintf(buf, sizeof(buf), "%s%s/%s",
 				mntdir, CPT_HARDLINK_DIR, ep->d_name);
 		if (unlink(buf))
 			logger(-1, errno, "Warning: unlink %s failed", buf);
 	}
 	closedir(dp);
-
-	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
-	if (rmdir(buf))
-		logger(-1, errno, "Warning: rmdir %s failed", buf);
 }
 
-static int setup_hardlink_dir(const char *mntdir, int cpt_fd)
-{
-	char buf[STR_SIZE];
-	int fd, res = 0;
+int create_hardlink_dir(void) {
+	struct stat st;
 
-	snprintf(buf, sizeof(buf), "%s/%s", mntdir, CPT_HARDLINK_DIR);
-	if (mkdir(buf, 0711) && errno != EEXIST)
+	/* If dir is already there with proper ownership
+	 * and permissions, skip re-creating it
+	 */
+	if (stat(CPT_HARDLINK_DIR, &st) == 0 &&
+			S_ISDIR(st.st_mode) &&
+			(st.st_uid == 0) &&
+			(st.st_gid == 0) &&
+			((st.st_mode & 07777) == 0700))
+		return 0;
+
+	if (unlink(CPT_HARDLINK_DIR) && errno != ENOENT)
+		logger(-1, errno, "Warning: can't unlink %s",
+				CPT_HARDLINK_DIR);
+
+	if (mkdir(CPT_HARDLINK_DIR, 0700) && errno != EEXIST)
 		return vzctl_err(VZ_SYSTEM_ERROR, errno,
 				"Unable to create hardlink directory %s",
-				buf);
+				CPT_HARDLINK_DIR);
+	return 0;
+}
 
-	fd = open(buf, O_RDONLY | O_NOFOLLOW | O_DIRECTORY);
+static int setup_hardlink_dir(int cpt_fd)
+{
+	int fd, res = 0;
+
+	if (create_hardlink_dir())
+		return -1;
+	fd = open(CPT_HARDLINK_DIR, O_RDONLY | O_NOFOLLOW | O_DIRECTORY);
 	if (fd < 0) {
 		logger(-1, errno, "Error: Unable to open "
-				"hardlink directory %s", buf);
+				"hardlink directory %s", CPT_HARDLINK_DIR);
 		return 1;
 	}
 
@@ -554,7 +577,6 @@ static int setup_hardlink_dir(const char *mntdir, int cpt_fd)
 			res = 1;
 			logger(-1, errno, "Cannot set linkdir in kernel");
 		}
-		rmdir(buf);
 	}
 
 	close(fd);
@@ -591,7 +613,7 @@ static int real_chkpnt(int cpt_fd, envid_t veid, const char *root,
 	if (cmd == CMD_CHKPNT || cmd == CMD_DUMP) {
 		logger(0, 0, "\tdump...");
 		clean_hardlink_dir("/");
-		if (setup_hardlink_dir("/", cpt_fd))
+		if (setup_hardlink_dir(cpt_fd))
 			goto err_out;
 		if (ioctl(cpt_fd, CPT_DUMP, 0) < 0) {
 			logger(-1, errno, "Can not dump container");

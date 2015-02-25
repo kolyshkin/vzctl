@@ -21,6 +21,7 @@ int vps_chkpnt(vps_handler *h, envid_t veid, const fs_param *fs,
 		int cmd, cpt_param *param);
 int vps_restore(vps_handler *h, envid_t veid, struct vps_param *vps_p, int cmd,
 	cpt_param *param, skipFlags skip);
+int create_hardlink_dir(void);
 void clean_hardlink_dir(const char *mntdir);
 
 #endif
