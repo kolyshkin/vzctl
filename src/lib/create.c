@@ -467,7 +467,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 
 	if (action != NULL && action->mod_count) {
 		if ((ret = mod_setup(h, veid, 0, 0, action, vps_p)))
-			goto err_private;
+			goto err_cfg;
 	} else {
 		/* Set default ostemplate if not specified */
 		if (cmd_p->res.tmpl.ostmpl == NULL &&
@@ -491,7 +491,7 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		}
 		ret = fs_create(veid, h, vps_p);
 		if (ret)
-			goto err_root;
+			goto err_cfg;
 	}
 
 	if ((ret = vps_postcreate(veid, &vps_p->res)))
@@ -553,7 +553,6 @@ err_names:
 	remove_names(veid);
 err_root:
 	rmdir(fs->root);
-err_private:
 	vps_destroy_dir(veid, fs->private);
 err_cfg:
 	if (sample_config != NULL)
