@@ -220,7 +220,7 @@ find:
 		return VZ_FS_NEW_VE_PRVT;
 
 	/* Lock CT area */
-	if (make_dir(fs->private, 0))
+	if (make_dir(fs->private, 1))
 		return VZ_FS_NEW_VE_PRVT;
 	snprintf(tmp_dir, sizeof(tmp_dir), "%s.tmp", fs->private);
 	if (stat_file(tmp_dir) == 1) {
