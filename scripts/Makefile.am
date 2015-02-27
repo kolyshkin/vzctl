@@ -27,6 +27,7 @@ script_SCRIPTS = \
 	vzevent-stop \
 	vzevent-reboot \
 	vps-pci	\
+	vps-prestart \
 	vps-cpt \
 	vps-rst \
 	vps-rst-env \

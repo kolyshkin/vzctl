@@ -663,6 +663,11 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 			quota_inc(&res->dq, -100);
 	}
 
+	if (!(skip & SKIP_ACTION_SCRIPT)) {
+		ret = run_pre_script(veid, VPS_PRESTART);
+		if (ret)
+			goto err;
+	}
 	if ((ret = fill_vswap_ub(&res->ub, &res->ub)))
 		return ret;
 

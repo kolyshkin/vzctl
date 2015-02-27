@@ -32,6 +32,7 @@
 #define VPS_NETNS_DEV_ADD	SCRIPTDIR "/vps-netns_dev_add"
 #define VPS_NETNS_DEV_DEL	SCRIPTDIR "/vps-netns_dev_del"
 #define VPS_PCI			SCRIPTDIR "/vps-pci"
+#define VPS_PRESTART		SCRIPTDIR "/vps-prestart"
 
 /* User-defined scripts are in VPSCONFDIR */
 #define USER_CREATE_SCRIPT	VPSCONFDIR "/vps.create"
