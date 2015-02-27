@@ -666,7 +666,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		ret = run_pre_script(veid, VPS_PRESTART);
 		if (ret)
-			goto err;
+			return ret;
 	}
 	if ((ret = fill_vswap_ub(&res->ub, &res->ub)))
 		return ret;
