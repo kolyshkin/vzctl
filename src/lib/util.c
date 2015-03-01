@@ -167,7 +167,7 @@ int make_dir_mode(const char *path, int full, int mode)
 		snprintf(buf, len, "%s", path);
 		ps = p + 1;
 		if (stat_file(buf) != 1) {
-			if (mkdir(buf, mode)) {
+			if (mkdir(buf, mode) && errno != ENOENT) {
 				logger(-1, errno, "Can't create directory %s",
 					buf);
 				return 1;
@@ -177,7 +177,7 @@ int make_dir_mode(const char *path, int full, int mode)
 	if (!full)
 		return 0;
 	if (stat_file(path) != 1) {
-		if (mkdir(path, mode)) {
+		if (mkdir(path, mode) && errno != ENOENT) {
 			logger(-1, errno, "Can't create directory %s", path);
 			return 1;
 		}
