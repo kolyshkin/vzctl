@@ -1824,7 +1824,10 @@ static int collect()
 		return ret;
 	/* No CT found, exit with error */
 	if (!n_veinfo) {
-		fprintf(stderr, "Container(s) not found\n");
+		if (fmt_json)
+			printf("[]\n");
+		else
+			fprintf(stderr, "Container(s) not found\n");
 		return 1;
 	}
 	if (check_param(RES_CPUSTAT))
