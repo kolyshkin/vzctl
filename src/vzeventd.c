@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2011, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2010-2015, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -126,38 +126,29 @@ static int parse_event(char *buf)
 	switch (len - 3) {
 		case 4:
 			if (strncmp(name, "stop", 4) == 0)
-				goto ev_stop;
+				break;
 			goto ev_unknown;
 		case 5:
 			if (strncmp(name, "start", 5) == 0)
-				goto ev_start;
+				break;
 			else if (strncmp(name, "mount", 5) == 0)
-				goto ev_mount;
+				break;
 			goto ev_unknown;
 		case 6:
 			if (strncmp(name, "reboot", 6) == 0)
-				goto ev_reboot;
+				break;
 			else if (strncmp(name, "umount", 6) == 0)
-				goto ev_umount;
+				break;
 			goto ev_unknown;
 		default:
 			goto ev_unknown;
 	}
 
+	return run_event_script(ctid, name);
+
 ev_unknown:
 	logger(-1, 0, "Unknown event: %s", buf);
 	return -1;
-
-ev_mount:
-ev_umount:
-ev_start:
-	logger(2, 0, "Got %s event (ignored)", name);
-	/* Do nothing */
-	return 0;
-ev_reboot:
-	return run_event_script(ctid, "reboot");
-ev_stop:
-	return run_event_script(ctid, "stop");
 }
 
 static int read_events(int fd, struct sockaddr_nl *sa)
