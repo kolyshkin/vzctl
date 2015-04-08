@@ -62,6 +62,12 @@ static int run_event_script(envid_t ctid, const char *event)
 
 	snprintf(script, sizeof(script), "%s/vzevent-%s",
 			SCRIPTDIR, event);
+	if (access(script, X_OK) != 0) {
+		if (errno == ENOENT)
+			return 0;
+		logger(-1, errno, "Can't execute %s", script);
+	}
+
 	logger(1, 0, "Running %s event script", event);
 
 	pid = fork();
