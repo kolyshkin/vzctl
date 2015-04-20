@@ -2,12 +2,12 @@
 # OpenVZ init scripts for Red Hat/Fedora/Debian/SUSE.
 
 VZCONF=@PKGCONFDIR@/vz.conf
-[ -f ${VZCONF} ] || exit 0
+[ -f ${VZCONF} ] || exit 6
 . ${VZCONF}
 [ "${VIRTUOZZO}" = "no" ] && exit 0
 
 VZCTL=@SBINDIR@/vzctl
-[ -x ${VZCTL} ] || exit 0
+[ -x ${VZCTL} ] || exit 5
 
 rc_done='..done'
 rc_failed='..failed'
