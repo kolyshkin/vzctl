@@ -197,10 +197,12 @@ int add_dev_param(dev_param *dev, const dev_res *res)
 	if (list_is_init(&dev->dev))
 		list_head_init(&dev->dev);
 	memcpy(tmp, res, sizeof(*tmp));
-	tmp->name = strdup(res->name);
-	if (tmp->name == NULL) {
-		free(tmp);
-		return -1;
+	if (res->name) {
+		tmp->name = strdup(res->name);
+		if (tmp->name == NULL) { /* ENOMEM */
+			free(tmp);
+			return -1;
+		}
 	}
 	list_add_tail(&tmp->list, &dev->dev);
 
