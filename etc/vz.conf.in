@@ -24,8 +24,9 @@ VZFASTBOOT=no
 
 # Uncomment to limit CT IP ARP announces only to network interfaces
 # having IPs within the same IP network as a container IP.
-# Leave commented out to use all interfaces.
-#NEIGHBOUR_DEVS=detect
+# If you want to explicitly specify interfaces, use "list:eth0 eth1" form.
+# Leave commented out or set to "all" to use all interfaces.
+#NEIGHBOUR_DEVS="detect"
 
 ## Uncomment to skip ARP queries checking for CT IP being used
 ## by some other machine on the network
