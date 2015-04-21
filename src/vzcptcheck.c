@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013, Parallels, Inc. All rights reserved.
+ *  Copyright (C) 2013-2015, Parallels, Inc. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ static int usage(int rc)
 " [S]	vzcptcheck version		show cpt in-kernel version\n"
 " [D]	vzcptcheck version <ver>	test if <ver> version is supported\n"
 " [D]	vzcptcheck caps			show CPU capabilities\n"
-" [S]	vzcptcheck caps <veid> <caps>	test if <caps> work for <veid>\n"
+" [S]	vzcptcheck caps <caps>		test if <caps> work\n"
+" [S]	vzcptcheck caps <veid> <caps>	test if <caps> work for running <veid>\n"
 "\n"
 "[S] -- run this on source node\n"
 "[D] -- run on destination node\n"
@@ -171,6 +172,38 @@ static int cpt_caps(int argc, char *argv[])
 		}
 
 		printf("%d\n", caps);
+		return 0;
+	}
+	else if (argc == 2) { /* test caps, no VEID */
+		int ret;
+
+		caps = atoi(argv[1]);
+
+		fd = cpt_open("cpt", &err_fd);
+		if (fd < 0)
+			return 1;
+
+		ret = ioctl(fd, CPT_TEST_CAPS, caps);
+		cpt_read_error(err_fd);
+		close(fd);
+		if (ret < 0) {
+			if (errno == ENOSYS || errno == EAGAIN) {
+				fprintf(stderr, "vzcptcheck WARNING: old "
+						"kernel, please update to "
+						"kernel >= 042stab107.x\n");
+				/* As we can't test caps anyway, assume OK */
+				return 0;
+			}
+			ioctl_error("CPT_TEST_CAPS");
+			return 1;
+		}
+
+		if (ret > 0) {
+			fprintf(stderr, "Insufficient CPU capabilities: "
+					"can't migrate\n");
+			return 2;
+		}
+
 		return 0;
 	}
 	else if (argc == 3) { /* test caps */

@@ -1,4 +1,4 @@
-.TH vzcptcheck 8 "5 Mar 2013" "OpenVZ" "Containers"
+.TH vzcptcheck 8 "21 Apr 2015" "OpenVZ" "Containers"
 .SH NAME
 vzcptcheck \- show/test CPT properties
 .SH SYNOPSIS
@@ -42,10 +42,16 @@ Then, to check if this version number is supported, run
 .B caps
 .I ctid
 .I capnum
+.SY vzcptcheck
+.B caps
+.I capnum
 .YS
 To get CPU capabilities number, run \fBvzcptcheck caps\fR on the destination
-node. Then, to check if a CT can be migrated to node with such a CPU, run
-\fBvzcptcheck caps \fIctid capnum\fR on the source node.
+node. Then, to check if a running CT can be live migrated to a node
+with such a CPU, run \fBvzcptcheck caps \fIctid capnum\fR on the source node.
+To check if a suspended container can be migrated (i.e. it can be restored
+on the destination node), use the form without \fIctid\fR:
+\fBvzcptcheck caps \fIcapnum\fR.
 .SH EXIT STATUS
 In showing mode, returns \fB0\fR upon success, or \fB1\fR in case of an error.
 .P
@@ -72,4 +78,4 @@ If both tests pass, you should get 0 as a result for both checks.
 .SH SEE ALSO
 .BR vzmigrate (8).
 .SH LICENSE
-Copyright (C) 2013, Parallels, Inc. Licensed under GNU GPL v2.
+Copyright (C) 2013-2015, Parallels, Inc. Licensed under GNU GPL v2.

@@ -460,6 +460,7 @@ print_times() {
 
 check_cpt_props() {
 	local version
+	local id
 
 	log 2 "Checking for CPT version compatibility"
 	version=$(vzcptcheck version)
@@ -473,11 +474,13 @@ check_cpt_props() {
 		exit $MIG_ERR_UNSUP_CPT_VER
 	fi
 
+	test "$state" = "running" && id=$VEID
+
 	log 2 "Checking for CPU flags compatibility"
 	CPU_CAPS=$($SSH root@$host vzcptcheck caps)
 	if [ $? -ne 0 -o "$CPU_CAPS" = "" ]; then
 		log 1 "Warning: can't get remote CPU caps, skipping check"
-	elif ! logexec 1 vzcptcheck caps $VEID $CPU_CAPS; then
+	elif ! logexec 1 vzcptcheck caps $id $CPU_CAPS; then
 		log 0 "CPU capabilities check failed!"
 		log 0 "Destination node CPU is not compatible"
 		if [ $ignore_cpu -eq 1 ]; then
@@ -725,7 +728,7 @@ if [ "$dst_exist" = "exist" ]; then
 	exit $MIG_ERR_EXISTS
 fi
 
-if [ $online -eq 1 ]; then
+if [ $online -eq 1 -o "$suspended" = "suspended" ]; then
 	if ! which vzcptcheck >/dev/null; then
 		log 1 "Warning: no vzcptcheck binary on local node,"
 		log 1 "skipping CPT version and CPU caps checks"
