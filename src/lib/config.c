@@ -1227,14 +1227,15 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 	list_head_t *conf_h)
 {
 	char buf[STR_SIZE];
-	dev_param *dev = &vps_p->res.dev;
+	dev_param *odev = &old_p->res.dev; /* from ve.conf */
+	dev_param *ndev = &vps_p->res.dev; /* from cmdline (set --devices) */
 	dev_res *res;
 	int r;
 	char *sp, *ep;
 
 	if (conf->id != PARAM_DEVICES)
 		return 0;
-	if (list_empty(&dev->dev))
+	if (list_empty(&odev->dev) && list_empty(&ndev->dev))
 		return 0;
 
 	sp = buf;
@@ -1262,15 +1263,60 @@ do {									\
 		break;							\
 } while (0)
 
-	list_for_each(res, &dev->dev, list) {
+	/* First, go through odev, adding all entries
+	 * unless they also present in ndev.
+	 */
+	list_for_each(res, &odev->dev, list) {
+		int in_ndev = 0;
+
 		/* Devices with names (--devnodes) are handled by
 		 * store_devnodes(), so skip those here */
 		if (res->name)
 			continue;
+		/* Skip devices with 'none' permissions */
+		if (!res->mask)
+			continue;
+		/* Skip devices present in ndev */
+		if (! list_empty (&ndev->dev)) {
+			dev_res *nres;
+
+			list_for_each(nres, &ndev->dev, list)
+				if (res->type == nres->type &&
+						res->dev == nres->dev) {
+					in_ndev = 1;
+					continue;
+				}
+		}
+		if (in_ndev)
+			continue;
+
+		PRINT_DEV;
+	}
+
+	list_for_each(res, &ndev->dev, list) {
+		/* Devices with names (--devnodes) are handled by
+		 * store_devnodes(), so skip those here */
+		if (res->name)
+			continue;
+		/* Skip devices with 'none' permissions */
+		if (!res->mask)
+			continue;
+
 		PRINT_DEV;
 	}
 	if (sp != buf)
 		strcat(buf, "\"");
+	else {
+		/* Special case: removing all devices
+		 * If both odev and ndev lists are non-empty
+		 * but the resulting string is, it means all devices
+		 * were deleted. In order for vps_merge_conf() to report
+		 * configuration has changed we need to print something.
+		 */
+		if (!list_empty(&odev->dev) && !list_empty (&ndev->dev))
+			snprintf(buf, sizeof(buf),
+					"%s=\"\"", conf->name);
+	}
 	add_str_param(conf_h, buf);
 
 	return 0;
