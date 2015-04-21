@@ -1,4 +1,4 @@
-.TH vz.conf 5 "5 Dec 2012" "OpenVZ" "Containers"
+.TH vz.conf 5 "20 Apr 2015" "OpenVZ" "Containers"
 .SH NAME
 vz.conf \- global OpenVZ configuration file
 .SH SYNOPSIS
@@ -80,12 +80,20 @@ This parameter specifies the network device name which IP address will be
 used as the source IP. This is helpful in case more than one network
 interface is configured on HN and there is a need to specify the source
 IP address. Default is the first device in the network device list.
-.IP \fBNEIGHBOUR_DEVS\fR="\fBdetect\fR"
+.IP \fBNEIGHBOUR_DEVS\fR="\fBall\fR|\fBdetect\fR|\fBlist:\fIdev1\fR\ [\fIdev2\fR\ ...]"
 Controls on which interfaces to add/remove ARP records for a container IP, also
-which interfaces to use to query/announce ARP. If this is set to \fBdetect\fR,
-the right network interface (the one which is in the same subnet as a CT IP)
-will be chosen automatically. Any other value restores old (as of vzctl 3.0.19
-or older) behavior, when all the possible interfaces were used.
+which interfaces to use to query/announce ARP.
+
+If set to \fBall\fR, an empty string, or unset, all possible
+network interfaces (i.e. the ones that are UP and doesn't have NOARP,
+SLAVE, or LOOPBACK flags) are used. This is the default mode.
+
+If set to \fBdetect\fR, the right network interface
+(i.e. the one which is in the same subnet as a container IP)
+will be chosen automatically.
+
+If the value starts with \fBlist:\fR prefix, the space-separated list of
+interfaces following the prefix is used.
 .IP \fBERROR_ON_ARPFAIL\fR=\fByes\fR|\fBno\fR
 In case the value of this parameter is set to \fByes\fR, vzctl will fail to
 start a container if there is another host with the same IP present
