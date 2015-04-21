@@ -1236,36 +1236,46 @@ static int store_dev(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 		return 0;
 	if (list_empty(&dev->dev))
 		return 0;
+
 	sp = buf;
 	ep = buf + sizeof(buf) - 1;
-	list_for_each(res, &dev->dev, list) {
-		int major, minor;
 
+#define PRINT_DEV \
+do {									\
+	int major, minor;						\
+									\
+	if (sp == buf)							\
+		sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);	\
+	major = major(res->dev);					\
+	minor = minor(res->dev);					\
+	if (res->use_major) {						\
+		r = snprintf(sp, ep - sp, "%c:%d:all:%s ",		\
+				S_ISBLK(res->type) ? 'b' : 'c', major,	\
+				devperm2str(res->mask));		\
+	} else {							\
+		r = snprintf(sp, ep - sp, "%c:%d:%d:%s ",		\
+				S_ISBLK(res->type) ? 'b' : 'c',		\
+				major, minor, devperm2str(res->mask));	\
+	}								\
+	sp += r;							\
+	if ((r < 0) || (sp >= ep))					\
+		break;							\
+} while (0)
+
+	list_for_each(res, &dev->dev, list) {
 		/* Devices with names (--devnodes) are handled by
 		 * store_devnodes(), so skip those here */
 		if (res->name)
 			continue;
-		if (sp == buf)
-			sp += snprintf(buf, sizeof(buf), "%s=\"", conf->name);
-		major = major(res->dev);
-		minor = minor(res->dev);
-		if (res->use_major) {
-			r = snprintf(sp, ep - sp, "%c:%d:all:%s ",
-				S_ISBLK(res->type) ? 'b' : 'c', major,
-				devperm2str(res->mask));
-		} else {
-			r = snprintf(sp, ep - sp, "%c:%d:%d:%s ",
-				S_ISBLK(res->type) ? 'b' : 'c', major, minor,
-				devperm2str(res->mask));
-		}
-		sp += r;
-		if ((r < 0) || (sp >= ep))
-			break;
+		PRINT_DEV;
 	}
 	if (sp != buf)
 		strcat(buf, "\"");
 	add_str_param(conf_h, buf);
+
 	return 0;
+
+#undef PRINT_DEV
 }
 
 static int parse_devnodes_str(const char *str, dev_res *dev)
