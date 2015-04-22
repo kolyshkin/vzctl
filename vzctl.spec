@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.8
+Version: 4.9
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -300,6 +300,58 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Wed Apr 22 2015 Kir Kolyshkin <kir@openvz.org> - 4.9-1
+- New functionality and important changes:
+-- vzmigrate: check CPU caps for suspended CT
+-- suse-{add,del}_ip.sh: support for IP mask
+-- vz.conf: allow list of interfaces in NEIGHBOUR_DEVS (#1289, #3192)
+-- Introduce funtoo-set_hostname (#3097)
+-- vz-postinstall: add a way to disable stock distro kernels from repos
+-- vzctl set --devnodes|--devices: made cumulative, fix
+-- vzctl set --devnodes: remove devices from CT
+-- vzctl start/resume: load kernel modules needed for CT
+-- vzctl create: disallow VE_PRIVATE be a mount point (#3166)
+-- vzevent: try to run a script for all known events
+-- vzctl restore|resume: add --skip-fsck
+- Fixes:
+-- redhat-add_ip.sh: support for Fedora 21 and RHEL/CentOS 7.1 (#3169)
+-- vzctl snapshot-delete: ignore ploop 'no guid found'
+-- suse-add_ip.sh: fix for venet routing in SUSE 13.2
+-- osrelease.conf: add suse 13.2
+-- vzctl chkpnt: workaround for ENOSPC
+-- ct_enter(): enter mnt namespace last (#3038)
+-- vzmigrate: fix for vzfsync if VE_PRIVATE differs (#3170)
+-- init.d/vz-gentoo: fix a typo
+-- vzctl.spec: fix iptables checking for RHEL5 (#2755)
+-- vzmigrate: use DUMPDIR for CT dump (#3054)
+-- vzmigrate: don't hardcode /vz/lock, use LOCKDIR (#2976)
+-- vzmigrate: use C locale (#3049)
+-- vzlist: fix cpuunits rounding (#3120)
+-- snapshot-switch --must-restore: fix restoring config
+-- fs_create: lock private
+-- vps_create: minor fixes to cleanup logic
+-- make_dir_mode(): ignore EEXIST from mkdir()
+-- vzlist -j: output valid JSON for no CTs
+-- init.d/vz-redhat: fix exit codes according to LSB (#3195)
+- Improvements:
+-- vzmigrate: random ports for ploop copy (#3052)
+-- vzctl start: close extra fds later (#3091)
+-- vzctl start: mkdir /proc in CT if needed (#3091)
+-- vzctl create: fix an error message
+-- vzctl.spec: require recent RHEL6 kernel (#3094)
+-- init.d/vz*: load pio_kaio
+-- suse-add_ip.sh: fix a warning
+-- suse-del_ip.sh: remove venet routes
+-- init.d/vz-redhat: fix a bashism (#3148)
+-- vzctl delete: do rm config/dump even if failed to rm VE_PRIVATE
+-- dists/scripts/{funtoo,gentoo}*: remove env var doc
+-- debian-add_ip.sh: silent an error
+-- vzeventd: ignore non-existent event scripts
+- Documentation:
+-- vzeventd(8): document new behavior
+-- vzcptcheck(8): describe caps check w/o CTID
+-- vz.conf(5): describe new NEIGHBOUR_DEV syntax
+
 * Mon Oct  6 2014 Kir Kolyshkin <kir@openvz.org> - 4.8-1
 - New functionality and important changes:
 -- vzctl set: add NUMA --nodemask (sponsored by FastVPS)
