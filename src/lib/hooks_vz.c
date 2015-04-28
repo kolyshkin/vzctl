@@ -44,6 +44,8 @@
 
 #define ENVRETRY	3
 
+static int create_hardlink_dir(void);
+
 static int vz_env_create_ioctl(vps_handler *h, envid_t veid, int flags)
 {
 	struct vzctl_env_create env_create;
@@ -154,7 +156,8 @@ static int _env_create(vps_handler *h, void *data)
 	envid_t veid = arg->veid;
 
 	clean_hardlink_dir("/");
-	create_hardlink_dir();
+	if (create_hardlink_dir())
+		return VZ_SYSTEM_ERROR;
 	fill_container_param(arg, &create_param);
 
 	env_create_data.veid = veid;
@@ -535,19 +538,26 @@ void clean_hardlink_dir(const char *mntdir)
 	closedir(dp);
 }
 
-int create_hardlink_dir(void) {
+static int create_hardlink_dir(void) {
 	struct stat st;
+	int ret;
 
-	/* If dir is already there with proper ownership
-	 * and permissions, skip re-creating it
-	 */
-	if (stat(CPT_HARDLINK_DIR, &st) == 0 &&
-			S_ISDIR(st.st_mode) &&
-			(st.st_uid == 0) &&
-			(st.st_gid == 0) &&
-			((st.st_mode & 07777) == 0700))
+	ret = stat(CPT_HARDLINK_DIR, &st);
+	if (ret && errno != ENOENT) {
+		logger(-1, errno, "Can't stat %s", CPT_HARDLINK_DIR);
+		return -1;
+	}
+
+	if (ret == 0 && S_ISDIR(st.st_mode)) {
+		/* dir exists -- make sure mode/ownership is right */
+		if ((st.st_mode & 07777) != 0700)
+			chmod(CPT_HARDLINK_DIR, 0700);
+		if ((st.st_uid != 0) || (st.st_gid != 0))
+			chown(CPT_HARDLINK_DIR, 0, 0);
 		return 0;
+	}
 
+	/* CPT_HARDLINK_DIR doesn't exist, or is not a directory */
 	if (unlink(CPT_HARDLINK_DIR) && errno != ENOENT)
 		logger(-1, errno, "Warning: can't unlink %s",
 				CPT_HARDLINK_DIR);
