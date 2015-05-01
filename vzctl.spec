@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.9
+Version: 4.9.1
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -299,6 +299,10 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Thu Apr 30 2015 Kir Kolyshkin <kir@openvz.org> - 4.9.1-1
+- create_hardlink_dir(): fix wrong owner/perms case (#3222)
+- vzctl.spec: drop the "Conflicts: vzkernel" (#3219)
+
 * Wed Apr 22 2015 Kir Kolyshkin <kir@openvz.org> - 4.9-1
 - New functionality and important changes:
 -- vzmigrate: check CPU caps for suspended CT
