@@ -1434,7 +1434,9 @@ static int store_devnodes(vps_param *old_p, vps_param *vps_p, vps_config *conf,
 			dev_res *nres;
 
 			list_for_each(nres, &ndev->dev, list)
-				if (!strcmp(res->name, nres->name)) {
+				if (nres->name &&
+						!strcmp(res->name,
+							nres->name)) {
 					in_ndev = 1;
 					continue;
 				}
