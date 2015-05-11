@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.9.1
+Version: 4.9.2
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -300,6 +300,11 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Mon May 11 2015 Kir Kolyshkin <kir@openvz.org> - 4.9.2-1
+- store_devnodes: fix NULL deref (#3228)
+- vps-create.sh: use stat -f instead of df
+- vzctl.spec: require attr package
+
 * Thu Apr 30 2015 Kir Kolyshkin <kir@openvz.org> - 4.9.1-1
 - create_hardlink_dir(): fix wrong owner/perms case (#3222)
 - vzctl.spec: drop the "Conflicts: vzkernel" (#3219)
