@@ -93,6 +93,8 @@ setup_systemd_console()
 
 	[ -L  $SYSTEMD_DIR/getty.target.wants/getty@tty1.service ] && \
 		rm -f $SYSTEMD_DIR/getty.target.wants/getty@tty1.service
+	[ -L  $SYSTEMD_DIR/getty.target.wants/getty-static.service ] && \
+		rm -f $SYSTEMD_DIR/getty.target.wants/getty-static.service
 	[ -L  $ETC_SYSTEMD_DIR/getty.target.wants/getty@tty1.service ] && \
 		rm -f $ETC_SYSTEMD_DIR/getty.target.wants/getty@tty1.service
 	[ -L  $SYSTEMD_DIR/getty.target.wants/getty@tty2.service ] || \
