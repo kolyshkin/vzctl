@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2013, Parallels, Inc. All rights reserved.
+# Copyright (C) 2013-2015, Parallels, Inc. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -99,6 +99,9 @@ function footer() {
 		if (t_flags ~ "R")
 			printf("  R: non-VSwap container, RAM limit guessed " \
 				"based on privvmpages\n");
+		if (t_flags ~ "U")
+			printf("  U: unlimited container, RAM limit " \
+				"not included into totals\n");
 		if (t_flags ~ "S")
 			printf("  S: unlimited swap (ok for non-vswap), " \
 				"not counted into total swap limit\n");
@@ -119,10 +122,16 @@ function process_ct() {
 	flags=""
 
 	if (ram_limit == 0 || ram_limit == 2147483647 || ram_limit == 9223372036854775807) {
-		# Non-VSwap config!
-		flags="R"
-		# Roughly guess limit based on privvmpages / vm_overcommit
-		ram_limit=vm_limit/2
+		if (vm_limit == 2147483647 || vm_limit  == 9223372036854775807) {
+			# Unlimited container?
+			flags="U"
+			ram_limit=0
+		} else {
+			# Non-VSwap config!
+			flags="R"
+			# Roughly guess limit based on privvmpages / vm_overcommit
+			ram_limit=vm_limit/2
+		}
 	}
 	if (swap_limit == 2147483647 || swap_limit == 9223372036854775807) {
 		# Hmm, unlimited swap?
