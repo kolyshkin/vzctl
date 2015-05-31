@@ -214,7 +214,7 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 	}
 	if (vps_is_run(h, veid)) {
 		logger(-1, 0, "Container is running -- stop it first");
-		return 0;
+		return VZ_VE_RUNNING;
 	}
 	if (!(skip & SKIP_ACTION_SCRIPT)) {
 		snprintf(buf, sizeof(buf), "%s/%d.%s", VPSCONFDIR,
