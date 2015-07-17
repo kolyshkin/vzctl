@@ -105,6 +105,11 @@ use ARP queries when starting a container in order to detect if there is
 another host with the same IP present in the network. Note that for each
 IP, vzctl sends ARP query and waits up to 1 second for response.
 Any other value means to do ARP detection.
+.IP \fBFORCE_ROUTE\fR=\fByes\fR|\fBno\fR
+In case the value of this parameter is set to \fByes\fR, vzctl will attempt
+to change an existing route to point to a container when starting a container
+if new route setup fails.
+Any other value means to only attempt to add new routes (default behavior).
 
 .SS Defaults for vzctl create
 
