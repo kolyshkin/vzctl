@@ -312,13 +312,23 @@ vzaddrouting4()
 		src_addr="src $src_addr"
 	fi
 	${IP_CMD} route add "$1" dev venet0 $src_addr ||
-		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 $src_addr" $VZ_CANT_ADDIP
+		if [ "$FORCE_ROUTE" = 'yes' ]; then
+			${IP_CMD} route change "$1" dev venet0 $src_addr ||
+				vzerror "Unable to add or change route ${IP_CMD} route change $1 dev venet0 $src_addr" $VZ_CANT_ADDIP
+		else
+			vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0 $src_addr" $VZ_CANT_ADDIP
+		fi
 }
 
 vzaddrouting6()
 {
 	${IP_CMD} route add "$1" dev venet0 ||
-		vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0" $VZ_CANT_ADDIP
+		if [ "$FORCE_ROUTE" = 'yes' ]; then
+			${IP_CMD} route change "$1" dev venet0 ||
+				vzerror "Unable to add or change route ${IP_CMD} route change $1 dev venet0" $VZ_CANT_ADDIP
+		else
+			vzerror "Unable to add route ${IP_CMD} route add $1 dev venet0" $VZ_CANT_ADDIP
+		fi
 }
 
 # Sets VE0 source routing for given IP
