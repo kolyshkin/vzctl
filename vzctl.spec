@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.9.2
+Version: 4.9.3
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -300,6 +300,12 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Mon Jul 27 2015 Kir Kolyshkin <kir@openvz.org> - 4.9.3-1
+- set_console.sh: ubuntu 15.04 systemd console support
+- vzoversell: handle unlimited RAM CTs
+- vzctl umount: fix exit code if CT is running
+- vz.conf, vps-net_add: add FORCE_ROUTE to change existing route to CT
+
 * Mon May 11 2015 Kir Kolyshkin <kir@openvz.org> - 4.9.2-1
 - store_devnodes: fix NULL deref (#3228)
 - vps-create.sh: use stat -f instead of df
