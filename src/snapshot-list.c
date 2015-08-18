@@ -248,7 +248,7 @@ static void usage_snapshot_list(int err)
 }
 
 int vzctl_env_snapshot_list(int argc, char **argv, int envid,
-		const char *ve_private)
+		const struct fs_param *fs)
 {
 	int c, ret;
 	int no_hdr = 0;
@@ -316,15 +316,15 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 	if (ret)
 		return ret;
 
-	if (ve_private == NULL) {
+	if (fs->private == NULL) {
 		fprintf(stderr, "VE_PRIVATE is not specified");
 		return VZ_VE_PRIVATE_NOTSET;
 	}
 
-	if (!is_snapshot_supported(ve_private))
+	if (!is_snapshot_supported(fs))
 		return VZCTL_E_LIST_SNAPSHOT;
 
-	GET_SNAPSHOT_XML(fname, ve_private);
+	GET_SNAPSHOT_XML(fname, fs->private);
 	if (stat_file(fname) != 1) {
 		print_hdr(no_hdr);
 		return 0;
@@ -344,7 +344,7 @@ int vzctl_env_snapshot_list(int argc, char **argv, int envid,
 	if (ret)
 		goto free_tree;
 
-	GET_DISK_DESCRIPTOR(fname, ve_private);
+	GET_DISK_DESCRIPTOR(fname, fs->private);
 	ret = ploop.read_disk_descr(&g_di, fname);
 	if (ret) {
 		fprintf(stderr, "Failed to read %s: %s",

@@ -46,4 +46,6 @@ int merge_global_param(vps_param *dst, vps_param *src);
 void free_vps_param(vps_param *param);
 int get_veid_by_name(const char *name);
 int set_name(int veid, char *new_name, char *old_name);
+int save_ve_layout(int veid, vps_param *param, int layout);
+
 #endif

@@ -27,6 +27,7 @@
 #include "types.h"
 #include "quota.h"
 #include "fs.h"
+#include "res.h"
 
 #define VZCTL_VE_ROOTHDD_DIR	"root.hdd"
 
@@ -61,7 +62,8 @@ struct vzctl_mount_param {
 
 int is_ploop_supported(void);
 int get_ploop_type(const char *type);
-int ve_private_is_ploop(const char *private);
+int guess_ve_private_is_ploop(const char *private);
+int ve_private_is_ploop(const fs_param *fs);
 
 #ifdef HAVE_PLOOP
 extern struct ploop_functions ploop;
@@ -88,7 +90,7 @@ int vzctl_mount_snapshot(unsigned envid, const char *ve_private, struct vzctl_mo
 int vzctl_umount_snapshot(unsigned envid, const char *ve_private, char *guid);
 const char *generate_snapshot_component_name(unsigned int envid,
 		const char *data, char *buf, int len);
-int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
+int vzctl_env_convert_ploop(vps_handler *h, envid_t veid, vps_param *vps_p,
 		fs_param *fs, dq_param *dq, int mode);
 #endif /* HAVE_PLOOP */
 

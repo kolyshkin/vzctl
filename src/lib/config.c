@@ -2126,6 +2126,37 @@ static int parse_ve_layout(int *layout, int *mode, const char *val)
 	return ERR_INVAL;
 }
 
+static int store_ve_layout(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+		list_head_t *conf_h)
+{
+	int ret = 0;
+	int layout;
+
+	if (conf->id != PARAM_VE_LAYOUT)
+		return 0;
+
+	layout = vps_p->res.fs.layout ?: old_p->res.fs.layout;
+	if (layout) {
+		ret = conf_store_str(conf_h, conf->name,
+			layout == VE_LAYOUT_PLOOP ? "ploop" : "simfs");
+	}
+	return ret;
+}
+
+int save_ve_layout(int veid, vps_param *param, int layout)
+{
+	int ret;
+	struct vps_param *fixed;
+	char path[PATH_MAX];
+
+	fixed = init_vps_param();
+	fixed->res.fs.layout = layout;
+	get_vps_conf_path(veid, path, sizeof(path));
+	ret = vps_save_config(0, path, fixed, param, NULL);
+	free_vps_param(fixed);
+	return ret;
+}
+
 static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 {
 	int ret;
@@ -2522,6 +2553,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_netif(old_p, vps_p, conf, conf_h);
 		store_name(old_p, vps_p, conf, conf_h);
 		store_io(old_p, vps_p, conf, conf_h);
+		store_ve_layout(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }

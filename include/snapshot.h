@@ -45,7 +45,7 @@ int vzctl_read_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tree
 int vzctl_store_snapshot_tree(const char *fname, struct vzctl_snapshot_tree *tree);
 
 /* src/snapshot.c */
-int is_snapshot_supported(const char *ve_private);
+int is_snapshot_supported(const fs_param *fs);
 int vzctl_env_create_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 		const struct vzctl_snapshot_param *param);
 
@@ -55,14 +55,14 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid, vps_param *g_p,
 int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid, const fs_param *fs,
 		const char *guid);
 
-int vzctl_env_mount_snapshot(unsigned veid, char *ve_private, char *mnt,
+int vzctl_env_mount_snapshot(unsigned veid, const fs_param *fs, char *mnt,
 		char *guid);
 
-int vzctl_env_umount_snapshot(unsigned veid, char *ve_private,
+int vzctl_env_umount_snapshot(unsigned veid, const fs_param *fs,
 		char *guid);
 
 /* src/snapshot-list.c */
 int vzctl_env_snapshot_list(int argc, char **argv, int envid,
-		const char *ve_private);
+		const struct fs_param *fs);
 #endif /* __SNAPSHOT_H__ */
 #endif /* HAVE_PLOOP */

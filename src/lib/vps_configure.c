@@ -320,7 +320,7 @@ static int vps_quota_configure(vps_handler *h, envid_t veid,
 	snprintf(buf, sizeof(buf), "VE_STATE=%s", str_state);
 	envp[i++] = strdup(buf);
 	if (*dq->ugidlimit)  {
-		if (!ve_private_is_ploop(fs->private)) {
+		if (!ve_private_is_ploop(fs)) {
 			/* simfs/vzquota case */
 			struct stat st;
 			const char *fs_name;

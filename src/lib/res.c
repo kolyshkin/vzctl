@@ -40,15 +40,15 @@
 #include "script.h"
 
 static int fill_2quota_param(struct setup_env_quota_param *p,
-		const char *ve_private, const char *ve_root)
+		const struct fs_param *fs)
 {
 	struct stat st;
 
-	if (!ve_private_is_ploop(ve_private)) {
+	if (!ve_private_is_ploop(fs)) {
 		/* simfs case */
-		if (stat(ve_root, &st)) {
+		if (stat(fs->root, &st)) {
 			logger(-1, errno, "%s: Can't stat %s",
-				       __func__, ve_root);
+				       __func__, fs->root);
 			return VZ_ERROR_SET_USER_QUOTA;
 		}
 		p->dev_name[0] = 0;
@@ -61,8 +61,8 @@ static int fill_2quota_param(struct setup_env_quota_param *p,
 	if (!is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
 #ifdef HAVE_PLOOP
-	if (vzctl_get_ploop_dev(ve_root, p->dev_name, sizeof(p->dev_name))) {
-		logger(-1, 0, "Unable to find ploop device for %s", ve_root);
+	if (vzctl_get_ploop_dev(fs->root, p->dev_name, sizeof(p->dev_name))) {
+		logger(-1, 0, "Unable to find ploop device for %s", fs->root);
 		return VZ_ERROR_SET_USER_QUOTA;
 	}
 #endif
@@ -132,7 +132,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	/* Setup 2nd-level quota */
 	if (is_2nd_level_quota_on(&res->dq)) {
 		struct setup_env_quota_param qp;
-		if ((ret = fill_2quota_param(&qp, fs->private, fs->root)))
+		if ((ret = fill_2quota_param(&qp, fs)))
 			return ret;
 		if ((ret = vps_2quota_perm(h, veid, qp.dev)))
 			return ret;
@@ -155,7 +155,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 	if (!(skip & SKIP_CONFIGURE))
 		vps_configure(h, veid, actions, fs, param, vps_state);
 	/* Setup quota limits after configure steps */
-	if (!ve_private_is_ploop(fs->private)) {
+	if (!ve_private_is_ploop(fs)) {
 		if ((ret = vps_set_quota(veid, &res->dq)))
 			return ret;
 	}

@@ -93,13 +93,14 @@ static int download_template(char *tmpl)
 struct destroy_ve {
 	envid_t veid;
 	char *private;
+	int layout;
 };
 
 static void cleanup_destroy_ve(void *data)
 {
 	struct destroy_ve *d = data;
 
-	vps_destroy_dir(d->veid, d->private);
+	vps_destroy_dir(d->veid, d->private, d->layout);
 }
 
 #ifdef HAVE_PLOOP
@@ -239,6 +240,7 @@ find:
 
 	ddata.veid = veid;
 	ddata.private = tmp_dir;
+	ddata.layout = fs->layout;
 	ch = add_cleanup_handler(cleanup_destroy_ve, &ddata);
 
 	if (ploop) {
@@ -552,7 +554,7 @@ err_names:
 	remove_names(veid);
 err_root:
 	rmdir(fs->root);
-	vps_destroy_dir(veid, fs->private);
+	vps_destroy_dir(veid, fs->private, fs->layout);
 err_cfg:
 	if (sample_config != NULL)
 		unlink(dst);

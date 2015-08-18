@@ -487,7 +487,7 @@ static int parse_convert_opt(envid_t veid, int argc, char **argv,
 }
 
 static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
-		vps_param *cmd_p)
+		vps_param *cmd_p, vps_param *vps_p)
 {
 	int layout = cmd_p->res.fs.layout;
 	int mode = cmd_p->res.fs.mode;
@@ -504,7 +504,7 @@ static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
 		return VZ_INVALID_PARAMETER_VALUE;
 	}
 
-	return vzctl_env_convert_ploop(h, veid,
+	return vzctl_env_convert_ploop(h, veid, vps_p,
 			&g_p->res.fs, &g_p->res.dq, mode);
 }
 
@@ -531,7 +531,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 		return VZ_FS_NOPRVT;
 	}
 
-	if (!ve_private_is_ploop(private)) {
+	if (!ve_private_is_ploop(&g_p->res.fs)) {
 		logger(0, 0, "Compact only makes sense for ploop containers");
 		return 0;
 	}
@@ -998,7 +998,7 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 					"can only be used with --diskspace");
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
-		if (!ve_private_is_ploop(param->g_param->res.fs.private)) {
+		if (!ve_private_is_ploop(&param->g_param->res.fs)) {
 			logger(0, 0, "Warning: option --offline-resize "
 					"only makes sense for a ploop CT");
 		}
@@ -1038,7 +1038,7 @@ static int check_set_opt(int argc, char *argv[], vps_param *param)
 			return VZ_INVALID_PARAMETER_SYNTAX;
 		}
 		if (param->res.dq.diskspace &&
-				ve_private_is_ploop(param->g_param->res.fs.private))
+				ve_private_is_ploop(&param->g_param->res.fs))
 		{
 			logger(-1, 0, "Error: can't use --diskspace without --save "
 					"for a ploop-based container");
@@ -1237,7 +1237,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	}
 	/* Resize ploop image if --diskspace is supplied */
 	if (cmd_p->res.dq.diskspace &&
-			ve_private_is_ploop(g_p->res.fs.private))
+			ve_private_is_ploop(&g_p->res.fs))
 	{
 		if (! is_ploop_supported()) {
 			ret=VZ_PLOOP_UNSUP;
@@ -1267,7 +1267,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 	}
 	/* Warn that --diskinodes is ignored for ploop CT */
 	if (cmd_p->res.dq.diskinodes &&
-			ve_private_is_ploop(g_p->res.fs.private))
+			ve_private_is_ploop(&g_p->res.fs))
 	{
 		logger(0, 0, "Warning: --diskinodes is ignored for "
 				"ploop-based container");
@@ -1712,7 +1712,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		break;
 #ifdef HAVE_PLOOP
 	case ACTION_CONVERT:
-		ret = convert(h, veid, g_p, cmd_p);
+		ret = convert(h, veid, g_p, cmd_p, vps_p);
 		break;
 	case ACTION_COMPACT:
 		ret = compact(h, veid, g_p, cmd_p);
@@ -1753,7 +1753,7 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		logger(0, 0, "Disk quota is not enabled, skipping operation");	\
 		break;								\
 	}									\
-	if (ve_private_is_ploop(g_p->res.fs.private)) {				\
+	if (ve_private_is_ploop(&g_p->res.fs)) {				\
 		ret = 0;							\
 		logger(0, 0, "CT is on ploop, disk quota is obsoleted, "	\
 				"skipping operation");				\
@@ -1788,15 +1788,14 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = vzctl_env_switch_snapshot(h, veid, g_p, &cmd_p->snap);
 		break;
 	case ACTION_SNAPSHOT_LIST:
-		ret = vzctl_env_snapshot_list(argc, argv, veid,
-				g_p->res.fs.private);
+		ret = vzctl_env_snapshot_list(argc, argv, veid, &g_p->res.fs);
 		break;
 	case ACTION_SNAPSHOT_MOUNT:
-		ret = vzctl_env_mount_snapshot(veid, g_p->res.fs.private,
+		ret = vzctl_env_mount_snapshot(veid, &g_p->res.fs,
 				cmd_p->snap.target, cmd_p->snap.guid);
 		break;
 	case ACTION_SNAPSHOT_UMOUNT:
-		ret = vzctl_env_umount_snapshot(veid, g_p->res.fs.private,
+		ret = vzctl_env_umount_snapshot(veid, &g_p->res.fs,
 				cmd_p->snap.guid);
 		break;
 #endif

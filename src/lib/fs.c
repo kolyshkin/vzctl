@@ -44,7 +44,7 @@ int fsmount(envid_t veid, fs_param *fs, dq_param *dq, int fsck)
 		logger(-1, 0, "Can't create mount point %s", fs->root);
 		return VZ_FS_MPOINTCREATE;
 	}
-	if (ve_private_is_ploop(fs->private)) {
+	if (ve_private_is_ploop(fs)) {
 		if (! is_ploop_supported())
 			return VZ_PLOOP_UNSUP;
 #ifdef HAVE_PLOOP
@@ -120,7 +120,7 @@ int fsumount(envid_t veid, const fs_param *fs)
 {
 	umount_submounts(fs->root);
 
-	if (ve_private_is_ploop(fs->private)) {
+	if (ve_private_is_ploop(fs)) {
 		if (! is_ploop_supported())
 			return VZ_PLOOP_UNSUP;
 #ifdef HAVE_PLOOP

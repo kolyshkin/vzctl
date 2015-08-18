@@ -19,7 +19,7 @@
 #define	_DESTROY_H_
 #include "res.h"
 
-int vps_destroy_dir(envid_t veid, char *dir);
+int vps_destroy_dir(envid_t veid, char *dir, int layout);
 int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs,  cpt_param *cpt);
 int del_dir(char *dir);
 int destroydir(char *dir);

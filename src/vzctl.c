@@ -343,6 +343,8 @@ int main(int argc, char *argv[], char *envp[])
 			ret = VZ_INVALID_PARAMETER_VALUE;
 			goto error;
 		}
+		/* do not use the layout from global config, autodetect it */
+		gparam->res.fs.layout = 0;
 	} else if (action != ACTION_CREATE &&
 			action != ACTION_STATUS &&
 			action != ACTION_SET)
