@@ -159,12 +159,11 @@ static int fs_create(envid_t veid, vps_handler *h, vps_param *vps_p)
 	const char *ext[] = { "", ".gz", ".bz2", ".xz", NULL };
 	const char *errmsg_ext = "[.gz|.bz2|.xz]";
 	dq_param *dq = &vps_p->res.dq;
-	int layout = vps_p->opt.layout;
 	fs_param *fs = &vps_p->res.fs;
 	tmpl_param *tmpl = &vps_p->res.tmpl;
 	unsigned long uid_offset = 0;
 	unsigned long gid_offset = 0;
-	int ploop = (layout == VE_LAYOUT_PLOOP);
+	int ploop = (fs->layout == VE_LAYOUT_PLOOP);
 	struct destroy_ve ddata;
 	struct vzctl_cleanup_handler *ch;
 #ifdef HAVE_PLOOP
@@ -250,7 +249,7 @@ find:
 		/* Create and mount ploop image */
 		struct vzctl_create_image_param param = {};
 		struct vzctl_mount_param mount_param = {};
-		int ploop_mode = vps_p->opt.mode;
+		int ploop_mode = fs->mode;
 
 		if (ploop_mode < 0)
 			ploop_mode = PLOOP_EXPANDED_MODE;
@@ -444,15 +443,15 @@ int vps_create(vps_handler *h, envid_t veid, vps_param *vps_p, vps_param *cmd_p,
 		goto err_cfg;
 	}
 
-	if (vps_p->opt.layout == 0) {
+	if (vps_p->res.fs.layout == 0) {
 #ifdef HAVE_PLOOP
-		vps_p->opt.layout = VE_LAYOUT_PLOOP;
+		vps_p->res.fs.layout = VE_LAYOUT_PLOOP;
 #else
-		vps_p->opt.layout = VE_LAYOUT_SIMFS;
+		vps_p->res.fs.layout = VE_LAYOUT_SIMFS;
 #endif
 	}
 
-	if (vps_p->opt.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
+	if (vps_p->res.fs.layout == VE_LAYOUT_PLOOP && !is_ploop_supported()) {
 		logger(-1, 0, "Alternatively, if you can't or don't want to use ploop, please");
 		logger(-1, 0, "add --layout simfs option, or set VE_LAYOUT=simfs in " GLOBAL_CFG);
 		ret = VZ_PLOOP_UNSUP;

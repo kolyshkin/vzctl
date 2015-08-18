@@ -489,8 +489,8 @@ static int parse_convert_opt(envid_t veid, int argc, char **argv,
 static int convert(vps_handler *h, envid_t veid, vps_param *g_p,
 		vps_param *cmd_p)
 {
-	int layout = cmd_p->opt.layout;
-	int mode = cmd_p->opt.mode;
+	int layout = cmd_p->res.fs.layout;
+	int mode = cmd_p->res.fs.mode;
 
 	/* Set defaults if not specified */
 	if (layout == 0)

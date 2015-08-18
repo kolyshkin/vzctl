@@ -2299,8 +2299,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = conf_parse_str(&vps_p->res.fs.tmpl, val);
 		break;
 	case PARAM_VE_LAYOUT:
-		ret = parse_ve_layout(&vps_p->opt.layout,
-				&vps_p->opt.mode, val);
+		ret = parse_ve_layout(&vps_p->res.fs.layout,
+				&vps_p->res.fs.mode, val);
 		break;
 	case PARAM_DEF_OSTEMPLATE:
 		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val);
@@ -2847,7 +2847,7 @@ vps_param *init_vps_param()
 	param->res.io.ioprio = -1;
 	param->res.io.iolimit = -1;
 	param->res.io.iopslimit = -1;
-	param->opt.mode = -1;
+	param->res.fs.mode = -1;
 	param->res.misc.stop_timeout = -1;
 
 	return param;
@@ -3095,8 +3095,6 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_INT(start_force)
 	MERGE_INT(setmode)
 	MERGE_INT(apply_cfg_map)
-	MERGE_INT(layout)
-	MERGE_INT2(mode)
 
 	MERGE_STR(config)
 	MERGE_STR(origin_sample)
@@ -3118,6 +3116,8 @@ static void merge_fs(fs_param *dst, fs_param *src)
 	MERGE_STR(tmpl)
 	MERGE_STR(mount_opts)
 	MERGE_INT(flags)
+	MERGE_INT(layout)
+	MERGE_INT2(mode)
 }
 
 static void merge_tmpl(tmpl_param *dst, tmpl_param *src)
