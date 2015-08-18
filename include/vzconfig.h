@@ -31,11 +31,11 @@ typedef struct vps_config {
 	int id;		/* command line option id */
 } vps_config;
 
-int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
+int vps_parse_config(envid_t veid, const char *path, vps_param *vps_p,
 	struct mod_action *action);
 int vps_parse_opt(envid_t veid, struct option *opts, vps_param *param,
 	int opt, char *rval, struct mod_action *action);
-int vps_save_config(envid_t veid, char *path, vps_param *new_p,
+int vps_save_config(envid_t veid, const char *path, vps_param *new_p,
 	vps_param *old_p, struct mod_action *action);
 vps_param *reread_vps_config(envid_t veid);
 

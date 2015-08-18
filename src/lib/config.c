@@ -2530,7 +2530,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 /*	CT parse config stuff				*/
 /********************************************************/
 
-int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
+int vps_parse_config(envid_t veid, const char *path, vps_param *vps_p,
 	struct mod_action *action)
 {
 	char *str;
@@ -2657,7 +2657,7 @@ err:
 /********************************************************/
 /*	CT save config stuff				*/
 /********************************************************/
-static int read_conf(char *fname, list_head_t *conf_h)
+static int read_conf(const char *fname, list_head_t *conf_h)
 {
 	FILE *fp;
 	char str[16384];
@@ -2674,7 +2674,7 @@ static int read_conf(char *fname, list_head_t *conf_h)
 	return 0;
 }
 
-static int write_conf(char *fname, list_head_t *head)
+static int write_conf(const char *fname, list_head_t *head)
 {
 	char *tmpfile, *file;
 	conf_struct *conf;
@@ -2759,7 +2759,7 @@ static int vps_merge_conf(list_head_t *dst, list_head_t *src)
 	return cnt;
 }
 
-int vps_save_config(envid_t veid, char *path, vps_param *new_p,
+int vps_save_config(envid_t veid, const char *path, vps_param *new_p,
 	vps_param *old_p, struct mod_action *action)
 {
 	vps_param *tmp_old_p = NULL;
