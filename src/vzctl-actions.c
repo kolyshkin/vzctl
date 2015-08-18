@@ -330,7 +330,7 @@ static int try_restore(vps_handler *h, envid_t veid, vps_param *g_p,
 }
 
 static int start(vps_handler *h, envid_t veid, vps_param *g_p,
-	vps_param *cmd_p)
+	vps_param *cmd_p, vps_param *vps_p)
 {
 	int ret;
 	const char *private = g_p->res.fs.private;
@@ -372,6 +372,14 @@ static int start(vps_handler *h, envid_t veid, vps_param *g_p,
 	g_p->res.misc.wait = cmd_p->res.misc.wait;
 	ret = vps_start(h, veid, g_p, skip, &g_action);
 
+	if (!vps_p->res.fs.layout) {
+		int layout = ve_private_is_ploop(&vps_p->res.fs)
+			? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
+		logger(0, 0, "Saving VE layout '%s' to the VE config file",
+			layout == VE_LAYOUT_PLOOP ? "ploop" : "simfs");
+		save_ve_layout(veid, vps_p, layout);
+	}
+
 	return ret;
 }
 
@@ -395,7 +403,7 @@ static int stop(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *cmd_p)
 }
 
 static int restart(vps_handler *h, envid_t veid, vps_param *g_p,
-	vps_param *cmd_p)
+	vps_param *cmd_p, vps_param *vps_p)
 {
 	int ret;
 
@@ -407,7 +415,7 @@ static int restart(vps_handler *h, envid_t veid, vps_param *g_p,
 			return ret;
 	}
 
-	return start(h, veid, g_p, cmd_p);
+	return start(h, veid, g_p, cmd_p, vps_p);
 }
 
 static int parse_create_opt(envid_t veid, int argc, char **argv,
@@ -1289,7 +1297,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 			} else {
 				/* do restart */
 				merge_vps_param(g_p, cmd_p);
-				ret = restart(h, veid, g_p, cmd_p);
+				ret = restart(h, veid, g_p, cmd_p, vps_p);
 			}
 			goto err;
 		}
@@ -1702,13 +1710,13 @@ int run_action(envid_t veid, act_t action, vps_param *g_p, vps_param *vps_p,
 		ret = vps_umount(h, veid, &g_p->res.fs, 0);
 		break;
 	case ACTION_START:
-		ret = start(h, veid, g_p, cmd_p);
+		ret = start(h, veid, g_p, cmd_p, vps_p);
 		break;
 	case ACTION_STOP:
 		ret = stop(h, veid, g_p, cmd_p);
 		break;
 	case ACTION_RESTART:
-		ret = restart(h, veid, g_p, cmd_p);
+		ret = restart(h, veid, g_p, cmd_p, vps_p);
 		break;
 #ifdef HAVE_PLOOP
 	case ACTION_CONVERT:
