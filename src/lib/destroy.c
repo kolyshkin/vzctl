@@ -61,13 +61,14 @@ int del_dir(char *dir)
 	return ret;
 }
 
-int vps_destroy_dir(envid_t veid, char *dir)
+int vps_destroy_dir(envid_t veid, char *dir, int layout)
 {
-	int ret;
+	int ret, ploop;
 
 	logger(0, 0, "Destroying container private area: %s", dir);
 
-	if (!ve_private_is_ploop(dir)) {
+	ploop = layout ? (layout == VE_LAYOUT_PLOOP) : guess_ve_private_is_ploop(dir);
+	if (!ploop) {
 		if (!quota_ctl(veid, QUOTA_STAT))
 			if ((ret = quota_off(veid, 0)))
 				if ((ret = quota_off(veid, 1)))
@@ -268,7 +269,7 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 		logger(0, 0, "Container is currently mounted (umount first)");
 		return VZ_FS_MOUNTED;
 	}
-	ret = vps_destroy_dir(veid, fs->private);
+	ret = vps_destroy_dir(veid, fs->private, fs->layout);
 	move_config(veid, BACKUP);
 	if (destroy_dump(veid, cpt != NULL ? cpt->dumpdir : NULL) < 0)
 		logger(-1, errno, "Warning: failed to remove dump file");

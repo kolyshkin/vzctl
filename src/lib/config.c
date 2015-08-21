@@ -2126,6 +2126,37 @@ static int parse_ve_layout(int *layout, int *mode, const char *val)
 	return ERR_INVAL;
 }
 
+static int store_ve_layout(vps_param *old_p, vps_param *vps_p, vps_config *conf,
+		list_head_t *conf_h)
+{
+	int ret = 0;
+	int layout;
+
+	if (conf->id != PARAM_VE_LAYOUT)
+		return 0;
+
+	layout = vps_p->res.fs.layout ?: old_p->res.fs.layout;
+	if (layout) {
+		ret = conf_store_str(conf_h, conf->name,
+			layout == VE_LAYOUT_PLOOP ? "ploop" : "simfs");
+	}
+	return ret;
+}
+
+int save_ve_layout(int veid, vps_param *param, int layout)
+{
+	int ret;
+	struct vps_param *fixed;
+	char path[PATH_MAX];
+
+	fixed = init_vps_param();
+	fixed->res.fs.layout = layout;
+	get_vps_conf_path(veid, path, sizeof(path));
+	ret = vps_save_config(0, path, fixed, param, NULL);
+	free_vps_param(fixed);
+	return ret;
+}
+
 static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 {
 	int ret;
@@ -2299,8 +2330,8 @@ static int parse(envid_t veid, vps_param *vps_p, char *val, int id)
 		ret = conf_parse_str(&vps_p->res.fs.tmpl, val);
 		break;
 	case PARAM_VE_LAYOUT:
-		ret = parse_ve_layout(&vps_p->opt.layout,
-				&vps_p->opt.mode, val);
+		ret = parse_ve_layout(&vps_p->res.fs.layout,
+				&vps_p->res.fs.mode, val);
 		break;
 	case PARAM_DEF_OSTEMPLATE:
 		ret = conf_parse_str(&vps_p->res.tmpl.def_ostmpl, val);
@@ -2522,6 +2553,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 		store_netif(old_p, vps_p, conf, conf_h);
 		store_name(old_p, vps_p, conf, conf_h);
 		store_io(old_p, vps_p, conf, conf_h);
+		store_ve_layout(old_p, vps_p, conf, conf_h);
 	}
 	return 0;
 }
@@ -2530,7 +2562,7 @@ static int store(vps_param *old_p, vps_param *vps_p, list_head_t *conf_h)
 /*	CT parse config stuff				*/
 /********************************************************/
 
-int vps_parse_config(envid_t veid, char *path, vps_param *vps_p,
+int vps_parse_config(envid_t veid, const char *path, vps_param *vps_p,
 	struct mod_action *action)
 {
 	char *str;
@@ -2657,7 +2689,7 @@ err:
 /********************************************************/
 /*	CT save config stuff				*/
 /********************************************************/
-static int read_conf(char *fname, list_head_t *conf_h)
+static int read_conf(const char *fname, list_head_t *conf_h)
 {
 	FILE *fp;
 	char str[16384];
@@ -2674,7 +2706,7 @@ static int read_conf(char *fname, list_head_t *conf_h)
 	return 0;
 }
 
-static int write_conf(char *fname, list_head_t *head)
+static int write_conf(const char *fname, list_head_t *head)
 {
 	char *tmpfile, *file;
 	conf_struct *conf;
@@ -2759,7 +2791,7 @@ static int vps_merge_conf(list_head_t *dst, list_head_t *src)
 	return cnt;
 }
 
-int vps_save_config(envid_t veid, char *path, vps_param *new_p,
+int vps_save_config(envid_t veid, const char *path, vps_param *new_p,
 	vps_param *old_p, struct mod_action *action)
 {
 	vps_param *tmp_old_p = NULL;
@@ -2847,7 +2879,7 @@ vps_param *init_vps_param()
 	param->res.io.ioprio = -1;
 	param->res.io.iolimit = -1;
 	param->res.io.iopslimit = -1;
-	param->opt.mode = -1;
+	param->res.fs.mode = -1;
 	param->res.misc.stop_timeout = -1;
 
 	return param;
@@ -3095,8 +3127,6 @@ static void merge_opt(vps_opt *dst, vps_opt *src)
 	MERGE_INT(start_force)
 	MERGE_INT(setmode)
 	MERGE_INT(apply_cfg_map)
-	MERGE_INT(layout)
-	MERGE_INT2(mode)
 
 	MERGE_STR(config)
 	MERGE_STR(origin_sample)
@@ -3118,6 +3148,8 @@ static void merge_fs(fs_param *dst, fs_param *src)
 	MERGE_STR(tmpl)
 	MERGE_STR(mount_opts)
 	MERGE_INT(flags)
+	MERGE_INT(layout)
+	MERGE_INT2(mode)
 }
 
 static void merge_tmpl(tmpl_param *dst, tmpl_param *src)

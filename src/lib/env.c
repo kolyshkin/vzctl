@@ -632,7 +632,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 	if ((ret = check_ub(h, &res->ub)))
 		return ret;
 
-	ploop = ve_private_is_ploop(res->fs.private);
+	ploop = ve_private_is_ploop(&res->fs);
 	if (ploop && !is_ploop_supported())
 		return VZ_PLOOP_UNSUP;
 

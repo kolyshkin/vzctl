@@ -47,9 +47,9 @@ static void vzctl_get_snapshot_ve_conf(const char *private, const char *guid,
 			private, guid);
 }
 
-int is_snapshot_supported(const char *ve_private)
+int is_snapshot_supported(const fs_param *fs)
 {
-	if (! ve_private_is_ploop(ve_private)) {
+	if (! ve_private_is_ploop(fs)) {
 		logger(-1, 0, "Snapshot feature is only available "
 				"for ploop-based CTs");
 		return 0;
@@ -73,7 +73,7 @@ int vzctl_env_create_snapshot(vps_handler *h, envid_t veid,
 	struct ploop_disk_images_data *di = NULL;
 	struct vzctl_snapshot_tree *tree = NULL;
 
-	if (!is_snapshot_supported(fs->private))
+	if (!is_snapshot_supported(fs))
 		return VZCTL_E_CREATE_SNAPSHOT;
 	tree = vzctl_alloc_snapshot_tree();
 	if (tree == NULL)
@@ -198,7 +198,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 	struct ploop_disk_images_data *di = NULL;
 	struct ploop_snapshot_switch_param switch_param = {};
 
-	if (!is_snapshot_supported(fs->private))
+	if (!is_snapshot_supported(fs))
 		return VZCTL_E_SWITCH_SNAPSHOT;
 
 	GET_SNAPSHOT_XML(fname, fs->private);
@@ -387,7 +387,7 @@ int vzctl_env_delete_snapshot(vps_handler *h, envid_t veid,
 	char tmp[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
 
-	if (!is_snapshot_supported(fs->private))
+	if (!is_snapshot_supported(fs))
 		return VZCTL_E_DELETE_SNAPSHOT;
 
 	GET_SNAPSHOT_XML(fname, fs->private);
@@ -449,22 +449,23 @@ err:
 	return VZCTL_E_DELETE_SNAPSHOT;
 }
 
-int vzctl_env_mount_snapshot(unsigned veid, char *ve_private, char *mnt, char *guid)
+int vzctl_env_mount_snapshot(unsigned veid, const fs_param *fs,
+	char *mnt, char *guid)
 {
 	int ret;
 	char fname[PATH_MAX];
 	struct vzctl_snapshot_tree *tree = NULL;
 	struct vzctl_mount_param param = {};
 
-	if (ve_private == NULL)
+	if (fs->private == NULL)
 		return vzctl_err(VZ_VE_PRIVATE_NOTSET, 0,
 				"Failed to mount snapshot: "
 				"CT private not set");
 
-	if (!is_snapshot_supported(ve_private))
+	if (!is_snapshot_supported(fs))
 		return VZCTL_E_MOUNT_SNAPSHOT;
 
-	GET_SNAPSHOT_XML(fname, ve_private);
+	GET_SNAPSHOT_XML(fname, fs->private);
 	if (stat_file(fname) != 1)
 		return vzctl_err(VZCTL_E_MOUNT_SNAPSHOT, 0,
 				"Snapshot description file %s not found",
@@ -491,24 +492,24 @@ int vzctl_env_mount_snapshot(unsigned veid, char *ve_private, char *mnt, char *g
 	param.ro = 1;
 	param.target = mnt;
 	param.guid = guid;
-	return vzctl_mount_snapshot(veid, ve_private, &param);
+	return vzctl_mount_snapshot(veid, fs->private, &param);
 
 free_tree:
 	vzctl_free_snapshot_tree(tree);
 	return ret;
 }
 
-int vzctl_env_umount_snapshot(unsigned veid, char *ve_private, char *guid)
+int vzctl_env_umount_snapshot(unsigned veid, const fs_param *fs, char *guid)
 {
-	if (ve_private == NULL)
+	if (fs->private == NULL)
 		return vzctl_err(VZ_VE_PRIVATE_NOTSET, 0,
 				"Failed to umount snapshot: "
 				"CT private not set");
 
-	if (!is_snapshot_supported(ve_private))
+	if (!is_snapshot_supported(fs))
 		return VZCTL_E_UMOUNT_SNAPSHOT;
 
 	logger(0, 0, "Umounting snapshot %s", guid);
 
-	return vzctl_umount_snapshot(veid, ve_private, guid);
+	return vzctl_umount_snapshot(veid, fs->private, guid);
 }

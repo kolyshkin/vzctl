@@ -1150,6 +1150,7 @@ FOR_ALL_UBC(MERGE_UBC)
 	ve->disabled = opt->start_disabled;
 	if (opt->origin_sample != NULL)
 		ve->origin_sample = strdup(opt->origin_sample);
+	ve->layout = res->fs.layout;
 }
 
 static int read_ves_param()
@@ -1601,11 +1602,13 @@ static int get_mounted_status(int detailed)
 
 static int get_ves_layout()
 {
-	int i, ploop;
+	int i;
 
 	for (i = 0; i < n_veinfo; i++) {
-		ploop = ve_private_is_ploop(veinfo[i].private);
-		veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
+		if (veinfo[i].layout == 0) {
+			int ploop = guess_ve_private_is_ploop(veinfo[i].private);
+			veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
+		}
 	}
 
 	return 0;

@@ -37,6 +37,7 @@
 #include "env.h"
 #include "destroy.h"
 #include "cleanup.h"
+#include "vzconfig.h"
 
 #ifndef MAX
 #define MAX(a, b)	((a) > (b) ? (a) : (b))
@@ -73,13 +74,47 @@ int get_ploop_type(const char *type)
 	return -1;
 }
 
-int ve_private_is_ploop(const char *private)
+static int lstat_file(const char *path, struct stat *st)
 {
-	char image[PATH_MAX];
+	if (lstat(path, st) == -1) {
+		if (errno != ENOENT)
+			logger(-1, errno, "Can not access %s", path);
+		return 1;
+	}
+	return 0;
+}
 
-	GET_DISK_DESCRIPTOR(image, private);
+int guess_ve_private_is_ploop(const char *private)
+{
+	struct stat st;
+	char dd[PATH_MAX], dir[PATH_MAX];
 
-	return (stat_file(image) == 1);
+	/* first check that /root.hdd exists and is a directory */
+	snprintf(dir, sizeof(dir), "%s/root.hdd", private);
+	if (lstat_file(dir, &st))
+		return 0;
+	if (!S_ISDIR(st.st_mode)) {
+		logger(-1, 0, "Warning: %s is not a directory.\n"
+			"Please set the VE_LAYOUT parameter value in the VE config.", dir);
+	}
+
+	/* then look for /root.hdd/DiskDescriptor.xml */
+	GET_DISK_DESCRIPTOR(dd, private);
+	if (lstat_file(dd, &st))
+		return 0;
+	if (!S_ISREG(st.st_mode)) {
+		logger(-1, 0, "Warning: %s is not a regular file.\n"
+			"Please set the VE_LAYOUT parameter value in the VE config.", dd);
+	}
+	/* TODO: check whether base image from DD.xml is a regular file */
+	return 1;
+}
+
+int ve_private_is_ploop(const struct fs_param *fs)
+{
+	if (fs->layout)
+		return fs->layout == VE_LAYOUT_PLOOP;
+	return guess_ve_private_is_ploop(fs->private);
 }
 
 #ifdef HAVE_PLOOP
@@ -578,7 +613,7 @@ int vzctl_umount_snapshot(unsigned envid, const char *ve_private, char *guid)
 }
 
 /* Convert a CT to ploop layout */
-int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
+int vzctl_env_convert_ploop(vps_handler *h, envid_t veid, vps_param *vps_p,
 		fs_param *fs, dq_param *dq, int mode)
 {
 	struct vzctl_create_image_param param = {};
@@ -588,7 +623,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 	char new_private[STR_SIZE];
 	char tmp_private[STR_SIZE];
 
-	if (ve_private_is_ploop(fs->private)) {
+	if (ve_private_is_ploop(fs)) {
 		logger(0, 0, "CT is already on ploop");
 		return 0;
 	}
@@ -656,9 +691,15 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid,
 		goto err;
 	}
 	/* Move new private to its place */
-	if (rename(new_private, fs->private)) {
-		logger(-1, errno, "Can't rename %s to %s",
+	if (rename(new_private, fs->private))
+		ret = errno;
+	else
+		ret2 = save_ve_layout(veid, vps_p, VE_LAYOUT_PLOOP);
+	if (ret || ret2) {
+		if (ret) {
+			logger(-1, ret, "Can't rename %s to %s",
 				new_private, fs->private);
+		}
 
 		/* try to restore old private back */
 		if (rename(tmp_private, fs->private)) {

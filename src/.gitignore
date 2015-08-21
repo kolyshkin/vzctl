@@ -13,3 +13,5 @@ vzlist
 vzmemcheck
 vzsplit
 vzeventd
+vzfsync
+vznnc
