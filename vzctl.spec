@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.9.3
+Version: 4.9.4
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -300,6 +300,10 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Mon Aug 24 2015 Sergey Bronnikov <sergeyb@openvz.org> - 4.9.4-1
+- store VE layout to VE config on start
+- store VE layout in VE config during create and convert
+
 * Mon Jul 27 2015 Kir Kolyshkin <kir@openvz.org> - 4.9.3-1
 - set_console.sh: ubuntu 15.04 systemd console support
 - vzoversell: handle unlimited RAM CTs
