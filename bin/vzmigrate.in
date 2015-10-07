@@ -412,7 +412,7 @@ ploop_copy() {
 
 		# check if ssh is still there
 		kill -0 $pid 2>/dev/null && break
-		let try=try+1
+		try=$((try+1))
 	done
 
 	if [ $try = 5 ]; then
