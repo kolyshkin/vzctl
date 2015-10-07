@@ -55,7 +55,6 @@ EOF
 
 CTIDS=""
 FILE=""
-WATCH=""
 ARGV=$*
 
 # For vzlist to work, make sure @SBINDIR@ is in $PATH
