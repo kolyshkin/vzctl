@@ -1579,6 +1579,10 @@ static int get_mounted_status(int detailed)
 	char buf[512];
 
 	for (i = 0; i < n_veinfo; i++) {
+		if (veinfo[i].layout == 0) {
+			int ploop = guess_ve_private_is_ploop(veinfo[i].private);
+			veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
+		}
 		if (veinfo[i].status == VE_RUNNING)
 			continue;
 		if (veinfo[i].private == NULL ||
@@ -1597,20 +1601,6 @@ static int get_mounted_status(int detailed)
 		if (vps_is_mounted(veinfo[i].root, veinfo[i].private) == 1)
 			veinfo[i].status = VE_MOUNTED;
 	}
-	return 0;
-}
-
-static int get_ves_layout()
-{
-	int i;
-
-	for (i = 0; i < n_veinfo; i++) {
-		if (veinfo[i].layout == 0) {
-			int ploop = guess_ve_private_is_ploop(veinfo[i].private);
-			veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
-		}
-	}
-
 	return 0;
 }
 
@@ -1844,7 +1834,6 @@ static int collect()
 	if (check_param(RES_IO))
 		update_ves_io();
 	get_mounted_status(check_param(RES_STATUS));
-	get_ves_layout();
 	if (check_param(RES_QUOTA)) {
 		get_run_quota_stat();
 		get_ves_ploop_info();
