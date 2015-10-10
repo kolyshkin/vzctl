@@ -1577,12 +1577,15 @@ static int get_mounted_status(int detailed)
 {
 	int i;
 	char buf[512];
+	fs_param fs = {};
 
 	for (i = 0; i < n_veinfo; i++) {
 		if (veinfo[i].layout == 0) {
 			int ploop = guess_ve_private_is_ploop(veinfo[i].private);
 			veinfo[i].layout = ploop ? VE_LAYOUT_PLOOP : VE_LAYOUT_SIMFS;
 		}
+		fs.layout = veinfo[i].layout;
+
 		if (veinfo[i].status == VE_RUNNING)
 			continue;
 		if (veinfo[i].private == NULL ||
@@ -1598,7 +1601,9 @@ static int get_mounted_status(int detailed)
 			veinfo[i].status = VE_SUSPENDED;
 		if (veinfo[i].root == NULL)
 			continue;
-		if (vps_is_mounted(veinfo[i].root, veinfo[i].private) == 1)
+		fs.root = veinfo[i].root;
+		fs.private = veinfo[i].private;
+		if (vps_is_mounted(&fs) == 1)
 			veinfo[i].status = VE_MOUNTED;
 	}
 	return 0;

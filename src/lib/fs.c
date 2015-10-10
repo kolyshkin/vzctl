@@ -155,7 +155,7 @@ int vps_mount(vps_handler *h, envid_t veid, fs_param *fs, dq_param *dq,
 		return VZ_VE_ROOT_NOTSET;
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
-	if (vps_is_mounted(fs->root, fs->private) == 1) {
+	if (vps_is_mounted(fs) == 1) {
 		logger(-1, 0, "Container is already mounted");
 		return 0;
 	}
@@ -208,7 +208,7 @@ int vps_umount(vps_handler *h, envid_t veid, const fs_param *fs,
 	char buf[PATH_LEN];
 	int ret, i;
 
-	if (vps_is_mounted(fs->root, fs->private) == 0) {
+	if (vps_is_mounted(fs) == 0) {
 		logger(-1, 0, "CT is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}
@@ -257,7 +257,7 @@ int vps_set_fs(fs_param *g_fs, fs_param *fs)
 		return VZ_VE_ROOT_NOTSET;
 	if (check_var(g_fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
-	if (vps_is_mounted(g_fs->root, g_fs->private) == 0) {
+	if (vps_is_mounted(g_fs) == 0) {
 		logger(-1, 0, "Container is not mounted");
 		return VZ_FS_NOT_MOUNTED;
 	}

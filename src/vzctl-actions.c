@@ -544,7 +544,7 @@ static int compact(vps_handler *h, envid_t veid, vps_param *g_p,
 		return 0;
 	}
 
-	mounted = vps_is_mounted(root, private);
+	mounted = vps_is_mounted(&g_p->res.fs);
 	if (mounted == 0)
 	{
 		ret = vps_mount(h, veid, &g_p->res.fs, &g_p->res.dq,
@@ -1253,8 +1253,7 @@ static int set(vps_handler *h, envid_t veid, vps_param *g_p, vps_param *vps_p,
 		}
 		/* offline resize requires unmounted container */
 		if (cmd_p->res.dq.offline_resize == YES) {
-			int is_mounted = (vps_is_mounted(g_p->res.fs.root,
-						g_p->res.fs.private) == 1);
+			int is_mounted = (vps_is_mounted(&g_p->res.fs) == 1);
 
 			if (is_run || is_mounted) {
 				logger(-1, 0, "Option --offline-resize "
@@ -1512,7 +1511,7 @@ static int show_status(vps_handler *h, envid_t veid, vps_param *param)
 	get_vps_conf_path(veid, buf, sizeof(buf));
 	exist = (fs->private != NULL && stat_file(fs->private) == 1
 			&& stat_file(buf) == 1);
-	mounted = (vps_is_mounted(fs->root, fs->private) == 1);
+	mounted = (vps_is_mounted(fs) == 1);
 	run = vps_is_run(h, veid);
 	if (exist && !run) {
 		get_dump_file(veid, param->res.cpt.dumpdir, buf, sizeof(buf));

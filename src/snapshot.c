@@ -259,7 +259,7 @@ int vzctl_env_switch_snapshot(vps_handler *h, envid_t veid,
 		ret = vps_chkpnt(h, veid, fs, CMD_SUSPEND, &cpt);
 		if (ret)
 			goto err1;
-	} else if (vps_is_mounted(fs->root, fs->private) == 1) {
+	} else if (vps_is_mounted(fs) == 1) {
 		if (vps_umount(h, veid, fs, 0))
 			goto err1;
 	}

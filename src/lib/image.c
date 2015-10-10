@@ -634,7 +634,7 @@ int vzctl_env_convert_ploop(vps_handler *h, envid_t veid, vps_param *vps_p,
 		logger(-1, 0, "CT is running (stop it first)");
 		return VZ_VE_RUNNING;
 	}
-	if (vps_is_mounted(fs->root, fs->private) == 1) {
+	if (vps_is_mounted(fs) == 1) {
 		logger(-1, 0, "CT is mounted (umount it first)");
 		return VZ_FS_MOUNTED;
 	}

@@ -644,7 +644,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 
 	if (!(skip & SKIP_REMOUNT)) {
 		/* if CT is mounted -- umount first, to cleanup mount state */
-		if (vps_is_mounted(res->fs.root, res->fs.private) == 1) {
+		if (vps_is_mounted(&res->fs) == 1) {
 			vps_umount(h, veid, &res->fs, skip);
 		}
 #ifdef HAVE_PLOOP
@@ -653,7 +653,7 @@ int vps_start_custom(vps_handler *h, envid_t veid, vps_param *param,
 #endif
 	}
 
-	if (vps_is_mounted(res->fs.root, res->fs.private) != 1) {
+	if (vps_is_mounted(&res->fs) != 1) {
 		/* increase quota to perform setup */
 		if (!ploop)
 			quota_inc(&res->dq, 100);
@@ -801,7 +801,7 @@ err:
 		/* restore original quota values */
 		if (!ploop)
 			vps_set_quota(veid, &res->dq);
-		if ((vps_is_mounted(res->fs.root, res->fs.private) == 1) &&
+		if ((vps_is_mounted(&res->fs) == 1) &&
 				!(skip & SKIP_UMOUNT))
 			vps_umount(h, veid, &res->fs, skip);
 	}

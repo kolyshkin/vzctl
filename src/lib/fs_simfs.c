@@ -35,10 +35,12 @@
  *   0: not mounted
  *  -1: error getting status
  */
-int vps_is_mounted(const char *root, const char *private)
+int vps_is_mounted(const fs_param *fs)
 {
 	struct stat st1, st2;
 	char parent[PATH_MAX];
+	const char *root = fs->root;
+	const char *private = fs->private;
 
 	if (!root || !private)
 		return -1;
