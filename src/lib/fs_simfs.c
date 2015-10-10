@@ -44,6 +44,22 @@ int vps_is_mounted(const fs_param *fs)
 
 	if (!root || !private)
 		return -1;
+#if TREAT_SEMI_MOUNTED_PLOOP_AS_MOUNTED
+	/* There can be a weird case -- CT is on ploop, ploop itself
+	 * is mounted but the filesystem is not -- some "semi-mounted"
+	 * state.  We consider this state as not mounted, because
+	 * there's no data in VE_PRIVATE.
+	 * Because of this consideration, below code is disabled.
+	 * If you'll ever want to enable it, please make sure to
+	 * #include "image.h"
+	 */
+	if (fs->layout == VE_LAYOUT_PLOOP && !is_ploop_supported())
+		return VZ_PLOOP_UNSUP;
+#ifdef HAVE_PLOOP
+	return is_image_mounted(private);
+#endif
+
+#endif
 
 	if (stat(root, &st1)) {
 		logger(-1, errno, "stat(%s)", root);
