@@ -255,6 +255,7 @@ int destroy_dump(envid_t veid, const char *dumpdir)
 int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 {
 	int ret;
+	int ploop;
 
 	if (check_var(fs->private, "VE_PRIVATE is not set"))
 		return VZ_VE_PRIVATE_NOTSET;
@@ -269,6 +270,15 @@ int vps_destroy(vps_handler *h, envid_t veid, fs_param *fs, cpt_param *cpt)
 		logger(0, 0, "Container is currently mounted (umount first)");
 		return VZ_FS_MOUNTED;
 	}
+
+	ploop = ve_private_is_ploop(fs);
+	if (ploop && !is_ploop_supported())
+		return VZ_PLOOP_UNSUP;
+#ifdef HAVE_PLOOP
+	if (ploop && (is_image_mounted(fs->private)))
+		if (vzctl_umount_image(fs->private))
+			return VZ_FS_MOUNTED;
+#endif
 	ret = vps_destroy_dir(veid, fs->private, fs->layout);
 	move_config(veid, BACKUP);
 	if (destroy_dump(veid, cpt != NULL ? cpt->dumpdir : NULL) < 0)
