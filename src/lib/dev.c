@@ -64,7 +64,7 @@ static int create_tmpfiles_d_entry(const char *prefix,
 		return vzctl_err(-1, errno, "Failed to create %s", buf);
 	fprintf(fp, "%c /dev/%s 0700 root root - %d:%d\n",
 			(mode & S_IFBLK) ? 'b' : 'c',
-			name, gnu_dev_major(dev), gnu_dev_minor(dev));
+			name, major(dev), minor(dev));
 	fclose(fp);
 
 	return 0;

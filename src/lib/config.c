@@ -2715,7 +2715,7 @@ static int write_conf(const char *fname, list_head_t *head)
 	const char *suffix = ".tmp";
 	char *fmt;
 
-	file = canonicalize_file_name(fname);
+	file = realpath(fname, NULL);
 	if (file == NULL) {
 		if (errno != ENOENT) {
 			logger(-1, errno, "Unable to resolve path %s", fname);
