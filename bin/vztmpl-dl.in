@@ -72,7 +72,7 @@ usage()
 Usage:
   $SELF [option ...] <template> [<template> ...]
   $SELF [option ...] --update-all
-  $SELF --list-remove | --list-local | --list-all | --list-orphans
+  $SELF --list-remote | --list-local | --list-all | --list-orphans
   $SELF --config | --help
 Options:
   --gpg-check		Check GPG signatures of downloaded files
