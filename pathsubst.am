@@ -31,4 +31,4 @@ pathsubst = sed -e '$(pathsubst_RULES)'
 
 %: %.in
 	$(AM_V_GEN)$(pathsubst) $< > $@
-	@chmod --reference=$< $@ || true
+	@chmod --reference=$< $@ 2>/dev/null || true
