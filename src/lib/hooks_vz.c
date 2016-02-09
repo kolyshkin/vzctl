@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <limits.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <linux/vzcalluser.h>

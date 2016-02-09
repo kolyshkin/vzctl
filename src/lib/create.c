@@ -27,6 +27,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <limits.h>
 
 #include "list.h"
 #include "logger.h"
