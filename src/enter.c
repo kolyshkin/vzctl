@@ -27,7 +27,7 @@
 #include <string.h>
 #include <linux/vzcalluser.h>
 #include <linux/limits.h>
-#include <wait.h>
+#include <sys/wait.h>
 #include <termios.h>
 #include <pty.h>
 #include <grp.h>

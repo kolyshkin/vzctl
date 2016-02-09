@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
-#include <wait.h>
+#include <sys/wait.h>
 
 #include "types.h"
 #include "logger.h"
