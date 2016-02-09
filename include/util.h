@@ -110,4 +110,15 @@ int vzctl_get_normalized_guid(const char *str, char *buf, int len);
 	((unsigned char *)dev)[4],      \
 	((unsigned char *)dev)[5]
 
+#if !HAVE_DECL_STRNDUPA
+#define strndupa(s, n) \
+  ({ \
+	const char *__old = (s); \
+	size_t __len = strnlen(__old, (n)); \
+	char *__new = (char *)alloca(__len + 1); \
+	__new[__len] = '\0'; \
+	(char *)memcpy(__new, __old, __len); \
+ })
+#endif
+
 #endif

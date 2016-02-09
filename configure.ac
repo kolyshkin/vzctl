@@ -130,6 +130,8 @@ AC_CHECK_FUNCS([alarm bzero dup2 endgrent endpwent memset mkdir mkfifo \
 	strrchr strstr strtol strtoul strtoull uname],,
 	AC_MSG_ERROR([some needed function(s) not found]))
 
+AC_CHECK_DECLS([strndupa])
+
 AC_ARG_ENABLE([bashcomp],
               [AS_HELP_STRING([--enable-bashcomp],
                               [Enable bashcompletion support])],
