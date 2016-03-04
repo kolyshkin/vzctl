@@ -255,9 +255,9 @@ function important(id, held, maxheld, barrier, limit, failcnt) {
 
 function prepare_header() {
 	header=sprintf( c_h \
-"----------------------------------------------------------------%s\n" \
-"CT %-10s| HELD%s Bar%% Lim%%| MAXH Bar%% Lim%%| BAR | LIM |%cFAIL\n" \
-"-------------+-%s--------------+---------------+-----+-----+------" \
+"--------------------------------------------------------------------%s\n" \
+"CT %-10s| HELD%s  Bar%%  Lim%%| MAXH  Bar%%  Lim%%| BAR | LIM |%cFAIL\n" \
+"-------------+-%s----------------+-----------------+-----+-----+------" \
 c_n, inc ? "-------" : "",
 bcid, inc ? "  +/-  " : "", rel ? "+" : " ", inc ? "-------" : "")
 }
@@ -367,7 +367,7 @@ BEGIN {
 		printf c_w;
 	else
 		printf c_n;
-	printf "%13s|%5s%s %4s %4s|%5s %4s %4s|%5s|%5s| %5s\n" c_n,
+	printf "%13s|%5s%s %5s %5s|%5s %5s %5s|%5s|%5s| %5s\n" c_n,
 		id,
 		hr(id, held), d_held, dp(held, barrier), dp(held, limit),
 		hr(id, maxheld), dp(maxheld, barrier), dp(maxheld, limit),
@@ -384,6 +384,6 @@ BEGIN {
 }
 END {
 	if (printed)
-		printf "----------------------------------------------------------------%s\n", inc ? "-------" : ""
+		printf "--------------------------------------------------------------------%s\n", inc ? "-------" : ""
 }
 '
