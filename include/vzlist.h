@@ -117,6 +117,7 @@ struct Cveinfo {
 	unsigned long long features_mask;
 	unsigned long long features_known;
 	float vm_overcommit;
+	unsigned long nf_mask; // netfilter
 };
 
 #define RES_NONE	0
