@@ -170,6 +170,7 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 		char *buf, int len)
 {
 	unsigned int i;
+	unsigned int j = 0;
 	int r;
 	char *sp, *ep;
 
@@ -191,7 +192,7 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 		else
 			continue;
 		r = snprintf(sp, ep - sp, "%s%s:%s",
-				i == 0 ? "" : delim,
+				j++ == 0 ? "" : delim,
 				cap_names[i],
 				op == 1 ? "on" : "off");
 		if (r < 0 || sp + r >= ep)
