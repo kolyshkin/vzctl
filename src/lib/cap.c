@@ -19,6 +19,7 @@
 #include <linux/unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <errno.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -199,6 +200,37 @@ void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 			break;
 		sp += r;
 	}
+}
+
+void print_json_cap(cap_param *cap)
+{
+	unsigned int i, j = 0;
+	unsigned int l = 0;
+	char lc[64] = "";
+
+	for (i = 0; i < ARRAY_SIZE(cap_names); i++) {
+		int op = 0;
+
+		if (CAP_TO_MASK(i) & cap->on)
+			op = 1;
+		else if (CAP_TO_MASK(i) & cap->off)
+			op = 2;
+		else
+			continue;
+
+		for (l=0; cap_names[i][l]; l++)
+			lc[l] = tolower(cap_names[i][l]);
+
+		printf("%s      \"%s\": %s",
+				j++ == 0 ? "{\n" : ",\n",
+				lc,
+				op ? "true" : "false");
+	}
+
+	if (j)
+		printf("\n    }");
+	else
+		printf("null");
 }
 
 static int set_cap_bound(cap_t mask)

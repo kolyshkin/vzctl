@@ -65,4 +65,6 @@ int vps_set_cap(envid_t veid, struct env_param *env, cap_param *cap,
 void build_cap_str(cap_param *new, cap_param *old, const char *delim,
 		char *buf, int len);
 
+void print_json_cap(cap_param *cap);
+
 #endif
