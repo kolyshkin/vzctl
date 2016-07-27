@@ -410,13 +410,14 @@ static void print_netfilter(struct Cveinfo *p, int index)
 
 static void print_capability(struct Cveinfo *p, int index)
 {
+	char buf[STR_SIZE] = "-";
+	unsigned int l;
+
 	if (fmt_json)
 		return print_json_cap(&p->cap);
 
-	char buf[STR_SIZE] = "-";
 	build_cap_str(&p->cap, NULL, ",", buf, sizeof(buf));
-	unsigned int l = 0;
-	for (l=0; buf[l]; l++)
+	for (l = 0; buf[l]; l++)
 		buf[l] = tolower(buf[l]);
 	p_buf += snprintf(p_buf, e_buf - p_buf,
 			"%-15s", buf);

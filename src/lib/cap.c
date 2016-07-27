@@ -218,7 +218,7 @@ void print_json_cap(cap_param *cap)
 		else
 			continue;
 
-		for (l=0; cap_names[i][l]; l++)
+		for (l = 0; cap_names[i][l]; l++)
 			lc[l] = tolower(cap_names[i][l]);
 
 		printf("%s      \"%s\": %s",
