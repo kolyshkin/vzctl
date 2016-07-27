@@ -30,6 +30,8 @@
 
 #define MAXCPUUNITS	500000
 
+#include "cap.h"
+
 enum {
 	VE_RUNNING,
 	VE_STOPPED,
@@ -117,6 +119,8 @@ struct Cveinfo {
 	unsigned long long features_mask;
 	unsigned long long features_known;
 	float vm_overcommit;
+	unsigned long nf_mask; // netfilter
+	cap_param cap; // capability
 };
 
 #define RES_NONE	0

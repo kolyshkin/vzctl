@@ -47,6 +47,7 @@
 #include "image.h"
 #include "vzfeatures.h"
 #include "io.h"
+#include "iptables.h"
 
 static struct Cveinfo *veinfo = NULL;
 static int n_veinfo = 0;
@@ -396,6 +397,29 @@ static void print_layout(struct Cveinfo *p, int index)
 	else
 		p_buf += snprintf(p_buf, e_buf - p_buf,
 				"%-6s",	layout2str(p->layout));
+}
+
+static void print_netfilter(struct Cveinfo *p, int index)
+{
+	if (fmt_json)
+		print_json_str(netfilter_mask2str(p->nf_mask));
+	else
+		p_buf += snprintf(p_buf, e_buf - p_buf,
+				"%-9s",	netfilter_mask2str(p->nf_mask));
+}
+
+static void print_capability(struct Cveinfo *p, int index)
+{
+	if (fmt_json)
+		return print_json_cap(&p->cap);
+
+	char buf[STR_SIZE] = "-";
+	build_cap_str(&p->cap, NULL, ",", buf, sizeof(buf));
+	unsigned int l = 0;
+	for (l=0; buf[l]; l++)
+		buf[l] = tolower(buf[l]);
+	p_buf += snprintf(p_buf, e_buf - p_buf,
+			"%-15s", buf);
 }
 
 static void print_features(struct Cveinfo *p, int index)
@@ -767,6 +791,8 @@ UBC_FIELD(swappages, SWAPP),
 {"disabled", "DISABL", "%6s", 0, RES_NONE, print_disabled, none_sort_fn},
 {"vm_overcommit", "VM_OVC", "%6s", 0, RES_NONE,
 	print_vm_overcommit, none_sort_fn},
+{"netfilter", "NETFILTER", "%-9s", 0, RES_NONE, print_netfilter, none_sort_fn},
+{"capability", "CAPABILITY", "%-15s", 0, RES_NONE, print_capability, none_sort_fn},
 };
 
 static void *x_malloc(int size)
@@ -1151,6 +1177,8 @@ FOR_ALL_UBC(MERGE_UBC)
 	if (opt->origin_sample != NULL)
 		ve->origin_sample = strdup(opt->origin_sample);
 	ve->layout = res->fs.layout;
+	ve->nf_mask = res->env.nf_mask;
+	ve->cap = res->cap;
 }
 
 static int read_ves_param()
