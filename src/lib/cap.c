@@ -224,7 +224,7 @@ void print_json_cap(cap_param *cap)
 		printf("%s      \"%s\": %s",
 				j++ == 0 ? "{\n" : ",\n",
 				lc,
-				op ? "true" : "false");
+				op == 1 ? "true" : "false");
 	}
 
 	if (j)
