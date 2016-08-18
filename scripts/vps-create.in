@@ -56,6 +56,8 @@ create_prvt()
 	case $HEADER in
 		' 1f 8b') # gzip
 			OPT=-z
+			# Use pigz for more fast uncompress template if we can
+			pigz -V >/dev/null 2>&1 && TAR_OPT="--use-compress-program=pigz ${TAR_OPT}" && OPT=""
 			NEEDED="$(gzip -l "$PRIVATE_TEMPLATE" | \
 				awk 'END {print int($2/1024)}')"
 			;;
