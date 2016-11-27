@@ -11,7 +11,7 @@
 
 Summary: OpenVZ containers control utility
 Name: vzctl
-Version: 4.9.4
+Version: 4.10
 %define rel 1
 Release: %{rel}%{?dist}
 License: GPLv2+
@@ -300,6 +300,14 @@ OpenVZ containers control utility core package
 /sbin/ldconfig
 
 %changelog
+* Mon Nov 28 2016 Kir Kolyshkin <kir@openvz.org> - 4.10-1
+- postcreate.sh: support for Debian 8/Ubuntu 15.04+ xattrs
+- vzctl create: add pigz support (if available)
+- vzlist: add netfilter, capability output fields
+- compilation fixes for Alpine Linux / musl libc
+- vzctl destroy: handle the semi-mounted ploop
+- vzubc: allow for more than 999%
+
 * Mon Aug 24 2015 Sergey Bronnikov <sergeyb@openvz.org> - 4.9.4-1
 - store VE layout to VE config on start
 - store VE layout in VE config during create and convert
