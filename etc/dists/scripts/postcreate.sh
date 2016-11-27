@@ -126,10 +126,21 @@ set_file_caps()
 	local rhel7
 	local f15	# or greater
 	local f18	# or greater
+	local u15	# Ubuntu 15.xx or greater
+	local d8	# Debian 8 or greater
 
 	# openSUSE 13.1+
 	if grep -qw 'opensuse:13' ${VE_ROOT}/etc/os-release 2>/dev/null; then
 		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6
+	fi
+
+	d8=$(grep -E '^[8-9]|^1[0-9]' ${VE_ROOT}/etc/debian_version 2>/dev/null)
+	u15=$(grep -Ew 'Ubuntu 1[5-9]' /etc/lsb-release 2>/dev/null)
+
+	# Debian 8+ / Ubuntu 15.04+
+	if [ -n "$d8" -o -n "$u15" ]; then
+		_sc 0sAQAAAgAgAAAAAAAAAAAAAAAAAAA= /bin/ping /bin/ping6 /usr/bin/arping /usr/bin/traceroute6.iputils
+		_sc 0sAQAAAgIACAAAAAAAAAAAAAAAAAA= /usr/bin/systemd-detect-virt
 	fi
 
 	rhel7=$(grep 'release 7' ${VE_ROOT}/etc/redhat-release 2>/dev/null)
