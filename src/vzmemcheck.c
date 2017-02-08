@@ -249,6 +249,7 @@ int main(int argc, char **argv)
 			break;
 		case 'h':
 			usage(0);
+			break;
 		default:
 			usage(1);
 		}
