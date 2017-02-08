@@ -417,7 +417,7 @@ static int conf_store_int(list_head_t *conf, const char *name, int val)
 
 static int conf_store_float(list_head_t *conf, const char *name, float val)
 {
-	char buf[] = "1.34567e+12";
+	char buf[16];
 
 	snprintf(buf, sizeof(buf), "%g", val);
 	return conf_store_str(conf, name, buf);
