@@ -78,13 +78,16 @@ static int fill_2quota_param(struct setup_env_quota_param *p,
 /** Give Container permissions to do quotactl operations on its root.
  *
  */
-static int vps_2quota_perm(vps_handler *h, int veid, dev_t device)
+static int vps_2quota_perm(vps_handler *h, int veid, dev_t device,
+			   const struct fs_param *fs)
 {
 	dev_res dev = { };
 
 	dev.dev = device;
 	dev.type = S_IFBLK | VE_USE_MINOR;
 	dev.mask = S_IXGRP;
+	if (ve_private_is_ploop(fs))
+		dev.mask |= S_IROTH;
 	return h->setdevperm(h, veid, &dev);
 }
 
@@ -134,7 +137,7 @@ int vps_setup_res(vps_handler *h, envid_t veid, dist_actions *actions,
 		struct setup_env_quota_param qp;
 		if ((ret = fill_2quota_param(&qp, fs)))
 			return ret;
-		if ((ret = vps_2quota_perm(h, veid, qp.dev)))
+		if ((ret = vps_2quota_perm(h, veid, qp.dev, fs)))
 			return ret;
 		if ((ret = vps_execFn(h, veid, fs->root,
 					(execFn)setup_env_quota, &qp,
