@@ -25,6 +25,7 @@
 #include <arpa/inet.h>
 #include <getopt.h>
 #include <sys/types.h>
+#include <sys/sysmacros.h>
 #include <sys/stat.h>
 #include <linux/vzcalluser.h>
 #include <unistd.h>

@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <netinet/in.h>
 #include <linux/vzcalluser.h>
 

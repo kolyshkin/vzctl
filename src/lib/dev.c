@@ -25,6 +25,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <limits.h>
+#include <sys/sysmacros.h>
 
 #include <linux/vzcalluser.h>
 
