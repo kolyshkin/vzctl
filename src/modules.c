@@ -122,7 +122,7 @@ void init_modules(struct mod_action *action, const char *name)
 	DIR *dir;
 	struct dirent *ent;
 	struct stat st;
-	char fname[256];
+	char fname[512];
 
 	dir = opendir(MODULESDIR);
 	if (!dir) {
